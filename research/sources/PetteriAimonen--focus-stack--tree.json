@@ -1,0 +1,904 @@
+{
+  "provenance": {
+    "repository": "PetteriAimonen/focus-stack",
+    "url": "https://github.com/PetteriAimonen/focus-stack",
+    "retrieved_at": "2026-11-15",
+    "default_branch": "master",
+    "commit": "0cd289e224fe24aead5b146faeaa46950775f346",
+    "commit_url": "https://github.com/PetteriAimonen/focus-stack/commit/0cd289e224fe24aead5b146faeaa46950775f346",
+    "commit_date": "2026-01-11T18:49:22Z",
+    "license_api_hint": "MIT",
+    "readme_path": "README.md"
+  },
+  "data": {
+    "sha": "0cd289e224fe24aead5b146faeaa46950775f346",
+    "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/0cd289e224fe24aead5b146faeaa46950775f346",
+    "tree": [
+      {
+        "path": ".github",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "251c9e3949024c89f4ad646fdbdd84fdebed9bc0",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/251c9e3949024c89f4ad646fdbdd84fdebed9bc0"
+      },
+      {
+        "path": ".github/workflows",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "849a61369f7ef609d6b2f5c195dab3a421d6bfb1",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/849a61369f7ef609d6b2f5c195dab3a421d6bfb1"
+      },
+      {
+        "path": ".github/workflows/release.yml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "947a56a487eacfb6cbe1844bcb6154e29c808cd5",
+        "size": 5809,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/947a56a487eacfb6cbe1844bcb6154e29c808cd5"
+      },
+      {
+        "path": ".github/workflows/run_tests.yml",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ed4e7f895e8399dece1e5dbf71a51c5fb5f10f22",
+        "size": 1013,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/ed4e7f895e8399dece1e5dbf71a51c5fb5f10f22"
+      },
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ef467c91328afbf95df481ba1cc010da78c02edf",
+        "size": 57,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/ef467c91328afbf95df481ba1cc010da78c02edf"
+      },
+      {
+        "path": "CMakeLists.txt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c07c03a24a7db40aa67ecda07ab7708ae57c3096",
+        "size": 1386,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/c07c03a24a7db40aa67ecda07ab7708ae57c3096"
+      },
+      {
+        "path": "Dockerfile",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4ed61f9bca4eb5f820f86c473f1a85bc2422a8f5",
+        "size": 401,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/4ed61f9bca4eb5f820f86c473f1a85bc2422a8f5"
+      },
+      {
+        "path": "LICENSE.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5f1656334a8a74f76fc42e4a1e7c774acde36cde",
+        "size": 1059,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/5f1656334a8a74f76fc42e4a1e7c774acde36cde"
+      },
+      {
+        "path": "Makefile",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0863e0fbeddaea664981036507b400a8f7bf01d0",
+        "size": 4821,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/0863e0fbeddaea664981036507b400a8f7bf01d0"
+      },
+      {
+        "path": "Makefile.windows",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "508f828e765ceb0c620a79a77710328e58094338",
+        "size": 2264,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/508f828e765ceb0c620a79a77710328e58094338"
+      },
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5588d467906187e39d848b34807e276e98cc606b",
+        "size": 7373,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/5588d467906187e39d848b34807e276e98cc606b"
+      },
+      {
+        "path": "debian",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "c2075b55efadddcf40d302a4df909580494d4228",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/c2075b55efadddcf40d302a4df909580494d4228"
+      },
+      {
+        "path": "debian/changelog",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "15817b2de32295cabfe6f5bf05cc63a6238d90ce",
+        "size": 554,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/15817b2de32295cabfe6f5bf05cc63a6238d90ce"
+      },
+      {
+        "path": "debian/compat",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f599e28b8ab0d8c9c57a486c89c4a5132dcbd3b2",
+        "size": 3,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/f599e28b8ab0d8c9c57a486c89c4a5132dcbd3b2"
+      },
+      {
+        "path": "debian/control",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b60427541a46db539d4e8f26bdc642d48ccdf2e4",
+        "size": 685,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/b60427541a46db539d4e8f26bdc642d48ccdf2e4"
+      },
+      {
+        "path": "debian/copyright",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "17e049f21b6f9b5b7dcf51c3f8396abcb03d4ad5",
+        "size": 1269,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/17e049f21b6f9b5b7dcf51c3f8396abcb03d4ad5"
+      },
+      {
+        "path": "debian/focus-stack-docs.docs",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b43bf86b50fd8d3529a0dc062c30006ed38f309e",
+        "size": 10,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/b43bf86b50fd8d3529a0dc062c30006ed38f309e"
+      },
+      {
+        "path": "debian/rules",
+        "mode": "100755",
+        "type": "blob",
+        "sha": "01f3043481692681d318a3da3916898d84a0045f",
+        "size": 44,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/01f3043481692681d318a3da3916898d84a0045f"
+      },
+      {
+        "path": "debian/source",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "91b36eb62cd6a56b0eb689d9cde9e0f28955e334",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/91b36eb62cd6a56b0eb689d9cde9e0f28955e334"
+      },
+      {
+        "path": "debian/source/format",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "163aaf8d82b6c54f23c45f32895dbdfdcc27b047",
+        "size": 12,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/163aaf8d82b6c54f23c45f32895dbdfdcc27b047"
+      },
+      {
+        "path": "docs",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "b303bd8c3fb9a2ca056aa95a897631c33f3e094e",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/b303bd8c3fb9a2ca056aa95a897631c33f3e094e"
+      },
+      {
+        "path": "docs/Algorithms.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4d8282da19702b3326d97980b0affa28066646d1",
+        "size": 7449,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/4d8282da19702b3326d97980b0affa28066646d1"
+      },
+      {
+        "path": "docs/focus-stack.1",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8f2da7d2df0d3179028d2b36eaadabb08b7e39b6",
+        "size": 7969,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/8f2da7d2df0d3179028d2b36eaadabb08b7e39b6"
+      },
+      {
+        "path": "docs/focus-stack.html",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "dedc75a21dfcb403b9af19f9338870cf490e5088",
+        "size": 11968,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/dedc75a21dfcb403b9af19f9338870cf490e5088"
+      },
+      {
+        "path": "docs/focus-stack.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "99cda8621d3c83a80c0c43ef9fbbf0d067478edf",
+        "size": 7821,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/99cda8621d3c83a80c0c43ef9fbbf0d067478edf"
+      },
+      {
+        "path": "docs/imgs",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "c4b5846d31b472d2c971c605ff686ce0631e6e76",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/c4b5846d31b472d2c971c605ff686ce0631e6e76"
+      },
+      {
+        "path": "docs/imgs/3d.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e3e587edc5d31b9f5684e67e0bb8e627698c8346",
+        "size": 125713,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/e3e587edc5d31b9f5684e67e0bb8e627698c8346"
+      },
+      {
+        "path": "docs/imgs/alignment.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "72e7824f0f997defaccaf6583850fb1074dca269",
+        "size": 185180,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/72e7824f0f997defaccaf6583850fb1074dca269"
+      },
+      {
+        "path": "docs/imgs/alignment_flow.png",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f45fdd623cf29587aea433d135dcfefc1552a43c",
+        "size": 41310,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/f45fdd623cf29587aea433d135dcfefc1552a43c"
+      },
+      {
+        "path": "docs/imgs/denoise.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "00b7cde1dc64f7b9cc585951a89c073ec9f2c75f",
+        "size": 43123,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/00b7cde1dc64f7b9cc585951a89c073ec9f2c75f"
+      },
+      {
+        "path": "docs/imgs/depth_inpainted.png",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9aca45f880c68a9c2052f5430adecf9b6bb99576",
+        "size": 305227,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/9aca45f880c68a9c2052f5430adecf9b6bb99576"
+      },
+      {
+        "path": "docs/imgs/depth_points.png",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "741193d176c65c1da65534802827969938a36bdb",
+        "size": 133853,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/741193d176c65c1da65534802827969938a36bdb"
+      },
+      {
+        "path": "docs/imgs/depth_raw.png",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e42a8c417bb45fdd02be18f0e0e9f8defa796303",
+        "size": 745776,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/e42a8c417bb45fdd02be18f0e0e9f8defa796303"
+      },
+      {
+        "path": "docs/imgs/reassignment.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "084995363a709fabec2c1e21c371c21cd5c08777",
+        "size": 479749,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/084995363a709fabec2c1e21c371c21cd5c08777"
+      },
+      {
+        "path": "docs/imgs/wavelet.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2893c5bf3bc962d3a287aace7977998e9b3b4a7c",
+        "size": 381583,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/2893c5bf3bc962d3a287aace7977998e9b3b4a7c"
+      },
+      {
+        "path": "examples",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "bd4cfe6e70661ccde05739d4c689c481d47ac82d",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/bd4cfe6e70661ccde05739d4c689c481d47ac82d"
+      },
+      {
+        "path": "examples/depthmap",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "3458b1db77e0c869a2b1a84ca51c80ac99fa8521",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/3458b1db77e0c869a2b1a84ca51c80ac99fa8521"
+      },
+      {
+        "path": "examples/depthmap/pcb_000.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a92242813d7f1a38ef2026dc93115a1def0d2781",
+        "size": 942841,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/a92242813d7f1a38ef2026dc93115a1def0d2781"
+      },
+      {
+        "path": "examples/depthmap/pcb_001.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a0ef191f996e8217e5731bdc63c4bd79511de848",
+        "size": 958227,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/a0ef191f996e8217e5731bdc63c4bd79511de848"
+      },
+      {
+        "path": "examples/depthmap/pcb_002.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8ae782c2c8dc0b0c23a11e8d1e019e679eb016f4",
+        "size": 1018203,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/8ae782c2c8dc0b0c23a11e8d1e019e679eb016f4"
+      },
+      {
+        "path": "examples/depthmap/pcb_003.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4747b5596ceed05cce34ff705f33307b4dcd4d56",
+        "size": 999741,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/4747b5596ceed05cce34ff705f33307b4dcd4d56"
+      },
+      {
+        "path": "examples/depthmap/pcb_004.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5b73c9bf046b86345259e9753516ed06a6891e54",
+        "size": 973064,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/5b73c9bf046b86345259e9753516ed06a6891e54"
+      },
+      {
+        "path": "examples/depthmap/pcb_005.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "43b5ef4ba7c2a6fab5b997b8a417ca72668de260",
+        "size": 991472,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/43b5ef4ba7c2a6fab5b997b8a417ca72668de260"
+      },
+      {
+        "path": "examples/depthmap/pcb_006.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6484a297205dbb1f4c648550a4fa94b56aad3708",
+        "size": 964363,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/6484a297205dbb1f4c648550a4fa94b56aad3708"
+      },
+      {
+        "path": "examples/depthmap/pcb_007.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "58c722e20ef8822d4c6a431275d09c8320d2c68b",
+        "size": 898955,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/58c722e20ef8822d4c6a431275d09c8320d2c68b"
+      },
+      {
+        "path": "examples/depthmap/pcb_008.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1ea5dfbb2fe90c4d16cd88099b9a66de9923a959",
+        "size": 866853,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/1ea5dfbb2fe90c4d16cd88099b9a66de9923a959"
+      },
+      {
+        "path": "examples/depthmap/pcb_009.JPG",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c9e194ed220a7490ada9ef8cc5a24c51bc79a50e",
+        "size": 838051,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/c9e194ed220a7490ada9ef8cc5a24c51bc79a50e"
+      },
+      {
+        "path": "examples/pcb",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "fd1a9f4b4c8ccd1186a3bef65d766d22c624ebc8",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/fd1a9f4b4c8ccd1186a3bef65d766d22c624ebc8"
+      },
+      {
+        "path": "examples/pcb/expected.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9dbbf461e15d2f36d8e0b80b966450ddbefd7611",
+        "size": 535898,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/9dbbf461e15d2f36d8e0b80b966450ddbefd7611"
+      },
+      {
+        "path": "examples/pcb/pcb_001.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "43e385c2dfd36fb351aa087412763c2d0288bee0",
+        "size": 334392,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/43e385c2dfd36fb351aa087412763c2d0288bee0"
+      },
+      {
+        "path": "examples/pcb/pcb_002.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e5274fae7c01f642427ccfe3ec58b2c8d8869220",
+        "size": 311787,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/e5274fae7c01f642427ccfe3ec58b2c8d8869220"
+      },
+      {
+        "path": "examples/pcb/pcb_003.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "88e6062a48692b66ea274f079cf3f39b2f701f69",
+        "size": 310288,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/88e6062a48692b66ea274f079cf3f39b2f701f69"
+      },
+      {
+        "path": "examples/pcb/pcb_004.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7ed88c72dbc9bb27adbd19ddf1b5fce4d312aaa1",
+        "size": 320674,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/7ed88c72dbc9bb27adbd19ddf1b5fce4d312aaa1"
+      },
+      {
+        "path": "examples/pcb/pcb_005.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "531652a1498ac97a0f763323dd4a554aee34d2fe",
+        "size": 346633,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/531652a1498ac97a0f763323dd4a554aee34d2fe"
+      },
+      {
+        "path": "examples/pcb/pcb_006.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7a9b33abf9d5a93608c3aa16afc052e3961a21ea",
+        "size": 326132,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/7a9b33abf9d5a93608c3aa16afc052e3961a21ea"
+      },
+      {
+        "path": "examples/pcb/pcb_007.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "bdc69fc76a689ead7658779f4cccaa5819a85415",
+        "size": 311782,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/bdc69fc76a689ead7658779f4cccaa5819a85415"
+      },
+      {
+        "path": "packaging",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "ccc45c1788b21c67e55c59265d8b8fe77ea05f31",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/ccc45c1788b21c67e55c59265d8b8fe77ea05f31"
+      },
+      {
+        "path": "packaging/focus-stack.desktop",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "957a76bcacc319abc64c02b6a7318608a27df832",
+        "size": 142,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/957a76bcacc319abc64c02b6a7318608a27df832"
+      },
+      {
+        "path": "packaging/macosx",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "7bf61e0d1600471ddf3d1cec36103cbd3742ee7a",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/7bf61e0d1600471ddf3d1cec36103cbd3742ee7a"
+      },
+      {
+        "path": "packaging/macosx/Info.plist",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7fe345419c2f4397da4cfc09d953a80006b4bb0d",
+        "size": 1297,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/7fe345419c2f4397da4cfc09d953a80006b4bb0d"
+      },
+      {
+        "path": "packaging/macosx/PkgInfo",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cda79fa55dd707900370bef701e8daa5d0dadc2c",
+        "size": 9,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/cda79fa55dd707900370bef701e8daa5d0dadc2c"
+      },
+      {
+        "path": "packaging/macosx/focus-stack-gui.scpt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4bf137413bc675005713d1f1715faeae3949715b",
+        "size": 1748,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/4bf137413bc675005713d1f1715faeae3949715b"
+      },
+      {
+        "path": "src",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "b041732cce5f2f043bfab1eb661743e0610bc5d5",
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/trees/b041732cce5f2f043bfab1eb661743e0610bc5d5"
+      },
+      {
+        "path": "src/fast_bilateral.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "63a2430444a9f7d7478140b54ab56bd750d5ae1b",
+        "size": 7441,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/63a2430444a9f7d7478140b54ab56bd750d5ae1b"
+      },
+      {
+        "path": "src/focusstack.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "419e8c725b6a7713a4b52c3d89493bb4a4e40f50",
+        "size": 16192,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/419e8c725b6a7713a4b52c3d89493bb4a4e40f50"
+      },
+      {
+        "path": "src/focusstack.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d94ac2111011d2584a7a52a5f2225705a4e35ff1",
+        "size": 7170,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/d94ac2111011d2584a7a52a5f2225705a4e35ff1"
+      },
+      {
+        "path": "src/gtest_main.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7860d633111f0bd3c678e94e182526c9f72a1879",
+        "size": 131,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/7860d633111f0bd3c678e94e182526c9f72a1879"
+      },
+      {
+        "path": "src/histogrampercentile.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a7b0495e9980dfe071dbb578da73b9821fc86d79",
+        "size": 2514,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/a7b0495e9980dfe071dbb578da73b9821fc86d79"
+      },
+      {
+        "path": "src/histogrampercentile.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7d0e27296b3175065f1d35cf2ae605bc906dc8bc",
+        "size": 1122,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/7d0e27296b3175065f1d35cf2ae605bc906dc8bc"
+      },
+      {
+        "path": "src/logger.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6b186741be038c1383eac967cfde818cced2c14e",
+        "size": 1664,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/6b186741be038c1383eac967cfde818cced2c14e"
+      },
+      {
+        "path": "src/logger.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4bbceedb1c22a67ebd684d6a9dc75a918f386f57",
+        "size": 1290,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/4bbceedb1c22a67ebd684d6a9dc75a918f386f57"
+      },
+      {
+        "path": "src/main.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9544a2a19a0e649db6d2e0c3e72524a492ca3b49",
+        "size": 8857,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/9544a2a19a0e649db6d2e0c3e72524a492ca3b49"
+      },
+      {
+        "path": "src/options.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "73d25977d50ac5a401e0cdde993663796a02cc59",
+        "size": 1618,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/73d25977d50ac5a401e0cdde993663796a02cc59"
+      },
+      {
+        "path": "src/options.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "cd95af5f85ed98c6dc1c28bfeabfea1a6e196898",
+        "size": 869,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/cd95af5f85ed98c6dc1c28bfeabfea1a6e196898"
+      },
+      {
+        "path": "src/radialfilter.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7fd18d9be4320db7e4eb4eab5f706d7af8d8eda0",
+        "size": 8512,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/7fd18d9be4320db7e4eb4eab5f706d7af8d8eda0"
+      },
+      {
+        "path": "src/radialfilter.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d85baecf0c9c574f561b57941a1d8daa85097c4e",
+        "size": 1537,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/d85baecf0c9c574f561b57941a1d8daa85097c4e"
+      },
+      {
+        "path": "src/radialfilter_tests.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "efede5dc3770897c223a5a76510671536349bb5c",
+        "size": 1518,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/efede5dc3770897c223a5a76510671536349bb5c"
+      },
+      {
+        "path": "src/task_3dpreview.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "330d21269697b3bdfdc380c77df3d284d75da401",
+        "size": 3619,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/330d21269697b3bdfdc380c77df3d284d75da401"
+      },
+      {
+        "path": "src/task_3dpreview.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "81cf2f2f91cbe36d4454b14e701a420b05b1f642",
+        "size": 731,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/81cf2f2f91cbe36d4454b14e701a420b05b1f642"
+      },
+      {
+        "path": "src/task_align.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4626572ddc78103d13158d77452e15473361a536",
+        "size": 15606,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/4626572ddc78103d13158d77452e15473361a536"
+      },
+      {
+        "path": "src/task_align.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0e64e35c3889e5befc39d414ed6fa9d971016d82",
+        "size": 1901,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/0e64e35c3889e5befc39d414ed6fa9d971016d82"
+      },
+      {
+        "path": "src/task_background_removal.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e67e91f628e796b5458234df369a5bd675ad64fa",
+        "size": 1450,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/e67e91f628e796b5458234df369a5bd675ad64fa"
+      },
+      {
+        "path": "src/task_background_removal.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "dadbd9199411b5a5aa6afbbaf98b89e9b3db1ace",
+        "size": 462,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/dadbd9199411b5a5aa6afbbaf98b89e9b3db1ace"
+      },
+      {
+        "path": "src/task_denoise.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "469298d9e90f0845a580b8ec77b64936bb13b5ce",
+        "size": 1563,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/469298d9e90f0845a580b8ec77b64936bb13b5ce"
+      },
+      {
+        "path": "src/task_denoise.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3d02a06f4586cf6d8435f12f8458cf59734e8161",
+        "size": 338,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/3d02a06f4586cf6d8435f12f8458cf59734e8161"
+      },
+      {
+        "path": "src/task_depthmap.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9f76f08923759cb23cc38721d3a15f510fda91fe",
+        "size": 5812,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/9f76f08923759cb23cc38721d3a15f510fda91fe"
+      },
+      {
+        "path": "src/task_depthmap.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "98cea392a81a61054b881b4402215dafea5ffb9d",
+        "size": 2110,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/98cea392a81a61054b881b4402215dafea5ffb9d"
+      },
+      {
+        "path": "src/task_depthmap_inpaint.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "399126818ec863c4ec769fc9970f82110e803c97",
+        "size": 4097,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/399126818ec863c4ec769fc9970f82110e803c97"
+      },
+      {
+        "path": "src/task_depthmap_inpaint.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "837d6bc496b890a478f3113766cf2999e69ecdac",
+        "size": 668,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/837d6bc496b890a478f3113766cf2999e69ecdac"
+      },
+      {
+        "path": "src/task_focusmeasure.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "7d5d1db8f809dba1bc025d207452b8eb6a12e2a8",
+        "size": 1474,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/7d5d1db8f809dba1bc025d207452b8eb6a12e2a8"
+      },
+      {
+        "path": "src/task_focusmeasure.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "fcca252cb9bdf9a6a84b3325b207200006ba2206",
+        "size": 454,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/fcca252cb9bdf9a6a84b3325b207200006ba2206"
+      },
+      {
+        "path": "src/task_grayscale.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d04c7fb8b374dee5e50f177f1f8b113b23d674de",
+        "size": 2196,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/d04c7fb8b374dee5e50f177f1f8b113b23d674de"
+      },
+      {
+        "path": "src/task_grayscale.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a29fdc2ca999b2c489e5bfee1cf3bad43e6559db",
+        "size": 635,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/a29fdc2ca999b2c489e5bfee1cf3bad43e6559db"
+      },
+      {
+        "path": "src/task_grayscale_tests.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "bdc4d13f76729fcc054349fc7f1a8eaf45e27e46",
+        "size": 507,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/bdc4d13f76729fcc054349fc7f1a8eaf45e27e46"
+      },
+      {
+        "path": "src/task_loadimg.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "84b304dfaa4945475d6e2a36da3899fc137c3bf4",
+        "size": 2682,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/84b304dfaa4945475d6e2a36da3899fc137c3bf4"
+      },
+      {
+        "path": "src/task_loadimg.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6f0c612a5162f57a95ede6bc03ba7cb2b560a1e3",
+        "size": 504,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/6f0c612a5162f57a95ede6bc03ba7cb2b560a1e3"
+      },
+      {
+        "path": "src/task_merge.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "6eb91fccdff0971585f04d1005dd682e9f011ac1",
+        "size": 5301,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/6eb91fccdff0971585f04d1005dd682e9f011ac1"
+      },
+      {
+        "path": "src/task_merge.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "aab5f58772068cbad66b26f16dad3ca2f8129fe5",
+        "size": 1016,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/aab5f58772068cbad66b26f16dad3ca2f8129fe5"
+      },
+      {
+        "path": "src/task_reassign.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "36e5a9e283a0b6df15ce062facf336b30968effc",
+        "size": 6628,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/36e5a9e283a0b6df15ce062facf336b30968effc"
+      },
+      {
+        "path": "src/task_reassign.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "06c52f3f4a8247b4ccbde793965e1c464fe03c04",
+        "size": 2908,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/06c52f3f4a8247b4ccbde793965e1c464fe03c04"
+      },
+      {
+        "path": "src/task_saveimg.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "45da68d580c261e45918d6d700f33e0dbd5f3262",
+        "size": 2288,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/45da68d580c261e45918d6d700f33e0dbd5f3262"
+      },
+      {
+        "path": "src/task_saveimg.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d03196160cceff523abbda784b0c6aae19521275",
+        "size": 652,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/d03196160cceff523abbda784b0c6aae19521275"
+      },
+      {
+        "path": "src/task_wavelet.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1b0a89ec1cd0de81047298e8831a18705e4d8d7a",
+        "size": 2605,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/1b0a89ec1cd0de81047298e8831a18705e4d8d7a"
+      },
+      {
+        "path": "src/task_wavelet.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "148be5f169b961b20e12e8956f24cc22e25c657f",
+        "size": 1124,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/148be5f169b961b20e12e8956f24cc22e25c657f"
+      },
+      {
+        "path": "src/task_wavelet_opencl.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1895ab27392c7046cc943ba68f05ad9190407601",
+        "size": 1670,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/1895ab27392c7046cc943ba68f05ad9190407601"
+      },
+      {
+        "path": "src/task_wavelet_opencl.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3d6f395ef7d49f31bb8358001450c86b26715337",
+        "size": 336,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/3d6f395ef7d49f31bb8358001450c86b26715337"
+      },
+      {
+        "path": "src/task_wavelet_opencl_kernels.cl",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "133fc7057ab56bd99b0eb7fc4bb7aaf34c88b3be",
+        "size": 6307,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/133fc7057ab56bd99b0eb7fc4bb7aaf34c88b3be"
+      },
+      {
+        "path": "src/task_wavelet_opencl_tests.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9a49ae78b2a8935de017302ad0205dbf0023feea",
+        "size": 6655,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/9a49ae78b2a8935de017302ad0205dbf0023feea"
+      },
+      {
+        "path": "src/task_wavelet_templates.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c58fff45ec6522648a5d6647beefc87dddcb3ba1",
+        "size": 9161,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/c58fff45ec6522648a5d6647beefc87dddcb3ba1"
+      },
+      {
+        "path": "src/task_wavelet_tests.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f1d2984f4aeb82ceb50f5357d1a32d3bb837d02a",
+        "size": 4794,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/f1d2984f4aeb82ceb50f5357d1a32d3bb837d02a"
+      },
+      {
+        "path": "src/worker.cc",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "533dde365b531c3e6e04ee82890d095109d00df3",
+        "size": 8376,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/533dde365b531c3e6e04ee82890d095109d00df3"
+      },
+      {
+        "path": "src/worker.hh",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e99fa79e4ed8a1d56839d710fb6233a7d49da614",
+        "size": 3855,
+        "url": "https://api.github.com/repos/PetteriAimonen/focus-stack/git/blobs/e99fa79e4ed8a1d56839d710fb6233a7d49da614"
+      }
+    ],
+    "truncated": false
+  }
+}

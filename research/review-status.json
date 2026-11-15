@@ -1,0 +1,15 @@
+{
+  "research_date": "2026-11-15",
+  "scope": "Measurement-first macro focus-stacking research",
+  "sequence": [
+    {"phase": "01-artifacts", "status": "complete", "agent": "artifact_literature"},
+    {"phase": "02-algorithms", "status": "in_progress", "agent": "algorithm_literature"},
+    {"phase": "03-measurement", "status": "waiting_for_algorithm_review"},
+    {"phase": "04-datasets", "status": "waiting_for_algorithm_review"},
+    {"phase": "05-synthesis", "status": "pending"}
+  ],
+  "repository_snapshots": "sources/repository-pins.json",
+  "algorithm_runs_performed": false,
+  "metric_validation_performed": false,
+  "dataset_curation_completed": false
+}

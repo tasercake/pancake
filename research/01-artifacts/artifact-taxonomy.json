@@ -1,0 +1,727 @@
+{
+  "schema_version": "1.0",
+  "research_date": "2026-11-15",
+  "scope": "Macro focus stacking; long real stacks",
+  "status": "Engineering taxonomy synthesized from primary evidence; no detectors or thresholds validated",
+  "evidence_ledger": "sources.md",
+  "severity_policy": {
+    "status": "proposed",
+    "dimensions": [
+      "amplitude",
+      "extent",
+      "spatial_scale",
+      "critical_structure_loss",
+      "confidence"
+    ],
+    "annotation_scale": {
+      "0": "Absent within available evidence",
+      "1": "Visible under magnification; negligible structural loss",
+      "2": "Clear local defect; measurable structure/radiometry error",
+      "3": "Major defect or critical structure loss",
+      "4": "Catastrophic/unusable region"
+    },
+    "constraints": [
+      "Ordinal labels require rater calibration; not interval-scale numbers",
+      "Report amplitude and extent separately",
+      "Do not conflate unknown with zero",
+      "Do not charge capture-unobserved detail loss as if clean source existed",
+      "Assess 100% and intended viewing size under fixed rendering"
+    ]
+  },
+  "availability_classes": [
+    "directly_observed",
+    "contaminated_or_inferable",
+    "unobserved_or_indeterminate"
+  ],
+  "artifacts": [
+    {
+      "id": "A01",
+      "name": "Boundary halo and defocus veil",
+      "stage": [
+        "acquisition_optics",
+        "fusion"
+      ],
+      "appearance": "Broad bright, dark or colored band near depth edge; adjacent texture loses contrast.",
+      "causes": "Finite-aperture defocus mixing, wrong source selection or excessive mask smoothing.",
+      "confounders": [
+        "Real flare or haze",
+        "Transparent edge",
+        "Intentional background blur",
+        "Post-sharpening halo"
+      ],
+      "observability": "Output-only alarm is possible; reliable attribution needs stack, depth/visibility boundary and suitable reference.",
+      "required_references": [
+        "Boundary geometry or manual edge labels",
+        "Clean source region or declared synthetic target",
+        "Color-managed source stack"
+      ],
+      "availability": "Often contaminated/inferable; never presume clean source exists.",
+      "severity": "Width in pixels and physical units when known; signed amplitude; affected boundary length; lost-detail area.",
+      "candidate_measurements": [
+        "Boundary-normal residual profiles",
+        "Halo width and integrated excess error by side",
+        "Texture retention versus edge distance"
+      ],
+      "evidence": [
+        "S01",
+        "S08",
+        "S09"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A02",
+      "name": "False transparency and background leakage",
+      "stage": [
+        "acquisition_optics",
+        "fusion"
+      ],
+      "appearance": "Sharp background texture visible inside intended opaque foreground.",
+      "causes": "Fusion retains finite-aperture background rays that pass around foreground.",
+      "confounders": [
+        "Real translucency",
+        "Refractive material",
+        "Holes in foreground",
+        "Motion"
+      ],
+      "observability": "Cannot classify reliably from output alone without opacity/visibility evidence.",
+      "required_references": [
+        "Opaque foreground mask at target view",
+        "Known background code or reliable source appearance",
+        "Material label"
+      ],
+      "availability": "Clean foreground may be directly observed; target visibility must be defined.",
+      "severity": "Leaked area fraction and background-correlated energy inside opaque mask.",
+      "candidate_measurements": [
+        "Background-code leakage correlation",
+        "Opaque-mask interior false-edge precision",
+        "Foreground/background ownership error"
+      ],
+      "evidence": [
+        "S04"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A03",
+      "name": "Excess softness and texture loss",
+      "stage": [
+        "registration",
+        "fusion",
+        "postprocess"
+      ],
+      "appearance": "Wide edges or reduced fine texture compared with valid focused observations.",
+      "causes": "Blurred selection, blending, interpolation, denoising or excessive smoothing.",
+      "confounders": [
+        "Diffraction/source lens blur",
+        "Lack of focal coverage",
+        "Wrong registration",
+        "Genuinely low texture"
+      ],
+      "observability": "Needs a valid sharp observation, calibrated target or exact model target.",
+      "required_references": [
+        "Focused source correspondence or target render",
+        "Valid support mask",
+        "Matching radiometric scale"
+      ],
+      "availability": "Charge algorithm only for directly observed or otherwise independently constrained detail.",
+      "severity": "Edge width increase; frequency-specific contrast loss; affected area.",
+      "candidate_measurements": [
+        "Calibrated edge-spread/MTF comparison",
+        "Source-coherent detail transfer",
+        "Local texture contrast loss"
+      ],
+      "evidence": [
+        "S07",
+        "S02"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A04",
+      "name": "Thin-structure omission or thickening",
+      "stage": [
+        "fusion",
+        "registration"
+      ],
+      "appearance": "Missing, broken, joined or widened hairs, bristles and filaments.",
+      "causes": "Selection regularization and support windows merge small structures; resampling loses width.",
+      "confounders": [
+        "Subpixel sampling",
+        "True transparency",
+        "Motion",
+        "Source aliasing"
+      ],
+      "observability": "Requires known line geometry or high-confidence focused sources.",
+      "required_references": [
+        "Filament centerline and width labels",
+        "Visibility mask",
+        "Pixel scale"
+      ],
+      "availability": "Directly observed thin detail is distinguishable from unresolved subpixel structure.",
+      "severity": "Missing length fraction, false length, break count and line-width bias.",
+      "candidate_measurements": [
+        "Skeleton precision/recall",
+        "Connected-component topology error",
+        "Width error by true diameter"
+      ],
+      "evidence": [
+        "S01",
+        "S02",
+        "S07"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A05",
+      "name": "Wrong focus or wrong content selection",
+      "stage": [
+        "fusion"
+      ],
+      "appearance": "Locally blurred patch, depth-inconsistent detail or sharp incorrect region.",
+      "causes": "Focus estimate fails near mixed depth, low texture, noise or repeated patterns.",
+      "confounders": [
+        "No focused source",
+        "Misregistration",
+        "Lighting variation",
+        "Real multilayer transparency"
+      ],
+      "observability": "Focus-score maximum alone cannot certify correct content.",
+      "required_references": [
+        "Stack correspondence",
+        "Independent focus/depth labels where meaningful",
+        "Source-availability annotation"
+      ],
+      "availability": "May be directly observed or indeterminate; identify before scoring.",
+      "severity": "Area and contrast of incorrect selections; focal-plane error only where meaningful.",
+      "candidate_measurements": [
+        "Independent oracle selection agreement",
+        "Local content fidelity",
+        "Focus-confidence calibration"
+      ],
+      "evidence": [
+        "S09",
+        "S15"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A06",
+      "name": "Ringing and edge overshoot",
+      "stage": [
+        "fusion",
+        "registration",
+        "postprocess"
+      ],
+      "appearance": "Alternating bright/dark bands beside strong edge; artificial extra extrema.",
+      "causes": "Multiscale coefficient inconsistencies, interpolation or sharpening.",
+      "confounders": [
+        "Periodic real texture",
+        "Source JPEG ringing",
+        "Demosaicing",
+        "Lens fringes"
+      ],
+      "observability": "Output can flag oscillations; source/reference needed to distinguish added error.",
+      "required_references": [
+        "Calibrated edge with known plateaus",
+        "Source edge profiles",
+        "Common output sampling"
+      ],
+      "availability": "Usually directly assessable on controlled targets.",
+      "severity": "Overshoot/undershoot amplitude, oscillation energy and decay distance.",
+      "candidate_measurements": [
+        "Edge-normal extra-extrema count",
+        "Signed plateau overshoot",
+        "Localized ringing energy"
+      ],
+      "evidence": [
+        "S14",
+        "S15"
+      ],
+      "measurement_status": "proposed; prior published ringing metrics require separate validation"
+    },
+    {
+      "id": "A07",
+      "name": "Seams, blotches and smooth-region inconsistency",
+      "stage": [
+        "fusion",
+        "radiometric_preprocess"
+      ],
+      "appearance": "Visible patch boundaries, swirls, steps or low-frequency mottling.",
+      "causes": "Uncertain source ownership, exposure mismatch, discontinuous masks or depth estimates.",
+      "confounders": [
+        "Real surface patches",
+        "Illumination gradients",
+        "Noise",
+        "Banding"
+      ],
+      "observability": "Uniform/ramp target gives strong evidence; arbitrary natural scenes ambiguous.",
+      "required_references": [
+        "Flat/ramp reference or reliable low-texture source region",
+        "Stack exposure metadata",
+        "Mask/source map if available"
+      ],
+      "availability": "Textureless depth may be indeterminate although output smoothness is testable.",
+      "severity": "Added step magnitude, patch area and spatial scale.",
+      "candidate_measurements": [
+        "Low-frequency residual energy",
+        "Chroma/luminance seam step",
+        "Ramp second-derivative residual"
+      ],
+      "evidence": [
+        "S01",
+        "S15",
+        "S16"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A08",
+      "name": "Noise accumulation, grit and false detail",
+      "stage": [
+        "fusion",
+        "postprocess"
+      ],
+      "appearance": "Added grain, speckle or high-frequency structure without scene support.",
+      "causes": "Focus maxima select noise; sharpening or reconstruction amplifies it.",
+      "confounders": [
+        "Real microtexture",
+        "Demosaicing",
+        "Compression",
+        "Display rescaling"
+      ],
+      "observability": "Repeated captures or calibrated noise generation needed for reliable separation.",
+      "required_references": [
+        "Repeat exposure or known clean target",
+        "Sensor/noise calibration",
+        "Texture retention control"
+      ],
+      "availability": "Noise can be constrained statistically even without exact clean image.",
+      "severity": "Noise variance/power and correlation, stratified by signal and texture.",
+      "candidate_measurements": [
+        "Noise-power spectrum",
+        "Repeat-difference noise estimate",
+        "False structure rate on flat fields"
+      ],
+      "evidence": [
+        "S12",
+        "S13"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A09",
+      "name": "Residual misregistration and double edges",
+      "stage": [
+        "registration",
+        "fusion"
+      ],
+      "appearance": "Doubled lines, jagged edges, shifts or local ghost contours.",
+      "causes": "Incorrect global/local transforms, blur-induced matching failure, resampling.",
+      "confounders": [
+        "Scene motion",
+        "Actual repeated structures",
+        "Perspective change",
+        "Defocus edge expansion"
+      ],
+      "observability": "Requires correspondences in mutually valid visible regions.",
+      "required_references": [
+        "Known transforms or landmark tracks",
+        "Occlusion-valid masks",
+        "Target viewpoint"
+      ],
+      "availability": "Directly observed correspondences only; skip unsupported matches.",
+      "severity": "Landmark/edge displacement and duplicated-edge length.",
+      "candidate_measurements": [
+        "Registration target error",
+        "Duplicate contour distance",
+        "Mutual consistency of controlled fiducials"
+      ],
+      "evidence": [
+        "S10",
+        "S11"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A10",
+      "name": "Perspective distortion and inconsistent geometry",
+      "stage": [
+        "acquisition_geometry",
+        "registration",
+        "fusion"
+      ],
+      "appearance": "Locally stretched shapes or crisp mosaic incompatible with one viewpoint.",
+      "causes": "Camera/lens viewpoint changes; a global scale does not model depth-dependent parallax.",
+      "confounders": [
+        "Intentional nonphysical composite",
+        "Lens distortion",
+        "Focus breathing without parallax",
+        "Ground-truth viewpoint mismatch"
+      ],
+      "observability": "A visually sharp output is insufficient; geometry and target view needed.",
+      "required_references": [
+        "Known 3D geometry or calibration target",
+        "Capture poses/optics",
+        "Declared target projection"
+      ],
+      "availability": "Visibility may change; some target rays can be unobserved.",
+      "severity": "Shape/landmark error by depth, local scale bias and visibility inconsistency.",
+      "candidate_measurements": [
+        "Projection residual",
+        "Relative landmark distance error",
+        "Line straightness and topology"
+      ],
+      "evidence": [
+        "S10",
+        "S05"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A11",
+      "name": "Temporal ghosts and moving-part duplication",
+      "stage": [
+        "acquisition_time",
+        "registration",
+        "fusion"
+      ],
+      "appearance": "Several antenna/leg positions, semi-transparent ghosts or deformed moving surface.",
+      "causes": "Source frames contain incompatible poses or illumination times.",
+      "confounders": [
+        "Parallax",
+        "Actual branching structures",
+        "Rolling-shutter distortion",
+        "Focus blur"
+      ],
+      "observability": "Requires temporal source inspection and explicit target-time policy.",
+      "required_references": [
+        "Ordered original stack",
+        "Motion tracks",
+        "Declared pose/time selection policy"
+      ],
+      "availability": "No unique static truth when incompatible times are mixed without a target policy.",
+      "severity": "Duplicate count, ghost area and pose discontinuity.",
+      "candidate_measurements": [
+        "Moving-part instance count",
+        "Temporal source-ownership coherence",
+        "Reference-pose landmark error"
+      ],
+      "evidence": [
+        "S07",
+        "S11"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A12",
+      "name": "Color, contrast and tone distortion",
+      "stage": [
+        "radiometric_preprocess",
+        "fusion",
+        "export"
+      ],
+      "appearance": "Changed hue/saturation, black level, local contrast or overall tone.",
+      "causes": "Multiscale fusion, exposure compensation, color management or tone compression.",
+      "confounders": [
+        "Real illumination change",
+        "Different target rendering",
+        "Profile mismatch",
+        "Specular changes"
+      ],
+      "observability": "Need common color pipeline and explicit intended radiometric target.",
+      "required_references": [
+        "Color chart/known colors",
+        "Raw or calibrated sources",
+        "Encoding/profile/transfer function"
+      ],
+      "availability": "Unsaturated stable diffuse areas most defensible.",
+      "severity": "Color/luminance error distributions; contrast gain and clipped area reported separately.",
+      "candidate_measurements": [
+        "Calibrated color error",
+        "Neutral-axis drift",
+        "Local contrast transfer"
+      ],
+      "evidence": [
+        "S02",
+        "S03"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A13",
+      "name": "Highlight corruption, clipping and bokeh remnants",
+      "stage": [
+        "acquisition_optics",
+        "fusion",
+        "export"
+      ],
+      "appearance": "Extra bright points/disks, altered highlight shape or novel clipped whites.",
+      "causes": "Defocused specular structure selected as detail; contrast expansion; saturated sources.",
+      "confounders": [
+        "Genuine highlight movement",
+        "Real multiple reflections",
+        "Diffraction stars",
+        "Flare"
+      ],
+      "observability": "Reliable attribution needs unsaturated data and defined lighting/viewpoint.",
+      "required_references": [
+        "Known reflective target and lighting",
+        "Exposure brackets or unclipped source data",
+        "Highlight masks"
+      ],
+      "availability": "Clipped data is indeterminate; view-dependent material cannot use naive fixed-color oracle.",
+      "severity": "Novel clipped area; extra highlight count; shape/energy error.",
+      "candidate_measurements": [
+        "Highlight component precision/recall",
+        "Bokeh-ring residual energy",
+        "Unclipped radiance/shape consistency"
+      ],
+      "evidence": [
+        "S03",
+        "S18",
+        "S07"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A14",
+      "name": "Illumination/exposure selection discontinuity",
+      "stage": [
+        "acquisition_lighting",
+        "radiometric_preprocess",
+        "fusion"
+      ],
+      "appearance": "Brightness/chroma patches that follow selected source regions.",
+      "causes": "Flash variation, auto exposure, changing light or local shading.",
+      "confounders": [
+        "Actual surface reflectance",
+        "Motion-caused shadows",
+        "Specular change",
+        "Vignetting"
+      ],
+      "observability": "Needs exposure record, stable diffuse regions or known synthetic perturbation.",
+      "required_references": [
+        "Radiometrically calibrated stack",
+        "Source-map diagnostics",
+        "Stable-light reference or perturbation log"
+      ],
+      "availability": "May be correctable when signal unsaturated; local changes can remain ambiguous.",
+      "severity": "Seam contrast and low-frequency radiometric inconsistency.",
+      "candidate_measurements": [
+        "Exposure-normalized seam residual",
+        "Patchwise gain/offset error",
+        "Chroma discontinuity"
+      ],
+      "evidence": [
+        "S16",
+        "S01"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A15",
+      "name": "Unsupported or fabricated content",
+      "stage": [
+        "fusion",
+        "reconstruction"
+      ],
+      "appearance": "Plausible structure that does not match known scene content.",
+      "causes": "Novel coefficient combinations, inferred reconstruction or learned prior.",
+      "confounders": [
+        "Legitimate multi-frame recovery",
+        "Contaminated observations",
+        "True texture unseen in one source",
+        "Reference error"
+      ],
+      "observability": "Natural-image output alone cannot prove hallucination; known content is required.",
+      "required_references": [
+        "Exact synthetic/physical coded target",
+        "Independent capture/geometry",
+        "Source uncertainty"
+      ],
+      "availability": "Judge only where truth is independently known; abstain elsewhere.",
+      "severity": "Incorrect code/feature count, area and amplitude; factual error separate from preference.",
+      "candidate_measurements": [
+        "Hidden-code decoding accuracy",
+        "Known texture identity error",
+        "False-feature precision"
+      ],
+      "evidence": [
+        "S11",
+        "S19"
+      ],
+      "evidence_status": "benchmark risk inferred from reconstruction and fallible reference evidence; not prevalence claim",
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A16",
+      "name": "Missing focal coverage and focus banding",
+      "stage": [
+        "acquisition_sampling"
+      ],
+      "appearance": "Soft bands/depth regions despite sharp regions elsewhere.",
+      "causes": "Focus steps too wide; near/far truncation; frame loss; insufficient stack depth.",
+      "confounders": [
+        "Fusion wrong selection",
+        "Motion blur",
+        "Diffraction",
+        "Low texture"
+      ],
+      "observability": "Need full stack and focus-domain target; nominal depth of field alone insufficient.",
+      "required_references": [
+        "Focus order/positions if known",
+        "Dense reference capture or geometry",
+        "Per-region availability labels"
+      ],
+      "availability": "Desired detail may never be directly observed.",
+      "severity": "Uncovered area/depth fraction and worst retained resolution.",
+      "candidate_measurements": [
+        "Dense-versus-subsampled capture comparison",
+        "Focus coverage confidence",
+        "Blur versus known depth"
+      ],
+      "evidence": [
+        "S06",
+        "S11"
+      ],
+      "measurement_status": "proposed; primarily capture-quality label"
+    },
+    {
+      "id": "A17",
+      "name": "Inherited optical/source defects",
+      "stage": [
+        "acquisition_optics",
+        "raw_development"
+      ],
+      "appearance": "Diffraction softness, chromatic fringes, source sharpening, motion blur or clipping.",
+      "causes": "Lens/sensor/exposure/development before stacking.",
+      "confounders": [
+        "New fusion ringing",
+        "Color misregistration",
+        "True colored edge",
+        "Output tone mapping"
+      ],
+      "observability": "Need source analysis and matched development pipeline.",
+      "required_references": [
+        "Raw sources or calibrated developed inputs",
+        "Lens/target calibration",
+        "Exposure metadata"
+      ],
+      "availability": "Lost detail may be unconstrained; inherited defects must not be misattributed.",
+      "severity": "Source baseline versus output incremental error.",
+      "candidate_measurements": [
+        "Source MTF/fringing baseline",
+        "Inherited versus added clipping",
+        "Matched raw-development comparisons"
+      ],
+      "evidence": [
+        "S06",
+        "S13"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A18",
+      "name": "Dust, hot-pixel and defect trails",
+      "stage": [
+        "sensor_defects",
+        "registration",
+        "fusion"
+      ],
+      "appearance": "Dark or bright linear/wavy trails made from repeated sensor-fixed spots.",
+      "causes": "Alignment moves sensor-fixed defects relative to scene; fusion preserves them.",
+      "confounders": [
+        "Real hairs",
+        "Fine cracks",
+        "Moving particles",
+        "Noise"
+      ],
+      "observability": "Strong evidence from sensor-coordinate persistence across unaligned sources.",
+      "required_references": [
+        "Original unaligned stack",
+        "Defect map or flat/dark frame",
+        "Transforms"
+      ],
+      "availability": "Usually detectable without all-in-focus truth.",
+      "severity": "Trail length/area, amplitude and count.",
+      "candidate_measurements": [
+        "Sensor-fixed spot tracking",
+        "Predicted defect-path overlap",
+        "False connected structures"
+      ],
+      "evidence": [
+        "S03"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A19",
+      "name": "Invalid borders, edge streaks and coverage loss",
+      "stage": [
+        "registration",
+        "fusion",
+        "crop"
+      ],
+      "appearance": "Stretched margins, incomplete detail, blank edges or excess crop.",
+      "causes": "Transform support and focal coverage differ across frames.",
+      "confounders": [
+        "Intentional crop",
+        "Real radial structure",
+        "Vignetting",
+        "Incorrect evaluation alignment"
+      ],
+      "observability": "Need per-frame valid support and fixed target canvas.",
+      "required_references": [
+        "Uncropped outputs",
+        "Transform/support masks",
+        "Declared common evaluation domain"
+      ],
+      "availability": "Border desired content may be absent from necessary focus frames.",
+      "severity": "Bad-border area and retained usable field of view.",
+      "candidate_measurements": [
+        "Coverage fraction",
+        "Border residual separate from interior",
+        "Crop/gap accounting"
+      ],
+      "evidence": [
+        "S03",
+        "S05"
+      ],
+      "measurement_status": "proposed"
+    },
+    {
+      "id": "A20",
+      "name": "Rendering/export/preview artifacts",
+      "stage": [
+        "export",
+        "display"
+      ],
+      "appearance": "Banding, profile-dependent color, clipped range, preview moire or compression error.",
+      "causes": "Quantization, color/profile transfer, output format or display rescaling.",
+      "confounders": [
+        "True texture moire",
+        "Fusion ringing",
+        "Sensor noise",
+        "Different display pipeline"
+      ],
+      "observability": "Compare saved files at native resolution under controlled color pipeline.",
+      "required_references": [
+        "Float/high-bit-depth output where possible",
+        "Encoding/profile metadata",
+        "Native-resolution file comparison"
+      ],
+      "availability": "Distinct from fusion quality; retained file may differ from preview.",
+      "severity": "Quantization/encoding error and true saved-file defect area.",
+      "candidate_measurements": [
+        "High-bit-depth versus exported residual",
+        "Profile consistency check",
+        "Native-resolution artifact confirmation"
+      ],
+      "evidence": [
+        "S03"
+      ],
+      "measurement_status": "proposed"
+    }
+  ]
+}
