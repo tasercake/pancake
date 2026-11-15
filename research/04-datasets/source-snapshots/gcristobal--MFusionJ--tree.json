@@ -1,0 +1,219 @@
+{
+  "sha": "5b44ceaf85e17c90ed1c5de061f8266cf4d1aa58",
+  "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/trees/5b44ceaf85e17c90ed1c5de061f8266cf4d1aa58",
+  "tree": [
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7115e8b3405ddb8072f138155090b79a1d59a9fb",
+      "size": 1504,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/7115e8b3405ddb8072f138155090b79a1d59a9fb"
+    },
+    {
+      "path": "MFusionJ",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "4889d63d120d43ce1f5f43585b99dd89e67c5124",
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/trees/4889d63d120d43ce1f5f43585b99dd89e67c5124"
+    },
+    {
+      "path": "MFusionJ/Decompose_.class",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9176eed5b5de724a6e4738358b909059b1eef23a",
+      "size": 9602,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/9176eed5b5de724a6e4738358b909059b1eef23a"
+    },
+    {
+      "path": "MFusionJ/Fusion_.class",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7f3d0586e34176046fa3be1ae11cae92cabae8c1",
+      "size": 3310,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/7f3d0586e34176046fa3be1ae11cae92cabae8c1"
+    },
+    {
+      "path": "MFusionJ/Saliency_.class",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a03b4a66eaf91b4209ac9e76d6246039bac1cbd",
+      "size": 5329,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/6a03b4a66eaf91b4209ac9e76d6246039bac1cbd"
+    },
+    {
+      "path": "MFusionJ/WMAP_.class",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5ffed7a5dde583ef8c29ef3fe93bc44c262b23d4",
+      "size": 8638,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/5ffed7a5dde583ef8c29ef3fe93bc44c262b23d4"
+    },
+    {
+      "path": "MFusionJ/Weight_.class",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e5d568c84210b1debf6053169ffa003fd6b79ffe",
+      "size": 2188,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/e5d568c84210b1debf6053169ffa003fd6b79ffe"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "07f9e74ee7d62d7fdc4f9b19f7d22ce4acb0d45b",
+      "size": 3661,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/07f9e74ee7d62d7fdc4f9b19f7d22ce4acb0d45b"
+    },
+    {
+      "path": "images",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "15e6f9d62e36c190e45fdd4b9ddc3aca65961aef",
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/trees/15e6f9d62e36c190e45fdd4b9ddc3aca65961aef"
+    },
+    {
+      "path": "images/1.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9c9d566749a0204c4e897cd456b706c4159bcfbc",
+      "size": 11371,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/9c9d566749a0204c4e897cd456b706c4159bcfbc"
+    },
+    {
+      "path": "images/100.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a2a07d3d91829c24b6a4d3022329c3993c3118e",
+      "size": 2108504,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/3a2a07d3d91829c24b6a4d3022329c3993c3118e"
+    },
+    {
+      "path": "images/160.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f5b5aaceb7954f2a9c8d912f8951e66ddf132f0",
+      "size": 1756107,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/6f5b5aaceb7954f2a9c8d912f8951e66ddf132f0"
+    },
+    {
+      "path": "images/2.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "52d0071e67d34a0ca1b452b54584e643798a4edb",
+      "size": 11945,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/52d0071e67d34a0ca1b452b54584e643798a4edb"
+    },
+    {
+      "path": "images/3.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9a8685e4970401756080bbaac641d7f9e3488009",
+      "size": 7798,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/9a8685e4970401756080bbaac641d7f9e3488009"
+    },
+    {
+      "path": "images/60.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "97cc9ee93a55c18388b40b1ca2d0f3a9c4a124dc",
+      "size": 2227576,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/97cc9ee93a55c18388b40b1ca2d0f3a9c4a124dc"
+    },
+    {
+      "path": "images/fus.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "43c46a3a4eaf83ff6dfef88c323a7885705223f3",
+      "size": 9634,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/43c46a3a4eaf83ff6dfef88c323a7885705223f3"
+    },
+    {
+      "path": "images/fused_exp.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d1f99e2fa252f7ee6cd5c7776d603041df96c47b",
+      "size": 2105311,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/d1f99e2fa252f7ee6cd5c7776d603041df96c47b"
+    },
+    {
+      "path": "images/plot.jpg",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8a640eb546bc8b673d9cbcb90e41168e777c2656",
+      "size": 9976,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/8a640eb546bc8b673d9cbcb90e41168e777c2656"
+    },
+    {
+      "path": "macros",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "e1621b9892b69ca75d35fde81049758dc1028126",
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/trees/e1621b9892b69ca75d35fde81049758dc1028126"
+    },
+    {
+      "path": "macros/Fusion_multiexposure.ijm",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2588b007a1fc2d42a9b9b38b6aac44188b6d6b14",
+      "size": 9569,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/2588b007a1fc2d42a9b9b38b6aac44188b6d6b14"
+    },
+    {
+      "path": "macros/Fusion_multifocus.ijm",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "60723b80a15ab89dda95363e5058682e8513d440",
+      "size": 9567,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/60723b80a15ab89dda95363e5058682e8513d440"
+    },
+    {
+      "path": "src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "53546b1ba802943f605aa7ff86e2bb3935d65906",
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/trees/53546b1ba802943f605aa7ff86e2bb3935d65906"
+    },
+    {
+      "path": "src/Decompose_.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "402dd1a210b9486381fc842251a904570d149b24",
+      "size": 16236,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/402dd1a210b9486381fc842251a904570d149b24"
+    },
+    {
+      "path": "src/Fusion_.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7bee4507de7483f1c1c623fa885c07a003b7e479",
+      "size": 4418,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/7bee4507de7483f1c1c623fa885c07a003b7e479"
+    },
+    {
+      "path": "src/Saliency_.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a3b257812b3f3126bbe8abc24c2dc40a12420d51",
+      "size": 8637,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/a3b257812b3f3126bbe8abc24c2dc40a12420d51"
+    },
+    {
+      "path": "src/WMAP_.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a68db7749fa444026fddff530e2b854be12e0f9",
+      "size": 17852,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/6a68db7749fa444026fddff530e2b854be12e0f9"
+    },
+    {
+      "path": "src/Weight_.java",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da9b05ac0142d7fffd7fffff52fd25aecb595d57",
+      "size": 3334,
+      "url": "https://api.github.com/repos/gcristobal/MFusionJ/git/blobs/da9b05ac0142d7fffd7fffff52fd25aecb595d57"
+    }
+  ],
+  "truncated": false
+}

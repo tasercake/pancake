@@ -1,0 +1,1010 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/focus-stacking/scene-manifest-0.1.0.schema.json",
+  "title": "Proposed macro focus-stacking scene record",
+  "description": "Research schema, not proof of truth, rights, independence or hash agreement. Nullable unknowns must not be encoded as zero. Example records cannot be benchmark-eligible.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "record_status",
+    "example_only",
+    "dataset_id",
+    "scene_id",
+    "leakage_group_id",
+    "independence_status",
+    "identity",
+    "split",
+    "provenance",
+    "frames",
+    "capture",
+    "signal",
+    "target",
+    "annotations",
+    "references",
+    "calibration",
+    "intake"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "record_status": {
+      "enum": [
+        "example",
+        "catalogued",
+        "acquired",
+        "eligible",
+        "quarantined"
+      ]
+    },
+    "example_only": {
+      "type": "boolean"
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scene_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "leakage_group_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "independence_status": {
+      "enum": [
+        "verified_after_ancestry_audit",
+        "uncertain",
+        "example"
+      ]
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "specimen_ids",
+        "session_ids",
+        "capture_id",
+        "source_scene_ids",
+        "asset_family_ids",
+        "ancestry_edges"
+      ],
+      "properties": {
+        "specimen_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "session_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "capture_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_scene_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "asset_family_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "ancestry_edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "relation",
+              "entity_id",
+              "evidence"
+            ],
+            "properties": {
+              "relation": {
+                "enum": [
+                  "same_specimen",
+                  "same_amber_piece",
+                  "same_patient_or_slide",
+                  "same_session",
+                  "same_scene",
+                  "derived_from",
+                  "shares_foreground",
+                  "shares_background",
+                  "shares_mesh",
+                  "shares_texture",
+                  "shares_HDRI",
+                  "duplicate",
+                  "uncertain_link"
+                ]
+              },
+              "entity_id": {
+                "type": "string"
+              },
+              "evidence": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "split": {
+      "type": "object",
+      "required": [
+        "split_role",
+        "assignment_status",
+        "original_split",
+        "split_manifest_sha256"
+      ],
+      "properties": {
+        "split_role": {
+          "enum": [
+            "unassigned",
+            "algorithm_train",
+            "algorithm_validation",
+            "algorithm_test",
+            "metric_development",
+            "metric_qualification",
+            "external_regression",
+            "external_stress",
+            "quarantine"
+          ]
+        },
+        "assignment_status": {
+          "enum": [
+            "unassigned",
+            "proposed",
+            "frozen",
+            "upstream_only",
+            "example"
+          ]
+        },
+        "original_split": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "split_manifest_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "primary_url",
+        "retrieved_at",
+        "release_id",
+        "rights"
+      ],
+      "properties": {
+        "primary_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "release_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rights": {
+          "type": "object",
+          "required": [
+            "status",
+            "license_name",
+            "license_url",
+            "attribution",
+            "source_asset_review"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "explicit_dataset_terms",
+                "repository_terms_only",
+                "research_only",
+                "not_located",
+                "permission_pending",
+                "owned_assets",
+                "example"
+              ]
+            },
+            "license_name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "license_url": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "attribution": {
+              "type": "string"
+            },
+            "source_asset_review": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "frames": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "frame_id",
+          "path",
+          "ordinal",
+          "focus_distance_m",
+          "focus_setting",
+          "sha256",
+          "hash_status",
+          "locally_acquired"
+        ],
+        "properties": {
+          "frame_id": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "ordinal": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "focus_distance_m": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          },
+          "focus_setting": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hash_status": {
+            "enum": [
+              "creator_manifest_only",
+              "computed_local_bytes",
+              "not_available",
+              "example"
+            ]
+          },
+          "locally_acquired": {
+            "type": "boolean"
+          },
+          "focal_position_uncertainty_m": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "metadata_override": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "capture": {
+      "type": "object",
+      "required": [
+        "modality",
+        "camera",
+        "lens",
+        "magnification",
+        "capture_mode",
+        "focal_order",
+        "focal_spacing",
+        "lighting",
+        "temporal_policy",
+        "pixel_scale_um",
+        "metadata_status"
+      ],
+      "properties": {
+        "modality": {
+          "enum": [
+            "reflective_macro",
+            "optical_brightfield",
+            "optical_DIC",
+            "optical_fluorescence",
+            "confocal",
+            "optical_lightfield",
+            "synthetic_render",
+            "image_blur_synthetic",
+            "smartphone_focal_sweep",
+            "unknown",
+            "example"
+          ]
+        },
+        "camera": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lens": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "magnification": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "capture_mode": {
+          "enum": [
+            "focus_ring_or_internal_focus",
+            "rail",
+            "fixed_lens_sensor_motion",
+            "lightfield_refocus",
+            "rendered",
+            "unknown",
+            "example"
+          ]
+        },
+        "focal_order": {
+          "enum": [
+            "near_to_far",
+            "far_to_near",
+            "arbitrary_known",
+            "unknown",
+            "example"
+          ]
+        },
+        "focal_spacing": {
+          "type": "string"
+        },
+        "lighting": {
+          "type": "string"
+        },
+        "temporal_policy": {
+          "type": "string"
+        },
+        "pixel_scale_um": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "metadata_status": {
+          "type": "string"
+        },
+        "exposure_and_WB": {
+          "type": "string"
+        },
+        "aperture_f_number": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "focal_length_mm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "duration_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "signal": {
+      "type": "object",
+      "required": [
+        "format",
+        "data_type",
+        "nominal_bit_depth",
+        "black_level",
+        "white_level",
+        "transfer_function",
+        "color_space",
+        "range_contract",
+        "decoder_and_processing",
+        "grid_mapping"
+      ],
+      "properties": {
+        "format": {
+          "type": "string"
+        },
+        "data_type": {
+          "type": "string"
+        },
+        "nominal_bit_depth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "black_level": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "white_level": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "transfer_function": {
+          "type": "string"
+        },
+        "color_space": {
+          "type": "string"
+        },
+        "range_contract": {
+          "type": "string"
+        },
+        "decoder_and_processing": {
+          "type": "string"
+        },
+        "grid_mapping": {
+          "type": "string"
+        },
+        "width_px": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "height_px": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "view_convention",
+        "target_view_id",
+        "focus_domain",
+        "background_policy",
+        "material_classes",
+        "visibility_convention",
+        "reference_contract",
+        "numerical_uncertainty"
+      ],
+      "properties": {
+        "view_convention": {
+          "type": "string"
+        },
+        "target_view_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "focus_domain": {
+          "anyOf": [
+            {
+              "type": "object",
+              "required": [
+                "path",
+                "sha256",
+                "provenance",
+                "independence"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "provenance": {
+                  "type": "string"
+                },
+                "independence": {
+                  "enum": [
+                    "independent_measurement",
+                    "known_generator",
+                    "manual_annotation",
+                    "evaluated_algorithm",
+                    "unknown",
+                    "example"
+                  ]
+                },
+                "uncertainty": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "background_policy": {
+          "type": "string"
+        },
+        "material_classes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "visibility_convention": {
+          "type": "string"
+        },
+        "reference_contract": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "numerical_uncertainty": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotations": {
+      "type": "object",
+      "required": [
+        "masks",
+        "source_support_classes",
+        "artifact_labels",
+        "uncertainty"
+      ],
+      "properties": {
+        "masks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "file"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "validity",
+                  "coverage",
+                  "depth",
+                  "depth_boundary",
+                  "opacity",
+                  "visibility",
+                  "material",
+                  "filament",
+                  "flat_field",
+                  "color_patch",
+                  "highlight",
+                  "source_support",
+                  "motion",
+                  "focus_domain",
+                  "other"
+                ]
+              },
+              "file": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "sha256",
+                  "provenance",
+                  "independence"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "provenance": {
+                    "type": "string"
+                  },
+                  "independence": {
+                    "enum": [
+                      "independent_measurement",
+                      "known_generator",
+                      "manual_annotation",
+                      "evaluated_algorithm",
+                      "unknown",
+                      "example"
+                    ]
+                  },
+                  "uncertainty": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "source_support_classes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "directly_observed",
+              "contaminated_or_inferable",
+              "unobserved_or_indeterminate",
+              "unknown"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "artifact_labels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^A(0[1-9]|1[0-9]|20)$"
+          },
+          "uniqueItems": true
+        },
+        "uncertainty": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "file",
+          "definition",
+          "trusted_for",
+          "uncertainty"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "analytic_discrete_truth",
+              "model_defined_render",
+              "independent_real_measurement",
+              "software_pseudo_reference",
+              "manual_composite",
+              "light_field_derived_reference",
+              "task_label",
+              "demonstration_output",
+              "unknown"
+            ]
+          },
+          "file": {
+            "anyOf": [
+              {
+                "type": "object",
+                "required": [
+                  "path",
+                  "sha256",
+                  "provenance",
+                  "independence"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "provenance": {
+                    "type": "string"
+                  },
+                  "independence": {
+                    "enum": [
+                      "independent_measurement",
+                      "known_generator",
+                      "manual_annotation",
+                      "evaluated_algorithm",
+                      "unknown",
+                      "example"
+                    ]
+                  },
+                  "uncertainty": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "definition": {
+            "type": "string"
+          },
+          "trusted_for": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "uncertainty": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "required": [
+        "files",
+        "repeated_capture_group_ids",
+        "registration_provenance",
+        "response_and_noise_model",
+        "calibration_status"
+      ],
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256",
+              "provenance",
+              "independence"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "provenance": {
+                "type": "string"
+              },
+              "independence": {
+                "enum": [
+                  "independent_measurement",
+                  "known_generator",
+                  "manual_annotation",
+                  "evaluated_algorithm",
+                  "unknown",
+                  "example"
+                ]
+              },
+              "uncertainty": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "repeated_capture_group_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "registration_provenance": {
+          "type": "string"
+        },
+        "response_and_noise_model": {
+          "type": "string"
+        },
+        "calibration_status": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "intake": {
+      "type": "object",
+      "required": [
+        "image_bytes_verified",
+        "decode_QC",
+        "focus_coverage_QC",
+        "ancestry_QC",
+        "eligibility",
+        "notes"
+      ],
+      "properties": {
+        "image_bytes_verified": {
+          "type": "boolean"
+        },
+        "decode_QC": {
+          "type": "string"
+        },
+        "focus_coverage_QC": {
+          "type": "string"
+        },
+        "ancestry_QC": {
+          "type": "string"
+        },
+        "eligibility": {
+          "enum": [
+            "not_reviewed",
+            "eligible_for_declared_track",
+            "quarantined",
+            "example_only"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "example_only": {
+            "const": true
+          }
+        },
+        "required": [
+          "example_only"
+        ]
+      },
+      "then": {
+        "properties": {
+          "record_status": {
+            "const": "example"
+          },
+          "intake": {
+            "properties": {
+              "eligibility": {
+                "const": "example_only"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "record_status": {
+            "const": "eligible"
+          }
+        },
+        "required": [
+          "record_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "example_only": {
+            "const": false
+          },
+          "independence_status": {
+            "const": "verified_after_ancestry_audit"
+          },
+          "intake": {
+            "properties": {
+              "image_bytes_verified": {
+                "const": true
+              },
+              "eligibility": {
+                "const": "eligible_for_declared_track"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

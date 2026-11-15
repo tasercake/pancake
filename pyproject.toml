@@ -1,0 +1,30 @@
+[project]
+name = "bokehforge"
+version = "0.1.0"
+description = "A measurement-first workbench for sharp focus stacks."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy>=2.2,<3",
+  "pillow>=11,<13",
+  "tifffile>=2025.1.10",
+  "imagecodecs>=2025.3.30",
+  "rawpy>=0.24,<0.27",
+  "requests>=2.32,<3",
+  "beautifulsoup4>=4.13,<5",
+  "libarchive-c>=5.1,<6"
+]
+
+[project.scripts]
+bokehforge = "bokehforge.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["pytest>=8.3,<10"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

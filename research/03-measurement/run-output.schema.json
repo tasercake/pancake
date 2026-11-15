@@ -1,0 +1,780 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:macro-focus-stack:run-output:1.0",
+  "title": "Proposed macro focus-stacking run and measurement record",
+  "description": "Research schema only. No run or score exists by virtue of this schema. Corpus/scene ancestry is owned by04-datasets/scene-manifest.schema.json; this record references its frozen manifests.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "scene_id",
+    "leakage_group_id",
+    "split_role",
+    "scene_manifest_sha256",
+    "split_manifest_sha256",
+    "metric_contract_sha256",
+    "pipeline_condition",
+    "input_decode_condition",
+    "evidence_classes",
+    "algorithm",
+    "execution",
+    "coordinate_contract",
+    "signal_contract",
+    "status",
+    "outputs",
+    "measurements",
+    "record_status",
+    "example_only"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scene_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "leakage_group_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "split_role": {
+      "enum": [
+        "unassigned",
+        "algorithm_train",
+        "algorithm_validation",
+        "algorithm_test",
+        "metric_development",
+        "metric_qualification",
+        "external_regression",
+        "external_stress",
+        "quarantine"
+      ],
+      "description": "Exact value must equal scene.split.split_role and containing split.groups[].split_role."
+    },
+    "scene_manifest_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "split_manifest_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "metric_contract_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "pipeline_condition": {
+      "enum": [
+        "fusion_core",
+        "end_to_end"
+      ]
+    },
+    "input_decode_condition": {
+      "enum": [
+        "fixed_external",
+        "native"
+      ]
+    },
+    "evidence_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "analytic_verified",
+          "synthetic_converged_estimate",
+          "controlled_physical",
+          "supported_real_local",
+          "pseudo_teacher",
+          "unreferenced_real",
+          "restricted_physics",
+          "human"
+        ]
+      }
+    },
+    "algorithm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "code_revision",
+        "checkpoint_sha256",
+        "parameters",
+        "frame_order_sha256",
+        "reduction_policy",
+        "manual_effort_policy"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "code_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checkpoint_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "environment_lock_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "frame_order_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reduction_policy": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Whole-stack, ordered sweep or exact pair/slab reduction tree; include slab/batch overlap and tie policy in parameters."
+        },
+        "manual_effort_policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seed": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "fitted_on_test_data": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": [
+        "hardware",
+        "device_path",
+        "threads",
+        "timing_boundary",
+        "wall_seconds",
+        "peak_host_gib",
+        "peak_device_gib",
+        "fallback_events"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "hardware": {
+          "type": "string",
+          "minLength": 1
+        },
+        "os_driver_library_versions": {
+          "type": "object"
+        },
+        "device_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "threads": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "timing_boundary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "wall_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "peak_host_gib": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "peak_device_gib": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "stage_seconds": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          }
+        },
+        "fallback_events": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/file_ref"
+          }
+        }
+      }
+    },
+    "coordinate_contract": {
+      "type": "object",
+      "required": [
+        "target_grid_id",
+        "width",
+        "height",
+        "output_to_target_policy",
+        "registration_contract_id",
+        "mask_manifest_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "target_grid_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "output_to_target_policy": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Externally fixed transform only; no candidate-specific corrective warp."
+        },
+        "registration_contract_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mask_manifest_sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "registration_uncertainty": {
+          "type": "string"
+        },
+        "crop_mapping": {
+          "type": "object"
+        },
+        "extrapolated_border_policy": {
+          "type": "string"
+        }
+      }
+    },
+    "signal_contract": {
+      "type": "object",
+      "required": [
+        "decode_contract_id",
+        "color_primaries",
+        "white_point",
+        "transfer_function",
+        "scene_linear_scale",
+        "declared_input_precision",
+        "decoded_output_precision",
+        "display_transform_id",
+        "output_stage"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "decode_contract_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "color_primaries": {
+          "type": "string",
+          "minLength": 1
+        },
+        "white_point": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transfer_function": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scene_linear_scale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "declared_input_precision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decoded_output_precision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_transform_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "output_stage": {
+          "enum": [
+            "pre_tone_pre_sharpen",
+            "delivered",
+            "other_declared"
+          ]
+        },
+        "saturation_ceiling": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "raw_preview_fallback_detected": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "quantization_or_range_notes": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "success",
+        "method_failed",
+        "unsupported",
+        "infrastructure_failed"
+      ]
+    },
+    "status_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file_ref"
+      }
+    },
+    "measurements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "metric_id",
+          "metric_version",
+          "region_id",
+          "status",
+          "value",
+          "units",
+          "eligible_denominator",
+          "scored_denominator",
+          "denominator_units",
+          "reference_class",
+          "uncertainty",
+          "confidence",
+          "reason"
+        ],
+        "properties": {
+          "metric_id": {
+            "type": "string",
+            "pattern": "^M[0-9]{2}$"
+          },
+          "metric_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "region_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "measured",
+              "not_applicable",
+              "insufficient_evidence",
+              "measurement_failed",
+              "method_failed"
+            ]
+          },
+          "value": {
+            "description": "Scalar/vector/object in native metric units; null required when not measured."
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "eligible_denominator": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "scored_denominator": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "denominator_units": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reference_class": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uncertainty": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "confidence": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "confidence_calibration_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "maps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/file_ref"
+            }
+          },
+          "threshold_configuration_sha256": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/sha256"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "measured"
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "not": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "not_applicable",
+                    "insufficient_evidence",
+                    "measurement_failed",
+                    "method_failed"
+                  ]
+                }
+              },
+              "required": [
+                "status"
+              ]
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "type": "null"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "confidence": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "confidence"
+              ]
+            },
+            "then": {
+              "required": [
+                "confidence_calibration_id"
+              ],
+              "properties": {
+                "confidence_calibration_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "record_status": {
+      "enum": [
+        "actual_run",
+        "example"
+      ],
+      "description": "Example records must never enter dataset counts, quality summaries or benchmark ranks."
+    },
+    "example_only": {
+      "type": "boolean"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "pipeline_condition": {
+            "const": "fusion_core"
+          }
+        },
+        "required": [
+          "pipeline_condition"
+        ]
+      },
+      "then": {
+        "properties": {
+          "input_decode_condition": {
+            "const": "fixed_external"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "success"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "outputs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "method_failed",
+              "unsupported",
+              "infrastructure_failed"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "status_reason"
+        ],
+        "properties": {
+          "status_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "record_status": {
+            "const": "example"
+          }
+        },
+        "required": [
+          "record_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "example_only": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "record_status": {
+            "const": "actual_run"
+          }
+        },
+        "required": [
+          "record_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "example_only": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "record_status": {
+            "const": "actual_run"
+          },
+          "status": {
+            "const": "success"
+          }
+        },
+        "required": [
+          "record_status",
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "algorithm": {
+            "properties": {
+              "frame_order_sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          },
+          "coordinate_contract": {
+            "properties": {
+              "mask_manifest_sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "file_ref": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "role"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

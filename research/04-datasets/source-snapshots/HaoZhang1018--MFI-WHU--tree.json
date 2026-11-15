@@ -1,0 +1,31 @@
+{
+  "sha": "6071f2909f5563ccb9bcd71317f5102eefe13e6f",
+  "url": "https://api.github.com/repos/HaoZhang1018/MFI-WHU/git/trees/6071f2909f5563ccb9bcd71317f5102eefe13e6f",
+  "tree": [
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e33a297498bdb4332f06b8206f8c60149b2b8d94",
+      "size": 1066,
+      "url": "https://api.github.com/repos/HaoZhang1018/MFI-WHU/git/blobs/e33a297498bdb4332f06b8206f8c60149b2b8d94"
+    },
+    {
+      "path": "MFI-WHU.rar",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a2068f533492a8ee0831e24b9a0e81aa91c3df5",
+      "size": 18169332,
+      "url": "https://api.github.com/repos/HaoZhang1018/MFI-WHU/git/blobs/0a2068f533492a8ee0831e24b9a0e81aa91c3df5"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "83cd81a2dd3013a9301998943b1d997f0ab35839",
+      "size": 629,
+      "url": "https://api.github.com/repos/HaoZhang1018/MFI-WHU/git/blobs/83cd81a2dd3013a9301998943b1d997f0ab35839"
+    }
+  ],
+  "truncated": false
+}

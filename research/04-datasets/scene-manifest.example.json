@@ -1,0 +1,122 @@
+{
+  "schema_version": "0.1.0",
+  "record_status": "example",
+  "example_only": true,
+  "dataset_id": "EXAMPLE_ONLY_NOT_A_DATASET",
+  "scene_id": "EXAMPLE_ONLY_scene_001",
+  "leakage_group_id": "EXAMPLE_ONLY_family_A",
+  "independence_status": "example",
+  "identity": {
+    "specimen_ids": [],
+    "session_ids": [
+      "EXAMPLE_ONLY_session"
+    ],
+    "capture_id": null,
+    "source_scene_ids": [],
+    "asset_family_ids": [
+      "EXAMPLE_ONLY_owned_wire_geometry"
+    ],
+    "ancestry_edges": []
+  },
+  "split": {
+    "split_role": "unassigned",
+    "assignment_status": "example",
+    "original_split": null,
+    "split_manifest_sha256": null
+  },
+  "provenance": {
+    "primary_url": "https://example.invalid/fictional-scene",
+    "retrieved_at": "2026-11-15",
+    "release_id": null,
+    "rights": {
+      "status": "example",
+      "license_name": null,
+      "license_url": null,
+      "attribution": "Fictional schema illustration; no images exist.",
+      "source_asset_review": "Not performed; example only."
+    }
+  },
+  "frames": [
+    {
+      "frame_id": "EXAMPLE_ONLY_000",
+      "path": "EXAMPLE_ONLY/frame_000.exr",
+      "ordinal": 0,
+      "focus_distance_m": null,
+      "focus_setting": "EXAMPLE_ONLY_near",
+      "sha256": null,
+      "hash_status": "example",
+      "locally_acquired": false
+    },
+    {
+      "frame_id": "EXAMPLE_ONLY_001",
+      "path": "EXAMPLE_ONLY/frame_001.exr",
+      "ordinal": 1,
+      "focus_distance_m": null,
+      "focus_setting": "EXAMPLE_ONLY_far",
+      "sha256": null,
+      "hash_status": "example",
+      "locally_acquired": false
+    }
+  ],
+  "capture": {
+    "modality": "example",
+    "camera": null,
+    "lens": null,
+    "magnification": null,
+    "capture_mode": "example",
+    "focal_order": "example",
+    "focal_spacing": "Unknown; fictional example.",
+    "lighting": "Fictional.",
+    "temporal_policy": "Not defined.",
+    "pixel_scale_um": null,
+    "metadata_status": "No real capture."
+  },
+  "signal": {
+    "format": "EXAMPLE_ONLY",
+    "data_type": "float32",
+    "nominal_bit_depth": 32,
+    "black_level": null,
+    "white_level": null,
+    "transfer_function": "Not defined.",
+    "color_space": "Not defined.",
+    "range_contract": "Must be defined before eligibility.",
+    "decoder_and_processing": "None; no files exist.",
+    "grid_mapping": "None."
+  },
+  "target": {
+    "view_convention": "Not defined; hypothetical opaque-wire target.",
+    "target_view_id": null,
+    "focus_domain": null,
+    "background_policy": "Must be declared.",
+    "material_classes": [
+      "opaque"
+    ],
+    "visibility_convention": "Must be declared independently.",
+    "reference_contract": null,
+    "numerical_uncertainty": "No reference produced."
+  },
+  "annotations": {
+    "masks": [],
+    "source_support_classes": [
+      "unknown"
+    ],
+    "artifact_labels": [],
+    "uncertainty": "No labels acquired."
+  },
+  "references": [],
+  "calibration": {
+    "files": [],
+    "repeated_capture_group_ids": [],
+    "registration_provenance": "None.",
+    "response_and_noise_model": "None.",
+    "calibration_status": "Not calibrated."
+  },
+  "intake": {
+    "image_bytes_verified": false,
+    "decode_QC": "Not run.",
+    "focus_coverage_QC": "Not run.",
+    "ancestry_QC": "Not run.",
+    "eligibility": "example_only",
+    "notes": "Fictional record only. Never include in counts or splits."
+  }
+}

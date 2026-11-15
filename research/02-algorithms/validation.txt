@@ -1,0 +1,6 @@
+Validation date: 2026-11-15
+Method matrix: 29 unique method records; 14 columns; CSV parsed.
+Evidence ledger: 26 unique source IDs; all CSV and report source IDs resolve.
+Local links: checked in review, base comparison, and handoff.
+Snapshots: SHA-256 inventory written; upstream terms remain attached.
+Algorithms/checkpoints/datasets/metrics: not run, downloaded as a corpus, or validated.

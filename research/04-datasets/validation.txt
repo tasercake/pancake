@@ -1,0 +1,8 @@
+Metadata/schema validation only; no image/algorithm/metric validation.
+Dataset records: 28; CSV rows: 28; IDs unique: True
+scene-manifest: Draft2020-12 schema and fictional example pass
+split-manifest: Draft2020-12 schema and fictional example pass
+Cervix93 exact official IDs: 93; train 69 / test 24; source frames 1602
+HF remote file manifest: 1998 creator checksum entries; source bytes not acquired
+EDMF metadata audit: 950 matched IDs; missing A 543–592; no decoding claimed
+Lytro/MFIFB exact Git blob overlaps: 40; this detects identical bytes only

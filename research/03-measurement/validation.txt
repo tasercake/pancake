@@ -1,0 +1,9 @@
+Date:2026-11-15. Structural research-artifact validation only.
+JSON files parsed with non-finite constants rejected: metric-registry.json, run-output.example.json, run-output.schema.json
+Metrics:27 unique; all20 artifact IDs A01-A20 covered;23 primary source IDs unique/resolved.
+Required metric fields and unvalidated-status checks passed.
+Draft202012Validator.check_schema and fictional run-example validation passed.
+Scene/group/split-role example joins, exact role enums and3 current file hashes passed.
+Negative schema checks passed: unknown score cannot become zero; uncalibrated confidence rejected; native decode rejected for fixed fusion track; empty successful output rejected; unknown split role rejected; example cannot claim actual record flag.
+Markdown local-link existence checks passed.
+NO algorithms, detectors, renderers, human studies, actual dataset splits or metric qualification executed.

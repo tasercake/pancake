@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1.0",
+  "status": "example",
+  "dataset_version": "EXAMPLE_ONLY",
+  "policy_sha256": null,
+  "scene_manifest_sha256": null,
+  "assignment_method": "Fictional illustration; no assignment performed.",
+  "seed": null,
+  "groups": [
+    {
+      "leakage_group_id": "EXAMPLE_ONLY_family_A",
+      "scene_ids": [
+        "EXAMPLE_ONLY_scene_001"
+      ],
+      "split_role": "unassigned",
+      "strata": [
+        "EXAMPLE_ONLY"
+      ]
+    }
+  ],
+  "frozen_at": null,
+  "exposure_audit": "Not performed; no actual data.",
+  "notes": "This is not an acquired or frozen split."
+}

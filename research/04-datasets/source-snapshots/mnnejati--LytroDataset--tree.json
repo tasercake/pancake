@@ -1,0 +1,465 @@
+{
+  "retrieved_at": "2026-11-15",
+  "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/trees/main?recursive=1",
+  "data": {
+    "sha": "8e9f62124a78dbca09e37bdecd369c8294223e24",
+    "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/trees/8e9f62124a78dbca09e37bdecd369c8294223e24",
+    "tree": [
+      {
+        "path": "LytroDataset",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "a17a62d56da42053a934172f75ea65523b39f2eb",
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/trees/a17a62d56da42053a934172f75ea65523b39f2eb"
+      },
+      {
+        "path": "LytroDataset/Readme.txt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "625d9bd57b693da4150c5fcb523a94128f829b40",
+        "size": 604,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/625d9bd57b693da4150c5fcb523a94128f829b40"
+      },
+      {
+        "path": "LytroDataset/Triple Series",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "69ba7953503ae797b513dbe6802d1592e057cda3",
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/trees/69ba7953503ae797b513dbe6802d1592e057cda3"
+      },
+      {
+        "path": "LytroDataset/Triple Series/Readme.txt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "625d9bd57b693da4150c5fcb523a94128f829b40",
+        "size": 604,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/625d9bd57b693da4150c5fcb523a94128f829b40"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-01-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0ba76924186f8632fc9596b1983630044b728e7d",
+        "size": 37772,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/0ba76924186f8632fc9596b1983630044b728e7d"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-01-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ddde44eaf12845d51587ef44e9aad6f79057073e",
+        "size": 36068,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/ddde44eaf12845d51587ef44e9aad6f79057073e"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-01-C.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "808f27810e01df7e7fce7299481c92f13c64ed46",
+        "size": 38621,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/808f27810e01df7e7fce7299481c92f13c64ed46"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-02-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "3af7787c394e78ac1125811e0d9c4c3c3b2aa55c",
+        "size": 40555,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/3af7787c394e78ac1125811e0d9c4c3c3b2aa55c"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-02-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8495829f8d31c702e53bc10426e056fa3fc42a33",
+        "size": 45480,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/8495829f8d31c702e53bc10426e056fa3fc42a33"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-02-C.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e7db60d7f64589d45c8d1bbc2ecf94bcb5fd8991",
+        "size": 42329,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/e7db60d7f64589d45c8d1bbc2ecf94bcb5fd8991"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-03-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "47b302e72bdd32f7e95f42801adb84ad0a7d9c8e",
+        "size": 39222,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/47b302e72bdd32f7e95f42801adb84ad0a7d9c8e"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-03-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "02a1d13052b56d0887f7dae46a82eef939f0d244",
+        "size": 45208,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/02a1d13052b56d0887f7dae46a82eef939f0d244"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-03-C.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "533e1480c22f068a508551437e774b5846e74e7d",
+        "size": 41191,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/533e1480c22f068a508551437e774b5846e74e7d"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-04-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9d229b3b87aa5d67a1f09e6972ffcacafa2be554",
+        "size": 24185,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/9d229b3b87aa5d67a1f09e6972ffcacafa2be554"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-04-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "127ef5821cadcffa79d72328ac13b154498b5195",
+        "size": 18514,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/127ef5821cadcffa79d72328ac13b154498b5195"
+      },
+      {
+        "path": "LytroDataset/Triple Series/lytro-04-C.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b64973740a8637bfbd93db08030c4c15e3181e1f",
+        "size": 24310,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/b64973740a8637bfbd93db08030c4c15e3181e1f"
+      },
+      {
+        "path": "LytroDataset/lytro-01-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e2c2d246567f50e036f09d7f643f19a7e9ac0c22",
+        "size": 29704,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/e2c2d246567f50e036f09d7f643f19a7e9ac0c22"
+      },
+      {
+        "path": "LytroDataset/lytro-01-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "60a8194ecc7b9160ab0a0f0237222fad8fe8f735",
+        "size": 32513,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/60a8194ecc7b9160ab0a0f0237222fad8fe8f735"
+      },
+      {
+        "path": "LytroDataset/lytro-02-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a21f7605b083eb3c7f7de6df2051dcfc0bee47d7",
+        "size": 30851,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/a21f7605b083eb3c7f7de6df2051dcfc0bee47d7"
+      },
+      {
+        "path": "LytroDataset/lytro-02-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e3219ebf05fb09719a5d30cd855d8099757a6f0d",
+        "size": 30424,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/e3219ebf05fb09719a5d30cd855d8099757a6f0d"
+      },
+      {
+        "path": "LytroDataset/lytro-03-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "55e6763bb5be29b683d19cb5ef4c2d3e4abb3b6a",
+        "size": 31039,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/55e6763bb5be29b683d19cb5ef4c2d3e4abb3b6a"
+      },
+      {
+        "path": "LytroDataset/lytro-03-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "88cac8c0d814996175aed764c9a51bdd498c1224",
+        "size": 32801,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/88cac8c0d814996175aed764c9a51bdd498c1224"
+      },
+      {
+        "path": "LytroDataset/lytro-04-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "da4f39de50c967372f21716b9e61db6cdd1f2c5d",
+        "size": 28778,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/da4f39de50c967372f21716b9e61db6cdd1f2c5d"
+      },
+      {
+        "path": "LytroDataset/lytro-04-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0a7ca306775d4f2f23d982e909d8547e935b65aa",
+        "size": 29291,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/0a7ca306775d4f2f23d982e909d8547e935b65aa"
+      },
+      {
+        "path": "LytroDataset/lytro-05-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f75b198749db64f3be1280c8d9416ad43a3a71c9",
+        "size": 29022,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/f75b198749db64f3be1280c8d9416ad43a3a71c9"
+      },
+      {
+        "path": "LytroDataset/lytro-05-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8c4c16bff15aa94ac4bdbfd9f8253906892c3b7f",
+        "size": 41387,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/8c4c16bff15aa94ac4bdbfd9f8253906892c3b7f"
+      },
+      {
+        "path": "LytroDataset/lytro-06-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e743a8d1992c445f134612e633e143c43900bd95",
+        "size": 32116,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/e743a8d1992c445f134612e633e143c43900bd95"
+      },
+      {
+        "path": "LytroDataset/lytro-06-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b9aec368a07a2f3eff259a565fad70ea59249af6",
+        "size": 33603,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/b9aec368a07a2f3eff259a565fad70ea59249af6"
+      },
+      {
+        "path": "LytroDataset/lytro-07-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ce11d9eeebd12e7695861b07e859a7e9f2fcf1f3",
+        "size": 66475,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/ce11d9eeebd12e7695861b07e859a7e9f2fcf1f3"
+      },
+      {
+        "path": "LytroDataset/lytro-07-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a47aac534d9de9c85be512ae54c16c0aadebb83c",
+        "size": 65997,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/a47aac534d9de9c85be512ae54c16c0aadebb83c"
+      },
+      {
+        "path": "LytroDataset/lytro-08-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b9e5feda86e282a3a26d9345e4f7ec0157180a1f",
+        "size": 48904,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/b9e5feda86e282a3a26d9345e4f7ec0157180a1f"
+      },
+      {
+        "path": "LytroDataset/lytro-08-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "43f35e50cacbbf97b212e786a2737b846d052264",
+        "size": 47991,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/43f35e50cacbbf97b212e786a2737b846d052264"
+      },
+      {
+        "path": "LytroDataset/lytro-09-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "fc69aab919fda1f37b90ee2c5e64a3ecbb303317",
+        "size": 38635,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/fc69aab919fda1f37b90ee2c5e64a3ecbb303317"
+      },
+      {
+        "path": "LytroDataset/lytro-09-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "4297e1e4311a93669387ea1cb2d1126f156036be",
+        "size": 37131,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/4297e1e4311a93669387ea1cb2d1126f156036be"
+      },
+      {
+        "path": "LytroDataset/lytro-10-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "5bfc80ca2831b59f30fc538273f62d9bd8593f9a",
+        "size": 65166,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/5bfc80ca2831b59f30fc538273f62d9bd8593f9a"
+      },
+      {
+        "path": "LytroDataset/lytro-10-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2b3469ca97239b41623b0b1f32bfa987a3530f55",
+        "size": 51679,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/2b3469ca97239b41623b0b1f32bfa987a3530f55"
+      },
+      {
+        "path": "LytroDataset/lytro-11-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0b2179428ff58572e5215c086609387499425a92",
+        "size": 29611,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/0b2179428ff58572e5215c086609387499425a92"
+      },
+      {
+        "path": "LytroDataset/lytro-11-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "9966e4b4fbb3933952f3ea32e95df288ff3aa7ca",
+        "size": 48041,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/9966e4b4fbb3933952f3ea32e95df288ff3aa7ca"
+      },
+      {
+        "path": "LytroDataset/lytro-12-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "8caf5762d97454597d47d3158b5f43f6665ae66b",
+        "size": 31415,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/8caf5762d97454597d47d3158b5f43f6665ae66b"
+      },
+      {
+        "path": "LytroDataset/lytro-12-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b88f6c614b530d7013cfbef26256787404b15906",
+        "size": 42548,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/b88f6c614b530d7013cfbef26256787404b15906"
+      },
+      {
+        "path": "LytroDataset/lytro-13-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "17a25c13e3aaa17631197068c4d5d90274d920bf",
+        "size": 34158,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/17a25c13e3aaa17631197068c4d5d90274d920bf"
+      },
+      {
+        "path": "LytroDataset/lytro-13-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "930f3aaedf03cd7931f7796b7611c28c18fff3ac",
+        "size": 60321,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/930f3aaedf03cd7931f7796b7611c28c18fff3ac"
+      },
+      {
+        "path": "LytroDataset/lytro-14-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "263be61c970991e0438dfcfdd3b90c1f76e7194b",
+        "size": 31407,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/263be61c970991e0438dfcfdd3b90c1f76e7194b"
+      },
+      {
+        "path": "LytroDataset/lytro-14-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "62f0a5565ffa9f397b5bd0c62ce0a7424eb3c9c7",
+        "size": 32479,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/62f0a5565ffa9f397b5bd0c62ce0a7424eb3c9c7"
+      },
+      {
+        "path": "LytroDataset/lytro-15-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d34f67905604496b38ba5a7ded637134f151cda6",
+        "size": 33908,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/d34f67905604496b38ba5a7ded637134f151cda6"
+      },
+      {
+        "path": "LytroDataset/lytro-15-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f8f83aa27646caf4ca87f7695660159bd458470c",
+        "size": 40996,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/f8f83aa27646caf4ca87f7695660159bd458470c"
+      },
+      {
+        "path": "LytroDataset/lytro-16-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "32b8fb485bb722a46d84a97a405f494512dc73d3",
+        "size": 81275,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/32b8fb485bb722a46d84a97a405f494512dc73d3"
+      },
+      {
+        "path": "LytroDataset/lytro-16-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "149265622d2f31706d37832975e9b0d337cbc435",
+        "size": 76360,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/149265622d2f31706d37832975e9b0d337cbc435"
+      },
+      {
+        "path": "LytroDataset/lytro-17-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a67a9c153502c0afebc06dc1d6f76ff1c801d104",
+        "size": 167423,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/a67a9c153502c0afebc06dc1d6f76ff1c801d104"
+      },
+      {
+        "path": "LytroDataset/lytro-17-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b53d3d00df1a3d983c5d0d63c7aa2cb4ea77598e",
+        "size": 45100,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/b53d3d00df1a3d983c5d0d63c7aa2cb4ea77598e"
+      },
+      {
+        "path": "LytroDataset/lytro-18-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "e6c9c6df0e14246abcb2355ba0fa7cb100eafaf5",
+        "size": 25493,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/e6c9c6df0e14246abcb2355ba0fa7cb100eafaf5"
+      },
+      {
+        "path": "LytroDataset/lytro-18-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "60c314ea91b1cbc24d50f7a7a8bb55e8d9597d85",
+        "size": 23906,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/60c314ea91b1cbc24d50f7a7a8bb55e8d9597d85"
+      },
+      {
+        "path": "LytroDataset/lytro-19-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "099cf3d6fbacb4e4a7deff64e27b5b97074c6802",
+        "size": 140925,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/099cf3d6fbacb4e4a7deff64e27b5b97074c6802"
+      },
+      {
+        "path": "LytroDataset/lytro-19-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "69a69128a6e97c432e84344e6cd03a7ebbf8569d",
+        "size": 30259,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/69a69128a6e97c432e84344e6cd03a7ebbf8569d"
+      },
+      {
+        "path": "LytroDataset/lytro-20-A.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "18e025596ed678ddeae4abf09b16b24b381b2759",
+        "size": 24538,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/18e025596ed678ddeae4abf09b16b24b381b2759"
+      },
+      {
+        "path": "LytroDataset/lytro-20-B.jpg",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "38bc618a59d087415ae077021d557b0edcc959f5",
+        "size": 24214,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/38bc618a59d087415ae077021d557b0edcc959f5"
+      },
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "10211bac42dc338b9527e0c3e8f3a10cb54033a5",
+        "size": 1469,
+        "url": "https://api.github.com/repos/mnnejati/LytroDataset/git/blobs/10211bac42dc338b9527e0c3e8f3a10cb54033a5"
+      }
+    ],
+    "truncated": false
+  }
+}

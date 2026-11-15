@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "record_status": "example",
+  "example_only": true,
+  "run_id": "EXAMPLE_ONLY_no_run",
+  "scene_id": "EXAMPLE_ONLY_scene_001",
+  "leakage_group_id": "EXAMPLE_ONLY_family_A",
+  "split_role": "unassigned",
+  "scene_manifest_sha256": "345e43fa5ca673870fe73b596e17793d517e52b1412265b7777ef59ace90ad79",
+  "split_manifest_sha256": "33a24a6e1eba4e81b1b9aff0193c43614ff83967f3e61b6c4e58a759d5566315",
+  "metric_contract_sha256": "97edbcb9846290643bef3a42bd969599adbd3a531a82db5b7fffcbc69b185300",
+  "pipeline_condition": "fusion_core",
+  "input_decode_condition": "fixed_external",
+  "evidence_classes": [
+    "analytic_verified"
+  ],
+  "algorithm": {
+    "name": "EXAMPLE_ONLY_not_executed",
+    "code_revision": "EXAMPLE_ONLY_not_executed",
+    "checkpoint_sha256": null,
+    "parameters": {
+      "example_only": true
+    },
+    "frame_order_sha256": null,
+    "reduction_policy": "EXAMPLE_ONLY_not_executed",
+    "manual_effort_policy": "No algorithm or human retouch performed."
+  },
+  "execution": {
+    "hardware": "EXAMPLE_ONLY_not_executed",
+    "device_path": "EXAMPLE_ONLY_not_executed",
+    "threads": null,
+    "timing_boundary": "No timing occurred.",
+    "wall_seconds": null,
+    "peak_host_gib": null,
+    "peak_device_gib": null,
+    "fallback_events": []
+  },
+  "coordinate_contract": {
+    "target_grid_id": "EXAMPLE_ONLY_undefined",
+    "width": 1,
+    "height": 1,
+    "output_to_target_policy": "EXAMPLE_ONLY_no_output",
+    "registration_contract_id": "EXAMPLE_ONLY_none",
+    "mask_manifest_sha256": null,
+    "registration_uncertainty": "No registration was performed."
+  },
+  "signal_contract": {
+    "decode_contract_id": "EXAMPLE_ONLY_none",
+    "color_primaries": "EXAMPLE_ONLY_undefined",
+    "white_point": "EXAMPLE_ONLY_undefined",
+    "transfer_function": "EXAMPLE_ONLY_undefined",
+    "scene_linear_scale": "EXAMPLE_ONLY_undefined",
+    "declared_input_precision": "EXAMPLE_ONLY_undefined",
+    "decoded_output_precision": "EXAMPLE_ONLY_no_output",
+    "display_transform_id": "EXAMPLE_ONLY_none",
+    "output_stage": "other_declared"
+  },
+  "status": "unsupported",
+  "status_reason": "Fictional schema illustration only. No data, method run, decode, mask, registration, timing or quality measurement exists.",
+  "outputs": [],
+  "measurements": [
+    {
+      "metric_id": "M05",
+      "metric_version": "proposed_1.0",
+      "region_id": "EXAMPLE_ONLY_no_region",
+      "status": "insufficient_evidence",
+      "value": null,
+      "units": [
+        "contrast-normalized residual x pixels"
+      ],
+      "eligible_denominator": null,
+      "scored_denominator": null,
+      "denominator_units": "target boundary length",
+      "reference_class": "EXAMPLE_ONLY_no_reference",
+      "uncertainty": null,
+      "confidence": null,
+      "reason": "Fictional schema illustration; no images or boundary labels exist."
+    }
+  ],
+  "notes": "No benchmark run occurred. Manifest hashes identify the fictional scene/split illustration files and proposed registry only. No frame-order or mask assets exist, so their hashes are null. This record must never enter actual-run benchmark counts or scores."
+}

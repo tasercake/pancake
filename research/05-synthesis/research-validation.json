@@ -1,0 +1,230 @@
+{
+  "research_date": "2026-11-15",
+  "scope": "Research structure, metadata and illustrative contracts only; no algorithm or metric validation",
+  "checks": {
+    "json_syntax": {
+      "passed": true,
+      "detail": {
+        "files": 38,
+        "errors": []
+      }
+    },
+    "csv_structure": {
+      "passed": true,
+      "detail": [
+        {
+          "path": "02-algorithms/method-matrix.csv",
+          "records": 29,
+          "bad_rows": []
+        },
+        {
+          "path": "04-datasets/dataset-catalogue.csv",
+          "records": 28,
+          "bad_rows": []
+        },
+        {
+          "path": "04-datasets/EDMF-pair-audit.csv",
+          "records": 1000,
+          "bad_rows": []
+        },
+        {
+          "path": "04-datasets/Cervix93-official-split.csv",
+          "records": 93,
+          "bad_rows": []
+        },
+        {
+          "path": "04-datasets/Lytro-MFIFB-exact-blob-overlap.csv",
+          "records": 40,
+          "bad_rows": []
+        },
+        {
+          "path": "04-datasets/hf-999-file-manifest.csv",
+          "records": 1998,
+          "bad_rows": []
+        },
+        {
+          "path": "04-datasets/source-snapshots/Cervix93-official-labels.csv",
+          "records": 93,
+          "bad_rows": []
+        }
+      ]
+    },
+    "scene-manifest_schema_and_example": {
+      "passed": true,
+      "detail": []
+    },
+    "split-manifest_schema_and_example": {
+      "passed": true,
+      "detail": []
+    },
+    "run-output_schema_and_example": {
+      "passed": true,
+      "detail": []
+    },
+    "example_joins": {
+      "passed": true,
+      "detail": {
+        "scene_id": "EXAMPLE_ONLY_scene_001",
+        "group": "EXAMPLE_ONLY_family_A",
+        "role": "unassigned"
+      }
+    },
+    "fictional_examples_labeled": {
+      "passed": true,
+      "detail": null
+    },
+    "example_manifest_file_hashes": {
+      "passed": true,
+      "detail": {
+        "scene_manifest_sha256": "04-datasets/scene-manifest.example.json",
+        "split_manifest_sha256": "04-datasets/split-manifest.example.json",
+        "metric_contract_sha256": "03-measurement/metric-registry.json"
+      }
+    },
+    "shared_role_enums": {
+      "passed": true,
+      "detail": [
+        "algorithm_test",
+        "algorithm_train",
+        "algorithm_validation",
+        "external_regression",
+        "external_stress",
+        "metric_development",
+        "metric_qualification",
+        "quarantine",
+        "unassigned"
+      ]
+    },
+    "artifact_and_metric_ids": {
+      "passed": true,
+      "detail": {
+        "artifacts": 20,
+        "metrics": 27,
+        "unknown_artifacts": []
+      }
+    },
+    "targeted_artifact_coverage": {
+      "passed": true,
+      "detail": {
+        "covered": 20,
+        "excludes": "Human and generic perceptual/legacy panels",
+        "missing": []
+      }
+    },
+    "metric_source_references": {
+      "passed": true,
+      "detail": {
+        "source_ids": 23,
+        "unknown": []
+      }
+    },
+    "artifact_source_references": {
+      "passed": true,
+      "detail": {
+        "source_ids": 19,
+        "unknown": []
+      }
+    },
+    "method_registry": {
+      "passed": true,
+      "detail": {
+        "records": 29
+      }
+    },
+    "dataset_registry_consistency": {
+      "passed": true,
+      "detail": {
+        "records": 28
+      }
+    },
+    "algorithm_source_snapshot_hashes": {
+      "passed": true,
+      "detail": {
+        "files": 23,
+        "mismatches": []
+      }
+    },
+    "HF_remote_listing_counts": {
+      "passed": true,
+      "detail": {
+        "revision": "0f8256edf2d2e3f1f1ea162f78a8bca36eb6915c",
+        "CR3_paths": 999,
+        "TIFF_paths": 999,
+        "hashes_not_checked_against_image_bytes": true
+      }
+    },
+    "EDMF_remote_pair_audit": {
+      "passed": true,
+      "detail": {
+        "statuses": {
+          "both_paths_listed_not_decoded": 950,
+          "quarantine_missing_counterpart": 50
+        },
+        "missing_A_ID_range": [
+          543,
+          592
+        ]
+      }
+    },
+    "Cervix93_upstream_split_count": {
+      "passed": true,
+      "detail": {
+        "records": 93,
+        "columns": [
+          "upstream_FOV_id",
+          "grade",
+          "upstream_set",
+          "upstream_role",
+          "listed_source_frame_count",
+          "independent_slide_group_verified",
+          "new_macro_benchmark_assignment"
+        ]
+      }
+    },
+    "Lytro_MFIFB_overlap_count": {
+      "passed": true,
+      "detail": {
+        "matching_source_files": 40,
+        "pairs": 20,
+        "evidence": "Upstream Git blob identities, not decoded local images"
+      }
+    },
+    "authored_markdown_local_links": {
+      "passed": true,
+      "detail": {
+        "links_checked": 91,
+        "broken": []
+      }
+    },
+    "binomial_planning_arithmetic": {
+      "passed": true,
+      "detail": {
+        "zero_false_alarms_59_upper_one_sided_95": 0.049507609888227,
+        "zero_misses_29_lower_one_sided_95": 0.9018553723227043,
+        "assumption": "Independent Bernoulli cases; not an observed experiment"
+      }
+    },
+    "dataset_metadata_snapshot_hashes": {
+      "passed": true,
+      "detail": {
+        "files": 30,
+        "mismatches": [],
+        "image_byte_hashes_verified": false
+      }
+    },
+    "review_completion_status": {
+      "passed": true,
+      "detail": {
+        "artifact_classes": 20,
+        "method_records": 29,
+        "candidate_measurements": 27,
+        "dataset_records": 28
+      }
+    }
+  },
+  "errors": [],
+  "status": "passed",
+  "experimental_validation_performed": false,
+  "file_count_at_audit": 118,
+  "total_bytes_at_audit": 4294963
+}
