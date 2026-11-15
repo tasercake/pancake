@@ -1,0 +1,1241 @@
+{
+  "schema_version": "1.0",
+  "research_date": "2026-11-15",
+  "status": "Design only; no metric or detector qualified",
+  "artifact_taxonomy": "../01-artifacts/artifact-taxonomy.json",
+  "source_ledger": "sources.md",
+  "common_contract": {
+    "F": "Candidate output on declared target grid",
+    "T": "Trusted target where applicable; provenance and uncertainty mandatory",
+    "D": "Intended domain fixed independently of tested outputs",
+    "thresholds": "Noise floors, tau, extraction tolerances, band widths, receptive fields and viewing scales are fixed from metric-development calibration, versioned and frozen before qualification",
+    "mask_policy": "Eligibility is independent of tested output. Output validity affects coverage, never silently shrinks intended denominator.",
+    "reporting": "Return values, units, eligible/scored denominators, confidence/uncertainty, reference class and explicit status/reason. Unknown is never zero.",
+    "counting": "Overlapping artifact labels are multilabel evidence, not additive independent physical-defect counts.",
+    "aggregation": "Group by independent scene/specimen/asset family; preserve local maps, extent, conditional severity, joint burden and worst fixed-region tails.",
+    "summary": "No universal scalar approved; qualify any future scalar against untouched human/factual evidence."
+  },
+  "metrics": [
+    {
+      "id": "M01",
+      "name": "Domain, source and measurement coverage",
+      "artifacts": [
+        "A16",
+        "A19"
+      ],
+      "definition": "Freeze intended domain D before any method runs. Report output_coverage=|D intersect Vout|/|D|; focal_coverage=|D intersect Vfocus|/|D|; evidence_coverage=|D intersect Vmetric|/|D|. Vout excludes extrapolated or missing pixels; Vfocus and Vmetric are independently audited. Keep missing pixels in coverage denominator; never assign them zero error.",
+      "units": [
+        "fraction",
+        "pixels",
+        "mm^2 when calibrated"
+      ],
+      "direction": "Higher coverage, reported separately; evidence coverage is descriptive and cannot be optimized by abstaining.",
+      "required_inputs": [
+        "target grid/domain",
+        "external source visibility/warp/focal coverage",
+        "output crop/grid mapping",
+        "metric eligibility mask"
+      ],
+      "reference_class": [
+        "any with declared domain"
+      ],
+      "normalization": "Original target domain, plus per-object/stratum coverage; no per-output mask shrinkage.",
+      "abstain": "If true coverage cannot be verified, label unknown and retain conservative known-invalid masks.",
+      "confounders": [
+        "legitimate selected background blur",
+        "viewpoint-specific disocclusion",
+        "resampling footprint"
+      ],
+      "attacks": [
+        "crop hard boundaries",
+        "return only easy patches",
+        "count reflected borders as evidence"
+      ],
+      "sources": [
+        "Q13",
+        "Q15"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M02",
+      "name": "Completion and contract compliance",
+      "artifacts": [
+        "A19",
+        "A20"
+      ],
+      "definition": "For the fixed assigned scene cohort, report counts of success, crash, timeout, OOM, invalid dimensions/grid, NaN/Inf, decode failure and declared unsupported input. success_rate=contract-valid completed scenes / assigned scenes. A quality score on successful scenes is conditional, not a substitute for this endpoint.",
+      "units": [
+        "fraction",
+        "count"
+      ],
+      "direction": "Higher success; lower failures.",
+      "required_inputs": [
+        "assigned cohort",
+        "run log",
+        "output decode/contract checks"
+      ],
+      "reference_class": [
+        "none"
+      ],
+      "normalization": "Scene count, not crop or frame count; include unsupported cases in designated applicability cohort.",
+      "abstain": "None for logged contract failures; infrastructure errors are labeled separately and rerun under a predeclared policy.",
+      "confounders": [
+        "external hardware failure",
+        "unsupported format outside entered track"
+      ],
+      "attacks": [
+        "skip difficult scenes",
+        "silently fall back to a preview",
+        "return previous output"
+      ],
+      "sources": [],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M03",
+      "name": "Trusted-reference radiometric residual",
+      "artifacts": [
+        "A03",
+        "A05",
+        "A12",
+        "A15",
+        "A20"
+      ],
+      "definition": "With fixed scene-linear RGB range scale L and valid trusted domain V, E_rgb(x)=mean_c (F_c(x)-T_c(x))^2; MSE=mean_V E_rgb; PSNR=10 log10(L^2/MSE), infinity only for exact equality. Report signed RGB bias, median/p95 absolute residual and fixed-tile worst mean as well. Do not fit gain/offset, warp, white balance or tone map to each F.",
+      "units": [
+        "linear RGB squared",
+        "linear RGB",
+        "dB"
+      ],
+      "direction": "Lower residual/bias; higher PSNR, conditional on reference validity.",
+      "required_inputs": [
+        "trusted T",
+        "fixed decoding/range L",
+        "external V",
+        "reference uncertainty"
+      ],
+      "reference_class": [
+        "analytic",
+        "converged synthetic",
+        "controlled physical",
+        "supported real local",
+        "pseudo-reference labeled teacher agreement only"
+      ],
+      "normalization": "Frozen L, fixed ROI weights and full eligibility denominator; never use F's observed maximum.",
+      "abstain": "Unsupported/ambiguous target pixels or unknown transfer function; report uncertain reference error separately rather than subtracting unverified variance.",
+      "confounders": [
+        "subpixel registration",
+        "reference noise",
+        "material/view mismatch",
+        "legitimate different target convention"
+      ],
+      "attacks": [
+        "teacher imitation",
+        "smooth small critical structures to lower mean error",
+        "crop residuals"
+      ],
+      "sources": [
+        "Q02"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M04",
+      "name": "Secondary reference perceptual distances",
+      "artifacts": [
+        "A01",
+        "A03",
+        "A06",
+        "A07",
+        "A12",
+        "A15",
+        "A20"
+      ],
+      "definition": "Run pinned SSIM/MS-SSIM, LPIPS, DISTS and FLIP on the identical fixed display rendering of F and T, recording each implementation, weights, input range, channel order, resize and viewing parameter. Report local maps where implementation supports them, pooled by fixed scene/ROI. For SSIM use its published luminance/contrast/structure form; do not label mean similarity to blurred sources full-reference truth.",
+      "units": [
+        "native metric units"
+      ],
+      "direction": "SSIM higher; LPIPS/DISTS/FLIP lower. No cross-metric numeric averaging before qualification.",
+      "required_inputs": [
+        "trusted reference and fixed display transform",
+        "pinned metric implementations",
+        "fixed viewing pixels per degree for FLIP"
+      ],
+      "reference_class": [
+        "trusted image reference",
+        "pseudo-reference teacher agreement only"
+      ],
+      "normalization": "No per-output min-max normalization; fixed scale/window/patch borders and common color conversion.",
+      "abstain": "No suitable reference, incompatible HDR/LDR transform or insufficient receptive-field support.",
+      "confounders": [
+        "texture resampling tolerance",
+        "small translation",
+        "network domain shift",
+        "display scale"
+      ],
+      "attacks": [
+        "metric-specific optimized preprocessing",
+        "texture substitution",
+        "local contrast increase",
+        "hide small severe defect in global mean"
+      ],
+      "sources": [
+        "Q02",
+        "Q03",
+        "Q04",
+        "Q05",
+        "Q10",
+        "Q11"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M05",
+      "name": "Boundary halo and veil profiles",
+      "artifacts": [
+        "A01"
+      ],
+      "definition": "Use independent target boundary B, normals n(s), disjoint side bands t in [-r,0) and (0,r], and reference residual r(s,t)=Y_F(B(s)+tn)-Y_T(...). Normalize by frozen local target plateau contrast C(s), only where C exceeds calibration floor. Report positive/negative integrated residual per unit boundary length, p95 magnitude, affected boundary fraction, and contiguous width where |r|/C exceeds calibrated tau. Also measure chroma residual and coherent texture loss in the same bands. At junctions use fixed distance bands or abstain from normal profile.",
+      "units": [
+        "contrast-normalized residual x pixels",
+        "pixels",
+        "fraction of boundary length"
+      ],
+      "direction": "Lower signed excess magnitudes, width and affected fraction; sign is descriptive.",
+      "required_inputs": [
+        "independent boundary/side labels",
+        "trusted target or local uncontaminated reference",
+        "pixel scale",
+        "reference contrast/uncertainty"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled target",
+        "supported real local"
+      ],
+      "normalization": "Per true boundary length, both sides separately, original pixels and optional micrometres.",
+      "abstain": "Low contrast, genuine translucent edge, ambiguous target blur, uncertain alignment beyond width being measured.",
+      "confounders": [
+        "flare",
+        "soft shadow",
+        "registration shift",
+        "real transparency",
+        "sharpening"
+      ],
+      "attacks": [
+        "blur away halo and hairs",
+        "raise local contrast",
+        "change crop",
+        "move boundary to evade bands"
+      ],
+      "sources": [
+        "Q13",
+        "Q14",
+        "Q15",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M06",
+      "name": "Opaque-region background leakage",
+      "artifacts": [
+        "A02",
+        "A15"
+      ],
+      "definition": "In target-view opaque foreground mask O, project a known independent background code b to the target grid. After a frozen high-pass filter, estimate leakage coefficient alpha=<H(F-T),Hb>/<Hb,Hb> and normalized residual/code correlation; report alpha, code-bit false recovery, leaked area and false edges inside O. Verify foreground texture is decorrelated from b using independent codes; do not fit a new nuisance model to each candidate.",
+      "units": [
+        "leakage coefficient",
+        "correlation",
+        "fraction",
+        "false decoded bits"
+      ],
+      "direction": "Lower unintended leakage and false structure.",
+      "required_inputs": [
+        "opaque material/visibility mask",
+        "known background code or synthetic layers",
+        "trusted foreground appearance/negative control"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled coded target"
+      ],
+      "normalization": "Opaque eligible interior and boundary bands separately; codes randomized by scene group.",
+      "abstain": "Genuine transparency/refraction, unknown holes or motion, unverified opacity/target view.",
+      "confounders": [
+        "true perforation",
+        "subpixel partial coverage",
+        "foreground pattern accidentally matching code"
+      ],
+      "attacks": [
+        "preserve sharp but wrong background texture",
+        "erase foreground to reduce gradients",
+        "overfit fixed code"
+      ],
+      "sources": [
+        "Q13",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M07",
+      "name": "Controlled edge spatial frequency response",
+      "artifacts": [
+        "A03",
+        "A06",
+        "A17"
+      ],
+      "definition": "On independent single-depth slanted-edge targets, linearize signal, estimate subpixel edge-spread function, differentiate with pinned correction/window, Fourier transform and normalize by DC to get SFR(f). Report MTF50, MTF at preregistered frequencies, edge width and difference from trusted optical/source response. Always pair with M11 overshoot and M09/M08 detail fidelity; sharpened MTF is not recovered information.",
+      "units": [
+        "cycles per original pixel",
+        "micrometre edge width",
+        "contrast transfer"
+      ],
+      "direction": "Smaller loss from appropriate target response; unrestricted higher MTF is not universally better.",
+      "required_inputs": [
+        "known slanted-edge target",
+        "fixed linearization",
+        "independent edge geometry",
+        "pinned SFR configuration"
+      ],
+      "reference_class": [
+        "analytic",
+        "controlled physical",
+        "synthetic"
+      ],
+      "normalization": "Same pixel grid, target contrast and orientation; report source SFR and output SFR separately.",
+      "abstain": "Clipping, strong nonlinearity, insufficient edge length, mixed depth, unmodeled ringing or unreliable linearization.",
+      "confounders": [
+        "demosaicing",
+        "edge-adaptive sharpening",
+        "aliasing",
+        "manufacturing blur"
+      ],
+      "attacks": [
+        "unsharp mask",
+        "increase contrast",
+        "tune only slanted edges"
+      ],
+      "sources": [
+        "Q12"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M08",
+      "name": "Source-coherent detail and false high-frequency energy",
+      "artifacts": [
+        "A03",
+        "A05",
+        "A08",
+        "A15"
+      ],
+      "definition": "In fixed directly supported patches, use a preregistered bandpass/wavelet bank H_b. Report relative coefficient error ||H_b(F)-H_b(T)||^2/(||H_b(T)||^2+epsilon), signed transfer <H_b(F),H_b(T)>/(||H_b(T)||^2+epsilon), phase/coherence and residual energy not explained by T. Use noiseless/converged T or independently averaged repeat reference. Do not use the noisiest focus-score maximum as T. On real sources, the reference frame/patch is chosen using independent focus labels and held-out noise evidence.",
+      "units": [
+        "relative energy",
+        "transfer gain",
+        "coherence"
+      ],
+      "direction": "Lower residual and false energy; transfer near target, not maximal.",
+      "required_inputs": [
+        "independent focused reference",
+        "fixed patch correspondence and masks",
+        "noise uncertainty",
+        "fixed bands"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled repeat reference",
+        "supported real local"
+      ],
+      "normalization": "Target band energy with a fixed noise-derived epsilon; low-energy bands excluded and coverage reported.",
+      "abstain": "No clean or constrained reference, uncertain alignment, subpixel unresolved detail, target band below noise floor.",
+      "confounders": [
+        "reference noise correlation",
+        "legitimate superresolution",
+        "local exposure mismatch",
+        "view-dependent texture"
+      ],
+      "attacks": [
+        "add noise or texture",
+        "increase fine-band gain",
+        "blur then sharpen",
+        "choose favorable source per pixel"
+      ],
+      "sources": [
+        "Q02",
+        "Q13",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M09",
+      "name": "Filament completeness, precision and topology",
+      "artifacts": [
+        "A04",
+        "A09",
+        "A10",
+        "A15"
+      ],
+      "definition": "Use target-visible annotated centerline segments and widths. Apply one frozen output line detector, then bipartite-match segments within calibrated position/orientation tolerances. Recall=matched true length/true visible length; precision=matched output length/output line length. Report break count per true length, false joins, missed branch/endpoints, matched cross-section width bias and p95 displacement. Validate detector with contrast/noise/width negative controls; retain manual adjudication when it cannot reliably extract a line.",
+      "units": [
+        "length fraction",
+        "count per mm or per1000px",
+        "pixels",
+        "micrometres"
+      ],
+      "direction": "Higher precision/recall; lower breaks, joins, width and position error.",
+      "required_inputs": [
+        "independent centerline/width/topology labels",
+        "visibility mask",
+        "fixed detector/tolerances",
+        "pixel scale"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled target",
+        "supported real labels"
+      ],
+      "normalization": "True structure length, stratified by resolved diameter/contrast/depth, not foreground area alone.",
+      "abstain": "Unresolved subpixel structures, unverified line visibility, true translucent overlap or detector outside calibrated range.",
+      "confounders": [
+        "aliasing",
+        "contrast loss causing detection failure",
+        "intersecting true hairs",
+        "sampling orientation"
+      ],
+      "attacks": [
+        "remove hard hairs",
+        "draw sharper false hairs",
+        "thicken all lines",
+        "fragment line into multiple detections"
+      ],
+      "sources": [
+        "Q12",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M10",
+      "name": "Optional source-index/focus-label correctness",
+      "artifacts": [
+        "A05",
+        "A16"
+      ],
+      "definition": "Only when a method emits a source-index distribution and independent meaningful focal/depth labels exist, define acceptable index set K*(x) from calibrated focus tolerance/visibility. Report mean probability mass outside K*, hard-selection error area and focal-distance error using measured positions. For an index map without confidence, report selection error only. Reconstruction methods without a meaningful source index receive not_applicable, not zero or failure.",
+      "units": [
+        "probability mass",
+        "fraction",
+        "dioptres or micrometres"
+      ],
+      "direction": "Lower out-of-support mass and focal-position error.",
+      "required_inputs": [
+        "optional source-index output",
+        "independent focal labels/positions",
+        "opaque single-surface applicability mask"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled depth/focus labels"
+      ],
+      "normalization": "Only locations with an identifiable acceptable set; no single forced oracle for equal-focus sources.",
+      "abstain": "No emitted index, multiple transparent layers, comparable sources, irregular/unknown focus distances.",
+      "confounders": [
+        "source values mixed across scales",
+        "reconstruction beyond selection",
+        "focal index not metric depth"
+      ],
+      "attacks": [
+        "emit plausible but unused index map",
+        "optimize index while output differs",
+        "treat a predicted monocular depth map as exact label"
+      ],
+      "sources": [
+        "Q13",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M11",
+      "name": "Ringing and overshoot",
+      "artifacts": [
+        "A06",
+        "A13"
+      ],
+      "definition": "For calibrated monotone edge profiles with target plateaus lo,hi, report overshoot=max(F-hi,0)/(hi-lo), undershoot=max(lo-F,0)/(hi-lo), integrated excess beyond plateaus and extra profile extrema above fixed prominence. For textured boundaries use target-subtracted profiles and count only residual oscillations. Report amplitude and spatial decay length; source pre-existing ringing measured separately.",
+      "units": [
+        "relative contrast",
+        "pixels",
+        "extra extrema per edge length"
+      ],
+      "direction": "Lower added oscillation, overshoot/undershoot and decay length.",
+      "required_inputs": [
+        "independent edge profiles/plateaus",
+        "target or source baseline",
+        "calibrated prominence/noise threshold"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled target",
+        "supported real local"
+      ],
+      "normalization": "Target contrast; no candidate plateau refitting.",
+      "abstain": "Real periodic texture not independently separated, low contrast, clipping hides original profile.",
+      "confounders": [
+        "JPEG ringing",
+        "demosaicing",
+        "physical diffraction",
+        "nearby edge"
+      ],
+      "attacks": [
+        "clip overshoot",
+        "blur edges",
+        "fit output plateaus to excuse contrast changes"
+      ],
+      "sources": [
+        "Q12",
+        "Q16",
+        "Q17"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M12",
+      "name": "Seam, blotch and exposure discontinuity",
+      "artifacts": [
+        "A07",
+        "A14"
+      ],
+      "definition": "On independently known smooth/ramp/same-surface regions, compute fixed low-pass residual e=LP(F-T) and report robust range, p95 residual gradient and max fixed-tile step energy. For annotated expected-continuous curves, measure one-sided residual means at fixed offsets and their jump. On no-AIF real stacks, use independently verified same-surface/no-edge labels and report new discontinuity alarms rather than exact color error.",
+      "units": [
+        "linear luminance/chroma",
+        "residual per pixel",
+        "affected area/curve fraction"
+      ],
+      "direction": "Lower added patchiness and discontinuity.",
+      "required_inputs": [
+        "smooth/same-surface labels",
+        "known ramp or reference where available",
+        "fixed spatial scales"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled target",
+        "expert-supported real alarms"
+      ],
+      "normalization": "Fixed signal scale and eligible smooth area/curve length.",
+      "abstain": "Genuine shading edge, specular movement, uncertain surface continuity or intended compositional boundary.",
+      "confounders": [
+        "vignetting",
+        "lighting gradients",
+        "real texture",
+        "transparent layer"
+      ],
+      "attacks": [
+        "smooth all texture",
+        "change exposure globally",
+        "hide seam in noisy output"
+      ],
+      "sources": [
+        "Q07",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M13",
+      "name": "Repeat-based noise power and instability",
+      "artifacts": [
+        "A08"
+      ],
+      "definition": "For two independent repeated captures of the same static stack and fixed deterministic processing, d=(F1-F2)/sqrt(2). Estimate variance and 2D noise power spectrum of d on fixed homogeneous regions; repeat across seeds separately to estimate algorithm stochasticity. Report bias against an independent averaged/known target separately. Noise-only interpretation requires negligible scene drift and equal independent noise. Fusion of the same noisy frames twice is not an independent replicate.",
+      "units": [
+        "linear signal variance",
+        "power per spatial frequency",
+        "seed variance"
+      ],
+      "direction": "Lower noise/instability conditional on retained detail; no scalar reward for blur.",
+      "required_inputs": [
+        "independent repeated stack captures or calibrated simulation",
+        "static/flat masks",
+        "same settings",
+        "fixed registration"
+      ],
+      "reference_class": [
+        "controlled repeats",
+        "synthetic"
+      ],
+      "normalization": "Exposure-normalized fixed linear units; report dependence on signal, frequency and frame count.",
+      "abstain": "Scene/lighting motion, correlated reference noise, insufficient independent repeats; label difference as repeatability rather than pure noise if confounded.",
+      "confounders": [
+        "illumination drift",
+        "alignment jitter",
+        "motion",
+        "shot-noise intensity changes"
+      ],
+      "attacks": [
+        "strong blur",
+        "repeat identical frame pretending independence",
+        "deterministic invented microtexture"
+      ],
+      "sources": [
+        "Q06",
+        "Q13",
+        "Q18"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M14",
+      "name": "Target-view geometry and ghost edges",
+      "artifacts": [
+        "A09",
+        "A10"
+      ],
+      "definition": "Match independent target-view landmarks/contours to output with a fixed bounded detector and one-to-one correspondence. Report endpoint error distribution, p95 contour distance, duplicate unmatched edge length, local calibrated grid spacing/angle/area error and visibility violations. Candidate output receives no fitted elastic warp. A fixed known grid conversion is applied only by track contract; its uncertainty is propagated.",
+      "units": [
+        "original pixels",
+        "micrometres",
+        "relative length/area error",
+        "degrees"
+      ],
+      "direction": "Lower position/shape and duplicate-edge errors.",
+      "required_inputs": [
+        "independent target-view landmark/grid/contour labels",
+        "visibility masks",
+        "fixed coordinate contract"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled physical",
+        "supported real landmarks"
+      ],
+      "normalization": "Object dimensions and original grid; report both absolute and relative error.",
+      "abstain": "No unique target view or trustworthy correspondence, unobserved/disoccluded target, view-dependent feature mistaken for diffuse landmark.",
+      "confounders": [
+        "rail parallax",
+        "focus breathing",
+        "true movement",
+        "refraction"
+      ],
+      "attacks": [
+        "align away distortion",
+        "drop unmatched contours",
+        "overfit detector to method output"
+      ],
+      "sources": [
+        "Q13",
+        "Q15",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M15",
+      "name": "Temporal pose consistency and duplication",
+      "artifacts": [
+        "A11"
+      ],
+      "definition": "Declare target instant/pose or admissible coherent pose set before running methods. Annotate moving-part tracks and identities from sources or controlled animation. Count output parts/contours incompatible with any single admissible pose, duplicate identities and omitted required parts; report matched landmark residuals within a permitted pose. Do not require impossible simultaneously sharp content at one instant when capture never observed it.",
+      "units": [
+        "duplicate/omitted parts",
+        "inconsistent length fraction",
+        "pixels"
+      ],
+      "direction": "Lower incompatible pose/identity errors.",
+      "required_inputs": [
+        "source temporal tracks or synthetic animation",
+        "declared temporal target/admissible pose rule",
+        "source support"
+      ],
+      "reference_class": [
+        "synthetic",
+        "controlled motion",
+        "expert-supported real"
+      ],
+      "normalization": "True part count/length, with unavailable detail separately labeled.",
+      "abstain": "Temporal target unspecified, ambiguous identity, non-identifiable transient appearance.",
+      "confounders": [
+        "true multi-branch structure",
+        "occlusion",
+        "transparent moving wing"
+      ],
+      "attacks": [
+        "choose each sharp part from a different time",
+        "erase moving parts",
+        "declare a convenient pose after seeing output"
+      ],
+      "sources": [
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M16",
+      "name": "Color and tone fidelity",
+      "artifacts": [
+        "A12",
+        "A14"
+      ],
+      "definition": "In fixed color-managed unsaturated patches, convert F and T through the same declared transform/white point and compute CIEDE2000 with a verified implementation; report median/p95 DeltaE00 plus signed linear RGB/luminance bias and tone-curve residuals on known ramps. Keep HDR scene-linear error separate from LDR display color difference. No per-candidate WB/exposure/color fit.",
+      "units": [
+        "DeltaE00",
+        "linear RGB/luminance",
+        "ramp residual"
+      ],
+      "direction": "Lower differences and signed bias magnitude; no universal DeltaE threshold assumed.",
+      "required_inputs": [
+        "trusted patch/ramp reference",
+        "color/range/illuminant metadata",
+        "fixed display transform"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled color target",
+        "supported real local"
+      ],
+      "normalization": "Fixed illuminant/white point and patch weights; equal spatial support.",
+      "abstain": "Unknown transfer/primaries, clipped target, view-dependent material without declared target, color calibration uncertainty dominates.",
+      "confounders": [
+        "metamerism",
+        "camera spectral mismatch",
+        "reference demosaicing",
+        "illumination change"
+      ],
+      "attacks": [
+        "global contrast gain",
+        "per-output normalization",
+        "gamut clipping",
+        "tone-map to metric preference"
+      ],
+      "sources": [
+        "Q19"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M17",
+      "name": "Highlight integrity and novel clipping",
+      "artifacts": [
+        "A13"
+      ],
+      "definition": "On independently labeled highlight targets, compare component count, position, integrated energy, area and second moments after fixed thresholds and one-to-one matching. Novel clipping fraction counts pixels/channels at the declared delivery ceiling where trusted target is unsaturated by more than uncertainty; report lost unsaturated highlight gradation on ramps. Analyze point/blur-disk remnants separately from broad diffuse whites. For real specular stacks without a unique target, report source-supported anomalies and blinded judgments, not absolute brightness-constancy error.",
+      "units": [
+        "count",
+        "pixels",
+        "linear energy",
+        "fraction",
+        "shape error"
+      ],
+      "direction": "Lower false/missing components, shape/energy error and new clipping.",
+      "required_inputs": [
+        "declared view/material/appearance target",
+        "HDR or unsaturated reference",
+        "highlight masks",
+        "delivery ceiling"
+      ],
+      "reference_class": [
+        "synthetic",
+        "controlled physical",
+        "expert-supported real alarms"
+      ],
+      "normalization": "Highlight object count/area and fixed radiometric scale; separate already clipped input domains.",
+      "abstain": "Unknown finite-aperture/specular target, source already clipped without independent reference, changing light/view not modeled.",
+      "confounders": [
+        "legitimate specular motion",
+        "bokeh shape",
+        "transparent droplets",
+        "diffraction spikes"
+      ],
+      "attacks": [
+        "clip to remove ringing",
+        "brighten all highlights",
+        "suppress difficult points",
+        "copy same highlight at multiple planes"
+      ],
+      "sources": [
+        "Q05",
+        "Q13",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M18",
+      "name": "Factual coded-content accuracy",
+      "artifacts": [
+        "A05",
+        "A15"
+      ],
+      "definition": "Place unseen random binary/microtext/line codes on known surfaces. With fixed target-grid sampling and a decoder calibrated on clean targets, report bit/character error, erasure rate and false confident reads; include line topology checks. Codes, seed families and assets are split before synthesis. Report confidence-error calibration and separate unreadable evidence from wrong invented answers.",
+      "units": [
+        "bit/character error fraction",
+        "erasure fraction",
+        "false confident read fraction"
+      ],
+      "direction": "Lower wrong reads; erasures separately reported and cannot silently improve conditional accuracy.",
+      "required_inputs": [
+        "known hidden code truth",
+        "target visibility/sampling contract",
+        "fixed decoder and independent calibration"
+      ],
+      "reference_class": [
+        "analytic",
+        "synthetic",
+        "controlled physical"
+      ],
+      "normalization": "All eligible bits/characters including erasures as separate outcome; stratify resolved size.",
+      "abstain": "Reference code below designed sensor resolution or information absent; factual recovery is not scored as required there, but incorrect confident invention can still be counted.",
+      "confounders": [
+        "decoder bias",
+        "subpixel aliasing",
+        "manufacturing limits",
+        "refraction"
+      ],
+      "attacks": [
+        "memorize codes",
+        "sharpen wrong text",
+        "drop hard regions",
+        "metric-specific glyph substitution"
+      ],
+      "sources": [
+        "Q13",
+        "Q16",
+        "Q20"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M19",
+      "name": "Input focal completeness and output focus banding",
+      "artifacts": [
+        "A16",
+        "A03"
+      ],
+      "definition": "Using known depth/focus geometry or independently calibrated focus sweeps, mark whether each intended region has a source meeting a preregistered resolution/visibility criterion; compute completeness by area/depth/structure length. In complete regions, compare output supported detail along depth and report periodic/local deficits against target. In incomplete regions, report achievable-evidence ceiling and perceptual/uncertainty behavior separately.",
+      "units": [
+        "fraction",
+        "depth interval missing",
+        "detail loss by depth"
+      ],
+      "direction": "Higher input completeness is a capture descriptor; lower output loss conditional on complete evidence.",
+      "required_inputs": [
+        "calibrated focal positions/depth or independent focus labels",
+        "target resolution criterion",
+        "visibility"
+      ],
+      "reference_class": [
+        "synthetic",
+        "controlled target",
+        "supported real local"
+      ],
+      "normalization": "Intended sharp subject and depth range; background policy excluded explicitly.",
+      "abstain": "Textureless focus indeterminate, no calibration, unknown source optical response.",
+      "confounders": [
+        "diffraction",
+        "low texture",
+        "motion blur",
+        "lens field curvature"
+      ],
+      "attacks": [
+        "count every contrast/noise peak as focused",
+        "exclude hard depths",
+        "hallucinate texture in focal gaps"
+      ],
+      "sources": [
+        "Q12",
+        "Q13",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M20",
+      "name": "Inherited defects and defect-trail growth",
+      "artifacts": [
+        "A17",
+        "A18"
+      ],
+      "definition": "Use independent sensor defect/dust masks and known source optical defects. Propagate sensor-fixed defects through externally known warps to predicted trail envelopes; count added/remaining output trail pixels and connected length against controlled clean reference, with true scene-line negative controls. For optical/source defects report input level, output level and change in matched target tests; do not automatically assign all residual source damage to fusion.",
+      "units": [
+        "defect count",
+        "trail pixels/length",
+        "change in source error"
+      ],
+      "direction": "Lower newly introduced/preserved unwanted defects; acquisition and removal claims separate.",
+      "required_inputs": [
+        "flat/dark calibration or controlled defect injection",
+        "source/warp provenance",
+        "clean target where available"
+      ],
+      "reference_class": [
+        "synthetic",
+        "controlled physical",
+        "supported real calibration"
+      ],
+      "normalization": "Eligible sensor/scene area and source defect count; depth/warp length stratified.",
+      "abstain": "Unverified defect identity or true scene structure cannot be separated.",
+      "confounders": [
+        "real hairs",
+        "moving dust",
+        "demosaicing",
+        "chromatic aberration"
+      ],
+      "attacks": [
+        "erase all small dark structures",
+        "inpaint plausible but incorrect texture"
+      ],
+      "sources": [
+        "Q12",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M21",
+      "name": "Precision, encoding and preview round trip",
+      "artifacts": [
+        "A20",
+        "A12",
+        "A13"
+      ],
+      "definition": "Feed exact integer/float ramps, dark gradients, color patches, negative/headroom values where contract permits and known alpha/ICC metadata. Decode delivered file independently; measure absolute sample error, distinct ramp levels, monotonicity violations, clipped range and metadata conformance. Compare saved decoded pixels with computed intermediate, and test preview at100% and fixed scaling separately to locate display-only aliasing. File bit depth alone is not the result.",
+      "units": [
+        "sample error",
+        "levels",
+        "count",
+        "range fraction"
+      ],
+      "direction": "Lower unexplained quantization/clipping/error; more preserved valid levels within declared contract.",
+      "required_inputs": [
+        "known precision/color targets",
+        "intermediate when available",
+        "independent decoder",
+        "file/preview metadata"
+      ],
+      "reference_class": [
+        "analytic"
+      ],
+      "normalization": "Declared input/output type/range, not per-file min-max.",
+      "abstain": "Unavailable intermediate limits attribution; delivered-file conformance still testable.",
+      "confounders": [
+        "intentional output quantization",
+        "ICC rendering",
+        "lossy compression chosen by contract"
+      ],
+      "attacks": [
+        "16-bit container holding8-bit values",
+        "preview fallback",
+        "normalize every output"
+      ],
+      "sources": [
+        "Q02",
+        "Q19"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M22",
+      "name": "Independently supported source-patch consistency",
+      "artifacts": [
+        "A03",
+        "A05",
+        "A12",
+        "A15"
+      ],
+      "definition": "For each preannotated directly observed target patch, choose acceptable source patches using independent focus/visibility and registration evidence. Compare F to their noise-aware compatible reference distribution at fixed scales; report residuals/content mismatch plus support coverage. Do not choose max similarity/source index separately for every output pixel. Where acceptable sources disagree beyond noise, label ambiguity rather than pick the most flattering match.",
+      "units": [
+        "noise-normalized residual",
+        "patch mismatch fraction",
+        "support coverage"
+      ],
+      "direction": "Lower inconsistency where support is trustworthy; no conclusion in contaminated/indeterminate regions.",
+      "required_inputs": [
+        "full stack",
+        "independent sharp-source support labels",
+        "external transforms",
+        "noise/radiometry metadata"
+      ],
+      "reference_class": [
+        "stack-conditioned no AIF reference"
+      ],
+      "normalization": "Fixed patch/scale and source eligibility; all unsupported area explicitly reported.",
+      "abstain": "Contaminated boundaries, uncertain geometry, transparent/specular correspondence, no independent focus evidence.",
+      "confounders": [
+        "source noise",
+        "exposure drift",
+        "legitimate reconstruction from mixtures"
+      ],
+      "attacks": [
+        "pixelwise nearest-source mosaic",
+        "copy blurred source",
+        "overfit support selection to candidate"
+      ],
+      "sources": [
+        "Q07",
+        "Q13",
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M23",
+      "name": "Restricted held-out image-formation consistency",
+      "artifacts": [
+        "A01",
+        "A02",
+        "A05",
+        "A13",
+        "A15"
+      ],
+      "definition": "Under a preregistered calibrated latent scene parameterization compatible with the candidate, predict withheld focal observations with occlusion-aware Phi_k. Compute heldout mean squared whitened residual (I_k-Phi_k)^T Sigma_k^-1 (I_k-Phi_k)/degrees_of_freedom and spatial residual maps, plus predictive interval coverage. Fit nuisance/geometry only with designated calibration/training observations, never output-specific unconstrained fitting. Compare model mismatch controls and report posterior/identifiability ambiguity. F alone is generally insufficient for Phi.",
+      "units": [
+        "noise-normalized residual",
+        "prediction coverage",
+        "spatial residual"
+      ],
+      "direction": "Residual consistent with calibrated noise/model floor; a minimum unconstrained residual is not universally better.",
+      "required_inputs": [
+        "held-out observations not given to method",
+        "independently calibrated optics/noise",
+        "fixed scene/visibility/material representation",
+        "compatible candidate-to-latent mapping"
+      ],
+      "reference_class": [
+        "restricted physics consistency"
+      ],
+      "normalization": "Effective degrees of freedom/covariance with spatial correlation and fitting accounted for; no naive pixel independence.",
+      "abstain": "General real scene lacks compatible latent representation, hidden-surface radiance unknown, material/view mismatch, unconstrained depth can absorb errors.",
+      "confounders": [
+        "optical-model mismatch",
+        "noise covariance error",
+        "hidden surfaces",
+        "non-Lambertian material"
+      ],
+      "attacks": [
+        "fit high-capacity depth/material to each output",
+        "use held-out frames in calibration",
+        "reblur2D RGB ignoring occlusion"
+      ],
+      "sources": [
+        "Q13",
+        "Q14",
+        "Q15"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M24",
+      "name": "Claim-conditional robustness and reproducibility",
+      "artifacts": [
+        "A01",
+        "A03",
+        "A05",
+        "A08",
+        "A09",
+        "A12",
+        "A15",
+        "A19",
+        "A20"
+      ],
+      "definition": "Apply only preregistered transformations with a declared target relation. Compare mapped outputs using artifact vector and repeat distances; record reversal, independent-noise duplicates, valid thinning, slab/batch, CPU/GPU and seeds separately. Arbitrary permutation is an invariance requirement only when claimed; thinning may change available information. Report scene-level max/median degradation and exact failure rate.",
+      "units": [
+        "change in each base metric",
+        "scene failures",
+        "repeat variability"
+      ],
+      "direction": "Lower unintended change when invariance is valid; quality degradation otherwise interpreted against changed evidence.",
+      "required_inputs": [
+        "method input contract",
+        "transformation/target mapping",
+        "same data and compute settings",
+        "seed/device logs"
+      ],
+      "reference_class": [
+        "any with valid transformation contract"
+      ],
+      "normalization": "Original scene groups remain clustered; transformed crops/rotations are not new independent scenes.",
+      "abstain": "Transformation changes target optics/material/coverage without a known new reference.",
+      "confounders": [
+        "interpolation from rotation",
+        "ordered depth assumptions",
+        "real evidence loss"
+      ],
+      "attacks": [
+        "use invalid permutations to discredit an ordered method",
+        "hide fallback",
+        "select best seed"
+      ],
+      "sources": [
+        "Q16"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M25",
+      "name": "Blinded expert preference and localized artifact labels",
+      "artifacts": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06",
+        "A07",
+        "A08",
+        "A09",
+        "A10",
+        "A11",
+        "A12",
+        "A13",
+        "A14",
+        "A15",
+        "A16",
+        "A17",
+        "A18",
+        "A19",
+        "A20"
+      ],
+      "definition": "Randomize anonymous paired outputs with left/right counterbalancing; collect overall preference with tie/uncertain options, artifact presence/extent/ordinal0–4 severity and task-coded accuracy. Separate initial output-only preference from source-assisted fidelity adjudication. Standardize100%/intended-size viewing and color management, train raters on disjoint examples, repeat trials and model scene/rater dependence. Report raw pairwise win/tie rates, mixed-effects/Bradley-Terry style estimates where identifiable, reliability and clustered intervals.",
+      "units": [
+        "win/tie fraction",
+        "ordinal severity",
+        "annotated extent",
+        "task accuracy"
+      ],
+      "direction": "Higher task-appropriate preference/factual accuracy; lower artifact burden, with disagreement retained.",
+      "required_inputs": [
+        "expert panel",
+        "blind viewer",
+        "independent scene groups",
+        "frozen instructions/anchors",
+        "reference/source access policy"
+      ],
+      "reference_class": [
+        "human reference"
+      ],
+      "normalization": "Per scene/rater design; no treating ordinal scores as interval distances without validation.",
+      "abstain": "Rater cannot judge, unavailable source evidence, unclear target; retain uncertain labels.",
+      "confounders": [
+        "aesthetic preference versus fidelity",
+        "fatigue",
+        "display variability",
+        "method recognition",
+        "expert disagreement"
+      ],
+      "attacks": [
+        "show method names",
+        "select favorable crops",
+        "ask one global score after hinting defect type",
+        "remove dissenting raters posthoc"
+      ],
+      "sources": [
+        "Q03",
+        "Q07",
+        "Q20",
+        "Q21",
+        "Q22"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M26",
+      "name": "Resource use and completion budget",
+      "artifacts": [],
+      "definition": "Measure input decode, registration, fusion, postprocess/export and total wall time separately where observable; record peak host/GPU memory, hardware, driver, threads, cold/warm policy and I/O. Use fixed resolution, stack length, precision and output stage; include failed/OOM runs. Report paired scene distribution and quality/resource Pareto points; speed cannot cancel a quality gate.",
+      "units": [
+        "seconds",
+        "GiB",
+        "failure count"
+      ],
+      "direction": "Lower resources conditional on comparable quality and complete outputs.",
+      "required_inputs": [
+        "fixed hardware/workload contract",
+        "instrumented logs",
+        "output quality report"
+      ],
+      "reference_class": [
+        "none"
+      ],
+      "normalization": "Same actual pixels x frames and data precision; no extrapolation from pair/thumbnail speed.",
+      "abstain": "Internal stage unavailable; total measured time remains valid with stated boundary.",
+      "confounders": [
+        "cache",
+        "disk I/O",
+        "GPU asynchronous timing",
+        "auto device selection"
+      ],
+      "attacks": [
+        "skip frames",
+        "downsample silently",
+        "report fusion-only time as end-to-end"
+      ],
+      "sources": [
+        "Q01"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    },
+    {
+      "id": "M27",
+      "name": "Legacy fusion and blind-IQA compatibility panel",
+      "artifacts": [
+        "A03",
+        "A08",
+        "A12",
+        "A15"
+      ],
+      "definition": "Compute pinned original source-conditioned fusion metrics (e.g. QABF, Hassen MEMF index, MI/FMI) and output statistics (entropy, average gradient/spatial frequency), plus NIQE, only as separate exploratory outputs. Specify exact two-source vs multi-source aggregation and every implementation variant. Mean gradient satisfies AG(aF+b)=|a|AG(F) before clipping, so contrast is an explicit negative control. No rank sum or majority vote of correlated metrics is primary quality evidence.",
+      "units": [
+        "native units"
+      ],
+      "direction": "Implementation-specific; higher entropy/gradient is not inherently higher quality.",
+      "required_inputs": [
+        "original sources for source-conditioned metrics",
+        "pinned implementations and aggregation",
+        "frozen display/linear signal contract"
+      ],
+      "reference_class": [
+        "stack-conditioned no AIF reference",
+        "output-only"
+      ],
+      "normalization": "Document image range, histogram bins, windows, pair/stack aggregation and resize; no silent reuse of two-image formula for100frames.",
+      "abstain": "Unverified implementation/extension, unknown data domain, no valid natural-statistics support.",
+      "confounders": [
+        "noise",
+        "contrast",
+        "blurred source matching",
+        "metric correlation"
+      ],
+      "attacks": [
+        "add noise",
+        "unsharp mask",
+        "source replication",
+        "select metrics after results"
+      ],
+      "sources": [
+        "Q01",
+        "Q06",
+        "Q07",
+        "Q08",
+        "Q09",
+        "Q10",
+        "Q11"
+      ],
+      "validation_status": "proposed_macro_application_not_implemented_or_validated"
+    }
+  ]
+}

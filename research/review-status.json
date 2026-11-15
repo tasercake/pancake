@@ -3,13 +3,23 @@
   "scope": "Measurement-first macro focus-stacking research",
   "sequence": [
     {"phase": "01-artifacts", "status": "complete", "agent": "artifact_literature"},
-    {"phase": "02-algorithms", "status": "in_progress", "agent": "algorithm_literature"},
-    {"phase": "03-measurement", "status": "waiting_for_algorithm_review"},
-    {"phase": "04-datasets", "status": "waiting_for_algorithm_review"},
-    {"phase": "05-synthesis", "status": "pending"}
+    {"phase": "02-algorithms", "status": "complete", "agent": "algorithm_literature"},
+    {"phase": "03-measurement", "status": "complete", "agent": "measurement_suite"},
+    {"phase": "04-datasets", "status": "complete", "agent": "dataset_literature"},
+    {"phase": "05-synthesis", "status": "complete", "agent": "root"}
   ],
   "repository_snapshots": "sources/repository-pins.json",
   "algorithm_runs_performed": false,
   "metric_validation_performed": false,
-  "dataset_curation_completed": false
+  "dataset_curation_completed": false,
+  "image_archives_acquired": true,
+  "dataset_acquisition_pipeline": "../docs/data.md",
+  "requested_review_order_preserved": true,
+  "research_counts": {
+    "artifact_classes": 20,
+    "method_records": 29,
+    "candidate_measurements": 27,
+    "dataset_records": 28
+  },
+  "structural_verification": "05-synthesis/research-validation.json"
 }

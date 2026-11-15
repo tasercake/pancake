@@ -1,23 +1,35 @@
 # Macro focus-stacking research
 
-Research date: 2026-11-15. Scope: build an open-source, high-quality macro focus-stacking benchmark before choosing or changing an algorithm.
+Research cutoff: **2026-11-15**. All four reviews and final integration are complete. Scope: design a defensible quality benchmark and dataset strategy before choosing or changing the stacking algorithm.
 
-## Review sequence
+**Start with the [integrated benchmark plan](05-synthesis/benchmark-plan.md).** Recommendation: artifact-specific severity/extent measurements, explicit coverage and failure accounting, and blinded expert comparison. Qualify the measurements before optimizing an algorithm against them.
 
-1. `01-artifacts/`: documented failure modes, causes, and visual evidence.
-2. `02-algorithms/`: state of the art, reproducibility, and candidate-base assessment. Starts after artifact review completes.
-3. `03-measurement/`: robust evaluation design. Starts after algorithm review completes.
-4. `04-datasets/`: dataset discovery and suitability audit. Runs alongside measurement design.
-5. `05-synthesis/`: consolidated benchmark specification, decisions, and next steps.
+## Research package
 
-## Evidence rules
+| Question | Deliverable |
+|---|---|
+| What goes wrong? | [Artifact review](01-artifacts/review.md), [20-class taxonomy](01-artifacts/artifact-taxonomy.json), and primary-source ledger. |
+| Which algorithms are relevant? | [Algorithm review](02-algorithms/review.md), [29-record method matrix](02-algorithms/method-matrix.csv), and [pinned base audit](02-algorithms/base-comparison.md). |
+| How should quality be measured? | [Suite design](03-measurement/benchmark-design.md), [27-measure registry](03-measurement/metric-registry.json), [qualification/human protocol](03-measurement/validation-protocol.md), and [synthetic reference contract](03-measurement/synthetic-ground-truth.md). |
+| Which data can support it? | [Dataset review](04-datasets/dataset-review.md), [28-record catalogue](04-datasets/dataset-catalogue.csv), [split protocol](04-datasets/split-protocol.md), [acquisition plan](04-datasets/acquisition-plan.md), schemas and remote-file audits. |
+| What should happen next? | [Integrated implementation order](05-synthesis/benchmark-plan.md#8-implementation-order), [decisions](05-synthesis/decisions.md), and [validation scope](05-synthesis/validation-scope.md). |
 
-- Prefer papers, author repositories, official dataset pages, and original software documentation.
-- Record direct URLs, access date, source type, and the claims each source supports.
-- Separate published findings, authors' claims, code inspection, and proposed methods.
-- Treat multi-focus image fusion, long macro stacks, microscopy, and light-field data as distinct domains.
-- Do not imply that an all-in-focus reference is physically exact, or that a proposed metric has been validated.
-- Mark download status, licensing uncertainty, missing evidence, and unresolved questions explicitly.
-- Store all notes, manifests, scripts, and intermediate research under this directory.
+The requested sequence was preserved: artifact review first; algorithm review after that; measurement and dataset reviews together afterward. Their handoffs, evidence ledgers and source snapshots remain in the corresponding folders. [review-status.json](review-status.json) records stage and experimental status.
 
-This index will be updated as reviews finish.
+Acquisition policy update: **LSFD (D01) is excluded by user decision as an infeasible source.** It remains in historical reviews for provenance, but the acquisition scripts never resolve or download it. This supersedes its place in earlier acquisition shortlists.
+
+## Key decisions and limits
+
+- Keep focus-stack as a wavelet baseline.
+- Start measurement development with **12 controlled scene/asset families + 12 independent real macro groups**. This is a proposed feasibility pilot, not a powered final evaluation.
+- For a sufficiently large new algorithm corpus, propose **60/20/20 train/validation/test by independent ancestry group**. Preserve official holdouts and separate metric qualification from final algorithm testing. No new final scene assignment exists yet.
+- Existing sources include real RAW bursts, a licensed 999-frame one-scene macro sweep, optical amber stacks, and supplementary short-pair/light-field data. Reference quality, terms, access and independent-group counts vary. See the catalogue and the subsequent [reproducible acquisition pipeline](../docs/data.md).
+- The research reviews did not download or decode an image corpus. The subsequent [acquisition and conversion phase](../docs/data.md) preserves native files and creates canonical TIFF sequences, with explicit access/storage failures. **No stacker, detector, renderer or human study was run.** Registries, schemas and acquired data do not constitute validated measurements or an audited final split.
+
+## Evidence and provenance
+
+Each review links primary sources and distinguishes full-text/code inspection from abstract-only or metadata-only evidence. Papers' reported rankings, vendor claims, static code findings and new proposals remain distinct. Synthetic, teacher-produced, manually fused, light-field-derived and controlled physical references retain their different semantics.
+
+[Source snapshots](sources/README.md), [repository pins](sources/repository-pins.json), the [research protocol](research-protocol.md), and phase-specific ledgers preserve provenance. The [independent metric audit](05-synthesis/metric-evidence-audit.md) explains why evaluator qualification and deliberate metric attacks are necessary.
+
+[Structural verification](05-synthesis/research-validation.json) passed registry, schema/example, join/hash, source-ID and local-link checks. These checks validate research artifacts, not stacking quality or detector accuracy.

@@ -1,0 +1,96 @@
+{
+  "retrieved_at": "2026-11-15",
+  "status": "read_only_inspection_not_runtime_validation",
+  "files": [
+    {
+      "path": "source-snapshots/Linfeng-Tang--SwinFusion--README.md",
+      "bytes": 12278,
+      "sha256": "ad76deca5534e9e8f188a8923c5138e7d171e98808de4fb6e80a66ee85b58aad"
+    },
+    {
+      "path": "source-snapshots/MalumaDev--VAEEDOF--README.md",
+      "bytes": 1518,
+      "sha256": "99cec69313e310f55d97cdca4c8823dc397423f1b1928c7456e46d759bd442b0"
+    },
+    {
+      "path": "source-snapshots/MorvanLi--ReDiffuse--README.md",
+      "bytes": 2339,
+      "sha256": "0413a151ebc14122770153916c5e6466fe96b1ae19178768ad35306b6186059d"
+    },
+    {
+      "path": "source-snapshots/PetteriAimonen--focus-stack--docs--Algorithms.md",
+      "bytes": 7450,
+      "sha256": "c01ae8cb526fb33a8202eb685afce3cdd45ef246569d3392fa0847cafbe98696"
+    },
+    {
+      "path": "source-snapshots/PetteriAimonen--focus-stack--src--task_align.cc",
+      "bytes": 15607,
+      "sha256": "8508cc0235cb6c8d1499a3861db2febc4448d0b54b3d717def5488ef1a5b0092"
+    },
+    {
+      "path": "source-snapshots/PetteriAimonen--focus-stack--src--task_loadimg.cc",
+      "bytes": 2683,
+      "sha256": "9df4344428d12991dda468993c02878962911d40ecb7ec13167c7400e17b9ed1"
+    },
+    {
+      "path": "source-snapshots/PetteriAimonen--focus-stack--src--task_merge.cc",
+      "bytes": 5302,
+      "sha256": "35a3c8935f3f8e3f605a8f0533e55c0ebef185365ff3bdbb32d5f6490fa9f0d5"
+    },
+    {
+      "path": "source-snapshots/PetteriAimonen--focus-stack--src--task_reassign.cc",
+      "bytes": 6629,
+      "sha256": "1f869fbc9c4a520fb67e173aa3c8844cf1f1a0ffa2a9fa5ba2d62711738394cf"
+    },
+    {
+      "path": "source-snapshots/PetteriAimonen--focus-stack--src--task_saveimg.cc",
+      "bytes": 2289,
+      "sha256": "c3c2d6955d08e704f923021f2b0989f0445fa5dd5f0aa9347db9396674ce1caa"
+    },
+    {
+      "path": "source-snapshots/README.md",
+      "bytes": 867,
+      "sha256": "ef40cab09e2a5d1126b6b3aab6016e730b2057b7d5c62095e34cacbb5cf2804e"
+    },
+    {
+      "path": "source-snapshots/Xinzhe99--StackMFF--README.md",
+      "bytes": 4935,
+      "sha256": "64db74833ab1d9dca6c2e94bfe60362f49cb0e48bf01c21685d965cbee4033fe"
+    },
+    {
+      "path": "source-snapshots/Xinzhe99--StackMFF-V2--README.md",
+      "bytes": 17295,
+      "sha256": "5e7d184225be9a1a8caffbe7e673aa05ee5c5ba7916a4ac869cbd411a3c7d08f"
+    },
+    {
+      "path": "source-snapshots/Xinzhe99--StackMFF-V3--LICENSE",
+      "bytes": 3459,
+      "sha256": "d7119aae1f0af7eb26c3fe2d68ff5e94d40993102f21b78ad5f6a1e69ac231e3"
+    },
+    {
+      "path": "source-snapshots/Xinzhe99--StackMFF-V3--README.md",
+      "bytes": 25658,
+      "sha256": "b1657dd7c6d22ea3dfd692421402d835c18ebb9b687e35e1a82f95e276c69883"
+    },
+    {
+      "path": "source-snapshots/ZYC-HUST--CSNet--README.md",
+      "bytes": 282,
+      "sha256": "858edcb9747ac13d16d6d419b1748b581bbe3a8075c8a9518d1ee1692fdbc790"
+    },
+    {
+      "path": "source-snapshots/zhaolb4080--SD-Fuse--README.md",
+      "bytes": 1044,
+      "sha256": "20efde25e2f59b3abbc925a5e637a427d5586f6ea9ecbd0420e1166c3d3b9857"
+    },
+    {
+      "path": "source-snapshots/zwy0913--PDRFuse--README.md",
+      "bytes": 9371,
+      "sha256": "8b05ba2cc0dc5056c6200ebdc80e43c56ec4ae2b8a7663790d9516594c4b7289"
+    },
+    {
+      "path": "source-snapshots/zyb5--UHD-MFF--README.md",
+      "bytes": 2838,
+      "sha256": "25fd820727e447bf833ebc2cd1ffeb1f68e1232c77607afda40f733a3bd49e0f"
+    }
+  ]
+}
