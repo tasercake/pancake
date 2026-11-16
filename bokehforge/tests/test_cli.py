@@ -47,3 +47,15 @@ def test_default_source_config_works_outside_repository(tmp_path):
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert json.loads(lock.read_text())["datasets"][0]["status"] == "disabled"
+
+
+def test_nested_project_runs_from_repository_root():
+    repository = next(parent for parent in Path(__file__).resolve().parents if (parent / ".git").exists())
+    project = repository / "bokehforge"
+    result = subprocess.run(["uv", "run", "--project", str(project), "--frozen", "--offline",
+                             "bokehforge", "data", "--help"], cwd=repository, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert "download" in result.stdout and "process" in result.stdout
+    config = project / "config/data/sources.json"
+    default_root = json.loads(config.read_text())["defaults"]["data_root"]
+    assert (config.parent / default_root).resolve() == repository / "datasets"
