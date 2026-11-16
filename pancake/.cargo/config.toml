@@ -1,0 +1,7 @@
+[build]
+rustflags = ["-Dwarnings"]
+rustdocflags = ["-Dwarnings"]
+
+[alias]
+lint = "clippy --locked --workspace --all-targets --all-features -- -D warnings"
+test-all = "test --locked --workspace --all-features"

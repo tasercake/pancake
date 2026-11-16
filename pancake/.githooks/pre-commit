@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+if git diff --cached --quiet -- pancake .github/workflows/pancake.yml .github/dependabot.yml; then
+    exit 0
+fi
+if ! git diff --quiet -- pancake .github/workflows/pancake.yml .github/dependabot.yml || \
+    [[ -n $(git ls-files --others --exclude-standard -- \
+        pancake .github/workflows/pancake.yml .github/dependabot.yml) ]]; then
+    printf 'Pancake: stage or stash unstaged project changes before checking commit.\n' >&2
+    exit 1
+fi
+bash "$repo/pancake/scripts/check.sh" fast
+bash "$repo/pancake/scripts/check.sh" test

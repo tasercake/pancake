@@ -1,0 +1,15 @@
+[profile.default]
+retries = 0
+fail-fast = false
+slow-timeout = { period = "30s", terminate-after = 2 }
+leak-timeout = "1s"
+failure-output = "immediate-final"
+success-output = "never"
+status-level = "fail"
+final-status-level = "all"
+
+[profile.ci]
+inherits = "default"
+
+[profile.ci.junit]
+path = "junit.xml"

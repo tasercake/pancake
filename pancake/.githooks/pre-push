@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+needs_check=false
+while read -r local_ref local_sha remote_ref remote_sha; do
+    # Deleted refs contain no new code. Ref names are intentionally not executed.
+    [[ -n $local_ref && -n $remote_ref ]] || exit 2
+    [[ $local_sha != 0000000000000000000000000000000000000000 ]] || continue
+    if [[ $remote_sha == 0000000000000000000000000000000000000000 ]]; then
+        remote_sha=$(git hash-object -t tree /dev/null)
+    fi
+    if ! git diff --quiet "$remote_sha" "$local_sha" -- \
+        pancake .github/workflows/pancake.yml .github/dependabot.yml; then
+        if [[ -n $(git status --porcelain -- \
+            pancake .github/workflows/pancake.yml .github/dependabot.yml) ]] || \
+            ! git diff --quiet "$local_sha" -- pancake .github; then
+            printf 'Pancake: push checks require a clean checkout matching the pushed project.\n' >&2
+            exit 1
+        fi
+        needs_check=true
+    fi
+done
+[[ $needs_check == true ]] || exit 0
+bash "$repo/pancake/scripts/check.sh" all

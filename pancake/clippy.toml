@@ -1,0 +1,6 @@
+msrv = "1.100.0"
+check-private-items = true
+allow-unwrap-in-tests = false
+allow-expect-in-tests = false
+allow-panic-in-tests = false
+allow-print-in-tests = false

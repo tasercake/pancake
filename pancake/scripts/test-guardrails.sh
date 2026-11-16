@@ -11,6 +11,8 @@ for file in Cargo.toml Cargo.lock README.md rust-toolchain.toml clippy.toml; do
     cp "$root/$file" "$fixture/$file"
 done
 mkdir -p "$fixture/src"
+mkdir -p "$fixture/scripts"
+cp "$root/scripts/check.sh" "$root/scripts/tool-versions.sh" "$fixture/scripts/"
 cd "$fixture"
 export CARGO_TARGET_DIR="$root/target/guardrail-build"
 
@@ -22,7 +24,7 @@ reject() {
         cat "$fixture/check.log" >&2
         exit 1
     fi
-    if ! grep -Fq -- "$diagnostic" "$fixture/check.log"; then
+    if ! tr '_' '-' <"$fixture/check.log" | grep -F -- "${diagnostic//_/-}" >/dev/null; then
         printf 'FAIL: wrong rejection for %s\n' "$diagnostic" >&2
         cat "$fixture/check.log" >&2
         exit 1
@@ -91,14 +93,25 @@ reject unfulfilled_lint_expectations lint
 if [[ ${1:-lint} == deep ]]; then
     cat >src/lib.rs <<'RS'
 //! Negative fixture.
-/// Deliberately untested implementation.
+/// Deliberately undertested implementation.
 #[must_use]
-pub const fn untested(value: u8) -> u8 {
-    value
+pub const fn untested(value: i32) -> i32 {
+    if value > 0 {
+        value
+    } else {
+        0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn only_positive_is_covered() {
+        assert_eq!(super::untested(1), 1, "positive sample must pass");
+    }
 }
 RS
-    reject uncovered cargo llvm-cov --offline --locked --workspace --all-features \
-        --fail-uncovered-lines 0 --fail-uncovered-functions 0 --fail-uncovered-regions 0
+    reject 'Missed Lines' bash scripts/check.sh coverage
 
     cat >src/lib.rs <<'RS'
 //! Negative fixture.
@@ -116,5 +129,54 @@ mod tests {
     }
 }
 RS
-    reject missed cargo mutants --in-place --timeout 30 -- --locked
+    reject missed bash scripts/check.sh mutants
+
+    cat >src/lib.rs <<'RS'
+//! Negative fixture for a branch that line coverage cannot distinguish.
+/// Checks whether an integer is nonnegative.
+#[must_use]
+pub const fn nonnegative(value: i32) -> bool {
+    if value > 0 || value == 0 {
+        true
+    } else {
+        false
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn misses_zero_condition() {
+        assert!(super::nonnegative(1), "positive value must pass");
+        assert!(!super::nonnegative(-1), "negative value must fail");
+    }
+}
+RS
+    reject 'Uncovered branches' bash scripts/check.sh branches
+
+    cat >src/lib.rs <<'RS'
+//! Positive control: a small, fully tested contract.
+/// Checks whether an integer is positive.
+#[must_use]
+pub const fn positive(value: i32) -> bool {
+    value > 0
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn covers_boundary_and_both_signs() {
+        assert!(super::positive(1), "positive value must pass");
+        assert!(!super::positive(0), "zero must fail");
+        assert!(!super::positive(-1), "negative value must fail");
+    }
+}
+RS
+    if ! bash scripts/check.sh coverage >"$fixture/positive.log" 2>&1 || \
+        ! bash scripts/check.sh mutants \
+        >>"$fixture/positive.log" 2>&1; then
+        cat "$fixture/positive.log" >&2
+        exit 1
+    fi
+    printf 'PASS: accepted fully covered code with mutation-resistant tests\n'
 fi
