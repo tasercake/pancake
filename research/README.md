@@ -23,8 +23,8 @@ Acquisition policy update: **LSFD (D01) is excluded by user decision as an infea
 - Keep focus-stack as a wavelet baseline.
 - Start measurement development with **12 controlled scene/asset families + 12 independent real macro groups**. This is a proposed feasibility pilot, not a powered final evaluation.
 - For a sufficiently large new algorithm corpus, propose **60/20/20 train/validation/test by independent ancestry group**. Preserve official holdouts and separate metric qualification from final algorithm testing. No new final scene assignment exists yet.
-- Existing sources include real RAW bursts, a licensed 999-frame one-scene macro sweep, optical amber stacks, and supplementary short-pair/light-field data. Reference quality, terms, access and independent-group counts vary. See the catalogue and the subsequent [reproducible acquisition pipeline](../docs/data.md).
-- The research reviews did not download or decode an image corpus. The subsequent [acquisition and conversion phase](../docs/data.md) preserves native files and creates canonical TIFF sequences, with explicit access/storage failures. **No stacker, detector, renderer or human study was run.** Registries, schemas and acquired data do not constitute validated measurements or an audited final split.
+- Existing sources include real RAW bursts, a licensed 999-frame one-scene macro sweep, optical amber stacks, and supplementary short-pair/light-field data. Reference quality, terms, access and independent-group counts vary. See the catalogue and the subsequent [reproducible acquisition pipeline](../bokehforge/docs/data.md).
+- The research reviews did not download or decode an image corpus. The subsequent [acquisition and conversion phase](../bokehforge/docs/data.md) preserves native files and creates canonical TIFF sequences, with explicit access/storage failures. **No stacker, detector, renderer or human study was run.** Registries, schemas and acquired data do not constitute validated measurements or an audited final split.
 
 ## Evidence and provenance
 

@@ -3,7 +3,7 @@
   "defaults": {
     "reserve_gib": 15,
     "standard_format": "float32_RGB_TIFF",
-    "data_root": "../../datasets",
+    "data_root": "../../../datasets",
     "max_download_bytes": 2147483648
   },
   "datasets": [

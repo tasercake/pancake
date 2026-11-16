@@ -13,7 +13,7 @@
   "metric_validation_performed": false,
   "dataset_curation_completed": false,
   "image_archives_acquired": true,
-  "dataset_acquisition_pipeline": "../docs/data.md",
+  "dataset_acquisition_pipeline": "../bokehforge/docs/data.md",
   "requested_review_order_preserved": true,
   "research_counts": {
     "artifact_classes": 20,

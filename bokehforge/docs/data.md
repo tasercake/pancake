@@ -8,7 +8,7 @@ uv run --frozen bokehforge data download
 uv run --frozen bokehforge data process
 ```
 
-Run from the repository root. Commands are provided by the Bokehforge project in [../pyproject.toml](../pyproject.toml). Python is pinned to 3.12.12 by the root `.python-version`; the root `uv.lock` pins Python dependencies and wheel hashes. `config/data/sources.json` describes all 28 research candidates. `config/data/sources.lock.json` freezes resolved source revisions, original file paths, available provider hashes, and SHA-256 hashes acquired on first successful download. Keep the lockfile with the code.
+Run from the `bokehforge/` project directory. Commands are provided by the Bokehforge project in [../pyproject.toml](../pyproject.toml). Python is pinned to 3.12.12 by the project `.python-version`; the project `uv.lock` pins Python dependencies and wheel hashes. `config/data/sources.json` describes all 28 research candidates. `config/data/sources.lock.json` freezes resolved source revisions, original file paths, available provider hashes, and SHA-256 hashes acquired on first successful download. Keep the lockfile with the code.
 
 ## Configuration
 
@@ -17,7 +17,7 @@ Edit [source policy](../config/data/sources.json) before source resolution. Conf
 ```json
 {
   "defaults": {
-    "data_root": "../../datasets",
+    "data_root": "../../../datasets",
     "reserve_gib": 15,
     "max_download_bytes": 2147483648,
     "standard_format": "float32_RGB_TIFF"
@@ -25,7 +25,7 @@ Edit [source policy](../config/data/sources.json) before source resolution. Conf
 }
 ```
 
-`data_root` is relative to the configuration file, or an absolute path. Both scripts also accept `--root /path/to/data` and `--reserve-gib 15`. Default storage is the repository's `datasets/` directory, relative to `config/data/sources.json`. The scripts never remove unrelated files to make space.
+`data_root` is relative to the configuration file, or an absolute path. Both scripts also accept `--root /path/to/data` and `--reserve-gib 15`. Default storage is the repository-root `datasets/` directory, resolved relative to `bokehforge/config/data/sources.json`. The scripts never remove unrelated files to make space.
 
 The default **total native-data budget is 2 GiB** (`2147483648` bytes). `bokehforge data download` writes `.bokehforge/state/download-plan.json` beneath the data root before acquiring payloads. It selects whole datasets or intact independently usable Figshare stack archives; it never keeps an arbitrary prefix of a focal sweep. Source sizes must be established before selection. `--max-download-gib 4` overrides the global cap for that run. This is a cap on unique selected native payloads; metadata requests and network retries add transfer overhead.
 
@@ -59,10 +59,10 @@ Run the two data commands sequentially. The converter holds the acquisition lock
 ## Layout
 
 ```text
-config/data/                    # durable source policy and exact source pins
+config/data/                    # durable policy and pins inside bokehforge/
   sources.json
   sources.lock.json
-datasets/                       # generated; may be removed and rebuilt
+../datasets/                    # generated at repository root; may be rebuilt
   raw/Dxx/                      # untouched provider files
   standardized/Dxx/scene/
     frames/000000.tif           # canonical focal inputs
@@ -81,7 +81,7 @@ datasets/                       # generated; may be removed and rebuilt
     locks/data.lock             # shared acquisition/processing lock
 ```
 
-The entire generated `datasets/` directory is Git-ignored. Keep `config/data/` and the root dependency lock with the code. Downloaded data are not implicitly licensed for redistribution; source rights evidence is retained in config and manifests.
+The entire generated `datasets/` directory is Git-ignored. Keep the project's `config/data/` and `uv.lock` with the code. Downloaded data are not implicitly licensed for redistribution; source rights evidence is retained in config and manifests.
 
 ## Logs and reports
 
@@ -134,7 +134,7 @@ Converter verifies original file hashes, extracts archives with path/link checks
 
 Byte reproduction is checked in the pinned runtime/platform. Cross-platform codec and RAW-development parity is not asserted without verification. The lockfile records source bytes independently of conversion-platform differences.
 
-Implementation lives in `src/bokehforge/data/`; CLI entry point lives in `src/bokehforge/cli.py`. Tests live in `tests/data/` and `tests/test_cli.py`. Project metadata, Python pin and dependency lock live at repository root.
+Implementation lives in `src/bokehforge/data/`; CLI entry point lives in `src/bokehforge/cli.py`. Tests live in `tests/data/` and `tests/test_cli.py`. Project metadata, Python pin and dependency lock live in `bokehforge/`.
 
 Keep code unchanged during a run. Conversion recipes record the code hashes loaded at process start, package versions, Python/platform identity, LibRaw and LittleCMS versions. An updated recipe is a new conversion snapshot, even when verified identical pixels permit TIFF byte reuse.
 
