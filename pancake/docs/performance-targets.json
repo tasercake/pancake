@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-17",
+  "status": "frozen_initial_engineering_targets",
+  "basis": "Initial engineering targets set during authorized P0 execution; these figures are not prior user-supplied promises or measured achievements. Changes must reopen P0.01 before evaluating a replacement target.",
+  "targets_version": "p0-initial-1",
+  "qualification": {
+    "performance_pass": false,
+    "corpus_status": "not_selected_or_frozen",
+    "reference_baseline_status": "not_measured",
+    "pancake_runtime_status": "not_implemented",
+    "p0_01_status": "blocked_on_real_corpus_and_support_matrix"
+  },
+  "targets": {
+    "warm_completed_job": {
+      "minimum_speedup": 2.0,
+      "maximum_candidate_to_reference_median_ratio": 0.5,
+      "applies": "Every selected recipe/method/explicit-device profile independently; no pooled averaging hides a failing profile."
+    },
+    "cold_completed_job": {
+      "maximum_candidate_to_reference_median_ratio": 1.0,
+      "includes": "Fresh process, isolated empty application/compiler/JIT/autotune caches, initialization, full decode/alignment/fusion/export; OS disk caches are not claimed cold."
+    },
+    "peak_memory": {
+      "maximum_candidate_to_reference_ratio": 0.5,
+      "discrete_gpu": "Enforce separately for process-tree peak resident memory and attributable peak GPU allocated/resident memory where reliably measurable. Do not move allocations from CPU to GPU to claim half memory.",
+      "apple_unified": "Use peak task physical footprint as primary physical-memory metric; record peak RSS and logical GPU allocations separately, never add them to footprint. Same measurement tool/version and sampling rules for both targets.",
+      "unavailable_metric": "Do not claim pass for an unmeasured required memory metric; mark profile pending."
+    },
+    "viewer_event_to_present": {
+      "p95_max_ms": 33,
+      "minimum_events": 200,
+      "event_set": "source/result selection, pan, zoom and comparison drag on selected real 24MP image; exposure preview if exposed",
+      "endpoint": "Native input dispatch timestamp to first presented correct image/state, not compute submission, callback return or screenshot call duration.",
+      "concurrent_load": "Measure both idle and during real numerical processing."
+    },
+    "pause_and_cancel": {
+      "acknowledgement_max_ms": 250,
+      "minimum_requests_per_operation": 30,
+      "pause_endpoint": "Worker has reached safe boundary, no new processing batch submits, truthful paused state is observed. UI receipt/Pausing alone is insufficient.",
+      "cancel_endpoint": "Worker has accepted cancellation and stopped new decode/compute submissions; truthful Cancelling state is observed. Track settled reusable Idle and resource-drain latency separately; never label unfinished cleanup Complete.",
+      "measurement": "Apply deadline to every sampled acknowledgement, not only mean; also report P50/P95/max and settled-state latency. Use actual 64-frame lifecycle workload and selected real jobs, never sleeps/barriers/business hooks."
+    }
+  },
+  "reference": {
+    "suite_source_commit": "00bd1371e1ee8873a90e462d8cef3ef0c5d05e92",
+    "runtime_lock_sha256": "fda57ac5eea063aebcc278eb57a90228e6da32fe2d8f67d7025ac367f4b51036",
+    "descriptor_sha256": "e3e951b674bc0103f267575a99533cc33ead40e2af56671766f4fc71f3f12b76",
+    "instrumentation": "Disable Python/Rust coverage and profiling while measuring primary timings; retain actual backend evidence as separately recorded or identically instrumented validation run.",
+    "baseline_measurement_status": "not_run"
+  },
+  "workloads": [
+    {
+      "id": "T50",
+      "domain": "focus_stacking",
+      "frames": 50,
+      "dimensions": [
+        6000,
+        4000
+      ],
+      "input": "RGB16 TIFF, lossless ZIP/Deflate",
+      "source_requirement": "50 distinct consecutive real optical focus frames; common recorded crop from native images at least 6000x4000 allowed; no synthetic source, resizing, repeated frame, or duplicated path to fill count.",
+      "methods": [
+        "laplacian",
+        "hybrid",
+        "weighted_average",
+        "depth_map"
+      ],
+      "alignment_mode": "similarity",
+      "slab_size": 0
+    },
+    {
+      "id": "R50",
+      "domain": "focus_stacking",
+      "frames": 50,
+      "dimensions": "native, recorded per selected camera",
+      "input": "native supported camera RAW",
+      "source_requirement": "50 distinct real optical focus frames from one capture, retaining full RAW decode and camera metadata; no embedded-thumbnail substitute.",
+      "methods": [
+        "laplacian",
+        "hybrid",
+        "weighted_average",
+        "depth_map"
+      ],
+      "alignment_mode": "similarity",
+      "slab_size": 0
+    },
+    {
+      "id": "D150",
+      "domain": "focus_stacking",
+      "frames": 150,
+      "dimensions": "native, fixed and recorded across frames",
+      "input": "native supported camera files or losslessly derived TIFF; record actual source precision",
+      "source_requirement": "150 distinct consecutive real deep-focus capture frames; retain source and conversion hashes.",
+      "methods": [
+        "laplacian",
+        "hybrid",
+        "weighted_average",
+        "depth_map"
+      ],
+      "alignment_mode": "breathing",
+      "slab_size": 40,
+      "slab_overlap": 4
+    },
+    {
+      "id": "E9",
+      "domain": "exposure_fusion",
+      "frames": 9,
+      "dimensions": "native, fixed and recorded across frames",
+      "input": "original supported exposure-bracket files or provenance-pinned float32 linear TIFF derivatives",
+      "source_requirement": "Nine distinct bracketed exposures of same scene/focus; not a focus stack and not nine repeats of one source.",
+      "methods": [
+        "exposure_fusion"
+      ],
+      "alignment_mode": "euclidean",
+      "exposure_batch_tree": "4+4+1 frames, equal final batch weights; preserve current contract semantics"
+    }
+  ],
+  "common_profile": {
+    "kernel_size": 6,
+    "pyramid_levels": 8,
+    "alignment_reference": "first",
+    "scale_factor": 6,
+    "auto_parameters": false,
+    "auto_crop": true,
+    "output_format": "tiff",
+    "output_bit_depth": 16,
+    "quality_report": false
+  },
+  "measurement_protocol": {
+    "warm": {
+      "warmup_complete_jobs": 2,
+      "measured_complete_jobs": 10,
+      "process_model": "Each CLI job uses a fresh process but pre-warmed persistent compiler/shader/Numba caches and normal OS file caches. No decoded-input/result cache crosses jobs. Report GUI persistent-engine timings separately.",
+      "timer": "Monotonic parent wall clock immediately before process spawn through successful process exit with complete export closed/published. Decode output independently after timer to validate completion. Enqueue-only timings are invalid.",
+      "primary_statistic": "Median of 10 completed jobs; retain all samples, min, P50, nearest-rank P95 and max. Job P95 is descriptive at n=10, not tail certification."
+    },
+    "cold": {
+      "measured_complete_jobs": 5,
+      "cache_policy": "Unique case-owned application/compiler caches per run for both targets; do not delete global/user caches or install drivers during timed runs.",
+      "primary_statistic": "Median of 5 completed fresh-cache jobs; report each run and compile/setup breakdown separately where available."
+    },
+    "latency": {
+      "events": 200,
+      "p95": "Empirical nearest rank, sorted sample at ceil(0.95*n); no inferred FPS or image-pack kernel latency substitute.",
+      "lifecycle_requests_per_operation": 30
+    },
+    "scheduling": "Serialize benchmark jobs per device. Alternate target order per pair. Same hardware, power mode, driver, OS, input bytes, method/settings and output depth. Record thermal/power state; no concurrent audit or GPU workloads. Rerun only for a documented invalid measurement, retaining original data and reason; never retry away numerical failure.",
+    "device_matching": "Explicit CPU versus explicit CPU on same physical host; explicit GPU versus explicit GPU on same physical GPU. Native CUDA/HIP may compare against reference OpenCL on that physical GPU, with APIs disclosed. Never compare candidate CPU with baseline GPU, different devices, or only Auto selections; qualify Auto separately.",
+    "memory": "Fresh process for every measured job; capture high-water marks over initialization through exit, including workers, staging, output encoding and cleanup. Record OS units and instrumentation. Sample device/process counters at <=20ms if no high-water counter; declare resolution and missed-short-peak limitation.",
+    "provenance": "Freeze ordered selected input SHA256/byte-size/shape/exposure metadata, rights/source and conversion commands, target commit+lock+flags, physical device/driver/OS/power identity, timer/memory tool version, output hashes, samples and validation results."
+  },
+  "read_only_corpus_discovery": {
+    "scope": "Existing workspace datasets/ plus versioned Bokehforge source configuration only; no personal photo-library scan.",
+    "observed": "Workspace datasets/ contains .bokehforge state/cache/report directories; no TIFF/DNG/RAW files found by extension scan.",
+    "configured_candidate": "D02: jjjsood/focus-stack-sample, raw CR3 macro capture, pinned config revision 0f8256edf2d2e3f1f1ea162f78a8bca36eb6915c, CC BY 4.0 per versioned source config; not selected/acquired/verified here.",
+    "selection_status": "pending",
+    "budget": "Preserve Bokehforge configured 2147483648-byte download cap; no implicit dataset acquisition authorized by this metadata."
+  }
+}
