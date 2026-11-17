@@ -1,0 +1,4367 @@
+{
+  "schema_version": 1,
+  "review_basis": {
+    "candidate": "Final P0 kernel graph: CubeCL 0.11.4, Slint 1.19.0, wgpu 30.0.2, reviewed vendor patches and lock unification",
+    "evidence": [
+      "docs/p0-runtime-evidence.json",
+      "docs/p0-upstream-patch-review.md"
+    ],
+    "metadata_sha256": "b5aeb34708c8b418bc9969d6cd1490efd1caa5e4bf18d04f9463a2df54d927c7",
+    "scope": "Full metadata covers optional/platform/build paths for Clippy; cargo-deny skips cover only diagnosed desktop-target duplicate groups. Reviews do not qualify runtime behavior."
+  },
+  "duplicate_exceptions": [
+    {
+      "name": "allocator-api2",
+      "version": "0.2.21",
+      "reason": "Hashbrown and optional Turso monitoring require different allocator-trait generations; allocators and allocated collections stay inside each owning parent.",
+      "parents": [
+        {
+          "name": "hashbrown",
+          "version": "0.15.5",
+          "requirement": "^0.2.9"
+        },
+        {
+          "name": "hashbrown",
+          "version": "0.16.1",
+          "requirement": "^0.2.9"
+        },
+        {
+          "name": "hashbrown",
+          "version": "0.17.1",
+          "requirement": "^0.2.9"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "allocator-api2",
+      "version": "0.4.0",
+      "reason": "Hashbrown and optional Turso monitoring require different allocator-trait generations; allocators and allocated collections stay inside each owning parent.",
+      "parents": [
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^0.4"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "base64",
+      "version": "0.22.1",
+      "reason": "Optional monitoring sync and current HTTP/SVG parents require distinct base64 APIs; encoded byte/text results do not share codec state.",
+      "parents": [
+        {
+          "name": "turso_sync_engine",
+          "version": "0.8.3",
+          "requirement": "^0.22.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "base64",
+      "version": "0.23.1",
+      "reason": "Optional monitoring sync and current HTTP/SVG parents require distinct base64 APIs; encoded byte/text results do not share codec state.",
+      "parents": [
+        {
+          "name": "ureq",
+          "version": "3.5.2",
+          "requirement": "^0.23.1"
+        },
+        {
+          "name": "ureq-proto",
+          "version": "0.7.1",
+          "requirement": "^0.23.1"
+        },
+        {
+          "name": "usvg",
+          "version": "0.49.0",
+          "requirement": "^0.23"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "bindgen",
+      "version": "0.69.5",
+      "reason": "Optional Turso SDKs and Skia bindings require different host binding-generator APIs; generated bindings stay in their respective parent crates.",
+      "parents": [
+        {
+          "name": "turso_sdk_kit",
+          "version": "0.8.3",
+          "requirement": "^0.69.5"
+        },
+        {
+          "name": "turso_sync_sdk_kit",
+          "version": "0.8.3",
+          "requirement": "^0.69.5"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "bindgen",
+      "version": "0.73.2",
+      "reason": "Optional Turso SDKs and Skia bindings require different host binding-generator APIs; generated bindings stay in their respective parent crates.",
+      "parents": [
+        {
+          "name": "skia-bindings",
+          "version": "0.157.0",
+          "requirement": "^0.73.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "bitflags",
+      "version": "1.3.2",
+      "reason": "Legacy native platform wrappers require bitflags 1; modern GPU/UI crates use bitflags 2. Flag types stay inside each parent API.",
+      "parents": [
+        {
+          "name": "core-graphics",
+          "version": "0.23.2",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "core-graphics-types",
+          "version": "0.1.3",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "redox_syscall",
+          "version": "0.4.1",
+          "requirement": "^1.1.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "bitflags",
+      "version": "2.13.2",
+      "reason": "Legacy native platform wrappers require bitflags 1; modern GPU/UI crates use bitflags 2. Flag types stay inside each parent API.",
+      "parents": [
+        {
+          "name": "android-activity",
+          "version": "0.6.1",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "bindgen",
+          "version": "0.69.5",
+          "requirement": "^2.2.1"
+        },
+        {
+          "name": "bindgen",
+          "version": "0.73.2",
+          "requirement": "^2.2.1"
+        },
+        {
+          "name": "calloop",
+          "version": "0.13.0",
+          "requirement": "^2.4"
+        },
+        {
+          "name": "calloop",
+          "version": "0.14.5",
+          "requirement": "^2.4"
+        },
+        {
+          "name": "cubecl-core",
+          "version": "0.11.4",
+          "requirement": "^2.13.1"
+        },
+        {
+          "name": "cubecl-spirv",
+          "version": "0.11.4",
+          "requirement": "^2.13.1"
+        },
+        {
+          "name": "dispatch2",
+          "version": "0.3.1",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "drm",
+          "version": "0.14.1",
+          "requirement": "^2"
+        },
+        {
+          "name": "drm",
+          "version": "0.15.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "femtovg",
+          "version": "0.28.0",
+          "requirement": "^2.6.0"
+        },
+        {
+          "name": "gbm",
+          "version": "0.18.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "glutin",
+          "version": "0.32.3",
+          "requirement": "^2.2.1"
+        },
+        {
+          "name": "harfrust",
+          "version": "0.12.0",
+          "requirement": "^2.9"
+        },
+        {
+          "name": "i-slint-core",
+          "version": "1.19.0",
+          "requirement": "^2.4.2"
+        },
+        {
+          "name": "io-uring",
+          "version": "0.7.16",
+          "requirement": "^2"
+        },
+        {
+          "name": "keyboard-types",
+          "version": "0.8.3",
+          "requirement": "^2"
+        },
+        {
+          "name": "libredox",
+          "version": "0.1.25",
+          "requirement": "^2"
+        },
+        {
+          "name": "naga",
+          "version": "30.0.2",
+          "requirement": "^2.9"
+        },
+        {
+          "name": "ndk",
+          "version": "0.9.0",
+          "requirement": "^2.4"
+        },
+        {
+          "name": "nix",
+          "version": "0.31.4",
+          "requirement": "^2.3.3"
+        },
+        {
+          "name": "nvml-wrapper",
+          "version": "0.13.0",
+          "requirement": "^2.4.0"
+        },
+        {
+          "name": "objc2-app-kit",
+          "version": "0.2.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-cloud-kit",
+          "version": "0.2.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-core-data",
+          "version": "0.2.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-core-foundation",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-core-graphics",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-core-text",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-foundation",
+          "version": "0.2.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-foundation",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-io-kit",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-io-surface",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-metal",
+          "version": "0.2.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-metal",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-quartz-core",
+          "version": "0.2.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-quartz-core",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.2.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.3.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "objc2-user-notifications",
+          "version": "0.2.2",
+          "requirement": "^2.5.0"
+        },
+        {
+          "name": "pliron-llvm",
+          "version": "0.19.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "png",
+          "version": "0.18.1",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "pulldown-cmark",
+          "version": "0.13.6",
+          "requirement": "^2"
+        },
+        {
+          "name": "redox_syscall",
+          "version": "0.5.18",
+          "requirement": "^2.4"
+        },
+        {
+          "name": "redox_syscall",
+          "version": "0.9.5",
+          "requirement": "^2.4"
+        },
+        {
+          "name": "rustc_apfloat",
+          "version": "0.2.3+llvm-462a31f5a5ab",
+          "requirement": "^2.6.0"
+        },
+        {
+          "name": "rustix",
+          "version": "0.38.44",
+          "requirement": "^2.4.0"
+        },
+        {
+          "name": "rustix",
+          "version": "1.1.6",
+          "requirement": "^2.9.2"
+        },
+        {
+          "name": "skia-safe",
+          "version": "0.157.0",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.19.2",
+          "requirement": "^2.4"
+        },
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.20.0",
+          "requirement": "^2.4"
+        },
+        {
+          "name": "spirv",
+          "version": "0.4.0+sdk-1.4.341.0",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "tracel-rspirv",
+          "version": "0.16.1+sdk-1.4.357.0",
+          "requirement": "^2.9.4"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^2.9.4"
+        },
+        {
+          "name": "turso_parser",
+          "version": "0.8.3",
+          "requirement": "^2.9.4"
+        },
+        {
+          "name": "wayland-client",
+          "version": "0.31.15",
+          "requirement": "^2"
+        },
+        {
+          "name": "wayland-csd-frame",
+          "version": "0.3.0",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "wayland-protocols",
+          "version": "0.32.13",
+          "requirement": "^2"
+        },
+        {
+          "name": "wayland-protocols-experimental",
+          "version": "20250721.0.1",
+          "requirement": "^2"
+        },
+        {
+          "name": "wayland-protocols-misc",
+          "version": "0.3.12",
+          "requirement": "^2"
+        },
+        {
+          "name": "wayland-protocols-plasma",
+          "version": "0.3.12",
+          "requirement": "^2"
+        },
+        {
+          "name": "wayland-protocols-wlr",
+          "version": "0.3.12",
+          "requirement": "^2"
+        },
+        {
+          "name": "wgpu",
+          "version": "30.0.2",
+          "requirement": "^2.9"
+        },
+        {
+          "name": "wgpu-core",
+          "version": "30.0.2",
+          "requirement": "^2.9"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^2.9"
+        },
+        {
+          "name": "wgpu-types",
+          "version": "30.0.2",
+          "requirement": "^2.9"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^2"
+        },
+        {
+          "name": "xkbcommon-dl",
+          "version": "0.4.2",
+          "requirement": "^2.3.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "block2",
+      "version": "0.5.1",
+      "reason": "Winit and newer Apple platform wrappers require different Objective-C block binding generations; do not exchange their block wrapper types.",
+      "parents": [
+        {
+          "name": "objc2-app-kit",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-cloud-kit",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-contacts",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-core-data",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-core-image",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-core-location",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-foundation",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-link-presentation",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-metal",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-quartz-core",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-uniform-type-identifiers",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "objc2-user-notifications",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.5.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "block2",
+      "version": "0.6.2",
+      "reason": "Winit and newer Apple platform wrappers require different Objective-C block binding generations; do not exchange their block wrapper types.",
+      "parents": [
+        {
+          "name": "cubecl-metal",
+          "version": "0.11.4",
+          "requirement": "^0.6"
+        },
+        {
+          "name": "dispatch2",
+          "version": "0.3.1",
+          "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
+          "name": "i-slint-backend-winit",
+          "version": "1.19.0",
+          "requirement": "^0.6.2"
+        },
+        {
+          "name": "objc2-core-foundation",
+          "version": "0.3.2",
+          "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
+          "name": "objc2-foundation",
+          "version": "0.3.2",
+          "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
+          "name": "objc2-io-kit",
+          "version": "0.3.2",
+          "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
+          "name": "objc2-metal",
+          "version": "0.3.2",
+          "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.3.2",
+          "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.6.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "calloop",
+      "version": "0.13.0",
+      "reason": "Winit and its Wayland titlebar stack require different event-loop generations; each owns its event sources and callbacks.",
+      "parents": [
+        {
+          "name": "calloop-wayland-source",
+          "version": "0.3.0",
+          "requirement": "^0.13.0"
+        },
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.19.2",
+          "requirement": "^0.13.0"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.13.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "calloop",
+      "version": "0.14.5",
+      "reason": "Winit and its Wayland titlebar stack require different event-loop generations; each owns its event sources and callbacks.",
+      "parents": [
+        {
+          "name": "calloop-wayland-source",
+          "version": "0.4.1",
+          "requirement": "^0.14.0"
+        },
+        {
+          "name": "i-slint-backend-linuxkms",
+          "version": "1.19.0",
+          "requirement": "^0.14.1"
+        },
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.20.0",
+          "requirement": "^0.14.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "calloop-wayland-source",
+      "version": "0.3.0",
+      "reason": "Separate Smithay toolkit generations require matching Wayland event-source APIs; parent-private event sources cannot be substituted across versions.",
+      "parents": [
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.19.2",
+          "requirement": "^0.3.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "calloop-wayland-source",
+      "version": "0.4.1",
+      "reason": "Separate Smithay toolkit generations require matching Wayland event-source APIs; parent-private event sources cannot be substituted across versions.",
+      "parents": [
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.20.0",
+          "requirement": "^0.4.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "convert_case",
+      "version": "0.10.0",
+      "reason": "Different code-generation crates require distinct case-conversion APIs; generated identifiers are strings and no runtime ABI is shared.",
+      "parents": [
+        {
+          "name": "derive_more-impl",
+          "version": "2.1.1",
+          "requirement": "^0.10"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "convert_case",
+      "version": "0.11.0",
+      "reason": "Different code-generation crates require distinct case-conversion APIs; generated identifiers are strings and no runtime ABI is shared.",
+      "parents": [
+        {
+          "name": "pliron-derive",
+          "version": "0.19.0",
+          "requirement": "^0.11"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "cpufeatures",
+      "version": "0.2.17",
+      "reason": "Private hash/crypto implementation parents require different CPU-detection generations; only each parent consumes its detected feature values.",
+      "parents": [
+        {
+          "name": "aes",
+          "version": "0.8.4",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "polyval",
+          "version": "0.6.2",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "sha2",
+          "version": "0.10.9",
+          "requirement": "^0.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "cpufeatures",
+      "version": "0.3.1",
+      "reason": "Private hash/crypto implementation parents require different CPU-detection generations; only each parent consumes its detected feature values.",
+      "parents": [
+        {
+          "name": "chacha20",
+          "version": "0.10.2",
+          "requirement": "^0.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "darling",
+      "version": "0.20.11",
+      "reason": "Independent derive-macro generations require matching darling AST APIs; this host-side code generation does not share runtime values.",
+      "parents": [
+        {
+          "name": "wrapcenum-derive",
+          "version": "0.4.1",
+          "requirement": "^0.20"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "darling",
+      "version": "0.24.1",
+      "reason": "Independent derive-macro generations require matching darling AST APIs; this host-side code generation does not share runtime values.",
+      "parents": [
+        {
+          "name": "cubecl-macros",
+          "version": "0.11.4",
+          "requirement": "^0.24"
+        },
+        {
+          "name": "cubecl-macros-internal",
+          "version": "0.11.4",
+          "requirement": "^0.24"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "darling_core",
+      "version": "0.20.11",
+      "reason": "Matching darling generations require their own core parser APIs; this host-side derive implementation stays within each macro dependency tree.",
+      "parents": [
+        {
+          "name": "darling",
+          "version": "0.20.11",
+          "requirement": "=0.20.11"
+        },
+        {
+          "name": "darling_macro",
+          "version": "0.20.11",
+          "requirement": "=0.20.11"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "darling_core",
+      "version": "0.24.1",
+      "reason": "Matching darling generations require their own core parser APIs; this host-side derive implementation stays within each macro dependency tree.",
+      "parents": [
+        {
+          "name": "darling",
+          "version": "0.24.1",
+          "requirement": "=0.24.1"
+        },
+        {
+          "name": "darling_macro",
+          "version": "0.24.1",
+          "requirement": "=0.24.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "darling_macro",
+      "version": "0.20.11",
+      "reason": "Matching darling generations require their own proc-macro implementation APIs; this host-side code generation does not cross runtime boundaries.",
+      "parents": [
+        {
+          "name": "darling",
+          "version": "0.20.11",
+          "requirement": "=0.20.11"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "darling_macro",
+      "version": "0.24.1",
+      "reason": "Matching darling generations require their own proc-macro implementation APIs; this host-side code generation does not cross runtime boundaries.",
+      "parents": [
+        {
+          "name": "darling",
+          "version": "0.24.1",
+          "requirement": "=0.24.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "downcast-rs",
+      "version": "1.2.1",
+      "reason": "Legacy Wayland and current UI parents require different trait-object downcast APIs; parent-local trait objects are not exchanged between generations.",
+      "parents": [
+        {
+          "name": "wayland-backend",
+          "version": "0.3.17",
+          "requirement": "^1.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "downcast-rs",
+      "version": "2.0.2",
+      "reason": "Legacy Wayland and current UI parents require different trait-object downcast APIs; parent-local trait objects are not exchanged between generations.",
+      "parents": [
+        {
+          "name": "cubecl-opt",
+          "version": "0.11.4",
+          "requirement": "^2"
+        },
+        {
+          "name": "pliron",
+          "version": "0.19.0",
+          "requirement": "^2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "drm",
+      "version": "0.14.1",
+      "reason": "Linux KMS/software-window and wgpu-hal integrations require different DRM wrapper APIs; each parent owns its wrappers and shared window/GPU resources remain unique.",
+      "parents": [
+        {
+          "name": "gbm",
+          "version": "0.18.0",
+          "requirement": "^0.14.0"
+        },
+        {
+          "name": "i-slint-backend-linuxkms",
+          "version": "1.19.0",
+          "requirement": "^0.14.0"
+        },
+        {
+          "name": "softbuffer",
+          "version": "0.4.8",
+          "requirement": "^0.14.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "drm",
+      "version": "0.15.0",
+      "reason": "Linux KMS/software-window and wgpu-hal integrations require different DRM wrapper APIs; each parent owns its wrappers and shared window/GPU resources remain unique.",
+      "parents": [
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.15"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "embedded-hal",
+      "version": "0.2.7",
+      "reason": "Optional embedded time support deliberately depends on both HAL generations through named aliases; trait implementations do not cross the desktop GPU boundary.",
+      "parents": [
+        {
+          "name": "embassy-time",
+          "version": "0.5.1",
+          "requirement": "^0.2.6"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "embedded-hal",
+      "version": "1.0.0",
+      "reason": "Optional embedded time support deliberately depends on both HAL generations through named aliases; trait implementations do not cross the desktop GPU boundary.",
+      "parents": [
+        {
+          "name": "embassy-time",
+          "version": "0.5.1",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "embedded-hal-async",
+          "version": "1.0.0",
+          "requirement": "^1.0.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "foldhash",
+      "version": "0.1.5",
+      "reason": "Distinct hashbrown generations require matching hash implementations; hash state is internal to each owning collection.",
+      "parents": [
+        {
+          "name": "hashbrown",
+          "version": "0.15.5",
+          "requirement": "^0.1.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "foldhash",
+      "version": "0.2.0",
+      "reason": "Distinct hashbrown generations require matching hash implementations; hash state is internal to each owning collection.",
+      "parents": [
+        {
+          "name": "cubecl-environment",
+          "version": "0.11.4",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "cubecl-ir",
+          "version": "0.11.4",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "cubecl-opt",
+          "version": "0.11.4",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "cubecl-runtime",
+          "version": "0.11.4",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "cubecl-server",
+          "version": "0.11.4",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "hashbrown",
+          "version": "0.16.1",
+          "requirement": "^0.2.0"
+        },
+        {
+          "name": "hashbrown",
+          "version": "0.17.1",
+          "requirement": "^0.2.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "getrandom",
+      "version": "0.2.17",
+      "reason": "Platform and utility parents require incompatible random-byte API generations; random-byte results are plain buffers, not shared generator objects.",
+      "parents": [
+        {
+          "name": "rand_core",
+          "version": "0.6.4",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "ring",
+          "version": "0.17.14",
+          "requirement": "^0.2.10"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^0.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "getrandom",
+      "version": "0.3.4",
+      "reason": "Platform and utility parents require incompatible random-byte API generations; random-byte results are plain buffers, not shared generator objects.",
+      "parents": [
+        {
+          "name": "ahash",
+          "version": "0.8.12",
+          "requirement": "^0.3.1"
+        },
+        {
+          "name": "fastbloom",
+          "version": "0.14.1",
+          "requirement": "^0.3"
+        },
+        {
+          "name": "rand_core",
+          "version": "0.9.5",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^0.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "getrandom",
+      "version": "0.4.3",
+      "reason": "Platform and utility parents require incompatible random-byte API generations; random-byte results are plain buffers, not shared generator objects.",
+      "parents": [
+        {
+          "name": "jobserver",
+          "version": "0.1.35",
+          "requirement": "^0.4"
+        },
+        {
+          "name": "rand",
+          "version": "0.10.4",
+          "requirement": "^0.4.0"
+        },
+        {
+          "name": "tempfile",
+          "version": "3.27.0",
+          "requirement": ">=0.3.0, <0.5"
+        },
+        {
+          "name": "turso_ext",
+          "version": "0.8.3",
+          "requirement": "^0.4.2"
+        },
+        {
+          "name": "uuid",
+          "version": "1.29.3",
+          "requirement": "^0.4"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "glow",
+      "version": "0.17.0",
+      "reason": "Wgpu-hal 30 requires glow 0.17 while Slint/FemtoVG requires glow 0.18. Each owns its GL wrapper; the application shares one wgpu family only.",
+      "parents": [
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.17"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "glow",
+      "version": "0.18.0",
+      "reason": "Wgpu-hal 30 requires glow 0.17 while Slint/FemtoVG requires glow 0.18. Each owns its GL wrapper; the application shares one wgpu family only.",
+      "parents": [
+        {
+          "name": "femtovg",
+          "version": "0.28.0",
+          "requirement": "^0.18.0"
+        },
+        {
+          "name": "i-slint-renderer-femtovg",
+          "version": "1.19.0",
+          "requirement": "^0.18"
+        },
+        {
+          "name": "i-slint-renderer-skia",
+          "version": "1.19.0",
+          "requirement": "^0.18"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.14.5",
+      "reason": "Compiler, UI and runtime parents require distinct collection APIs; maps stay private to their parent and shared GPU/window handles remain single-version.",
+      "parents": [
+        {
+          "name": "rowan",
+          "version": "0.17.0",
+          "requirement": "^0.14.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.15.5",
+      "reason": "Compiler, UI and runtime parents require distinct collection APIs; maps stay private to their parent and shared GPU/window handles remain single-version.",
+      "parents": [
+        {
+          "name": "internment",
+          "version": "0.8.6",
+          "requirement": "^0.15.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.16.1",
+      "reason": "Compiler, UI and runtime parents require distinct collection APIs; maps stay private to their parent and shared GPU/window handles remain single-version.",
+      "parents": [
+        {
+          "name": "clru",
+          "version": "0.6.3",
+          "requirement": "^0.16"
+        },
+        {
+          "name": "gpu-allocator",
+          "version": "0.28.0",
+          "requirement": "^0.16.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.17.1",
+      "reason": "Compiler, UI and runtime parents require distinct collection APIs; maps stay private to their parent and shared GPU/window handles remain single-version.",
+      "parents": [
+        {
+          "name": "accesskit_consumer",
+          "version": "0.39.2",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "accesskit_ios",
+          "version": "0.2.2",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "accesskit_macos",
+          "version": "0.27.2",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "accesskit_windows",
+          "version": "0.35.2",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-common",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-core",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-environment",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-ir",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-metal",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-opt",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-runtime",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-server",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-spirv",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "cubecl-wgpu",
+          "version": "0.11.4",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "fontique",
+          "version": "0.12.0",
+          "requirement": "^0.17.1"
+        },
+        {
+          "name": "indexmap",
+          "version": "2.14.2",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "naga",
+          "version": "30.0.2",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "naga-types",
+          "version": "30.0.2",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "parley",
+          "version": "0.12.0",
+          "requirement": "^0.17.1"
+        },
+        {
+          "name": "parley_engine",
+          "version": "0.12.0",
+          "requirement": "^0.17.1"
+        },
+        {
+          "name": "pliron",
+          "version": "0.19.0",
+          "requirement": "^0"
+        },
+        {
+          "name": "wgpu",
+          "version": "30.0.2",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "wgpu-core",
+          "version": "30.0.2",
+          "requirement": "^0.17"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.17"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "itertools",
+      "version": "0.12.1",
+      "reason": "Legacy bindgen requires an older iterator-helper generation while CubeCL/Slint require current APIs; iterator adapters remain local to their parent code.",
+      "parents": [
+        {
+          "name": "bindgen",
+          "version": "0.69.5",
+          "requirement": ">=0.10, <0.13"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "itertools",
+      "version": "0.15.0",
+      "reason": "Legacy bindgen requires an older iterator-helper generation while CubeCL/Slint require current APIs; iterator adapters remain local to their parent code.",
+      "parents": [
+        {
+          "name": "cubecl-core",
+          "version": "0.11.4",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "cubecl-cpp",
+          "version": "0.11.4",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "cubecl-ir",
+          "version": "0.11.4",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "cubecl-macros",
+          "version": "0.11.4",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "cubecl-opt",
+          "version": "0.11.4",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "cubecl-runtime",
+          "version": "0.11.4",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "cubecl-server",
+          "version": "0.11.4",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "cubecl-spirv",
+          "version": "0.11.4",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "cubecl-wgpu",
+          "version": "0.11.4",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "femtovg",
+          "version": "0.28.0",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "i-slint-backend-winit",
+          "version": "1.19.0",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "i-slint-compiler",
+          "version": "1.19.0",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "pliron-spirv",
+          "version": "0.16.1+sdk-1.4.357.0",
+          "requirement": "^0.15"
+        },
+        {
+          "name": "prost-derive",
+          "version": "0.14.6",
+          "requirement": ">=0.10.1, <=0.15"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "jni-sys",
+      "version": "0.3.1",
+      "reason": "Android NDK and JNI parents require different native binding generations, including a compatibility wrapper; no desktop GPU resource is exchanged through these bindings.",
+      "parents": [
+        {
+          "name": "ndk",
+          "version": "0.9.0",
+          "requirement": "^0.3"
+        },
+        {
+          "name": "ndk-sys",
+          "version": "0.6.0+11769913",
+          "requirement": "^0.3.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "jni-sys",
+      "version": "0.4.1",
+      "reason": "Android NDK and JNI parents require different native binding generations, including a compatibility wrapper; no desktop GPU resource is exchanged through these bindings.",
+      "parents": [
+        {
+          "name": "jni",
+          "version": "0.22.4",
+          "requirement": "^0.4.1"
+        },
+        {
+          "name": "jni-sys",
+          "version": "0.3.1",
+          "requirement": "^0.4"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "libloading",
+      "version": "0.8.9",
+      "reason": "Native library users and optional CUDA bindings require different loader APIs; each parent owns its library handles and symbol lifetimes.",
+      "parents": [
+        {
+          "name": "antithesis_sdk",
+          "version": "0.3.0",
+          "requirement": "^0.8"
+        },
+        {
+          "name": "ash",
+          "version": "0.38.0+1.3.281",
+          "requirement": "^0.8"
+        },
+        {
+          "name": "clang-sys",
+          "version": "1.9.1",
+          "requirement": "^0.8"
+        },
+        {
+          "name": "cubecl-hip-sys",
+          "version": "7.14.6085001",
+          "requirement": "^0.8"
+        },
+        {
+          "name": "dlib",
+          "version": "0.5.3",
+          "requirement": ">=0.7, <0.9"
+        },
+        {
+          "name": "glutin",
+          "version": "0.32.3",
+          "requirement": "^0.8.0"
+        },
+        {
+          "name": "khronos-egl",
+          "version": "6.0.0",
+          "requirement": "^0.8"
+        },
+        {
+          "name": "nvml-wrapper",
+          "version": "0.13.0",
+          "requirement": "^0.8.1"
+        },
+        {
+          "name": "nvml-wrapper-sys",
+          "version": "0.10.0",
+          "requirement": "^0.8.1"
+        },
+        {
+          "name": "tiny-xlib",
+          "version": "0.2.5",
+          "requirement": "^0.8.0"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^0.8.6"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.8"
+        },
+        {
+          "name": "x11rb",
+          "version": "0.13.2",
+          "requirement": "^0.8.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "libloading",
+      "version": "0.9.1",
+      "reason": "Native library users and optional CUDA bindings require different loader APIs; each parent owns its library handles and symbol lifetimes.",
+      "parents": [
+        {
+          "name": "cudarc",
+          "version": "0.19.10",
+          "requirement": "^0.9.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "linux-raw-sys",
+      "version": "0.4.15",
+      "reason": "Rustix generations require their matching Linux syscall bindings. Binding types remain internal to each syscall wrapper.",
+      "parents": [
+        {
+          "name": "rustix",
+          "version": "0.38.44",
+          "requirement": "^0.4.14"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "linux-raw-sys",
+      "version": "0.9.4",
+      "reason": "Rustix generations require their matching Linux syscall bindings. Binding types remain internal to each syscall wrapper.",
+      "parents": [
+        {
+          "name": "drm-sys",
+          "version": "0.8.1",
+          "requirement": "^0.9"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "linux-raw-sys",
+      "version": "0.12.1",
+      "reason": "Rustix generations require their matching Linux syscall bindings. Binding types remain internal to each syscall wrapper.",
+      "parents": [
+        {
+          "name": "rustix",
+          "version": "1.1.6",
+          "requirement": "^0.12"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "miniz_oxide",
+      "version": "0.8.9",
+      "reason": "Image/compression and backtrace parents require different decompression APIs; each owns its buffers and decompressor state.",
+      "parents": [
+        {
+          "name": "png",
+          "version": "0.18.1",
+          "requirement": "^0.8"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "miniz_oxide",
+      "version": "0.9.1",
+      "reason": "Image/compression and backtrace parents require different decompression APIs; each owns its buffers and decompressor state.",
+      "parents": [
+        {
+          "name": "backtrace",
+          "version": "0.3.77",
+          "requirement": "^0.9"
+        },
+        {
+          "name": "flate2",
+          "version": "1.1.11",
+          "requirement": "^0.9.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "nb",
+      "version": "0.1.3",
+      "reason": "Optional embedded HAL compatibility wraps the older nonblocking result API over a newer implementation; these result types remain in embedded support.",
+      "parents": [
+        {
+          "name": "embedded-hal",
+          "version": "0.2.7",
+          "requirement": "^0.1.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "nb",
+      "version": "1.1.0",
+      "reason": "Optional embedded HAL compatibility wraps the older nonblocking result API over a newer implementation; these result types remain in embedded support.",
+      "parents": [
+        {
+          "name": "nb",
+          "version": "0.1.3",
+          "requirement": "^1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "nom",
+      "version": "7.1.3",
+      "reason": "Optional binding generation and runtime type-name parsing require different parser-combinator APIs; parser state stays in its parent crate.",
+      "parents": [
+        {
+          "name": "cexpr",
+          "version": "0.6.0",
+          "requirement": "^7"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "nom",
+      "version": "8.0.0",
+      "reason": "Optional binding generation and runtime type-name parsing require different parser-combinator APIs; parser state stays in its parent crate.",
+      "parents": [
+        {
+          "name": "tynm",
+          "version": "0.2.0",
+          "requirement": "^8.0.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2",
+      "version": "0.5.3",
+      "reason": "Winit requires objc2 0.5 while wgpu-hal uses objc2 0.6. Native object wrappers stay within their owning parent; shared raw-window-handle remains unique.",
+      "parents": [
+        {
+          "name": "accesskit_ios",
+          "version": "0.2.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "accesskit_macos",
+          "version": "0.27.2",
+          "requirement": "^0.5.1"
+        },
+        {
+          "name": "block2",
+          "version": "0.5.1",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-app-kit",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-cloud-kit",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-contacts",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-core-data",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-core-image",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-core-location",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-foundation",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-link-presentation",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-metal",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-quartz-core",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-symbols",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-uniform-type-identifiers",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "objc2-user-notifications",
+          "version": "0.2.2",
+          "requirement": "^0.5.2"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.5.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "objc2",
+      "version": "0.6.5",
+      "reason": "Winit requires objc2 0.5 while wgpu-hal uses objc2 0.6. Native object wrappers stay within their owning parent; shared raw-window-handle remains unique.",
+      "parents": [
+        {
+          "name": "arboard",
+          "version": "3.7.0",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "block2",
+          "version": "0.6.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "cubecl-metal",
+          "version": "0.11.4",
+          "requirement": "^0.6"
+        },
+        {
+          "name": "dispatch2",
+          "version": "0.3.1",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "fontique",
+          "version": "0.12.0",
+          "requirement": "^0.6.5"
+        },
+        {
+          "name": "glutin",
+          "version": "0.32.3",
+          "requirement": "^0.6.1"
+        },
+        {
+          "name": "i-slint-backend-winit",
+          "version": "1.19.0",
+          "requirement": "^0.6.3"
+        },
+        {
+          "name": "i-slint-common",
+          "version": "1.19.0",
+          "requirement": "^0.6.3"
+        },
+        {
+          "name": "i-slint-core",
+          "version": "1.19.0",
+          "requirement": "^0.6.3"
+        },
+        {
+          "name": "i-slint-renderer-skia",
+          "version": "1.19.0",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "muda",
+          "version": "0.21.2",
+          "requirement": "^0.6.1"
+        },
+        {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "objc2-core-foundation",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "objc2-core-graphics",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "objc2-foundation",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "objc2-io-kit",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "objc2-io-surface",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "objc2-metal",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "objc2-open-directory",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "objc2-quartz-core",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
+          "name": "raw-window-metal",
+          "version": "1.1.0",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "softbuffer",
+          "version": "0.4.8",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "webbrowser",
+          "version": "1.2.7",
+          "requirement": "^0.6"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.6.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-app-kit",
+      "version": "0.2.2",
+      "reason": "Winit and newer Apple integrations require incompatible AppKit binding generations; parent-owned wrappers must not be exchanged.",
+      "parents": [
+        {
+          "name": "accesskit_macos",
+          "version": "0.27.2",
+          "requirement": "^0.2.0"
+        },
+        {
+          "name": "objc2-link-presentation",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.2.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "objc2-app-kit",
+      "version": "0.3.2",
+      "reason": "Winit and newer Apple integrations require incompatible AppKit binding generations; parent-owned wrappers must not be exchanged.",
+      "parents": [
+        {
+          "name": "arboard",
+          "version": "3.7.0",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "glutin",
+          "version": "0.32.3",
+          "requirement": "^0.3.1"
+        },
+        {
+          "name": "i-slint-backend-winit",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "i-slint-core",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "i-slint-renderer-skia",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "muda",
+          "version": "0.21.2",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "webbrowser",
+          "version": "1.2.7",
+          "requirement": "^0.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-foundation",
+      "version": "0.2.2",
+      "reason": "Winit and newer Apple integrations require incompatible Foundation binding generations; parent-owned wrappers must not be exchanged.",
+      "parents": [
+        {
+          "name": "accesskit_ios",
+          "version": "0.2.2",
+          "requirement": "^0.2.0"
+        },
+        {
+          "name": "accesskit_macos",
+          "version": "0.27.2",
+          "requirement": "^0.2.0"
+        },
+        {
+          "name": "objc2-app-kit",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-cloud-kit",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-contacts",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-core-data",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-core-image",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-core-location",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-link-presentation",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-metal",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-quartz-core",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-symbols",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-uniform-type-identifiers",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-user-notifications",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.2.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "objc2-foundation",
+      "version": "0.3.2",
+      "reason": "Winit and newer Apple integrations require incompatible Foundation binding generations; parent-owned wrappers must not be exchanged.",
+      "parents": [
+        {
+          "name": "arboard",
+          "version": "3.7.0",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "cubecl-metal",
+          "version": "0.11.4",
+          "requirement": "^0.3"
+        },
+        {
+          "name": "fontique",
+          "version": "0.12.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "glutin",
+          "version": "0.32.3",
+          "requirement": "^0.3.1"
+        },
+        {
+          "name": "i-slint-backend-winit",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "i-slint-core",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "i-slint-renderer-skia",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "muda",
+          "version": "0.21.2",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "objc2-metal",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "objc2-open-directory",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "objc2-quartz-core",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "raw-window-metal",
+          "version": "1.1.0",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "softbuffer",
+          "version": "0.4.8",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "webbrowser",
+          "version": "1.2.7",
+          "requirement": "^0.3"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.3.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-metal",
+      "version": "0.2.2",
+      "reason": "Older Apple framework wrappers and current GPU backends require different Metal binding generations; parent-owned native wrappers must not be exchanged.",
+      "parents": [
+        {
+          "name": "objc2-core-image",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-quartz-core",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-metal",
+      "version": "0.3.2",
+      "reason": "Older Apple framework wrappers and current GPU backends require different Metal binding generations; parent-owned native wrappers must not be exchanged.",
+      "parents": [
+        {
+          "name": "cubecl-metal",
+          "version": "0.11.4",
+          "requirement": "^0.3"
+        },
+        {
+          "name": "cubecl-wgpu",
+          "version": "0.11.4",
+          "requirement": "^0.3"
+        },
+        {
+          "name": "i-slint-renderer-skia",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "objc2-quartz-core",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.3.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-quartz-core",
+      "version": "0.2.2",
+      "reason": "Winit-era Apple bindings and newer Slint/wgpu integrations require different QuartzCore APIs; parent-owned wrappers must not be exchanged.",
+      "parents": [
+        {
+          "name": "objc2-app-kit",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-quartz-core",
+      "version": "0.3.2",
+      "reason": "Winit-era Apple bindings and newer Slint/wgpu integrations require different QuartzCore APIs; parent-owned wrappers must not be exchanged.",
+      "parents": [
+        {
+          "name": "i-slint-backend-winit",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "i-slint-renderer-skia",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "raw-window-metal",
+          "version": "1.1.0",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "softbuffer",
+          "version": "0.4.8",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.3.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-ui-kit",
+      "version": "0.2.2",
+      "reason": "Winit/iOS accessibility and newer Slint platform integration require different UIKit bindings; wrappers stay parent-local and iOS is outside the desktop qualification claim.",
+      "parents": [
+        {
+          "name": "accesskit_ios",
+          "version": "0.2.2",
+          "requirement": "^0.2.0"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.2.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-ui-kit",
+      "version": "0.3.2",
+      "reason": "Winit/iOS accessibility and newer Slint platform integration require different UIKit bindings; wrappers stay parent-local and iOS is outside the desktop qualification claim.",
+      "parents": [
+        {
+          "name": "i-slint-backend-winit",
+          "version": "1.19.0",
+          "requirement": "^0.3.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "prettyplease",
+      "version": "0.2.37",
+      "reason": "Different bindgen and CubeCL macro generations require distinct host syntax-printer APIs; generated Rust text crosses the boundary, not syntax-tree objects.",
+      "parents": [
+        {
+          "name": "bindgen",
+          "version": "0.69.5",
+          "requirement": "^0.2.7"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "prettyplease",
+      "version": "0.3.0",
+      "reason": "Different bindgen and CubeCL macro generations require distinct host syntax-printer APIs; generated Rust text crosses the boundary, not syntax-tree objects.",
+      "parents": [
+        {
+          "name": "bindgen",
+          "version": "0.73.2",
+          "requirement": ">=0.2.7, <0.4"
+        },
+        {
+          "name": "cubecl-macros",
+          "version": "0.11.4",
+          "requirement": "^0.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "r-efi",
+      "version": "5.3.0",
+      "reason": "Getrandom generations require matching EFI bindings on that target; this optional platform entropy implementation does not exchange desktop GPU resources.",
+      "parents": [
+        {
+          "name": "getrandom",
+          "version": "0.3.4",
+          "requirement": "^5.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "r-efi",
+      "version": "6.0.0",
+      "reason": "Getrandom generations require matching EFI bindings on that target; this optional platform entropy implementation does not exchange desktop GPU resources.",
+      "parents": [
+        {
+          "name": "getrandom",
+          "version": "0.4.3",
+          "requirement": "^6"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand",
+      "version": "0.8.8",
+      "reason": "Optional monitoring/test-scheduler parents and CubeCL environment support require different random APIs; each parent owns its generators and produces plain values.",
+      "parents": [
+        {
+          "name": "antithesis_sdk",
+          "version": "0.3.0",
+          "requirement": "^0.8"
+        },
+        {
+          "name": "shuttle",
+          "version": "0.8.1",
+          "requirement": "^0.8.5"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand",
+      "version": "0.9.5",
+      "reason": "Optional monitoring/test-scheduler parents and CubeCL environment support require different random APIs; each parent owns its generators and produces plain values.",
+      "parents": [
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^0.9.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand",
+      "version": "0.10.4",
+      "reason": "Optional monitoring/test-scheduler parents and CubeCL environment support require different random APIs; each parent owns its generators and produces plain values.",
+      "parents": [
+        {
+          "name": "cubecl-environment",
+          "version": "0.11.4",
+          "requirement": "^0.10.0"
+        },
+        {
+          "name": "twox-hash",
+          "version": "2.1.5",
+          "requirement": ">=0.9.0, <=0.11.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand_chacha",
+      "version": "0.3.1",
+      "reason": "Rand generations require matching ChaCha generator APIs; generator state stays private to each parent random implementation.",
+      "parents": [
+        {
+          "name": "rand",
+          "version": "0.8.8",
+          "requirement": "^0.3.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand_chacha",
+      "version": "0.9.0",
+      "reason": "Rand generations require matching ChaCha generator APIs; generator state stays private to each parent random implementation.",
+      "parents": [
+        {
+          "name": "rand",
+          "version": "0.9.5",
+          "requirement": "^0.9.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand_core",
+      "version": "0.6.4",
+      "reason": "Rand/crypto generations require distinct RNG-trait APIs; generators remain parent-local and no cross-generation RNG object is shared.",
+      "parents": [
+        {
+          "name": "crypto-common",
+          "version": "0.1.7",
+          "requirement": "^0.6"
+        },
+        {
+          "name": "rand",
+          "version": "0.8.8",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "rand_chacha",
+          "version": "0.3.1",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "rand_pcg",
+          "version": "0.3.1",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "shuttle",
+          "version": "0.8.1",
+          "requirement": "^0.6.4"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand_core",
+      "version": "0.9.5",
+      "reason": "Rand/crypto generations require distinct RNG-trait APIs; generators remain parent-local and no cross-generation RNG object is shared.",
+      "parents": [
+        {
+          "name": "rand",
+          "version": "0.9.5",
+          "requirement": "^0.9.0"
+        },
+        {
+          "name": "rand_chacha",
+          "version": "0.9.0",
+          "requirement": "^0.9.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand_core",
+      "version": "0.10.1",
+      "reason": "Rand/crypto generations require distinct RNG-trait APIs; generators remain parent-local and no cross-generation RNG object is shared.",
+      "parents": [
+        {
+          "name": "chacha20",
+          "version": "0.10.2",
+          "requirement": "^0.10"
+        },
+        {
+          "name": "getrandom",
+          "version": "0.4.3",
+          "requirement": "^0.10.0"
+        },
+        {
+          "name": "rand",
+          "version": "0.10.4",
+          "requirement": "^0.10.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "redox_syscall",
+      "version": "0.4.1",
+      "reason": "Redox platform wrappers select different syscall-binding generations; bindings remain internal and Redox is outside the required desktop target union.",
+      "parents": [
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.4.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "redox_syscall",
+      "version": "0.5.18",
+      "reason": "Redox platform wrappers select different syscall-binding generations; bindings remain internal and Redox is outside the required desktop target union.",
+      "parents": [
+        {
+          "name": "parking_lot_core",
+          "version": "0.9.12",
+          "requirement": "^0.5"
+        },
+        {
+          "name": "softbuffer",
+          "version": "0.4.8",
+          "requirement": "^0.5"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "redox_syscall",
+      "version": "0.9.5",
+      "reason": "Redox platform wrappers select different syscall-binding generations; bindings remain internal and Redox is outside the required desktop target union.",
+      "parents": [
+        {
+          "name": "libredox",
+          "version": "0.1.25",
+          "requirement": "^0.9.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rustc-hash",
+      "version": "1.1.0",
+      "reason": "Compiler and runtime parents require distinct hasher APIs. Each parent owns its hash collections and does not exchange hasher state.",
+      "parents": [
+        {
+          "name": "bindgen",
+          "version": "0.69.5",
+          "requirement": "^1.0.1"
+        },
+        {
+          "name": "naga",
+          "version": "30.0.2",
+          "requirement": "^1.1"
+        },
+        {
+          "name": "naga-types",
+          "version": "30.0.2",
+          "requirement": "^1.1"
+        },
+        {
+          "name": "rowan",
+          "version": "0.17.0",
+          "requirement": "^1.0.1"
+        },
+        {
+          "name": "wgpu-core",
+          "version": "30.0.2",
+          "requirement": "^1.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "rustc-hash",
+      "version": "2.1.3",
+      "reason": "Compiler and runtime parents require distinct hasher APIs. Each parent owns its hash collections and does not exchange hasher state.",
+      "parents": [
+        {
+          "name": "bindgen",
+          "version": "0.73.2",
+          "requirement": "^2.1.0"
+        },
+        {
+          "name": "pliron",
+          "version": "0.19.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "pliron-derive",
+          "version": "0.19.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "tracel-rspirv",
+          "version": "0.16.1+sdk-1.4.357.0",
+          "requirement": "^2.1.0"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "unsynn",
+          "version": "0.3.0",
+          "requirement": "^2.1.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rustix",
+      "version": "0.38.44",
+      "reason": "Native window, filesystem and runtime parents require different syscall wrapper generations; OS resources cross only their documented standard handle APIs.",
+      "parents": [
+        {
+          "name": "calloop",
+          "version": "0.13.0",
+          "requirement": "^0.38"
+        },
+        {
+          "name": "calloop-wayland-source",
+          "version": "0.3.0",
+          "requirement": "^0.38.4"
+        },
+        {
+          "name": "drm",
+          "version": "0.14.1",
+          "requirement": "^0.38.22"
+        },
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.19.2",
+          "requirement": "^0.38.15"
+        },
+        {
+          "name": "which",
+          "version": "4.4.2",
+          "requirement": "^0.38.10"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.38.4"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "rustix",
+      "version": "1.1.6",
+      "reason": "Native window, filesystem and runtime parents require different syscall wrapper generations; OS resources cross only their documented standard handle APIs.",
+      "parents": [
+        {
+          "name": "async-io",
+          "version": "2.6.0",
+          "requirement": "^1.0.7"
+        },
+        {
+          "name": "async-process",
+          "version": "2.5.0",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "async-signal",
+          "version": "0.2.14",
+          "requirement": "^1.0.7"
+        },
+        {
+          "name": "calloop",
+          "version": "0.14.5",
+          "requirement": "^1.0.0"
+        },
+        {
+          "name": "calloop-wayland-source",
+          "version": "0.4.1",
+          "requirement": "^1.0.7"
+        },
+        {
+          "name": "drm",
+          "version": "0.15.0",
+          "requirement": "^1"
+        },
+        {
+          "name": "drm-ffi",
+          "version": "0.9.1",
+          "requirement": "^1"
+        },
+        {
+          "name": "gethostname",
+          "version": "1.1.0",
+          "requirement": "^1.0.3"
+        },
+        {
+          "name": "polling",
+          "version": "3.11.0",
+          "requirement": "^1.0.5"
+        },
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.20.0",
+          "requirement": "^1.0.7"
+        },
+        {
+          "name": "softbuffer",
+          "version": "0.4.8",
+          "requirement": "^1.0.1"
+        },
+        {
+          "name": "tempfile",
+          "version": "3.27.0",
+          "requirement": "^1.1.4"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^1.0.5"
+        },
+        {
+          "name": "wayland-backend",
+          "version": "0.3.17",
+          "requirement": "^1.0.2"
+        },
+        {
+          "name": "wayland-client",
+          "version": "0.31.15",
+          "requirement": "^1.0.2"
+        },
+        {
+          "name": "wayland-cursor",
+          "version": "0.31.14",
+          "requirement": "^1.0.2"
+        },
+        {
+          "name": "x11rb",
+          "version": "0.13.2",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "xattr",
+          "version": "1.7.0",
+          "requirement": "^1.1.6"
+        },
+        {
+          "name": "zbus",
+          "version": "5.19.0",
+          "requirement": "^1.1.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "shlex",
+      "version": "1.3.0",
+      "reason": "Legacy and current binding/native-build generators require different shell-tokenizer APIs; these host-side token streams stay inside each build tool.",
+      "parents": [
+        {
+          "name": "bindgen",
+          "version": "0.69.5",
+          "requirement": "^1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "shlex",
+      "version": "2.0.1",
+      "reason": "Legacy and current binding/native-build generators require different shell-tokenizer APIs; these host-side token streams stay inside each build tool.",
+      "parents": [
+        {
+          "name": "bindgen",
+          "version": "0.73.2",
+          "requirement": "^2"
+        },
+        {
+          "name": "cc",
+          "version": "1.11.2",
+          "requirement": "^2.0.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "smithay-client-toolkit",
+      "version": "0.19.2",
+      "reason": "Winit and its titlebar stack require different Smithay generations. Each owns its Wayland surface/event integration; Linux runtime checks remain required.",
+      "parents": [
+        {
+          "name": "sctk-adwaita",
+          "version": "0.10.1",
+          "requirement": "^0.19.0"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.19.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "smithay-client-toolkit",
+      "version": "0.20.0",
+      "reason": "Winit and its titlebar stack require different Smithay generations. Each owns its Wayland surface/event integration; Linux runtime checks remain required.",
+      "parents": [
+        {
+          "name": "smithay-clipboard",
+          "version": "0.7.3",
+          "requirement": "^0.20.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "smol_str",
+      "version": "0.2.2",
+      "reason": "Winit and newer UI/tooling parents require different compact-string APIs; application boundaries use ordinary Rust strings.",
+      "parents": [
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.2.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "smol_str",
+      "version": "0.3.7",
+      "reason": "Winit and newer UI/tooling parents require different compact-string APIs; application boundaries use ordinary Rust strings.",
+      "parents": [
+        {
+          "name": "i-slint-compiler",
+          "version": "1.19.0",
+          "requirement": "^0.3.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "strum",
+      "version": "0.26.3",
+      "reason": "Optional Turso parsers and Slint require different enum-helper APIs; each parent owns its generated enum implementations.",
+      "parents": [
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^0.26"
+        },
+        {
+          "name": "turso_parser",
+          "version": "0.8.3",
+          "requirement": "^0.26"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "strum",
+      "version": "0.28.0",
+      "reason": "Optional Turso parsers and Slint require different enum-helper APIs; each parent owns its generated enum implementations.",
+      "parents": [
+        {
+          "name": "i-slint-backend-winit",
+          "version": "1.19.0",
+          "requirement": "^0.28"
+        },
+        {
+          "name": "i-slint-compiler",
+          "version": "1.19.0",
+          "requirement": "^0.28"
+        },
+        {
+          "name": "i-slint-core",
+          "version": "1.19.0",
+          "requirement": "^0.28"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "strum_macros",
+      "version": "0.26.4",
+      "reason": "Matching strum generations require different derive implementations; host-side code generation produces parent-owned enum implementations.",
+      "parents": [
+        {
+          "name": "strum",
+          "version": "0.26.3",
+          "requirement": "^0.26"
+        },
+        {
+          "name": "strum",
+          "version": "0.26.3",
+          "requirement": "^0.26.3"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^0.26"
+        },
+        {
+          "name": "turso_parser",
+          "version": "0.8.3",
+          "requirement": "^0.26"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "strum_macros",
+      "version": "0.28.0",
+      "reason": "Matching strum generations require different derive implementations; host-side code generation produces parent-owned enum implementations.",
+      "parents": [
+        {
+          "name": "strum",
+          "version": "0.28.0",
+          "requirement": "^0.28"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119",
+      "reason": "Independent procedural macros require different Rust syntax-tree generations; host-side ASTs do not form a shared runtime ABI.",
+      "parents": [
+        {
+          "name": "aristo-macros",
+          "version": "0.4.1",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "bindgen",
+          "version": "0.69.5",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "bindgen",
+          "version": "0.73.2",
+          "requirement": ">=2, <4"
+        },
+        {
+          "name": "darling_core",
+          "version": "0.20.11",
+          "requirement": "^2.0.15"
+        },
+        {
+          "name": "darling_macro",
+          "version": "0.20.11",
+          "requirement": "^2.0.15"
+        },
+        {
+          "name": "derive-new",
+          "version": "0.7.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "derive_more-impl",
+          "version": "2.1.1",
+          "requirement": "^2.0.45"
+        },
+        {
+          "name": "enumflags2_derive",
+          "version": "0.7.12",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "jni-macros",
+          "version": "0.22.4",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "jni-sys-macros",
+          "version": "0.4.1",
+          "requirement": "^2"
+        },
+        {
+          "name": "miette-derive",
+          "version": "7.6.0",
+          "requirement": "^2.0.87"
+        },
+        {
+          "name": "num_enum_derive",
+          "version": "0.7.6",
+          "requirement": "^2"
+        },
+        {
+          "name": "phf_macros",
+          "version": "0.14.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "pin-project-internal",
+          "version": "1.1.13",
+          "requirement": "^2.0.1"
+        },
+        {
+          "name": "prettyplease",
+          "version": "0.2.37",
+          "requirement": "^2.0.105"
+        },
+        {
+          "name": "prost-derive",
+          "version": "0.14.6",
+          "requirement": "^2"
+        },
+        {
+          "name": "strum_macros",
+          "version": "0.26.4",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "strum_macros",
+          "version": "0.28.0",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "thiserror-impl",
+          "version": "1.0.69",
+          "requirement": "^2.0.87"
+        },
+        {
+          "name": "tracing-attributes",
+          "version": "0.1.31",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "turso_macros",
+          "version": "0.8.3",
+          "requirement": "^2.0.96"
+        },
+        {
+          "name": "turso_sdk_kit_macros",
+          "version": "0.8.3",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "windows-implement",
+          "version": "0.100.0",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "windows-implement",
+          "version": "0.60.2",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "windows-interface",
+          "version": "0.100.0",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "windows-interface",
+          "version": "0.59.3",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "wrapcenum-derive",
+          "version": "0.4.1",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "zbus-lockstep-macros",
+          "version": "0.5.2",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "zerocopy-derive",
+          "version": "0.8.63",
+          "requirement": "^2.0.46"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "syn",
+      "version": "3.0.10",
+      "reason": "Independent procedural macros require different Rust syntax-tree generations; host-side ASTs do not form a shared runtime ABI.",
+      "parents": [
+        {
+          "name": "async-recursion",
+          "version": "1.2.0",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "async-trait",
+          "version": "0.1.92",
+          "requirement": "^3"
+        },
+        {
+          "name": "bytemuck_derive",
+          "version": "1.12.1",
+          "requirement": "^3"
+        },
+        {
+          "name": "const-field-offset-macro",
+          "version": "0.2.1",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "cubecl-macros",
+          "version": "0.11.4",
+          "requirement": "^3"
+        },
+        {
+          "name": "cubecl-macros-internal",
+          "version": "0.11.4",
+          "requirement": "^3"
+        },
+        {
+          "name": "darling_core",
+          "version": "0.24.1",
+          "requirement": "^3.0.0"
+        },
+        {
+          "name": "darling_macro",
+          "version": "0.24.1",
+          "requirement": "^3.0.0"
+        },
+        {
+          "name": "displaydoc",
+          "version": "0.2.7",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "foreign-types-macros",
+          "version": "0.2.4",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "futures-macro",
+          "version": "0.3.34",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "i-slint-compiler",
+          "version": "1.19.0",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "i-slint-core-macros",
+          "version": "1.19.0",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "linkme-impl",
+          "version": "0.3.38",
+          "requirement": "^3"
+        },
+        {
+          "name": "pliron-derive",
+          "version": "0.19.0",
+          "requirement": "^3"
+        },
+        {
+          "name": "prettyplease",
+          "version": "0.3.0",
+          "requirement": "^3"
+        },
+        {
+          "name": "serde_derive",
+          "version": "1.0.229",
+          "requirement": "^3"
+        },
+        {
+          "name": "serde_repr",
+          "version": "0.1.21",
+          "requirement": "^3"
+        },
+        {
+          "name": "synstructure",
+          "version": "0.14.0",
+          "requirement": "^3"
+        },
+        {
+          "name": "thiserror-impl",
+          "version": "2.0.21",
+          "requirement": "^3"
+        },
+        {
+          "name": "vtable-macro",
+          "version": "0.5.1",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "wasm-bindgen-macro-support",
+          "version": "0.2.130",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "yoke-derive",
+          "version": "0.8.4",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "zbus_macros",
+          "version": "5.19.0",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "zerofrom-derive",
+          "version": "0.1.8",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "zerovec-derive",
+          "version": "0.11.7",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "zvariant_derive",
+          "version": "5.15.1",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "zvariant_utils",
+          "version": "4.2.0",
+          "requirement": "^3.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "thiserror",
+      "version": "1.0.69",
+      "reason": "Parent crates require distinct generated-error APIs. Their error types remain parent-local and are handled through documented results.",
+      "parents": [
+        {
+          "name": "calloop",
+          "version": "0.13.0",
+          "requirement": "^1.0.7"
+        },
+        {
+          "name": "ndk",
+          "version": "0.9.0",
+          "requirement": "^1.0.23"
+        },
+        {
+          "name": "nvml-wrapper",
+          "version": "0.13.0",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.19.2",
+          "requirement": "^1.0.30"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "thiserror",
+      "version": "2.0.21",
+      "reason": "Parent crates require distinct generated-error APIs. Their error types remain parent-local and are handled through documented results.",
+      "parents": [
+        {
+          "name": "android-activity",
+          "version": "0.6.1",
+          "requirement": "^2"
+        },
+        {
+          "name": "cubecl-cpp",
+          "version": "0.11.4",
+          "requirement": "^2"
+        },
+        {
+          "name": "cubecl-ir",
+          "version": "0.11.4",
+          "requirement": "^2"
+        },
+        {
+          "name": "cubecl-llvm",
+          "version": "0.11.4",
+          "requirement": "^2"
+        },
+        {
+          "name": "cubecl-opt",
+          "version": "0.11.4",
+          "requirement": "^2"
+        },
+        {
+          "name": "cubecl-runtime",
+          "version": "0.11.4",
+          "requirement": "^2"
+        },
+        {
+          "name": "cubecl-server",
+          "version": "0.11.4",
+          "requirement": "^2"
+        },
+        {
+          "name": "cubecl-wgpu",
+          "version": "0.11.4",
+          "requirement": "^2"
+        },
+        {
+          "name": "gpu-allocator",
+          "version": "0.28.0",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "jni",
+          "version": "0.22.4",
+          "requirement": "^2"
+        },
+        {
+          "name": "lyon_extra",
+          "version": "1.1.0",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "muda",
+          "version": "0.21.2",
+          "requirement": "^2"
+        },
+        {
+          "name": "naga",
+          "version": "30.0.2",
+          "requirement": "^2.0.12"
+        },
+        {
+          "name": "naga-types",
+          "version": "30.0.2",
+          "requirement": "^2.0.12"
+        },
+        {
+          "name": "pliron",
+          "version": "0.19.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "pliron-llvm",
+          "version": "0.19.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "pliron-spirv",
+          "version": "0.16.1+sdk-1.4.357.0",
+          "requirement": "^2"
+        },
+        {
+          "name": "redox_users",
+          "version": "0.5.3",
+          "requirement": "^2.0"
+        },
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.20.0",
+          "requirement": "^2.0.12"
+        },
+        {
+          "name": "tracing-appender",
+          "version": "0.2.5",
+          "requirement": "^2"
+        },
+        {
+          "name": "turso",
+          "version": "0.8.3",
+          "requirement": "^2.0.16"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^2.0.16"
+        },
+        {
+          "name": "turso_parser",
+          "version": "0.8.3",
+          "requirement": "^2.0.16"
+        },
+        {
+          "name": "turso_sync_engine",
+          "version": "0.8.3",
+          "requirement": "^2.0.12"
+        },
+        {
+          "name": "wgpu-core",
+          "version": "30.0.2",
+          "requirement": "^2.0.12"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^2.0.12"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "thiserror-impl",
+      "version": "1.0.69",
+      "reason": "Each thiserror generation requires its matching proc-macro implementation; host-side expansion is not a shared runtime API.",
+      "parents": [
+        {
+          "name": "thiserror",
+          "version": "1.0.69",
+          "requirement": "=1.0.69"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "thiserror-impl",
+      "version": "2.0.21",
+      "reason": "Each thiserror generation requires its matching proc-macro implementation; host-side expansion is not a shared runtime API.",
+      "parents": [
+        {
+          "name": "thiserror",
+          "version": "2.0.21",
+          "requirement": "=2.0.21"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "tiny-skia",
+      "version": "0.11.4",
+      "reason": "Slint and Wayland title decorations require different software-rasterizer APIs; parent-owned pixel buffers are not shared renderer objects.",
+      "parents": [
+        {
+          "name": "sctk-adwaita",
+          "version": "0.10.1",
+          "requirement": "^0.11"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "tiny-skia",
+      "version": "0.12.0",
+      "reason": "Slint and Wayland title decorations require different software-rasterizer APIs; parent-owned pixel buffers are not shared renderer objects.",
+      "parents": [
+        {
+          "name": "resvg",
+          "version": "0.49.0",
+          "requirement": "^0.12.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "tiny-skia-path",
+      "version": "0.11.4",
+      "reason": "Each tiny-skia generation requires its matching geometry APIs; path objects remain inside their owning renderer.",
+      "parents": [
+        {
+          "name": "tiny-skia",
+          "version": "0.11.4",
+          "requirement": "^0.11.4"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "tiny-skia-path",
+      "version": "0.12.0",
+      "reason": "Each tiny-skia generation requires its matching geometry APIs; path objects remain inside their owning renderer.",
+      "parents": [
+        {
+          "name": "tiny-skia",
+          "version": "0.12.0",
+          "requirement": "^0.12.0"
+        },
+        {
+          "name": "usvg",
+          "version": "0.49.0",
+          "requirement": "^0.12.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "unicode-width",
+      "version": "0.1.14",
+      "reason": "Diagnostic renderers require different Unicode width APIs; each computes scalar widths locally without sharing layout objects.",
+      "parents": [
+        {
+          "name": "miette",
+          "version": "7.6.0",
+          "requirement": "^0.1.11"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "unicode-width",
+      "version": "0.2.3",
+      "reason": "Diagnostic renderers require different Unicode width APIs; each computes scalar widths locally without sharing layout objects.",
+      "parents": [
+        {
+          "name": "annotate-snippets",
+          "version": "0.12.18",
+          "requirement": "^0.2.2"
+        },
+        {
+          "name": "codespan-reporting",
+          "version": "0.13.1",
+          "requirement": ">=0.1, <0.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-core",
+      "version": "0.62.2",
+      "reason": "Desktop graphics/accessibility wrappers and optional generator support require different Windows core bindings; their native wrappers remain parent-owned.",
+      "parents": [
+        {
+          "name": "accesskit_windows",
+          "version": "0.35.2",
+          "requirement": "^0.62.0"
+        },
+        {
+          "name": "fontique",
+          "version": "0.12.0",
+          "requirement": "^0.62.2"
+        },
+        {
+          "name": "i-slint-renderer-skia",
+          "version": "1.19.0",
+          "requirement": "^0.62.0"
+        },
+        {
+          "name": "iana-time-zone",
+          "version": "0.1.65",
+          "requirement": ">=0.56, <=0.62"
+        },
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.62"
+        },
+        {
+          "name": "windows",
+          "version": "0.62.2",
+          "requirement": "^0.62.2"
+        },
+        {
+          "name": "windows-collections",
+          "version": "0.3.2",
+          "requirement": "^0.62.2"
+        },
+        {
+          "name": "windows-future",
+          "version": "0.3.2",
+          "requirement": "^0.62.2"
+        },
+        {
+          "name": "windows-numerics",
+          "version": "0.3.1",
+          "requirement": "^0.62.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-core",
+      "version": "0.100.0",
+      "reason": "Desktop graphics/accessibility wrappers and optional generator support require different Windows core bindings; their native wrappers remain parent-owned.",
+      "parents": [
+        {
+          "name": "generator",
+          "version": "0.8.12",
+          "requirement": "^0.100"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-implement",
+      "version": "0.60.2",
+      "reason": "Matching Windows core generations require corresponding implementation macros; host-generated interfaces stay within each core binding family.",
+      "parents": [
+        {
+          "name": "windows-core",
+          "version": "0.62.2",
+          "requirement": "^0.60.2"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-implement",
+      "version": "0.100.0",
+      "reason": "Matching Windows core generations require corresponding implementation macros; host-generated interfaces stay within each core binding family.",
+      "parents": [
+        {
+          "name": "windows-core",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-interface",
+      "version": "0.59.3",
+      "reason": "Matching Windows core generations require corresponding interface macros; host-generated interfaces stay within each core binding family.",
+      "parents": [
+        {
+          "name": "windows-core",
+          "version": "0.62.2",
+          "requirement": "^0.59.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-interface",
+      "version": "0.100.0",
+      "reason": "Matching Windows core generations require corresponding interface macros; host-generated interfaces stay within each core binding family.",
+      "parents": [
+        {
+          "name": "windows-core",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-link",
+      "version": "0.2.1",
+      "reason": "Different Windows binding families require distinct symbol-link helper generations; symbol declarations remain inside the native wrapper that uses them.",
+      "parents": [
+        {
+          "name": "backtrace",
+          "version": "0.3.77",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "chrono",
+          "version": "0.4.45",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "gethostname",
+          "version": "1.1.0",
+          "requirement": "^0.2.1"
+        },
+        {
+          "name": "jni",
+          "version": "0.22.4",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "libloading",
+          "version": "0.8.9",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "libloading",
+          "version": "0.9.1",
+          "requirement": "^0.2"
+        },
+        {
+          "name": "parking_lot_core",
+          "version": "0.9.12",
+          "requirement": "^0.2.0"
+        },
+        {
+          "name": "windows-core",
+          "version": "0.62.2",
+          "requirement": "^0.2.1"
+        },
+        {
+          "name": "windows-future",
+          "version": "0.3.2",
+          "requirement": "^0.2.1"
+        },
+        {
+          "name": "windows-numerics",
+          "version": "0.3.1",
+          "requirement": "^0.2.1"
+        },
+        {
+          "name": "windows-result",
+          "version": "0.4.1",
+          "requirement": "^0.2.1"
+        },
+        {
+          "name": "windows-strings",
+          "version": "0.5.1",
+          "requirement": "^0.2.1"
+        },
+        {
+          "name": "windows-sys",
+          "version": "0.61.2",
+          "requirement": "^0.2.1"
+        },
+        {
+          "name": "windows-threading",
+          "version": "0.2.1",
+          "requirement": "^0.2.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-link",
+      "version": "0.100.0",
+      "reason": "Different Windows binding families require distinct symbol-link helper generations; symbol declarations remain inside the native wrapper that uses them.",
+      "parents": [
+        {
+          "name": "windows-core",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
+        },
+        {
+          "name": "windows-result",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
+        },
+        {
+          "name": "windows-strings",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-result",
+      "version": "0.4.1",
+      "reason": "Different Windows core families require matching HRESULT/result wrappers; parent-owned error wrappers are handled through documented APIs.",
+      "parents": [
+        {
+          "name": "wgpu-hal",
+          "version": "30.0.2",
+          "requirement": "^0.4"
+        },
+        {
+          "name": "windows-core",
+          "version": "0.62.2",
+          "requirement": "^0.4.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-result",
+      "version": "0.100.0",
+      "reason": "Different Windows core families require matching HRESULT/result wrappers; parent-owned error wrappers are handled through documented APIs.",
+      "parents": [
+        {
+          "name": "windows-core",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-strings",
+      "version": "0.5.1",
+      "reason": "Different Windows core families require matching native string wrappers; native string ownership stays within its binding family.",
+      "parents": [
+        {
+          "name": "windows-core",
+          "version": "0.62.2",
+          "requirement": "^0.5.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-strings",
+      "version": "0.100.0",
+      "reason": "Different Windows core families require matching native string wrappers; native string ownership stays within its binding family.",
+      "parents": [
+        {
+          "name": "windows-core",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-sys",
+      "version": "0.52.0",
+      "reason": "Platform parents require different Windows binding generations; internal bindings do not replace the single raw-window-handle boundary.",
+      "parents": [
+        {
+          "name": "android-build",
+          "version": "0.1.4",
+          "requirement": "^0.52"
+        },
+        {
+          "name": "glutin",
+          "version": "0.32.3",
+          "requirement": "^0.52"
+        },
+        {
+          "name": "glutin_egl_sys",
+          "version": "0.7.1",
+          "requirement": "^0.52"
+        },
+        {
+          "name": "ring",
+          "version": "0.17.14",
+          "requirement": "^0.52"
+        },
+        {
+          "name": "rustix",
+          "version": "0.38.44",
+          "requirement": ">=0.52, <=0.59"
+        },
+        {
+          "name": "winit",
+          "version": "0.30.13",
+          "requirement": "^0.52.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": true
+    },
+    {
+      "name": "windows-sys",
+      "version": "0.61.2",
+      "reason": "Platform parents require different Windows binding generations; internal bindings do not replace the single raw-window-handle boundary.",
+      "parents": [
+        {
+          "name": "arboard",
+          "version": "3.7.0",
+          "requirement": ">=0.52.0, <0.62.0"
+        },
+        {
+          "name": "async-io",
+          "version": "2.6.0",
+          "requirement": "^0.61"
+        },
+        {
+          "name": "async-signal",
+          "version": "0.2.14",
+          "requirement": "^0.61"
+        },
+        {
+          "name": "cubecl-monitoring",
+          "version": "0.11.4",
+          "requirement": "^0.61"
+        },
+        {
+          "name": "dirs-sys",
+          "version": "0.5.0",
+          "requirement": ">=0.59.0"
+        },
+        {
+          "name": "errno",
+          "version": "0.3.15",
+          "requirement": ">=0.52, <0.62"
+        },
+        {
+          "name": "etcetera",
+          "version": "0.11.0",
+          "requirement": "^0.61"
+        },
+        {
+          "name": "generator",
+          "version": "0.8.12",
+          "requirement": "^0.61.2"
+        },
+        {
+          "name": "home",
+          "version": "0.5.12",
+          "requirement": "^0.61"
+        },
+        {
+          "name": "muda",
+          "version": "0.21.2",
+          "requirement": ">=0.60, <=0.61"
+        },
+        {
+          "name": "nu-ansi-term",
+          "version": "0.50.3",
+          "requirement": ">=0.59, <=0.61"
+        },
+        {
+          "name": "polling",
+          "version": "3.11.0",
+          "requirement": "^0.61"
+        },
+        {
+          "name": "rustix",
+          "version": "1.1.6",
+          "requirement": ">=0.52, <0.62"
+        },
+        {
+          "name": "softbuffer",
+          "version": "0.4.8",
+          "requirement": "^0.61.2"
+        },
+        {
+          "name": "tempfile",
+          "version": "3.27.0",
+          "requirement": ">=0.52, <0.62"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^0.61.2"
+        },
+        {
+          "name": "uds_windows",
+          "version": "1.2.1",
+          "requirement": ">=0.60, <0.62"
+        },
+        {
+          "name": "winapi-util",
+          "version": "0.1.11",
+          "requirement": ">=0.48.0, <=0.61"
+        },
+        {
+          "name": "zbus",
+          "version": "5.19.0",
+          "requirement": "^0.61"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    }
+  ],
+  "advisory_exceptions": [
+    {
+      "name": "ttf-parser",
+      "version": "0.25.1",
+      "reason": "Temporary maintenance exception for Wayland titlebar font parsing; replacing the CSD text stack needs Linux titlebar tests and native dependency review.",
+      "parents": [
+        {
+          "name": "owned_ttf_parser",
+          "version": "0.25.1",
+          "requirement": "^0.25.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2026-12-17",
+      "id": "RUSTSEC-2026-0192",
+      "exposure_review": "Runtime system-font bytes selected by fc-match are memory-mapped and parsed by sctk-adwaita AbGlyphTitleText; embedded Cantarell is fallback. This is not compile-only. No photo-import parser exposure is claimed; malicious or corrupt installed font data remains an exposure.",
+      "removal_condition": "Replace or upgrade the Wayland titlebar parser stack without dropping titlebars; validate Linux system-font selection and fallback."
+    },
+    {
+      "name": "zvariant",
+      "version": "5.15.1",
+      "reason": "Temporary maintenance exception for the zbus 5 accessibility/settings stack; zbus 6 migration requires coordinated Slint and AT-SPI API changes.",
+      "parents": [
+        {
+          "name": "accesskit_atspi_common",
+          "version": "0.21.1",
+          "requirement": "^5.15"
+        },
+        {
+          "name": "atspi-common",
+          "version": "0.13.0",
+          "requirement": "^5.2"
+        },
+        {
+          "name": "zbus",
+          "version": "5.19.0",
+          "requirement": "^5.14.0"
+        },
+        {
+          "name": "zbus-lockstep",
+          "version": "0.5.2",
+          "requirement": "^5.1"
+        },
+        {
+          "name": "zbus-lockstep-macros",
+          "version": "0.5.2",
+          "requirement": "^5.1"
+        },
+        {
+          "name": "zbus_macros",
+          "version": "5.19.0",
+          "requirement": "^5.14.0"
+        },
+        {
+          "name": "zbus_names",
+          "version": "4.3.5",
+          "requirement": "^5.15.0"
+        },
+        {
+          "name": "zbus_xml",
+          "version": "5.2.1",
+          "requirement": "^5.13.1"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2026-12-17",
+      "id": "RUSTSEC-2026-0370",
+      "exposure_review": "Runtime D-Bus message and variant decoding for desktop accessibility/settings; local session-bus peers can supply data. Preserve existing accessibility and settings behavior; no compile-only claim.",
+      "removal_condition": "Migrate Slint, accesskit_unix, atspi, atspi-common and atspi-proxies together to zbus 6; validate native accessibility/settings."
+    },
+    {
+      "name": "zbus_names",
+      "version": "4.3.5",
+      "reason": "Temporary maintenance exception for zbus 5 name types required by the current accessibility/settings APIs; coordinated zbus 6 migration remains open.",
+      "parents": [
+        {
+          "name": "atspi-common",
+          "version": "0.13.0",
+          "requirement": "^4.1.1"
+        },
+        {
+          "name": "zbus",
+          "version": "5.19.0",
+          "requirement": "^4.3.4"
+        },
+        {
+          "name": "zbus_macros",
+          "version": "5.19.0",
+          "requirement": "^4.3.4"
+        },
+        {
+          "name": "zbus_xml",
+          "version": "5.2.1",
+          "requirement": "^4.3.4"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2026-12-17",
+      "id": "RUSTSEC-2026-0371",
+      "exposure_review": "Runtime D-Bus names from accessibility/settings session-bus traffic are parsed/validated; local peers can supply input. Disabling accessibility to hide this dependency is not accepted.",
+      "removal_condition": "Migrate the coordinated zbus/AT-SPI name-type APIs and validate desktop settings and accessibility."
+    },
+    {
+      "name": "zvariant_derive",
+      "version": "5.15.1",
+      "reason": "Temporary maintenance exception for code generation paired with zvariant 5; upgrading it independently would break generated wire-type implementations.",
+      "parents": [
+        {
+          "name": "zvariant",
+          "version": "5.15.1",
+          "requirement": "^5.15.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2026-12-17",
+      "id": "RUSTSEC-2026-0372",
+      "exposure_review": "Host proc macro generates variant serialization/deserialization implementations used by runtime D-Bus accessibility/settings. The macro itself handles Rust syntax, while generated code handles session-bus input.",
+      "removal_condition": "Migrate with zvariant and zbus 6; validate generated wire contracts and native accessibility/settings."
+    }
+  ]
+}

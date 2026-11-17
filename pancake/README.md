@@ -11,7 +11,7 @@ bash scripts/bootstrap.sh
 bash scripts/check.sh all
 ```
 
-Scripts require Bash (Git Bash on Windows), rustup, and jq. Bootstrap installs
+Scripts require Bash (Git Bash on Windows), rustup, jq, and Python 3.11 or newer. Bootstrap installs
 pinned Rust tools into `target/tools`, not the global Cargo tool directory.
 Install actionlint 1.7.12 and ShellCheck 0.11.0 from official releases or a package
 manager. Rust 1.100.0, nightly-2026-11-15, and development tools are pinned.
@@ -24,8 +24,13 @@ Missing tools fail checks rather than silently disabling them.
 | Tests | Debug/release native tests, doctests, exhaustive feature combinations, ignored tests included, no retries, bounded test runtime. |
 | Coverage | Zero uncovered instrumented lines, regions, functions, and branches; nightly includes doctests. Only the exact empty scaffold is exempt. |
 | Mutation | Surviving mutations fail. A deliberately weak test fixture proves this gate rejects inadequate assertions. |
-| Dependencies | Locked resolution; advisories, unmaintained/unsound/yanked crates, unknown sources, unapproved licenses, wildcards, duplicate versions, and unused dependencies fail. |
+| Dependencies | Locked resolution; advisories, unmaintained/unsound/yanked crates, unknown sources, wildcards, duplicate versions, and unused dependencies fail except exact, expiring reviewed exceptions. License declarations are inventoried without a license gate. |
 | Runtime | Pinned-nightly Miri and two randomized layout seeds; Linux address/thread sanitizers in CI. |
+
+Dependency reviews live in [dependency-policy.json](dependency-policy.json).
+[Policy enforcement](docs/dependency-policy.md) explains exact-version/parent checks,
+expiry enforcement, protected shared GPU/window boundaries, and the informational
+license inventory. Existing local hooks and CI gates invoke these checks.
 
 Run individual gates with `bash scripts/check.sh fast`, `test`, `coverage`,
 `branches`, `deps`, `mutants`, `nightly`, or `guardrails`. Linux x86_64 also supports

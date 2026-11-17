@@ -12,11 +12,7 @@ unmaintained = "all"
 unsound = "all"
 ignore = []
 
-[licenses]
-confidence-threshold = 0.95
-# Expand this list only when an actual dependency and its license are reviewed.
-allow = ["GPL-3.0-or-later"]
-exceptions = []
+# License declarations are inventoried; no license allowlist or gate is enforced.
 
 [bans]
 multiple-versions = "deny"

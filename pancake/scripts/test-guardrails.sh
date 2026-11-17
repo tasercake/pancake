@@ -7,14 +7,17 @@ export PATH="$root/target/tools/bin:$PATH"
 mkdir -p "$root/target"
 fixture=$(mktemp -d "$root/target/guardrails.XXXXXX")
 trap 'rm -rf -- "${fixture:?}"' EXIT
-for file in Cargo.toml Cargo.lock README.md rust-toolchain.toml clippy.toml; do
+for file in README.md rust-toolchain.toml clippy.toml; do
     cp "$root/$file" "$fixture/$file"
 done
+python3 "$root/scripts/guardrail_manifest.py" "$root/Cargo.toml" "$fixture/Cargo.toml"
 mkdir -p "$fixture/src"
+printf '//! Guardrail fixture bootstrap.\n' >"$fixture/src/lib.rs"
 mkdir -p "$fixture/scripts"
 cp "$root/scripts/check.sh" "$root/scripts/tool-versions.sh" "$fixture/scripts/"
 cd "$fixture"
 export CARGO_TARGET_DIR="$root/target/guardrail-build"
+cargo generate-lockfile --offline --manifest-path "$fixture/Cargo.toml"
 
 reject() {
     local diagnostic=$1

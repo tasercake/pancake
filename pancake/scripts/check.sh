@@ -29,6 +29,21 @@ require_tool() {
     fi
 }
 
+# Cargo-deny cannot expire reviews or bind advisory ignores to exact versions.
+# The same checks constrain Clippy's name-only duplicate allowances.
+dependency_policy() {
+    mkdir -p target/dependency-policy
+    cargo metadata --locked --format-version 1 --all-features \
+        > target/dependency-policy/metadata.json
+    python3 scripts/dependency_policy.py \
+        --config deny.toml --ledger dependency-policy.json \
+        --metadata target/dependency-policy/metadata.json \
+        --effective-config target/dependency-policy/deny-effective.toml \
+        --license-inventory target/dependency-policy/licenses.json \
+        --clippy-config clippy.toml \
+        --effective-clippy-dir target/dependency-policy/clippy
+}
+
 # Only this exact, single-target documentation-only scaffold has no coverage data.
 empty_scaffold() {
     [[ $(find src -type f -print) == src/lib.rs ]] || return 1
@@ -51,8 +66,11 @@ case ${1:-all} in
     fast)
         require_tool actionlint "$PANCAKE_ACTIONLINT_VERSION"
         require_tool shellcheck "$PANCAKE_SHELLCHECK_VERSION"
+        python3 -m unittest scripts/test_dependency_policy.py scripts/test_guardrail_manifest.py
+        dependency_policy
         cargo fmt --all -- --check
-        cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+        CLIPPY_CONF_DIR="$root/target/dependency-policy/clippy" \
+            cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
         cargo doc --locked --workspace --all-features --no-deps --document-private-items
         shellcheck --source-path=SCRIPTDIR --external-sources \
             scripts/bootstrap.sh scripts/check.sh scripts/test-guardrails.sh .githooks/*
@@ -102,8 +120,14 @@ case ${1:-all} in
     deps)
         require_tool cargo-deny
         require_tool cargo-machete
-        cargo deny --locked --workspace --all-features check --deny warnings
-        cargo machete --with-metadata
+        python3 -m unittest scripts/test_dependency_policy.py scripts/test_unused_dependencies.py
+        dependency_policy
+        # Omitting [licenses] alone would retain cargo-deny's default license gate.
+        # User chose an informational inventory instead of license enforcement.
+        cargo deny --locked --workspace --all-features \
+            --config "$root/target/dependency-policy/deny-effective.toml" \
+            check advisories bans sources --deny warnings
+        python3 scripts/check_unused_dependencies.py target/dependency-policy/metadata.json
         ;;
     mutants)
         require_tool cargo-mutants
