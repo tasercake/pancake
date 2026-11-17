@@ -1,0 +1,12 @@
+   Compiling rowan v0.17.0 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-kernels/artifacts/p0-rowan-validation/rowan)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.26s
+     Running unittests src/lib.rs (/Users/krishna/Documents/focus-stacking/.worktrees/p0-kernels/artifacts/p0-rowan-validation/target/debug/build/rowan/11d141cf7c47c267/out/rowan-11d141cf7c47c267)
+
+running 4 tests
+test green::tests::test_size_of ... ok
+test green::tests::assert_send_sync ... ok
+test green::node::layout_tests::explicit_child_layout_preserves_clone_drop_and_offsets ... ok
+test syntax_text::tests::test_text_equality ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

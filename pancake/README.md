@@ -1,8 +1,8 @@
 # Pancake application
 
-Dependency-free Rust 2024 scaffold for the Pancake focus-stacking application.
-Implementation has not started. The library contains only crate documentation;
-there are no GUI/GPU libraries, codecs, APIs, or placeholder tests.
+Rust 2024 foundation and P0 image-kernel qualification for Pancake. Slint 1.19,
+CubeCL 0.11.4 and wgpu 30 share one dependency graph. One safe CubeCL kernel
+applies a full-precision u16 horizontal blur on CPU LLVM JIT and GPU runtimes.
 
 From this directory:
 
@@ -25,7 +25,7 @@ Missing tools fail checks rather than silently disabling them.
 | Coverage | Zero uncovered instrumented lines, regions, functions, and branches; nightly includes doctests. Only the exact empty scaffold is exempt. |
 | Mutation | Surviving mutations fail. A deliberately weak test fixture proves this gate rejects inadequate assertions. |
 | Dependencies | Locked resolution; advisories, unmaintained/unsound/yanked crates, unknown sources, wildcards, duplicate versions, and unused dependencies fail except exact, expiring reviewed exceptions. License declarations are inventoried without a license gate. |
-| Runtime | Pinned-nightly Miri and two randomized layout seeds; Linux address/thread sanitizers in CI. |
+| Runtime | Pinned-nightly Miri checks pure host contracts; mandatory native CPU/GPU integration and two randomized layout seeds check JIT/driver paths; Linux address/thread sanitizers in CI. |
 
 Dependency reviews live in [dependency-policy.json](dependency-policy.json).
 [Policy enforcement](docs/dependency-policy.md) explains exact-version/parent checks,
@@ -35,8 +35,10 @@ license inventory. Existing local hooks and CI gates invoke these checks.
 Run individual gates with `bash scripts/check.sh fast`, `test`, `coverage`,
 `branches`, `deps`, `mutants`, `nightly`, or `guardrails`. Linux x86_64 also supports
 `bash scripts/check.sh sanitizer address` and `thread`. `bash scripts/check.sh all` runs every
-local gate. No executable application code exists, so no test count or coverage
-percentage can yet be claimed. Coverage cannot prove correctness or performance.
+local gate. Native qualification requires a physical GPU; it rejects software
+fallback. See [kernel qualification](docs/p0-kernel-qualification.md) for numerical
+contracts, hardware evidence, the Miri boundary and exact measurement limits.
+Coverage cannot prove correctness or performance.
 
 Clippy's full restriction group is intentionally not enabled: some lints conflict.
 Selected high-value restrictions are denied. Exceptions must use a narrow,
@@ -57,5 +59,3 @@ status check. No repository ruleset is changed by this scaffold.
 CI runs on every push and pull request, daily, and manually. Actions use immutable
 commit pins and read-only permissions. Property tests, input fuzzing, CPU/GPU
 parity tests, and benchmarks become mandatory when their actual APIs exist.
-
-The [implementation plan](docs/implementation-plan.md) covers the application architecture and implementation milestones. It adds no application behavior to this scaffold.

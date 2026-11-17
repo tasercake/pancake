@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "source_sha256": {
+    "src/lib.rs": "67db6936187d715540c7b85d64d1c831f85b3ce88b0daa3eefc302b370fb96c8",
+    "src/tests.rs": "b12b08b830f7b616de325f4145ed64feb72688d59006e00ce06623a53d950808",
+    "tests/kernel_contract.rs": "c8fc7d6a7a582df32ce3f8e58b2a948b154719a361c952749595b8ed3b561d44",
+    "Cargo.toml": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649",
+    "Cargo.lock": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b",
+    "vendor/cubecl-macros-0.11.4/src/lib.rs": "484f1ea80ab86aeeefb5c80817c19ef1ad766d819d74f25455be8e6131f07e1e",
+    "vendor/rowan-0.17.0/src/green/node.rs": "ff8c9c9ace20a6fd85c9be569cef6d2148b19bee7a14b67376c7a54be073319d",
+    "vendor/rowan-0.17.0/src/arc.rs": "e45de75fdd175c53db3de16bdc0be73eb907343c491b38a520d0e0c9927ed80f"
+  },
+  "local_runtime": {
+    "cpu": "Apple M4 Pro / CubeCL LLVM23.1.0",
+    "gpu": "Apple M4 Pro IntegratedGpu / wgpu Metal",
+    "adapter_artifact": "target/p0-kernel-adapter.txt",
+    "native_tests": 3,
+    "host_tests": 3,
+    "ignored_tests": 0
+  },
+  "host_coverage": {
+    "lines": [
+      62,
+      62
+    ],
+    "functions": [
+      7,
+      7
+    ],
+    "regions": [
+      66,
+      66
+    ],
+    "branches": [
+      8,
+      8
+    ],
+    "source_exclusions_added": 0
+  },
+  "mutations": {
+    "caught": 35,
+    "missed": 0,
+    "timeouts": 0,
+    "unviable": 0,
+    "ignore_exceptions_added": 0
+  },
+  "miri": {
+    "application_host_tests_passed": 3,
+    "flags": [
+      "-Zmiri-strict-provenance",
+      "-Zmiri-symbolic-alignment-check"
+    ],
+    "native_integration_failure": "unsupported foreign function mach_host_self in sysinfo CPU runtime initialization",
+    "original_rowan_failure": "Stacked Borrows HeaderSlice unsizing retag at arc.rs:264",
+    "patched_rowan_failure": "Same failure; ARC implementation unchanged"
+  },
+  "rowan_layout": {
+    "native_upstream_tests_per_seed": 4,
+    "seeds_passed": [
+      1,
+      42
+    ],
+    "representation": "repr(u32)",
+    "unsafe_implementation_changes": 0
+  },
+  "commands_passed": [
+    "bash scripts/check.sh all",
+    "bash scripts/check.sh deps",
+    "python3 -m unittest discover -s vendor/tests -v"
+  ],
+  "pending": [
+    "Final locked-graph remote hardware reruns",
+    "Linux sanitizer qualification",
+    "Slint UI qualification",
+    "AMD, Intel and Windows hardware qualification"
+  ]
+}

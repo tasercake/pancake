@@ -30,7 +30,7 @@ class DependencyPatchContracts(unittest.TestCase):
 
     def test_vendor_records_exact_original_crate_identities(self):
         provenance = json.loads((VENDOR / "upstream-sources.json").read_text())
-        expected = {f"cubecl-{part}" for part in CUBECL_PACKAGES} | {"spin_on"}
+        expected = {f"cubecl-{part}" for part in CUBECL_PACKAGES} | {"spin_on", "cubecl-macros", "rowan"}
         self.assertEqual({p["name"] for p in provenance["packages"]}, expected)
         for package in provenance["packages"]:
             with self.subTest(package=package["name"]):

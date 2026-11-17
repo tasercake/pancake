@@ -14,7 +14,23 @@ publish = false
 
 [workspace]
 members = ["."]
+exclude = ["vendor/*"]
 resolver = "3"
+
+[dependencies]
+cubecl = { version = "=0.11.4", default-features = false, features = ["std", "stdlib", "cpu", "wgpu"] }
+slint = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "unstable-wgpu-30", "compat-1-18", "accessibility"] }
+wgpu = { version = "=30.0.2", default-features = false, features = ["std", "wgsl", "metal", "vulkan", "dx12"] }
+
+[patch.crates-io]
+cubecl-core = { path = "vendor/cubecl-core-0.11.4" }
+cubecl-macros = { path = "vendor/cubecl-macros-0.11.4" }
+cubecl-std = { path = "vendor/cubecl-std-0.11.4" }
+cubecl-cpp = { path = "vendor/cubecl-cpp-0.11.4" }
+cubecl-hip = { path = "vendor/cubecl-hip-0.11.4" }
+cubecl-spirv = { path = "vendor/cubecl-spirv-0.11.4" }
+spin_on = { path = "vendor/spin_on-0.1.1" }
+rowan = { path = "vendor/rowan-0.17.0" }
 
 [lints]
 workspace = true

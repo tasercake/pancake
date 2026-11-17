@@ -124,6 +124,46 @@
           "sha1": "1605b63506316d89722c650e3fac6fdb643c3ef9"
         }
       }
+    },
+    {
+      "name": "cubecl-macros",
+      "version": "0.11.4",
+      "directory": "cubecl-macros-0.11.4",
+      "archive_url": "https://static.crates.io/crates/cubecl-macros/cubecl-macros-0.11.4.crate",
+      "archive_sha256": "0c67962ecb52dc6fd493df1ef6c01990bc8c98a29039765a5e58bef00d9ab304",
+      "modified_files": [
+        {
+          "path": "src/lib.rs",
+          "original_sha256": "cd0fa6dc212110e4a64d878c7fe7b4954fdd022db2594aca53613369b7e32e2a",
+          "patched_sha256": "484f1ea80ab86aeeefb5c80817c19ef1ad766d819d74f25455be8e6131f07e1e"
+        }
+      ],
+      "upstream_repository": {
+        "git": {
+          "sha1": "d092bd99b1323d58c3c58c042da237b46bb17dfd"
+        },
+        "path_in_vcs": "crates/cubecl-macros"
+      }
+    },
+    {
+      "name": "rowan",
+      "version": "0.17.0",
+      "directory": "rowan-0.17.0",
+      "archive_url": "https://static.crates.io/crates/rowan/rowan-0.17.0.crate",
+      "archive_sha256": "14b574c58582fa59fa43a2feb6608b8744184659f08a2e0117e4b8224d95ed61",
+      "modified_files": [
+        {
+          "path": "src/green/node.rs",
+          "original_sha256": "09f4002c03c67bd3308884f02e953ba19d579547fee15294f675dfda94d59c9c",
+          "patched_sha256": "ff8c9c9ace20a6fd85c9be569cef6d2148b19bee7a14b67376c7a54be073319d"
+        }
+      ],
+      "upstream_repository": {
+        "git": {
+          "sha1": "c781c336f44a28210fefaa4d86b8c9902b781c8e"
+        },
+        "path_in_vcs": ""
+      }
     }
   ]
 }

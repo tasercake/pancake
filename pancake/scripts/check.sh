@@ -121,6 +121,7 @@ case ${1:-all} in
         require_tool cargo-deny
         require_tool cargo-machete
         python3 -m unittest scripts/test_dependency_policy.py scripts/test_unused_dependencies.py
+        python3 -m unittest discover -s vendor/tests -v
         dependency_policy
         # Omitting [licenses] alone would retain cargo-deny's default license gate.
         # User chose an informational inventory instead of license enforcement.
@@ -135,8 +136,10 @@ case ${1:-all} in
             --build-timeout 180 -- --locked -- --include-ignored
         ;;
     nightly)
+        # Miri checks pure host contracts. Native integration tests below exercise
+        # LLVM JIT and GPU FFI, which Miri cannot interpret (mach_host_self on macOS).
         MIRIFLAGS="-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check" \
-            cargo +"$PANCAKE_NIGHTLY" miri test --locked --workspace --all-features -- --include-ignored
+            cargo +"$PANCAKE_NIGHTLY" miri test --locked --workspace --all-features --lib -- --include-ignored
         for seed in 1 42; do
             RUSTFLAGS="-Dwarnings -Zrandomize-layout -Zlayout-seed=$seed" \
                 cargo +"$PANCAKE_NIGHTLY" test --locked --workspace --all-features -- --include-ignored

@@ -11,6 +11,8 @@ regression code and forbids unsafe Rust.
 | --- | --- | --- |
 | `cubecl-core`, `cubecl-std`, `cubecl-cpp`, `cubecl-hip`, `cubecl-spirv` 0.11.4 | Rename dependency key `paste` to package `pastey =0.2.3` | Manifest only; existing `paste::paste!` imports and exported macro stay intact. Cargo and advisory tools see the actual `pastey` identity. |
 | `spin_on` 0.1.1 | Replace `pin_utils::pin_mut!` with `core::pin::pin!`; remove `pin-utils` | Same future is pinned on stack before its first poll; no allocation. Declare Rust 1.68, when the standard macro became stable. Replace deprecated atomic spin hint with its standard `core::hint::spin_loop` successor. Update dependency-count documentation. |
+| `cubecl-macros` 0.11.4 | Honor the existing `expand_only` flag for functions | Opt-in removal of the nonexecuted host DSL stub. Checked launch and device IR generation remain; unflagged functions retain their original behavior. Three compile contracts check these guarantees. |
+| `rowan` 0.17.0 | Give private `GreenChild` enum explicit `repr(u32)` | Preserve its asserted 16-byte layout under both randomized layout seeds. Native regression tests exercise node/token clone, drop, offsets and payload access. Existing ARC implementation is unchanged; separate upstream Miri failures are recorded. |
 
 No crate is relabelled as another API major. `cubecl-ir` has no production
 `paste` dependency and is not patched. Published backend **dev** dependencies
@@ -33,11 +35,13 @@ remain in Cargo's dependency/advisory/license audit. Root manifest overrides:
 ```toml
 [patch.crates-io]
 cubecl-core = { path = "vendor/cubecl-core-0.11.4" }
+cubecl-macros = { path = "vendor/cubecl-macros-0.11.4" }
 cubecl-std = { path = "vendor/cubecl-std-0.11.4" }
 cubecl-cpp = { path = "vendor/cubecl-cpp-0.11.4" }
 cubecl-hip = { path = "vendor/cubecl-hip-0.11.4" }
 cubecl-spirv = { path = "vendor/cubecl-spirv-0.11.4" }
 spin_on = { path = "vendor/spin_on-0.1.1" }
+rowan = { path = "vendor/rowan-0.17.0" }
 ```
 
 Keep the resolved lockfile. Do not edit registry cache files. Remove overrides

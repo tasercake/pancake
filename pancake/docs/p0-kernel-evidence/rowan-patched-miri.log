@@ -1,0 +1,61 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.00s
+     Running unittests src/lib.rs (/Users/krishna/Documents/focus-stacking/.worktrees/p0-kernels/artifacts/p0-rowan-validation/target/miri/aarch64-apple-darwin/debug/build/rowan/34953cbf10c25cc5/out/rowan-34953cbf10c25cc5)
+
+running 4 tests
+test green::node::layout_tests::explicit_child_layout_preserves_clone_drop_and_offsets ... error: Undefined Behavior: trying to retag from <133051> for SharedReadOnly permission at alloc41772[0x18], but that tag does not exist in the borrow stack for this location
+   --> rowan/src/arc.rs:264:13
+    |
+264 |             &*(fake_slice as *const HeaderSlice<H, [T]>)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this error occurs as part of retag at alloc41772[0x8..0x20]
+    |
+    = help: this indicates a potential bug in the program: it performed an invalid operation, but the Stacked Borrows rules it violated are still experimental
+    = help: see https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md for further information
+help: <133051> was created by a SharedReadOnly retag at offsets [0x8..0x18]
+   --> rowan/src/arc.rs:263:43
+    |
+263 |                 ptr::slice_from_raw_parts(self as *const _ as *const T, len);
+    |                                           ^^^^
+    = note: this is on thread `green::node::layout_tests::explicit_child_layout_preserves_clon`
+    = note: stack backtrace:
+            0: <arc::HeaderSlice<green::token::GreenTokenHead, [u8; 0]> as std::ops::Deref>::deref
+                at rowan/src/arc.rs:264:13: 264:57
+            1: green::token::GreenTokenData::text
+                at rowan/src/green/token.rs:101:48: 101:65
+            2: green::token::GreenTokenData::text_len
+                at rowan/src/green/token.rs:107:22: 107:33
+            3: green::element::<impl utility_types::NodeOrToken<&green::node::GreenNodeData, &green::token::GreenTokenData>>::text_len
+                at rowan/src/green/element.rs:77:39: 77:52
+            4: green::element::<impl utility_types::NodeOrToken<green::node::GreenNode, green::token::GreenToken>>::text_len
+                at rowan/src/green/element.rs:58:9: 58:35
+            5: green::node::GreenNode::new::<std::iter::Map<std::vec::Drain<'_, (u64, utility_types::NodeOrToken<green::node::GreenNode, green::token::GreenToken>)>, {closure@rowan/src/green/node_cache.rs:77:68: 77:77}>>::{closure#0}
+                at rowan/src/green/node.rs:242:25: 242:38
+            6: std::ops::function::impls::<impl std::ops::FnOnce<(utility_types::NodeOrToken<green::node::GreenNode, green::token::GreenToken>,)> for &mut {closure@rowan/src/green/node.rs:240:49: 240:53}>::call_once
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/ops/function.rs:310:13: 310:35
+            7: std::option::Option::<utility_types::NodeOrToken<green::node::GreenNode, green::token::GreenToken>>::map::<green::node::GreenChild, &mut {closure@rowan/src/green/node.rs:240:49: 240:53}>
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/option.rs:1165:29: 1165:33
+            8: <std::iter::Map<std::iter::Map<std::vec::Drain<'_, (u64, utility_types::NodeOrToken<green::node::GreenNode, green::token::GreenToken>)>, {closure@rowan/src/green/node_cache.rs:77:68: 77:77}>, {closure@rowan/src/green/node.rs:240:49: 240:53}> as std::iter::Iterator>::next
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/adapters/map.rs:107:9: 107:42
+            9: arc::ThinArc::<green::node::GreenNodeHead, green::node::GreenChild>::from_header_and_iter::<std::iter::Map<std::iter::Map<std::vec::Drain<'_, (u64, utility_types::NodeOrToken<green::node::GreenNode, green::token::GreenToken>)>, {closure@rowan/src/green/node_cache.rs:77:68: 77:77}>, {closure@rowan/src/green/node.rs:240:49: 240:53}>>
+                at rowan/src/arc.rs:384:25: 384:37
+            10: green::node::GreenNode::new::<std::iter::Map<std::vec::Drain<'_, (u64, utility_types::NodeOrToken<green::node::GreenNode, green::token::GreenToken>)>, {closure@rowan/src/green/node_cache.rs:77:68: 77:77}>>
+                at rowan/src/green/node.rs:249:20: 252:10
+            11: green::node_cache::NodeCache::node::{closure#0}
+                at rowan/src/green/node_cache.rs:77:13: 77:82
+            12: green::node_cache::NodeCache::node
+                at rowan/src/green/node_cache.rs:124:28: 124:48
+            13: green::builder::GreenNodeBuilder::<'_>::finish_node
+                at rowan/src/green/builder.rs:54:28: 54:82
+            14: green::node::layout_tests::explicit_child_layout_preserves_clone_drop_and_offsets
+                at rowan/src/green/node.rs:46:9: 46:30
+            15: green::node::layout_tests::explicit_child_layout_preserves_clone_drop_and_offsets::{closure#0}
+                at rowan/src/green/node.rs:42:64: 42:64
+
+note: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace
+
+error: aborting due to 1 previous error
+
+error: test failed, to rerun pass `-p rowan --lib`
+
+Caused by:
+  process didn't exit successfully: `/Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/bin/cargo-miri runner /Users/krishna/Documents/focus-stacking/.worktrees/p0-kernels/artifacts/p0-rowan-validation/target/miri/aarch64-apple-darwin/debug/build/rowan/34953cbf10c25cc5/out/rowan-34953cbf10c25cc5` (exit status: 1)
+note: test exited abnormally; to see the full output pass --no-capture to the harness.

@@ -1,0 +1,88 @@
+ Downloading crates ...
+  Downloaded memchr v2.7.4
+  Downloaded regex v1.11.1
+  Downloaded aho-corasick v1.1.3
+  Downloaded regex-syntax v0.8.5
+  Downloaded regex-automata v0.4.9
+   Compiling memchr v2.7.4
+   Compiling autocfg v1.5.1
+   Compiling regex-syntax v0.8.5
+   Compiling countme v3.0.1
+   Compiling hashbrown v0.14.5
+   Compiling text-size v1.1.1
+   Compiling rustc-hash v1.1.0
+   Compiling aho-corasick v1.1.3
+   Compiling memoffset v0.9.1
+   Compiling regex-automata v0.4.9
+   Compiling regex v1.11.1
+   Compiling m_lexer v0.0.4
+   Compiling rowan v0.17.0 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-kernels/artifacts/p0-rowan-original/rowan-0.17.0)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.13s
+     Running unittests src/lib.rs (/Users/krishna/Documents/focus-stacking/.worktrees/p0-kernels/artifacts/p0-rowan-original/rowan-0.17.0/target/miri/aarch64-apple-darwin/debug/build/rowan/7d1825c6316e53ec/out/rowan-7d1825c6316e53ec)
+
+running 1 test
+test syntax_text::tests::test_text_equality ... error: Undefined Behavior: trying to retag from <139395> for SharedReadOnly permission at alloc42706[0x18], but that tag does not exist in the borrow stack for this location
+   --> src/arc.rs:264:13
+    |
+264 |             &*(fake_slice as *const HeaderSlice<H, [T]>)
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this error occurs as part of retag at alloc42706[0x8..0x28]
+    |
+    = help: this indicates a potential bug in the program: it performed an invalid operation, but the Stacked Borrows rules it violated are still experimental
+    = help: see https://github.com/rust-lang/unsafe-code-guidelines/blob/master/wip/stacked-borrows.md for further information
+help: <139395> was created by a SharedReadOnly retag at offsets [0x8..0x18]
+   --> src/arc.rs:263:43
+    |
+263 |                 ptr::slice_from_raw_parts(self as *const _ as *const T, len);
+    |                                           ^^^^
+    = note: this is on thread `syntax_text::tests::test_text_equality`
+    = note: stack backtrace:
+            0: <arc::HeaderSlice<green::node::GreenNodeHead, [green::node::GreenChild; 0]> as std::ops::Deref>::deref
+                at src/arc.rs:264:13: 264:57
+            1: green::node::GreenNodeData::slice
+                at src/green/node.rs:115:9: 115:26
+            2: green::node::GreenNodeData::children
+                at src/green/node.rs:133:25: 133:37
+            3: cursor::SyntaxNode::first_child_or_token
+                at src/cursor.rs:410:9: 410:36
+            4: <cursor::PreorderWithTokens as std::iter::Iterator>::next::{closure#0}
+                at src/cursor.rs:987:54: 987:81
+            5: std::option::Option::<&utility_types::WalkEvent<utility_types::NodeOrToken<cursor::SyntaxNode, cursor::SyntaxToken>>>::and_then::<utility_types::WalkEvent<utility_types::NodeOrToken<cursor::SyntaxNode, cursor::SyntaxToken>>, {closure@src/cursor.rs:984:44: 984:50}>
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/option.rs:1544:24: 1544:28
+            6: <cursor::PreorderWithTokens as std::iter::Iterator>::next
+                at src/cursor.rs:984:21: 999:11
+            7: <cursor::PreorderWithTokens as std::iter::Iterator>::try_fold::<(), {closure@std::iter::adapters::filter_map::filter_map_try_fold<'_, utility_types::WalkEvent<utility_types::NodeOrToken<cursor::SyntaxNode, cursor::SyntaxToken>>, utility_types::NodeOrToken<cursor::SyntaxNode, cursor::SyntaxToken>, (), std::result::Result<(), std::fmt::Error>, {closure@src/cursor.rs:476:48: 476:55}, {closure@std::iter::adapters::filter_map::filter_map_try_fold<'_, utility_types::NodeOrToken<cursor::SyntaxNode, cursor::SyntaxToken>, cursor::SyntaxToken, (), std::result::Result<(), std::fmt::Error>, {closure@src/syntax_text.rs:108:56: 108:65}, {closure@std::iter::adapters::filter_map::filter_map_try_fold<'_, cursor::SyntaxToken, (cursor::SyntaxToken, text_size::TextRange), (), std::result::Result<(), std::fmt::Error>, {closure@src/syntax_text.rs:109:13: 109:25}, {closure@src/syntax_text.rs:88:29: 88:55}>::{closure#0}}>::{closure#0}}>::{closure#0}}, std::result::Result<(), std::fmt::Error>>
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/traits/iterator.rs:2503:29: 2503:40
+            8: <std::iter::FilterMap<cursor::PreorderWithTokens, {closure@src/cursor.rs:476:48: 476:55}> as std::iter::Iterator>::try_fold::<(), {closure@std::iter::adapters::filter_map::filter_map_try_fold<'_, utility_types::NodeOrToken<cursor::SyntaxNode, cursor::SyntaxToken>, cursor::SyntaxToken, (), std::result::Result<(), std::fmt::Error>, {closure@src/syntax_text.rs:108:56: 108:65}, {closure@std::iter::adapters::filter_map::filter_map_try_fold<'_, cursor::SyntaxToken, (cursor::SyntaxToken, text_size::TextRange), (), std::result::Result<(), std::fmt::Error>, {closure@src/syntax_text.rs:109:13: 109:25}, {closure@src/syntax_text.rs:88:29: 88:55}>::{closure#0}}>::{closure#0}}, std::result::Result<(), std::fmt::Error>>
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/adapters/filter_map.rs:138:9: 138:73
+            9: <std::iter::FilterMap<std::iter::FilterMap<cursor::PreorderWithTokens, {closure@src/cursor.rs:476:48: 476:55}>, {closure@src/syntax_text.rs:108:56: 108:65}> as std::iter::Iterator>::try_fold::<(), {closure@std::iter::adapters::filter_map::filter_map_try_fold<'_, cursor::SyntaxToken, (cursor::SyntaxToken, text_size::TextRange), (), std::result::Result<(), std::fmt::Error>, {closure@src/syntax_text.rs:109:13: 109:25}, {closure@src/syntax_text.rs:88:29: 88:55}>::{closure#0}}, std::result::Result<(), std::fmt::Error>>
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/adapters/filter_map.rs:138:9: 138:73
+            10: <std::iter::FilterMap<std::iter::FilterMap<std::iter::FilterMap<cursor::PreorderWithTokens, {closure@src/cursor.rs:476:48: 476:55}>, {closure@src/syntax_text.rs:108:56: 108:65}>, {closure@src/syntax_text.rs:109:13: 109:25}> as std::iter::Iterator>::try_fold::<(), {closure@src/syntax_text.rs:88:29: 88:55}, std::result::Result<(), std::fmt::Error>>
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/core/src/iter/adapters/filter_map.rs:138:9: 138:73
+            11: syntax_text::SyntaxText::try_fold_chunks::<(), {closure@src/syntax_text.rs:95:34: 95:50}, std::fmt::Error>
+                at src/syntax_text.rs:87:9: 88:85
+            12: syntax_text::SyntaxText::try_for_each_chunk::<{closure@src/syntax_text.rs:133:33: 133:40}, std::fmt::Error>
+                at src/syntax_text.rs:95:9: 95:60
+            13: <syntax_text::SyntaxText as std::fmt::Display>::fmt
+                at src/syntax_text.rs:133:9: 133:69
+            14: <syntax_text::SyntaxText as std::string::SpecToString>::spec_to_string
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/alloc/src/string.rs:3048:9: 3048:48
+            15: <syntax_text::SyntaxText as std::string::ToString>::to_string
+                at /Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/lib/rustlib/src/rust/library/alloc/src/string.rs:3027:9: 3027:53
+            16: syntax_text::tests::test_text_equality::do_check
+                at src/syntax_text.rs:288:28: 288:42
+            17: syntax_text::tests::test_text_equality::check
+                at src/syntax_text.rs:295:13: 295:29
+            18: syntax_text::tests::test_text_equality
+                at src/syntax_text.rs:299:9: 299:28
+            19: syntax_text::tests::test_text_equality::{closure#0}
+                at src/syntax_text.rs:284:28: 284:28
+
+note: some details are omitted, run with `MIRIFLAGS=-Zmiri-backtrace=full` for a verbose backtrace
+
+error: aborting due to 1 previous error
+
+error: test failed, to rerun pass `--lib`
+
+Caused by:
+  process didn't exit successfully: `/Users/krishna/.rustup/toolchains/nightly-2026-11-15-aarch64-apple-darwin/bin/cargo-miri runner /Users/krishna/Documents/focus-stacking/.worktrees/p0-kernels/artifacts/p0-rowan-original/rowan-0.17.0/target/miri/aarch64-apple-darwin/debug/build/rowan/7d1825c6316e53ec/out/rowan-7d1825c6316e53ec 'syntax_text::tests::test_text_equality'` (exit status: 1)
+note: test exited abnormally; to see the full output pass --no-capture to the harness.
