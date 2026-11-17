@@ -115,7 +115,10 @@ It does not implement the full application before implementation starts.
 User has no suitable local T50 source and authorizes generation or temporary
 open-source download, with cleanup. Use a deterministic **GENERATED** native
 6000×4000, genuine RGB16 ZIP-TIFF 50-frame scale workload, with known focus
-variation and independent full decode/hash verification. Retain generator, seed,
+variation and independent full decode/hash verification. All fifty native frames
+plus two truth images pass; every generated image is deleted. The retained
+[recipe and receipts](../../qualification/t50-generated/README.md) reproduce the
+exact samples; a later benchmark must add full-set preparation with disk preflight. Retain generator, seed,
 ordered file/pixel hashes and cleanup receipt; remove generated images after
 qualification. This changes T50's earlier real-photo-only input condition before
 any matched candidate measurement. It does not change thresholds, case oracles,

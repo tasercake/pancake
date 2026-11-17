@@ -36,7 +36,9 @@ license inventory. Existing local hooks and CI gates invoke these checks.
 Run individual gates with `bash scripts/check.sh fast`, `test`, `coverage`,
 `branches`, `deps`, `mutants`, `nightly`, or `guardrails`. Linux x86_64 also supports
 `bash scripts/check.sh sanitizer address` and `thread`. `bash scripts/check.sh all` runs every
-local gate. Native qualification requires a physical GPU; it rejects software
+local gate. Hosted CPU profiles include `test-cpu`, `coverage-cpu`,
+`nightly-cpu`, `branches-cpu` and `mutants-cpu`; they do not replace the physical
+GPU gate. Native qualification requires a physical GPU; it rejects software
 fallback. See [kernel qualification](docs/p0-kernel-qualification.md) for numerical
 contracts, hardware evidence, the Miri boundary and exact measurement limits.
 Coverage cannot prove correctness or performance.

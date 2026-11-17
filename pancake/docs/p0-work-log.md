@@ -15,7 +15,7 @@ caches remain ignored; their manifests identify retained locations and hashes.
 | Dependency and safe API choices | Slint 1.19.0, CubeCL 0.11.4, wgpu 30.0.2; safe TensorHandle kernels; Rawler 0.8.0 plus image/tiff/exr/lcms2. License gate removed. Exact expiring dependency reviews enforced. | Actual integrated consumers must build and pass policy; new architectural choices reopen P0. |
 | Numerical / UI proofs | Blur, stable f32 variance, checked budgets and repeated ownership; native Slint controls, actual pixels and cancellable reusable worker. Final required-profile receipts below. | Full numerical methods P3–P5; job/UI/lifecycle P6–P8. |
 | Assurance / builds | Local aggregate, Linux CPU ASan/TSan and Windows build receipts pass; hosted CI setup corrections remain under validation. GPU-ASan failure remains an explicit external-runtime follow-up. | Complete application assurance and packages P9. |
-| Full product / performance | **Not run.** No Pancake CLI/GUI application or complete stacking job yet. Targets frozen; three real corpora retained; generated T50 qualification/cleanup is in progress after explicit user authorization. | P1–P10, with T50 before matched comparisons. |
+| Full product / performance | **Not run.** No Pancake CLI/GUI application or complete stacking job yet. Targets frozen; three real corpora retained; generated T50 passes qualification and is deleted after explicit user authorization. | P1–P10, with T50 before matched comparisons. |
 
 ## 2. Evidence chronology
 
@@ -330,7 +330,7 @@ establish final cold-start or viewer-latency targets.
 | D150 | 150 distinct optical-focus amber-mite frames, 2304×1728 original JPEG8, selected from 152. Source/archive/file hashes and CC BY4.0 evidence retained. |
 | E9 | Nine distinct Balloons exposure brackets, 512×339 original PNG8; actual exposure domain, not focus frames or repeated sources. Rights evidence retained. |
 | R50 | First 50 consecutive pinned Canon CR3 files, original hashes all distinct; visible 5118×3412, sensor 14-bit stored u16. Full LibRaw decode of all 50 complete. Below T50 resolution. |
-| T50 | Earlier real-photo-only slot is explicitly superseded by later user permission to generate temporary data. Deterministic 50-frame native 6000×4000 genuine RGB16 ZIP-TIFF scale qualification/cleanup is in progress. Retain recipe/hashes; no real-camera quality or full-job timing claim. |
+| T50 | Earlier real-photo-only slot is explicitly superseded by later user permission to generate temporary data. Deterministic 50-frame native 6000×4000 genuine RGB16 ZIP-TIFF scale qualification passes; all images deleted. Retain recipe/hashes; no real-camera quality or full-job timing claim. |
 | Acquisition | Initial unique payload 214,404,651 bytes plus R50 442,098,996 = 656,503,647 bytes, below unchanged 2,147,483,648-byte cap. D01 disabled/untouched. D05 acquired but unused in benchmarks; no photos redistributed. |
 
 Original data stay in retained ignored `p0-performance` and `p0-unblock` worktrees;
@@ -356,6 +356,37 @@ v1.7.12 from its Go module; no version/gate changed. Native macOS Bash 3.2 then
 rejected an empty `assurance_args` array under `set -u` after all 79 mutations
 and five strict Miri tests had passed. This is a script failure, not a failing
 kernel/layout test; final command must rerun after compatible argument handling.
+
+### Generated T50 qualification and cleanup
+
+User explicitly authorized generation or temporary open-source download because
+no suitable local source exists. This revises T50's earlier real-photo-only
+condition before any matched candidate measurements. All numeric targets,
+settings, sample protocol and real R50/D150/E9 requirements remain unchanged.
+Bounded primary-source discovery did not select a qualifying real capture;
+D01/LSFD remained disabled and no dataset payload was downloaded.
+
+[Recipe/source](../../qualification/t50-generated/README.md),
+[full result](../../qualification/t50-generated/evidence/RESULTS.md) and
+[canonical receipt](../../qualification/t50-generated/evidence/native-t50-receipt.json)
+are retained. Receipt SHA-256:
+`8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c`.
+Fifty distinct 6000×4000 RGB16 ZIP-TIFF frames use seed 20261117, fifty known depth
+regions and explicit integer defocus/spatial detail. Sharp RGB16 and categorical
+single-channel depth truth are also generated; depth labels are not photographic
+high-bit samples. Each input frame has 49,928–49,929 distinct u16 values and at
+least 71,718,603 samples not divisible by 257. No resized/8-bit-promoted source.
+
+Every pixel matches original synthesis, tifffile/imagecodecs decode and separate
+stdlib zlib/predictor reversal. There are 384 tiles and 53 independent scalar
+sample locations per image; tile-row-major pixel-hash order is documented.
+**All 52 images are deleted; zero remain.** Generated/deleted total:
+2,775,174,405 bytes; peak retained image storage: 62,597,312 bytes; complete
+process peak RSS: 121,454,592 bytes. Zero downloaded bytes. The 15 GiB reserve
+is enforced. Eleven tests plus Ruff pass. Original cumulative-byte guard stopped
+a diagnostic after 22 images; retained-vs-total regression failed first, then
+passes after correct peak-retention accounting. Canonical run restarts all fifty
+under one final generator hash; numeric recipe is unchanged.
 
 ## 12. Final execution receipts and closure
 

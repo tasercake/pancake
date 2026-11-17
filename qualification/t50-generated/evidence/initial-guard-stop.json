@@ -1,0 +1,11 @@
+{
+  "initial_guard": "Incorrectly charged all deleted TIFF history against retained-byte cap",
+  "remaining_images": [],
+  "retained_marker_only": true,
+  "run_log_sha256": "00c6b2568501d1d290522f1887146ec324f69c2e9ac768ba3e0b864acdf1bc5a",
+  "scope": "Diagnostic only; canonical evidence reruns all50 with corrected retained-byte guard and one frozen generator source.",
+  "source_sha256": "aee399754bb9927b795863e0d1a9bd02475259f8e258224b25d4c82b52e3e343",
+  "status": "PRELIMINARY_GUARD_STOP_NOT_QUALIFIED",
+  "verified_and_deleted_bytes": 1194748042,
+  "verified_and_deleted_frames": 22
+}

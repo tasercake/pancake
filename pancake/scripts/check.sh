@@ -254,7 +254,7 @@ case ${1:-all} in
         done
         ;;
     *)
-        printf 'Usage: check.sh [all|fast|test|test-cpu|gpu|coverage|coverage-cpu|branches|branches-cpu|deps|mutants|nightly|nightly-cpu|sanitizer|sanitizer-gpu|guardrails]\n' >&2
+        printf 'Usage: check.sh [all|fast|test|test-cpu|gpu|coverage|coverage-cpu|branches|branches-cpu|deps|mutants|mutants-cpu|nightly|nightly-cpu|sanitizer|sanitizer-gpu|guardrails]\n' >&2
         exit 2
         ;;
 esac

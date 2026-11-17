@@ -6,10 +6,10 @@
   "targets_version": "p0-initial-1",
   "qualification": {
     "performance_pass": false,
-    "corpus_status": "D150_and_E9_real_inputs_pinned;T50_and_R50_unselected",
+    "corpus_status": "D150_E9_R50_real_inputs_pinned;T50_generated_native_scale_verified_and_deleted",
     "reference_baseline_status": "two_single_CPU_diagnostics_only;frozen_profile_and_statistical_protocol_pending",
-    "pancake_runtime_status": "not_implemented",
-    "p0_01_status": "blocked_on_real_corpus_and_support_matrix"
+    "pancake_runtime_status": "kernel_qualified_full_application_job_not_implemented",
+    "p0_01_status": "passed_adopted_architectural_minimum;matched_full_job_baselines_P2_P10"
   },
   "targets": {
     "warm_completed_job": {
@@ -30,7 +30,7 @@
     "viewer_event_to_present": {
       "p95_max_ms": 33,
       "minimum_events": 200,
-      "event_set": "source/result selection, pan, zoom and comparison drag on selected real 24MP image; exposure preview if exposed",
+      "event_set": "source/result selection, pan, zoom and comparison drag on generated native24MP T50 or qualified real24MP image; exposure preview if exposed; label input kind",
       "endpoint": "Native input dispatch timestamp to first presented correct image/state, not compute submission, callback return or screenshot call duration.",
       "concurrent_load": "Measure both idle and during real numerical processing."
     },
@@ -47,7 +47,7 @@
     "runtime_lock_sha256": "fda57ac5eea063aebcc278eb57a90228e6da32fe2d8f67d7025ac367f4b51036",
     "descriptor_sha256": "e3e951b674bc0103f267575a99533cc33ead40e2af56671766f4fc71f3f12b76",
     "instrumentation": "Disable Python/Rust coverage and profiling while measuring primary timings; retain actual backend evidence as separately recorded or identically instrumented validation run.",
-    "baseline_measurement_status": "not_run"
+    "baseline_measurement_status": "diagnostic_samples_only;qualified_baselines_not_run"
   },
   "workloads": [
     {
@@ -59,7 +59,7 @@
         4000
       ],
       "input": "RGB16 TIFF, lossless ZIP/Deflate",
-      "source_requirement": "50 distinct consecutive real optical focus frames; common recorded crop from native images at least 6000x4000 allowed; no synthetic source, resizing, repeated frame, or duplicated path to fill count.",
+      "source_requirement": "50 distinct deterministic GENERATED native 6000x4000 genuine RGB16 focal-scale frames, frozen integer recipe/seed/file+pixel hashes; no 8-bit promotion, resize or duplicated frame. Current qualification verifies/deletes sequentially; benchmark preparation must materialize exact recipe under full-set disk-reserve preflight, then clean up.",
       "methods": [
         "laplacian",
         "hybrid",
@@ -67,7 +67,9 @@
         "depth_map"
       ],
       "alignment_mode": "similarity",
-      "slab_size": 0
+      "slab_size": 0,
+      "input_kind": "generated_scale_workload_not_camera_photography",
+      "recipe_path": "qualification/t50-generated/README.md"
     },
     {
       "id": "R50",
@@ -181,7 +183,24 @@
       "input_precision_bits": 8,
       "source_format": "PNG"
     },
-    "T50": "not_selected",
+    "T50": {
+      "kind": "GENERATED_SCALE_NOT_PHOTOGRAPHY",
+      "native_frames": 50,
+      "dimensions": [
+        6000,
+        4000
+      ],
+      "precision": "RGB16, direct native16 synthesis, no8bitpromotion",
+      "recipe_path": "qualification/t50-generated/README.md",
+      "receipt_path": "qualification/t50-generated/evidence/native-t50-receipt.json",
+      "receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+      "status": "all50_generated_full_pixel_verified_then_deleted",
+      "new_download_bytes": 0,
+      "remaining_images": 0,
+      "peak_retained_tiff_bytes": 62597312,
+      "total_generated_and_deleted_tiff_bytes": 2775174405,
+      "future_benchmark_preparation": "Materialize exact recipe with full-set+15GiB preflight; current generator always verifies/deletes sequentially."
+    },
     "R50": {
       "selected_id": "R50-sood-first50",
       "manifest_sha256": "dd7a7e8a396d16e952d3d24d258afc1e05b77bb1664b179d3a43a7f66e413fab",
@@ -198,5 +217,15 @@
     "qualification_baseline": "not_measured_to_frozen_profile_or_sample_protocol",
     "retained_data_worktree": "/Users/krishna/Documents/focus-stacking/.worktrees/p0-performance",
     "frame_path_resolution": "Native frame paths in performance-corpus.json are relative to retained_data_worktree, not the main checkout. Metadata integration does not copy images."
+  },
+  "input_policy_revision": {
+    "date": "2026-11-17",
+    "authorized_by": "User has no local T50 source and explicitly authorizes temporary generated or open-source downloaded data, with cleanup.",
+    "affected_workload": "T50 only; real R50/D150/E9 unchanged",
+    "previous_spec_sha256": "2ba855b481d1df2852fd74ae61dfd9fb5e3da66e08bc78d60c9c848ac9e27cca",
+    "previous_t50_source_requirement": "50 distinct consecutive real optical focus frames; common recorded crop from native images at least 6000x4000 allowed; no synthetic source, resizing, repeated frame, or duplicated path to fill count.",
+    "numeric_targets_unchanged": true,
+    "matched_candidate_measurements_before_change": 0,
+    "receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c"
   }
 }
