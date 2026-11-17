@@ -1,9 +1,14 @@
 # P0 hardware and native test-lane audit
 
+> Current scope update, 2026-11-17: AMD/Intel GPU and Windows execution/testing
+> are best effort; build support remains required. Missing access alone no longer
+> blocks P0. The [implementation plan](implementation-plan.md#testing-scope--adopted-user-decision-2026-11-17)
+> is authoritative. Observed results below are retained as historical evidence.
+
 Date: 2026-11-17, Asia/Singapore. Source revision: `8fcbc52` (P0 planning
 baseline over `00bd137`). Audit worktree: `codex/p0-hardware`.
 
-## Verdict
+## Original audit verdict
 
 ## Observed local resources
 
@@ -65,7 +70,7 @@ availability. Hosted CI definitions are also not evidence of a physical GPU:
 current CI runs Linux/macOS regressions and Linux GUI smoke, but no advertised
 NVIDIA/AMD/Intel physical-GPU runner is configured there.
 
-## Minimum prerequisites before P0.02 can pass
+## Original full-matrix prerequisites — testing scope superseded
 
 | Lane | Available now | Remaining requirement |
 |---|---|---|

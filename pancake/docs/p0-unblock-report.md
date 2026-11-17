@@ -1,5 +1,10 @@
 # P0 fix execution and remaining conditions
 
+> Current scope update, 2026-11-17: AMD/Intel GPU and Windows execution/testing
+> are best effort; build support remains required. Missing access alone no longer
+> blocks P0. The [implementation plan](implementation-plan.md#testing-scope--adopted-user-decision-2026-11-17)
+> is authoritative. Observed results below are retained as historical evidence.
+
 Date: 2026-11-17. Integration worktree: `codex/p0-unblock`.
 
 ## Applied fixes
@@ -61,12 +66,14 @@ reproduction; no host package, driver, permission or desktop setting changed.
 | Gate family | Condition that can still stop P0 |
 |---|---|
 | P0.01–P0.03 | T50: 50 distinct native images at least 6000x4000, genuine high-bit-depth input. Exact complete support/build/package matrix and safe codec/RAW/color graph. No upscaling, repeated frames or source-scope reduction. |
-| P0.02/P0.06 | Actual AMD HIP/wgpu, Intel GPU and Windows execution access, plus promised platform/package lanes. CPU model names and software adapters cannot substitute for physical GPUs. |
+| P0.02/P0.06 | Complete the required Apple/NVIDIA kernel battery and native GUI/permission checks. AMD/Intel GPU and Windows execution are now best effort; their absent runtime evidence is no longer a blocker. Retained platform/backend builds remain required. |
 | P0.04–P0.09 | Complete resource/interop/budget, decoder/file/color, assurance and numerical battery on promised runtimes. A blur pass does not qualify FFT, warp or memory pressure. |
 | P0.10–P0.15 | Real five-method/slab, hard registration/crop, job/device/error, native Slint controls, 64-frame lifecycle and deployment/accounting slices. None can be replaced with mock successful diagnostics. |
 | P0.16–P0.17 | Equal-quality full-job warm/cold/memory/viewer measurements against frozen targets, then every gate passed on matching source/lock/contract provenance. |
 
 User confirms there are **no AMD GPU, Intel GPU or Windows SSH/runner lanes**.
-Available Apple/NVIDIA work continues; no support-matrix reduction was approved.
+The later scope decision makes those execution/test lanes best effort while
+retaining builds. Required Apple/NVIDIA work continues; test observations and
+all other unresolved conditions remain unchanged.
 Dependency policy cannot create missing hardware, supply a real 24 MP corpus or
 substitute for unimplemented numerical/UI behavior. P1 remains closed.
