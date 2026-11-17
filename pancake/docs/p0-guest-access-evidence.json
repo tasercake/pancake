@@ -1,0 +1,77 @@
+{
+  "resource_config": {
+    "vcpus": 4,
+    "memory_bytes": 8589934592
+  },
+  "authentication_attempts": 1,
+  "started_by_task": true,
+  "no_host_gui_input": true,
+  "suite_lease_acquired": true,
+  "initially_running": false,
+  "ssh_exit_code": 0,
+  "guest_observations": {
+    "uid": 501,
+    "checks": {
+      "native_arch": {
+        "exit_code": 0,
+        "stdout": "Darwin arm64",
+        "stderr": ""
+      },
+      "macos": {
+        "exit_code": 0,
+        "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+        "stderr": ""
+      },
+      "console_user": {
+        "exit_code": 0,
+        "stdout": "admin",
+        "stderr": ""
+      },
+      "uv": {
+        "exit_code": 0,
+        "stdout": "uv 0.12.17 (635500036 2026-09-18 aarch64-apple-darwin)",
+        "stderr": ""
+      },
+      "swift": {
+        "exit_code": 0,
+        "stdout": "Apple Swift version 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101)\nTarget: arm64-apple-macosx26.0",
+        "stderr": "swift-driver version: 1.148.6"
+      },
+      "sip": {
+        "exit_code": 0,
+        "stdout": "System Integrity Protection status: enabled.",
+        "stderr": ""
+      }
+    },
+    "aqua_domain_exists": true,
+    "managed_python_paths": [
+      "/Users/admin/.local/share/uv/python/cpython-3.12-macos-aarch64-none/bin/python3",
+      "/Users/admin/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/bin/python3"
+    ],
+    "suite_root_exists": true,
+    "existing_runtime_pythons": [],
+    "prior_permission_record": {
+      "mtime": 1794826904.4735334,
+      "values": {
+        "screen": true,
+        "trust": {
+          "post_event_access": true,
+          "trusted": true
+        },
+        "automation": true,
+        "screenshot": true
+      },
+      "current_identity_requalified": false,
+      "mtime_utc": "2026-11-16T11:01:44.473533+00:00"
+    },
+    "native_helpers_cached": 0,
+    "ssh_process_screen_capture_preflight": true
+  },
+  "cleanup_called": true,
+  "final_vm_states": {},
+  "observed_interval_utc": {
+    "started": "2026-11-17T08:01:13Z",
+    "completed": "2026-11-17T08:04:36Z"
+  },
+  "source_scope": "Read-only guest qualification, not application GUI execution"
+}
