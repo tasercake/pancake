@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "status": "passed_adopted_P0_RAW_IO_architecture_minimum",
+  "base_commit": "bb0307b2d5bfbaa3f839399040ffa181a0410c0d",
+  "decision": {
+    "raw": "rawler0.8.0 owned shared byte buffer -> RawDevelop default -> RGB16",
+    "crop": "decoder recommended active/default crop; no camera overrides",
+    "working_encoding": "full-scale RGB16 with Rawler default WB/calibration and sRGB transfer; no histogram auto-brightening",
+    "concurrency": "one LazyLock local Rayon pool shared by all RAW operations, two named workers, install scoped; no global pool mutation"
+  },
+  "fixture": {
+    "fixture": "bayer_dng",
+    "metadata": {
+      "generator_version": 2,
+      "reference_shape": [
+        112,
+        160,
+        3
+      ],
+      "cfa": "RGGB",
+      "black_level": 0,
+      "white_level": 65535,
+      "kind": "synthetic-uncompressed-bayer-dng",
+      "shape": [
+        112,
+        160
+      ],
+      "dtype": "uint16",
+      "input_count": 3
+    },
+    "fixture_generator_sha256": "995a0917fa900cd46143ad4a21dca1c3c7101d2c2dc418d2662043fa3ef1cebe",
+    "validator_sha256": "737830d600ac7ae35477aae72eda4d102eea0eb03c8c7fd90b89c79f32b6a396",
+    "versions": {
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "pillow": "12.3.0",
+      "tifffile": "2026.11.12"
+    },
+    "inputs": {
+      "fixtures/bayer_dng/frame_00.dng": "99051b2e08724bdf6aeb8c27a4c8aa495143d9ffa658d826c7ab089078c66817",
+      "fixtures/bayer_dng/frame_01.dng": "99051b2e08724bdf6aeb8c27a4c8aa495143d9ffa658d826c7ab089078c66817",
+      "fixtures/bayer_dng/frame_02.dng": "99051b2e08724bdf6aeb8c27a4c8aa495143d9ffa658d826c7ab089078c66817"
+    }
+  },
+  "development": {
+    "shape": [
+      112,
+      160,
+      3
+    ],
+    "dtype": "uint16",
+    "range": 65535.0,
+    "mean": 43152.29274553571,
+    "sharpness": 605521635.3430308,
+    "status": "pass",
+    "output_sha256": "1b7afc3b05d0cde5ee61b4ce2de7c3363cce19a923bc7e68b83dcaaa10ebda6c",
+    "pixel_sha256": "523d4b0e2c883f6661b82d6b269c832e1340001f13040abedbac9142ac14f396",
+    "unique_u16_values": 28206,
+    "non_8bit_promoted_samples": 52723,
+    "source_unchanged": true,
+    "fixture_inputs_unchanged": true,
+    "negative_promoted_8bit_rejected": true
+  },
+  "worker_budget": {
+    "raw_pool_count": 1,
+    "raw_worker_limit": 2,
+    "observed_worker_names": [
+      "pancake-raw-0",
+      "pancake-raw-1"
+    ],
+    "global_rayon_pool_configured": false
+  },
+  "retained_prior_proofs": {
+    "status": "pass",
+    "rgb16_png_exact": true,
+    "rgb16_tiff_exact": true,
+    "tiff_compression": "ADOBE_DEFLATE",
+    "float_tiff_bit_exact": true,
+    "float_exr_bit_exact": true,
+    "full_sensor_libraw_bit_exact": true,
+    "generated_bayer_dng_exact": true,
+    "sensor_samples_sha256": "81cff63b4c1b0cb71ddc0bca8551721c362b378b6b525f3fb09ea12f1965ca32",
+    "versions": {
+      "opencv": "5.0.0",
+      "numpy": "2.4.2",
+      "tifffile": "2026.3.3",
+      "OpenEXR": "3.5.4"
+    },
+    "equal_profile_exhaustive_noop": true,
+    "real_icc_transform_max_u16_error": 0,
+    "oracle_lcms_encoded_version": 2180
+  },
+  "combined_metadata": {
+    "status": "resolved_only_not_built_or_policy_qualified",
+    "packages": 839,
+    "versions": {
+      "pancake": [
+        "0.1.0"
+      ],
+      "cubecl": [
+        "0.11.4"
+      ],
+      "slint": [
+        "1.19.0"
+      ],
+      "wgpu": [
+        "30.0.2"
+      ],
+      "image": [
+        "0.25.10"
+      ],
+      "tiff": [
+        "0.11.3"
+      ],
+      "exr": [
+        "1.74.3"
+      ],
+      "rawler": [
+        "0.8.0"
+      ],
+      "rayon": [
+        "1.12.0"
+      ],
+      "lcms2": [
+        "6.2.0"
+      ],
+      "lcms2-sys": [
+        "4.0.7"
+      ]
+    },
+    "wgpu_families": {
+      "wgpu": [
+        "30.0.2"
+      ],
+      "wgpu-core": [
+        "30.0.2"
+      ],
+      "wgpu-core-deps-apple": [
+        "30.0.2"
+      ],
+      "wgpu-core-deps-emscripten": [
+        "30.0.2"
+      ],
+      "wgpu-core-deps-wasm": [
+        "30.0.2"
+      ],
+      "wgpu-core-deps-windows-linux-android": [
+        "30.0.2"
+      ],
+      "wgpu-hal": [
+        "30.0.2"
+      ],
+      "wgpu-naga-bridge": [
+        "30.0.2"
+      ],
+      "wgpu-types": [
+        "30.0.2"
+      ]
+    },
+    "vendor_override_count": 8,
+    "retired_helper_packages": {
+      "paste": [],
+      "pin-utils": []
+    },
+    "manifest_sha256": "0d280f93d6447d260dff780255656b4ce456bd01e0a68c3e14bb7c26db227329",
+    "lock_sha256": "9c52886eadc394842c6d848590428939a568111b186bf2631706d5cad596e7b3"
+  },
+  "assurance": {
+    "strict_lint_tables_match_application": true,
+    "first_party_shipping_logic_added": false,
+    "unsafe_rust_added": false,
+    "codec_tests_passed": 3,
+    "test_harness_threads": 1,
+    "compiler_jobs": 2,
+    "full_camera_render_comparison": "P2 before comparison; not claimed",
+    "application_graph_adoption_policy": "P2 enforced; not claimed by metadata probe",
+    "application_fast_and_test_hooks": "passed: strict app fast checks, debug/release native tests, docs and feature powerset",
+    "full_application_aggregate_gates": "Owned by separate assurance/integration workstream; not repeated with a competing instrumented cache in this I/O worktree"
+  },
+  "known_limits": [
+    "Exact Canon/LibRaw crop/render/WB/color parity remains P2 acceptance before comparison",
+    "Normal-orientation generated RGGB DNG is full-development proof; not all camera/sensor/compression/orientation support",
+    "No complete focus-stack method, GUI, throughput, resource-limit or atomic-export pass implied"
+  ],
+  "disk_budget": {
+    "minimum_free_gib": 15,
+    "last_observed_free_gib": 42,
+    "cache_reused": "p0-patches codec target; p0-unblock normal-build cache for normal hooks; combined graph metadata only"
+  }
+}

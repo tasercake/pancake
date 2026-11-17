@@ -5,6 +5,7 @@ use std::error::Error;
 use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::Path;
+use std::sync::LazyLock;
 
 use image::{ColorType, ImageBuffer, ImageFormat, Rgb};
 use rawler::formats::tiff::reader::TiffReader;
@@ -13,6 +14,22 @@ use tiff::encoder::{Compression, DeflateLevel, TiffEncoder, colortype};
 
 /// Probe result with recoverable dependency and I/O errors.
 type ProbeResult = Result<(), Box<dyn Error>>;
+
+/// One process-wide bounded pool owns every RAW decode/development operation.
+static RAW_POOL: LazyLock<Result<rayon::ThreadPool, String>> = LazyLock::new(|| {
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(2)
+        .thread_name(|index| format!("pancake-raw-{index}"))
+        .build()
+        .map_err(|error| error.to_string())
+});
+
+/// Obtain the shared RAW pool without building another or mutating Rayon globals.
+fn raw_pool() -> Result<&'static rayon::ThreadPool, io::Error> {
+    RAW_POOL
+        .as_ref()
+        .map_err(|message| io::Error::other(message.clone()))
+}
 
 /// RGB16 values include low bits that an eight-bit intermediate cannot preserve.
 const RGB16: [u16; 12] = [
@@ -39,7 +56,8 @@ const FLOAT: [f32; 12] = [
 fn decode_sensor(path: &Path, output: &Path) -> ProbeResult {
     let bytes = fs::read(path)?;
     let source = rawler::rawsource::RawSource::new_from_shared_vec(std::sync::Arc::new(bytes));
-    let raw = rawler::decode(&source, &rawler::decoders::RawDecodeParams::default())?;
+    let raw = raw_pool()?
+        .install(|| rawler::decode(&source, &rawler::decoders::RawDecodeParams::default()))?;
     let rawler::RawImageData::Integer(samples) = &raw.data else {
         return Err(io::Error::other("expected integer sensor data").into());
     };
@@ -264,7 +282,8 @@ fn generated_bayer_dng_retains_all_sensor_samples() -> ProbeResult {
     let output = Path::new(env!("CARGO_MANIFEST_DIR")).join("target/qualification");
     let bytes = fs::read(output.join("bayer.dng"))?;
     let source = rawler::rawsource::RawSource::new_from_shared_vec(std::sync::Arc::new(bytes));
-    let raw = rawler::decode(&source, &rawler::decoders::RawDecodeParams::default())?;
+    let raw = raw_pool()?
+        .install(|| rawler::decode(&source, &rawler::decoders::RawDecodeParams::default()))?;
     let rawler::RawImageData::Integer(samples) = &raw.data else {
         return Err(io::Error::other("Bayer DNG returned non-integer sensor data").into());
     };

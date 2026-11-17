@@ -24,6 +24,7 @@ image = { version = "=0.25.10", default-features = false, features = ["png", "ti
 tiff = "=0.11.3"
 exr = { version = "=1.74.3", default-features = false }
 rawler = { version = "=0.8.0", default-features = false }
+rayon = "=1.12.0"
 lcms2 = { version = "=6.2.0", features = ["static"] }
 
 [workspace.lints.rust]

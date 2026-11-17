@@ -931,6 +931,7 @@ dependencies = [
  "image",
  "lcms2",
  "rawler",
+ "rayon",
  "tiff",
 ]
 

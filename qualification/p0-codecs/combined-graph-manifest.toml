@@ -1,0 +1,29 @@
+[package]
+name = "pancake-codec-combined-metadata"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.100"
+publish = false
+
+[workspace]
+members = ["."]
+resolver = "3"
+
+[dependencies]
+pancake = { path = "../../../pancake" }
+image = { version = "=0.25.10", default-features = false, features = ["png", "tiff", "exr", "jpeg"] }
+tiff = "=0.11.3"
+exr = { version = "=1.74.3", default-features = false }
+rawler = { version = "=0.8.0", default-features = false }
+rayon = "=1.12.0"
+lcms2 = { version = "=6.2.0", features = ["static"] }
+
+[patch.crates-io]
+cubecl-core = { path = "../../../pancake/vendor/cubecl-core-0.11.4" }
+cubecl-macros = { path = "../../../pancake/vendor/cubecl-macros-0.11.4" }
+cubecl-std = { path = "../../../pancake/vendor/cubecl-std-0.11.4" }
+cubecl-cpp = { path = "../../../pancake/vendor/cubecl-cpp-0.11.4" }
+cubecl-hip = { path = "../../../pancake/vendor/cubecl-hip-0.11.4" }
+cubecl-spirv = { path = "../../../pancake/vendor/cubecl-spirv-0.11.4" }
+spin_on = { path = "../../../pancake/vendor/spin_on-0.1.1" }
+rowan = { path = "../../../pancake/vendor/rowan-0.17.0" }
