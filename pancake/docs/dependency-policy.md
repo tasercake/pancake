@@ -58,7 +58,7 @@ shared GPU/window crate; native runtime/interop tests are still required.
 
 ## Temporary maintenance notices
 
-Only the four reviewed **unmaintained** IDs below may receive exceptions. Other
+Only the five reviewed **unmaintained** IDs below may receive exceptions. Other
 advisories, including any new security issue for these crates, remain enforced.
 Cargo-deny ignores advisory IDs globally, so the helper additionally binds each ID
 to exact active package versions and their reviewed immediate parent paths.
@@ -72,11 +72,40 @@ reason in the ledger.
 | RUSTSEC-2026-0370, `zvariant` 5.15.1 | Runtime session D-Bus variant decoding for Slint settings and AT-SPI accessibility. Migration requires coordinated zbus/Slint/AccessKit/AT-SPI API changes. |
 | RUSTSEC-2026-0371, `zbus_names` 4.3.5 | Runtime session-bus name parsing for settings/accessibility; same coordinated migration is required. |
 | RUSTSEC-2026-0372, `zvariant_derive` 5.15.1 | Host macro generates wire serialization code paired with zvariant 5. Runtime generated code handles session-bus inputs; upgrade with the full stack. |
+| RUSTSEC-2026-0543, `chrono` 0.4.45 | Slint runtime date/calendar parsing and formatting plus local clock/timezone access. Full metadata also has exact dormant Turso SQL timestamp and VFS clock paths. Replace through a reviewed compatible date/time migration. |
 
 The [upstream patch review](p0-upstream-patch-review.md) documents exposure and
 removal alternatives. No exception exists for `paste` or `pin-utils`; reviewed
 source patches remove those dependencies. No titlebar/accessibility feature is
 disabled to remove a notice.
+
+## Chrono maintenance review, 2026-11-17
+
+RUSTSEC-2026-0543 is dated 2026-09-14 and explicitly classified
+`informational = "unmaintained"`, with no patched version listed. The
+[upstream maintainer's wind-down notice](https://github.com/chronotope/chrono/issues/1768)
+supports this maintenance classification. This review does not downgrade a
+security vulnerability or accept any other advisory ID for Chrono.
+
+The exact review covers `chrono` 0.4.45 and three immediate metadata parents:
+`i-slint-core` 1.19.0 (`^0.4`), `turso_core` 0.8.3 (`^0.4.42`) and `turso_ext`
+0.8.3 (`^0.4.42`). Current normal-feature `cargo tree --invert chrono` reaches it
+through Slint only. The helper also checks dormant full-metadata parent paths,
+so those Turso paths were reviewed explicitly instead of omitted from the ledger.
+
+In Slint's `date_time.rs`, `NaiveDate` handles UI date/format strings, calendar
+month lengths and weekday offsets. `Local::now` reads the system clock/timezone
+when `std` is enabled. Dormant Turso code uses Chrono for SQL timestamp/RFC3339
+parsing and arithmetic, local-time conversions, clock/pragma date values and VFS
+current-time formatting. These are runtime text/database/OS-time exposures; no
+compile-only or image/RAW parsing claim is made. Static source review does not
+claim that the current application exercised these APIs.
+
+The ledger records the advisory hash and seven reviewed source-file hashes.
+The review expires on 2026-12-17 and remains bound to exact package versions,
+parent versions and declared requirements. No date/time dependency or upstream
+source was replaced here. A maintained replacement still needs compatible
+parsing/formatting, invalid-input, calendar and local-time behavior checks.
 
 ## Unused dependencies
 
@@ -102,10 +131,20 @@ vendor manifest; metadata errors cannot count as a clean gate pass. See the
 On 2026-11-17 the helper reviewed the final P0 kernel metadata recorded by SHA-256
 in the ledger: 787 packages, 58 duplicate names and 123 exact package-version
 reviews for Clippy; 32 exact older-version cargo-deny skips across 29 diagnosed
-desktop duplicate groups. Four maintenance exceptions are active. All protected
+desktop duplicate groups. That initial audit had four maintenance exceptions. All protected
 families are single-version. Direct cargo-deny 0.20.2 evaluation of this metadata
 and generated config passed advisories, bans and sources with warnings denied.
 The 19 focused Python tests passed. `bash scripts/check.sh all` passed on the
 dependency-free policy worktree, including ten real-tool guardrail outcomes.
 That worktree remains the exact empty application scaffold; its Rust coverage
 exemption does not demonstrate coverage of the forthcoming kernel implementation.
+
+For the separate Chrono review, the focused regression was observed failing
+before the finite approved-ID set changed. It then passed, including rejection of
+an additional unreviewed Chrono version. All 20 policy/unused-dependency/fixture
+Python tests passed with the pinned tool directory on `PATH`. `bash scripts/check.sh deps` then passed: 19 policy/unused-dependency tests,
+seven vendor contracts, advisories/bans/sources with warnings denied, and the
+first-party unused-dependency check. No advisory other than the five reviewed
+maintenance IDs is ignored. Full graph build and `check.sh all`
+remain the responsibility of the already-compiled integration worktree after
+this maintenance commit is cherry-picked; they are not claimed for this worktree.

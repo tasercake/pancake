@@ -220,6 +220,25 @@ class DependencyPolicyTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("reviewed unmaintained", result.stderr)
 
+    def test_chrono_maintenance_review_is_exact_and_does_not_cover_other_versions(self):
+        metadata = copy.deepcopy(self.metadata)
+        metadata["packages"][0].update(name="chrono", version="0.4.45")
+        metadata["packages"][2].update(name="i-slint-core", version="1.19.0")
+        metadata["packages"][2]["dependencies"][0].update(name="chrono", req="^0.4")
+        entry = copy.deepcopy(self.entry)
+        entry.update(name="chrono", version="0.4.45", id="RUSTSEC-2026-0543",
+                     exposure_review="Runtime Slint date text/format parsing and local clock/timezone access.")
+        entry["parents"] = [{"name": "i-slint-core", "version": "1.19.0", "requirement": "^0.4"}]
+        ledger = {"schema_version": 1, "duplicate_exceptions": [], "advisory_exceptions": [entry]}
+        result = self.run_policy(ledger=ledger, metadata=metadata)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('id = "RUSTSEC-2026-0543"', (self.root / "effective.toml").read_text())
+
+        metadata["packages"][1].update(name="chrono", version="0.4.46")
+        result = self.run_policy(ledger=ledger, metadata=metadata)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unreviewed version", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

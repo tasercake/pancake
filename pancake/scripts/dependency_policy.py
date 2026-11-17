@@ -20,6 +20,7 @@ REVIEWED_UNMAINTAINED = {
     "RUSTSEC-2026-0370": "zvariant",
     "RUSTSEC-2026-0371": "zbus_names",
     "RUSTSEC-2026-0372": "zvariant_derive",
+    "RUSTSEC-2026-0543": "chrono",
 }
 EXACT_VERSION = re.compile(r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?\Z")
 MAX_REVIEW_DAYS = 90
