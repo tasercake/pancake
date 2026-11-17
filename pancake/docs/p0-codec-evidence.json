@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "status": "partial_qualification_P0.08_open",
+  "date": "2026-11-17",
+  "input": {
+    "source": "D02 Sood focus-stack-sample",
+    "revision": "0f8256edf2d2e3f1f1ea162f78a8bca36eb6915c",
+    "rights": "CC BY 4.0",
+    "frame": "raw/frame_000.CR3",
+    "size_bytes": 8869034,
+    "sha256": "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca"
+  },
+  "dependencies": {
+    "exr": {
+      "version": "1.74.3",
+      "crate_sha256": "cb29d0be702adf92c645d9b2f93472906ba83d400e59f98adb3770ce5c18c2f6"
+    },
+    "image": {
+      "version": "0.25.10",
+      "crate_sha256": "85ab80394333c02fe689eaf900ab500fbd0c2213da414687ebf995a65d5a6104"
+    },
+    "lcms2": {
+      "version": "6.2.0",
+      "crate_sha256": "80205450f4d8b4de92f18111de879f3df4a6b728915e89b73c38f7a59a81ad90"
+    },
+    "lcms2-sys": {
+      "version": "4.0.7",
+      "crate_sha256": "264db0b78119c5a37d78bb41fb355daab29b3b29430b53cd92e3da51f0ab06cc"
+    },
+    "png": {
+      "version": "0.18.1",
+      "crate_sha256": "60769b8b31b2a9f263dae2776c37b1b28ae246943cf719eb6946a1db05128a61"
+    },
+    "rawler": {
+      "version": "0.8.0",
+      "crate_sha256": "51cb9d46a5b34946878eb236d1180adec0806eee260738ce299517b083a232e8"
+    },
+    "tiff": {
+      "version": "0.11.3",
+      "crate_sha256": "b63feaf3343d35b6ca4d50483f94843803b0f51634937cc2ec519fc32232bc52"
+    }
+  },
+  "rust_toolchain": "1.100.0",
+  "probe_lock_sha256": "4fce19153e94f4805ab070988f627b5f75c3d65261f27cc4136f7b49fcb9bd4e",
+  "source_lint_tables_match_pancake": true,
+  "first_party_unsafe_added": false,
+  "oracles": {
+    "input_sha256": "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca",
+    "libraw_version": [
+      0,
+      22,
+      2
+    ],
+    "rawpy_version": "0.28.0",
+    "sensor_shape": [
+      3574,
+      5376
+    ],
+    "visible_shape": [
+      3412,
+      5118
+    ],
+    "white_level": 16383,
+    "libraw_left_margin": 258,
+    "libraw_top_margin": 162,
+    "default_crop_left": 272,
+    "default_crop_top": 172,
+    "default_crop_width": 5088,
+    "default_crop_height": 3392,
+    "sensor_samples_sha256": "81cff63b4c1b0cb71ddc0bca8551721c362b378b6b525f3fb09ea12f1965ca32"
+  },
+  "independent_results": {
+    "status": "pass",
+    "rgb16_png_exact": true,
+    "rgb16_tiff_exact": true,
+    "tiff_compression": "ADOBE_DEFLATE",
+    "float_tiff_bit_exact": true,
+    "float_exr_bit_exact": true,
+    "full_sensor_libraw_bit_exact": true,
+    "generated_bayer_dng_exact": true,
+    "sensor_samples_sha256": "81cff63b4c1b0cb71ddc0bca8551721c362b378b6b525f3fb09ea12f1965ca32",
+    "versions": {
+      "opencv": "5.0.0",
+      "numpy": "2.4.2",
+      "tifffile": "2026.3.3",
+      "OpenEXR": "3.5.4"
+    },
+    "equal_profile_exhaustive_noop": true,
+    "real_icc_transform_max_u16_error": 0,
+    "oracle_lcms_encoded_version": 2180
+  },
+  "raw_geometry": {
+    "libraw_visible": {
+      "left": 258,
+      "top": 162,
+      "width": 5118,
+      "height": 3412
+    },
+    "raw_source_default_crop": {
+      "left": 272,
+      "top": 172,
+      "width": 5088,
+      "height": 3392
+    },
+    "rawler_active_and_crop": {
+      "left": 272,
+      "top": 172,
+      "width": 5088,
+      "height": 3392
+    },
+    "cause": "Pinned LibRaw0.22.2 Canon sensor-size compatibility table versus file-recommended crop; no application camera hardcode added",
+    "rendered_parity": "unqualified"
+  },
+  "checks": {
+    "rust_dependency_tests_passed": 2,
+    "independent_oracles": "passed",
+    "strict_clippy": "passed",
+    "fmt": "passed",
+    "advisory_only_cargo_deny": "passed",
+    "combined_application_graph": "not_run",
+    "application_coverage_mutation": "not_qualified",
+    "native_linux_windows": "not_run",
+    "scaffold_full_check": {
+      "exit_code": 0,
+      "clean": false,
+      "machete_vendor_metadata_errors": 6,
+      "scope": "Dependency-free scaffold in own patch worktree; not integrated application gate pass"
+    }
+  },
+  "artifacts": {
+    "bayer-expected.u16": {
+      "size_bytes": 1536,
+      "sha256": "43e91cad10c0b5308f968ba9055357c9ed1b605c06e39ca1fa30766a20f57aa6"
+    },
+    "bayer-rust.u16": {
+      "size_bytes": 1536,
+      "sha256": "43e91cad10c0b5308f968ba9055357c9ed1b605c06e39ca1fa30766a20f57aa6"
+    },
+    "bayer.dng": {
+      "size_bytes": 2128,
+      "sha256": "b4ee865ac361f38f3145f917f958832c3f8e452e9ee720e8d354401f091efe4f"
+    },
+    "float32.exr": {
+      "size_bytes": 465,
+      "sha256": "d4bc39a1df61f5407c4211c8af10e6e24e5e53bada9abc2841ee2f876dc07c22"
+    },
+    "float32.tiff": {
+      "size_bytes": 258,
+      "sha256": "db7372090768f9cdad65d256ac76b649a0d147c5e5019afe9ad884a887a6cdd7"
+    },
+    "icc-linear.u16": {
+      "size_bytes": 24,
+      "sha256": "15a2f2d3344f57e4054a18c3b1acd18bf041d563be17acb1ffc54c9509dca27a"
+    },
+    "icc-noop.u16": {
+      "size_bytes": 393216,
+      "sha256": "da525fe9518924357f963edff58fa38987d5df9eb6e0e768b11617d909ae8e7a"
+    },
+    "independent-results.json": {
+      "size_bytes": 590,
+      "sha256": "74e7d81b1cb099ac8cd30616c366374c2b15bf6714bb44ad056dbdc21467f5f8"
+    },
+    "libraw-sensor.json": {
+      "size_bytes": 547,
+      "sha256": "31e6987bf47fc5b849426bf43abdb898e0deb4852f67b4378cf062148e187ead"
+    },
+    "libraw-sensor.u16": {
+      "size_bytes": 38427648,
+      "sha256": "81cff63b4c1b0cb71ddc0bca8551721c362b378b6b525f3fb09ea12f1965ca32"
+    },
+    "linear-srgb.icc": {
+      "size_bytes": 568,
+      "sha256": "fffe1b0367427594e8a8b52d37b2647c49277a8efcf3693c7c297a3ccb6b3f2e"
+    },
+    "rawler-sensor.txt": {
+      "size_bytes": 2574,
+      "sha256": "8ce8b3f043a3f97579067d6205fe59d40d5e559c68c0ce107cf9abfce7847f06"
+    },
+    "rawler-sensor.u16": {
+      "size_bytes": 38427648,
+      "sha256": "81cff63b4c1b0cb71ddc0bca8551721c362b378b6b525f3fb09ea12f1965ca32"
+    },
+    "rgb16.png": {
+      "size_bytes": 94,
+      "sha256": "39ec185075826251b55e67864a7c8124db5df51a5cdf87b1178c7b516af13584"
+    },
+    "rgb16.tiff": {
+      "size_bytes": 242,
+      "sha256": "3de01144bb93d363f349f6d4df27a2b7e522011c487fc351989635c832f8a683"
+    },
+    "srgb.icc": {
+      "size_bytes": 588,
+      "sha256": "c8a7c3989157318aaf94b9b0a4be6fe03db4c676787770a79d9155c0e2641e86"
+    }
+  },
+  "remaining": [
+    "RAW rendered geometry/demosaic/WB/color parity",
+    "Grayscale/alpha, all EXIF orientations, mixed dimensions, Unicode/non-BMP paths",
+    "Oversized resource limits and malformed/atomic export retention",
+    "Complete application transfer/profile policy and native packaging",
+    "Combined Slint/CubeCL/codecs dependency and first-party assurance gates"
+  ]
+}
