@@ -41,6 +41,9 @@ local gate. Hosted CPU profiles include `test-cpu`, `coverage-cpu`,
 GPU gate. Native qualification requires a physical GPU; it rejects software
 fallback. See [kernel qualification](docs/p0-kernel-qualification.md) for numerical
 contracts, hardware evidence, the Miri boundary and exact measurement limits.
+The [Miri host contract](docs/p0-miri-host-boundary.md) requires actual macOS
+Miri for the current pinned portable host source. Linux retains layouts, branches
+and sanitizers; local Linux `all` records its unrun canonical-Miri obligation.
 Coverage cannot prove correctness or performance.
 
 Clippy's full restriction group is intentionally not enabled: some lints conflict.

@@ -1,0 +1,5979 @@
+{
+  "outcomes": [
+    {
+      "scenario": "Baseline",
+      "summary": "Success",
+      "log_path": "log/baseline.log",
+      "diff_path": null,
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 54.028045709,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.4626075,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:35:5: replace blur_horizontal_u16 -> Result<Vec<u16>, String> with Ok(vec![])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "blur_horizontal_u16",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 19,
+                "column": 1
+              },
+              "end": {
+                "line": 36,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 35,
+              "column": 5
+            },
+            "end": {
+              "line": 35,
+              "column": 93
+            }
+          },
+          "replacement": "Ok(vec![])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_35_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_35_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.744350833,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.039374625,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:35:5: replace blur_horizontal_u16 -> Result<Vec<u16>, String> with Ok(vec![0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "blur_horizontal_u16",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 19,
+                "column": 1
+              },
+              "end": {
+                "line": 36,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 35,
+              "column": 5
+            },
+            "end": {
+              "line": 35,
+              "column": 93
+            }
+          },
+          "replacement": "Ok(vec![0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_35_col_5_001.log",
+      "diff_path": "diff/src__lib.rs_line_35_col_5_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.766483292,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.99560425,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:35:5: replace blur_horizontal_u16 -> Result<Vec<u16>, String> with Ok(vec![1])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "blur_horizontal_u16",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 19,
+                "column": 1
+              },
+              "end": {
+                "line": 36,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 35,
+              "column": 5
+            },
+            "end": {
+              "line": 35,
+              "column": 93
+            }
+          },
+          "replacement": "Ok(vec![1])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_35_col_5_002.log",
+      "diff_path": "diff/src__lib.rs_line_35_col_5_002.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.662776125,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.04543775,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:55:5: replace blur_horizontal_u16_bounded -> Result<Vec<u16>, String> with Ok(vec![])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "blur_horizontal_u16_bounded",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 38,
+                "column": 1
+              },
+              "end": {
+                "line": 76,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 55,
+              "column": 5
+            },
+            "end": {
+              "line": 75,
+              "column": 77
+            }
+          },
+          "replacement": "Ok(vec![])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_55_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_55_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.79432275,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.991052125,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:55:5: replace blur_horizontal_u16_bounded -> Result<Vec<u16>, String> with Ok(vec![0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "blur_horizontal_u16_bounded",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 38,
+                "column": 1
+              },
+              "end": {
+                "line": 76,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 55,
+              "column": 5
+            },
+            "end": {
+              "line": 75,
+              "column": 77
+            }
+          },
+          "replacement": "Ok(vec![0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_55_col_5_001.log",
+      "diff_path": "diff/src__lib.rs_line_55_col_5_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.651647292,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.989881375,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:55:5: replace blur_horizontal_u16_bounded -> Result<Vec<u16>, String> with Ok(vec![1])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "blur_horizontal_u16_bounded",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 38,
+                "column": 1
+              },
+              "end": {
+                "line": 76,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 55,
+              "column": 5
+            },
+            "end": {
+              "line": 75,
+              "column": 77
+            }
+          },
+          "replacement": "Ok(vec![1])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_55_col_5_002.log",
+      "diff_path": "diff/src__lib.rs_line_55_col_5_002.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.649420709,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.136351625,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:84:5: replace validate_shape -> Result<usize, String> with Ok(0)",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_shape",
+            "return_type": "-> Result<usize, String>",
+            "span": {
+              "start": {
+                "line": 78,
+                "column": 1
+              },
+              "end": {
+                "line": 95,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 84,
+              "column": 5
+            },
+            "end": {
+              "line": 94,
+              "column": 13
+            }
+          },
+          "replacement": "Ok(0)",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_84_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_84_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.923480875,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.244654625,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:84:5: replace validate_shape -> Result<usize, String> with Ok(1)",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_shape",
+            "return_type": "-> Result<usize, String>",
+            "span": {
+              "start": {
+                "line": 78,
+                "column": 1
+              },
+              "end": {
+                "line": 95,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 84,
+              "column": 5
+            },
+            "end": {
+              "line": 94,
+              "column": 13
+            }
+          },
+          "replacement": "Ok(1)",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_84_col_5_001.log",
+      "diff_path": "diff/src__lib.rs_line_84_col_5_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.676516917,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.126969625,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:84:19: replace || with && in validate_shape",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_shape",
+            "return_type": "-> Result<usize, String>",
+            "span": {
+              "start": {
+                "line": 78,
+                "column": 1
+              },
+              "end": {
+                "line": 95,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 84,
+              "column": 19
+            },
+            "end": {
+              "line": 84,
+              "column": 21
+            }
+          },
+          "replacement": "&&",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_84_col_19.log",
+      "diff_path": "diff/src__lib.rs_line_84_col_19.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.767276458,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.180225084,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:84:14: replace == with != in validate_shape",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_shape",
+            "return_type": "-> Result<usize, String>",
+            "span": {
+              "start": {
+                "line": 78,
+                "column": 1
+              },
+              "end": {
+                "line": 95,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 84,
+              "column": 14
+            },
+            "end": {
+              "line": 84,
+              "column": 16
+            }
+          },
+          "replacement": "!=",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_84_col_14.log",
+      "diff_path": "diff/src__lib.rs_line_84_col_14.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.762125208,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.185266458,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:84:29: replace == with != in validate_shape",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_shape",
+            "return_type": "-> Result<usize, String>",
+            "span": {
+              "start": {
+                "line": 78,
+                "column": 1
+              },
+              "end": {
+                "line": 95,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 84,
+              "column": 29
+            },
+            "end": {
+              "line": 84,
+              "column": 31
+            }
+          },
+          "replacement": "!=",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_84_col_29.log",
+      "diff_path": "diff/src__lib.rs_line_84_col_29.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.693664,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.173407042,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:91:14: replace != with == in validate_shape",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_shape",
+            "return_type": "-> Result<usize, String>",
+            "span": {
+              "start": {
+                "line": 78,
+                "column": 1
+              },
+              "end": {
+                "line": 95,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 91,
+              "column": 14
+            },
+            "end": {
+              "line": 91,
+              "column": 16
+            }
+          },
+          "replacement": "==",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_91_col_14.log",
+      "diff_path": "diff/src__lib.rs_line_91_col_14.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.735039166,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.182479792,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:105:5: replace finish_readback -> Result<Vec<u16>, String> with Ok(vec![])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "finish_readback",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 97,
+                "column": 1
+              },
+              "end": {
+                "line": 111,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 105,
+              "column": 5
+            },
+            "end": {
+              "line": 110,
+              "column": 15
+            }
+          },
+          "replacement": "Ok(vec![])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_105_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_105_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.787688417,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.179537625,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:105:5: replace finish_readback -> Result<Vec<u16>, String> with Ok(vec![0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "finish_readback",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 97,
+                "column": 1
+              },
+              "end": {
+                "line": 111,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 105,
+              "column": 5
+            },
+            "end": {
+              "line": 110,
+              "column": 15
+            }
+          },
+          "replacement": "Ok(vec![0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_105_col_5_001.log",
+      "diff_path": "diff/src__lib.rs_line_105_col_5_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.864684875,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.173170292,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:105:5: replace finish_readback -> Result<Vec<u16>, String> with Ok(vec![1])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "finish_readback",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 97,
+                "column": 1
+              },
+              "end": {
+                "line": 111,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 105,
+              "column": 5
+            },
+            "end": {
+              "line": 110,
+              "column": 15
+            }
+          },
+          "replacement": "Ok(vec![1])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_105_col_5_002.log",
+      "diff_path": "diff/src__lib.rs_line_105_col_5_002.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.660964375,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.196043666,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:119:5: replace decode_pixels -> Result<Vec<u16>, String> with Ok(vec![])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_pixels",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 113,
+                "column": 1
+              },
+              "end": {
+                "line": 130,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 119,
+              "column": 5
+            },
+            "end": {
+              "line": 129,
+              "column": 19
+            }
+          },
+          "replacement": "Ok(vec![])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_119_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_119_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.9319293330000002,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.179105125,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:119:5: replace decode_pixels -> Result<Vec<u16>, String> with Ok(vec![0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_pixels",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 113,
+                "column": 1
+              },
+              "end": {
+                "line": 130,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 119,
+              "column": 5
+            },
+            "end": {
+              "line": 129,
+              "column": 19
+            }
+          },
+          "replacement": "Ok(vec![0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_119_col_5_001.log",
+      "diff_path": "diff/src__lib.rs_line_119_col_5_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.074332417,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.233155166,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:119:5: replace decode_pixels -> Result<Vec<u16>, String> with Ok(vec![1])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_pixels",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 113,
+                "column": 1
+              },
+              "end": {
+                "line": 130,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 119,
+              "column": 5
+            },
+            "end": {
+              "line": 129,
+              "column": 19
+            }
+          },
+          "replacement": "Ok(vec![1])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_119_col_5_002.log",
+      "diff_path": "diff/src__lib.rs_line_119_col_5_002.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.313375042,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.251800792,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:120:8: delete ! in decode_pixels",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_pixels",
+            "return_type": "-> Result<Vec<u16>, String>",
+            "span": {
+              "start": {
+                "line": 113,
+                "column": 1
+              },
+              "end": {
+                "line": 130,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 120,
+              "column": 8
+            },
+            "end": {
+              "line": 120,
+              "column": 9
+            }
+          },
+          "replacement": "",
+          "genre": "UnaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_120_col_8.log",
+      "diff_path": "diff/src__lib.rs_line_120_col_8.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.900541291,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.656441458,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:138:5: replace horizontal_blur with ()",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 138,
+              "column": 5
+            },
+            "end": {
+              "line": 149,
+              "column": 87
+            }
+          },
+          "replacement": "()",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_138_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_138_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.195544625,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.642821625,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:138:31: replace % with / in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 138,
+              "column": 31
+            },
+            "end": {
+              "line": 138,
+              "column": 32
+            }
+          },
+          "replacement": "/",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_138_col_31.log",
+      "diff_path": "diff/src__lib.rs_line_138_col_31.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.04222425,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.746381833,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:138:31: replace % with + in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 138,
+              "column": 31
+            },
+            "end": {
+              "line": 138,
+              "column": 32
+            }
+          },
+          "replacement": "+",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_138_col_31_001.log",
+      "diff_path": "diff/src__lib.rs_line_138_col_31_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.885627459,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.708666167,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:139:26: replace == with != in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 139,
+              "column": 26
+            },
+            "end": {
+              "line": 139,
+              "column": 28
+            }
+          },
+          "replacement": "!=",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_139_col_26.log",
+      "diff_path": "diff/src__lib.rs_line_139_col_26.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.0360225,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.7515335419999998,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:142:22: replace - with + in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 142,
+              "column": 22
+            },
+            "end": {
+              "line": 142,
+              "column": 23
+            }
+          },
+          "replacement": "+",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_142_col_22.log",
+      "diff_path": "diff/src__lib.rs_line_142_col_22.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.9789383750000002,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.67982175,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:142:22: replace - with / in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 142,
+              "column": 22
+            },
+            "end": {
+              "line": 142,
+              "column": 23
+            }
+          },
+          "replacement": "/",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_142_col_22_001.log",
+      "diff_path": "diff/src__lib.rs_line_142_col_22_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.85622575,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.652343042,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:144:31: replace == with != in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 144,
+              "column": 31
+            },
+            "end": {
+              "line": 144,
+              "column": 33
+            }
+          },
+          "replacement": "!=",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_144_col_31.log",
+      "diff_path": "diff/src__lib.rs_line_144_col_31.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.789568,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.630398666,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:144:27: replace + with - in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 144,
+              "column": 27
+            },
+            "end": {
+              "line": 144,
+              "column": 28
+            }
+          },
+          "replacement": "-",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_144_col_27.log",
+      "diff_path": "diff/src__lib.rs_line_144_col_27.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.257847,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.7208905,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:144:27: replace + with * in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 144,
+              "column": 27
+            },
+            "end": {
+              "line": 144,
+              "column": 28
+            }
+          },
+          "replacement": "*",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_144_col_27_001.log",
+      "diff_path": "diff/src__lib.rs_line_144_col_27_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.373484917,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.741065959,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:147:22: replace + with - in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 147,
+              "column": 22
+            },
+            "end": {
+              "line": 147,
+              "column": 23
+            }
+          },
+          "replacement": "-",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_147_col_22.log",
+      "diff_path": "diff/src__lib.rs_line_147_col_22.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.047133,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.6828496250000002,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:147:22: replace + with * in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 147,
+              "column": 22
+            },
+            "end": {
+              "line": 147,
+              "column": 23
+            }
+          },
+          "replacement": "*",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_147_col_22_001.log",
+      "diff_path": "diff/src__lib.rs_line_147_col_22_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.0712635,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.6332535,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:149:83: replace / with % in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 149,
+              "column": 83
+            },
+            "end": {
+              "line": 149,
+              "column": 84
+            }
+          },
+          "replacement": "%",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_149_col_83.log",
+      "diff_path": "diff/src__lib.rs_line_149_col_83.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.923174875,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.6699312920000002,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:149:83: replace / with * in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 149,
+              "column": 83
+            },
+            "end": {
+              "line": 149,
+              "column": 84
+            }
+          },
+          "replacement": "*",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_149_col_83_001.log",
+      "diff_path": "diff/src__lib.rs_line_149_col_83_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.905171916,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.682155084,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:149:67: replace + with - in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 149,
+              "column": 67
+            },
+            "end": {
+              "line": 149,
+              "column": 68
+            }
+          },
+          "replacement": "-",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_149_col_67.log",
+      "diff_path": "diff/src__lib.rs_line_149_col_67.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.99621025,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.6505495420000003,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:149:67: replace + with * in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 149,
+              "column": 67
+            },
+            "end": {
+              "line": 149,
+              "column": 68
+            }
+          },
+          "replacement": "*",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_149_col_67_001.log",
+      "diff_path": "diff/src__lib.rs_line_149_col_67_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.005177125,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.696794667,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:149:41: replace + with - in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 149,
+              "column": 41
+            },
+            "end": {
+              "line": 149,
+              "column": 42
+            }
+          },
+          "replacement": "-",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_149_col_41.log",
+      "diff_path": "diff/src__lib.rs_line_149_col_41.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.912577292,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.654379875,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:149:41: replace + with * in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 149,
+              "column": 41
+            },
+            "end": {
+              "line": 149,
+              "column": 42
+            }
+          },
+          "replacement": "*",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_149_col_41_001.log",
+      "diff_path": "diff/src__lib.rs_line_149_col_41_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.837226875,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.635785083,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:149:45: replace * with + in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 149,
+              "column": 45
+            },
+            "end": {
+              "line": 149,
+              "column": 46
+            }
+          },
+          "replacement": "+",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_149_col_45.log",
+      "diff_path": "diff/src__lib.rs_line_149_col_45.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.790820541,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.614822416,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:149:45: replace * with / in horizontal_blur",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "horizontal_blur",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 132,
+                "column": 1
+              },
+              "end": {
+                "line": 150,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 149,
+              "column": 45
+            },
+            "end": {
+              "line": 149,
+              "column": 46
+            }
+          },
+          "replacement": "/",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_149_col_45_001.log",
+      "diff_path": "diff/src__lib.rs_line_149_col_45_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.705767292,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.696286917,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:171:5: replace row_variance_u16 -> Result<Vec<f32>, String> with Ok(vec![])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "row_variance_u16",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 152,
+                "column": 1
+              },
+              "end": {
+                "line": 192,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 171,
+              "column": 5
+            },
+            "end": {
+              "line": 191,
+              "column": 78
+            }
+          },
+          "replacement": "Ok(vec![])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_171_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_171_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.784911833,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.115791041,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:171:5: replace row_variance_u16 -> Result<Vec<f32>, String> with Ok(vec![0.0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "row_variance_u16",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 152,
+                "column": 1
+              },
+              "end": {
+                "line": 192,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 171,
+              "column": 5
+            },
+            "end": {
+              "line": 191,
+              "column": 78
+            }
+          },
+          "replacement": "Ok(vec![0.0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_171_col_5_001.log",
+      "diff_path": "diff/src__lib.rs_line_171_col_5_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.7420201669999997,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.117456084,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:171:5: replace row_variance_u16 -> Result<Vec<f32>, String> with Ok(vec![1.0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "row_variance_u16",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 152,
+                "column": 1
+              },
+              "end": {
+                "line": 192,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 171,
+              "column": 5
+            },
+            "end": {
+              "line": 191,
+              "column": 78
+            }
+          },
+          "replacement": "Ok(vec![1.0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_171_col_5_002.log",
+      "diff_path": "diff/src__lib.rs_line_171_col_5_002.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.73788125,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.135683209,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:171:5: replace row_variance_u16 -> Result<Vec<f32>, String> with Ok(vec![-1.0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "row_variance_u16",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 152,
+                "column": 1
+              },
+              "end": {
+                "line": 192,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 171,
+              "column": 5
+            },
+            "end": {
+              "line": 191,
+              "column": 78
+            }
+          },
+          "replacement": "Ok(vec![-1.0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_171_col_5_003.log",
+      "diff_path": "diff/src__lib.rs_line_171_col_5_003.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.748775125,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.117140625,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:204:5: replace validate_working_budget -> Result<(), String> with Ok(())",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_working_budget",
+            "return_type": "-> Result<(), String>",
+            "span": {
+              "start": {
+                "line": 194,
+                "column": 1
+              },
+              "end": {
+                "line": 211,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 204,
+              "column": 5
+            },
+            "end": {
+              "line": 210,
+              "column": 11
+            }
+          },
+          "replacement": "Ok(())",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_204_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_204_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.795904792,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.192996542,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:207:17: replace > with == in validate_working_budget",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_working_budget",
+            "return_type": "-> Result<(), String>",
+            "span": {
+              "start": {
+                "line": 194,
+                "column": 1
+              },
+              "end": {
+                "line": 211,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 207,
+              "column": 17
+            },
+            "end": {
+              "line": 207,
+              "column": 18
+            }
+          },
+          "replacement": "==",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_207_col_17.log",
+      "diff_path": "diff/src__lib.rs_line_207_col_17.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.752393084,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.186347375,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:207:17: replace > with < in validate_working_budget",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_working_budget",
+            "return_type": "-> Result<(), String>",
+            "span": {
+              "start": {
+                "line": 194,
+                "column": 1
+              },
+              "end": {
+                "line": 211,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 207,
+              "column": 17
+            },
+            "end": {
+              "line": 207,
+              "column": 18
+            }
+          },
+          "replacement": "<",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_207_col_17_001.log",
+      "diff_path": "diff/src__lib.rs_line_207_col_17_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.784773333,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.18133425,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:207:17: replace > with >= in validate_working_budget",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "validate_working_budget",
+            "return_type": "-> Result<(), String>",
+            "span": {
+              "start": {
+                "line": 194,
+                "column": 1
+              },
+              "end": {
+                "line": 211,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 207,
+              "column": 17
+            },
+            "end": {
+              "line": 207,
+              "column": 18
+            }
+          },
+          "replacement": ">=",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_207_col_17_002.log",
+      "diff_path": "diff/src__lib.rs_line_207_col_17_002.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.007255083,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.183448125,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:221:5: replace finish_variances -> Result<Vec<f32>, String> with Ok(vec![])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "finish_variances",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 213,
+                "column": 1
+              },
+              "end": {
+                "line": 227,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 221,
+              "column": 5
+            },
+            "end": {
+              "line": 226,
+              "column": 15
+            }
+          },
+          "replacement": "Ok(vec![])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_221_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_221_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.847838292,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.1707825,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:221:5: replace finish_variances -> Result<Vec<f32>, String> with Ok(vec![0.0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "finish_variances",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 213,
+                "column": 1
+              },
+              "end": {
+                "line": 227,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 221,
+              "column": 5
+            },
+            "end": {
+              "line": 226,
+              "column": 15
+            }
+          },
+          "replacement": "Ok(vec![0.0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_221_col_5_001.log",
+      "diff_path": "diff/src__lib.rs_line_221_col_5_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.7725239999999998,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.253991,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:221:5: replace finish_variances -> Result<Vec<f32>, String> with Ok(vec![1.0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "finish_variances",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 213,
+                "column": 1
+              },
+              "end": {
+                "line": 227,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 221,
+              "column": 5
+            },
+            "end": {
+              "line": 226,
+              "column": 15
+            }
+          },
+          "replacement": "Ok(vec![1.0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_221_col_5_002.log",
+      "diff_path": "diff/src__lib.rs_line_221_col_5_002.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.771411792,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.188400209,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:221:5: replace finish_variances -> Result<Vec<f32>, String> with Ok(vec![-1.0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "finish_variances",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 213,
+                "column": 1
+              },
+              "end": {
+                "line": 227,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 221,
+              "column": 5
+            },
+            "end": {
+              "line": 226,
+              "column": 15
+            }
+          },
+          "replacement": "Ok(vec![-1.0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_221_col_5_003.log",
+      "diff_path": "diff/src__lib.rs_line_221_col_5_003.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.779914625,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.193399833,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:235:5: replace decode_variance_values -> Result<Vec<f32>, String> with Ok(vec![])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_variance_values",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 229,
+                "column": 1
+              },
+              "end": {
+                "line": 249,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 235,
+              "column": 5
+            },
+            "end": {
+              "line": 248,
+              "column": 19
+            }
+          },
+          "replacement": "Ok(vec![])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_235_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_235_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.761844666,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.386919083,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:235:5: replace decode_variance_values -> Result<Vec<f32>, String> with Ok(vec![0.0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_variance_values",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 229,
+                "column": 1
+              },
+              "end": {
+                "line": 249,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 235,
+              "column": 5
+            },
+            "end": {
+              "line": 248,
+              "column": 19
+            }
+          },
+          "replacement": "Ok(vec![0.0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_235_col_5_001.log",
+      "diff_path": "diff/src__lib.rs_line_235_col_5_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.754409916,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.188613375,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:235:5: replace decode_variance_values -> Result<Vec<f32>, String> with Ok(vec![1.0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_variance_values",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 229,
+                "column": 1
+              },
+              "end": {
+                "line": 249,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 235,
+              "column": 5
+            },
+            "end": {
+              "line": 248,
+              "column": 19
+            }
+          },
+          "replacement": "Ok(vec![1.0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_235_col_5_002.log",
+      "diff_path": "diff/src__lib.rs_line_235_col_5_002.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.741338625,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.230062,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:235:5: replace decode_variance_values -> Result<Vec<f32>, String> with Ok(vec![-1.0])",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_variance_values",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 229,
+                "column": 1
+              },
+              "end": {
+                "line": 249,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 235,
+              "column": 5
+            },
+            "end": {
+              "line": 248,
+              "column": 19
+            }
+          },
+          "replacement": "Ok(vec![-1.0])",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_235_col_5_003.log",
+      "diff_path": "diff/src__lib.rs_line_235_col_5_003.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.748898167,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.194143333,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:236:8: delete ! in decode_variance_values",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_variance_values",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 229,
+                "column": 1
+              },
+              "end": {
+                "line": 249,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 236,
+              "column": 8
+            },
+            "end": {
+              "line": 236,
+              "column": 9
+            }
+          },
+          "replacement": "",
+          "genre": "UnaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_236_col_8.log",
+      "diff_path": "diff/src__lib.rs_line_236_col_8.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.821607583,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.1910765,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:243:16: delete ! in decode_variance_values",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "decode_variance_values",
+            "return_type": "-> Result<Vec<f32>, String>",
+            "span": {
+              "start": {
+                "line": 229,
+                "column": 1
+              },
+              "end": {
+                "line": 249,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 243,
+              "column": 16
+            },
+            "end": {
+              "line": 243,
+              "column": 17
+            }
+          },
+          "replacement": "",
+          "genre": "UnaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_243_col_16.log",
+      "diff_path": "diff/src__lib.rs_line_243_col_16.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.747508791,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 1.169038584,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:257:5: replace centered_variance with ()",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 257,
+              "column": 5
+            },
+            "end": {
+              "line": 269,
+              "column": 63
+            }
+          },
+          "replacement": "()",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_257_col_5.log",
+      "diff_path": "diff/src__lib.rs_line_257_col_5.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.766416375,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.138496209,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:257:28: replace * with + in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 257,
+              "column": 28
+            },
+            "end": {
+              "line": 257,
+              "column": 29
+            }
+          },
+          "replacement": "+",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_257_col_28.log",
+      "diff_path": "diff/src__lib.rs_line_257_col_28.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.704383333,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.168469541,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:257:28: replace * with / in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 257,
+              "column": 28
+            },
+            "end": {
+              "line": 257,
+              "column": 29
+            }
+          },
+          "replacement": "/",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_257_col_28_001.log",
+      "diff_path": "diff/src__lib.rs_line_257_col_28_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.70272025,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.2189885,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:261:22: replace += with -= in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 261,
+              "column": 22
+            },
+            "end": {
+              "line": 261,
+              "column": 24
+            }
+          },
+          "replacement": "-=",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_261_col_22.log",
+      "diff_path": "diff/src__lib.rs_line_261_col_22.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.775041416,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.1673165,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:261:22: replace += with *= in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 261,
+              "column": 22
+            },
+            "end": {
+              "line": 261,
+              "column": 24
+            }
+          },
+          "replacement": "*=",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_261_col_22_001.log",
+      "diff_path": "diff/src__lib.rs_line_261_col_22_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.8222071250000003,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.143597459,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:261:61: replace - with + in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 261,
+              "column": 61
+            },
+            "end": {
+              "line": 261,
+              "column": 62
+            }
+          },
+          "replacement": "+",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_261_col_61.log",
+      "diff_path": "diff/src__lib.rs_line_261_col_61.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.738495041,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.172114625,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:261:61: replace - with / in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 261,
+              "column": 61
+            },
+            "end": {
+              "line": 261,
+              "column": 62
+            }
+          },
+          "replacement": "/",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_261_col_61_001.log",
+      "diff_path": "diff/src__lib.rs_line_261_col_61_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.728645375,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.249441459,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:261:50: replace + with - in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 261,
+              "column": 50
+            },
+            "end": {
+              "line": 261,
+              "column": 51
+            }
+          },
+          "replacement": "-",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_261_col_50.log",
+      "diff_path": "diff/src__lib.rs_line_261_col_50.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.816719958,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.194762292,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:261:50: replace + with * in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 261,
+              "column": 50
+            },
+            "end": {
+              "line": 261,
+              "column": 51
+            }
+          },
+          "replacement": "*",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_261_col_50_001.log",
+      "diff_path": "diff/src__lib.rs_line_261_col_50_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.70902275,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.186635083,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:263:29: replace / with % in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 263,
+              "column": 29
+            },
+            "end": {
+              "line": 263,
+              "column": 30
+            }
+          },
+          "replacement": "%",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_263_col_29.log",
+      "diff_path": "diff/src__lib.rs_line_263_col_29.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.932084417,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.176667708,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:263:29: replace / with * in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 263,
+              "column": 29
+            },
+            "end": {
+              "line": 263,
+              "column": 30
+            }
+          },
+          "replacement": "*",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_263_col_29_001.log",
+      "diff_path": "diff/src__lib.rs_line_263_col_29_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.668598208,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.247805,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:266:69: replace - with + in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 266,
+              "column": 69
+            },
+            "end": {
+              "line": 266,
+              "column": 70
+            }
+          },
+          "replacement": "+",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_266_col_69.log",
+      "diff_path": "diff/src__lib.rs_line_266_col_69.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.987214416,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.215786875,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:266:69: replace - with / in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 266,
+              "column": 69
+            },
+            "end": {
+              "line": 266,
+              "column": 70
+            }
+          },
+          "replacement": "/",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_266_col_69_001.log",
+      "diff_path": "diff/src__lib.rs_line_266_col_69_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.355934458,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.169077791,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:266:62: replace - with + in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 266,
+              "column": 62
+            },
+            "end": {
+              "line": 266,
+              "column": 63
+            }
+          },
+          "replacement": "+",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_266_col_62.log",
+      "diff_path": "diff/src__lib.rs_line_266_col_62.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.790937375,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.168251542,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:266:62: replace - with / in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 266,
+              "column": 62
+            },
+            "end": {
+              "line": 266,
+              "column": 63
+            }
+          },
+          "replacement": "/",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_266_col_62_001.log",
+      "diff_path": "diff/src__lib.rs_line_266_col_62_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.903253083,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.15763725,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:266:51: replace + with - in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 266,
+              "column": 51
+            },
+            "end": {
+              "line": 266,
+              "column": 52
+            }
+          },
+          "replacement": "-",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_266_col_51.log",
+      "diff_path": "diff/src__lib.rs_line_266_col_51.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.835423791,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.367033208,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:266:51: replace + with * in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 266,
+              "column": 51
+            },
+            "end": {
+              "line": 266,
+              "column": 52
+            }
+          },
+          "replacement": "*",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_266_col_51_001.log",
+      "diff_path": "diff/src__lib.rs_line_266_col_51_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.830280208,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.134240792,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:267:20: replace += with -= in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 267,
+              "column": 20
+            },
+            "end": {
+              "line": 267,
+              "column": 22
+            }
+          },
+          "replacement": "-=",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_267_col_20.log",
+      "diff_path": "diff/src__lib.rs_line_267_col_20.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.9282552920000002,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.201997041,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:267:20: replace += with *= in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 267,
+              "column": 20
+            },
+            "end": {
+              "line": 267,
+              "column": 22
+            }
+          },
+          "replacement": "*=",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_267_col_20_001.log",
+      "diff_path": "diff/src__lib.rs_line_267_col_20_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.0821935,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 7.941674625,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:267:34: replace * with + in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 267,
+              "column": 34
+            },
+            "end": {
+              "line": 267,
+              "column": 35
+            }
+          },
+          "replacement": "+",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_267_col_34.log",
+      "diff_path": "diff/src__lib.rs_line_267_col_34.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 3.006469458,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.214713959,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:267:34: replace * with / in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 267,
+              "column": 34
+            },
+            "end": {
+              "line": 267,
+              "column": 35
+            }
+          },
+          "replacement": "/",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_267_col_34_001.log",
+      "diff_path": "diff/src__lib.rs_line_267_col_34_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.830554667,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.219155708,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:269:39: replace / with % in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 269,
+              "column": 39
+            },
+            "end": {
+              "line": 269,
+              "column": 40
+            }
+          },
+          "replacement": "%",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_269_col_39.log",
+      "diff_path": "diff/src__lib.rs_line_269_col_39.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.895078208,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.254585042,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/lib.rs:269:39: replace / with * in centered_variance",
+          "package": "pancake",
+          "file": "src/lib.rs",
+          "function": {
+            "function_name": "centered_variance",
+            "return_type": "",
+            "span": {
+              "start": {
+                "line": 251,
+                "column": 1
+              },
+              "end": {
+                "line": 270,
+                "column": 2
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 269,
+              "column": 39
+            },
+            "end": {
+              "line": 269,
+              "column": 40
+            }
+          },
+          "replacement": "*",
+          "genre": "BinaryOperator"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__lib.rs_line_269_col_39_001.log",
+      "diff_path": "diff/src__lib.rs_line_269_col_39_001.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 2.8298794579999997,
+          "process_status": "Success",
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 4.253286041,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/Users/krishna/.rustup/toolchains/1.100.0-aarch64-apple-darwin/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_numerical_contract",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ]
+    }
+  ],
+  "total_mutants": 79,
+  "missed": 0,
+  "caught": 79,
+  "timeout": 0,
+  "unviable": 0,
+  "success": 0,
+  "start_time": "2026-11-17T13:31:02.323897Z",
+  "end_time": "2026-11-17T13:39:23.440799Z",
+  "cargo_mutants_version": "27.1.0"
+}

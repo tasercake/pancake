@@ -1,0 +1,56 @@
+{
+  "run_id": 44096988927,
+  "source_commit": "93aaaf1a1f98caa46220fcf2cc7f0828ccab22b7",
+  "overall_conclusion": "failure",
+  "successes_not_promoted_to_whole_workflow_pass": [
+    {
+      "name": "Sanitizer (address)",
+      "job_id": 134086613818,
+      "conclusion": "success",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44096988927/job/134086613818",
+      "log": "pancake/docs/p0-close-evidence/ci-second/sanitizer-address.log.gz",
+      "raw_log_bytes": 107931,
+      "raw_log_sha256": "4150776e0509bcee8cfee2a9ae29df3645fefc026105e46fc26ae31ec4dee3c0"
+    },
+    {
+      "name": "Sanitizer (thread)",
+      "job_id": 134086614301,
+      "conclusion": "success",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44096988927/job/134086614301",
+      "log": "pancake/docs/p0-close-evidence/ci-second/sanitizer-thread.log.gz",
+      "raw_log_bytes": 107746,
+      "raw_log_sha256": "6623992de95c84d06993b3ab31f9c91c2bc39e3164b77eddd460630720f292c2"
+    },
+    {
+      "name": "Platform (ubuntu-24.04)",
+      "job_id": 134086614332,
+      "conclusion": "success",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44096988927/job/134086614332",
+      "log": "pancake/docs/p0-close-evidence/ci-second/platform-ubuntu-24.04.log.gz",
+      "raw_log_bytes": 182986,
+      "raw_log_sha256": "27911739990abcac821d30b1308487cdf5936a67b0866254d05db101cb9f01d0"
+    },
+    {
+      "name": "Windows MSVC build and link",
+      "job_id": 134086614591,
+      "conclusion": "success",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44096988927/job/134086614591",
+      "log": "pancake/docs/p0-close-evidence/ci-second/windows-msvc-build-and-link.log.gz",
+      "raw_log_bytes": 78603,
+      "raw_log_sha256": "f6c2e200f799492f5e0835ab6cdc33f4c1ea47242603c3d0989b41db74f1adde"
+    },
+    {
+      "name": "Platform (macos-15)",
+      "job_id": 134086615443,
+      "conclusion": "success",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44096988927/job/134086615443",
+      "log": "pancake/docs/p0-close-evidence/ci-second/platform-macos-15.log.gz",
+      "raw_log_bytes": 154534,
+      "raw_log_sha256": "c76ae27d927ac901426922c96f63e5ec2a867f239ed2b864daa2b34e0120e62f"
+    }
+  ],
+  "failed_jobs": [
+    "Linux Miri: upstream tiny-xlib dlopen before tests",
+    "Macro compile contracts: incomplete fixture patch set in clean offline cache"
+  ]
+}

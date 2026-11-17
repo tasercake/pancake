@@ -1,0 +1,8 @@
+test_default_macro_retains_original_function (test_macro_expand_only.ExpandOnlyContracts.test_default_macro_retains_original_function) ... ok
+test_expand_only_has_no_original_function_symbol (test_macro_expand_only.ExpandOnlyContracts.test_expand_only_has_no_original_function_symbol) ... ok
+test_expand_only_retains_safe_checked_launch (test_macro_expand_only.ExpandOnlyContracts.test_expand_only_retains_safe_checked_launch) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 29.428s
+
+OK

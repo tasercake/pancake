@@ -158,7 +158,13 @@ below. Standalone UI and codec workspaces have their own strict lint, unit and
 functional proofs; they do not inherit a root-library coverage or sanitizer pass.
 Integrated production consumers must meet all owned-source gates when introduced.
 
-Pure host contracts run under strict Miri. Actual CPU JIT and GPU kernels run in
+The five current OS-neutral pure-host tests run under strict Miri on the
+required canonical macOS CI lane. Linux's transitive tiny-xlib constructor calls
+unsupported `dlopen` before test entry. No constructor, dependency feature or
+test is disabled: Linux retains native layouts, branches and ASan/TSan.
+[Source/lock/nightly-pinned host policy](p0-miri-host-boundary.md) fails closed
+when owned source or its dependency graph changes. Linux local `all` prints its
+unrun canonical-Miri obligation and cannot substitute for the required Mac result. Actual CPU JIT and GPU kernels run in
 native integration tests. Linux CPU ASan/TSan exercises authored allocation,
 launch, IR construction and readback. CPU-only and full native LLVM coverage
 must both have zero uncovered lines/functions/regions/branches, and the native
@@ -200,10 +206,24 @@ pretend P0 tested the full feature. A newly discovered architectural failure
 reopens the relevant P0 gate. Finite prototypes do not guarantee unknown future
 implementation details.
 
+### Known later conditions that can stop a phase
+
+| Condition | Required owner / timing |
+|---|---|
+| Expiring dependency reviews | Every milestone: five exact maintenance reviews expire 2026-12-17; duplicate reviews expire 2027-02-15. Replace or explicitly re-review before expiry; gates fail closed. |
+| New source/dependency or OS-specific code | P1 onward: re-review pinned Miri host contract and source-universe guards. Current Mac Miri proof does not certify future Linux-only code. Separate CLI/core from UI dependencies in P1. |
+| Full product acceptance | P2–P8: camera parity/files, complete methods/geometry and actual native lifecycle/permissions may stop their owning phase. P0 has not passed those cases. No artificial lifecycle delay. |
+| Release trust/tool boundary | P9: record interpreter/Rowan runtime trust or adopt reviewed generated bindings; complete integrated host assurance and GPU-ASan investigation. No full UI Miri/GPU sanitizer pass is claimed. |
+| Performance / generated-input preparation | First complete pipeline/P10: materialize exact T50 recipe with full-set disk preflight; match real R50/D150/E9 baselines and frozen numeric/quality targets. A failed target stops release. |
+
 ## 4. Architecture and ownership
 
-Start with modules in the existing crate. Extract crates only when an actual
-build boundary requires it: CLI must be window-system independent, kernels must
+P1 must separate the reusable compute/core crate from the UI dependency graph
+before shipping a headless CLI. The P0 single-graph qualification exports Slint;
+Linux's eager Xlib constructor is concrete evidence that the final CLI/kernel
+crate must not link the UI graph. Keep each kernel definition once in that core.
+Start other components as modules; extract further crates only for real build
+boundaries: CLI must be window-system independent, kernels must
 not depend on Slint, and native runtimes need target-scoped dependencies. Every
 new crate inherits workspace lints.
 

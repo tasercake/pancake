@@ -1,0 +1,204 @@
+{
+  "scope": "Current production root library; standalone UI/codec/generator have separate qualification",
+  "source_commit": "93aaaf1a1f98caa46220fcf2cc7f0828ccab22b7",
+  "command": "CARGO_TARGET_DIR=<shared-normal-cache> CARGO_BUILD_JOBS=2 git push origin codex/p0-close; unmodified pre-push hook runs check.sh all",
+  "exit_code": 0,
+  "gates": [
+    "fast",
+    "test",
+    "coverage",
+    "deps",
+    "mutants",
+    "nightly",
+    "branches",
+    "guardrails"
+  ],
+  "native_tests_each_profile": 11,
+  "strict_miri_host_tests": 5,
+  "layout_seeds": [
+    1,
+    42
+  ],
+  "guardrail_outcomes_passed": 10,
+  "reports": {
+    "target/assurance/coverage-cpu.json": {
+      "totals": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 28,
+          "covered": 22,
+          "percent": 78.57142857142857
+        },
+        "lines": {
+          "count": 139,
+          "covered": 139,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 143,
+          "covered": 143,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "source_paths": [
+        "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close/pancake/src/lib.rs"
+      ],
+      "original_sha256": "8bc2b2bd6bfa476fbbc96e726e8845fe8f1eeab82e33c7222c89e01a480722c3"
+    },
+    "target/assurance/coverage-native.json": {
+      "totals": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 28,
+          "covered": 22,
+          "percent": 78.57142857142857
+        },
+        "lines": {
+          "count": 139,
+          "covered": 139,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 143,
+          "covered": 143,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "source_paths": [
+        "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close/pancake/src/lib.rs"
+      ],
+      "original_sha256": "839d1dd9f7cc47797c4293b33d22423ac24f1879a0788be14eaa7db2ee52af5d"
+    },
+    "target/coverage/branches-cpu.json": {
+      "totals": {
+        "branches": {
+          "count": 14,
+          "covered": 14,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 56,
+          "covered": 44,
+          "percent": 78.57142857142857
+        },
+        "lines": {
+          "count": 139,
+          "covered": 139,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 143,
+          "covered": 143,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "source_paths": [
+        "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close/pancake/src/lib.rs"
+      ],
+      "original_sha256": "acbd5e727f2dd860ec9251cabcb00e9dec7362361b229d4ef8f139ab490d7977"
+    },
+    "target/coverage/branches.json": {
+      "totals": {
+        "branches": {
+          "count": 14,
+          "covered": 14,
+          "notcovered": 0,
+          "percent": 100
+        },
+        "functions": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 28,
+          "covered": 22,
+          "percent": 78.57142857142857
+        },
+        "lines": {
+          "count": 139,
+          "covered": 139,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 143,
+          "covered": 143,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "source_paths": [
+        "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close/pancake/src/lib.rs"
+      ],
+      "original_sha256": "9c2c037ae02677620a9696637422c425f1d21ca2a00d9be8a190f3cacbc8deef"
+    }
+  },
+  "mutations": {
+    "total_mutants": 79,
+    "caught": 79,
+    "missed": 0,
+    "unviable": 0,
+    "timeout": 0
+  },
+  "production_hashes": {
+    "pancake/Cargo.toml": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649",
+    "pancake/Cargo.lock": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b",
+    "pancake/src/lib.rs": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+    "pancake/src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f",
+    "pancake/scripts/check.sh": "f7d79ad755c6e9f52409ef9f57119748fbe4727d582d67183fefeb8c0dc09e25",
+    ".github/workflows/pancake.yml": "119999a3cbc9310dc6df2ecd870fc7f97cdbb650339d624a239d35e4243cf03f"
+  }
+}

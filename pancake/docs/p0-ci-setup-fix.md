@@ -34,7 +34,22 @@ classifier to select the library and every `cpu_*` target. It mutates the same
 production library and retains all CPU numerical oracles. Native `mutants` and
 local `all` still run the full hardware scope; no source or mutant is excluded.
 Cargo-mutants 27.1.0 accepts Cargo target selectors after its `--` separator.
-The actual end-to-end CPU mutation result is recorded separately after execution.
+The actual macOS ARM64 CPU baseline passes all nine tests, followed by **79/79
+caught mutations**, zero misses, timeouts or unviable mutations. The root library
+SHA-256 is unchanged after the in-place run. Complete outputs, diffs and per-case
+logs are retained in `p0-ci-evidence/cpu-mutants-complete.tar.gz`.
+
+Routing is qualified with a real setup-negative: `CUBECL_WGPU_MAX_TASKS=0` makes
+the unchanged GPU kernel test fail with exit 101 and
+`Invalid wgpu configuration: tasks_max must be greater than zero`. The same
+setting remains active during the successful CPU baseline and all 79 mutations.
+This variable is read by CubeCL wgpu RuntimeOptions, not its CPU runtime. The
+mutation build stage still compiles test binaries; only execution selects the
+library and both CPU integration targets. This proves CPU routing when GPU setup
+is blocked; it does not demonstrate a hosted software adapter or a driver fault.
+Exact commands, tool output, restored-source hashes and a live 15 GiB disk guard
+receipt are retained. Minimum free space was 108,239,835,136 bytes; the guard did
+not trigger.
 
 Local verification covers checksum-pinned installation without Go, exact version
 output, host-provisioning refusal, shell syntax, ShellCheck, actionlint and normal

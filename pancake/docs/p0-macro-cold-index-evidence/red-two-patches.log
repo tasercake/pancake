@@ -1,0 +1,47 @@
+test_default_macro_retains_original_function (test_macro_expand_only.ExpandOnlyContracts.test_default_macro_retains_original_function) ... FAIL
+test_expand_only_has_no_original_function_symbol (test_macro_expand_only.ExpandOnlyContracts.test_expand_only_has_no_original_function_symbol) ... FAIL
+test_expand_only_retains_safe_checked_launch (test_macro_expand_only.ExpandOnlyContracts.test_expand_only_retains_safe_checked_launch) ... FAIL
+
+======================================================================
+FAIL: test_default_macro_retains_original_function (test_macro_expand_only.ExpandOnlyContracts.test_default_macro_retains_original_function)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-assurance/pancake/vendor/tests/test_macro_expand_only.py", line 76, in test_default_macro_retains_original_function
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 101 != 0 : error: no matching package named `cubecl-hip` found
+location searched: crates.io index
+required by package `cubecl v0.11.4`
+    ... which satisfies dependency `cubecl = "=0.11.4"` (locked to 0.11.4) of package `macro-contract-default v0.0.0 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-assurance/pancake/target/macro-contract/default)`
+note: offline mode (via `--offline`) can sometimes cause surprising resolution failures
+help: if this error is too confusing you may wish to retry without `--offline`
+
+
+======================================================================
+FAIL: test_expand_only_has_no_original_function_symbol (test_macro_expand_only.ExpandOnlyContracts.test_expand_only_has_no_original_function_symbol)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-assurance/pancake/vendor/tests/test_macro_expand_only.py", line 64, in test_expand_only_has_no_original_function_symbol
+    self.assertIn("error[E0423]: cannot find value `kernel`", result.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'error[E0423]: cannot find value `kernel`' not found in 'error: no matching package named `cubecl-hip` found\nlocation searched: crates.io index\nrequired by package `cubecl v0.11.4`\n    ... which satisfies dependency `cubecl = "=0.11.4"` (locked to 0.11.4) of package `macro-contract-absent v0.0.0 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-assurance/pancake/target/macro-contract/absent)`\nnote: offline mode (via `--offline`) can sometimes cause surprising resolution failures\nhelp: if this error is too confusing you may wish to retry without `--offline`\n'
+
+======================================================================
+FAIL: test_expand_only_retains_safe_checked_launch (test_macro_expand_only.ExpandOnlyContracts.test_expand_only_retains_safe_checked_launch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-assurance/pancake/vendor/tests/test_macro_expand_only.py", line 72, in test_expand_only_retains_safe_checked_launch
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 101 != 0 : error: no matching package named `cubecl-hip` found
+location searched: crates.io index
+required by package `cubecl v0.11.4`
+    ... which satisfies dependency `cubecl = "=0.11.4"` (locked to 0.11.4) of package `macro-contract-checked v0.0.0 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-assurance/pancake/target/macro-contract/checked)`
+note: offline mode (via `--offline`) can sometimes cause surprising resolution failures
+help: if this error is too confusing you may wish to retry without `--offline`
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.166s
+
+FAILED (failures=3)

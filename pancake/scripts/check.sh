@@ -82,7 +82,8 @@ case ${1:-all} in
         require_tool actionlint "$PANCAKE_ACTIONLINT_VERSION"
         require_tool shellcheck "$PANCAKE_SHELLCHECK_VERSION"
         python3 -m unittest scripts/test_dependency_policy.py scripts/test_guardrail_manifest.py \
-            scripts/test_assurance_targets.py scripts/test_assurance_coverage.py
+            scripts/test_assurance_targets.py scripts/test_assurance_coverage.py scripts/test_miri_host_policy.py
+        python3 scripts/miri_host_policy.py "$root" validate
         dependency_policy
         cargo fmt --all -- --check
         CLIPPY_CONF_DIR="$root/target/dependency-policy/clippy" \
@@ -207,15 +208,26 @@ case ${1:-all} in
                 --build-timeout 180 -- --locked -- --include-ignored
         fi
         ;;
-    nightly | nightly-cpu)
+    miri)
+        python3 scripts/miri_host_policy.py "$root" miri
         # Miri checks pure host contracts. Native integration tests below exercise
         # LLVM JIT and GPU FFI, which Miri cannot interpret (mach_host_self on macOS).
         MIRIFLAGS="-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check" \
             cargo +"$PANCAKE_NIGHTLY" miri test --locked --workspace --all-features --lib -- --include-ignored
+        ;;
+    nightly | nightly-cpu)
+        bash scripts/check.sh miri
+        if [[ $1 == nightly-cpu ]]; then
+            bash scripts/check.sh layouts-cpu
+        else
+            bash scripts/check.sh layouts
+        fi
+        ;;
+    layouts | layouts-cpu)
         for seed in 1 42; do
             # Bash 3.2 treats an empty array expansion as unset under nounset.
             # Native tests retain Cargo's default unit/integration/doctest scope.
-            if [[ $1 == nightly-cpu ]]; then
+            if [[ $1 == layouts-cpu ]]; then
                 assurance_profile cpu
                 RUSTFLAGS="-Dwarnings -Zrandomize-layout -Zlayout-seed=$seed" \
                     cargo +"$PANCAKE_NIGHTLY" test --locked --workspace --all-features \
@@ -248,13 +260,15 @@ case ${1:-all} in
         bash scripts/test-guardrails.sh deep
         ;;
     all)
-        for gate in fast test coverage deps mutants nightly branches guardrails; do
+        mkdir -p target/assurance
+        python3 scripts/miri_host_policy.py "$root" all-plan > target/assurance/local-gates.txt
+        while IFS= read -r gate <&3; do
             printf '\nPancake gate: %s\n' "$gate"
-            bash scripts/check.sh "$gate"
-        done
+            bash scripts/check.sh "$gate" 3<&-
+        done 3< target/assurance/local-gates.txt
         ;;
     *)
-        printf 'Usage: check.sh [all|fast|test|test-cpu|gpu|coverage|coverage-cpu|branches|branches-cpu|deps|mutants|mutants-cpu|nightly|nightly-cpu|sanitizer|sanitizer-gpu|guardrails]\n' >&2
+        printf 'Usage: check.sh [all|fast|test|test-cpu|gpu|coverage|coverage-cpu|branches|branches-cpu|deps|mutants|mutants-cpu|miri|nightly|nightly-cpu|layouts|layouts-cpu|sanitizer|sanitizer-gpu|guardrails]\n' >&2
         exit 2
         ;;
 esac

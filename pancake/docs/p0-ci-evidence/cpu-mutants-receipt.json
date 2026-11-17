@@ -1,0 +1,29 @@
+{
+  "source_sha256_before": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+  "source_sha256_after": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+  "gpu_setup_negative_command": [
+    "cargo",
+    "+1.100.0",
+    "test",
+    "--locked",
+    "--test",
+    "gpu_kernel_contract",
+    "--",
+    "--include-ignored"
+  ],
+  "gpu_setup_negative_exit": 101,
+  "mutation_command": [
+    "bash",
+    "scripts/check.sh",
+    "mutants-cpu"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close/pancake/target",
+    "CARGO_BUILD_JOBS": "2",
+    "CUBECL_WGPU_MAX_TASKS": "0"
+  },
+  "mutation_exit": 0,
+  "disk_guard_triggered": false,
+  "minimum_free_bytes": 108239835136,
+  "reserve_bytes": 16106127360
+}

@@ -1,0 +1,12 @@
+test_default_macro_retains_original_function (test_macro_expand_only.ExpandOnlyContracts.test_default_macro_retains_original_function) ... ok
+test_expand_only_has_no_original_function_symbol (test_macro_expand_only.ExpandOnlyContracts.test_expand_only_has_no_original_function_symbol) ... ok
+test_expand_only_retains_safe_checked_launch (test_macro_expand_only.ExpandOnlyContracts.test_expand_only_retains_safe_checked_launch) ... ok
+test_cubecl_uses_maintained_proc_macro_under_existing_import_name (test_patch_contracts.DependencyPatchContracts.test_cubecl_uses_maintained_proc_macro_under_existing_import_name) ... ok
+test_modified_files_match_reviewed_hashes (test_patch_contracts.DependencyPatchContracts.test_modified_files_match_reviewed_hashes) ... ok
+test_spin_on_has_no_retired_pinning_dependency (test_patch_contracts.DependencyPatchContracts.test_spin_on_has_no_retired_pinning_dependency) ... ok
+test_vendor_records_exact_original_crate_identities (test_patch_contracts.DependencyPatchContracts.test_vendor_records_exact_original_crate_identities) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 27.200s
+
+OK

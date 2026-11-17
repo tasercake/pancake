@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "linux_red": {
+    "run": 44096988927,
+    "job": 134086614107,
+    "source": "93aaaf1a1f98caa46220fcf2cc7f0828ccab22b7",
+    "result": "unsupported Linux dlopen in tiny-xlib eager constructor before first test"
+  },
+  "macos_miri": {
+    "command": "bash scripts/check.sh miri",
+    "host": "Darwin",
+    "machine": "arm64",
+    "nightly": "nightly-2026-11-15",
+    "miri_flags": "-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check",
+    "tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "ignored": 0,
+    "target_directory": "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close/pancake/target"
+  },
+  "policy_tests": {
+    "tests": 4,
+    "result": "pass; initial red log retained"
+  },
+  "source": {
+    "pancake/assurance-platforms.json": "4d396fb9ee1fef4b3e60bdc0ceb243ea4a1bc51ca1ed5768aeba5c5a3b9e2981",
+    "pancake/scripts/miri_host_policy.py": "0611a3ee9716fb3a44f05ea4c15be6f1f6c2ca4dc024158cb86d1daa2f509c7e",
+    "pancake/scripts/test_miri_host_policy.py": "ee6a66a39001d9eeadc3e2d4693828e9c081dfae0d884a293d85fbe7b2a3e109",
+    "pancake/scripts/check.sh": "534cf354661aff9ada4f21e492ed840b416eb448e673b096ef0c8ac2081800c6",
+    ".github/workflows/pancake.yml": "e0542b1c109e925ed8b6e6ad21625483563c24c05043525728f3704f182c03f4",
+    "pancake/src/lib.rs": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+    "pancake/src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f",
+    "pancake/Cargo.toml": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649",
+    "pancake/Cargo.lock": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b"
+  },
+  "artifacts": {
+    "linux-local-obligation.log": {
+      "sha256": "255fd25f8e8d6bd6ca8db035d25be021ef9e5073fee2b9e4d7e72d807ce31f9e",
+      "bytes": 112
+    },
+    "linux-local-plan.txt": {
+      "sha256": "be7950f69d0c1284c01300543951d1f721cc28c5932f66adec559958bbd1ced1",
+      "bytes": 60
+    },
+    "linux-nightly-red.log.gz": {
+      "sha256": "c48d7ebeaca9d0d2e9aef222eb0bb43610467ca23bd630a4b58d403366fe2b0f",
+      "bytes": 26405
+    },
+    "macos-local-obligation.log": {
+      "sha256": "8426704b4e5f7905ecfc589e102694d510e06f23508594550fde9c6263f0a108",
+      "bytes": 54
+    },
+    "macos-local-plan.txt": {
+      "sha256": "7f78b0046a7fb1f85fe41e7796cd538d5cebe0fb32ab7dc0cc592956c42712f1",
+      "bytes": 60
+    },
+    "macos-miri.log.gz": {
+      "sha256": "f9a1a5d6a1a827de1866594f60b0482c84832e359b20deba0a7d6e4e6d53632f",
+      "bytes": 4173
+    },
+    "policy-green.log": {
+      "sha256": "7b057eb92a50bb1f8d57fc3b9ddd0f11876e42732f607a548eb9dcecc13213a4",
+      "bytes": 102
+    },
+    "policy-red.log": {
+      "sha256": "0e1ebb79ec24472e9e580d6b14791ab305af556b40c931bbb6ae0d729e02ceff",
+      "bytes": 3942
+    }
+  },
+  "limits": "No Linux Miri pass, hosted macOS Miri pass, full transitive unsafe proof or complete CI pass claimed by this local receipt. Required hosted lane remains mandatory."
+}

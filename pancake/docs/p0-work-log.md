@@ -305,7 +305,7 @@ Borrows retag; that model is experimental. Native success is not a proof of
 soundness. No upstream ARC
 rewrite, Miri exclusion or claim of full UI Miri coverage was introduced. P0
 records trusted repository-owned embedded-source use only. P9 must explicitly
-review/record the release interpreter/Rowan boundary or adopt reviewed generated
+review and record the release interpreter/Rowan boundary or adopt reviewed generated
 bindings; this is a visible release condition, not a deferred P0 proof.
 
 Resource bounds: two 512×384 RGBA textures (786,432 bytes each), two
@@ -387,6 +387,36 @@ is enforced. Eleven tests plus Ruff pass. Original cumulative-byte guard stopped
 a diagnostic after 22 images; retained-vs-total regression failed first, then
 passes after correct peak-retention accounting. Canonical run restarts all fifty
 under one final generator hash; numeric recipe is unchanged.
+
+### Further hosted assurance findings and resolutions
+
+Run [44096988927](https://github.com/tasercake/focus-stacking/actions/runs/44096988927)
+actually passes Linux ASan, TSan, Linux/macOS platform tests and Windows MSVC
+build/link. Those complete successful-job logs are retained under
+`p0-close-evidence/ci-second/`. The **whole workflow still fails** two independent
+assurance checks; those passes are not promoted to workflow success.
+
+Linux Miri stops before tests in tiny-xlib 0.2.5's eager Xlib constructor:
+`dlopen` is unsupported by Miri. This is distinct from Rowan's ARC Miri report.
+The [explicit source-pinned host contract](p0-miri-host-boundary.md) requires all
+five current OS-neutral pure-host Miri tests on macOS, where actual strict Miri
+passes. Linux retains both native layout seeds, branch coverage and real ASan/TSan.
+Its local `all` reports Miri NOT RUN with required canonical Mac CI obligation;
+no constructor, feature, ignored test, source exclusion or suppression is added.
+New/changed source, dependencies or nightly pin forces review. Current helpers
+use 64-bit little-endian checked shapes/budgets/bytes, not OS services.
+
+Offline macro fixtures previously copied only core/macros overrides alongside
+the root lock. A warm local index hid missing metadata for optional HIP. A clean
+index reproduces all three failures before any compile contract runs. Fixtures
+now inherit **all root patch tables**, with absolute escaped paths. In the same
+isolated index without the HIP entry, all three real compile contracts, all seven
+vendor tests and actual dependency gate pass. Global index remains untouched;
+temporary copies are removed. [Cold-index proof](p0-macro-cold-index.md) retains
+red/green logs, commands and unchanged Cargo/kernel hashes. No network fallback.
+
+All production Rust and Cargo bytes remain unchanged by these infrastructure
+fixes. Final hosted workflow validation is still required before P0 closure.
 
 ## 12. Final execution receipts and closure
 

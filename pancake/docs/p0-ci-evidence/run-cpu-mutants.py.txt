@@ -1,0 +1,57 @@
+"""Run actual CPU mutations with GPU setup disabled and an active disk guard."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import signal
+import subprocess
+import time
+
+root = Path.cwd()
+output = root / 'artifacts/p0-ci'
+output.mkdir(parents=True, exist_ok=True)
+environment = dict(os.environ)
+environment.update(
+    CARGO_TARGET_DIR='/Users/krishna/Documents/focus-stacking/.worktrees/p0-close/pancake/target',
+    CARGO_BUILD_JOBS='2', CUBECL_WGPU_MAX_TASKS='0',
+)
+environment['PATH'] = '/Users/krishna/Documents/focus-stacking/.worktrees/p0-unblock/pancake/target/tools/bin:' + environment['PATH']
+source = root / 'pancake/src/lib.rs'
+original = hashlib.sha256(source.read_bytes()).hexdigest()
+negative_command = ['cargo', '+1.100.0', 'test', '--locked', '--test', 'gpu_kernel_contract', '--', '--include-ignored']
+with (output/'gpu-setup-negative.log').open('w') as log:
+    negative = subprocess.run(negative_command, cwd=root/'pancake', env=environment, stdout=log, stderr=subprocess.STDOUT, check=False)
+text = (output/'gpu-setup-negative.log').read_text()
+if negative.returncode == 0 or 'tasks_max must be greater than zero' not in text:
+    raise SystemExit(f'Expected actual GPU configuration rejection, got {negative.returncode}: {text}')
+command = ['bash', 'scripts/check.sh', 'mutants-cpu']
+minimum_free = shutil.disk_usage(root).free
+reserve = 15 * 1024**3
+if minimum_free < reserve:
+    raise SystemExit('15 GiB reserve unavailable before starting mutations')
+with (output/'cpu-mutants.log').open('w') as log:
+    process = subprocess.Popen(command, cwd=root/'pancake', env=environment, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+    guard_triggered = False
+    while process.poll() is None:
+        free = shutil.disk_usage(root).free
+        minimum_free = min(minimum_free, free)
+        if free < reserve:
+            guard_triggered = True
+            os.killpg(process.pid, signal.SIGINT)
+            break
+        time.sleep(2)
+    code = process.wait(timeout=30)
+receipt = {
+    'source_sha256_before': original,
+    'source_sha256_after': hashlib.sha256(source.read_bytes()).hexdigest(),
+    'gpu_setup_negative_command': negative_command,
+    'gpu_setup_negative_exit': negative.returncode,
+    'mutation_command': command,
+    'environment': {key: environment[key] for key in ['CARGO_TARGET_DIR','CARGO_BUILD_JOBS','CUBECL_WGPU_MAX_TASKS']},
+    'mutation_exit': code, 'disk_guard_triggered': guard_triggered,
+    'minimum_free_bytes': minimum_free, 'reserve_bytes': reserve,
+}
+(output/'cpu-mutants-receipt.json').write_text(json.dumps(receipt, indent=2)+'\n')
+if code != 0 or guard_triggered or receipt['source_sha256_before'] != receipt['source_sha256_after']:
+    raise SystemExit(f'Mutation run incomplete: {receipt}')

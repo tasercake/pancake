@@ -1,0 +1,43 @@
+FFFF
+======================================================================
+FAIL: test_changed_or_new_production_source_requires_boundary_review (scripts.test_miri_host_policy.MiriHostPolicyTests.test_changed_or_new_production_source_requires_boundary_review)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/krishna/Documents/focus-stacking/.worktrees/p0-ci-fix/pancake/scripts/test_miri_host_policy.py", line 52, in test_changed_or_new_production_source_requires_boundary_review
+    self.assertIn('changed reviewed file', result.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'changed reviewed file' not found in "/Library/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/krishna/Documents/focus-stacking/.worktrees/p0-ci-fix/pancake/scripts/miri_host_policy.py': [Errno 2] No such file or directory\n"
+
+======================================================================
+FAIL: test_dependency_resolution_and_unknown_platform_fail_closed (scripts.test_miri_host_policy.MiriHostPolicyTests.test_dependency_resolution_and_unknown_platform_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/krishna/Documents/focus-stacking/.worktrees/p0-ci-fix/pancake/scripts/test_miri_host_policy.py", line 63, in test_dependency_resolution_and_unknown_platform_fail_closed
+    self.assertIn('changed reviewed file', result.stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'changed reviewed file' not found in "/Library/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/krishna/Documents/focus-stacking/.worktrees/p0-ci-fix/pancake/scripts/miri_host_policy.py': [Errno 2] No such file or directory\n"
+
+======================================================================
+FAIL: test_linux_all_keeps_native_gates_and_names_required_external_miri (scripts.test_miri_host_policy.MiriHostPolicyTests.test_linux_all_keeps_native_gates_and_names_required_external_miri)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/krishna/Documents/focus-stacking/.worktrees/p0-ci-fix/pancake/scripts/test_miri_host_policy.py", line 34, in test_linux_all_keeps_native_gates_and_names_required_external_miri
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : /Library/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/krishna/Documents/focus-stacking/.worktrees/p0-ci-fix/pancake/scripts/miri_host_policy.py': [Errno 2] No such file or directory
+
+
+======================================================================
+FAIL: test_mac_all_keeps_actual_miri_and_linux_cannot_claim_local_miri (scripts.test_miri_host_policy.MiriHostPolicyTests.test_mac_all_keeps_actual_miri_and_linux_cannot_claim_local_miri)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/krishna/Documents/focus-stacking/.worktrees/p0-ci-fix/pancake/scripts/test_miri_host_policy.py", line 42, in test_mac_all_keeps_actual_miri_and_linux_cannot_claim_local_miri
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : /Library/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/krishna/Documents/focus-stacking/.worktrees/p0-ci-fix/pancake/scripts/miri_host_policy.py': [Errno 2] No such file or directory
+
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.055s
+
+FAILED (failures=4)

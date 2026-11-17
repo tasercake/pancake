@@ -1,0 +1,8 @@
+fast
+test
+coverage
+deps
+mutants
+nightly
+branches
+guardrails

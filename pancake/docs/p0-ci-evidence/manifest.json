@@ -15,6 +15,29 @@
       "bytes": 96,
       "sha256": "2f40fa9e505771c4dd7ff4b6ed601e587f52744935b72906e55b21a9a7c1ce1b"
     },
+    "cpu-mutants-complete.tar.gz": {
+      "bytes": 4133123,
+      "sha256": "4305b94a1d8c5a1e368d5335326c7569e8d6e82cc192e0c9d7ae89d6abe366d9",
+      "uncompressed_bytes": 28887040
+    },
+    "cpu-mutants-outcomes.json": {
+      "bytes": 161711,
+      "sha256": "3ac5457d2e28fe4d90bc15c52d6a2646d40b1cb116cc3b8045883535ab72f4bb"
+    },
+    "cpu-mutants-receipt.json": {
+      "bytes": 791,
+      "sha256": "986b2c4089c98daa34e7d46b1389c5259775638bed59688469e056d99a483893"
+    },
+    "cpu-mutants.log.gz": {
+      "bytes": 105,
+      "sha256": "a281cdfc901ecd642c0c489dab3ffcc6ad963ef13159e771aba5e2067a1d7509",
+      "uncompressed_bytes": 111
+    },
+    "gpu-setup-negative.log.gz": {
+      "bytes": 532,
+      "sha256": "b88ac7933d456efca98c5653fe2075f14d8a779ee5cf489881e3ca7e524e13d4",
+      "uncompressed_bytes": 1107
+    },
     "native-deps-host-refused.log": {
       "bytes": 71,
       "sha256": "d89a5dfc8d6caaa48cffa1e5690a14112014d123a15dbc526dd45e4ce640a1da"
@@ -48,6 +71,21 @@
       "bytes": 5764,
       "sha256": "eba35e7df1825f46344dd1d82398359147725e2cee73d0a5719d209119d599e8",
       "uncompressed_bytes": 23636
+    },
+    "run-cpu-mutants.py.txt": {
+      "bytes": 2802,
+      "sha256": "f012ee5b8cbc77398458beb91c26bff82e86d48770b731af37a6118a821e6a6d"
     }
+  },
+  "cpu_mutation_proof": {
+    "source_commit": "9bb0a17",
+    "root_source_sha256": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+    "check_script_sha256": "a5f5b5bdb69572078e31b6eb38548bf599290b2f9f9edebcd6fdb1a0cfa31ba0",
+    "baseline_tests": 9,
+    "mutants": 79,
+    "caught": 79,
+    "missed": 0,
+    "timeout": 0,
+    "unviable": 0
   }
 }

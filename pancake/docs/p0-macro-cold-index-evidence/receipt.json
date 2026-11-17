@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+  "python": "3.13.7",
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+  "source_base_commit": "349d2b8641aae2ccbacf737965434095f76896ac",
+  "unchanged_root_sources_sha256": {
+    "Cargo.toml": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649",
+    "Cargo.lock": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b",
+    "src/lib.rs": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51"
+  },
+  "fixture_patch_names": [
+    "cubecl-core",
+    "cubecl-cpp",
+    "cubecl-hip",
+    "cubecl-macros",
+    "cubecl-spirv",
+    "cubecl-std",
+    "rowan",
+    "spin_on"
+  ],
+  "generated_fixture_patch_equality": "all three match every root patch with resolved absolute paths",
+  "cold_index": {
+    "removed_name": "cubecl-hip",
+    "scope": "per-class temporary copy of registry/index",
+    "global_index_modified": false,
+    "temporary_index_cleaned": true,
+    "global_hip_entries_retained_sha256": {
+      "registry/index/index.crates.io-1949cf8c6b5b557f/.cache/cu/be/cubecl-hip": "92790431905829165849897349876f7d071e147a3b8c2e387c5b1f89502e8968"
+    },
+    "registry_cache_and_source": "shared by symlink; cargo check --offline; no download or cache garbage collection"
+  },
+  "runs": [
+    {
+      "source": "cold setup plus original two-patch fixture",
+      "command": "python3 -m unittest discover -s vendor/tests -p test_macro_expand_only.py -v",
+      "exit_code": 1,
+      "tests": 3,
+      "failed": 3,
+      "failure": "no matching package named `cubecl-hip` found",
+      "log": "red-two-patches.log"
+    },
+    {
+      "source": "cold setup plus all root patches",
+      "command": "python3 -m unittest discover -s vendor/tests -p test_macro_expand_only.py -v",
+      "exit_code": 0,
+      "tests": 3,
+      "passed": 3,
+      "log": "green-all-patches.log"
+    },
+    {
+      "source": "final fixture",
+      "command": "python3 -m unittest discover -s vendor/tests -v",
+      "exit_code": 0,
+      "tests": 7,
+      "passed": 7,
+      "log": "all-vendor-contracts.log"
+    },
+    {
+      "source": "final fixture through the actual dependency gate",
+      "command": "PATH=<parent pinned tools>:$PATH CARGO_TARGET_DIR=<parent normal build cache> bash scripts/check.sh deps",
+      "exit_code": 0,
+      "vendor_contracts_passed": 7,
+      "advisories": "ok",
+      "bans": "ok",
+      "sources": "ok",
+      "unused_dependencies": "none",
+      "log": "deps.log"
+    }
+  ],
+  "artifacts_sha256": {
+    "all-vendor-contracts.log": "2a872bfab52d6a01cc68bb26a47c9dea3702b95d16ae841650ac38924eab2dac",
+    "green-all-patches.log": "0bed778278b4dfea823a7751eab0e0b2d68a86e2134c563d1d9e9d9f5c57c09f",
+    "red-two-patches.log": "1e3110d5fcad6b215bae45c0f0e53f92fae6ed2396bcff7210cd37596b934bb8",
+    "deps.log": "cf32272531beae33dfa2b1f0f95927fd7630a6bd5e21b0eab6070e603e09f646"
+  }
+}
