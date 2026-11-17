@@ -1,0 +1,45 @@
+slow_unwind_exit=1
+vkCreateInstance=0
+adapter=NVIDIA GeForce RTX 3090 vendor=0x10de
+vkCreateDevice=0
+
+=================================================================
+==35511==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x7473345e73b7 in __interceptor_calloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:77
+    #1 0x74732b8de1e9  (<unknown module>)
+    #2 0x74732b8de2d4  (<unknown module>)
+    #3 0x74732b8de67f  (<unknown module>)
+    #4 0x74732b8d2166  (<unknown module>)
+    #5 0x747333522e84  (<unknown module>)
+    #6 0x747332574b1d  (<unknown module>)
+    #7 0x747332573a1c  (<unknown module>)
+    #8 0x747332574811  (<unknown module>)
+    #9 0x7473344ec0cc  (/lib/x86_64-linux-gnu/libvulkan.so.1+0x2d0cc)
+    #10 0x7473344f4268 in vkCreateInstance (/lib/x86_64-linux-gnu/libvulkan.so.1+0x35268)
+    #11 0x5eeb2f13959b in main /work/pancake/target/p0-sanitizer-probe/vulkan-device-probe.c:17
+    #12 0x747334304249  (/lib/x86_64-linux-gnu/libc.so.6+0x27249)
+    #13 0x747334304304 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x27304)
+    #14 0x5eeb2f1391d0 in _start (/work/pancake/target/p0-sanitizer-probe/vulkan-device-asan+0x11d0)
+
+Indirect leak of 144 byte(s) in 1 object(s) allocated from:
+    #0 0x7473345e73b7 in __interceptor_calloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:77
+    #1 0x74733292d6dd  (<unknown module>)
+    #2 0x74733292eb79  (/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2+0xb79)
+    #3 0x747332933163  (<unknown module>)
+    #4 0x74732b8de2a1  (<unknown module>)
+    #5 0x74732b8de67f  (<unknown module>)
+    #6 0x74732b8d2166  (<unknown module>)
+    #7 0x747333522e84  (<unknown module>)
+    #8 0x747332574b1d  (<unknown module>)
+    #9 0x747332573a1c  (<unknown module>)
+    #10 0x747332574811  (<unknown module>)
+    #11 0x7473344ec0cc  (/lib/x86_64-linux-gnu/libvulkan.so.1+0x2d0cc)
+    #12 0x7473344f4268 in vkCreateInstance (/lib/x86_64-linux-gnu/libvulkan.so.1+0x35268)
+    #13 0x5eeb2f13959b in main /work/pancake/target/p0-sanitizer-probe/vulkan-device-probe.c:17
+    #14 0x747334304249  (/lib/x86_64-linux-gnu/libc.so.6+0x27249)
+    #15 0x747334304304 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x27304)
+    #16 0x5eeb2f1391d0 in _start (/work/pancake/target/p0-sanitizer-probe/vulkan-device-asan+0x11d0)
+
+SUMMARY: AddressSanitizer: 184 byte(s) leaked in 2 allocation(s).

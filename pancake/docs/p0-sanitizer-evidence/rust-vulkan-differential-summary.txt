@@ -1,0 +1,40 @@
+minimal_wgpu_exit=1 cubecl_pinned_exit=1
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+minimal_wgpu_adapter=AdapterInfo { name: "NVIDIA GeForce RTX 3090", vendor: 4318, device: 8708, device_type: DiscreteGpu, device_pci_bus_id: "0000:01:00.0", driver: "NVIDIA", driver_info: "580.178.04", backend: Vulkan, subgroup_min_size: 32, subgroup_max_size: 32, transient_saves_memory: Some(false), limit_bucket: None }
+minimal_wgpu_device=ok
+
+=================================================================
+==35484==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x5f25d8b02682  (/work/pancake/target/x86_64-unknown-linux-gnu/debug/build/pancake-sanitizer-boundary-probe/92114979f9192eac/out/device_probe-92114979f9192eac+0x35a0682) (BuildId: de5f2ccfec4a136adebd145bb4ad7775c63a4853)
+    #1 0x78b13f32a1e9  (<unknown module>)
+
+Indirect leak of 144 byte(s) in 1 object(s) allocated from:
+    #0 0x5f25d8b02682  (/work/pancake/target/x86_64-unknown-linux-gnu/debug/build/pancake-sanitizer-boundary-probe/92114979f9192eac/out/device_probe-92114979f9192eac+0x35a0682) (BuildId: de5f2ccfec4a136adebd145bb4ad7775c63a4853)
+    #1 0x7cb140b4e6dd  (<unknown module>)
+    #2 0x447265646e65722e  (<unknown module>)
+
+SUMMARY: AddressSanitizer: 184 byte(s) leaked in 2 allocation(s).
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+Error: "Unable to request a wgpu device: Parent device is lost"
+
+=================================================================
+==35495==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x5cdf76a11682  (/work/pancake/target/x86_64-unknown-linux-gnu/debug/build/pancake-sanitizer-boundary-probe/92114979f9192eac/out/device_probe-92114979f9192eac+0x35a0682) (BuildId: de5f2ccfec4a136adebd145bb4ad7775c63a4853)
+    #1 0x750d1c5d21e9  (<unknown module>)
+
+Indirect leak of 144 byte(s) in 1 object(s) allocated from:
+    #0 0x5cdf76a11682  (/work/pancake/target/x86_64-unknown-linux-gnu/debug/build/pancake-sanitizer-boundary-probe/92114979f9192eac/out/device_probe-92114979f9192eac+0x35a0682) (BuildId: de5f2ccfec4a136adebd145bb4ad7775c63a4853)
+    #1 0x790d1e3516dd  (/lib/x86_64-linux-gnu/libnvidia-glsi.so.580.178.04+0x3b6dd) (BuildId: 4aa7a498f7b6a06f02ce19cf17fc73e302f04491)
+    #2 0x447265646e65722e  (<unknown module>)
+
+SUMMARY: AddressSanitizer: 184 byte(s) leaked in 2 allocation(s).
+Filesystem      Size  Used Avail Use% Mounted on
+overlay         1.1T 1020G   29G  98% /

@@ -1,0 +1,24 @@
+
+[package]
+autobins = false
+name = "pancake-sanitizer-boundary-probe"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+
+[dependencies]
+pancake = { path = "/work/pancake" }
+cubecl = { version = "=0.11.4", default-features = false, features = ["std", "stdlib", "cpu", "wgpu"] }
+
+[profile]
+release = { overflow-checks = true, lto = "thin", codegen-units = 1 }
+test = { overflow-checks = true, debug-assertions = true }
+
+[patch]
+crates-io = { cubecl-core = { path = "/work/pancake/vendor/cubecl-core-0.11.4" }, cubecl-macros = { path = "/work/pancake/vendor/cubecl-macros-0.11.4" }, cubecl-std = { path = "/work/pancake/vendor/cubecl-std-0.11.4" }, cubecl-cpp = { path = "/work/pancake/vendor/cubecl-cpp-0.11.4" }, cubecl-hip = { path = "/work/pancake/vendor/cubecl-hip-0.11.4" }, cubecl-spirv = { path = "/work/pancake/vendor/cubecl-spirv-0.11.4" }, spin_on = { path = "/work/pancake/vendor/spin_on-0.1.1" } }
+
+[[test]]
+name = "device-probe"
+path = "src/main.rs"
+harness = false

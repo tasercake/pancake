@@ -1,0 +1,21 @@
+native_exit=0 asan_exit=1
+vkCreateInstance=0
+adapter=NVIDIA GeForce RTX 3090 vendor=0x10de
+vkCreateDevice=0
+vkCreateInstance=0
+adapter=NVIDIA GeForce RTX 3090 vendor=0x10de
+vkCreateDevice=0
+
+=================================================================
+==29478==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x7e8c4d4a93b7 in __interceptor_calloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:77
+    #1 0x7e8c4b7d21e9  (<unknown module>)
+
+Indirect leak of 144 byte(s) in 1 object(s) allocated from:
+    #0 0x7e8c4d4a93b7 in __interceptor_calloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:77
+    #1 0x7e8c4c3dd6dd  (<unknown module>)
+    #2 0x447265646e65722e  (<unknown module>)
+
+SUMMARY: AddressSanitizer: 184 byte(s) leaked in 2 allocation(s).
