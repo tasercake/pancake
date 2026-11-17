@@ -1,0 +1,17 @@
+//! Qualification of unchanged Pancake image kernel on native CUDA.
+use slint as _;
+use wgpu as _;
+
+/// Full-range and odd-width values use the same image definition as CPU/wgpu.
+#[test]
+fn native_cuda_blur_matches_independent_values() -> Result<(), String> {
+    let device = cubecl::Device::cuda(0).map_err(|error| error.to_string())?;
+    let input = [0, 4, 8, 12, 16, 65_535, 65_535, 0, 1, 65_534, 1, 2, 3, 4, 5];
+    let expected = [1, 4, 8, 12, 15, 65_535, 49_151, 16_384, 16_384, 49_150, 1, 2, 3, 4, 4];
+    assert_eq!(pancake::blur_horizontal_u16(&device, 5, 3, &input)?, expected);
+    assert_eq!(pancake::blur_horizontal_u16(&device, 1, 3, &[0, 32_768, 65_535])?, [0, 32_768, 65_535]);
+    let constant = vec![65_535; 771];
+    assert_eq!(pancake::blur_horizontal_u16(&device, 257, 3, &constant)?, constant);
+    std::fs::write("target/p0-native-cuda.txt", format!("{:#?}\n", device.client().properties().identity)).map_err(|error| error.to_string())?;
+    Ok(())
+}

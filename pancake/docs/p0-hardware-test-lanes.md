@@ -110,5 +110,12 @@ worktrees. Existing unrelated containers, applications and VMs remain untouched.
 Host PCI inventory exposes one GPU: NVIDIA RTX 3090. Vulkan also reports a
 software llvmpipe adapter; it is not AMD/Intel GPU evidence. Existing libvirt
 inventory has no VM. No AMD GPU, Intel GPU, Windows or macOS guest login lane has
-been established. User confirmed no AMD/Intel/Windows test hosts or runners while independent
+been established by that Linux check. The later dedicated guest qualification
+supersedes only the SSH/Aqua access gap, not current AX/Automation identity. User confirmed no AMD/Intel/Windows test hosts or runners while independent
 work continued; P0.02 remains blocked. These conditions cannot be removed by dependency exceptions.
+
+Dedicated guest access is now verified separately in
+[p0-guest-access-qualification.md](p0-guest-access-qualification.md). The suite-managed
+key exists in its cache even though the descriptor-specific `~/.ssh` path was
+absent. This closes SSH/Aqua access only; current native permission identity and
+actual Pancake GUI remain unqualified.

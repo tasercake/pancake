@@ -15,7 +15,14 @@ Date: 2026-11-17. Integration worktree: `codex/p0-unblock`.
 
 [Dependency policy](dependency-policy.md) defines the enforced exceptions;
 [upstream patch review](p0-upstream-patch-review.md) records source provenance.
-The runtime report records final strict executable assurance results.
+The [kernel report](p0-kernel-qualification.md) records strict executable assurance.
+Integrated `bash scripts/check.sh all` passed on macOS: 6 debug/release tests,
+62/62 lines, 7/7 functions, 66/66 regions, 8/8 branches, 35/35 mutants caught,
+3 strict host Miri tests and both native layout seeds.
+[Linux GPU ASan remains failed](p0-sanitizer-investigation.md); no sanitizer
+exception, suppression or test split was applied. Rowan also needed a narrow
+explicit-layout patch; its pre-existing upstream ARC Miri limitation is recorded
+separately and its unsafe implementation remains unchanged.
 
 ## Real runtime evidence
 
@@ -34,16 +41,20 @@ Runtime selection changes device/compiler, not kernel source.
 | wgpu Vulkan | NVIDIA RTX 3090, discrete GPU | Exact values pass; software fallback rejected. |
 | Native CUDA | NVIDIA RTX 3090, CUDA 12.5/driver 580.178.04 | Exact values, borders and tail pass; `ptx_sm86`. Missing-runtime negative test fails as required before enabling `cubecl/cuda`. |
 
-These rows qualify one primitive. They do not pass the full kernel battery,
-registration, five-method, memory or performance gates. Final source and lock
-hashes must accompany the post-integration reruns; earlier snapshots remain
-separate probe evidence.
-
 ## Corpus and decoder evidence
 
-The independent codec workstream investigates safe RAW bindings, Rawler,
-RGB16 PNG/TIFF, float TIFF/EXR and color transforms. Its findings must not be
-promoted into full RAW render or dimension parity without the documented checks.
+The [codec probe](p0-codec-qualification.md) proves full sensor decode against
+LibRaw, real Bayer DNG, RGB16 PNG/ZIP TIFF and float TIFF/EXR roundtrips. Identical
+ICC bytes bypass color conversion without losing a bit; a real transform matches
+system LCMS. Rawler recommended crop differs from LibRaw visible output on R50,
+so RAW rendering/geometry parity remains blocked. The combined production graph
+and the remaining file/error/resource cases are still unqualified.
+
+The [dedicated macOS guest](p0-guest-access-qualification.md) now supports SSH
+and an Aqua session through the existing managed key. Current AX/Automation
+identity is still unqualified. The task guest was stopped; the unrelated guest
+was left running. Linux task container is retained stopped with tools/cache for
+reproduction; no host package, driver, permission or desktop setting changed.
 
 ## Conditions still required
 
