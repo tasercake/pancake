@@ -1064,5 +1064,39 @@
       "other_requirement": "zvariant ^5.14.0 and zbus_names ^4.3.4",
       "reason": "Unmaintained split crates remain in the declared major ranges; migration to zbus6 cannot be selected by compatible patch resolution."
     }
-  ]
+  ],
+  "existing_remote_hardware": {
+    "date": "2026-11-17",
+    "status": "access_passed_runtime_unqualified",
+    "endpoint": "krishna-desktop",
+    "discovery": "Previously used authorized SSH hostname; independently verified now.",
+    "probe": {
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=8",
+        "-o",
+        "ConnectionAttempts=1",
+        "-o",
+        "NumberOfPasswordPrompts=0",
+        "krishna-desktop",
+        "hostname; uname -srm; if command -v nvidia-smi >/dev/null 2>&1; then nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader; fi"
+      ],
+      "exit_code": 0,
+      "hostname": "krishna-desktop",
+      "os_arch": "Linux 6.8.0-147-generic x86_64",
+      "gpu": "NVIDIA GeForce RTX 3090",
+      "driver_version": "580.178.04",
+      "gpu_memory_mib": 24576
+    },
+    "not_proven": [
+      "CUDA/LLVM build toolchains",
+      "CubeCL CUDA execution",
+      "wgpu device/driver qualification",
+      "isolated native GUI test access",
+      "all other hardware/runtime combinations"
+    ]
+  }
 }
