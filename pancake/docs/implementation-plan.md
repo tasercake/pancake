@@ -107,7 +107,7 @@ It does not implement the full application before implementation starts.
 | Earlier blocker | Required architectural proof in P0 | Required later acceptance |
 |---|---|---|
 | Linux GPU ASan | Actual CPU ASan/TSan on all owned host source; CPU/native source-universe coverage guard; mandatory real GPU tests. Preserve explicit GPU-sanitizer follow-up, with no suppression. | P9: investigate CubeCL/driver GPU ASan failure and final integrated regression. No GPU sanitizer pass is claimed before one exists. |
-| RAW compatibility / T50 | Safe full Bayer DNG development and genuine RGB16 output; selected crop/color policy; real codec precision APIs. | P2: proprietary-camera crop/render parity, all file/error/orientation cases, and acquire/hash-freeze T50 before matched comparisons. P10: complete unchanged numeric/quality protocol, with generated T50 labelled and other corpora real. |
+| RAW compatibility / T50 | Safe full Bayer DNG development and genuine RGB16 output; selected crop/color policy; real codec precision APIs. | P2: proprietary-camera crop/render parity, all file/error/orientation cases, and regenerate/hash-verify the frozen T50 recipe before matched comparisons. P10: complete unchanged numeric/quality protocol, with generated T50 labelled and other corpora real. |
 | Complete numerical/UI/lifecycle/performance slices | Real blur and stable f32 reduction, u16 precision, shape/budget errors, resource reuse; safe shared Slint/wgpu handles; actual native input/pixels and responsive cancellable reusable worker. | P3–P5: all methods/registration; P6–P8: full job/UI/lifecycle; P9: packages/full suite; P10: final speed/memory/latency targets. Start timing the first complete pipeline. |
 
 ### T50 input policy — later user instruction
@@ -136,7 +136,7 @@ Every PASS needs source/lock/device provenance, commands and a real result in th
 | Gate, in order | Architectural minimum / progress | Later requirement or reopening condition |
 |---|---|---|
 | **P0.02 — access** | **PASS.** Apple CPU/GPU and Linux NVIDIA CPU/GPU reachable; private Linux Xvfb/AT-SPI can use physical GPU. Dedicated macOS guest SSH/Aqua route qualified. | P7/P9: current guest application AX/Automation identity, full workflows and packages. Never use host desktop input. New required hardware reopens access. |
-| **P0.03 — foundation and builds** | **PASS build minimum; CI setup fixes in progress.** Slint 1.19, CubeCL 0.11.4, wgpu 30.0.2; selected safe codec/RAW/color APIs; available native runtime builds. Combined graph resolves, metadata only. Actual Windows MSVC all-target build/link and Linux HIP build pass; receipts in work log. | P2: actual combined consumer build/audit; P9: packaged native dependencies/signing. A missing critical API or incompatible graph reopens P0. |
+| **P0.03 — foundation and builds** | **PASS.** Slint 1.19, CubeCL 0.11.4, wgpu 30.0.2; selected safe codec/RAW/color APIs; available native runtime builds. Combined graph resolves, metadata only. Actual Windows MSVC all-target build/link and Linux HIP build pass; receipts in work log. | P2: actual combined consumer build/audit; P9: packaged native dependencies/signing. A missing critical API or incompatible graph reopens P0. |
 | **P0.04 — safe launch/resources** | **PASS.** Safe typed handles and checked launch under authored unsafe-forbid; nonzero/length/overflow validation, pre-runtime byte budgets, recoverable readback failures and repeated-job ownership tests. | P2/P3: dtype/decoder bounds and tile halos as consumers appear. New unsafe or unbounded ownership requires review. |
 | **P0.05 — assurance** | **PASS for current production root library.** Strict CPU/native zero-uncovered-source comparison, mutation/branch/layout/Miri gates and actual Linux CPU ASan/TSan pass. Standalone UI/codec source has separate qualification, not full source-coverage/sanitizer approval. Physical GPU tests remain mandatory. | P9: external GPU-ASan investigation and complete integrated assurance. No ignored test, sanitizer suppression or production-source exclusion. |
 | **P0.06 — portable execution** | **PASS.** Same u16 blur and new centered f32 variance/budget/reuse oracle pass ARM64/x86 CPU, wgpu Metal/Vulkan and native Metal/CUDA. HIP compiles/links without execution. | P3–P5: full primitive/method battery. GPU software adapters cannot satisfy physical execution. Runtime/backend changes reopen qualification. |
@@ -402,7 +402,7 @@ not dispatch. Bound scratch, decoded lookahead, and preview/result caches by
 bytes; use lossless spill when needed. Spatial tiling needs correct halos and
 is distinct from frame slabbing. Fix targets in P0.01 and prove performance and
 resource mechanisms in P0.04/.07. Begin complete-job measurement at the first
-working pipeline; P10 owns final acceptance on the integrated application. Compare real RAW/TIFF stacks and peak memory;
+working pipeline; P10 owns final acceptance on the integrated application. Compare generated T50 scale inputs and real R50/D150/E9 stacks with peak memory;
 do not double-count Apple unified memory as independent CPU/GPU physical pools.
 
 ## 11. Sources

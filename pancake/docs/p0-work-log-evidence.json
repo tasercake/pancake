@@ -1,12 +1,38 @@
 {
   "schema_version": 1,
   "date": "2026-11-17",
-  "scope": "P0 source and retained evidence; plan/work-log/self omitted to avoid recursive hashing. Photos, large binaries and ignored compiler caches are not committed. New receipts append before closure.",
+  "scope": "P0 source and retained evidence, including historical failures; plan/work-log/self omitted to avoid recursive hashing. Photos, large binaries and compiler caches not committed. Final source/lock equivalence recorded separately.",
+  "file_count": 316,
   "files": [
     {
       "path": ".github/workflows/pancake.yml",
-      "bytes": 4356,
-      "sha256": "13bcf3c92fa8e02e945d844302ce1c99430ff4dfc853337d766b4f807d382c50"
+      "bytes": 4628,
+      "sha256": "e0542b1c109e925ed8b6e6ad21625483563c24c05043525728f3704f182c03f4"
+    },
+    {
+      "path": "pancake/.cargo/config.toml",
+      "bytes": 209,
+      "sha256": "9c2e6a6c88b24725f0eae28d1c6d87de8ea8c4bffa9971cf4284c209cefcbc07"
+    },
+    {
+      "path": "pancake/.config/nextest.toml",
+      "bytes": 306,
+      "sha256": "c53b6c83d095bfb7551b98c232ca3591744c870d577921f40db952185fbd2fa2"
+    },
+    {
+      "path": "pancake/.githooks/pre-commit",
+      "bytes": 609,
+      "sha256": "ae819de69d9d61515483bc740443f1118c4bbbbf3bc5ae4bd2a28d1b07f39cd3"
+    },
+    {
+      "path": "pancake/.githooks/pre-push",
+      "bytes": 1082,
+      "sha256": "f8516d43295693b513ce6108c0f55830edcd5154ebd9eb76b513336dceae8ec7"
+    },
+    {
+      "path": "pancake/AGENTS.md",
+      "bytes": 2045,
+      "sha256": "805efc2a6a29587ae1d9fc3fb51b22dd81079d47b35c79bb4f439cfd60d78ecb"
     },
     {
       "path": "pancake/Cargo.lock",
@@ -17,6 +43,16 @@
       "path": "pancake/Cargo.toml",
       "bytes": 3881,
       "sha256": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649"
+    },
+    {
+      "path": "pancake/README.md",
+      "bytes": 5034,
+      "sha256": "c7d123cda300885eb1fdea09b5c746265e6b926ffd2c309a7855541bff6510de"
+    },
+    {
+      "path": "pancake/assurance-platforms.json",
+      "bytes": 1090,
+      "sha256": "4d396fb9ee1fef4b3e60bdc0ceb243ea4a1bc51ca1ed5768aeba5c5a3b9e2981"
     },
     {
       "path": "pancake/clippy.toml",
@@ -34,14 +70,304 @@
       "sha256": "02ce3ddfb5d9e24be0064d3f87f0c87166140d657ef771127351165e5b9734dc"
     },
     {
+      "path": "pancake/docs/dependency-policy.md",
+      "bytes": 10157,
+      "sha256": "5244b7518bed999e9649ab21f595b35ca6def2ac9b8061f6613865f1fbd3efb2"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/actionlint-macos-arm64.log",
+      "bytes": 96,
+      "sha256": "2f40fa9e505771c4dd7ff4b6ed601e587f52744935b72906e55b21a9a7c1ce1b"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/cpu-mutants-complete.tar.gz",
+      "bytes": 4133123,
+      "sha256": "4305b94a1d8c5a1e368d5335326c7569e8d6e82cc192e0c9d7ae89d6abe366d9"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/cpu-mutants-outcomes.json",
+      "bytes": 161711,
+      "sha256": "3ac5457d2e28fe4d90bc15c52d6a2646d40b1cb116cc3b8045883535ab72f4bb"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/cpu-mutants-receipt.json",
+      "bytes": 791,
+      "sha256": "986b2c4089c98daa34e7d46b1389c5259775638bed59688469e056d99a483893"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/cpu-mutants.log.gz",
+      "bytes": 105,
+      "sha256": "a281cdfc901ecd642c0c489dab3ffcc6ad963ef13159e771aba5e2067a1d7509"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/gpu-setup-negative.log.gz",
+      "bytes": 532,
+      "sha256": "b88ac7933d456efca98c5653fe2075f14d8a779ee5cf489881e3ca7e524e13d4"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/manifest.json",
+      "bytes": 3144,
+      "sha256": "48894772bc5f83632de44fb4cc5c60eb32b2ef31d861ce4691b0b8200c8f1ecb"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/native-deps-host-refused.log",
+      "bytes": 71,
+      "sha256": "d89a5dfc8d6caaa48cffa1e5690a14112014d123a15dbc526dd45e4ce640a1da"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/red-asan.log.gz",
+      "bytes": 18972,
+      "sha256": "6eb691a07c6ec8233a2c1f4e9acde246560f6c8525395caa6d6d9e20d969a351"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/red-assurance.log.gz",
+      "bytes": 20288,
+      "sha256": "79318e24fe4224f5fa342db2881e6e00304797cd25d8a1a7e814f91047d6372d"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/red-macos.log.gz",
+      "bytes": 5186,
+      "sha256": "d4a2ce326d2d1ef57585269317ad3a40e9ee8328efc5fe48d955ef14d5db62e1"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/red-nightly.log.gz",
+      "bytes": 19405,
+      "sha256": "ebc7444aa293e1f4ddc052596f91edac76677862c58bf9b253fdeddd251451f0"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/red-tsan.log.gz",
+      "bytes": 18977,
+      "sha256": "c81f1195928ad4923b36a0717c6699501e074ab8ff345076581ad8d64778b80b"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/red-ubuntu-platform.log.gz",
+      "bytes": 5764,
+      "sha256": "eba35e7df1825f46344dd1d82398359147725e2cee73d0a5719d209119d599e8"
+    },
+    {
+      "path": "pancake/docs/p0-ci-evidence/run-cpu-mutants.py.txt",
+      "bytes": 2802,
+      "sha256": "f012ee5b8cbc77398458beb91c26bff82e86d48770b731af37a6118a821e6a6d"
+    },
+    {
+      "path": "pancake/docs/p0-ci-setup-fix.md",
+      "bytes": 3908,
+      "sha256": "438d1beafc5c1d661ecc4051cefa240729f1120d7d78a18feb3a59d382987c2f"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/branches-cpu.json.gz",
+      "bytes": 7983,
+      "sha256": "88e1b4be60b7c5b977746903f0c2c3e613dbd36b70923690fce8bc97e12ea799"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/branches-native.json.gz",
+      "bytes": 6954,
+      "sha256": "f142d2561c8987e6fd66d14de3593da8aaecc96f1ea8d296bf0bdbedf2c4af13"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-final/134112489077.log.gz",
+      "bytes": 24639,
+      "sha256": "ec8d65ea2f4da85e1fee84462a709a45ec5cddf741cc467200e5445ba7d34ac6"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-final/134112489381.log.gz",
+      "bytes": 18184,
+      "sha256": "fbd9c7db5493b7ab36720f4cfb77db12d2cdf2520c857e1c4e5b24e8e6bf4492"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-final/134112489545.log.gz",
+      "bytes": 32767,
+      "sha256": "3d97ec9b13f17f73cb8eb59b0f3b9122d347eb3e3912e74f2c76fe7ef010b5e9"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-final/134112489560.log.gz",
+      "bytes": 31914,
+      "sha256": "ec0fdc6846b14069fa7fc6d16ada14f42ebb4b2e80a59f07522eafb5021372b1"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-final/134112489591.log.gz",
+      "bytes": 24323,
+      "sha256": "7263a7e932554cf847a721094178cf009b0d406c5221dcac160df81c86e9ea9f"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-final/134112489636.log.gz",
+      "bytes": 38251,
+      "sha256": "2bda6e5a4c87c596b8bacce02a4f6c6152b525eb3e3f0a45cb9f0b181bf9dc90"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-final/134112489805.log.gz",
+      "bytes": 52989,
+      "sha256": "e950d376ce8f5c3a1fa2ac865ddd1f9d3d52eb44abfec9e3538c720263b59840"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-final/134129550068.log.gz",
+      "bytes": 928,
+      "sha256": "8cc38819d9795490f6b22f9b51ec9f8d965f64978aed0d9665eb0fcfa5c69616"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-final/receipt.json",
+      "bytes": 11462,
+      "sha256": "a84970bb7c2bfef4f17535c0afe5b6639e9fa312304c59af38cfdd8daff8e65a"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-second/jobs.json",
+      "bytes": 2456,
+      "sha256": "bdddaac632b43bd4fa7a5a91d408a6199b88af9d01366a7eee010fec9ac9e9cc"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-second/platform-macos-15.log.gz",
+      "bytes": 31824,
+      "sha256": "9b6bb5bac139efa058bc80f7ca5dedce9ce18d8dff4aeffee3119b4fa08c28b0"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-second/platform-ubuntu-24.04.log.gz",
+      "bytes": 38102,
+      "sha256": "17f1c303b83f3c4f5e79804644e98bf76dc1e9a5832e6942ac0b7819adebfd8c"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-second/sanitizer-address.log.gz",
+      "bytes": 24374,
+      "sha256": "45808dcbcdca2fe58261b32e3b92692d22b01f3c3a3dddc6e04b277b10fa0c4b"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-second/sanitizer-thread.log.gz",
+      "bytes": 24323,
+      "sha256": "4116b8208fd349260353df098ff205a155cd3a83c8c12632b76ab4bde003f410"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/ci-second/windows-msvc-build-and-link.log.gz",
+      "bytes": 18249,
+      "sha256": "e2e2011af830725a3b55e2626f87699cc70a841b9f1b513e2e36df29beb8c8ab"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/closure-branches-cpu.json.gz",
+      "bytes": 7983,
+      "sha256": "88e1b4be60b7c5b977746903f0c2c3e613dbd36b70923690fce8bc97e12ea799"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/closure-branches-native.json.gz",
+      "bytes": 6954,
+      "sha256": "f142d2561c8987e6fd66d14de3593da8aaecc96f1ea8d296bf0bdbedf2c4af13"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/closure-coverage-cpu.json.gz",
+      "bytes": 6105,
+      "sha256": "8d19a554dd3075e79115abd6e88239e7784797abc89a6625b3b8a40bee5369e0"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/closure-coverage-native.json.gz",
+      "bytes": 6691,
+      "sha256": "ab2aff3b03ea5b3c4a7c179f287780b299299b7466b35c20a02a9b880b2e0a9c"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/closure-local-aggregate.json",
+      "bytes": 5572,
+      "sha256": "f4d5ffb62ac9a13ff94092702e347434c95116759c04b00d1c51f1ed7b355182"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/closure-local-all.log.gz",
+      "bytes": 2828,
+      "sha256": "b6dd8ce3eabdbf087dd4933b1f6a15af5e9cdfa1e955ab0ab18c4ca9a62126e3"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/closure-mutation-outcomes.json.gz",
+      "bytes": 4710,
+      "sha256": "31eec4efc6d5a2791d943186385134cac3dd266081d0fe6ff7bbba81cb063bb8"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/closure.json",
+      "bytes": 4548,
+      "sha256": "692545d3d6d2f0309ba9474587c70a26a4cbe460371801250774de6169146f37"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/container-final-state.json",
+      "bytes": 754,
+      "sha256": "3edd05f4cb860970060fb2ca2d33a3f94a99e61412d9f69a4e2e34f917ea833e"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/coverage-cpu.json.gz",
+      "bytes": 6105,
+      "sha256": "8d19a554dd3075e79115abd6e88239e7784797abc89a6625b3b8a40bee5369e0"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/coverage-native.json.gz",
+      "bytes": 6691,
+      "sha256": "ab2aff3b03ea5b3c4a7c179f287780b299299b7466b35c20a02a9b880b2e0a9c"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/final-branches-cpu.json.gz",
+      "bytes": 7983,
+      "sha256": "88e1b4be60b7c5b977746903f0c2c3e613dbd36b70923690fce8bc97e12ea799"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/final-branches-native.json.gz",
+      "bytes": 6954,
+      "sha256": "f142d2561c8987e6fd66d14de3593da8aaecc96f1ea8d296bf0bdbedf2c4af13"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/final-coverage-cpu.json.gz",
+      "bytes": 6105,
+      "sha256": "8d19a554dd3075e79115abd6e88239e7784797abc89a6625b3b8a40bee5369e0"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/final-coverage-native.json.gz",
+      "bytes": 6691,
+      "sha256": "ab2aff3b03ea5b3c4a7c179f287780b299299b7466b35c20a02a9b880b2e0a9c"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/final-mutation-outcomes.json.gz",
+      "bytes": 4740,
+      "sha256": "6cdc0f4c3f22258ef6058debf9391804a0b9188218f11d7970e57250d99b9611"
+    },
+    {
       "path": "pancake/docs/p0-close-evidence/initial-aggregate.json",
       "bytes": 2721,
       "sha256": "693f33684dde119d8420181c852ddf4b648fcae4d0fef7af24ef64247e715a4f"
     },
     {
+      "path": "pancake/docs/p0-close-evidence/local-aggregate.json",
+      "bytes": 5484,
+      "sha256": "99794bd9caa0bea76e388dc39e4544ae262fbadfbbb94832599c994010dbcad6"
+    },
+    {
       "path": "pancake/docs/p0-close-evidence/local-all-before-bash-fix.log.gz",
       "bytes": 2305,
       "sha256": "fd466d276987680dc544f59dc649db2dcf97d3e6c5a1e7cc3fc8c8b3ba0119ba"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/local-all-passed.log.gz",
+      "bytes": 3043,
+      "sha256": "247d1d5040aa76a7a3c7b018415c2c67bb68e8c9cabee516511221149106b6c9"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/local-final-aggregate.json",
+      "bytes": 5433,
+      "sha256": "e518f0bd783b4ecd27e8d6804ac142a8b7d797c0b778b7b48e4657970cb470ff"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/local-final-all.log.gz",
+      "bytes": 2691,
+      "sha256": "2e373badfe8763454642da6ef67eee108d5ced7d9b8412b95eb86c471a9cab83"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/mutation-outcomes.json.gz",
+      "bytes": 4741,
+      "sha256": "af819e7195eb2e3855eccf409bb4b642933c81982272b117181c4a2d38910341"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/tested-source-equivalence.json",
+      "bytes": 93130,
+      "sha256": "6bda4c2bdf7d9362ca3551ef8cf565ff8fb575c90b67dd6c1b4fcf3f0a92643f"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/windows-msvc-build.json",
+      "bytes": 792,
+      "sha256": "f7c3df71d3e7a8eb9a616559c8788934be608ee0549a3c131fec5656db8cf509"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/windows-msvc-build.log.gz",
+      "bytes": 18249,
+      "sha256": "b53f175b2d8bab8ffe448a27c511c075608ae96ed6feae3edaa9569b57ddb7dd"
     },
     {
       "path": "pancake/docs/p0-codec-evidence.json",
@@ -105,13 +431,153 @@
     },
     {
       "path": "pancake/docs/p0-historical-viewer-evidence/provenance.json",
-      "bytes": 4188,
-      "sha256": "ad06e88b9008f2382fe989dbcf87f4b0d4a3dbb3436f0f688c98fc846721de6e"
+      "bytes": 4080,
+      "sha256": "19cda1a4b0898b6d03178e77d4044d13890f543e7f0a0034ca3ff0c245067bb8"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-1.json",
+      "bytes": 5682,
+      "sha256": "f2a7e23079df6fcf6b4d2fa11cc0822b8f893db90edc7ee4fedfbf010284f754"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-1.stderr",
+      "bytes": 777,
+      "sha256": "31d1dea0dacc0d3fb07b03c02f137ad7db8313ec7bf8176ad08e4e8c579000cf"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-2.json",
+      "bytes": 5693,
+      "sha256": "d956239b68778759f8fd9d78e285852261037e3ba6f8501f06aa3577c3fe5e75"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-2.stderr",
+      "bytes": 777,
+      "sha256": "d0ed586009c5d5a8123a4288ef12ce0134234ec5268d15bef89dbf4aef1f9585"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-3.json",
+      "bytes": 5869,
+      "sha256": "d497f051265e0c5d7e8288c184477c1cc413ab5c3d6bba8c9c11732b09f09134"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-3.stderr",
+      "bytes": 777,
+      "sha256": "816e26e7e508b2d5506107e6315d9327217a4d770a1c0dcd5bcda6a5e6d7fb98"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-4.json",
+      "bytes": 5830,
+      "sha256": "ab854979844b309fac8f1fdd3b4cc3528583efb67f7c5dc16b338422f71a4f3e"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-4.stderr",
+      "bytes": 777,
+      "sha256": "3d78e56ca5448fef8198324e71ea76d732018cea1460b4954bb954a1ea8bf292"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-5.json",
+      "bytes": 5706,
+      "sha256": "20e144df48a95465c6e61cf32cd19bc8eb8618a4dbae714fff6cac0e63e05c08"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/benchmark-5.stderr",
+      "bytes": 777,
+      "sha256": "9e0bc94ddcc72aaf0af2cd71928cc2f32dfda45fc760b92f5ef1e1d8d4ff335b"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/gui-24mp-samples.json",
+      "bytes": 2526,
+      "sha256": "2496ed55f206766b1867a6a01965b7b4f856d7b75611fa90ea33d5b010ae7be5"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/gui-24mp.stderr",
+      "bytes": 857,
+      "sha256": "60bdfb1dc033159c3125b6a9fefb6f1cde25a3ecbba32b73c4efbb10aa937b10"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/gui-24mp/after.png",
+      "bytes": 159129,
+      "sha256": "e7f429af0d48b1a3e70d4ce9dad7b0ea764cebe33aad9d642022416e6acf0a00"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/gui-24mp/before.png",
+      "bytes": 157689,
+      "sha256": "9c9a9bc3c2564d405de8c6cb50d8bae9de30f361fd71c88a7985ac4a353a2f69"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/audit/gui-24mp/render-smoke.json",
+      "bytes": 245,
+      "sha256": "c4e1082248f8b70e47befe0739da0bc19d1461cf8ea260307a4d5bdc30cd6c5b"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/render-smoke/after.png",
+      "bytes": 527636,
+      "sha256": "1c545bde3c723edbde5dcd4eea48cc162272c1cfe504c7a9e35469fb74dfdaf7"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/render-smoke/before.png",
+      "bytes": 516861,
+      "sha256": "b3728db16110056a187237fa0f13bbf5d18f49f1593c03c216ed6ab6867e1ef5"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/raw/render-smoke/render-smoke.json",
+      "bytes": 245,
+      "sha256": "c4e1082248f8b70e47befe0739da0bc19d1461cf8ea260307a4d5bdc30cd6c5b"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/asan-final-shape-binaries.sha256",
+      "bytes": 519,
+      "sha256": "81c2d1d6ecc23bb975962901942e9be077e853ea4ed00f5dca1297ca2d8758ef"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/asan-final-shape-source.sha256",
+      "bytes": 408,
+      "sha256": "04ec135e8a3e2fc790a143af2e209072d7ac5946973b61421586b802fbda3efd"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/asan-final-shape.log.gz",
+      "bytes": 4141,
+      "sha256": "d243eed70ae5e919d4c01ac5415a6d7ff069d43c6f8b699b455e212bf81df148"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/linux-tsan-isolated.log",
+      "bytes": 1765,
+      "sha256": "52dab47eb27ab0e2b973931eef49b7f2a4ca0e33e0e7e94ceaedb71fd08c234a"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/receipt.json",
+      "bytes": 6692,
+      "sha256": "b2ce80d4f1954692cd33eb7ce34de9a7f407a3ece51d91b2bf77a0eb003020b9"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/tsan-closure-manifest.json",
+      "bytes": 2240,
+      "sha256": "6cfb48d32b52c10a29a8efeb1efd2dc74a60d55cf668437dbd4530c9a3ff1787"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/tsan-execution-receipt.json",
+      "bytes": 787,
+      "sha256": "eda3d5c120a1d1c7bc00927447f49a05f3fb3d9d0262e15932f9b90dfd970e45"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/tsan-final-privileged-exec.log.gz",
+      "bytes": 629,
+      "sha256": "cbb1b9a179ddd2af129b8f6f4410ae39a56861c8489814273dec28e718cba333"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/tsan-final.log.gz",
+      "bytes": 4071,
+      "sha256": "8c74ec4e544215c41f6bada87848529ceced3093290b6b28af6fdb4719c2b7de"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance-evidence/tsan-source-manifest.json",
+      "bytes": 1404,
+      "sha256": "1a7078f13ff2469038db617204f301110547f0b264ff778f0397dfb1a6188eaa"
     },
     {
       "path": "pancake/docs/p0-host-assurance.md",
-      "bytes": 4300,
-      "sha256": "aa98e60d14394d77d85c1b8ab0ac057547736331d385648b88a3969c7da9629c"
+      "bytes": 6264,
+      "sha256": "f06e24f88e74c563bb6e52e089cd5f706861145026289ff296037ccad56ec21a"
     },
     {
       "path": "pancake/docs/p0-kernel-evidence.json",
@@ -184,14 +650,194 @@
       "sha256": "b1169a6016ae62a9618ebd14205330e068d18a8a7b22342ff38465cab4dec87d"
     },
     {
+      "path": "pancake/docs/p0-macro-cold-index-evidence/all-vendor-contracts.log",
+      "bytes": 1167,
+      "sha256": "2a872bfab52d6a01cc68bb26a47c9dea3702b95d16ae841650ac38924eab2dac"
+    },
+    {
+      "path": "pancake/docs/p0-macro-cold-index-evidence/deps.log",
+      "bytes": 1607,
+      "sha256": "cf32272531beae33dfa2b1f0f95927fd7630a6bd5e21b0eab6070e603e09f646"
+    },
+    {
+      "path": "pancake/docs/p0-macro-cold-index-evidence/green-all-patches.log",
+      "bytes": 533,
+      "sha256": "0bed778278b4dfea823a7751eab0e0b2d68a86e2134c563d1d9e9d9f5c57c09f"
+    },
+    {
+      "path": "pancake/docs/p0-macro-cold-index-evidence/receipt.json",
+      "bytes": 2914,
+      "sha256": "7cf6272e724b6da2aaab028f62f7d77121a71ab80f9425797a098d79e93ec61f"
+    },
+    {
+      "path": "pancake/docs/p0-macro-cold-index-evidence/red-two-patches.log",
+      "bytes": 4154,
+      "sha256": "1e3110d5fcad6b215bae45c0f0e53f92fae6ed2396bcff7210cd37596b934bb8"
+    },
+    {
+      "path": "pancake/docs/p0-macro-cold-index.md",
+      "bytes": 1832,
+      "sha256": "b3f4a8c7050c1175d2da896849ca9555fcdde84a2eba9879a12ff8447e62e677"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-boundary.md",
+      "bytes": 4321,
+      "sha256": "d87f154e61051bc4440e366f2b890303ae06766269c83ca89e01aa1e23ed59ee"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-evidence/linux-local-obligation.log",
+      "bytes": 112,
+      "sha256": "255fd25f8e8d6bd6ca8db035d25be021ef9e5073fee2b9e4d7e72d807ce31f9e"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-evidence/linux-local-plan.txt",
+      "bytes": 60,
+      "sha256": "be7950f69d0c1284c01300543951d1f721cc28c5932f66adec559958bbd1ced1"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-evidence/linux-nightly-red.log.gz",
+      "bytes": 26405,
+      "sha256": "c48d7ebeaca9d0d2e9aef222eb0bb43610467ca23bd630a4b58d403366fe2b0f"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-evidence/macos-local-obligation.log",
+      "bytes": 54,
+      "sha256": "8426704b4e5f7905ecfc589e102694d510e06f23508594550fde9c6263f0a108"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-evidence/macos-local-plan.txt",
+      "bytes": 60,
+      "sha256": "7f78b0046a7fb1f85fe41e7796cd538d5cebe0fb32ab7dc0cc592956c42712f1"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-evidence/macos-miri.log.gz",
+      "bytes": 4173,
+      "sha256": "f9a1a5d6a1a827de1866594f60b0482c84832e359b20deba0a7d6e4e6d53632f"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-evidence/manifest.json",
+      "bytes": 2991,
+      "sha256": "8990e4952f65b6e2fd17cbc1a331b624c2fa9facb6eb120475f92bc6388a645a"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-evidence/policy-green.log",
+      "bytes": 102,
+      "sha256": "7b057eb92a50bb1f8d57fc3b9ddd0f11876e42732f607a548eb9dcecc13213a4"
+    },
+    {
+      "path": "pancake/docs/p0-miri-host-evidence/policy-red.log",
+      "bytes": 3942,
+      "sha256": "0e1ebb79ec24472e9e580d6b14791ab305af556b40c931bbb6ae0d729e02ceff"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/Cargo.lock.txt",
+      "bytes": 206874,
+      "sha256": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/Cargo.toml.txt",
+      "bytes": 3881,
+      "sha256": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/bounded-runner.py.txt",
+      "bytes": 2842,
+      "sha256": "d165f28de539f254b54e73de2ec16371321565923d0753269f202e266e08ca6f"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/evidence.json",
+      "bytes": 11860,
+      "sha256": "181948351e77857c27953d16595345825ab1f582459ec13554cad9dd7c04a09d"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/hip-compile-link.log.gz",
+      "bytes": 320,
+      "sha256": "83131afeb4b849725f0b9dab6b059c9d53f9a91dd7010331f154911e70a9ab1f"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/hip-linked-binary.txt",
+      "bytes": 870,
+      "sha256": "e95412acb1e2b164ea90c705e56e84f16654d633dc7ca74f72ec50e1fa6fcb5b"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/lib.rs.txt",
+      "bytes": 9662,
+      "sha256": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/native-cuda-device-memory.txt",
+      "bytes": 774,
+      "sha256": "64cc75892d97b0ecb5895bac3ffd69ac705079940783d0b23892c5726ddae30f"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/native-cuda-numerical-contract.rs.txt",
+      "bytes": 620,
+      "sha256": "d5b1ee2f750bb1935c67c0ac19c4d284b2388e43f69214929922a7f1d4684936"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/native-cuda.log.gz",
+      "bytes": 434,
+      "sha256": "b092b110c3314e6f7e6d0a8b0cc4a8de80e669914e012b0652111751ea2b9af3"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/native-metal-device-memory.txt",
+      "bytes": 635,
+      "sha256": "6d07bf7bd390431c99f30bea242fa91c69ca4eeb606e6edce657cba28fe80cd8"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/native-metal-numerical-contract.rs.txt",
+      "bytes": 641,
+      "sha256": "8384d7259f70475d10393a61561325c680d730aaac7c2569f301e06568fe49dc"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/native-metal.log.gz",
+      "bytes": 2254,
+      "sha256": "d1b9de61cde51ac6f75ce18bdf0ab96e223af36ee3692a68e5f21a41984fb74d"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/numerical_cases.rs.txt",
+      "bytes": 3593,
+      "sha256": "a50430ef9f27f034102e6b38c3ca05be2cd3c48f1deb893cb4285d031d1ca379"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/wgpu-vulkan-adapter.txt",
+      "bytes": 389,
+      "sha256": "027fd18492e0be95348bcaa4f4d8e7af7d55df486879872c38a44ef0e7314bad"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/wgpu-vulkan-blur.log.gz",
+      "bytes": 345,
+      "sha256": "75d87e60f9236e277f13d5eb54835d01b1f28d77656b7cfebaf4a7b6feda4098"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/wgpu-vulkan-core-adapter.txt",
+      "bytes": 539,
+      "sha256": "215fc032f14294dfd0e11527de20f442d9ed2a0527e7af96a1ef3b516e3d5c48"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/wgpu-vulkan-device-memory.txt",
+      "bytes": 775,
+      "sha256": "9accfdde39f52b6d23c7c9903abe4b5a1c485f6355f7c8aa7cc3c415b2b44080"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-evidence/wgpu-vulkan-numerical.log.gz",
+      "bytes": 398,
+      "sha256": "f9b947bc118ec63331ba8c9473bcdfa0b4be9e245b0e540d3eca46ec02511c6d"
+    },
+    {
+      "path": "pancake/docs/p0-numerical-qualification.md",
+      "bytes": 4803,
+      "sha256": "51e90a50406c65886c5ba9433c55313ddf208dd0065565e1ca0815f9517e6bd4"
+    },
+    {
       "path": "pancake/docs/p0-performance-baseline.md",
       "bytes": 10500,
       "sha256": "82741782dd4760ece97a10751c2ad2fb45ea307f1821b92df5054efa8a78aa62"
     },
     {
       "path": "pancake/docs/p0-performance-targets.md",
-      "bytes": 9274,
-      "sha256": "d59d3622bf4e47c7cc48c3502effe95a5fbe185b2cf4133d8b210adf5b34d713"
+      "bytes": 9959,
+      "sha256": "4965cfc1e6a89323f863cde343e3b0ca87a0a7fa14231a2f6ae3c795fb5389f3"
     },
     {
       "path": "pancake/docs/p0-raw-development-evidence.json",
@@ -309,9 +955,174 @@
       "sha256": "9f70f9bb9ef9c1800059750a99bbd3ef324804d213f0dae660b76faa28cd5f8d"
     },
     {
+      "path": "pancake/docs/p0-ui-evidence/after.png",
+      "bytes": 43301,
+      "sha256": "4eae74f359594819ddfac2b89fcdc3459546f00769df754bf0ec25e172bd0a22"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/before.png",
+      "bytes": 42818,
+      "sha256": "ce9443d218ca1bddec9a1052dc94fac02a50680aa4385e5231a50cf41af86441"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/checks.log",
+      "bytes": 2058,
+      "sha256": "673959cf76beee26e084706d6b6ab9cae98e2e81f2ef804eb690bcbc961813b8"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/macro-forbid-negative.log",
+      "bytes": 2254,
+      "sha256": "22aec369e5089475caff9af446c7878b45db1f65cb3cddfa9ffc2d729928b531"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/manifest.json",
+      "bytes": 7724,
+      "sha256": "119210eb3f456ebdde0c0b3da132f09d26a1e0c278897d085167eaa7b48dc714"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-build.log",
+      "bytes": 151,
+      "sha256": "4993efd24306c77a810c204dc1a5174dc306aa61179f9eb568584b0998d4b73b"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-close-desktop-desktop.log.gz",
+      "bytes": 371,
+      "sha256": "31d49506b2ad747020f65e66a95ab4efae97a8b183b48eb7ee11721ff1fb94d5"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-close-failure-tree.json.gz",
+      "bytes": 888,
+      "sha256": "16b6266f43a468a2816a9eac9e10d80bff5b9ad22717ded465ab13546a166ecf"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-close-shutdown.json.gz",
+      "bytes": 161,
+      "sha256": "c55fcaa170a7c5427f161eff0a2f9190610aab184721860a714ed67b6a63cd97"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-close-ui-actions.jsonl.gz",
+      "bytes": 3168,
+      "sha256": "d3b208fdeb2a5ac2309896f2b662ade6126492cdfb860a836f2c742cac27fd36"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-application.log.gz",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-close-application.log.gz",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-close-desktop-desktop.log.gz",
+      "bytes": 372,
+      "sha256": "c5f268e2d89389d86e09dd09ebcd3c22032ae8ab079f993c0df2a9ccd52894cb"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-close-result.json",
+      "bytes": 48943,
+      "sha256": "c8b154432699c72e8c491d014992a31e0ab58a7f271ab672f3d503603836bb40"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-close-shutdown.json",
+      "bytes": 78,
+      "sha256": "37f8086e7ddcf95d8f116b02b80c33012c282b5126de877fcbde46cbfda51e9c"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-close-ui-actions.jsonl.gz",
+      "bytes": 1817,
+      "sha256": "dba8d924acd850e0f8574114a04d8c4ee470a92ea5582ff11aeda60e8b8bf7fe"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-close-ui-driver.stderr.gz",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-desktop-desktop.log.gz",
+      "bytes": 372,
+      "sha256": "941e8583f15c39b7e6e4c5dacfaebcb1a68ce599d637172aeecbf49406093102"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-result.json",
+      "bytes": 48916,
+      "sha256": "4300c407f02bd5690e1ea3ea210165d2aa2020a7e99a7ec1b64380b5ff79d7c2"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-shutdown.json",
+      "bytes": 192,
+      "sha256": "cdd89336f48c4aeca678280b6c2aae41ba545fe48cb4f1372791a933d9692d85"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-ui-actions.jsonl.gz",
+      "bytes": 3068,
+      "sha256": "22946201127f3c8fd9e0d61ae8ca6d8ca47f8c5d283fdd279297fe6a9e1b3be7"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-final-ui-driver.stderr.gz",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-red-enabled-desktop-desktop.log.gz",
+      "bytes": 370,
+      "sha256": "8deb8cace52c2865fd10e3d9af2a84fe5f22648e16970e7c1cf60e9830e79dea"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-red-enabled-failure-tree.json.gz",
+      "bytes": 239,
+      "sha256": "55e8a925d540b9c748c3c8146f2a58f743fd6b3141784a51c5998912b73f10ce"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-red-enabled-shutdown.json.gz",
+      "bytes": 162,
+      "sha256": "68452b29b34ae0a8de77f1bda332b01bd87e3f08474ddfa56a93cdbc841d3d9e"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-red-enabled-ui-actions.jsonl.gz",
+      "bytes": 874,
+      "sha256": "c35e3ebc394174a17ba6cdb243b3d4cba383be46737df8beb5d4121dd024f294"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-shutdown-desktop-desktop.log.gz",
+      "bytes": 372,
+      "sha256": "b43293171984aa914aae3a6e2b756e858c66585468f6da2f0e6c07500bcd3fd1"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-shutdown-failure-tree.json.gz",
+      "bytes": 887,
+      "sha256": "c7158859372a26b038aa2d5b12b37266df16e1cf1c50611d31200ce8ed41587c"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-shutdown-negative.log",
+      "bytes": 1054,
+      "sha256": "2761655218ab014be5a18cd48d606eeb946da5c633b09245f25a28471695a43b"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-shutdown-shutdown.json.gz",
+      "bytes": 162,
+      "sha256": "0ca02e2b4445b41054b8cc5cc979067a50cb98da669bf6bcf02ad4a420e05099"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/native-shutdown-ui-actions.jsonl.gz",
+      "bytes": 3132,
+      "sha256": "f6a90f7b34e7c96539332a2e8972b6edb8fa97ef544676e295f6a9ac8ef759d8"
+    },
+    {
+      "path": "pancake/docs/p0-ui-evidence/remote-hashes.json",
+      "bytes": 1682,
+      "sha256": "f7105a98ebae9f79398dddb11973b0b4c9e2c7550d03e961ae89e1b9329fb47f"
+    },
+    {
+      "path": "pancake/docs/p0-ui-qualification.md",
+      "bytes": 9296,
+      "sha256": "58b0b18d445887ec14bb3769f094b450ddfeea9c12be94617c86dc1a720533c9"
+    },
+    {
       "path": "pancake/docs/p0-unblock-report.md",
-      "bytes": 8767,
-      "sha256": "9dc1a269df048d476d9478dc9a4f3cb828fd4a262eba856c49b2bfe4f9dfa25a"
+      "bytes": 8768,
+      "sha256": "f4ec9c4efed6f5678ebdf5d8ab75bc85091c5571f1e88bc9951c534736215ce4"
     },
     {
       "path": "pancake/docs/p0-upstream-patch-review.md",
@@ -320,8 +1131,18 @@
     },
     {
       "path": "pancake/docs/performance-targets.json",
-      "bytes": 12241,
-      "sha256": "2ba855b481d1df2852fd74ae61dfd9fb5e3da66e08bc78d60c9c848ac9e27cca"
+      "bytes": 14310,
+      "sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc"
+    },
+    {
+      "path": "pancake/rust-toolchain.toml",
+      "bytes": 109,
+      "sha256": "ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e"
+    },
+    {
+      "path": "pancake/rustfmt.toml",
+      "bytes": 113,
+      "sha256": "be590c9a6ba7bf592f702b7e77394d75898dc081fc7c8b23a9d78f36907ce8c5"
     },
     {
       "path": "pancake/scripts/assurance_targets.py",
@@ -335,13 +1156,18 @@
     },
     {
       "path": "pancake/scripts/check.sh",
-      "bytes": 11902,
-      "sha256": "b0ffc272bc460e28eb40b795ab849075339311cd0068eeea6d1bb63da08ae851"
+      "bytes": 12837,
+      "sha256": "534cf354661aff9ada4f21e492ed840b416eb448e673b096ef0c8ac2081800c6"
     },
     {
       "path": "pancake/scripts/check_unused_dependencies.py",
       "bytes": 1622,
       "sha256": "b78d9fbc2c8edb6142b6141a516d5e8c4102d0e4efbef3d21b234fbb24fc24f2"
+    },
+    {
+      "path": "pancake/scripts/ci-linux-native-deps.sh",
+      "bytes": 722,
+      "sha256": "c70e4602a52aabb9f6b8d8dc956de50a0d48b7b5540be544db3f38f1d27633b9"
     },
     {
       "path": "pancake/scripts/compare_assurance_coverage.py",
@@ -357,6 +1183,16 @@
       "path": "pancake/scripts/guardrail_manifest.py",
       "bytes": 1647,
       "sha256": "6ee57e067dba67c6c0484856d9ee9bcd3730eb8caa91214e7043c0554596dd47"
+    },
+    {
+      "path": "pancake/scripts/install-actionlint.sh",
+      "bytes": 2255,
+      "sha256": "102318b7992d467c11ccd3fd5ca5447604f4e3ece9994b001a2e17ea9a408516"
+    },
+    {
+      "path": "pancake/scripts/miri_host_policy.py",
+      "bytes": 3333,
+      "sha256": "0611a3ee9716fb3a44f05ea4c15be6f1f6c2ca4dc024158cb86d1daa2f509c7e"
     },
     {
       "path": "pancake/scripts/test-guardrails.sh",
@@ -382,6 +1218,11 @@
       "path": "pancake/scripts/test_guardrail_manifest.py",
       "bytes": 2181,
       "sha256": "74562509db4d0a2ef8083d109b75f27ec2fe7e2c30fff43e9b495836f832d42b"
+    },
+    {
+      "path": "pancake/scripts/test_miri_host_policy.py",
+      "bytes": 4064,
+      "sha256": "ee6a66a39001d9eeadc3e2d4693828e9c081dfae0d884a293d85fbe7b2a3e109"
     },
     {
       "path": "pancake/scripts/test_unused_dependencies.py",
@@ -440,8 +1281,8 @@
     },
     {
       "path": "pancake/vendor/tests/test_macro_expand_only.py",
-      "bytes": 2538,
-      "sha256": "d50003f2c010a2c6486cb56057ea365aa6d0881053e8e242284b3011f9d9c8f1"
+      "bytes": 4197,
+      "sha256": "2e3fcbfb8d25962dc9c3b672ef39b92383dca662cf8c4301fd614007241874c8"
     },
     {
       "path": "pancake/vendor/tests/test_patch_contracts.py",
@@ -502,7 +1343,166 @@
       "path": "qualification/p0-codecs/tests/qualification.rs",
       "bytes": 13891,
       "sha256": "8f11a92fba615c306e2aa50305849ab028c1f73d546be0971f0b1a772a0ec9fa"
+    },
+    {
+      "path": "qualification/p0-ui/Cargo.lock",
+      "bytes": 207931,
+      "sha256": "aecc5eec4fa8391e01b509e792633f593768d1072abdba87a75a6e34ad38aa82"
+    },
+    {
+      "path": "qualification/p0-ui/Cargo.toml",
+      "bytes": 4146,
+      "sha256": "99ab14bf3e825c7fe3d2f5ef9114269281c174672c6d12cef6d7e5ab8c12ff3d"
+    },
+    {
+      "path": "qualification/p0-ui/README.md",
+      "bytes": 2002,
+      "sha256": "c47c5651a0db0b2cdcfae64c3ab77075f6abf933f238a7d5b5324140429c1da6"
+    },
+    {
+      "path": "qualification/p0-ui/check-macro-negative.sh",
+      "bytes": 1510,
+      "sha256": "ab891508770a9a97dae3c59ac3ac33d6051c39bf17d9caf26154d18fb65b41e2"
+    },
+    {
+      "path": "qualification/p0-ui/check.sh",
+      "bytes": 1840,
+      "sha256": "c2f1d9842d9eb788972af3c98142a276b8442fbb648bb3e3d38369ea5a6382f5"
+    },
+    {
+      "path": "qualification/p0-ui/dependency-review.json",
+      "bytes": 1137,
+      "sha256": "6e7dab073b346b0d05fb14c9f83fcdb0a2ca3e7e21e9bd4632bcb07b249ebc31"
+    },
+    {
+      "path": "qualification/p0-ui/oracle.py",
+      "bytes": 6910,
+      "sha256": "3ce3459ff3bcb154bd171379896967d6ce0c484d82912d6a69a25c9800579677"
+    },
+    {
+      "path": "qualification/p0-ui/probes/macro_forbid.rs",
+      "bytes": 533,
+      "sha256": "db72e10060631552cdd3b9bfc48048477d4bf2a25a8b844025ab619b3f473721"
+    },
+    {
+      "path": "qualification/p0-ui/review.py",
+      "bytes": 1203,
+      "sha256": "1dc64956762f9b5d4b3cb5cc9733d422f29b8fbdfbc454a1a588cf542e72451c"
+    },
+    {
+      "path": "qualification/p0-ui/src/lib.rs",
+      "bytes": 6336,
+      "sha256": "1a8baaa0f220e7751c5f8a81082f102f7a3a568c360cda413a711ce544010a52"
+    },
+    {
+      "path": "qualification/p0-ui/src/main.rs",
+      "bytes": 12290,
+      "sha256": "1e0bbb74c6730a3fe345e9baed2332bcf8df3ded1eda1a1f7999efdedf88bc39"
+    },
+    {
+      "path": "qualification/p0-ui/src/qualification.slint",
+      "bytes": 2946,
+      "sha256": "abf120ad648358974b2383fdaa5da687ca91001b7c36d4c6a40eb58e03d815fa"
+    },
+    {
+      "path": "qualification/p0-ui/src/worker.rs",
+      "bytes": 9611,
+      "sha256": "9dc724f104c72863bf16725217194ba7d39c8d902b14c078cc6fbaa47f80c033"
+    },
+    {
+      "path": "qualification/t50-generated/README.md",
+      "bytes": 5367,
+      "sha256": "e6a89cff8446701df69984a2889625e3649d2d7c7176dab0fc106df6e24bf758"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/RESULTS.md",
+      "bytes": 4302,
+      "sha256": "e6066ebcf472bbbfa9ef9e977774b7a98b1e05dd82d3b8ac802ce3ab8ccf9293"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/environment.json",
+      "bytes": 361,
+      "sha256": "f0144147d401504f5afabb396be3d29cbb1879902d6891a6e66199a8f1717555"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/final-verification.json",
+      "bytes": 940,
+      "sha256": "46a90903addb98fa2a8189dffbfb1ce388b2c9bc4dd1cae647cccb1bb2292ca2"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/initial-cumulative-guard-stop.log",
+      "bytes": 2433,
+      "sha256": "00c6b2568501d1d290522f1887146ec324f69c2e9ac768ba3e0b864acdf1bc5a"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/initial-guard-stop.json",
+      "bytes": 593,
+      "sha256": "081899b4716de2d89ad5954c589ee505c4d3066e6c0e29f19c9c525fb7b755f9"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/native-run.log",
+      "bytes": 4572,
+      "sha256": "63674c331ad36ce6c6f88edc32d864d07b58c10b2ed11b7a22366d28c174b68d"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/native-t50-receipt.json",
+      "bytes": 476347,
+      "sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/render-red.log.gz",
+      "bytes": 916,
+      "sha256": "6a4126a415887c0e088a514424e26da834991c3a2c115712244bd046923b715e"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/retained-budget-red.log",
+      "bytes": 2527,
+      "sha256": "99a14c5d3383a4587c7b8d016296fffb1f5264fd21b197af5a5f13b01b6f8ca0"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/sequential-red.log",
+      "bytes": 2333,
+      "sha256": "8badb0e4b5876b8f60e973ecc05f60c4980e1410703b405efd40ac6fff3d3d3c"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/source-discovery.md",
+      "bytes": 1632,
+      "sha256": "b0d8998b78dfdfdda47b29ee7ad2cbf336a78c65eed02c30180b97ed55c831f3"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/storage-red.log.gz",
+      "bytes": 857,
+      "sha256": "bb84f644070f8c5cf27dfda75d43bad835d0caeba9ae1a123dc5a7f6a2770e0c"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/unit-final.log",
+      "bytes": 1829,
+      "sha256": "45a6bf9dc6b40547105ab1858b94ba61db5335c74816262a1d747ca9278934e1"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/unit-green.log",
+      "bytes": 1829,
+      "sha256": "6148b8fabd4a6f372b5294617769bd36e002ad661dff733406bd0c3c1873bf54"
+    },
+    {
+      "path": "qualification/t50-generated/requirements.txt",
+      "bytes": 124,
+      "sha256": "17137525dbaa7a35f62862502baebf76e39b6ed3c8b8f7ff5cd301a11d366b34"
+    },
+    {
+      "path": "qualification/t50-generated/t50_generated.py",
+      "bytes": 19789,
+      "sha256": "b23d81db7a2da5e96a618aac29209486d7e62eb5563610656c847c3a2b45a1fa"
+    },
+    {
+      "path": "qualification/t50-generated/t50_oracle.py",
+      "bytes": 1295,
+      "sha256": "02ef3f567e84e2e11459e3af0d642f867740de24125a29145c8500ed7b36a116"
+    },
+    {
+      "path": "qualification/t50-generated/test_t50_generated.py",
+      "bytes": 10256,
+      "sha256": "747f640dd0a8d855a0869acfdb3b7f8de1dec058371cd109ddbb030859ff57a0"
     }
-  ],
-  "file_count": 116
+  ]
 }

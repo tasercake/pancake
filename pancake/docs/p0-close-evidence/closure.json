@@ -1,0 +1,174 @@
+{
+  "date": "2026-11-17",
+  "status": "P0_ARCHITECTURAL_MINIMA_COMPLETE",
+  "scope": "Adopted smaller P0, not full product or release acceptance",
+  "gates": [
+    {
+      "gate": "P0.01",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.02",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.03",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.04",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.05",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.06",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.07",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.08",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.09",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.10",
+      "status": "transferred_acceptance",
+      "owner": "P3/P4 methods/slabs"
+    },
+    {
+      "gate": "P0.11",
+      "status": "transferred_acceptance",
+      "owner": "P5 registration/crop"
+    },
+    {
+      "gate": "P0.12",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.13",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.14",
+      "status": "transferred_acceptance",
+      "owner": "P8 full64-frame lifecycle;P10 latency sampling"
+    },
+    {
+      "gate": "P0.15",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    },
+    {
+      "gate": "P0.16",
+      "status": "transferred_acceptance",
+      "owner": "First complete pipeline/P10 performance acceptance"
+    },
+    {
+      "gate": "P0.17",
+      "status": "passed_architectural_minimum",
+      "owner": "P0; regressions remain mandatory"
+    }
+  ],
+  "tested_source_commit": "bc67159a3d4569c8f4cc789eaee41a3d877f35a1",
+  "required_ci_run": 44104336768,
+  "required_ci_conclusion": "success",
+  "all8_jobs_passed": true,
+  "source_equivalence": "tested-source-equivalence.json",
+  "production_rust_coverage": {
+    "lines": [
+      139,
+      139
+    ],
+    "functions": [
+      14,
+      14
+    ],
+    "regions": [
+      143,
+      143
+    ],
+    "branches": [
+      14,
+      14
+    ],
+    "scope": "current production root library; standalone qualifications separate"
+  },
+  "native_mutations": {
+    "caught": 79,
+    "missed": 0,
+    "timeouts": 0,
+    "unviable": 0
+  },
+  "cpu_mutations": {
+    "caught": 79,
+    "missed": 0,
+    "timeouts": 0,
+    "unviable": 0
+  },
+  "miri": {
+    "canonical_host": "macOS",
+    "tests_passed": 5,
+    "linux": "notclaimed;actualnative layouts/branches andASan/TSanrequired"
+  },
+  "linux_sanitizers": {
+    "address_tests_passed": 9,
+    "thread_tests_passed": 9
+  },
+  "physical_runtime_paths": [
+    "AppleARM64CPU",
+    "ApplewgpuMetal",
+    "ApplenativeMetal",
+    "Linuxx86CPU",
+    "NVIDIAwgpuVulkan",
+    "NVIDIAnativeCUDA"
+  ],
+  "retained_builds": {
+    "Windowsx86MSVC": "alltargetscompile/linkpass;notestsrun",
+    "LinuxHIP": "compile/linkpass;noexecution"
+  },
+  "best_effort_execution": [
+    "AMD GPU",
+    "Intel GPU",
+    "Windows"
+  ],
+  "contract": {
+    "version": 2,
+    "cases": 376,
+    "frozen_files": 90,
+    "outside_adapter_changes": 0
+  },
+  "generated_t50": {
+    "frames": 50,
+    "remaining_images": 0,
+    "download_bytes": 0,
+    "receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c"
+  },
+  "application_performance_pass": false,
+  "required_later_acceptance": [
+    "P2camera/files+generatedfullsetpreparation",
+    "P3-P5methods/geometry",
+    "P6-P8jobs/UI/lifecycle",
+    "P9packages/fullaccounting/Rowantrust/integratedassurance/GPUASan investigation",
+    "P10unchangednumericperformanceandfull376releaseaccounting"
+  ]
+}

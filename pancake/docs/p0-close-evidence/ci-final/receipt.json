@@ -1,0 +1,357 @@
+{
+  "run_id": 44104336768,
+  "source_commit": "bc67159a3d4569c8f4cc789eaee41a3d877f35a1",
+  "status": "completed",
+  "conclusion": "success",
+  "url": "https://github.com/tasercake/focus-stacking/actions/runs/44104336768",
+  "jobs": [
+    {
+      "job_id": 134112489077,
+      "name": "Sanitizer (address)",
+      "conclusion": "success",
+      "started_at": "2026-11-17T14:33:07Z",
+      "completed_at": "2026-11-17T14:38:58Z",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44104336768/job/134112489077",
+      "raw_log_bytes": 107746,
+      "raw_log_sha256": "6eb90d6ce4401552be0555984a34e42cc9bc51c6bebc53a7bef6bb8ed36cc23f",
+      "compressed_log": "134112489077.log.gz",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Provision Linux native build dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install pinned nightly",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh sanitizer \"address\"",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "job_id": 134112489381,
+      "name": "Windows MSVC build and link",
+      "conclusion": "success",
+      "started_at": "2026-11-17T14:33:08Z",
+      "completed_at": "2026-11-17T14:40:23Z",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44104336768/job/134112489381",
+      "raw_log_bytes": 78596,
+      "raw_log_sha256": "dac387fff56a5f87aac8379a2f12d7103aea613d520d1a806f0a1f67e49e79f1",
+      "compressed_log": "134112489381.log.gz",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build and link every target without running Windows tests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "job_id": 134112489545,
+      "name": "macOS Miri, randomized layouts, and branch coverage",
+      "conclusion": "success",
+      "started_at": "2026-11-17T14:33:09Z",
+      "completed_at": "2026-11-17T14:49:59Z",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44104336768/job/134112489545",
+      "raw_log_bytes": 171624,
+      "raw_log_sha256": "3a33b7a4ee6906d620fec34c53ab90d91da2d9473c875bbd4d611751455c5c3e",
+      "compressed_log": "134112489545.log.gz",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install pinned nightly",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh nightly-cpu",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh branches-cpu",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "job_id": 134112489560,
+      "name": "Platform (macos-15)",
+      "conclusion": "success",
+      "started_at": "2026-11-17T14:33:08Z",
+      "completed_at": "2026-11-17T14:50:31Z",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44104336768/job/134112489560",
+      "raw_log_bytes": 154649,
+      "raw_log_sha256": "2a34ca8241905d3d2f2701af468ec2a3cba645c764fb29accde18d072029796d",
+      "compressed_log": "134112489560.log.gz",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519",
+          "conclusion": "success"
+        },
+        {
+          "name": "Provision Linux native build dependencies",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Install checksum-pinned actionlint release",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh fast",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh test-cpu",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "job_id": 134112489591,
+      "name": "Sanitizer (thread)",
+      "conclusion": "success",
+      "started_at": "2026-11-17T14:33:07Z",
+      "completed_at": "2026-11-17T14:37:33Z",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44104336768/job/134112489591",
+      "raw_log_bytes": 107928,
+      "raw_log_sha256": "336085d97b1ee645e207127bb7eed846cf2b2a82ad66c44778fe253ccd93fdff",
+      "compressed_log": "134112489591.log.gz",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Provision Linux native build dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install pinned nightly",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh sanitizer \"thread\"",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "job_id": 134112489636,
+      "name": "Platform (ubuntu-24.04)",
+      "conclusion": "success",
+      "started_at": "2026-11-17T14:33:07Z",
+      "completed_at": "2026-11-17T14:43:23Z",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44104336768/job/134112489636",
+      "raw_log_bytes": 183100,
+      "raw_log_sha256": "6de046abccb340d739996d6cb406c42a39cf3d066471dc0fd29272d9ed02f592",
+      "compressed_log": "134112489636.log.gz",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519",
+          "conclusion": "success"
+        },
+        {
+          "name": "Provision Linux native build dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install checksum-pinned actionlint release",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh fast",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh test-cpu",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "job_id": 134112489805,
+      "name": "Coverage, dependencies, mutation, and guardrails",
+      "conclusion": "success",
+      "started_at": "2026-11-17T14:33:07Z",
+      "completed_at": "2026-11-17T14:59:09Z",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44104336768/job/134112489805",
+      "raw_log_bytes": 225249,
+      "raw_log_sha256": "582587e794c52b8b6227aae2b0e3e888557d21faaa6763218886daaa68a91d7e",
+      "compressed_log": "134112489805.log.gz",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Provision Linux native build dependencies",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install nightly for branch guardrail fixture",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh coverage-cpu",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh deps",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh mutants-cpu",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh layouts-cpu",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh branches-cpu",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/check.sh guardrails",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "job_id": 134129550068,
+      "name": "Pancake required",
+      "conclusion": "success",
+      "started_at": "2026-11-17T14:59:12Z",
+      "completed_at": "2026-11-17T14:59:17Z",
+      "url": "https://github.com/tasercake/focus-stacking/actions/runs/44104336768/job/134129550068",
+      "raw_log_bytes": 2447,
+      "raw_log_sha256": "db72d1f9ba47a7096cbf78f504b73ede47a246bbc96450e05fed5bd73b5076a2",
+      "compressed_log": "134129550068.log.gz",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Require every gate",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ]
+}

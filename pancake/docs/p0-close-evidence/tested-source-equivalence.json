@@ -1,0 +1,2216 @@
+{
+  "tested_commit": "bc67159a3d4569c8f4cc789eaee41a3d877f35a1",
+  "scope": "All tracked first-party runtime/test/qualification/tool/vendor and workflow inputs selected below. Final integration changes only documentation/evidence.",
+  "file_count": 553,
+  "all_current_files_match_tested_commit": true,
+  "files": [
+    {
+      "path": ".github/workflows/pancake.yml",
+      "sha256": "e0542b1c109e925ed8b6e6ad21625483563c24c05043525728f3704f182c03f4"
+    },
+    {
+      "path": "pancake/.cargo/config.toml",
+      "sha256": "9c2e6a6c88b24725f0eae28d1c6d87de8ea8c4bffa9971cf4284c209cefcbc07"
+    },
+    {
+      "path": "pancake/.config/nextest.toml",
+      "sha256": "c53b6c83d095bfb7551b98c232ca3591744c870d577921f40db952185fbd2fa2"
+    },
+    {
+      "path": "pancake/.githooks/pre-commit",
+      "sha256": "ae819de69d9d61515483bc740443f1118c4bbbbf3bc5ae4bd2a28d1b07f39cd3"
+    },
+    {
+      "path": "pancake/.githooks/pre-push",
+      "sha256": "f8516d43295693b513ce6108c0f55830edcd5154ebd9eb76b513336dceae8ec7"
+    },
+    {
+      "path": "pancake/Cargo.lock",
+      "sha256": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b"
+    },
+    {
+      "path": "pancake/Cargo.toml",
+      "sha256": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649"
+    },
+    {
+      "path": "pancake/assurance-platforms.json",
+      "sha256": "4d396fb9ee1fef4b3e60bdc0ceb243ea4a1bc51ca1ed5768aeba5c5a3b9e2981"
+    },
+    {
+      "path": "pancake/clippy.toml",
+      "sha256": "ad6c3667dfa599f52feb977d29a450890653b2ae076cd1641175c4fbce655fba"
+    },
+    {
+      "path": "pancake/deny.toml",
+      "sha256": "3c796ee0d127da2ba2ecd5598d54d61dd6a1b1fff0fa601f526edc536ee20b92"
+    },
+    {
+      "path": "pancake/dependency-policy.json",
+      "sha256": "02ce3ddfb5d9e24be0064d3f87f0c87166140d657ef771127351165e5b9734dc"
+    },
+    {
+      "path": "pancake/rust-toolchain.toml",
+      "sha256": "ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e"
+    },
+    {
+      "path": "pancake/scripts/assurance_targets.py",
+      "sha256": "044dcaefaf20b04fda64f974d464c79298c54ee4bbac234661bb204809e27a3a"
+    },
+    {
+      "path": "pancake/scripts/bootstrap.sh",
+      "sha256": "9ea244a8c6eb936844de52c9895272652005a9e143d5492e2f47b3f66818c166"
+    },
+    {
+      "path": "pancake/scripts/check.sh",
+      "sha256": "534cf354661aff9ada4f21e492ed840b416eb448e673b096ef0c8ac2081800c6"
+    },
+    {
+      "path": "pancake/scripts/check_unused_dependencies.py",
+      "sha256": "b78d9fbc2c8edb6142b6141a516d5e8c4102d0e4efbef3d21b234fbb24fc24f2"
+    },
+    {
+      "path": "pancake/scripts/ci-linux-native-deps.sh",
+      "sha256": "c70e4602a52aabb9f6b8d8dc956de50a0d48b7b5540be544db3f38f1d27633b9"
+    },
+    {
+      "path": "pancake/scripts/compare_assurance_coverage.py",
+      "sha256": "a06a0f1498f6e6bfb37ed47403d7cee2d5e4005a0ae0db7bde96c6e6edf47419"
+    },
+    {
+      "path": "pancake/scripts/dependency_policy.py",
+      "sha256": "70daa6f90e237c6c95044a7ceefb31a2cb0e169f3f19ad41aea26ae0eef15184"
+    },
+    {
+      "path": "pancake/scripts/guardrail_manifest.py",
+      "sha256": "6ee57e067dba67c6c0484856d9ee9bcd3730eb8caa91214e7043c0554596dd47"
+    },
+    {
+      "path": "pancake/scripts/install-actionlint.sh",
+      "sha256": "102318b7992d467c11ccd3fd5ca5447604f4e3ece9994b001a2e17ea9a408516"
+    },
+    {
+      "path": "pancake/scripts/miri_host_policy.py",
+      "sha256": "0611a3ee9716fb3a44f05ea4c15be6f1f6c2ca4dc024158cb86d1daa2f509c7e"
+    },
+    {
+      "path": "pancake/scripts/test-guardrails.sh",
+      "sha256": "2e9c55438c90aff6594c675fa577c38d5a9ade620ce797016c404f2d29d4480f"
+    },
+    {
+      "path": "pancake/scripts/test_assurance_coverage.py",
+      "sha256": "b73a25ec9d1b4660bd59f953167dab7e182dc6a450437fd20deabcee7f7b1c85"
+    },
+    {
+      "path": "pancake/scripts/test_assurance_targets.py",
+      "sha256": "27a2191488f50c7633491bc6ce370e3b8062a0f177971b4d94814222c3dffa26"
+    },
+    {
+      "path": "pancake/scripts/test_dependency_policy.py",
+      "sha256": "2aa36ca3451f54c806916ca2e08e2921750bb9d19eb968d768903b01eab4e44e"
+    },
+    {
+      "path": "pancake/scripts/test_guardrail_manifest.py",
+      "sha256": "74562509db4d0a2ef8083d109b75f27ec2fe7e2c30fff43e9b495836f832d42b"
+    },
+    {
+      "path": "pancake/scripts/test_miri_host_policy.py",
+      "sha256": "ee6a66a39001d9eeadc3e2d4693828e9c081dfae0d884a293d85fbe7b2a3e109"
+    },
+    {
+      "path": "pancake/scripts/test_unused_dependencies.py",
+      "sha256": "5956d7023e7408cf414866ed207fbf013659bb97926c62e1e67b183dc91a19c9"
+    },
+    {
+      "path": "pancake/scripts/tool-versions.sh",
+      "sha256": "119585a7f2da02dede75bc9e253540e409c4c14e2933e9c77d15ed2b88396c92"
+    },
+    {
+      "path": "pancake/src/lib.rs",
+      "sha256": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51"
+    },
+    {
+      "path": "pancake/src/tests.rs",
+      "sha256": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f"
+    },
+    {
+      "path": "pancake/tests/common/kernel_cases.rs",
+      "sha256": "3aecde45edede0254025a4d9f01dbf1a46341605215ce9fee67753a056c5c47b"
+    },
+    {
+      "path": "pancake/tests/common/numerical_cases.rs",
+      "sha256": "a50430ef9f27f034102e6b38c3ca05be2cd3c48f1deb893cb4285d031d1ca379"
+    },
+    {
+      "path": "pancake/tests/cpu_kernel_contract.rs",
+      "sha256": "0779fe881f2ac3005a73801548fc2e078b44086e101e80761056311a78b8d118"
+    },
+    {
+      "path": "pancake/tests/cpu_numerical_contract.rs",
+      "sha256": "dcf157f8687c9ef5fa3e0d2fb4afe41bc1df59dfad3095c86d859d5baac37335"
+    },
+    {
+      "path": "pancake/tests/gpu_kernel_contract.rs",
+      "sha256": "2f1dc360cffeb47ab59d61c78ff614e08f8c19a6d6af183fc057e030b6fe6bb2"
+    },
+    {
+      "path": "pancake/tests/gpu_numerical_contract.rs",
+      "sha256": "6bde33a0c256ba5cf653286e2a07da1cd236482d3e606f72e4d46029a94631fc"
+    },
+    {
+      "path": "pancake/vendor/README.md",
+      "sha256": "57f3acd26bd4a518cea418f09e83585f9a457329c7cb911a6fe9dad9d9ae070d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/.cargo_vcs_info.json",
+      "sha256": "8324ba5ce1a901831a6f2564170fc2d748a2dabd0bd728e3268c2f8f62f21c39"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/Cargo.lock",
+      "sha256": "f06feb239e444a0b907ef7149b3fdf6fb5b45ae49a01b895222d0cbced7abcc0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/Cargo.toml",
+      "sha256": "9ebce9b782a93da7471c5d82394fb1953e1534231a6c3f63ebca534d96fbd5e5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/Cargo.toml.orig",
+      "sha256": "08677ca7218dd27f243d6a6570b817f79969ca50c09443c6568059ac87302b3f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/LICENSE-APACHE",
+      "sha256": "bdd26d197850a30393da963f01e97c78e91d69245089c543903f96a5dab95930"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/LICENSE-MIT",
+      "sha256": "b3b77503e5498c5fb0a1a0b102d748d7baed9cae9f502086a3cfedad62d503a4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/README.md",
+      "sha256": "1125e8626db3885b4c21dcff1077ae27dd22d0fe1c58883efa7e7d17ba2117b9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/codegen/compiler.rs",
+      "sha256": "14eac50df894f85347d89fa9ed4f9cd418f96dbfa4c1061f8f096c1596978d5e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/codegen/info.rs",
+      "sha256": "7c74fc5257c1fdb6efde0ded581c34551541fb763fc63aae947a0d6647db980e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/codegen/integrator.rs",
+      "sha256": "e3770c1212b14bcee1b07ff3f663e7537fd1d50cf9a3b1e6c00543149d774fb4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/codegen/metadata.rs",
+      "sha256": "26d231c62163b5fc808414f3940699cbfb112b8f4b63f27a7973e6b8350c9db7"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/codegen/mod.rs",
+      "sha256": "a54ed8a690d6037aa22366431052af61e2b7c3f31c284840a195413feaee21da"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/codegen/scalars.rs",
+      "sha256": "859f34dcd3b80decfd538d9efccd591bd5fa0c2cf284d14da57a9ddd9ce84d32"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/compute/builder.rs",
+      "sha256": "24cd8ea27be6fcb0f150395a605a78da701cfec9567d5e29bdbcc8918bb3ea74"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/compute/launcher.rs",
+      "sha256": "3bb73d409526cf0488532600d47fc961b690be65910a9278206a8c2f7351fa97"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/compute/mod.rs",
+      "sha256": "e9fd5a553efb27f5468ccf0004a9f5828198a58d3880434a5f8e9212915817bd"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/asm.rs",
+      "sha256": "17ced6c251d295b9a2f0ef680603a4867de76fc8ce66dc5f99436709902042a5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/barrier.rs",
+      "sha256": "eba9e64d350889104223efa8cf0c734eb73fc4dd1bcedecc2b009a464b7bd586"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/base.rs",
+      "sha256": "0d849af348cdf52f439047a88051bbb54ad3804da27ed5c3bda7858c8f0eb4b1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/branch.rs",
+      "sha256": "37103f606856ff10a404d185af525a847b791ef01fd1c57c995240ba29b7895d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/cmma.rs",
+      "sha256": "7de3119d5c775765dcd4377e8df34403f56d12db69e3e59fef821a8e9962fb11"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/comptime.rs",
+      "sha256": "1bdf4a8ce407325030f0f746a405797ab55bc10ca627c54df814824d24be238b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/comptime_error.rs",
+      "sha256": "8b6d33c4b1d4db27b8fa800e88851c79839d0d643066fdd3cb6bb2c87f6db78c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/comptime_option.rs",
+      "sha256": "548f75e5dfa968eb88132f5fbbb9d6c4a56c3d48cc9fff88775feaf425d1ce24"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/const_expand.rs",
+      "sha256": "bfb1d273a9a6066b49c8df7e9282774b1f5e8ff8052e023e81e077c69e139492"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/array/base.rs",
+      "sha256": "74696997ce099597462a8b7ba69034582326a1a60fa19a8b2217786f1dc276f8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/array/mod.rs",
+      "sha256": "f74315888d8c038d27037da7bfb6edbdd72347454ff0d56860de55786dd9117c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/buffer_len.rs",
+      "sha256": "915bf49269d617bd7ac5efc0a919eb7e8f220940034a2471c17855c121e4c46d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/cell/comptime.rs",
+      "sha256": "a110236d5d2c7c170fe77de4aef092cf90e88720962e424cb6c2dea028b6575c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/cell/mod.rs",
+      "sha256": "2ec75aefc88d592c5887e6db4c3558a2d67c0f8920d5aa22d02d16606406a0b9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/cell/runtime.rs",
+      "sha256": "9a197fbacb92a2e2be392939f171f752b53106daaa42389fb5030ca17848afbf"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/iter.rs",
+      "sha256": "f5a6e2c28a30fd1e9471488594077725a7374dae31f33d98013ad110a0c98790"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/mod.rs",
+      "sha256": "20a7ba921cd97ee1f0ae685352ad8e25eb1e0845b5b17c73422882f9a714b681"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/registry/base.rs",
+      "sha256": "4dda257abe65c4b356f033094290fb067413670bc59920a13edde5f4f009f5e8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/registry/mod.rs",
+      "sha256": "f74315888d8c038d27037da7bfb6edbdd72347454ff0d56860de55786dd9117c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/sequence/base.rs",
+      "sha256": "c86f1d6028534544f8e5fda19d77b42f43e952a8157ddf06a3607473b0581da7"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/sequence/launch.rs",
+      "sha256": "ec5338f665f5ecb40abe8acae35838e073f7873ed58e0fc6afd4e83a272b5df4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/sequence/mod.rs",
+      "sha256": "f7f377269faa60ecf55e3159d6a2f085410b476feafe08511b8cba5802a0d5eb"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/shared_memory.rs",
+      "sha256": "b1cf3206b2f9253fb7ff32e04f86efc26e5605ea48b2194bb07e64d790f00372"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/slice/base.rs",
+      "sha256": "2c56f69c610489dc1bc2df0f709bae7d7fbdd01069d34a045322d6d005e1b210"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/slice/launch.rs",
+      "sha256": "bca0e0699387e96219a2e1e4ba4ebf6ef234bf04570b9c77731507ddfde95689"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/slice/mod.rs",
+      "sha256": "5cf7bc4316fa44542988cf50d18c4e106c3b05e49a7c300bcf86197990a8d6b7"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/slice/operator.rs",
+      "sha256": "6265e57b86a1feb3b596f22ba419283fb6537e58c0642260b35c1b04cbce6e81"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/tensor/base.rs",
+      "sha256": "0d1236a916457537091a348a1fad50e57a7660dd1ef74d2cfb1a2d3b62ab5003"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/tensor/launch.rs",
+      "sha256": "fe1d919ce0d90d5b872a839d48821fc24b9e842cd7817d5ba03ae488c515db02"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/tensor/mod.rs",
+      "sha256": "6816d5f7dea75a77d7adab7aef783e103652517858702328e75320c416461633"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/tensor/tensormap.rs",
+      "sha256": "fa35f0e59676c3b9cd1e8a6049dcc326d08372a83afbb659843e1c0bb14ac2c5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/vector/base.rs",
+      "sha256": "d5980119df275b8f7d04d5d4c95aaa3dc620a5d645bd7f14525e48b8cf596522"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/vector/mod.rs",
+      "sha256": "4f316f42ffc3413458013b1bbb3faa4b9a32c9a3c49082f920ba72b705a7bc6b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/container/vector/ops.rs",
+      "sha256": "f0eba6af492970ab885799fe151c1565cf198b673bd6dc7b3b5c31ef6483e012"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/debug.rs",
+      "sha256": "661ed0d3e016e0069b5b44de0f61ba95cb68b8da2870985360403eaf2a38f97b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/atomic.rs",
+      "sha256": "f69240ae321b66654329f5e82d9e7815c4c7178e4a1bc2bbf7da638a69428143"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/base.rs",
+      "sha256": "fa3337d9d77afa2299a31cb03fbbfe4d1406f6aa4170f1c666d45a312193e5f8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/bool.rs",
+      "sha256": "b6b5371252e69abb48368ceadc31690e52866c4e0389e839ea5633f01aa894cf"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/cast.rs",
+      "sha256": "b5d68e89be6f22820aa2f5cbacc5d742d47583c30b1dec2d1e31dffe5102fa53"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/complex.rs",
+      "sha256": "3929d8c5917a20be9466b098b4ff2cf95307760e610bdb56a9d4a7a054ec8fe0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/cube_elem.rs",
+      "sha256": "9530530ab4ce07b714112f9810fea241acd8fd67c83d2b10aeee9f5b1935a39f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/float.rs",
+      "sha256": "3848643d57b6fb052db734e11d3fc1896b07863053de671af5b5bab628a606a8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/float/fp4.rs",
+      "sha256": "22a577b867f64f24b316a7b1ab96393b1afba8583af46864251a935a7a975459"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/float/fp6.rs",
+      "sha256": "d85d3ec9fe1ad3b32e29794ab150eb9670778d7298124fb6c6873bb3eb5ec829"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/float/fp8.rs",
+      "sha256": "c97bae482b676f1d3319806f8a6dde295b841bd4d2cced894d0d4a11af2a7aaf"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/float/relaxed.rs",
+      "sha256": "150dca716003de414a33911c34de15716fb5a88d54c60345384f84cabdb3b03d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/float/tensor_float.rs",
+      "sha256": "23579f5d603760363ab173a607cabac5e43d8aea0764ece78d82cdc73a02a8b1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/int.rs",
+      "sha256": "b203219b7d8c0fe46aa7eb56bc83b6ef99e690c23e0d10f8a6560fdd643647a2"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/mod.rs",
+      "sha256": "2648b80975729c898915a810f85de25cc280ca1631d54995c109574aecc656f9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/numeric.rs",
+      "sha256": "4fc84ddda0cf454acca44ce148678a9229e002b96f2cacd9a6890d4f8dc1c529"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/typemap.rs",
+      "sha256": "8567b27747ecbb9801d65003de09b27f99ae9b24f276df24fbe69edf54f662de"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/element/uint.rs",
+      "sha256": "241eeb0faa72c3120c45bd3ce55327ca126b8c25260fccbccdd5861f8cc7125b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/indexation.rs",
+      "sha256": "5b6187ce28adb7f0e0680b805f3fcbd34a43e80acbb9996821dba75c8051b903"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/list.rs",
+      "sha256": "4b709a48c308bff1bdf7f4b51178243a99ec933681119feaedc8e6ce95fb3c2a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/mod.rs",
+      "sha256": "67a3a606aec9c3eba3da078d557ab71c34a0b9cc84942c4533e5f0c4cce90e58"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/assignation.rs",
+      "sha256": "4c73f732a441bb9af41c2b38c17859acaa573fc907613658b881e2329edc0dfb"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/base.rs",
+      "sha256": "32bb15a4c4a9cf02df43881d7e1c3c1bdd8ac6e9c916b23afa4b56da26b10135"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/binary.rs",
+      "sha256": "54a8892a6596a67d38b25331491f50d713db5ca80cdcc9df70e8e466ef1f72e9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/branch.rs",
+      "sha256": "eca5d4463ae200d6840959c1b0711cb6008bdb6a603e2abf850ccfebf96c4d67"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/cmp.rs",
+      "sha256": "84979feabd803063b5d3c165e7e9503b23adcea07fabf688fdbbca467459345a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/copy_op.rs",
+      "sha256": "7b90624bd5de9a4cde8c024e23136d7d449b0de10b7677d900f788b96cb72669"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/dp4a.rs",
+      "sha256": "8286ff7ae671eca583b60c40ac995cc271bd1ce2646fa2a244c9e842a0bcf12e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/fma.rs",
+      "sha256": "49118f3ebfb06cb9ea8b2676b8aa272dd35d46ae91b0f7f7f383a8cdc1fe97a1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/mod.rs",
+      "sha256": "d9a1fb9bca6e46e5d194929926cf0407f77c881c154cc0c63bdad6361490e1e4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/operation/unary.rs",
+      "sha256": "3e5021bbccaf60df99d644c9b6b940c1f61517aa0426895114994678a829130f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/options.rs",
+      "sha256": "2593cb56713aa9e2ac0f95f59542e59c130fdd29c0508ffc5153575261f6d633"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/plane.rs",
+      "sha256": "499e4e632e8896d7fc78331254398bc7114f22ddb191c0a45ef2eaf404e41723"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/polyfills.rs",
+      "sha256": "fb9a126ff0775f35b8e717a2b0b41326438283465e4c34f91dfccb09cf1d1f53"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/ranges.rs",
+      "sha256": "b5d3ca7a406b820836fd39545b8ec53cc5bb3077860ba00aab08a38801bc0a21"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/runtime_option.rs",
+      "sha256": "50578dd61d7ac6de085a1f4bb573e05eb03cd4d553eca203208a0e847e3d3dc9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/scalar.rs",
+      "sha256": "26ce53adba57286e209a7b4e5f2dc03a1ea0e6bb6db04df979e10ce49a8c48d0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/synchronization.rs",
+      "sha256": "5a0b31a69705e56d41a9587392533ad9d87a3cb460486c96a1e4ea2f7b0f97a5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/tensor_layout.rs",
+      "sha256": "a50759f5a8a22d07835f1c365ba10e8fb16fa70d8ccfdd528c5053ec54a04b1d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/topology.rs",
+      "sha256": "4e3840bf61ce63c95426887bb312e8f7c89df575fdd4cf2f363c1d53f4d43b1e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/trigonometry.rs",
+      "sha256": "46c01d9c6f90cbe45a008497e22458640210aad87e83823ab71b6e07ef2edbe7"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/frontend/validation.rs",
+      "sha256": "cc740d2e73c81107c46ef738b05fae419db8da40ad9d721d1c9f10d3dfbc4faa"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/id.rs",
+      "sha256": "a5e352b4345edd8002cf5dfb9abe08309a7f92bd94b3a5f8d54d697b633f6130"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/io.rs",
+      "sha256": "5c8ed4586c785826cf8407e200d58c1d60d793b76e6ef36eb2cfea1dbb814935"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/lib.rs",
+      "sha256": "bf5b3342ceeb7243f6b9d074a948ab4bb729b55ab7b4998950c04d509cc4ed56"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/pod.rs",
+      "sha256": "5793753e42f8c784689555cfe698ad02437d3da61cdadfe6d8f4cea6985df81d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/post_processing/bf16.rs",
+      "sha256": "c53d5ea4c78cd4567afa853c1415f6a27a5b6fc1092342062b22afe493dff7d8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/post_processing/bitwise.rs",
+      "sha256": "8493061aa8dbc9e9b472b3300f3e9090605355ca63f0397424a6f54c6160a1f0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/post_processing/checked_io.rs",
+      "sha256": "6894df42082309b4e8aecd20e956516a1c2c9653075af2e9ef2ba415593975b4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/post_processing/fp4.rs",
+      "sha256": "1f90ce928c4318cf04b12a2a49ddde411d8ff6c6f4a72a956d36960a4e9537d8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/post_processing/minifloat.rs",
+      "sha256": "1564aa5e63e124ae1eb4bde6f0f5b10b681921b957492c4f6a58c5f7782823af"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/post_processing/mod.rs",
+      "sha256": "e7b7000572f2d070f3c85cb03c3fd98d015f6e6ddcb4c72ada0a629af6c0d83c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/post_processing/saturating.rs",
+      "sha256": "de88b5e0dbf230f07e3ce797f30e5ca2e1b7cf25bb887f3727b41e85f47e23d6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/post_processing/unroll.rs",
+      "sha256": "a03e1a26d55551014aa9ef6e520d34b990653d588259ac738aaabce9e044f2af"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/post_processing/util.rs",
+      "sha256": "2226b8115fababaf602f68f071fd19ebae9fcbbd57b9cf889a98268dadabda90"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/prelude.rs",
+      "sha256": "b6f4074ff127bd36e761b778e1ef1f73ed34de76358161a40146860d18a41219"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/all_reduce.rs",
+      "sha256": "9f93805d4a702046bbcc507a96de1dafe109a7b4e64905958e0ba2f32ea861cb"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/allocation_mode.rs",
+      "sha256": "aca8614e98956b36b0043581eaa6cd98dcb6e97a826253187e8eac86c7e4f8aa"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/arithmetic_chains.rs",
+      "sha256": "62979d83a06b85be11b9f3ed070f4c96069781a94f58990e39f77d6ed3adb00b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/assign.rs",
+      "sha256": "363b4c7df38341a6654c097c1ba3bc57e2cafe9ed1dca099e1283a43c36903e0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/atomic.rs",
+      "sha256": "3b2e06879d38311c39aaad80d1c631540da6d6713ab7f2d2d2b6bf67854c3563"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/barrier.rs",
+      "sha256": "ad1ad35bd2ec4c7c459263ecd49f9f1f9afb628dc0e6b0c303546e5352fd72ff"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/bf16.rs",
+      "sha256": "82cc7dfabb5923cbf935ced3a3f7ba578a0344829b9251dc3c23ccc0a53d7977"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/binary.rs",
+      "sha256": "e726cfd7e1c4952c57bb6561395b22c92a4e9d34431ceaa248bb7ba56ec5d012"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/branch.rs",
+      "sha256": "cb01a7a955981786d2bff21675a55ac4f0658457dba8e7144e3ae31a315c737f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/capture_status.rs",
+      "sha256": "bd1e57f113d42d23480543187e35b6569f349eea20b0538f1014f634194af617"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/cluster.rs",
+      "sha256": "7da6278af09d29f21fec28f3e59069b2f45099d238d79721d43ee843c29b6844"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/cmma.rs",
+      "sha256": "677e42f4809533abe785a8411756b61fb0b7bd052467200c7cf337627f906ac5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/cmma2.rs",
+      "sha256": "5dc51ea95b5af983dbf5216eddc0c3a9c172ea6e8c5509c534c6831144991721"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/comparison.rs",
+      "sha256": "4ae3aa37f05ce2197326a4f47d0159b5b4e80236f02651f3a754ca9cb490f293"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/complex.rs",
+      "sha256": "1c4c39e941bb3c8d0ae63fa6d8bccc17a84a8256b9b9b2425c1268477bdab76a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/const_match.rs",
+      "sha256": "7fb72b4c53cc4d6f33d6e7c6b1f87a5285b7e9f6de0008fe703704c43e7fda55"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/debug.rs",
+      "sha256": "f3c1ef7d096771120f145807f028236b6ce5ee330a90d446347d008733366236"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/different_rank.rs",
+      "sha256": "149742dcae1cc3cc3aa06638bb489d2832b186852c4d5ffddd6de691cc70e116"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/enums.rs",
+      "sha256": "b20d4106b923a1354ba37c8912bd51e8425f00fce6e4d808078452cdaa27f06d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/file.rs",
+      "sha256": "4e05952834dbbe412d1cd79a4eda588f2b624f707a1d2c14b439eb6d4076d957"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/index.rs",
+      "sha256": "6654b3af8c2bbc24e4ab5b2fc5b22e67723d704b08ee9168fc039ba74882c087"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/launch.rs",
+      "sha256": "945ad3418ce0c84340919b1930046c00219bc9d8e8d82ac6f91708c9e433f68b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/metadata.rs",
+      "sha256": "26776d08f0dcf4b94c8c5db695d27798958c314b30bf53534bf244503f35a57a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/minifloat.rs",
+      "sha256": "f5a1bc536b0a0669a7f42268067e4042fa81a5f94c1be56a93bc214ad50a8a4f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/mod.rs",
+      "sha256": "86ed654f8d9f378a72a7a54d47e38569e583910dd8afc50fe4100ff279d0cb56"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/numeric.rs",
+      "sha256": "8df73673e17a097243507006fff3adfefd7f9a49fbf8925e4f3e3d9fd478d0aa"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/out_of_memory.rs",
+      "sha256": "803d181e761abd8803894d2bf64223d34fb39fd4496cd82635577495a6992d0e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/plane.rs",
+      "sha256": "59f903c49d26147a6a6494cc59542646ecd2d795e36d35f87baf4444262f3f9e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/profiling.rs",
+      "sha256": "dc4d9893026eb542c57c62fedc14dc6001b339fcecac166eac014aff3c2a10fa"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/properties.rs",
+      "sha256": "bce540bb2d8ffb9f1a942cbca626dcba2c0ab37e2dc49c646a58b2ebcf0852ee"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/read_lazy.rs",
+      "sha256": "f6e9ab45b4bb2cd6d9f25f3a93a49c94194d4c01762605082db02d2416405186"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/relocation.rs",
+      "sha256": "76593e7e226413bcfd39abb7961b0dbc24dadc57e7d232fbb681c95fa3aa2bcf"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/saturating.rs",
+      "sha256": "3eb5ffb77fd5b4c2210a6859203eae2718d8dd6043b438096179f0efb4e3b905"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/sequence.rs",
+      "sha256": "c847f89a12b1881a19c14875f861948dd69c75db7b5391fe55dab29a17630917"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/short_circuit.rs",
+      "sha256": "ef2a516c4fa081b0d1e50431f4e7ca450f6b576a03e8680b6207c48c52a59d45"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/slice.rs",
+      "sha256": "bb72967b3e0140a32d7b208f31a1efdf30d9e5d613d68f74bfed29fdbb67c71b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/stream.rs",
+      "sha256": "6b3f62bbba22e65fbaf9af3d2868133ef46b3d1a5a9d94d6ac6b5a7c9c133cb5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/stream_errors.rs",
+      "sha256": "6158c984503897d3bad801383be1c677a19dabd09abd35d8534b7ed5778ce690"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/synchronization.rs",
+      "sha256": "50fe1ece353fe200ac79f723de779afe3e2fb153d222db9b4ad0427a89c303e9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/tensor.rs",
+      "sha256": "e0c8109c5d4b528ec659b72f6bc67e35dbc07fec5a215fb8d65bea4cfbfb42b3"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/tensormap.rs",
+      "sha256": "695f418acac781b1d129e67f7ccc48902ccb266e4b1256d9ccfe95b9d92a924a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/to_client.rs",
+      "sha256": "4677c4fa8cbf4c5fbfa9d9328dedc059b13621aeaf811207fa470056dc0ceb1c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/topology.rs",
+      "sha256": "5ab944e2b9458bd8b6f154787c73d53de9d14a028925de0618e3322ed946dcbc"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/traits.rs",
+      "sha256": "3ced9344c6e2d5b80f8fbaa730fe4f5bdb7327b44312d8f93d765d11a2bd2802"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/unary.rs",
+      "sha256": "a62e2fa908423f430d069a48481d0eeb7a5e0e86d638f932401c45300a8b5a5e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/unroll.rs",
+      "sha256": "1cde2ed215ece26c61b9f09d62fdc357c1a5f38ee39be0abf89cc49e3a82c6b1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/src/runtime_tests/vector.rs",
+      "sha256": "97289d47b315bbb9e438f8306a12562f1d9a36377212cfb2c441bb4887ac67ca"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/tests/error/array_variable.rs",
+      "sha256": "010790574c7cef9cbc424674092537a2c7c0a284abaf3a95894db43197d59ba0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/tests/error/array_variable.stderr",
+      "sha256": "31241a531f9b8a8ee52b0ec47a8e42f7bc797fbc6904d620d833eaa9cd1913e8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/tests/error/kernel_arg_trait_object.rs",
+      "sha256": "7659f26f4c33387a49c79bced8c2971b4fcc7169db6550c806a9b5d1c4bcd139"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/tests/error/kernel_arg_trait_object.stderr",
+      "sha256": "0bba74c116acf938cd3992049eb8cb98f94948a535ab70dc23e5cb20f60721f6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/tests/mod.rs",
+      "sha256": "a4e656bd9b6037323615769370a031218a62354f7a0acfcd8764773dcefd01a5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/tests/pass/create_dummy_kernel.rs",
+      "sha256": "0fcd68f620a7b435e3dfaead53fd665c949ded1558e6a12fa4a6df0abf6b0a30"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/tests/pass/cube_type_mut_generic.rs",
+      "sha256": "1a159a389078584840b165779f25a7548f7cfffa0dc753f4aa1526ce00a4efe3"
+    },
+    {
+      "path": "pancake/vendor/cubecl-core-0.11.4/tests/pass/nested_tuple_destructure.rs",
+      "sha256": "fc7e9508833c7b7a2088dcd1996810aa74d47466d8f5756e3dec20c5a87e06dc"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/.cargo_vcs_info.json",
+      "sha256": "297a447f060c635da6155f8097a82dcd5a2ad9802ead4d3852c58d48b4656b19"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/Cargo.lock",
+      "sha256": "bd1d82ddb7b34ebe5a74d2fe8d8d9088183c819d328e1ded820db82077119807"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/Cargo.toml",
+      "sha256": "47e6cdb4c1561c350b8b998a5972a43191182e8db080db622ea405d9e9b3e182"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/Cargo.toml.orig",
+      "sha256": "a58f097c1bffd5e99149424e6bf0432ec06cfe2abc777fe0b590688a38d5b723"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/README.md",
+      "sha256": "1125e8626db3885b4c21dcff1077ae27dd22d0fe1c58883efa7e7d17ba2117b9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/build.rs",
+      "sha256": "ff979a93371b9779dd78f6096ff20a11c02235cc0bc8bf7f9991db1d2c322589"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/arch.rs",
+      "sha256": "7bbd330d21d632a14be8ca050a804aab0a6d8b7fea0164075d5a102b19256745"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/atomic.rs",
+      "sha256": "d928df14eb8beca04aca1845725303af69f1f0222db896cfe1ad91231ccc58a1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/barrier.rs",
+      "sha256": "f71ff9c039d77a259bbe462ab319fcbee5f29ed47b52277af6224194a3bf6454"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/binary.rs",
+      "sha256": "c02f46aa6f7128ad1c408becaec83a8c27541ad3a3ab9b2c6f97d6bb0e3c6e2a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/builtin.rs",
+      "sha256": "26683dd013275f4c73616eccaae4025c2a56340236c23a6185a643d6aab5db31"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/convert.rs",
+      "sha256": "4e019fdd58710f5417488fd358ea1b1f9f1740dd904b646b97384620152f851e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/dialect.rs",
+      "sha256": "ddc179b582d343d71ba435029415dca8b03679dd4d4c64dea456c8b460d8909e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/mma/cuda_compiler.rs",
+      "sha256": "1ca8304f918ac2bb0a86fc7d69b7f25cadbc368433282cff71b7d3bb71ddef32"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/mma/manual.rs",
+      "sha256": "992318bc6dcb0bc486c142630f510c5083a768b9ffff9093f1f810309789f513"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/mma/mod.rs",
+      "sha256": "e818987a15f8c4ff6283e40054c03043bfb1d777d68fc62f22d1a4a62efb7dd1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/mma/ptx_wmma_compiler.rs",
+      "sha256": "30e2101229492c0b5ba3d4064a938ecf8442c1c1c9c1a45aa12497d337cc2335"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/mod.rs",
+      "sha256": "aa349b0724eeff90c2221f06ac561f3b8780d09a918e14f1fefa99b0eeeb87b9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/packed_ops.rs",
+      "sha256": "336e77846fa3d2b7d141b1441becad974575593cf7a9ac7e0be6f64947b72a85"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/plane.rs",
+      "sha256": "3d849e1f7d67257489eb0fba5aadbc402773a1abdf37761ac11ba5c01e94b006"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/ptx/asm.rs",
+      "sha256": "8979fe4512c14c3215220819d875e8a0f07bb43f96a8772eaa8bbbb91f2d27ea"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/ptx/copy_async.rs",
+      "sha256": "b1c79339db5bb27dbe8c47d2b8d15db55b6d420b084cf004db488fc6631bc7d5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/ptx/mma.rs",
+      "sha256": "2323121771ac212ef038beed0370046aa238d56e5f45bb4d813e50dc2de57d2d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/ptx/mod.rs",
+      "sha256": "f31f30dc27bc48b569a5d18bd4594b68e68a0dfe44883dfd03ef9b850c4498f7"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/ptx/tma_load_im2col.rs",
+      "sha256": "7c6b52aa91bcc35ec82cf1b7b1dd3a1c44e71a53c9b7f3b424a205156cc1c9c2"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/signature.rs",
+      "sha256": "7fe4e8bdc99d8b91d081c95e8a26e36fcccb028d76aaa554caa3b7021b9904b4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/tma.rs",
+      "sha256": "de81b044ac282154980056158848cb9e9774b3c9a05b5b336add1b8e676db4a1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/ty.rs",
+      "sha256": "b4ba9829e467ef4f0bc3db196c47be96ba840e19ee8bf3a69bf79b61255934f8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/cuda/unary.rs",
+      "sha256": "11edae16d0e30c6992a211d58e2cd36faf7e0d8766228a5b7d57fa9a0baac72e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/error.rs",
+      "sha256": "ccdce7e84d97e0223d8f60ee249f8e4b4e995c674ec9a0b55886564968f4d052"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/formatter.rs",
+      "sha256": "6ecb463c61bfb4c3050eae7e35ec2205b7e619eff3642e6381a265a8e62f205f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/arch.rs",
+      "sha256": "47d69c47a5115ed47d43197f7d6f5806a911d4c45f696d8ce0a0cdf4dce87a7a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/atomic.rs",
+      "sha256": "76d88601fe75753ce820d060a9fa27888c4a07df4ae36b938ee81e792bee8290"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/builtin.rs",
+      "sha256": "a157261fcc0b971b0d6dc774e9a0cf023090296f3fbb4891738b2a78b6d04453"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/dialect.rs",
+      "sha256": "8fde627f465fbd56f9a03d8fedb2797e60e6d584e0769ecf97c6d46bc204f1f8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/extension.rs",
+      "sha256": "829e4609135e7171c1367d2c06c42fc93f33952158f17f72fa0f824854d195c4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/mma/manual.rs",
+      "sha256": "4ce207b392991db00fcc09196f74faa747cda5c981303d2ced6689e8a8ea04f1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/mma/mod.rs",
+      "sha256": "5402b7b0cf1fafb1fa360f0592d680239c8cc6f8670c52f50fcce802b1576813"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/mma/rocwmma_compiler.rs",
+      "sha256": "dbd680ab7fbc4ccf22ddb6e25bb98d0504888924689bcc02dd30aa360f8bb9d1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/mma/wmma_intrinsics_compiler.rs",
+      "sha256": "d10a56e5c38587950cec1d875f375e845bf0cc02c447309f388f0e60c638f46f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/mod.rs",
+      "sha256": "231ee0ec4e37b31140d98d67812af16597cf2adc90609480d1d4b832370f08d2"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/plane.rs",
+      "sha256": "cedbc13f5447b8fc455049b8b0b1585ca4686194696ad1ee7777fd4c18efabc9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/signature.rs",
+      "sha256": "4c72fe861229bcdc86f667bb364b52eca431c9d5792ba4d4f8ff527016991818"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/ty.rs",
+      "sha256": "deaa79e5c5d2766c49be23fdbec062ff767e7f8cdedf9d5b9c64d7973b01f8a8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/hip/unary.rs",
+      "sha256": "d39b14023461278b2faecf6c7036d532bf93490f1934c61a5529e3e33658effd"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/lib.rs",
+      "sha256": "043646fcfc518fca7aae6d5076ca14e67e24c0225d09d4ca11fc3bc33b05b898"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/address_space.rs",
+      "sha256": "5592e3edbb17e6973050563503cd5d31fee875aa39b05cf03b924617d968a326"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/arch.rs",
+      "sha256": "54b61bc2bb10f08d6c9e774bcfd5a841224f0fa01261c2a30165b9ee2adb2fe3"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/atomic.rs",
+      "sha256": "facd0ac0bb92cb229ab132494e3973f0f2925f0cde171906278142ef311ad396"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/attribute.rs",
+      "sha256": "632da101ab7eda84d9dd0bcaacf72076d99636a20cc9c4557bb1d9ecfbc61e8c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/binary.rs",
+      "sha256": "b505132489b2ad45abced7b4f5ad54d9f6cf5250b1182685bab6ddba728b7778"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/builtin.rs",
+      "sha256": "d213148793a7251f54777cfe1cc501198b170bb427b0968974a2ed1f2590b573"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/dialect.rs",
+      "sha256": "76f932bf741731fc0ffceb4e841ee2f156e3c29e5d430f3e3f5cfbb0c26aae52"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/general.rs",
+      "sha256": "34698c6a6bae795434289742fee7aa33507563cb34264bf446bb19e2d2fbd7be"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/mma.rs",
+      "sha256": "9b8daa19327295662eb07c988f1d334af4a4c4aa6907fbbe9af0e43c16919740"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/mod.rs",
+      "sha256": "d11951c9a291da61ba1d10babcdbbae17ed7f141434ea2dfb2c146ba0f3ffb58"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/plane.rs",
+      "sha256": "6fea69142dd83e6f2f2aef52c4cef9e64deb7021dcc268f1bc1cb0706bb0aa6f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/signature.rs",
+      "sha256": "549f86cbd63d3322dffdb4f350343783d0e1d6227b134196068edb965f0d4e49"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/ty.rs",
+      "sha256": "6f2507a4df199f53f7112a75068becadf4ca4a556f1d3ae97875da983e997df9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/unary.rs",
+      "sha256": "1371c21e2c9b9900084b43bc6e056391416fb861b76812f3a5ecdf1a0ad0b98d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/metal/vector.rs",
+      "sha256": "d155da5f6946acb637e72d3c310adcd560757381069e8c3b5eb1ffde94d33045"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/atomic.rs",
+      "sha256": "ad19ea9bdc53bf0f0aa3b38c76f1fdcc3dcbd1fb459105c3cd611ac17cac29c4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/base.rs",
+      "sha256": "0f269dcbd6b46d035fbed93b2904c58b55810a13ef2fc01717c9f0a3041dc72e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/binary.rs",
+      "sha256": "eadef2109d7bb1d1cf0822afc7848f297aa7e93f2e679bf97b24ff589b7c93b9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/branch.rs",
+      "sha256": "732b770aaad3fa827b2fd3acac9a7aeb88d9612edf2919e6c9065db7f4ddfe4e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/builtin.rs",
+      "sha256": "3d242e25859ef81a4c7efb68f3ead05038d84d10b34fb99cb384d478cf4041d2"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/convert.rs",
+      "sha256": "875b7932b7f821c3a8ae4a7181374096893c62282382de674af776bea2965ed8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/kernel.rs",
+      "sha256": "28de391f301c5e9a23a5e1f2c381417f2ad4aa90a15b3f4037fa1877d28a3544"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/lowering.rs",
+      "sha256": "e9e4172934b6ae31a7f8a5097ce1ed879672e7cafb7b327dea7290a4dd6f406f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/metadata.rs",
+      "sha256": "857ed42ead85f82028d32e0728a912b65251f857ab650c446f688cd86bcffe08"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/mma.rs",
+      "sha256": "5f9ff5bf9a06eab785ee2cc059a59ac42025b4fadf1923d504388240a54bfa4f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/mod.rs",
+      "sha256": "ad474a4fd98ea073c37f3fe01d488f86d997625ad061766a5897b498ee785456"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/operation.rs",
+      "sha256": "f8c4a3b2ae205eb50702c73fa4f981ac8a2f70175e1999f29979bebb8189a7c5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/plane.rs",
+      "sha256": "1eac2d5fdd4be73ee7388fa7bc20dc35a3a4ea62f35c69511715d5532c573957"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/signature.rs",
+      "sha256": "34d7a9b3c765a64184b869e933718c2e235e89e4321247e622c376d4e37f3d5e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/ty.rs",
+      "sha256": "1a01de086699746825f9d02b74f06be90ad5408642eed03025caa58c3c75e8d5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/unary.rs",
+      "sha256": "64ae8e3df59d9baf7afe1eb9350c67b4d93883eb4aef05bfb059bb8c943f0978"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/unroll.rs",
+      "sha256": "7db542ec315e6921e2cd26c082e703a48a6f4f64787c7b00d6aa1c5e9b5d23cc"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/value.rs",
+      "sha256": "31665eda211e67c43d6bf7bd84aba01fd7271ef07d3dfed8c7c2e8cfb302b3aa"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/shared/vector.rs",
+      "sha256": "dc4d23b7cbe070d347656a5cce2c0c666bac8cd2fb10424c7c9e547adcafcd4b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-cpp-0.11.4/src/target.rs",
+      "sha256": "3b31f6b56146201d130f51aefe520cb418198859dd48207668b7fa0921aa546d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/.cargo_vcs_info.json",
+      "sha256": "6454ddb3f561f035ca37e30c4bf7e4fd80f933052c35abea4be14c1e46653504"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/Cargo.lock",
+      "sha256": "ca8282097b65597c65a6d692886712baf550792b25506afacd551e6150aded0d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/Cargo.toml",
+      "sha256": "db2d0392993c96d67a8fd75e384e3be8d8cb2f0c487d851b3231ab8dde1134db"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/Cargo.toml.orig",
+      "sha256": "100c313fb2b27e05044d7098669d5cda067d3c6a3f171317f434ec8b3dc83b2c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/LICENSE-APACHE",
+      "sha256": "bdd26d197850a30393da963f01e97c78e91d69245089c543903f96a5dab95930"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/LICENSE-MIT",
+      "sha256": "b3b77503e5498c5fb0a1a0b102d748d7baed9cae9f502086a3cfedad62d503a4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/README.md",
+      "sha256": "d888c6390ab97066157fa62c34984e69cf195af30214fa8554ac6f18b738bf8f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compiler.rs",
+      "sha256": "f4c32ceb8abeedaedb5c9d44fecf4ac5fc07e49cb6aa1b97d3695f92cd6bf8d1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/capture.rs",
+      "sha256": "5896dfa9e66c9837c0b3fd299f57fc69915c1d57326f3b8b9dd5c838b0db99ac"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/context.rs",
+      "sha256": "8ab7d3801aa725233c1033408945da03d29da13b601e0d2aea97fe31147aeeb9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/driver.rs",
+      "sha256": "afa079b1ebfbeb951c75b712ba83ce3e853cf58b5cca34ad30086188ba65b13a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/events.rs",
+      "sha256": "caa3ff363767b4626f904a6160e4245a6a698289de51902b98feed0cf54d8866"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/mod.rs",
+      "sha256": "976cf3a30ac103c4c7ba70fb51e2b1e6e45ce0a2db17455624ade1ce51af5791"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/server.rs",
+      "sha256": "952a3cc6ccdb20ec213bf0374b81a3d38b77ac645f594d2c9942e6f76530787b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/status.rs",
+      "sha256": "5fc5fdd5ece52dfc6f899d7b0fc8aedcf48a3c746e89e70308e85d8a079002f5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/storage/cpu.rs",
+      "sha256": "6dd9e2a327f653756decb4cb8e9ea83cc200e159f89f2ee064a1519451dbef72"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/storage/gpu.rs",
+      "sha256": "e486dc1d6fc80d839e9c312156220dc804b1d4e2ab9b33576005ea38940b0541"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/storage/mod.rs",
+      "sha256": "55e59db54c55d183bf5cdfe22a4b3193a89eaaf877c2fc5058e3b992c7bf721d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/compute/stream.rs",
+      "sha256": "da95950b3344cb816ba6d90e24c6f2f55c5f01454e3a2234807f60035e3a24ee"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/device.rs",
+      "sha256": "b11c5dc6a989c141740d08ea7cf83a7139d02d78bc7cf8cb208152aba06aefc0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/lib.rs",
+      "sha256": "071e31703c81b1f6f38997e018eb3f03bc1cf09394067c20d6272c17eb2fe115"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/src/runtime.rs",
+      "sha256": "d114556071ccd0b3fd91166d91c0eb9f433fe36d8e57bba8565227764015b638"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/tests/device_fault.rs",
+      "sha256": "c935eedb44d7988ba32f77b4e38b23029f19cad6d015d33365139f478cf7fabf"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/tests/empty_read.rs",
+      "sha256": "051c75cb5c0aa93283cf16de9cb4c2b2cdd8d9861b9664d8e9f991a16bca4ca1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/tests/graph.rs",
+      "sha256": "443f3d9d9ec0017683d4fc833c90e910b2c2d6705efd942878f50c57cc0fed34"
+    },
+    {
+      "path": "pancake/vendor/cubecl-hip-0.11.4/tests/relocation.rs",
+      "sha256": "0f49f064419a462370ba4589ca5c7f3518b700913b5e0f4d2457b89e466e44ad"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/.cargo_vcs_info.json",
+      "sha256": "7e20d4ee65d87486633ebbe46d951db7681c3ffdc01e801afd83b1befbaf622b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/Cargo.lock",
+      "sha256": "72f644f31efd49dd343e8926d76a6ba231ae9c9d74f0ade6b6816ee2c91e8b34"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/Cargo.toml",
+      "sha256": "ba867017267835cd28582dd9d4379a1ce1b81b230bb92d3e8d985745ca7e9bb0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/Cargo.toml.orig",
+      "sha256": "e23f6a31150996f5abd35d66220115921e4ed4b56b7b16ce60ddef53580cdbc6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/LICENSE-APACHE",
+      "sha256": "9cff568488e9d56aae60f162404acdb15d8533a0202cf01f6eb0843b264f20ff"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/LICENSE-MIT",
+      "sha256": "94949dd83279f3ca3d0ce42ce0fc154d0ed817444454ee2925e903eec93949b6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/README.md",
+      "sha256": "1125e8626db3885b4c21dcff1077ae27dd22d0fe1c58883efa7e7d17ba2117b9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/build.rs",
+      "sha256": "880ac1c11b0f72ea144222f217a2d5e6198510882fd03878a1f15337c2a380f9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/error.rs",
+      "sha256": "43d7336cabd064dc686a5941449a3e171aa136bc975fa591af7faa96b1465db5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/expression.rs",
+      "sha256": "242222f5c66355bb30f026da3a0aafa483ba5a6ba4860a8a454030aa6c6c97c4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/asm.rs",
+      "sha256": "e4fb3080cd265fbbe3be5c8e0d137871fc923fdd6281d3edd89b71bb3a9d4f39"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/assign.rs",
+      "sha256": "15d34ef114955ac2c69ba5748f390a10d93ec7b2728814a90be6d8039efd0cf4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/autotune.rs",
+      "sha256": "bb5fe6641aad9c431c38575fc7f24214ca47fde42389d695a60a5f55dfe1a60e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/cube_impl.rs",
+      "sha256": "4ce82eea29a6c41b8c5e158ae4a3fd1a5f7b9bc128ee1c40f640488bb3a3185d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/cube_trait.rs",
+      "sha256": "8d9f93616a37f3440a5e1ae34f31c63c77a1b4f60fb25976c0deb55b6ea5996a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/cube_type/generate.rs",
+      "sha256": "983924f22594e665c72a71e6f2a93407bc1a7351460b26db712b6e768a14128e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/cube_type/generate_enum.rs",
+      "sha256": "106af63bd32e620922f9994f430f1a36880f3e676add4dda63abe273ca585461"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/cube_type/generate_runtime_enum.rs",
+      "sha256": "283cba9afbd4d444a282ca859a9965a57688191f25f4f3ccadef6b7764aab3b6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/cube_type/generate_struct.rs",
+      "sha256": "f4904f98788d5b21fb5cb623e7ba7120c0059365732fb37c1481660561c3076c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/cube_type/mod.rs",
+      "sha256": "73b83e042de358ff048b3c44ec74a067668e09203838193ed3f7fc702f5c6905"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/expression.rs",
+      "sha256": "75c85a60635e7848d0c1209121d1985f59ea9a5204024d1ace4a5c8a9dcd2348"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/into_runtime.rs",
+      "sha256": "4b6731bffceefc5ba4265d374f4211dd6a759fe1d632754b069bc10b49654d70"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/kernel.rs",
+      "sha256": "afc053b42ac8a05a52b1dd30a3ad238cea93947fe423e87f1a65e2f048c7416b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/launch.rs",
+      "sha256": "663649a7b23c5cc25db90d51d730ed74f4a9d1322f13ec5a8be7349f6ec74364"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/mod.rs",
+      "sha256": "e9d83e0268f5b931ccff874a32ee113c9ce87ce0148ff0eb108600e3711fbbb9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/signature.rs",
+      "sha256": "2e060780663241485d39a15cc186dcf7cfdc26c02830b125359ebecf13c9a03e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/generate/statement.rs",
+      "sha256": "043e266afcf2ba6af2699cf08cd64527ef80b2380ce78521f9cb9cc6d583e1f6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/lib.rs",
+      "sha256": "484f1ea80ab86aeeefb5c80817c19ef1ad766d819d74f25455be8e6131f07e1e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/operator.rs",
+      "sha256": "53520e5ffa5385e0d9cef882367e7094909107e45fa8ff9e81991b9314233579"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/asm.rs",
+      "sha256": "13faff653f40ffcd5b9bd27dc19088f92f8ac5f270705dde867dfbe2ff7b3da1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/assign.rs",
+      "sha256": "f1121949efc0f1ec6409f8f5942be0945469b5833b7ab4b8f871014cda0b70e3"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/autotune.rs",
+      "sha256": "e047b75c77b722b08fe3e9ec1e215496dd224e63d3850292435e0ef9ede83977"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/branch.rs",
+      "sha256": "228b8fc1579e4e483cf532b4b30afcb5a4ae011e98c20ec882a617f5efac95f6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/cube_impl.rs",
+      "sha256": "d8835c79a2a4dfa4bfe53cb2d03790400fdb0bf4d13b155555605b1938b89e74"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/cube_trait.rs",
+      "sha256": "74408cd1307f18c9549165ff194e7f853e9f96e4929018e5e036f1ee35d5ca39"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/cube_type/mod.rs",
+      "sha256": "8051182028584b5db80860e43a35996e3f409f2f4453aee6887a51a90597122f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/cube_type/parse.rs",
+      "sha256": "97a98a1d9d1ed01b69c4a593eb991604c6d273b0f3211c4a49088289d7829594"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/cube_type/parse_enum.rs",
+      "sha256": "fa79890f1b246b04c5107ddb8039e22b5c99005bca7d1b11b9bf58ef7f49b216"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/cube_type/parse_struct.rs",
+      "sha256": "090a7dfbe4f58aea4b9002749a631f5870ccae0787c9f1d967b0aa46d3559f50"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/derive_expand.rs",
+      "sha256": "ec2127c66ee61c66c84c14a2a204aeeee8c73383dea6816826399434a19455a5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/desugar.rs",
+      "sha256": "99d3885377d3f9fc1439e5150e1f52bbdbdb5b6e8cb49135e7f5987650d50a20"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/expression.rs",
+      "sha256": "9f8a89fac06e00dc9c1905f1cdc6dd78448de26b11269e21301b0a41564b0204"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/helpers.rs",
+      "sha256": "647e00a8e50e1734d74c55125228380672c36c23beaad2a4e0d4c5c62aa4256d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/into_runtime.rs",
+      "sha256": "7605e580ffb47c666ab520545b8421b685073ecf661e121a3a92cc6caf81261e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/kernel.rs",
+      "sha256": "23c552e559d2050429871e89a18fbbbd01c937dab7be4eb7a7446b74239a249f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/mod.rs",
+      "sha256": "037cebe6f3979f40f3d63a4e2b015099ee8f1c305f1bbe288b6a6c811273a1c6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/operator.rs",
+      "sha256": "656291542d319227d67f3bb2c553eaef4f4cdfbe4a91ac0f08be227007d317e0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/signature.rs",
+      "sha256": "a9912ce60a1447e2ecc6af4f6b0c55a157b288b89c70cd5c7ab36d8e6c566e9a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/parse/statement.rs",
+      "sha256": "08b0b496f31cb5db0399d9b1a0f3d38a90dbe24ac329d9f071de6ea5b155bd03"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/paths.rs",
+      "sha256": "78cf03251bd7475448508c697e2a7730ff94763db4f412282d2b12e0b1ec17ec"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/scope.rs",
+      "sha256": "a9026c1f4b1229f7f285a31bd0ccd43e1d56463bd9e2dfa9ff20d2cfbe0299b6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-macros-0.11.4/src/statement.rs",
+      "sha256": "4f2db503c5c766179e92174bdb12cb7d45637c2ffee1447fcc14db1ce4c8961d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/.cargo_vcs_info.json",
+      "sha256": "2d8fce555a81df0e3dc1039b8626604849533c223d6f1bf32a953eff83cc8cee"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/Cargo.lock",
+      "sha256": "09a0b760ef5017e0cea42f5f59a02090f6f856c19e946617d40d7479bc5a6437"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/Cargo.toml",
+      "sha256": "61d08d322cf55f45668cba4a6850ee783114cd1e6f82ebe365197478f18831b7"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/Cargo.toml.orig",
+      "sha256": "524a8488c0df4ef4079f5c80b4aefac0995bcf3f1807978534bd2669702b98f9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/README.md",
+      "sha256": "d7de9b54c65a85df281f6c843e5a63df69a24d29847f9eab653f7c2334b314a1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/build.rs",
+      "sha256": "ff979a93371b9779dd78f6096ff20a11c02235cc0bc8bf7f9991db1d2c322589"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/attributes.rs",
+      "sha256": "d7f9b8e111b88007625fd9c1cacc928d467c637722af192b62ca8574f89fbf5f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/compiler.rs",
+      "sha256": "2fa7cbe40be9a1aef7a5e9c7650525be107dce4ca3574011cd89a3516b8003f3"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/lib.rs",
+      "sha256": "c47304a04ec37b148237e58d4052547f89989e53316ea97bb8e1ee55cc9893cc"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/lower.rs",
+      "sha256": "ad82d75159d298707e36c0567fd62b5a0385cc2ecc7f2016db7f56d06750c3f0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/atomic.rs",
+      "sha256": "54b304344856bc1fe9c6c8d5a2da019657e10fbb052d2d860fcc84f71a76dc03"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/base.rs",
+      "sha256": "65e992b2900a1b002bba0969c4887e607280561369c4539a13b4c2bcc18d86d3"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/bitwise.rs",
+      "sha256": "5487316447de243431e283ce09ea50d0205249539fcf0d83eea9d04622ae7e38"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/branch.rs",
+      "sha256": "b9b83294bf40b84ca7144f166cc4c8dd666d561a17d18ab63cc419953e67b74f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/builtin.rs",
+      "sha256": "2d0e104a2b3a80c36a288e261aeb671fe40758b5b63cb3dcf98822e1e0bc2766"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/cmp.rs",
+      "sha256": "6be94ce4434ac38c83195dcbd96f102750f48fd7067a0bd0c175f608a4b37311"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/convert.rs",
+      "sha256": "df5ba7e64e40ab6231507fed1e2756fcebe77b55b81c4dc95bd6a527bb76fcec"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/general.rs",
+      "sha256": "13760564da36194445e5f8c801d5d15cf68d76d7342da6b14636aa53b1446285"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/math.rs",
+      "sha256": "e4a089717a35b6e9b8e7a59e89a918e80b5871949accf9ec45ffd9ae924663fc"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/matrix.rs",
+      "sha256": "c43d58d0694e53839559a3f78df2bfaca7c992f1bb5a4bf71aa2f232f29bd521"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/memory.rs",
+      "sha256": "37a264518ffbcbefa0f6435d34bac1a6e7e6e2d5494277e325e84f6ac190e6a5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/mod.rs",
+      "sha256": "6b5e196966fd866cd88ec24998b3d91f0f1af113a23c2431b029a6de4f5b8458"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/plane.rs",
+      "sha256": "9e8eb9cfa5a83f99fd476ca081829a02e88a470bff44f5c8051a35e2b924bac4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/sync.rs",
+      "sha256": "51bc07af4bb7278ff53ac678d4a10dea3d572b945466b68883b8d4b1f1c3ed17"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/tensor_indexing.rs",
+      "sha256": "d70def8ee527789cafe7333980a4f5a728d80365ebc82e6d0026ad867d26a225"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/to_spirv_dialect.rs",
+      "sha256": "b57bed01f2cfbba7ccffd1cbaf009d0a1043356ca4e0a0450662f930cad4335d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/ops/vector.rs",
+      "sha256": "658873741888f113f8fcaa111d837b6c8ce3225ca8744d17310e9b22c7db23c6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/target.rs",
+      "sha256": "3e1e7a1f02a4baf88ee640d634d43949114406fab22119955fb3a1fb5cb74952"
+    },
+    {
+      "path": "pancake/vendor/cubecl-spirv-0.11.4/src/types.rs",
+      "sha256": "74e8bf6bf6ce684b381df8475b0d40408ffb17e25b124604e2a7ae9e19d11452"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/.cargo_vcs_info.json",
+      "sha256": "fd6d677e42506b194cf5d6a3fcbe83a26d97f7de2e99411b9a0a8d617d7315e6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/Cargo.lock",
+      "sha256": "5bb8c0f06b06a3d434623df4fa297b43f1d1ceeb552f27f5e90c9ed44d0e0080"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/Cargo.toml",
+      "sha256": "52b80fe4c153f7a4130775427693229e4154a934a17b0b1e895254ccef3557e0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/Cargo.toml.orig",
+      "sha256": "dfcf93defee98aee10907ab99e1a6a93e0047a0d05fedd7a063bd21f1d1f8c53"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/README.md",
+      "sha256": "1125e8626db3885b4c21dcff1077ae27dd22d0fe1c58883efa7e7d17ba2117b9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/event/mod.rs",
+      "sha256": "dbad907f9cb7d74d201a59e40a17200720479d9fa69fe4c112cfa113d053bf46"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/fast_math.rs",
+      "sha256": "d27de215b90d633bb7a94269683668a34c2826f5f88cc04bc5582b94a322168c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/lib.rs",
+      "sha256": "6fa447068f65a3d249940653101187440b1f7815327f008e02cb30f0c7324f9b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/quant/base.rs",
+      "sha256": "6f940ccc5986c26611fc25782d85a62e9e86efea1a47419538d6b16561bb1a1d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/quant/dequantize.rs",
+      "sha256": "c16c2fcf63f77b06ebae5555449e57ac245821d81eb404b4dbe89c48196a26b6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/quant/fp4.rs",
+      "sha256": "d1b93af49e3865bf550219e255b052888754bc6a601712e648f1fec527f33c5b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/quant/mod.rs",
+      "sha256": "0383ff24596fc835ac035da9fc255a85d1240f491eca0d3ac66e8ab4621ad4d6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/quant/round.rs",
+      "sha256": "a86499c881e91d97d5df8eb74e80804345157a8cbbab10c15afa227e2a10516a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/quant/view.rs",
+      "sha256": "aa3cf43206fd65d75a30e4d70111847585d161b19104e89a2a579ad2e9b805d3"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/reinterpret_slice.rs",
+      "sha256": "36ce9dd9581ee8db50046af41c353c826aa8d13093acc2de61b68647a050c21e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/swizzle.rs",
+      "sha256": "7b2101366d512e405f98d9ff7a6fb581d53af14f59154939148565877968fdd8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/contiguous/base.rs",
+      "sha256": "d0c0fa1f62bbb8bedb48c9d47d11d72f4ef2726c04cd43cc26d8562beb70b4c7"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/contiguous/launch.rs",
+      "sha256": "50857bf062494f706ae8a58d1742d6d2e65e0e0fcc669c22f2819aac5a1c50d7"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/contiguous/mod.rs",
+      "sha256": "60c16ae3ff6a6db6b3817aae776877dc68c8425f0e0161a40ea1584d54fe57ed"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/contiguous/perpendicular.rs",
+      "sha256": "3b415ccede2d0b18d20b774029d357d6e10b0625e8c2f801178e51c9c60a5c00"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/erased.rs",
+      "sha256": "a99758410c7088373f6967b27a0b3dd2119c15f758d3c14416b39252c007e7b2"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/handle.rs",
+      "sha256": "1e0d5b065f882d9a01d6c32bc3784e78aa36c70bbb0e5ac11279e6a4135b4117"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/identity.rs",
+      "sha256": "3f726b306afef03e26687b5a9bf25014f655ec896f1189719fd434a933f3cc0c"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/as_dyn.rs",
+      "sha256": "bd62b91a398dbb6d1e27d6da7f0e8b452050b9e73104cfe1f9f3c48a307f6e87"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/base.rs",
+      "sha256": "043d6c67f1f4a497c7559420f517333ea4cec9fdd2d67b2ed7348f3dbded687e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/chain.rs",
+      "sha256": "3e367893b388ed7d9061303ad253bbea8595d524674f89ec114c592063744b04"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/coordinates.rs",
+      "sha256": "0279e1149ec6758efb34933baedbe579a2a7ab8d7599f86816c97faf01c766f3"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/dynamic_rank_strided.rs",
+      "sha256": "20b88d201f3047edd9c47d9d747277f86adf0d8cc91a455b0a16193ec7e9fcd9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/fixed_dim.rs",
+      "sha256": "937ec05ee048629cb90f327520ebef085f0133ca461938934608665eb52352b5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/linear.rs",
+      "sha256": "0479a94abfbd7012ac91d02ea61b510a46332f113500a9ad23d24d1ca3f0c2ce"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/mod.rs",
+      "sha256": "ed0df373ab3632a48983095b35f30a8cc2b1c7ffc71c4adc7d629744f2b1abec"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/permuted.rs",
+      "sha256": "c0f6673f819f4f1307eb6e974ed2cb59a08d7ed6f00578ef40ba1ec14763588d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/plain.rs",
+      "sha256": "f5dac6746ebf8ab0eb0992e95cf387745d7ddba069acaccb0061a26145687605"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/simple.rs",
+      "sha256": "16d1b8903bca262943ce8b9f06156484fbc44c69ca1a3ab8ffeb3bd13cc46c0e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/slice.rs",
+      "sha256": "557cbe63b06d25f481d0463169c4bc0434dc29b58b4a98e331f8570c9e0884ec"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/strided.rs",
+      "sha256": "a34f6dc36b6d753b1f28905f654c052561720e35396c567843740c0c94f9f4e4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/tiled_view.rs",
+      "sha256": "9b36c5f701447fbc25c30e084b2ef97c29ce7a429097313e30b978f4e0753c55"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/layout/virtual.rs",
+      "sha256": "6b114b7802cd818d69c6fffdcf5102c25b67902c8509d69a860d40c7cf26ea40"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/matrix_batch_layout.rs",
+      "sha256": "4f819a55af593e0f47878b539f64a6097c30714dc7b9bee48f98afc5bc2bfed9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/mod.rs",
+      "sha256": "f5eaabfccc349cd4f77b2cc27c78156b342c7795f599a9e1ac4db112225ee1f1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/as_view.rs",
+      "sha256": "cf2ac26d44a92ca1f331cb835054e63d8097fe370dbe38ba14d2f35ed451b944"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/base.rs",
+      "sha256": "54c884118d0b43ee665c7f4797442fe800a702d20c89687e9ddf4bff4473450b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/launch.rs",
+      "sha256": "03bb58fca5d1853fd1b40f6ba53fbbbe8e8e60be03233248794ab2e545d77b9b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/mod.rs",
+      "sha256": "23e550f02eec08e96235f87280dd271360f4bb7364d3357598eb3c187db0788a"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/operations/base.rs",
+      "sha256": "2f443a08eb6050128b3d86d187f7ee37725b7fa1186e9535eecc98d7bf712c04"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/operations/mod.rs",
+      "sha256": "24c73bbfc601a19b669132ec93bbd6dfc9b8795ef4144270eb9607843c0ac96e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/operations/slice.rs",
+      "sha256": "1817c270fea1bc3f46fc7dcaa8ce746a39552c007bb9175fd08a5cd068e72e5d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/operations/tensor_map.rs",
+      "sha256": "a8324f4c1017c69f77931b5840002288ed05418437085fd8d9e445c7d21c6c56"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/operations/view.rs",
+      "sha256": "04d2e661010e1013a74af5e269e7d380838303946e2e6c3c6a6bf4d6a3c95324"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/operations/virtual_tensor.rs",
+      "sha256": "fc7d5092cf581e5fde99ac18f8be73e698d2cc0f085c99b5a67a3d815f066d40"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/view/operations/virtual_view.rs",
+      "sha256": "5f9b251b5fd779a3dbe776e6201eb048ae56d95db24dccc09c1001b1696498da"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tensor/virtual.rs",
+      "sha256": "49b01762b12a877b74caa4d6bf4b4edb8d6473e8a5ea9ade37dacdd4b45f7649"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/erased.rs",
+      "sha256": "70f3fb8b811ae85de7890ccef8fb0fc66986830061fc197f6e2387923a22a7ff"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/event.rs",
+      "sha256": "15a03bc0ebd6d1661e7c008b488864d8851a0b23f6be3645b9ab31d0df6b84a8"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/fp4.rs",
+      "sha256": "659bdc46eb301daadd1f73bb7f69188b6bef228c74e65e19b2f3c7bdf8836cb4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/mod.rs",
+      "sha256": "c5c94abcc14722306ffa155deb2cb6d8935200f47cf67e72b67a445489b565c1"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/reinterpret_slice.rs",
+      "sha256": "1909ff6c680b145de172ab41dcb690c08b3bb269b0da259083578b66596a871d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/round.rs",
+      "sha256": "782e3edd184e8ef8a3892c0cd116afb3246b42591b9368257475eb94bbe01696"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/tensor/identity.rs",
+      "sha256": "62b31d1ddf479afae7edec7851083ffbebf02109ac7a1061cd5b80cfd72a04e6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/tensor/into_contiguous.rs",
+      "sha256": "849979733616cf2d0a38dfc03de32afa72bad99aa7f87fd037b980f5f66a647e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/tensor/mod.rs",
+      "sha256": "a7904df9e6271a6453204a628a12de5a8a4d3e801d294b6c7fa04c7b440f92b5"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/tensor/test_macros/identity.rs",
+      "sha256": "1d72660f8e7dabb7f2886159009d76649e47f71740c7c650a1aa1eecd32779a6"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/tensor/test_macros/into_contiguous.rs",
+      "sha256": "1efe87e8ffe059b38666d3229676ccf19222e13064c0cd7e65180c406261ec3f"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/tensor/test_macros/mod.rs",
+      "sha256": "eacd4dbcec9969d0faef9d99f6caa092d6657df7e7a09b2962075542a279c90d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/tensor/test_utils.rs",
+      "sha256": "cdfe7fc7095dc94df627247772d0fd0468b6a7cc5831178f063b778508e1b6ac"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/trigonometry.rs",
+      "sha256": "ad25221c98d47277699e5ec9d88658a6b8bd726ad3368663b0588243313f7afe"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/view/mod.rs",
+      "sha256": "f79ed3fd0fd48ddefefc0f01dfb19070504983a526410642d4291306c7441cb2"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/tests/view/quantized.rs",
+      "sha256": "7aed404e5b395c7d268c7af1360f4d13f8798920e67b4c581deee5c99d2f57b0"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/base.rs",
+      "sha256": "cf2e2c00b0626d82654cb8c2215bfa5570edfab662449d9706bc61988c954a9d"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/launch.rs",
+      "sha256": "be782684f5e38344bea1a116632971f8da42ea9225727273c01e04c27d6d84ff"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/mod.rs",
+      "sha256": "9c58ddbf26caf22a32acb21fa8fe530fa0c0e0901abd7d09a45f10c6b9101e3e"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/operands.rs",
+      "sha256": "39d0100b0123e0909aa1c5716110cf4074f03815cd9b01e6dd2cb4f3e7eff0bf"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/pooling.rs",
+      "sha256": "e8836e866802c8b16ad2cb7b8a442d7ac8fac52e79eaf660b5e24e04d8f4cae3"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/runners/compute_cmma.rs",
+      "sha256": "fb11920e8d7b0d9c97170a33a94edd948e9187b81f3581f1131876142fcb90b4"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/runners/compute_direct.rs",
+      "sha256": "4e44c67d9eb59b011612581f76078544b9728f21c37d5d564a6ab93cc2cb4240"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/runners/launch_overhead.rs",
+      "sha256": "ae6a47b6f200ca3d7e954e3536821d0581433b1339b9c214863c92a558b47fb2"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/runners/memory_direct.rs",
+      "sha256": "396aae51d9e1917c96ee85844bfcfd8133c543aa2806ba86b0a90bc996f2adfa"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/runners/memory_probe.rs",
+      "sha256": "79748829ea5fe4ca99a97a75584d2e78f3dc4b5bd43f7456ecfcc70eb09f1380"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/runners/memory_read.rs",
+      "sha256": "52b60da1159cf8a6d2b3cf1f99ae40575f8f59542d3721d17f8453cde044ec77"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/runners/memory_write.rs",
+      "sha256": "0e3f666b75d0d0dba447d9e03ec11a24c8e91448549a93878a467ffa8c4eae44"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/runners/mod.rs",
+      "sha256": "228a6ba6c546978deccbdc2fe54e5e7803611c1cf11d6ed7556ce9d3931e9a3b"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/shape.rs",
+      "sha256": "6349c03f5d7f21a896691398956f6b698e82843fc7f5d763a2b428cd39213922"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/throughput/workers.rs",
+      "sha256": "a49ca7ca09ac1e4ee5ea64e674060d63ff85821e5c6920c2b9aea5efa182e7d9"
+    },
+    {
+      "path": "pancake/vendor/cubecl-std-0.11.4/src/trigonometry.rs",
+      "sha256": "7363dfde41ba988789531cf98b10e56eeba4f073c25c453d3bf09958ffecf2ad"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/.cargo_vcs_info.json",
+      "sha256": "cf9be9eeb1ca2d1265aa37c12b649537366658f12b3889b979d14c233b451cb6"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/.gitignore",
+      "sha256": "d2d5f0116b7cb52ebb34c455f052697685cd9a61faf424b4076db821325085e8"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/Cargo.toml",
+      "sha256": "9de44f0c955c65bd175ad0bc1d08ef022942dec8d4a715c49cf0d0a3a2f2ebb3"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/Cargo.toml.orig",
+      "sha256": "fcf983a1faaaf0bf8ed1ba18d0ad40e00c3247a347934599368541cb4ce6c964"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/LICENSE-APACHE",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/README.md",
+      "sha256": "69657dd291f7b245820ee01fa7bdbfdc5dc2b47284767641ffb8f94e9f9bc522"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/examples/math.rs",
+      "sha256": "e7557914686973cc16c6b2736a9934708465ef996b4f0a54fdb454b524641dc9"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/examples/s_expressions.rs",
+      "sha256": "6d963a8c030978e2648a059f2dcd5314d9fef47f0dda45e4134caedae1429eee"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/api.rs",
+      "sha256": "054f2a13fd3a261fee60c7101a6615ad40b4cdfa75bb0d1d73a9e9466f4afbab"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/arc.rs",
+      "sha256": "e45de75fdd175c53db3de16bdc0be73eb907343c491b38a520d0e0c9927ed80f"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/ast.rs",
+      "sha256": "74e686169718b2f1e4759335e38d2ba8cdfdc966b7d9def74d427d0fb73d3d70"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/cow_mut.rs",
+      "sha256": "c90f47a013ae8cfb00bee089b75bbc2e493424e344fb4aaeff78cb2db8558ec2"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/cursor.rs",
+      "sha256": "9a3bb73f27f05d3df85f6b4774034151e9276b73e96b2cc5c2b310443fe9c157"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/green.rs",
+      "sha256": "34d58d497d2af2bbd1533aea6b4aa91496d65275b3b6def8dd6f5b1210ec0ce0"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/green/builder.rs",
+      "sha256": "517e4f6393f8fe6deaabd288f5e5b6a670dc7deec99e5bd92df34cdb4f02db49"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/green/element.rs",
+      "sha256": "efe033b03d789f1f519fd530be9fb57aa70d9ab0ff32934210ffcaacdebef88a"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/green/node.rs",
+      "sha256": "ff8c9c9ace20a6fd85c9be569cef6d2148b19bee7a14b67376c7a54be073319d"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/green/node_cache.rs",
+      "sha256": "f85ca104edb7d2261fd111a6fa4165f076e802aa9414457bdb028788db8dde9d"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/green/token.rs",
+      "sha256": "b7437c56fcc269fa7a31659371b745d2f89bbb8e1d3b2422aa0eba4a62aa6d4b"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/lib.rs",
+      "sha256": "8917eef8d71a1d208f36835f523932a8fcbbaf51149bec01ef3ffa2ab255f8a6"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/serde_impls.rs",
+      "sha256": "603a459c1e3ad6edd2915e6ef3d103bae36364e01d781a8521486d618ba7b678"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/syntax_text.rs",
+      "sha256": "e387fa481a53aa9dd220a350acabd150daa8440c07ade49ea8a2f69275c6b366"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/src/utility_types.rs",
+      "sha256": "7cbf11210a0de2e72ff2f820caee40303a4cf943d46621c34be8e7db5f7f99ca"
+    },
+    {
+      "path": "pancake/vendor/rowan-0.17.0/tests/tidy.rs",
+      "sha256": "15f655d7022a23cea887c6ac52727811f72c7d6a0fd54cdbb0476521ab4fea7f"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/.cargo_vcs_info.json",
+      "sha256": "8eb3c99e9b7fe4cd3bd4757137992ba7bd023d096a3a38b54ba6d9aa7dcd8f4e"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/.gitignore",
+      "sha256": "2ebe6cb6f5289849dce5a8a6cdd77e06b1385302c862982f8e181c4782d19214"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/Cargo.toml",
+      "sha256": "3bbaaf0226549afa25aa11b5c0f25993fc94f497bfd7a13be9dfa1816023ce6b"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/Cargo.toml.orig",
+      "sha256": "bca09dcf4b245bf5c27996374f6324da85b9ffb706a609e60d3407eb0f5e6c19"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/LICENSE-APACHE",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/Makefile.toml",
+      "sha256": "6e145c8445b5bcc11693291231e415c86ad8941012c719fab2cf633ab8b4c933"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/README.md",
+      "sha256": "bfc257d83ebf232550a80ae05d4d82f470c950209c61af1d617dc682e2f9ef04"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/src/lib.rs",
+      "sha256": "db985a6df11cdbdf7bcd8e80855f8da637fa967d2ed1c4ed1179e8e20e943e2e"
+    },
+    {
+      "path": "pancake/vendor/spin_on-0.1.1/tests/pinned_future.rs",
+      "sha256": "c9ccec5e82512998f41699d59622de04c423e53582648ce227f6f41964893efa"
+    },
+    {
+      "path": "pancake/vendor/tests/test_macro_expand_only.py",
+      "sha256": "2e3fcbfb8d25962dc9c3b672ef39b92383dca662cf8c4301fd614007241874c8"
+    },
+    {
+      "path": "pancake/vendor/tests/test_patch_contracts.py",
+      "sha256": "55f299f292bd09d3745fd6ffb782d61deefcb1073c7fe9d5c55614be715fcf80"
+    },
+    {
+      "path": "pancake/vendor/upstream-sources.json",
+      "sha256": "59fcecce9c7efda4fdade9a000c546b1f23b6fdd099d0033781ab390b23549b0"
+    },
+    {
+      "path": "qualification/p0-codecs/.gitignore",
+      "sha256": "306fd52e74fca6746e12acc750f232de15e71da917756a1270d74c91f5eb7368"
+    },
+    {
+      "path": "qualification/p0-codecs/Cargo.lock",
+      "sha256": "311b613e79b6b1805936f5e842dd9e0cca7d0b8e946521d373ec4a3f7735da44"
+    },
+    {
+      "path": "qualification/p0-codecs/Cargo.toml",
+      "sha256": "c74cf4dbedc5fd0a1d65d2304d4443dabe2d4c36c97246b640b1a5626630133f"
+    },
+    {
+      "path": "qualification/p0-codecs/README.md",
+      "sha256": "a4352f900473496bfdc7beb065eaeadbd0d959d1e3e2e1551c14e8a4b8adfc14"
+    },
+    {
+      "path": "qualification/p0-codecs/combined-graph-manifest.toml",
+      "sha256": "0d280f93d6447d260dff780255656b4ce456bd01e0a68c3e14bb7c26db227329"
+    },
+    {
+      "path": "qualification/p0-codecs/combined-graph.lock",
+      "sha256": "9c52886eadc394842c6d848590428939a568111b186bf2631706d5cad596e7b3"
+    },
+    {
+      "path": "qualification/p0-codecs/fixture-requirements.txt",
+      "sha256": "8bcd2920cfbb09bc27c7064f2eadad30edb37f4fff693beaf99cb16ad1feceb0"
+    },
+    {
+      "path": "qualification/p0-codecs/oracle.py",
+      "sha256": "34729e0eb6b517de2ff3ddcdc877c42c1f08f3c952de77c8343fb5ec67155f64"
+    },
+    {
+      "path": "qualification/p0-codecs/requirements.txt",
+      "sha256": "ab7596e95d8f10a4e09bf9674e848f623be8c67d15ef32746b28e1b63a423dca"
+    },
+    {
+      "path": "qualification/p0-codecs/tests/qualification.rs",
+      "sha256": "8f11a92fba615c306e2aa50305849ab028c1f73d546be0971f0b1a772a0ec9fa"
+    },
+    {
+      "path": "qualification/p0-ui/Cargo.lock",
+      "sha256": "aecc5eec4fa8391e01b509e792633f593768d1072abdba87a75a6e34ad38aa82"
+    },
+    {
+      "path": "qualification/p0-ui/Cargo.toml",
+      "sha256": "99ab14bf3e825c7fe3d2f5ef9114269281c174672c6d12cef6d7e5ab8c12ff3d"
+    },
+    {
+      "path": "qualification/p0-ui/README.md",
+      "sha256": "c47c5651a0db0b2cdcfae64c3ab77075f6abf933f238a7d5b5324140429c1da6"
+    },
+    {
+      "path": "qualification/p0-ui/check-macro-negative.sh",
+      "sha256": "ab891508770a9a97dae3c59ac3ac33d6051c39bf17d9caf26154d18fb65b41e2"
+    },
+    {
+      "path": "qualification/p0-ui/check.sh",
+      "sha256": "c2f1d9842d9eb788972af3c98142a276b8442fbb648bb3e3d38369ea5a6382f5"
+    },
+    {
+      "path": "qualification/p0-ui/dependency-review.json",
+      "sha256": "6e7dab073b346b0d05fb14c9f83fcdb0a2ca3e7e21e9bd4632bcb07b249ebc31"
+    },
+    {
+      "path": "qualification/p0-ui/oracle.py",
+      "sha256": "3ce3459ff3bcb154bd171379896967d6ce0c484d82912d6a69a25c9800579677"
+    },
+    {
+      "path": "qualification/p0-ui/probes/macro_forbid.rs",
+      "sha256": "db72e10060631552cdd3b9bfc48048477d4bf2a25a8b844025ab619b3f473721"
+    },
+    {
+      "path": "qualification/p0-ui/review.py",
+      "sha256": "1dc64956762f9b5d4b3cb5cc9733d422f29b8fbdfbc454a1a588cf542e72451c"
+    },
+    {
+      "path": "qualification/p0-ui/src/lib.rs",
+      "sha256": "1a8baaa0f220e7751c5f8a81082f102f7a3a568c360cda413a711ce544010a52"
+    },
+    {
+      "path": "qualification/p0-ui/src/main.rs",
+      "sha256": "1e0bbb74c6730a3fe345e9baed2332bcf8df3ded1eda1a1f7999efdedf88bc39"
+    },
+    {
+      "path": "qualification/p0-ui/src/qualification.slint",
+      "sha256": "abf120ad648358974b2383fdaa5da687ca91001b7c36d4c6a40eb58e03d815fa"
+    },
+    {
+      "path": "qualification/p0-ui/src/worker.rs",
+      "sha256": "9dc724f104c72863bf16725217194ba7d39c8d902b14c078cc6fbaa47f80c033"
+    },
+    {
+      "path": "qualification/t50-generated/README.md",
+      "sha256": "e6a89cff8446701df69984a2889625e3649d2d7c7176dab0fc106df6e24bf758"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/RESULTS.md",
+      "sha256": "e6066ebcf472bbbfa9ef9e977774b7a98b1e05dd82d3b8ac802ce3ab8ccf9293"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/environment.json",
+      "sha256": "f0144147d401504f5afabb396be3d29cbb1879902d6891a6e66199a8f1717555"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/final-verification.json",
+      "sha256": "46a90903addb98fa2a8189dffbfb1ce388b2c9bc4dd1cae647cccb1bb2292ca2"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/initial-cumulative-guard-stop.log",
+      "sha256": "00c6b2568501d1d290522f1887146ec324f69c2e9ac768ba3e0b864acdf1bc5a"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/initial-guard-stop.json",
+      "sha256": "081899b4716de2d89ad5954c589ee505c4d3066e6c0e29f19c9c525fb7b755f9"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/native-run.log",
+      "sha256": "63674c331ad36ce6c6f88edc32d864d07b58c10b2ed11b7a22366d28c174b68d"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/native-t50-receipt.json",
+      "sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/render-red.log.gz",
+      "sha256": "6a4126a415887c0e088a514424e26da834991c3a2c115712244bd046923b715e"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/retained-budget-red.log",
+      "sha256": "99a14c5d3383a4587c7b8d016296fffb1f5264fd21b197af5a5f13b01b6f8ca0"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/sequential-red.log",
+      "sha256": "8badb0e4b5876b8f60e973ecc05f60c4980e1410703b405efd40ac6fff3d3d3c"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/source-discovery.md",
+      "sha256": "b0d8998b78dfdfdda47b29ee7ad2cbf336a78c65eed02c30180b97ed55c831f3"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/storage-red.log.gz",
+      "sha256": "bb84f644070f8c5cf27dfda75d43bad835d0caeba9ae1a123dc5a7f6a2770e0c"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/unit-final.log",
+      "sha256": "45a6bf9dc6b40547105ab1858b94ba61db5335c74816262a1d747ca9278934e1"
+    },
+    {
+      "path": "qualification/t50-generated/evidence/unit-green.log",
+      "sha256": "6148b8fabd4a6f372b5294617769bd36e002ad661dff733406bd0c3c1873bf54"
+    },
+    {
+      "path": "qualification/t50-generated/requirements.txt",
+      "sha256": "17137525dbaa7a35f62862502baebf76e39b6ed3c8b8f7ff5cd301a11d366b34"
+    },
+    {
+      "path": "qualification/t50-generated/t50_generated.py",
+      "sha256": "b23d81db7a2da5e96a618aac29209486d7e62eb5563610656c847c3a2b45a1fa"
+    },
+    {
+      "path": "qualification/t50-generated/t50_oracle.py",
+      "sha256": "02ef3f567e84e2e11459e3af0d642f867740de24125a29145c8500ed7b36a116"
+    },
+    {
+      "path": "qualification/t50-generated/test_t50_generated.py",
+      "sha256": "747f640dd0a8d855a0869acfdb3b7f8de1dec058371cd109ddbb030859ff57a0"
+    }
+  ]
+}
