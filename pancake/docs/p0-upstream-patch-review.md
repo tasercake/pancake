@@ -71,8 +71,11 @@ used to clear the audit.
 | --- | --- |
 | Pre-patch `python3 -m unittest discover -s pancake/vendor/tests -v` | Expected red: five CubeCL macro-package identity failures and one `pin-utils` dependency failure. Provenance identity check passed. |
 | Post-patch contract tests | Four tests passed, including package identity, retired dependency removal, original package provenance and reviewed changed-file hashes. |
-| Upstream `spin_on` unit/doc tests plus immovable-future regression | Passed: two upstream unit tests, one original doctest, one added address-stability/drop/waker regression. Run from the independent validation workspace below. |
-| Existing upstream CubeCL macro/unit tests | Pending separate Rust validation. |
+| Upstream `spin_on` unit/doc tests plus immovable-future regression | Passed on Rust 1.100.0: two upstream unit tests, one original doctest, one added address-stability/drop/waker regression. Same four passed under Miri with strict provenance and symbolic alignment checks. |
+| Existing upstream CubeCL unit tests | Passed on Rust 1.100.0: core 12, C++ generator 20, standard library 50; SPIR-V crate built with zero unit tests. These are code-generation tests, not physical CUDA/Metal/AMD execution. HIP build/device execution was not tested. |
+| Existing upstream CubeCL macro integration tests | Both trybuild groups passed: two rejected programs and three accepted programs. No expected-error snapshots changed. |
+| Independent validation lock | `pastey` 0.2.3 present; no package named `paste` or `pin-utils`. Lock SHA-256: `a638b910684a73a08a3a32d130a79d0a6a213f42cf211f893ce12f61a8740399`. This is not the integrated application lock. |
+| Exact archive/source comparison | All 390 upstream files checked against SHA-pinned original archives. Only seven files differ: five CubeCL manifests, `spin_on` manifest and `spin_on/src/lib.rs`. Added tests/provenance are separate. |
 | `bash scripts/check.sh all` | Exit 0 on dependency-free scaffold, but **not a clean integrated pass**: cargo-machete reported six vendor metadata/workspace errors and returned success. Other scaffold gates passed. Kernel agent owns root workspace exclusion; policy agent owns fail-closed dependency checking. |
 
 To keep root manifests under the kernel agent's ownership, exact copies of the
@@ -82,8 +85,16 @@ workspace lists those packages as members and applies the same path overrides.
 No copied package source or manifest was modified for this harness. Command:
 
 ```sh
-cargo test --manifest-path artifacts/p0-upstream-validation/Cargo.toml -p spin_on
+cargo +1.100.0 test --locked --manifest-path artifacts/p0-upstream-validation/Cargo.toml -p spin_on
+cargo +1.100.0 test --locked --manifest-path artifacts/p0-upstream-validation/Cargo.toml -p cubecl-core -p cubecl-std -p cubecl-cpp -p cubecl-spirv --lib -j 2
+cargo +1.100.0 test --locked --manifest-path artifacts/p0-upstream-validation/Cargo.toml -p cubecl-core --test mod -j 2
+CARGO_BUILD_JOBS=2 MIRIFLAGS="-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check" cargo +nightly-2026-11-15 miri test --locked --manifest-path artifacts/p0-upstream-validation/Cargo.toml -p spin_on
 ```
+
+Saved local logs: `artifacts/p0-upstream-validation/core-macro-regressions.log`
+and `artifacts/p0-upstream-validation/spin-on-miri.log`. The application manifest
+and lockfile were not edited by this workstream. Their actual resolved stack,
+first-party gates and device proofs must be checked after integration.
 
 The original upstream README files and one C++ backend Rust string retain seven
 trailing-whitespace lines from their exact published archives. The patch does
