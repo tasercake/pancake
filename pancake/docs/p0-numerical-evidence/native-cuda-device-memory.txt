@@ -1,0 +1,34 @@
+device=DeviceIdentity {
+    name: "NVIDIA GeForce RTX 3090",
+    fingerprint: "ptx_sm86",
+    physical: Some(
+        PhysicalDevice {
+            pci_address: Some(
+                PciAddress {
+                    domain: 0,
+                    bus: 1,
+                    device: 0,
+                    function: 0,
+                },
+            ),
+            luid: None,
+            registry_entry_id: None,
+            vendor: Some(
+                Nvidia,
+            ),
+        },
+    ),
+}
+warm=MemoryUsage {
+    number_allocs: 8,
+    bytes_in_use: 128,
+    bytes_padding: 3968,
+    bytes_reserved: 12582912,
+}
+settled=MemoryUsage {
+    number_allocs: 8,
+    bytes_in_use: 128,
+    bytes_padding: 3968,
+    bytes_reserved: 12582912,
+}
+logical_request_budget=8388608

@@ -1,0 +1,234 @@
+{
+  "source_commit": "cc316513d1d3855e58ec49843637f1f0d08876d3",
+  "parent_commits": [
+    "572e601",
+    "65185d9"
+  ],
+  "archive_sha256": "11980ab5a8f20212a9003bf4d520585b49c654277aea502a2b23ac1bae3aa596",
+  "source_sha256": {
+    "Cargo.toml": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649",
+    "Cargo.lock": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b",
+    "src/lib.rs": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+    "src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f",
+    "tests/common/numerical_cases.rs": "a50430ef9f27f034102e6b38c3ca05be2cd3c48f1deb893cb4285d031d1ca379",
+    "tests/cpu_numerical_contract.rs": "dcf157f8687c9ef5fa3e0d2fb4afe41bc1df59dfad3095c86d859d5baac37335",
+    "tests/gpu_numerical_contract.rs": "6bde33a0c256ba5cf653286e2a07da1cd236482d3e606f72e4d46029a94631fc"
+  },
+  "runtimes": {
+    "native_metal": {
+      "device": "Apple M4 Pro",
+      "fingerprint": "msl_Apple M4 Pro",
+      "run": {
+        "command": [
+          "cargo",
+          "+1.100.0",
+          "test",
+          "--locked",
+          "--features",
+          "cubecl/metal-native",
+          "--test",
+          "native_numerical_contract",
+          "-j2",
+          "--",
+          "--test-threads=1"
+        ],
+        "cwd": "artifacts/p0-numerics/pancake",
+        "exit_code": 0,
+        "elapsed_seconds": 108.93566604098305,
+        "stopped_for": null,
+        "log_cap_bytes": 1048576,
+        "log_bytes": 7987,
+        "discarded_log_bytes": 0,
+        "initial_free_bytes": 63340670976,
+        "minimum_free_bytes": 58424172544,
+        "final_free_bytes": 58423853056,
+        "environment": {
+          "CARGO_TARGET_DIR": "/Users/krishna/Documents/focus-stacking/.worktrees/p0-unblock/pancake/target",
+          "CARGO_HOME": null,
+          "RUSTUP_HOME": null,
+          "RUSTFLAGS": null,
+          "CUDARC_CUDA_VERSION": null,
+          "LD_LIBRARY_PATH": null
+        }
+      },
+      "host": {
+        "architecture": "Darwin 25.2.0 arm64",
+        "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+        "device_file_sha256": "6d07bf7bd390431c99f30bea242fa91c69ca4eeb606e6edce657cba28fe80cd8"
+      },
+      "warm": {
+        "number_allocs": 0,
+        "bytes_in_use": 0,
+        "bytes_reserved": 12582912
+      },
+      "settled": {
+        "number_allocs": 0,
+        "bytes_in_use": 0,
+        "bytes_reserved": 12582912
+      }
+    },
+    "native_cuda": {
+      "device": "NVIDIA GeForce RTX3090",
+      "fingerprint": "ptx_sm86",
+      "run": {
+        "command": [
+          "cargo",
+          "+1.100.0",
+          "test",
+          "--locked",
+          "--features",
+          "cubecl/cuda",
+          "--test",
+          "native_numerical_contract",
+          "-j2",
+          "--",
+          "--test-threads=1"
+        ],
+        "cwd": "/work/p0-numerics/pancake",
+        "exit_code": 0,
+        "elapsed_seconds": 23.527711272996385,
+        "stopped_for": null,
+        "log_cap_bytes": 1048576,
+        "log_bytes": 1237,
+        "discarded_log_bytes": 0,
+        "initial_free_bytes": 25557516288,
+        "minimum_free_bytes": 24810442752,
+        "final_free_bytes": 24810438656,
+        "environment": {
+          "CARGO_TARGET_DIR": "/work/pancake/target",
+          "CARGO_HOME": "/opt/pancake-cargo",
+          "RUSTUP_HOME": "/opt/pancake-rustup",
+          "RUSTFLAGS": "-Dwarnings",
+          "CUDARC_CUDA_VERSION": "12050",
+          "LD_LIBRARY_PATH": "/opt/pancake-cuda/lib64"
+        }
+      },
+      "host": {
+        "architecture": "Linux 6.8.0-147-generic x86_64",
+        "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+        "gpu": "NVIDIA GeForce RTX 3090, 580.178.04",
+        "source_sha256": {
+          "Cargo.toml": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649",
+          "Cargo.lock": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b",
+          "src/lib.rs": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+          "src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f",
+          "tests/common/numerical_cases.rs": "a50430ef9f27f034102e6b38c3ca05be2cd3c48f1deb893cb4285d031d1ca379",
+          "tests/cpu_numerical_contract.rs": "dcf157f8687c9ef5fa3e0d2fb4afe41bc1df59dfad3095c86d859d5baac37335",
+          "tests/gpu_numerical_contract.rs": "6bde33a0c256ba5cf653286e2a07da1cd236482d3e606f72e4d46029a94631fc",
+          "tests/native_numerical_contract.rs": "d5b1ee2f750bb1935c67c0ac19c4d284b2388e43f69214929922a7f1d4684936"
+        },
+        "hip_source": {
+          "version": "7.14.6085001",
+          "hipconfig": null,
+          "rocm_prefix_exists": false,
+          "HIP_PATH": null,
+          "ROCM_PATH": null,
+          "source_sha256": {
+            "build.rs": "e55a038323145157adce611b414fc211fb8f50644707e6a07c5969fadd2a8951",
+            "Cargo.toml": "1bdc795466fb48f67a0a2deb40bfd827cbcfbea2ff75aa4ab7f94ebba40de57d",
+            "src/lib.rs": "d3e9ee4b17422cc35f5d58bf8a2af9638e3987fcbff2026b0b8d84687aba8e9f",
+            "src/dynamic.rs": "537ec6d702681450304c502e07d48a978045bfe834a058d5ef8db33b7b58488a"
+          }
+        },
+        "container_state": "left running; lifecycle owned by p0_drift",
+        "free_bytes": 18397310976
+      },
+      "warm": {
+        "number_allocs": 8,
+        "bytes_in_use": 128,
+        "bytes_padding": 3968,
+        "bytes_reserved": 12582912
+      },
+      "settled": {
+        "number_allocs": 8,
+        "bytes_in_use": 128,
+        "bytes_padding": 3968,
+        "bytes_reserved": 12582912
+      }
+    },
+    "hip": {
+      "status": "compile_link_passed_no_execution",
+      "run": {
+        "command": [
+          "cargo",
+          "+1.100.0",
+          "test",
+          "--locked",
+          "--features",
+          "cubecl/hip",
+          "--test",
+          "cpu_numerical_contract",
+          "--no-run",
+          "-j2"
+        ],
+        "cwd": "/work/p0-numerics/pancake",
+        "exit_code": 0,
+        "elapsed_seconds": 32.845310384989716,
+        "stopped_for": null,
+        "log_cap_bytes": 1048576,
+        "log_bytes": 997,
+        "discarded_log_bytes": 0,
+        "initial_free_bytes": 22723440640,
+        "minimum_free_bytes": 18397663232,
+        "final_free_bytes": 18398404608,
+        "environment": {
+          "CARGO_TARGET_DIR": "/work/pancake/target",
+          "CARGO_HOME": "/opt/pancake-cargo",
+          "RUSTUP_HOME": "/opt/pancake-rustup",
+          "RUSTFLAGS": "-Dwarnings",
+          "CUDARC_CUDA_VERSION": null,
+          "LD_LIBRARY_PATH": null
+        }
+      },
+      "environment": {
+        "version": "7.14.6085001",
+        "hipconfig": null,
+        "rocm_prefix_exists": false,
+        "HIP_PATH": null,
+        "ROCM_PATH": null,
+        "source_sha256": {
+          "build.rs": "e55a038323145157adce611b414fc211fb8f50644707e6a07c5969fadd2a8951",
+          "Cargo.toml": "1bdc795466fb48f67a0a2deb40bfd827cbcfbea2ff75aa4ab7f94ebba40de57d",
+          "src/lib.rs": "d3e9ee4b17422cc35f5d58bf8a2af9638e3987fcbff2026b0b8d84687aba8e9f",
+          "src/dynamic.rs": "537ec6d702681450304c502e07d48a978045bfe834a058d5ef8db33b7b58488a"
+        }
+      },
+      "linked_binary_sha256": "9d707da750e72a0364cc40870e16c79c09f2c93adb5c0c4d6dab0f8e5a657579",
+      "missing_dynamic_libraries": false
+    }
+  },
+  "logical_request_budget_bytes": 8388608,
+  "resource_scope": "Logical working-data admission guard; driver allocator reservation is 12MiB on both measured native backends, not capped by the 8MiB request guard.",
+  "log_receipts": {
+    "native-metal.log": {
+      "raw_sha256": "3314ac22a83d49eb137164c851ce2e9120800dab369efbcf9b25b1c8583c65ba",
+      "gzip_sha256": "d1b9de61cde51ac6f75ce18bdf0ab96e223af36ee3692a68e5f21a41984fb74d",
+      "raw_bytes": 7987,
+      "gzip_bytes": 2254
+    },
+    "native-cuda.log": {
+      "raw_sha256": "993215ec939d63d6f62551b7ceafdcd0805a3db645b565dbe0f2a8b03fd04dd8",
+      "gzip_sha256": "b092b110c3314e6f7e6d0a8b0cc4a8de80e669914e012b0652111751ea2b9af3",
+      "raw_bytes": 1237,
+      "gzip_bytes": 434
+    },
+    "hip-compile-link.log": {
+      "raw_sha256": "946f59b250a57c853cdf4b3db5aa1c7431a170e361d0f2780a5c49c61cc6091d",
+      "gzip_sha256": "83131afeb4b849725f0b9dab6b059c9d53f9a91dd7010331f154911e70a9ab1f",
+      "raw_bytes": 997,
+      "gzip_bytes": 320
+    }
+  },
+  "harness_sha256": {
+    "metal": "8384d7259f70475d10393a61561325c680d730aaac7c2569f301e06568fe49dc",
+    "cuda": "d5b1ee2f750bb1935c67c0ac19c4d284b2388e43f69214929922a7f1d4684936"
+  },
+  "bounded_runner_sha256": "d165f28de539f254b54e73de2ec16371321565923d0753269f202e266e08ca6f",
+  "concurrency": "GPU slot coordinated with UI owner; container lifecycle stayed with p0_drift; /work/pancake and /work/p0-ui sources untouched. Shared normal debug cache retained.",
+  "checks_not_claimed": [
+    "HIP execution or AMD GPU availability",
+    "Full blur/FFT/warp/pyramid/registration/five-method battery",
+    "End-to-end performance or half-memory acceptance",
+    "Native backend sanitizer execution"
+  ]
+}

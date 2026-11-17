@@ -1,0 +1,29 @@
+device=DeviceIdentity {
+    name: "Apple M4 Pro",
+    fingerprint: "msl_Apple M4 Pro",
+    physical: Some(
+        PhysicalDevice {
+            pci_address: None,
+            luid: None,
+            registry_entry_id: Some(
+                RegistryEntryId(
+                    4294968351,
+                ),
+            ),
+            vendor: None,
+        },
+    ),
+}
+warm=MemoryUsage {
+    number_allocs: 0,
+    bytes_in_use: 0,
+    bytes_padding: 0,
+    bytes_reserved: 12582912,
+}
+settled=MemoryUsage {
+    number_allocs: 0,
+    bytes_in_use: 0,
+    bytes_padding: 0,
+    bytes_reserved: 12582912,
+}
+logical_request_budget=8388608

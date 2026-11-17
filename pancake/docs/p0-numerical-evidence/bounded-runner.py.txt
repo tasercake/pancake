@@ -1,0 +1,63 @@
+"""Run one owned native qualification command with log, time and disk bounds."""
+
+import argparse
+import json
+import os
+from pathlib import Path
+import selectors
+import shutil
+import signal
+import subprocess
+import time
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--cwd", required=True)
+parser.add_argument("--log", required=True, type=Path)
+parser.add_argument("--summary", required=True, type=Path)
+parser.add_argument("--disk-root", required=True)
+parser.add_argument("--timeout", type=int, default=420)
+parser.add_argument("command", nargs=argparse.REMAINDER)
+args = parser.parse_args()
+command = args.command[1:] if args.command[:1] == ["--"] else args.command
+reserve = 15 * 1024**3
+cap = 1024**2
+started = time.monotonic()
+initial_free = shutil.disk_usage(args.disk_root).free
+if initial_free < reserve:
+    raise SystemExit("Disk is below required 15 GiB reserve before execution")
+process = subprocess.Popen(command, cwd=args.cwd, stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT, start_new_session=True)
+selector = selectors.DefaultSelector()
+selector.register(process.stdout, selectors.EVENT_READ)
+written = discarded = 0
+stop = None
+minimum_free = initial_free
+args.log.parent.mkdir(parents=True, exist_ok=True)
+with args.log.open("wb") as log:
+    while selector.get_map():
+        elapsed = time.monotonic() - started
+        minimum_free = min(minimum_free, shutil.disk_usage(args.disk_root).free)
+        if stop is None and (elapsed > args.timeout or minimum_free < reserve):
+            stop = "timeout" if elapsed > args.timeout else "disk_reserve"
+            os.killpg(process.pid, signal.SIGKILL)
+        for key, _ in selector.select(timeout=0.2):
+            data = os.read(key.fd, 16384)
+            if not data:
+                selector.unregister(key.fileobj)
+                continue
+            retained = data[:max(0, cap - written)]
+            log.write(retained)
+            written += len(retained)
+            discarded += len(data) - len(retained)
+code = process.wait(timeout=10)
+report = {"command": command, "cwd": args.cwd, "exit_code": code,
+          "elapsed_seconds": time.monotonic() - started,
+          "stopped_for": stop, "log_cap_bytes": cap, "log_bytes": written,
+          "discarded_log_bytes": discarded, "initial_free_bytes": initial_free,
+          "minimum_free_bytes": minimum_free, "final_free_bytes": shutil.disk_usage(args.disk_root).free,
+          "environment": {name: os.environ.get(name) for name in
+                          ("CARGO_TARGET_DIR", "CARGO_HOME", "RUSTUP_HOME", "RUSTFLAGS",
+                           "CUDARC_CUDA_VERSION", "LD_LIBRARY_PATH")}}
+args.summary.write_text(json.dumps(report, indent=2) + "\n")
+print(json.dumps(report))
+raise SystemExit(code if code > 0 else (1 if code < 0 or stop else 0))

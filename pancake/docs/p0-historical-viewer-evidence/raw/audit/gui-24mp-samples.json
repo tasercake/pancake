@@ -1,0 +1,107 @@
+[
+  {
+    "elapsed_seconds": 0.017969875130802393,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "23312   0.0 00:00"
+  },
+  {
+    "elapsed_seconds": 0.5369175830855966,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "3444016  75.1 00:01"
+  },
+  {
+    "elapsed_seconds": 1.0576565423980355,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2510384  14.6 00:01"
+  },
+  {
+    "elapsed_seconds": 1.57845350028947,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2510384   5.6 00:02"
+  },
+  {
+    "elapsed_seconds": 2.0956356674432755,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2510384   3.6 00:02"
+  },
+  {
+    "elapsed_seconds": 2.6108534173108637,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2510384   2.5 00:03"
+  },
+  {
+    "elapsed_seconds": 3.1366806253790855,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2510384   2.3 00:03"
+  },
+  {
+    "elapsed_seconds": 3.6622187923640013,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2510384   4.0 00:04"
+  },
+  {
+    "elapsed_seconds": 4.190250500105321,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2510384   3.8 00:04"
+  },
+  {
+    "elapsed_seconds": 4.721838125027716,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2510384   3.0 00:05"
+  },
+  {
+    "elapsed_seconds": 5.242453792132437,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2510384   2.9 00:05"
+  },
+  {
+    "elapsed_seconds": 5.76303325034678,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2549872   7.8 00:06"
+  },
+  {
+    "elapsed_seconds": 6.282963875215501,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2549872   3.0 00:06"
+  },
+  {
+    "elapsed_seconds": 6.8113395832479,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2549872   2.7 00:07"
+  },
+  {
+    "elapsed_seconds": 7.3355179582722485,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2549872   3.7 00:07"
+  },
+  {
+    "elapsed_seconds": 7.856674208305776,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2549872   2.4 00:08"
+  },
+  {
+    "elapsed_seconds": 8.38541491702199,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2549872   2.6 00:08"
+  },
+  {
+    "elapsed_seconds": 8.91240854235366,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2549872   2.5 00:09"
+  },
+  {
+    "elapsed_seconds": 9.428780333139002,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2549872   2.3 00:09"
+  },
+  {
+    "elapsed_seconds": 9.955265708267689,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2549872   2.8 00:10"
+  },
+  {
+    "elapsed_seconds": 10.477044792380184,
+    "pid": 98325,
+    "ps_rss_kib_pcpu_etime": "2624240  16.6 00:10"
+  }
+]

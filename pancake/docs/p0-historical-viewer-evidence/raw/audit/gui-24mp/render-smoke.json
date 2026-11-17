@@ -1,0 +1,11 @@
+{
+  "changed_central_pixels": 944000,
+  "exposure_ev": 1.0,
+  "height": 1600,
+  "kind": "programmatic_render_smoke",
+  "max_allowed_oracle_error": 1,
+  "native_input_verified": false,
+  "selected": 1,
+  "snapshot_readbacks": 2,
+  "width": 2360
+}

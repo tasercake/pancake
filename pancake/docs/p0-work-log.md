@@ -52,7 +52,9 @@ plan record explicit transfers and final closure status.
 The earlier experiment is archived as small immutable documents under
 [`p0-historical-viewer-evidence/`](p0-historical-viewer-evidence/README.md).
 `provenance.json` records original source/manifest/lock hashes at `0c83870`.
-Numerical performance samples identify `6b9db62`; later callback/smoke changes
+Raw benchmark samples, rendered PNGs and GUI memory samples are archived under
+`p0-historical-viewer-evidence/raw/` with exact hashes. Numerical performance
+samples identify `6b9db62`; later callback/smoke changes
 must not be silently attributed to that measurement revision.
 
 | Check | Observed result / limit |
@@ -157,6 +159,14 @@ shape-error `?` return. Added shared public invalid-shape oracle (`65185d9`)
 instead of excluding the region. One parallel coverage run reused an
 instrumented cache and reported another worktree's source paths; that run is
 invalid evidence. Final aggregate owns instrumented collection exclusively.
+
+New native runtime receipt: [p0-numerical-qualification.md](p0-numerical-qualification.md)
+and [exact evidence](p0-numerical-evidence/evidence.json). Native Metal and CUDA
+both complete the unchanged variance/budget/reuse oracle. Metal live allocations
+return to zero; CUDA retains eight / 128 bytes, unchanged after eight rounds.
+Both reserve 12 MiB before/after. Linux HIP `--no-run` compiles/links an ELF
+without ROCm/hipconfig or missing dynamic dependencies. No HIP execution claim.
+New Vulkan reduction receipt is still being collected separately.
 
 ## 7. Assurance: observed failures and adopted boundary
 
