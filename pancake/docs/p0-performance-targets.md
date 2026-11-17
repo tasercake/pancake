@@ -96,16 +96,22 @@ Every measurement needs ordered input SHA-256/size/shape/metadata, source/rights
 conversion commands, program/runtime locks and options, hardware/driver/OS,
 counter versions, all raw samples, output hashes and validation results.
 
-**Targets are fixed; corpus qualification and measurements are pending.** Initial
+**Targets are fixed; full corpus/baseline qualification remains pending.** Initial
 read-only workspace discovery found no RAW/TIFF corpus under `datasets/`, only
 Bokehforge state/cache/report directories. Versioned source policy lists D02
 Sood CR3 as a possible real source, but naming a source is not selecting or
 qualifying its files. D01/LSFD remains excluded and the existing 2 GiB download
-budget remains in force. A separate bounded acquisition audit may supply real
-D150/E9 candidates; reduced-count/resolution baseline smoke must remain labelled
-diagnostic until exact workload and sample requirements are met.
+budget remains in force. The subsequent [bounded acquisition/baseline audit](p0-performance-baseline.md)
+pinned 150 real 2304x1728 dorsal focus JPEGs and nine real 512x339 Balloons
+exposure PNGs. It completed one reference CPU job per selected method: D150
+Hybrid 30.585 seconds with peak RSS 2,897,117,184 bytes; E9 exposure 0.877 seconds
+with peak RSS 237,469,696 bytes. These are diagnostic observations, not medians,
+unified-memory footprint measurements or target passes.
 
-No reference timing, candidate timing, memory or native input-latency result is
-claimed by this document. P0.01 remains blocked until the real corpus and support
-matrix are qualified; P0.16 remains unexecuted until real candidate code and
-valid matched baselines exist.
+The diagnostic jobs use kernel 3/levels 4 instead of the frozen 6/8 profile;
+auto-crop is absent, and E9 has no alignment instead of Euclidean alignment.
+They cannot become qualified baselines without the matched profile and full
+sampling/validation protocol. T50/R50 remain unselected. No candidate timing or
+native input-latency result exists. P0.01 remains blocked until the complete
+real corpus and support matrix are qualified; P0.16 remains unexecuted until
+real candidate code and valid matched baselines exist.

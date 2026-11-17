@@ -62,6 +62,11 @@ A new worktree-local Numba cache was used initially; E9 followed D150 and reused
 populated import/kernel caches. OS file caches were not cleared. There were no
 two warmups plus ten measured warm jobs or five fresh-cache cold runs.
 
+These jobs also differ from the frozen target profile: kernel 3/levels 4 rather
+than 6/8, no auto-crop, and E9 without the target's Euclidean alignment. Exact
+profile equality must be established before a future matched comparison;
+these single diagnostic values cannot be promoted into qualified baselines.
+
 The integration-owned target specification remains authoritative: at least 2x
 warm completed-job speed, no more than 50% reference peak process memory at
 equal quality, nonregressing cold median, viewer event-to-present P95 at most

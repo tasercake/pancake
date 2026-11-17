@@ -80,8 +80,8 @@ application/kernel work.
 
 | Gate | Current marker | Evidence and remaining condition |
 |---|---|---|
-| P0.01 | **BLOCKED; two subtasks complete** | Snapshot drift reviewed/adopted; concrete [performance targets](p0-performance-targets.md) frozen. Exact real benchmark corpus and full supported matrix remain unqualified; baseline not measured to the required protocol. |
-| P0.02 | **BLOCKED** | [Hardware audit](p0-hardware-test-lanes.md): local M4 Pro identified; current x86-64/NVIDIA/AMD/Intel/Windows access unqualified; guest identity/login unverified. Linux private desktop is a valid physical-GPU route. |
+| P0.01 | **BLOCKED; drift/targets complete, real corpus partial** | Snapshot drift reviewed/adopted; concrete [performance targets](p0-performance-targets.md) frozen. Real D150/E9 inputs pinned and [single reference diagnostics](p0-performance-baseline.md) completed. T50/R50 and full supported matrix remain unqualified; baseline protocol incomplete. |
+| P0.02 | **BLOCKED; Apple/NVIDIA access identified** | [Hardware audit](p0-hardware-test-lanes.md): local M4 Pro and reachable existing Linux x86-64 RTX 3090 host identified; native runtime/GUI execution unqualified. AMD/Intel/Windows access and guest login remain unresolved. Linux private desktop is a valid physical-GPU route. |
 | P0.03 | **BLOCKED; candidate graph rejected** | [Runtime audit](p0-runtime-feasibility.md): three actual cargo-deny candidate failures: the minimal patch-refreshed graph still has 30 duplicate-version groups and six unmaintained advisories; narrowing removed the original missing-license error. GPL-only allowlist additions need routine concrete license review; they do not resolve the independent graph blockers. No candidate dependencies adopted. |
 | P0.04 | **NOT RUN; static API route identified** | Safe tensor-backed launch APIs found in installed source; no policy-compliant custom kernel compiled or executed. |
 | P0.05 | **BLOCKED / NOT QUALIFIED** | All local empty-scaffold gates pass; real executable Slint/JIT coverage/Miri/sanitizer design remains unproven. Empty-source success does not qualify this gate. |
@@ -95,7 +95,7 @@ application/kernel work.
 | P0.13 | **NOT RUN** | No actual Slint accessibility replay through current native driver. |
 | P0.14 | **NOT RUN** | No actual worker lifecycle replay; no artificial timing substitute introduced. |
 | P0.15 | **NOT RUN; routes reviewed** | Existing Linux native route and macOS VM constraints inspected; Pancake binary/GUI deployment and physical-GPU completion not executed. |
-| P0.16 | **NOT RUN** | Numeric targets fixed; matched real-corpus reference/candidate performance not qualified. |
+| P0.16 | **NOT RUN; reference diagnostics available** | D150 Hybrid CPU 30.585 s, peak RSS 2,897,117,184 bytes; E9 exposure CPU 0.877 s, peak RSS 237,469,696 bytes, each n=1. These use a reduced/mismatched profile and no matched Pancake job; no target, warm/cold statistic, half-memory or quality-equivalence pass. |
 | P0.17 | **BLOCKED** | P0 is not complete; P1 cannot start with these open gates. |
 
 Finite prototypes cannot prove all future implementation details. Full-case

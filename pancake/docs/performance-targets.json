@@ -6,8 +6,8 @@
   "targets_version": "p0-initial-1",
   "qualification": {
     "performance_pass": false,
-    "corpus_status": "not_selected_or_frozen",
-    "reference_baseline_status": "not_measured",
+    "corpus_status": "D150_and_E9_real_inputs_pinned;T50_and_R50_unselected",
+    "reference_baseline_status": "two_single_CPU_diagnostics_only;frozen_profile_and_statistical_protocol_pending",
     "pancake_runtime_status": "not_implemented",
     "p0_01_status": "blocked_on_real_corpus_and_support_matrix"
   },
@@ -156,5 +156,35 @@
     "configured_candidate": "D02: jjjsood/focus-stack-sample, raw CR3 macro capture, pinned config revision 0f8256edf2d2e3f1f1ea162f78a8bca36eb6915c, CC BY 4.0 per versioned source config; not selected/acquired/verified here.",
     "selection_status": "pending",
     "budget": "Preserve Bokehforge configured 2147483648-byte download cap; no implicit dataset acquisition authorized by this metadata."
+  },
+  "corpus_evidence": {
+    "manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+    "status": "partial_real_corpus",
+    "report": "pancake/docs/p0-performance-baseline.md",
+    "D150": {
+      "selected_id": "D150-native-dorsal",
+      "native_frames": 150,
+      "dimensions": [
+        2304,
+        1728
+      ],
+      "input_precision_bits": 8,
+      "source_format": "JPEG"
+    },
+    "E9": {
+      "selected_id": "E9-native-balloons",
+      "native_frames": 9,
+      "dimensions": [
+        512,
+        339
+      ],
+      "input_precision_bits": 8,
+      "source_format": "PNG"
+    },
+    "T50": "not_selected",
+    "R50": "not_selected",
+    "qualification_baseline": "not_measured_to_frozen_profile_or_sample_protocol",
+    "retained_data_worktree": "/Users/krishna/Documents/focus-stacking/.worktrees/p0-performance",
+    "frame_path_resolution": "Native frame paths in performance-corpus.json are relative to retained_data_worktree, not the main checkout. Metadata integration does not copy images."
   }
 }
