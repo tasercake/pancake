@@ -34,7 +34,13 @@ jobs:
           persist-credentials: false
       - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
         with:
-          tool: cargo-nextest@0.9.152,cargo-hack@0.6.46,actionlint@1.7.12,shellcheck@0.11.0
+          tool: cargo-nextest@0.9.152,cargo-hack@0.6.46,shellcheck@0.11.0
+      - name: Install pinned actionlint from its Go module
+        run: |
+          source scripts/tool-versions.sh
+          export GOBIN="$RUNNER_TEMP/pancake-lint-tools"
+          go install "github.com/rhysd/actionlint/cmd/actionlint@v$PANCAKE_ACTIONLINT_VERSION"
+          printf '%s\n' "$GOBIN" >> "$GITHUB_PATH"
       - run: bash scripts/check.sh fast
       - run: bash scripts/check.sh test-cpu
 

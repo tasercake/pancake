@@ -1,0 +1,16 @@
+{
+  "logs": [
+    {
+      "original": ".worktrees/p0-patches/artifacts/p0-upstream-validation/core-macro-regressions.log",
+      "original_bytes": 21720,
+      "original_sha256": "e6cfa361b4a2c51465eb4e65142cf9cdeb4f91e8624e9ff7298d4fcab4de2680",
+      "archive": "core-macro-regressions.log.gz"
+    },
+    {
+      "original": ".worktrees/p0-patches/artifacts/p0-upstream-validation/spin-on-miri.log",
+      "original_bytes": 1070,
+      "original_sha256": "0636506bf0acda028dff37de57a9e7132190e1555a76e4d6caca7857919abc3b",
+      "archive": "spin-on-miri.log.gz"
+    }
+  ]
+}

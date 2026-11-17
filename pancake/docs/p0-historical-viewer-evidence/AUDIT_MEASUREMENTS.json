@@ -1,0 +1,218 @@
+{
+  "source_commit": "6b9db62",
+  "hardware": "Apple M4 Pro20GPUcores48GB",
+  "os": "macOS26.2(25C56)",
+  "statistics": "p95empiricalnearest-rank; timings CPUwallwithGPUcompletion; fiveprocessruns30iterationspercase",
+  "adapter": "AdapterInfo { name: \"Apple M4 Pro\", vendor: 0, device: 0, device_type: IntegratedGpu, device_pci_bus_id: \"\", driver: \"\", driver_info: \"\", backend: Metal, subgroup_min_size: 4, subgroup_max_size: 64, transient_saves_memory: Some(true), limit_bucket: None }",
+  "initialization": {
+    "n": 5,
+    "min_ms": 10.295584,
+    "median_ms": 10.32425,
+    "p95_ms": 11.756499999999999,
+    "max_ms": 11.756499999999999
+  },
+  "cases": [
+    {
+      "width": 257,
+      "height": 193,
+      "image_count": 3,
+      "estimated_live_gpu_bytes": 3717180,
+      "generation_ms": {
+        "n": 5,
+        "min_ms": 0.44916599999999995,
+        "median_ms": 0.462459,
+        "p95_ms": 0.543583,
+        "max_ms": 0.543583
+      },
+      "allocation_upload_ms": {
+        "n": 5,
+        "min_ms": 0.762125,
+        "median_ms": 0.797709,
+        "p95_ms": 0.888792,
+        "max_ms": 0.888792
+      },
+      "first_compute_for_shape_ms": {
+        "n": 5,
+        "min_ms": 5.5215000000000005,
+        "median_ms": 5.634209,
+        "p95_ms": 6.519457999999999,
+        "max_ms": 6.519457999999999
+      },
+      "readback_and_cpu_validation_ms": {
+        "n": 5,
+        "min_ms": 0.37541599999999997,
+        "median_ms": 0.38675,
+        "p95_ms": 0.419292,
+        "max_ms": 0.419292
+      },
+      "completed_compute_ms": {
+        "n": 150,
+        "min_ms": 0.132,
+        "median_ms": 0.16041650000000002,
+        "p95_ms": 0.412417,
+        "max_ms": 0.45625
+      },
+      "completed_buffer_to_texture_ms": {
+        "n": 150,
+        "min_ms": 0.123333,
+        "median_ms": 0.14910400000000001,
+        "p95_ms": 0.457916,
+        "max_ms": 0.5259579999999999
+      },
+      "max_u8_error": 0
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "image_count": 4,
+      "estimated_live_gpu_bytes": 199065600,
+      "generation_ms": {
+        "n": 5,
+        "min_ms": 23.636457999999998,
+        "median_ms": 23.807499999999997,
+        "p95_ms": 24.307875,
+        "max_ms": 24.307875
+      },
+      "allocation_upload_ms": {
+        "n": 5,
+        "min_ms": 26.171917,
+        "median_ms": 26.423790999999998,
+        "p95_ms": 29.941667000000002,
+        "max_ms": 29.941667000000002
+      },
+      "first_compute_for_shape_ms": {
+        "n": 5,
+        "min_ms": 7.524292,
+        "median_ms": 7.846417,
+        "p95_ms": 8.174166,
+        "max_ms": 8.174166
+      },
+      "readback_and_cpu_validation_ms": {
+        "n": 5,
+        "min_ms": 9.534749999999999,
+        "median_ms": 9.729042,
+        "p95_ms": 9.955874999999999,
+        "max_ms": 9.955874999999999
+      },
+      "completed_compute_ms": {
+        "n": 150,
+        "min_ms": 0.34016599999999997,
+        "median_ms": 0.8171255000000001,
+        "p95_ms": 0.903584,
+        "max_ms": 0.931709
+      },
+      "completed_buffer_to_texture_ms": {
+        "n": 150,
+        "min_ms": 0.167041,
+        "median_ms": 0.272667,
+        "p95_ms": 0.783334,
+        "max_ms": 0.939792
+      },
+      "max_u8_error": 0
+    },
+    {
+      "width": 6000,
+      "height": 4000,
+      "image_count": 2,
+      "estimated_live_gpu_bytes": 1152512000,
+      "generation_ms": {
+        "n": 5,
+        "min_ms": 136.42358299999998,
+        "median_ms": 136.971375,
+        "p95_ms": 137.944709,
+        "max_ms": 137.944709
+      },
+      "allocation_upload_ms": {
+        "n": 5,
+        "min_ms": 188.480125,
+        "median_ms": 189.216791,
+        "p95_ms": 198.830542,
+        "max_ms": 198.830542
+      },
+      "first_compute_for_shape_ms": {
+        "n": 5,
+        "min_ms": 61.256040999999996,
+        "median_ms": 61.679249999999996,
+        "p95_ms": 62.54304199999999,
+        "max_ms": 62.54304199999999
+      },
+      "readback_and_cpu_validation_ms": {
+        "n": 5,
+        "min_ms": 113.65658300000001,
+        "median_ms": 113.898167,
+        "p95_ms": 114.17804199999999,
+        "max_ms": 114.17804199999999
+      },
+      "completed_compute_ms": {
+        "n": 150,
+        "min_ms": 2.182166,
+        "median_ms": 2.2235625,
+        "p95_ms": 2.459875,
+        "max_ms": 3.455625
+      },
+      "completed_buffer_to_texture_ms": {
+        "n": 150,
+        "min_ms": 0.552458,
+        "median_ms": 0.580979,
+        "p95_ms": 3.530084,
+        "max_ms": 4.466792
+      },
+      "max_u8_error": 0
+    }
+  ],
+  "raw_evidence": [
+    {
+      "file": "artifacts/audit/benchmark-1.json",
+      "sha256": "f2a7e23079df6fcf6b4d2fa11cc0822b8f893db90edc7ee4fedfbf010284f754",
+      "maximum_resident_bytes": 3586555904,
+      "peak_memory_footprint_bytes": 4912303200
+    },
+    {
+      "file": "artifacts/audit/benchmark-2.json",
+      "sha256": "d956239b68778759f8fd9d78e285852261037e3ba6f8501f06aa3577c3fe5e75",
+      "maximum_resident_bytes": 3586080768,
+      "peak_memory_footprint_bytes": 4912303200
+    },
+    {
+      "file": "artifacts/audit/benchmark-3.json",
+      "sha256": "d497f051265e0c5d7e8288c184477c1cc413ab5c3d6bba8c9c11732b09f09134",
+      "maximum_resident_bytes": 3585982464,
+      "peak_memory_footprint_bytes": 4912204896
+    },
+    {
+      "file": "artifacts/audit/benchmark-4.json",
+      "sha256": "ab854979844b309fac8f1fdd3b4cc3528583efb67f7c5dc16b338422f71a4f3e",
+      "maximum_resident_bytes": 3585998848,
+      "peak_memory_footprint_bytes": 4912204872
+    },
+    {
+      "file": "artifacts/audit/benchmark-5.json",
+      "sha256": "20e144df48a95465c6e61cf32cd19bc8eb8618a4dbae714fff6cac0e63e05c08",
+      "maximum_resident_bytes": 3586031616,
+      "peak_memory_footprint_bytes": 4912270456
+    }
+  ],
+  "gui_24mp": {
+    "source_commit": "e52df36",
+    "input_images": 2,
+    "width": 6000,
+    "height": 4000,
+    "smoke_seconds": 10,
+    "maximum_resident_bytes": 3531177984,
+    "peak_memory_footprint_bytes": 4790799744,
+    "steady_before_snapshot_rss_bytes": 2570633216,
+    "steady_after_first_snapshot_rss_bytes": 2611068928,
+    "snapshot": {
+      "changed_central_pixels": 944000,
+      "exposure_ev": 1.0,
+      "height": 1600,
+      "kind": "programmatic_render_smoke",
+      "max_allowed_oracle_error": 1,
+      "native_input_verified": false,
+      "selected": 1,
+      "snapshot_readbacks": 2,
+      "width": 2360
+    },
+    "notes": "psRSSsampledabout0.5sec; snapshot/oracleperformsCPUreadbackonlysmokemode; nativeinputnotverified"
+  }
+}

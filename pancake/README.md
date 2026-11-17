@@ -2,7 +2,8 @@
 
 Rust 2024 foundation and P0 image-kernel qualification for Pancake. Slint 1.19,
 CubeCL 0.11.4 and wgpu 30 share one dependency graph. One safe CubeCL kernel
-applies a full-precision u16 horizontal blur on CPU LLVM JIT and GPU runtimes.
+applies a full-precision u16 horizontal blur; a second computes stable f32 row
+variance. Both use checked logical byte budgets on CPU LLVM JIT and GPU runtimes.
 
 From this directory:
 
@@ -59,3 +60,6 @@ status check. No repository ruleset is changed by this scaffold.
 CI runs on every push and pull request, daily, and manually. Actions use immutable
 commit pins and read-only permissions. Property tests, input fuzzing, CPU/GPU
 parity tests, and benchmarks become mandatory when their actual APIs exist.
+
+The [implementation plan](docs/implementation-plan.md) covers the application architecture and implementation milestones. The [P0 work log](docs/p0-work-log.md) consolidates
+current and historical proofs, failures and later acceptance owners.

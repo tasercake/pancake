@@ -1,5 +1,9 @@
 # P0 fix execution and remaining conditions
 
+> Historical report. The adopted smaller P0 and subsequent closure evidence are
+> recorded in [p0-work-log.md](p0-work-log.md) and the current plan. Original
+> failed/unrun results below are preserved, not promoted to passes.
+
 > Current scope update, 2026-11-17: AMD/Intel GPU and Windows execution/testing
 > are best effort; build support remains required. Missing access alone no longer
 > blocks P0. The [implementation plan](implementation-plan.md#testing-scope--adopted-user-decision-2026-11-17)

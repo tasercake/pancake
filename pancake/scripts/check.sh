@@ -206,11 +206,17 @@ case ${1:-all} in
         MIRIFLAGS="-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check" \
             cargo +"$PANCAKE_NIGHTLY" miri test --locked --workspace --all-features --lib -- --include-ignored
         for seed in 1 42; do
-            assurance_args=()
-            if [[ $1 == nightly-cpu ]]; then assurance_profile cpu; fi
-            RUSTFLAGS="-Dwarnings -Zrandomize-layout -Zlayout-seed=$seed" \
-                cargo +"$PANCAKE_NIGHTLY" test --locked --workspace --all-features \
-                    "${assurance_args[@]}" -- --include-ignored
+            # Bash 3.2 treats an empty array expansion as unset under nounset.
+            # Native tests retain Cargo's default unit/integration/doctest scope.
+            if [[ $1 == nightly-cpu ]]; then
+                assurance_profile cpu
+                RUSTFLAGS="-Dwarnings -Zrandomize-layout -Zlayout-seed=$seed" \
+                    cargo +"$PANCAKE_NIGHTLY" test --locked --workspace --all-features \
+                        "${assurance_args[@]}" -- --include-ignored
+            else
+                RUSTFLAGS="-Dwarnings -Zrandomize-layout -Zlayout-seed=$seed" \
+                    cargo +"$PANCAKE_NIGHTLY" test --locked --workspace --all-features -- --include-ignored
+            fi
         done
         ;;
     sanitizer | sanitizer-gpu)

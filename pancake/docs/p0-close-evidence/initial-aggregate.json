@@ -1,0 +1,102 @@
+{
+  "source_commit": "65185d9",
+  "aggregate_exit": 1,
+  "failure": "macOS Bash3.2 empty assurance_args array under set-u in nightly layout loop; strict Miri had already passed",
+  "coverage": {
+    "coverage-cpu.json": {
+      "sha256": "e6854f58e2696887468a43e155db1fd30adca6b459a6a25529a4180982f08045",
+      "totals": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 28,
+          "covered": 22,
+          "percent": 78.57142857142857
+        },
+        "lines": {
+          "count": 139,
+          "covered": 139,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 143,
+          "covered": 143,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "filenames": [
+        "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close/pancake/src/lib.rs"
+      ]
+    },
+    "coverage-native.json": {
+      "sha256": "839d1dd9f7cc47797c4293b33d22423ac24f1879a0788be14eaa7db2ee52af5d",
+      "totals": {
+        "branches": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "functions": {
+          "count": 14,
+          "covered": 14,
+          "percent": 100
+        },
+        "instantiations": {
+          "count": 28,
+          "covered": 22,
+          "percent": 78.57142857142857
+        },
+        "lines": {
+          "count": 139,
+          "covered": 139,
+          "percent": 100
+        },
+        "mcdc": {
+          "count": 0,
+          "covered": 0,
+          "notcovered": 0,
+          "percent": 0
+        },
+        "regions": {
+          "count": 143,
+          "covered": 143,
+          "notcovered": 0,
+          "percent": 100
+        }
+      },
+      "filenames": [
+        "/Users/krishna/Documents/focus-stacking/.worktrees/p0-close/pancake/src/lib.rs"
+      ]
+    }
+  },
+  "mutations": {
+    "total_mutants": 79,
+    "missed": 0,
+    "caught": 79,
+    "unviable": 0,
+    "timeout": 0
+  },
+  "source_sha256": {
+    "pancake/src/lib.rs": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+    "pancake/src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f",
+    "pancake/tests/common/numerical_cases.rs": "a50430ef9f27f034102e6b38c3ca05be2cd3c48f1deb893cb4285d031d1ca379",
+    "pancake/Cargo.lock": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b"
+  }
+}

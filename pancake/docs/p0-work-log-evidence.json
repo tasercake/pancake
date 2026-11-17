@@ -1,0 +1,508 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-17",
+  "scope": "P0 source and retained evidence; plan/work-log/self omitted to avoid recursive hashing. Photos, large binaries and ignored compiler caches are not committed. New receipts append before closure.",
+  "files": [
+    {
+      "path": ".github/workflows/pancake.yml",
+      "bytes": 4356,
+      "sha256": "13bcf3c92fa8e02e945d844302ce1c99430ff4dfc853337d766b4f807d382c50"
+    },
+    {
+      "path": "pancake/Cargo.lock",
+      "bytes": 206874,
+      "sha256": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b"
+    },
+    {
+      "path": "pancake/Cargo.toml",
+      "bytes": 3881,
+      "sha256": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649"
+    },
+    {
+      "path": "pancake/clippy.toml",
+      "bytes": 162,
+      "sha256": "ad6c3667dfa599f52feb977d29a450890653b2ae076cd1641175c4fbce655fba"
+    },
+    {
+      "path": "pancake/deny.toml",
+      "bytes": 551,
+      "sha256": "3c796ee0d127da2ba2ecd5598d54d61dd6a1b1fff0fa601f526edc536ee20b92"
+    },
+    {
+      "path": "pancake/dependency-policy.json",
+      "bytes": 124790,
+      "sha256": "02ce3ddfb5d9e24be0064d3f87f0c87166140d657ef771127351165e5b9734dc"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/initial-aggregate.json",
+      "bytes": 2721,
+      "sha256": "693f33684dde119d8420181c852ddf4b648fcae4d0fef7af24ef64247e715a4f"
+    },
+    {
+      "path": "pancake/docs/p0-close-evidence/local-all-before-bash-fix.log.gz",
+      "bytes": 2305,
+      "sha256": "fd466d276987680dc544f59dc649db2dcf97d3e6c5a1e7cc3fc8c8b3ba0119ba"
+    },
+    {
+      "path": "pancake/docs/p0-codec-evidence.json",
+      "bytes": 6694,
+      "sha256": "b1ecef5511a9f812e5c12d4cf8701bec30301b2eee1571e78387855d721fdf83"
+    },
+    {
+      "path": "pancake/docs/p0-codec-qualification.md",
+      "bytes": 9833,
+      "sha256": "729f3f77dcb6c6aae39eab4066ea44765d2c36d4fbe83bb2e8a941fac82f19fe"
+    },
+    {
+      "path": "pancake/docs/p0-guest-access-evidence.json",
+      "bytes": 2704,
+      "sha256": "4af6c82996c8177ed9578ab116b84f6243f055e6a49a64f7080ce684588c5a49"
+    },
+    {
+      "path": "pancake/docs/p0-guest-access-qualification.md",
+      "bytes": 4541,
+      "sha256": "b08e49f0fff1fe62b49cfe738e9ca238a6447be6f181cd4fa37f654f87b1a00d"
+    },
+    {
+      "path": "pancake/docs/p0-hardware-test-lanes.md",
+      "bytes": 15257,
+      "sha256": "99b7029b7b1fa9936e9b21ee67789a584bc7a76d537481683074f03b59929d5d"
+    },
+    {
+      "path": "pancake/docs/p0-historical-upstream-evidence/core-macro-regressions.log.gz",
+      "bytes": 4441,
+      "sha256": "d2999f0e0092f243f1d56285d659cda497875c7d38685e6300186f4dc077d962"
+    },
+    {
+      "path": "pancake/docs/p0-historical-upstream-evidence/provenance.json",
+      "bytes": 673,
+      "sha256": "b2f78f8b3031e59258df985ae821199826fa795b9c7dfbb41d82e77978b2d51a"
+    },
+    {
+      "path": "pancake/docs/p0-historical-upstream-evidence/spin-on-miri.log.gz",
+      "bytes": 454,
+      "sha256": "3b221b61fa74401b7fec49558ead3ea0a47ac1b1cff834ede1eabb09d0eb1167"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/AUDIT_MEASUREMENTS.json",
+      "bytes": 6510,
+      "sha256": "37763ec25413e1e9ca727ed07b8631829728cce23f84d8447c99ec6875b4bedf"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/BUILD_VALIDATION.md",
+      "bytes": 1665,
+      "sha256": "84f78e26554da61c7f648f31a42982a8745182d03c4c9c9821d9dc4dfe168f73"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/PERFORMANCE_AUDIT.md",
+      "bytes": 16522,
+      "sha256": "22c4ed3e5bfb812a62e4b8147b31149c8585285d348df87fb295ffb33d860bbe"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/README.md",
+      "bytes": 3564,
+      "sha256": "bf43ec920b8e59474a4079acfb28a5e906b1eed0341429a3bac9d1d559bd59e2"
+    },
+    {
+      "path": "pancake/docs/p0-historical-viewer-evidence/provenance.json",
+      "bytes": 4188,
+      "sha256": "ad06e88b9008f2382fe989dbcf87f4b0d4a3dbb3436f0f688c98fc846721de6e"
+    },
+    {
+      "path": "pancake/docs/p0-host-assurance.md",
+      "bytes": 4300,
+      "sha256": "aa98e60d14394d77d85c1b8ab0ac057547736331d385648b88a3969c7da9629c"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence.json",
+      "bytes": 2563,
+      "sha256": "0c410b36d473eeb774f574250748e8975a6013d9105c9b9eeed5bd0754206943"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/linux-desktop-probe.log.gz",
+      "bytes": 208,
+      "sha256": "2fbfbf0ce9ccc3a7bb93f48ced51325169cb44ac9dabaa0918154cc68e17631d"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/linux-merged-cuda-contract.log.gz",
+      "bytes": 348,
+      "sha256": "a2721d0a020b9e5de5a9e0be64758ff65937c065e097aeff2bff0264a06e8cce"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/linux-merged-kernel-contract.log.gz",
+      "bytes": 548,
+      "sha256": "081bc4ebff4b51de89e7a17737cab8d22bbc36f610e9fd95de5fe8c99ab38ab8"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/linux-suite-selftests.log.gz",
+      "bytes": 219,
+      "sha256": "ebdefaa113e64c8f42f744598e1061a66166624663bc2c5f9a92cc8380b5f498"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/local-integration-all.log.gz",
+      "bytes": 12766,
+      "sha256": "90cd2389f57172daebaf319f2a7e9fa69b26e61552a00cefedc9d8c621e178d0"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/native-cuda-contract.rs.txt",
+      "bytes": 976,
+      "sha256": "43cee0430ca24f3b9a927655d8651cdfe242347e250e8900017d120c206d5a76"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/native-merged-metal-contract.log.gz",
+      "bytes": 478,
+      "sha256": "403e4c9df20d7d6d17fc2d63f39d5d0318144360a46d651bdd758bd79f791a84"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/native-metal-contract.rs.txt",
+      "bytes": 997,
+      "sha256": "1b9d5780d66adff6937436eb977dfa01fdf783896fa36b73c71e2e77b10db487"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/rowan-layout-seed-1.log",
+      "bytes": 1100,
+      "sha256": "e74aa385f30f8e1e9772ab817b09df699ab6e94c8a17972cc9cbea1940f5a0af"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/rowan-layout-seed-42.log",
+      "bytes": 737,
+      "sha256": "2733f25b9dce2eff90f2a30f0f871ab7a3351a35c02bd3f7a6f3c3a19e509fb0"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/rowan-original-miri.log",
+      "bytes": 8635,
+      "sha256": "649e2d3b75807504a8ca4e1bebff6fcd149276e8265734d6b79f56ee4b8606d6"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-evidence/rowan-patched-miri.log",
+      "bytes": 5698,
+      "sha256": "f34d31dc6db47f8993c2bec4874f7d445384247905626d54890511e641542b9f"
+    },
+    {
+      "path": "pancake/docs/p0-kernel-qualification.md",
+      "bytes": 6533,
+      "sha256": "b1169a6016ae62a9618ebd14205330e068d18a8a7b22342ff38465cab4dec87d"
+    },
+    {
+      "path": "pancake/docs/p0-performance-baseline.md",
+      "bytes": 10500,
+      "sha256": "82741782dd4760ece97a10751c2ad2fb45ea307f1821b92df5054efa8a78aa62"
+    },
+    {
+      "path": "pancake/docs/p0-performance-targets.md",
+      "bytes": 9274,
+      "sha256": "d59d3622bf4e47c7cc48c3502effe95a5fbe185b2cf4133d8b210adf5b34d713"
+    },
+    {
+      "path": "pancake/docs/p0-raw-development-evidence.json",
+      "bytes": 5962,
+      "sha256": "3bc9d4e9e8c9b1572dd19eeb810f14ba7439ba94b4c480286d0b435165392c90"
+    },
+    {
+      "path": "pancake/docs/p0-raw-development-qualification.md",
+      "bytes": 6700,
+      "sha256": "6b8dd5e533ba964720ff23867a131414169c618dda427e32476072e894e4f0fe"
+    },
+    {
+      "path": "pancake/docs/p0-runtime-evidence.json",
+      "bytes": 35359,
+      "sha256": "3cf22fea2440d5fbed589acb312579508ec65bd33d4347d8b3c29ca87fda93fe"
+    },
+    {
+      "path": "pancake/docs/p0-runtime-feasibility.md",
+      "bytes": 15485,
+      "sha256": "3b792a6df8d0426a62e090b08e38b864c116d048ea2d54894ed626936b9843a5"
+    },
+    {
+      "path": "pancake/docs/p0-runtime-lock.patch",
+      "bytes": 152,
+      "sha256": "48fb2f4e13e568fc7400675aac8ce222b96fb720a5d67c4bcacfe963869c3a2f"
+    },
+    {
+      "path": "pancake/docs/p0-runtime-minimal-lock.patch",
+      "bytes": 3134,
+      "sha256": "0d710ef68ce365b9e9c8a42d50d7f5e48ee90ba416674fe532f74f8fe724aee3"
+    },
+    {
+      "path": "pancake/docs/p0-runtime-refreshed-lock.patch",
+      "bytes": 4860,
+      "sha256": "b2afc05899457d5e42630233834917d34e9f87a1d8c092694cc075e28042fcff"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/asan-gpu-loader.log.gz",
+      "bytes": 8240,
+      "sha256": "a5cb4ab14baaf21a90879eabb01fb1f36330ad57356c616f7861dca5c4bfef4f"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/asan-gpu-nvidia-only.log.gz",
+      "bytes": 7032,
+      "sha256": "5ccd52abd2a2928f2afedbb083e7536936e15311945bc1a607ab3bd3f400da52"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/asan-nvidia-vendors-head.txt",
+      "bytes": 600,
+      "sha256": "44cb53cb2ab2b9f538dd8c04421dfa52c342718083a011037afc4526e3cac425"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/cap-log.py",
+      "bytes": 199,
+      "sha256": "429d80750ec9244429a95ef26a26108efeb8d196c630a655cd96bb3d44ae3724"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/create-rust-probe.py",
+      "bytes": 919,
+      "sha256": "409c865667af158c8503605b3aaa35b7416ab64fd96ca0264db458fb235129ed"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/evidence.json",
+      "bytes": 8132,
+      "sha256": "e82e648874f2aa55fed73098859610c4ea0bca36a0f7b4aa39e8b1c34e047728"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/native-vs-asan.txt",
+      "bytes": 836,
+      "sha256": "8f0f537e18431b11462ee754528019c564aa820be2ac78902ead8959e150b290"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/original-linux-sanitizer-address.log.gz",
+      "bytes": 5597,
+      "sha256": "5f12cdb3ea78c6d573147691b3c64b6e16aa3c2565f13ef266e9c1faf098e469"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/rust-device-probe.rs",
+      "bytes": 2035,
+      "sha256": "c7acd5bbe3dc6fddedbe9482d042d2139bb3b0d70cb08ddc395340911b2d22ac"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/rust-probe-Cargo.lock.gz",
+      "bytes": 50164,
+      "sha256": "8e4b7a8dd38d410b8e6d326349562adf32f35ac5a5db4c8cebba73e0d6453afd"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/rust-probe-Cargo.toml",
+      "bytes": 975,
+      "sha256": "af1e630f99b02f6ef75c263d36d40a3aedb61eb2fe5922f82a90675b38983286"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/rust-vulkan-differential-summary.txt",
+      "bytes": 2812,
+      "sha256": "208f370db3003893e87f7aba2220f4777d6fe09a0343edeeaacf9ba276836f2a"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/slow-unwind-summary.txt",
+      "bytes": 2429,
+      "sha256": "4eeea4d9702d46dbecfb0f54e77c90773b87a3b3e6f3583ef692fd7cc61480fe"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/tsan-preflight-summary.txt",
+      "bytes": 1275,
+      "sha256": "c3fc03e2a9a6b06fa9d20c326324c8e1e9bee6a5786a9557c0cadf692db10f71"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-evidence/vulkan-device-probe.c",
+      "bytes": 2691,
+      "sha256": "04f8f008fa336114d26f11f11aa1490c6bb401f1ada19f315f4f46dfc2b96f4d"
+    },
+    {
+      "path": "pancake/docs/p0-sanitizer-investigation.md",
+      "bytes": 7210,
+      "sha256": "9f70f9bb9ef9c1800059750a99bbd3ef324804d213f0dae660b76faa28cd5f8d"
+    },
+    {
+      "path": "pancake/docs/p0-unblock-report.md",
+      "bytes": 8767,
+      "sha256": "9dc1a269df048d476d9478dc9a4f3cb828fd4a262eba856c49b2bfe4f9dfa25a"
+    },
+    {
+      "path": "pancake/docs/p0-upstream-patch-review.md",
+      "bytes": 7656,
+      "sha256": "2ba7ce39412572350fd0099edd11b94b3812f0f85b6db0ba6215230e5d327ea2"
+    },
+    {
+      "path": "pancake/docs/performance-targets.json",
+      "bytes": 12241,
+      "sha256": "2ba855b481d1df2852fd74ae61dfd9fb5e3da66e08bc78d60c9c848ac9e27cca"
+    },
+    {
+      "path": "pancake/scripts/assurance_targets.py",
+      "bytes": 1405,
+      "sha256": "044dcaefaf20b04fda64f974d464c79298c54ee4bbac234661bb204809e27a3a"
+    },
+    {
+      "path": "pancake/scripts/bootstrap.sh",
+      "bytes": 944,
+      "sha256": "9ea244a8c6eb936844de52c9895272652005a9e143d5492e2f47b3f66818c166"
+    },
+    {
+      "path": "pancake/scripts/check.sh",
+      "bytes": 11902,
+      "sha256": "b0ffc272bc460e28eb40b795ab849075339311cd0068eeea6d1bb63da08ae851"
+    },
+    {
+      "path": "pancake/scripts/check_unused_dependencies.py",
+      "bytes": 1622,
+      "sha256": "b78d9fbc2c8edb6142b6141a516d5e8c4102d0e4efbef3d21b234fbb24fc24f2"
+    },
+    {
+      "path": "pancake/scripts/compare_assurance_coverage.py",
+      "bytes": 2486,
+      "sha256": "a06a0f1498f6e6bfb37ed47403d7cee2d5e4005a0ae0db7bde96c6e6edf47419"
+    },
+    {
+      "path": "pancake/scripts/dependency_policy.py",
+      "bytes": 12124,
+      "sha256": "70daa6f90e237c6c95044a7ceefb31a2cb0e169f3f19ad41aea26ae0eef15184"
+    },
+    {
+      "path": "pancake/scripts/guardrail_manifest.py",
+      "bytes": 1647,
+      "sha256": "6ee57e067dba67c6c0484856d9ee9bcd3730eb8caa91214e7043c0554596dd47"
+    },
+    {
+      "path": "pancake/scripts/test-guardrails.sh",
+      "bytes": 4802,
+      "sha256": "2e9c55438c90aff6594c675fa577c38d5a9ade620ce797016c404f2d29d4480f"
+    },
+    {
+      "path": "pancake/scripts/test_assurance_coverage.py",
+      "bytes": 3140,
+      "sha256": "b73a25ec9d1b4660bd59f953167dab7e182dc6a450437fd20deabcee7f7b1c85"
+    },
+    {
+      "path": "pancake/scripts/test_assurance_targets.py",
+      "bytes": 2576,
+      "sha256": "27a2191488f50c7633491bc6ce370e3b8062a0f177971b4d94814222c3dffa26"
+    },
+    {
+      "path": "pancake/scripts/test_dependency_policy.py",
+      "bytes": 12170,
+      "sha256": "2aa36ca3451f54c806916ca2e08e2921750bb9d19eb968d768903b01eab4e44e"
+    },
+    {
+      "path": "pancake/scripts/test_guardrail_manifest.py",
+      "bytes": 2181,
+      "sha256": "74562509db4d0a2ef8083d109b75f27ec2fe7e2c30fff43e9b495836f832d42b"
+    },
+    {
+      "path": "pancake/scripts/test_unused_dependencies.py",
+      "bytes": 2143,
+      "sha256": "5956d7023e7408cf414866ed207fbf013659bb97926c62e1e67b183dc91a19c9"
+    },
+    {
+      "path": "pancake/scripts/tool-versions.sh",
+      "bytes": 340,
+      "sha256": "119585a7f2da02dede75bc9e253540e409c4c14e2933e9c77d15ed2b88396c92"
+    },
+    {
+      "path": "pancake/src/lib.rs",
+      "bytes": 9662,
+      "sha256": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51"
+    },
+    {
+      "path": "pancake/src/tests.rs",
+      "bytes": 5315,
+      "sha256": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f"
+    },
+    {
+      "path": "pancake/tests/common/kernel_cases.rs",
+      "bytes": 1370,
+      "sha256": "3aecde45edede0254025a4d9f01dbf1a46341605215ce9fee67753a056c5c47b"
+    },
+    {
+      "path": "pancake/tests/common/numerical_cases.rs",
+      "bytes": 3593,
+      "sha256": "a50430ef9f27f034102e6b38c3ca05be2cd3c48f1deb893cb4285d031d1ca379"
+    },
+    {
+      "path": "pancake/tests/cpu_kernel_contract.rs",
+      "bytes": 1321,
+      "sha256": "0779fe881f2ac3005a73801548fc2e078b44086e101e80761056311a78b8d118"
+    },
+    {
+      "path": "pancake/tests/cpu_numerical_contract.rs",
+      "bytes": 1148,
+      "sha256": "dcf157f8687c9ef5fa3e0d2fb4afe41bc1df59dfad3095c86d859d5baac37335"
+    },
+    {
+      "path": "pancake/tests/gpu_kernel_contract.rs",
+      "bytes": 1363,
+      "sha256": "2f1dc360cffeb47ab59d61c78ff614e08f8c19a6d6af183fc057e030b6fe6bb2"
+    },
+    {
+      "path": "pancake/tests/gpu_numerical_contract.rs",
+      "bytes": 1269,
+      "sha256": "6bde33a0c256ba5cf653286e2a07da1cd236482d3e606f72e4d46029a94631fc"
+    },
+    {
+      "path": "pancake/vendor/README.md",
+      "bytes": 3901,
+      "sha256": "57f3acd26bd4a518cea418f09e83585f9a457329c7cb911a6fe9dad9d9ae070d"
+    },
+    {
+      "path": "pancake/vendor/tests/test_macro_expand_only.py",
+      "bytes": 2538,
+      "sha256": "d50003f2c010a2c6486cb56057ea365aa6d0881053e8e242284b3011f9d9c8f1"
+    },
+    {
+      "path": "pancake/vendor/tests/test_patch_contracts.py",
+      "bytes": 2589,
+      "sha256": "55f299f292bd09d3745fd6ffb782d61deefcb1073c7fe9d5c55614be715fcf80"
+    },
+    {
+      "path": "pancake/vendor/upstream-sources.json",
+      "bytes": 6160,
+      "sha256": "59fcecce9c7efda4fdade9a000c546b1f23b6fdd099d0033781ab390b23549b0"
+    },
+    {
+      "path": "qualification/p0-codecs/.gitignore",
+      "bytes": 9,
+      "sha256": "306fd52e74fca6746e12acc750f232de15e71da917756a1270d74c91f5eb7368"
+    },
+    {
+      "path": "qualification/p0-codecs/Cargo.lock",
+      "bytes": 38130,
+      "sha256": "311b613e79b6b1805936f5e842dd9e0cca7d0b8e946521d373ec4a3f7735da44"
+    },
+    {
+      "path": "qualification/p0-codecs/Cargo.toml",
+      "bytes": 3153,
+      "sha256": "c74cf4dbedc5fd0a1d65d2304d4443dabe2d4c36c97246b640b1a5626630133f"
+    },
+    {
+      "path": "qualification/p0-codecs/README.md",
+      "bytes": 5007,
+      "sha256": "a4352f900473496bfdc7beb065eaeadbd0d959d1e3e2e1551c14e8a4b8adfc14"
+    },
+    {
+      "path": "qualification/p0-codecs/combined-graph-manifest.toml",
+      "bytes": 1088,
+      "sha256": "0d280f93d6447d260dff780255656b4ce456bd01e0a68c3e14bb7c26db227329"
+    },
+    {
+      "path": "qualification/p0-codecs/combined-graph.lock",
+      "bytes": 220492,
+      "sha256": "9c52886eadc394842c6d848590428939a568111b186bf2631706d5cad596e7b3"
+    },
+    {
+      "path": "qualification/p0-codecs/fixture-requirements.txt",
+      "bytes": 168,
+      "sha256": "8bcd2920cfbb09bc27c7064f2eadad30edb37f4fff693beaf99cb16ad1feceb0"
+    },
+    {
+      "path": "qualification/p0-codecs/oracle.py",
+      "bytes": 9525,
+      "sha256": "34729e0eb6b517de2ff3ddcdc877c42c1f08f3c952de77c8343fb5ec67155f64"
+    },
+    {
+      "path": "qualification/p0-codecs/requirements.txt",
+      "bytes": 118,
+      "sha256": "ab7596e95d8f10a4e09bf9674e848f623be8c67d15ef32746b28e1b63a423dca"
+    },
+    {
+      "path": "qualification/p0-codecs/tests/qualification.rs",
+      "bytes": 13891,
+      "sha256": "8f11a92fba615c306e2aa50305849ab028c1f73d546be0971f0b1a772a0ec9fa"
+    }
+  ],
+  "file_count": 116
+}

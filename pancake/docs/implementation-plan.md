@@ -1,5 +1,9 @@
 # Pancake implementation plan
 
+[Consolidated P0 work log, including earlier work](p0-work-log.md) is the evidence
+entry point. Historical reports retain their original outcomes; this plan owns
+current scope and exit requirements.
+
 ## 1. Objective and acceptance boundary
 
 Write each production image-processing kernel once in CubeCL. Execute those
@@ -8,30 +12,32 @@ engine from both GUI and CLI. Establish feasibility of the required Apple/NVIDIA
 CPU, wgpu, CUDA and native Metal paths in P0, using the same engine and kernels.
 Retain AMD/Intel GPU and Windows builds; their execution is best effort under the
 explicit testing policy below.
-Later phases complete and revalidate the product on that already-qualified
-matrix; they do not introduce first-time platform or algorithm feasibility gates.
+Later phases implement and validate the complete product. P0 proves selected
+architectural mechanisms, not every future algorithm or product requirement.
 
 ## 2. Updated stack
 
 | Piece | Selection | Purpose and reason |
 |---|---|---|
 | Application/build | Rust 2024, existing Rust 1.100.0 pin, Cargo workspace | Preserve scaffold lints, checked arithmetic, tool pins, lock discipline, and assurance gates. |
-| UI | Slint, winit, FemtoVG-wgpu, accessibility | Declarative controls, menus, native accessibility, and input. Enable software presentation for the GUI VM/no-GPU environment. |
+| UI | Slint 1.19 safe interpreter API, winit, FemtoVG-wgpu, accessibility | Declarative UI and native controls without generated unsafe Rust in first-party code. Shared wgpu 30 device/queue. Startup compiler/size cost and upstream Rowan trust boundary remain explicit; compiled Slint is an optional later optimization requiring generated-glue policy review. Software presentation remains the VM route. |
 | Numerical kernels | CubeCL | One implementation of blur, resize, warp, pyramids, focus measures, reductions, FFT, fusion, and preview packing. No parallel WGSL/CUDA/MSL copies. |
 | Compute runtimes | CubeCL CPU, wgpu, CUDA and native Metal qualified on required Apple/NVIDIA lanes; HIP retained as a best-effort execution path | Runtime changes compilation, resources, and dispatch, not algorithms. CPU uses LLVM JIT and its own worker pool. AMD/Intel GPU and Windows builds remain required. |
 | Graphics/interop | wgpu | Shared device/queue, upload/copy, textures, resource limits, and Slint integration. Numerical kernels remain CubeCL. |
 | Standard codecs | `image` with required features; direct `tiff` and `exr` APIs | Real u8/u16/float decode; reusable TIFF chunk buffers; full-precision export independent of previews. |
-| RAW | Safe Rust-facing decoder selected and qualified in P0 | Start with LibRaw to preserve the existing RAW engine; evaluate Rawler if no safe maintained binding meets the gate. Resolve the choice, DNG/metadata behavior, and licenses before P1. |
+| RAW | Rawler 0.8.0, owned buffers, full default development | Real Bayer DNG → genuine RGB16 is proven without new application FFI. Freeze recommended crop, metadata WB/calibration and sRGB transfer. Proprietary-camera render/crop parity, including known Canon difference, is P2 work. |
 | Color | Explicit encoding metadata; Little CMS through a safe Rust API when needed | Separate source precision, transfer functions, profiles, and display conversion. Do not silently change the processing color space during compatibility port. |
 | Small host math | Checked Rust; `nalgebra` when a real solve needs it | Transform composition, small optimizer solves, confidence decisions, and orchestration are shared host code, not duplicate pixel backends. |
-| Scheduling | Standard threads and bounded channels | Bounded decode lookahead, compute ownership, pause/cancel, latest-preview coalescing. Avoid a competing Rayon numerical pool. |
+| Scheduling | Standard threads and bounded channels; one bounded two-worker Rawler pool | Worker owns compute; UI polls bounded state and latest preview. Rawler nested work uses one explicit local pool. No separate Rayon pixel-algorithm implementation. |
 | Public interfaces | `clap`, `serde`, JSONL diagnostics | Shared job configuration, CLI diagnostics, settings, and truthful backend/geometry evidence. |
 
-P0 qualification spikes provide the first real consumers and tests for critical
-dependencies. Resolve their complete platform graphs, licenses, and native
-requirements then. Later additions must remain within that qualified design;
-an architectural dependency change reopens its P0 gate. Do not add Burn solely
-to access CubeCL.
+P0 spikes exercise critical safe APIs and available runtime profiles. The combined
+codec/foundation lock is a metadata resolution proof, not a combined compile or
+application assurance pass. Build and audit each actual integrated consumer when
+introduced. License declarations are inventory only; there is no license allowlist
+or license gate. Advisory, source, exact duplicate and expiry rules remain enforced.
+An architectural dependency change reopens its affected P0 gate. Do not add Burn
+solely to access CubeCL.
 
 ### Runtime portability
 
@@ -84,134 +90,90 @@ not be disguised as a passing build. Runtime absence alone is not a build failur
 
 Keep build/static-check jobs separate from hardware execution jobs. Windows CI
 must retain build/link checks without requiring physical-device tests. General
-application tests remain mandatory on required macOS/Linux lanes. This plan
-update does not claim that CI job selection has already been changed or that
-previously unrun Windows/HIP builds have passed.
+application tests remain mandatory on required macOS/Linux lanes. CI now separates hosted CPU assurance and Windows MSVC build/link from physical
+GPU execution. Record actual build receipts below; workflow syntax or metadata
+resolution alone is not a build pass.
 
 Earlier reports retain their observed results and their then-current scope.
 This policy supersedes statements that missing AMD/Intel GPU or Windows test
 access alone blocks P0. It does not turn historical unrun tests into passes.
 
-### Proposed narrower P0 — recommendation, not yet adopted
+### Adopted P0 scope — user decision, 2026-11-17
 
-| Blocker group | Proposed minimum before leaving P0 | Proposed later completion |
+P0 answers: **Can this stack use safe authored code, portable real kernels,
+bounded resources, native accessible UI and an enforceable assurance design?**
+It does not implement the full application before implementation starts.
+
+| Earlier blocker | Required architectural proof in P0 | Required later acceptance |
 |---|---|---|
-| Linux GPU ASan | Demonstrate and adopt a valid assurance design for authored host code and real CPU/GPU kernels. Resolve the CubeCL setup failure or justify a narrow, tested tool/runtime boundary; no blanket GPU sanitizer exclusion. Normal GPU operation already works. | Complete external-library/driver investigation and final integrated sanitizer regression in P9, before release; no claim of a GPU sanitizer pass until one exists. |
-| RAW compatibility and T50 data | Choose a safe decoder/render API and prove required Bayer DNG and genuine high-bit-depth output. Identify the visible-area policy and demonstrate that it can meet the contract. Exact proprietary-camera crop/render parity and an exact 24 MP corpus need not block unrelated CLI/kernel work. | Resolve Canon crop/render compatibility and full file/format cases in P2. Acquire and hash-freeze T50 before matched candidate/reference performance measurement, early enough to guide development. Keep the real-data requirement and numeric targets unchanged; do not replace T50 with upscaled or synthetic photographs. |
-| Numerical/UI/lifecycle/performance proofs | Use small real slices to prove the risky primitives, bounded memory/interop, Slint native accessibility and a responsive worker design. This is architectural feasibility, not all five finished methods, every control, the complete 64-frame scenario or the full benchmark campaign. | Complete numerics/methods/registration in P3–P5; jobs/UI/lifecycle in P6–P8; packaged/full-suite acceptance in P9. Start measuring the first working pipeline and retain final speed/memory/latency acceptance in P10. |
+| Linux GPU ASan | Actual CPU ASan/TSan on all owned host source; CPU/native source-universe coverage guard; mandatory real GPU tests. Preserve explicit GPU-sanitizer follow-up, with no suppression. | P9: investigate CubeCL/driver GPU ASan failure and final integrated regression. No GPU sanitizer pass is claimed before one exists. |
+| RAW compatibility / T50 | Safe full Bayer DNG development and genuine RGB16 output; selected crop/color policy; real codec precision APIs. | P2: proprietary-camera crop/render parity, all file/error/orientation cases, and acquire/hash-freeze T50 before matched comparisons. P10: complete unchanged real-data performance protocol. |
+| Complete numerical/UI/lifecycle/performance slices | Real blur and stable f32 reduction, u16 precision, shape/budget errors, resource reuse; safe shared Slint/wgpu handles; actual native input/pixels and responsive cancellable reusable worker. | P3–P5: all methods/registration; P6–P8: full job/UI/lifecycle; P9: packages/full suite; P10: final speed/memory/latency targets. Start timing the first complete pipeline. |
 
-The fixed RAW cases exercise a generated Bayer DNG; they do not certify every
-proprietary camera's crop/render behavior. Canon visible-area parity is a broader
-compatibility concern. Deferring that detail does not establish identical camera
-output or waive the existing DNG cases. T50 is missing benchmark input data,
-not evidence that the stack cannot process a large image.
+## 3. Ordered P0 gates and progress
 
-Under this proposal, unfinished later-phase work would remain required and
-visible, but would not be called a P0 architecture blocker. A newly discovered
-failure that invalidates the stack, safe API boundary or required architecture
-would still reopen P0. The existing gate ledger and milestone exits have not
-yet been changed to adopt this proposal.
+P1 starts only after every **active architectural minimum** below passes. A row
+marked **TRANSFERRED** has no remaining P0 execution gate; its full requirement
+is retained in the named later phase. Keep old gate IDs for roadmap continuity.
+Every PASS needs source/lock/device provenance, commands and a real result in the
+[work log](p0-work-log.md). Historical failed runs remain failed.
 
-## 3. P0: all known feasibility and external-prerequisite gates
-
-**P1 cannot start until every P0 gate passes on the required testing scope, with
-recorded evidence.** Best-effort execution exclusions above are explicit scope
-decisions, not deferred required tests. Unknown,
-unavailable, awaiting review, and untested are blocking statuses, not accepted
-risks to carry into a later milestone. Resolve a failed gate within the chosen
-stack and fixed contract; a necessary scope or policy change must be made
-explicit before leaving P0, never silently substituted mid-port.
-
-P0 is now a substantial feasibility phase, not a short dependency smoke test.
-It includes bounded, real numerical and native-UI vertical slices, including
-enough worker/engine behavior to test lifecycle timing. Reuse qualified code
-in later phases. Do not use placeholder kernels, fake executables, injected
-successful diagnostics, or artificial waits as evidence. This document update
-does not make a documentation-only statement into a passing execution result.
-The following progress ledger distinguishes completed reviews from unexecuted
-application/kernel work.
-
-### Execution progress — 2026-11-17
-
-| Gate | Current marker | Evidence and remaining condition |
+| Gate, in order | Architectural minimum / progress | Later requirement or reopening condition |
 |---|---|---|
-| P0.02 | **IN PROGRESS; required hosts reachable** | Apple/NVIDIA shared-kernel execution proven. Linux private desktop/AT-SPI provisioned. [Dedicated macOS guest](p0-guest-access-qualification.md) SSH/Aqua access works via existing managed key; current AX/Automation identity still unqualified. AMD/Intel GPU and Windows execution are now best effort and no longer access blockers. Required build checks remain. |
-| P0.03 | **BLOCKED; foundation graph passes** | Slint 1.19.0 + CubeCL 0.11.4 + wgpu 30.0.2 adopted. License gate removed; patched helpers and exact expiring reviews pass dependency checks. Native CPU/wgpu/CUDA/Metal blur builds run. Complete combined codec/RAW/color graph, RAW engine parity and retained package/platform build profiles remain unqualified; best-effort runtime absence is not a build pass or failure. |
-| P0.04 | **IN PROGRESS; safe blur launch proven** | Same checked TensorHandle kernel runs under application unsafe-forbid on Apple CPU/Metal and Linux CPU/Vulkan; malformed shapes fail before runtime creation. Remaining capacity/aliasing/decoder/texture/native boundaries require proof. |
-| P0.05 | **BLOCKED; Linux GPU ASan failed** | Integrated macOS `check.sh all` passed: 6 debug/release tests, 100% of 62 lines/7 functions/66 regions/8 branches, 35/35 mutants caught, strict host Miri and both layout seeds. [Linux ASan](p0-sanitizer-investigation.md) passes host/CPU tests but CubeCL GPU setup fails; minimal wgpu succeeds with external loader leaks. No suppression, ignored test or target split. Full TSan and Windows build checks are not qualified here; Windows runtime tests are best effort. |
-| P0.06 | **IN PROGRESS; six required paths pass blur subset** | Identical u16 blur passes ARM64/x86-64 CPU LLVM JIT, Apple Metal/wgpu, NVIDIA Vulkan/wgpu, native CUDA and native Metal. The full representative kernel battery remains required on these available lanes. AMD/Intel GPU, HIP and Windows runtime testing are best effort; their missing runtime evidence no longer blocks this gate. |
-| P0.07 | **NOT RUN** | Historical viewer interop experiment exists; production-safe bounded cache/ownership design and its measurements are unqualified. |
-| P0.08 | **BLOCKED; safe codec subset proven, RAW parity open** | [Pinned probe](p0-codec-qualification.md) proves CR3/DNG sensor samples, RGB16 PNG/ZIP TIFF and float TIFF/EXR bit-exact; ICC no-op/real-transform tests pass. Rawler crop 5088x3392 differs from LibRaw visible 5118x3412 on real R50 input; safe maintained LibRaw binding/general parity design unresolved. Other orientation/file/error/budget tests remain. |
-| P0.09 | **IN PROGRESS; u16 blur subset passes** | Independent exact u16 values, clamped one-pixel borders, odd dimensions and workgroup tails pass on CPU/Metal/Vulkan. Remaining resize/pyramids/warp/variance/reduction/FFT/determinism battery still required. |
-| P0.10 | **NOT RUN** | No five-method/slab numerical slice implemented or qualified. |
-| P0.11 | **NOT RUN** | Registration/crop numerical feasibility not executed. |
-| P0.12 | **NOT RUN** | Real job/device/error mechanisms not implemented or qualified. |
-| P0.13 | **NOT RUN** | No actual Slint accessibility replay through current native driver. |
-| P0.14 | **NOT RUN** | No actual worker lifecycle replay; no artificial timing substitute introduced. |
-| P0.15 | **IN PROGRESS; isolated access works** | Linux private desktop and physical NVIDIA GPU visible together. Dedicated macOS guest SSH/Aqua/tools verified and guest stopped after check. Actual Slint controls/export, current guest AX/Automation identity, physical-GPU GUI stacking and package/accounting route remain unqualified. |
-| P0.16 | **NOT RUN; reference diagnostics available** | D150 Hybrid CPU 30.585 s, peak RSS 2,897,117,184 bytes; E9 exposure CPU 0.877 s, peak RSS 237,469,696 bytes, each n=1. These use a reduced/mismatched profile and no matched Pancake job; no target, warm/cold statistic, half-memory or quality-equivalence pass. |
-| P0.17 | **BLOCKED** | P0 is not complete; P1 cannot start with these open gates. |
+| **P0.02 — access** | **PASS.** Apple CPU/GPU and Linux NVIDIA CPU/GPU reachable; private Linux Xvfb/AT-SPI can use physical GPU. Dedicated macOS guest SSH/Aqua route qualified. | P7/P9: current guest application AX/Automation identity, full workflows and packages. Never use host desktop input. New required hardware reopens access. |
+| **P0.03 — foundation and builds** | **VERIFYING.** Slint 1.19, CubeCL 0.11.4, wgpu 30.0.2; selected safe codec/RAW/color APIs; available native runtime builds. Combined graph resolves, metadata only. Retained Windows/HIP build receipts tracked in work log. | P2: actual combined consumer build/audit; P9: packaged native dependencies/signing. A missing critical API or incompatible graph reopens P0. |
+| **P0.04 — safe launch/resources** | **PASS.** Safe typed handles and checked launch under authored unsafe-forbid; nonzero/length/overflow validation, pre-runtime byte budgets, recoverable readback failures and repeated-job ownership tests. | P2/P3: dtype/decoder bounds and tile halos as consumers appear. New unsafe or unbounded ownership requires review. |
+| **P0.05 — assurance** | **VERIFYING.** Strict CPU/native zero-uncovered-source comparison, mutation/branch/layout/Miri gates; actual Linux CPU ASan/TSan. Physical GPU tests remain mandatory. | P9: external GPU-ASan investigation and complete integrated assurance. No ignored test, sanitizer suppression or production-source exclusion. |
+| **P0.06 — portable execution** | **VERIFYING.** Same u16 blur already passes ARM64/x86 CPU, wgpu Metal/Vulkan, native Metal/CUDA. New f32 reduction/budget/reuse proof is being rerun on required profiles. | P3–P5: full primitive/method battery. GPU software adapters cannot satisfy physical execution. Runtime/backend changes reopen qualification. |
+| **P0.07 — interop/bounds** | **VERIFYING.** Real Slint/CubeCL shared device/queue, finite cached textures/planes/staging, bounded worker state and explicit native-to-display transfer boundary. | P3/P7: production tile halos, decode/cache pressure, retained full-precision results. RGBA8 preview is not HDR or export precision. No zero-copy claim. |
+| **P0.08 — initial I/O** | **PASS.** Full suite-generated Bayer DNG → genuine RGB16 validated independently; safe owned Rawler API, bounded two-worker pool. PNG16/TIFF16/f32 TIFF/EXR and ICC precision proofs retained. | P2: Canon crop/render parity, other cameras, orientation/alpha/grayscale, Unicode, file limits and atomic failed-export retention. No camera-specific crop constants. |
+| **P0.09 — numerical risk** | **PASS on Apple; required-profile reruns tracked in .06.** Exact full-range u16 blur and centered f32 row variance handle bright/flat/narrow/odd inputs; checked budget limits and warm repeated resource reuse. | P3/P5: FFT/resize/warp/pyramid/reconstruction and full per-case determinism. No f16/f64 requirement, vendor algorithm copy or relaxed tolerance. |
+| **P0.10 — methods/slabs** | **TRANSFERRED to P3/P4.** No five-method/slab pass claimed. | Weighted/depth, Laplacian/Hybrid/exposure, auto parameters, 4+4+1 exposure tree, slabs and precision acceptance. |
+| **P0.11 — registration/crop** | **TRANSFERRED to P5.** No registration pass claimed. | Known-transform oracles, all reference modes, ambiguous motion, breathing, confidence, crop and drift. One CubeCL production pipeline. |
+| **P0.12 — worker mechanism** | **VERIFYING.** Actual compute progresses while native Ping responds; cancel stops new work and reused worker starts/cancels second job. | P6: full job/device/error/fallback/queue semantics, generation IDs and source/export preservation. |
+| **P0.13 — native UI mechanism** | **VERIFYING.** Unchanged Linux native driver clicks actual Slint controls, reads state and validates changed pixels. Selected safe interpreter avoids generated first-party unsafe. | P7: every required control, menus, panels, viewer/collection/crop and GUI/CLI parity. Upstream Rowan runtime limitation remains explicit. |
+| **P0.14 — complete lifecycle** | **TRANSFERRED to P8.** Minimal worker proof belongs to .12; no 64-frame scenario or 250 ms acceptance pass claimed. | P8: unchanged real 64-frame Laplacian/breathing pause/resume/cancel/reuse scenario. P10: 30-request latency campaign. No sleeps or business hooks. |
+| **P0.15 — verification route** | **PASS minimum.** Private native Linux input plus physical GPU and task-owned guest access exist; source/contract/hash receipts retained. No full case-accounting pass claimed. | P9: matched packages, launch/argv/settings, guest export, physical-GPU full workflow. |
+| **P0.16 — performance** | **TRANSFERRED to first complete pipeline/P10.** Targets and protocol frozen in .01. Historical single-job reference diagnostics retained; no speed/memory/latency improvement claimed. | Begin measurements at first working pipeline. Freeze T50 before comparisons. P10 requires equal quality, matched hardware/settings, warm/cold/RSS/GPU-memory/viewer statistics. |
 
-Finite prototypes cannot prove all future implementation details. Full-case
-acceptance and regressions remain checked throughout P1-P10. The purpose of
-this ordering is to expose every identified policy, hardware, toolchain,
-numerical, lifecycle, and performance feasibility risk before the main port.
+### Assurance boundary and explicit limits
 
-Execute these gates in order. Every row requires an artifact, a concrete verdict,
-and a named condition that would reopen it; documentation-only assertions do
-not qualify as execution evidence.
+Pure host contracts run under strict Miri. Actual CPU JIT and GPU kernels run in
+native integration tests. Linux CPU ASan/TSan exercises authored allocation,
+launch, IR construction and readback. CPU-only and full native LLVM coverage
+must both have zero uncovered lines/functions/regions/branches, and the native
+production function/region universe must occur in CPU coverage. Unknown source
+layouts and unclassified integration targets fail closed. No authored host path
+may disappear by moving its test into a GPU target.
 
-| Gate | Feasibility question and required exit evidence |
-|---|---|
-| **P0.02 — hardware and test access** | Qualify access to required macOS ARM64/Apple and Linux x86-64/NVIDIA CPU/GPU lanes, including native CUDA/Metal. Provision a physical-GPU GUI route and the dedicated macOS GUI guest; verify permissions, tools and repeatable access. AMD/Intel GPU and Windows execution are best effort: missing access does not block P0 and is not a passing test. Their builds remain in P0.03 scope. |
-| **P0.03 — complete dependency/build graph** | Resolve compatible Slint/CubeCL/wgpu, codec, RAW, color, and host-math dependencies on every retained build target. Build/link real runtime profiles; verify LLVM/JIT and native-library distribution, licenses, advisories, duplicate policy, and all-features/feature-powerset compatibility. Resolve package-launch/signing/tool access requirements. No unselected critical dependency remains for P2 or P9. |
-| **P0.04 — safe resource and launch boundary** | Test safe `TensorHandle` allocation/`into_arg()` with checked shape, dtype, capacity, aliasing, and lifetimes; test macro-expanded code under `unsafe_code = forbid`. Include decoder, texture, and native integration boundaries. Never copy the experiment's unsafe `BufferArg::from_raw_parts` statements. If safe APIs are insufficient, resolve the upstream API or reviewed policy decision here. |
-| **P0.05 — real assurance compatibility** | Run the existing local gates and relevant platform/sanitizer checks against executable qualification code, not only the empty scaffold. Demonstrate full application-owned source coverage, mutation resistance, and a valid Miri/native-JIT/GUI verification design. Miri cannot run a real GPU driver or LLVM JIT; any necessary policy/design decision must be resolved now without silent exclusions. |
-| **P0.06 — shared kernels on required runtime lanes** | Run the same representative image-kernel battery on required macOS ARM64/Linux x86-64 CPU, Apple Metal/wgpu and native Metal, NVIDIA Vulkan/wgpu and native CUDA. AMD/Intel GPU/HIP and Windows runtime tests are best effort, with retained builds checked separately. Exercise odd dimensions, indexing, reductions, workgroup/subgroup differences, memory limits, cold compilation/cache recovery, and GPU-free CPU startup. Record completed execution and exact device/runtime identity. A scalar toy kernel or software wgpu adapter is insufficient. |
-| **P0.07 — display interop and bounded resources** | Prove Slint/wgpu device/queue sharing, producer-consumer ordering, resource ownership through completion/eviction, and the explicit native-runtime preview bridge. Demonstrate bounded scratch/decode/cache storage and spatial tiling/halos on a large image. Confirm RGBA8 preview never limits full-precision export; accept or resolve display-color/HDR scope here. Do not defer memory scalability to P10. |
-| **P0.08 — codecs, RAW, color, and files** | Select the actual safe decoder and prove real Bayer DNG decode, true RGB16, float TIFF/EXR interpretation, grayscale/alpha, all EXIF orientations, mixed dimensions, Unicode/non-BMP paths, and PNG16/TIFF16 round-trip identity. Exercise malformed/oversized input and failed/atomic export retention. Freeze transfer-function/profile behavior; resolve binding safety or decoder substitution before P1. |
-| **P0.09 — numerical precision and determinism** | Qualify real blur/resize/pyramid/warp/variance/reduction/FFT operations across the required execution matrix with independent expected values. Test u16 low-bit retention, fixed ties/reduction order, zero weights, flat/odd/narrow inputs, reconstruction, and portable accumulation. Meet existing per-case precision/parity limits without f16 shortcuts, vendor-specific numerical implementations, or relaxed tolerances. |
-| **P0.10 — five-method and slab feasibility** | Build bounded vertical slices of weighted average, depth map, Laplacian, Hybrid, and exposure fusion using the shared primitives. Test both focus planes, detail/error limits, documented enhancement behavior, auto-parameter extremes, aligned/overlapping slabs, and the 2/4/9-frame exposure batch tree including a one-frame remainder. Preserve precision/determinism on all required execution runtimes; best-effort paths retain the same numerical source. |
-| **P0.11 — registration and crop feasibility** | Exercise hardest generated geometry: translation, Euclidean, similarity, affine, breathing, first/middle/previous reference, high precision, mixed dimensions, narrow cascades, repeated/nonrepeating texture, and ambiguous-motion identity/zero confidence. Validate reference-to-source matrices, corner/interior error, drift, one-resample composition, and symmetric/manual crop. Decide any portable feature/RANSAC seed design now; no first registration feasibility proof waits for P5. |
-| **P0.13 — native UI contract mechanisms** | Use the unchanged native driver to operate each required control/menu/dialog/gesture mechanism in Slint, including collection selection/virtualization, viewer metadata, comparison, advanced visibility, native file/export panels, isolated preferences, retained-result/crop coordinates, history, and recoverable dialogs. Verify actual pixels/state rather than action acknowledgements. Prove GUI/CLI use of the same numerical result. |
-| **P0.14 — lifecycle timing** | Run the unchanged 64-frame lifecycle scenario through a real worker performing normal Laplacian/breathing decode, alignment, and fusion. Prove native pause/resume/cancel and reuse without sleeps, barriers, or business hooks. Measure the available interaction window and cancellation latency. If optimized work outruns native input, resolve that fixed-contract conflict in P0; recording it as a future P8 problem does not pass this gate. |
-| **P0.16 — performance feasibility** | Measure the real numerical/worker/viewer slices against P0.01's frozen targets on agreed workloads/hardware. Include all five methods, representative registration/slabs, RAW/TIFF decode/export, cold JIT, warm completed jobs, memory pressure/cache eviction, and input-to-present latency. An exposure-only kernel or enqueue timing is insufficient. Show the chosen design can meet targets before committing to the main port. |
-| **P0.17 — closure review** | Produce the P0 evidence ledger: every gate PASS, reproducible commands, source/lock/contract/device provenance, artifacts, resolved policy/dependency choices, and locked performance targets. No required hardware, unresolved numerical failure, accepted-later risk, missing numeric threshold, or untested launch/verification mechanism remains. P1 starts only after this closure condition is met. |
+Neither ASan nor Miri proves GPU shaders, LLVM-generated machine code, proprietary
+drivers or all third-party unsafe sound. The existing GPU-ASan device failure
+and external loader leak stay visible for P9, with an executable diagnostic
+profile. Slint interpreter adds its compiler/Rowan to runtime trusted dependencies;
+Rowan's pre-existing ARC strict-Miri failure is not called a passing test. The
+narrow Rowan layout patch does not repair that upstream ARC implementation.
 
-P0.01 has fixed initial engineering limits in
-[performance-targets.json](performance-targets.json): at least 2x warm
-completed-job speed, at most 50% peak memory, no cold-job median regression,
-viewer P95 at most 33 ms, and pause/cancel acknowledgement at most 250 ms.
-These are targets defined during authorized P0 work, not prior user-supplied
-figures or measured achievements. The [measurement contract](p0-performance-targets.md)
-defines same-device/quality comparisons, separate unified/discrete memory
-accounting, ten measured warm jobs after two warm-ups, five fresh-cache jobs,
-200 viewer events and 30 lifecycle requests per operation. Real corpus and
-matched baseline selection remain pending; P10 cannot change thresholds after
-seeing results.
+P0.01's unchanged [targets](performance-targets.json): at least **2×** warm
+completed-job speed, at most **50%** peak memory, non-regressing cold median,
+viewer P95 **≤33 ms**, pause/cancel acknowledgement **≤250 ms**. The
+[measurement contract](p0-performance-targets.md) requires two warm-ups plus ten
+fresh-process cached jobs, five fresh-cache jobs, 200 input-to-present events and
+30 lifecycle requests per operation. These are engineering targets, not measured
+achievements. Keep all input/output hashes, quality checks and failed runs.
 
-### Evidence ledger and stop rule
+### Stop and reopen rule
 
-At P0 execution, keep per-gate records in adapter-owned verification artifacts,
-with status `not_run`, `blocked`, `failed`, or `passed`; all start `not_run`.
-Each record identifies the original late-phase risk, tested scenario/runtime,
-commands, numerical thresholds, results, artifact hashes, and regression owner.
-Dependency changes, new promised hardware, different accumulation/registration
-designs, changed memory ownership, or altered targets reopen relevant gates.
+Stop only the affected work when a failed architectural minimum invalidates the
+chosen stack, safe boundary, required runtime access or assurance design. Finish
+independent useful work while resolving it. Do not label missing results PASS.
+Dependency/policy exceptions remain exact, justified, expiring and enforced.
+New first-party FFI still requires an explicit reviewed design; this plan grants
+no unsafe or broad coverage exception.
 
-If a gate fails, finish only independent work useful to resolving P0. Do not
-proceed into P1 with a caveat such as "validate CUDA later" or "fix lifecycle in
-P8." Keep the chosen stack, fixed contract, and original requirements unless an
-explicit decision changes them. The existing absence of a portable real driver
-failure trigger remains a declared scope limit, not a reason to fabricate proof.
-
-If safe upstream APIs cannot satisfy the boundary, stop that milestone with a
-concrete decision: obtain a safe upstream API or review a narrow boundary policy
-change. Existing AGENTS.md requires reviewed policy changes for future FFI.
-This plan grants no exception and does not weaken `forbid`, coverage, or other
-gates. Resolve platform/assurance conflicts before the main implementation
-phases. P0 evidence must exercise real code; passing empty-scaffold checks is
-not sufficient.
+A later acceptance failure stops that phase's exit; it does not retroactively
+pretend P0 tested the full feature. A newly discovered architectural failure
+reopens the relevant P0 gate. Finite prototypes do not guarantee unknown future
+implementation details.
 
 ## 4. Architecture and ownership
 
@@ -293,27 +255,22 @@ passing cases in regression selections. Do not merge placeholders as passes.
 
 | Phase | Implementation and regression exit evidence after P0 closure |
 |---|---|
-| **P0 — all blocker qualification** | Execute P0.01-P0.17, including real critical numerical/UI/lifecycle slices, required Apple/NVIDIA runtimes and retained build profiles, physical-GPU GUI evidence, assurance compatibility, packaging route, and measured frozen performance targets. No open blocker enters P1. |
-| **P1 — CLI integration** | Complete shared job config, help/errors, path/glob/deduplication, limits, diagnostics/profile interfaces already proven in P0.01/.12/.15. Build release executable and pass full argument/help/rejection selections. |
-| **P2 — I/O integration** | Integrate the decoder/codec/color/export choices already qualified in P0.03/.04/.08. Complete error handling, Unicode, orientation, precision, atomic export, and source immutability cases; no first RAW-binding decision here. |
-| **P3 — primitives/basic fusion** | Harden/reuse P0.06/.09/.10 shared primitives, resources, weighted average, and depth map. Expand full parameter/shape/error coverage across qualified runtimes and pass matching device cases. |
-| **P4 — all methods/slabs** | Integrate P0.10's Laplacian/Hybrid/exposure/slab designs into complete engine, auto parameters, reports, and batch handling. Full numerical cases pass before optimization. |
-| **P5 — registration/crop integration** | Complete P0.11's proven geometry/FFT/refinement/confidence/crop design, including all references, breathing, high precision, legacy switch, cascades, and slabs. Run the complete geometry matrix; no first registration feasibility proof here. |
-| **P6 — device/resilience integration** | Complete P0.12's device selection, telemetry, queues, cancellation, and recovery mechanisms. All 341 host cases pass; keep the previously declared genuine-driver-trigger evidence gap explicit. |
-| **P7 — complete Slint workflow/viewer** | Assemble P0.07/.13's qualified controls, gestures, panels, collections, retained results, comparison, native export, batch/viewport export, and crop. Complete native workflow and GUI/CLI parity checks. |
-| **P8 — desktop lifecycle integration** | Complete preferences, history/context, About/Lightroom status, unsaved workflows, and error recovery. Rerun P0.14's already-working real lifecycle scenario against integrated application; all 34 VM-compatible GUI cases pass. |
-| **P9 — required matrix regression/package qualification** | Run complete applicable contracts on required P0.02/.06/.15 Apple/NVIDIA hardware, runtimes and packaged launch paths, including physical-GPU GUI. Retain all platform/backend builds. AMD/Intel GPU and Windows execution remain best effort and labelled unverified unless actually run; they do not block required-lane acceptance. |
+| **P0 — architecture qualification** | Close active P0.01–P0.17 minima above. Retain explicit transfers and unresolved third-party/tool limits. No full application or performance pass. |
+| **P1 — CLI integration** | Shared validated config, help/errors, path/glob/deduplication, resource limits and real diagnostics. Build runnable release CLI; test arguments, help, and rejection paths. |
+| **P2 — complete I/O** | Integrate selected codecs/Rawler/color into actual audited consumer. Complete DNG, precision, camera crop/render parity, orientation, grayscale/alpha, Unicode, malformed/oversized inputs, atomic export and source immutability. Acquire/freeze real T50 before matched performance comparisons. |
+| **P3 — primitives/basic fusion** | Implement shared resize/pyramids/focus/reduction resources, weighted average and depth map. Independent precision/shape/flat/tie oracles and applicable CPU/GPU device cases. |
+| **P4 — all methods/slabs** | Complete Laplacian, Hybrid, exposure and slabs, auto parameters, reports and 4+4+1 batch semantics. Pass full numerical cases before optimization. Start equal-quality full-pipeline timing as soon as executable. |
+| **P5 — registration/crop** | Implement/qualify transforms, multiscale FFT/refinement/confidence and all references, breathing, high precision, legacy switch, mixed dimensions, crop and slab drift. Known-transform independent oracles; no divergent OpenCV CPU path. |
+| **P6 — devices/resilience** | Complete device qualification/selection, truthful telemetry, bounded queues, pause/cancel, stale messages and errors. Pass all 341 host cases. Keep genuine-driver-trigger test gap explicit. |
+| **P7 — complete Slint workflow** | Build all controls, gestures, native panels, collections, retained results, comparison, export, viewport and crop on qualified safe UI/resource boundary. Native workflow and GUI/CLI parity; requalify guest AX identity. |
+| **P8 — desktop/lifecycle** | Preferences, history/context, About/Lightroom, unsaved/error workflows. Run unchanged real 64-frame lifecycle with no artificial delay. All 34 VM-compatible GUI cases pass; physical GPU case remains separate. |
+| **P9 — packages/required matrix** | Complete matching packages and native libraries, guest/physical-GPU GUI, integrated assurance and GPU-ASan investigation. Required Apple/NVIDIA runtime tests plus retained target/backend builds. AMD/Intel GPU and Windows runtime best effort; label unrun lanes unverified. |
+| **P10 — performance/release** | Full frozen real-data/quality protocol: 2× warm speed, ≤50% memory, non-regressing cold median and viewer/lifecycle limits. Required assurance/build/package receipts and explicit best-effort labels. No target edits after seeing results. |
 
-Registration feasibility is resolved in P0.11 using known-transform independent
-oracles and multiscale refinement; establish any portable feature/deterministic
-RANSAC seed requirement there. Do not maintain separate OpenCV-CPU
-and CubeCL-GPU production pipelines. RustFFT may serve as a local test oracle,
-not a divergent production CPU algorithm. Small host solves/control stay shared.
-
-P0 proves all identified risky mechanisms in real vertical slices. P1-P10
-complete their integration and exhaustive acceptance, and can still find bugs or
-regressions. A newly discovered architectural blocker reopens P0 immediately;
-do not carry it to a later release milestone or claim P0 prevents unknown defects.
+Use shared host math for small solves and control. RustFFT/OpenCV may be local
+independent test oracles; they must not become separate production CPU algorithms.
+Full feature acceptance remains mandatory in the phase above. An architectural
+failure reopens P0; routine defects remain in their owning phase.
 
 ## 8. Native UI and lifecycle details
 
@@ -337,10 +294,9 @@ stale preview/completion messages. Keep full-precision retained results immutabl
 
 Lifecycle fixture has 64 unique 1024x1536 paths. Perform normal per-frame decode,
 alignment, and fusion. No artificial sleep/barrier/business hook may extend
-runtime. Resolve an insufficient native interaction window in P0.14 without
-slowing production or synthesizing a pass. Later integration must preserve the
-qualified behavior; a recurrence reopens P0.14 rather than becoming a new P8
-feasibility caveat.
+runtime. Validate the complete native interaction window in P8 without slowing production
+or synthesizing a pass. P0 proves the worker mechanism only; it does not claim
+that this full workload already passes.
 
 ## 9. Verification lanes and full accounting
 
@@ -354,7 +310,7 @@ An adapter-owned release verifier may combine IDs from lanes only with matching
 source/descriptor/lock/contract provenance. Preserve every raw report/status;
 reject missing, duplicate/conflicting verdicts or incomplete runs. Explain the
 VM unsupported entry alongside physical evidence; never rewrite it as a pass or
-cherry-pick successful retries. Qualify this accounting route in P0.15. Unrun
+cherry-pick successful retries. Qualify complete accounting in P9; P0 retains raw provenance receipts only. Unrun
 required hardware remains unverified and cannot satisfy its P0 execution gate.
 Untested best-effort hardware remains labelled unverified without blocking that
 gate; its retained build obligations still apply.
@@ -362,8 +318,8 @@ gate; its retained build obligations still apply.
 Provision matching native binaries/libraries inside the guest before tests.
 Workspace sync does not prove ignored `target/` artifacts were copied. Build in
 an explicit guest preparation step or stage a matching package under the adapter;
-never compile inside a case's process timeout. Prove this preparation/launch route
-in P0.15, before relying on it for later GUI gates. Virtual GPU is unnecessary
+never compile inside a case's process timeout. Validate actual application package preparation/launch in P9 before final GUI
+acceptance. P0 proves access and the minimal isolated Linux native route. Virtual GPU is unnecessary
 for software UI presentation and native CPU processing.
 
 Target-scope native dependencies and runtime build profiles. Review compatibility
@@ -400,8 +356,8 @@ fusion, export, preview, and input-to-present separately. Time completed GPU wor
 not dispatch. Bound scratch, decoded lookahead, and preview/result caches by
 bytes; use lossless spill when needed. Spatial tiling needs correct halos and
 is distinct from frame slabbing. Fix targets in P0.01 and prove performance and
-resource feasibility in P0.07/.16; P10 repeats that acceptance on the integrated
-application. Compare real RAW/TIFF stacks and peak memory;
+resource mechanisms in P0.04/.07. Begin complete-job measurement at the first
+working pipeline; P10 owns final acceptance on the integrated application. Compare real RAW/TIFF stacks and peak memory;
 do not double-count Apple unified memory as independent CPU/GPU physical pools.
 
 ## 11. Sources
