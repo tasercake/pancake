@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15, windows-2025]
+        os: [ubuntu-24.04, macos-15]
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -36,7 +36,18 @@ jobs:
         with:
           tool: cargo-nextest@0.9.152,cargo-hack@0.6.46,actionlint@1.7.12,shellcheck@0.11.0
       - run: bash scripts/check.sh fast
-      - run: bash scripts/check.sh test
+      - run: bash scripts/check.sh test-cpu
+
+  windows-build:
+    name: Windows MSVC build and link
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Build and link every target without running Windows tests
+        run: cargo test --locked --workspace --all-targets --all-features --target x86_64-pc-windows-msvc --no-run
 
   assurance:
     name: Coverage, dependencies, mutation, and guardrails
@@ -53,7 +64,7 @@ jobs:
         run: |
           source scripts/tool-versions.sh
           rustup toolchain install "$PANCAKE_NIGHTLY" --profile minimal --component llvm-tools-preview
-      - run: bash scripts/check.sh coverage
+      - run: bash scripts/check.sh coverage-cpu
       - run: bash scripts/check.sh deps
       - run: bash scripts/check.sh mutants
       - run: bash scripts/check.sh guardrails
@@ -73,8 +84,8 @@ jobs:
       - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
         with:
           tool: cargo-llvm-cov@0.9.1
-      - run: bash scripts/check.sh nightly
-      - run: bash scripts/check.sh branches
+      - run: bash scripts/check.sh nightly-cpu
+      - run: bash scripts/check.sh branches-cpu
 
   sanitizer:
     name: Sanitizer (${{ matrix.kind }})
@@ -97,7 +108,7 @@ jobs:
   required:
     name: Pancake required
     if: always()
-    needs: [platform, assurance, nightly, sanitizer]
+    needs: [platform, windows-build, assurance, nightly, sanitizer]
     runs-on: ubuntu-24.04
     timeout-minutes: 2
     defaults:
@@ -109,7 +120,7 @@ jobs:
         env:
           RESULTS: ${{ join(needs.*.result, ',') }}
         run: |
-          if [[ "$RESULTS" != "success,success,success,success" ]]; then
+          if [[ "$RESULTS" != "success,success,success,success,success" ]]; then
             printf 'Pancake gates failed or were skipped: %s\n' "$RESULTS" >&2
             exit 1
           fi

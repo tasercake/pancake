@@ -44,6 +44,21 @@ dependency_policy() {
         --effective-clippy-dir target/dependency-policy/clippy
 }
 
+# Classify every integration target before selecting the memory-checking boundary.
+# Shared launch/readback code is in the library and must retain full CPU coverage.
+assurance_profile() {
+    local family=$1 target
+    mkdir -p target/assurance
+    cargo metadata --locked --no-deps --format-version 1 > target/assurance/metadata.json
+    python3 scripts/assurance_targets.py target/assurance/metadata.json "$family" \
+        > target/assurance/selected-targets.txt
+    assurance_args=()
+    if [[ $family == cpu ]]; then assurance_args=(--lib); fi
+    while IFS= read -r target; do
+        assurance_args+=(--test "$target")
+    done < target/assurance/selected-targets.txt
+}
+
 # Only this exact, single-target documentation-only scaffold has no coverage data.
 empty_scaffold() {
     [[ $(find src -type f -print) == src/lib.rs ]] || return 1
@@ -66,7 +81,8 @@ case ${1:-all} in
     fast)
         require_tool actionlint "$PANCAKE_ACTIONLINT_VERSION"
         require_tool shellcheck "$PANCAKE_SHELLCHECK_VERSION"
-        python3 -m unittest scripts/test_dependency_policy.py scripts/test_guardrail_manifest.py
+        python3 -m unittest scripts/test_dependency_policy.py scripts/test_guardrail_manifest.py \
+            scripts/test_assurance_targets.py scripts/test_assurance_coverage.py
         dependency_policy
         cargo fmt --all -- --check
         CLIPPY_CONF_DIR="$root/target/dependency-policy/clippy" \
@@ -76,45 +92,94 @@ case ${1:-all} in
             scripts/bootstrap.sh scripts/check.sh scripts/test-guardrails.sh .githooks/*
         actionlint "$root/../.github/workflows/pancake.yml"
         ;;
-    test)
+    test | test-cpu | gpu)
         require_tool cargo-nextest
         require_tool cargo-hack
+        if [[ $1 == test ]]; then
+            assurance_args=(--all-targets)
+        elif [[ $1 == gpu ]]; then
+            assurance_profile gpu
+        else
+            assurance_profile cpu
+        fi
         # Docs-only crates have no tests. Coverage rejects untested executable code.
         for profile in dev release; do
-            cargo nextest run --locked --workspace --all-targets --all-features \
+            cargo nextest run --locked --workspace "${assurance_args[@]}" --all-features \
                 --cargo-profile "$profile" --profile ci --no-tests=pass --run-ignored all
         done
-        cargo test --locked --workspace --all-features --doc -- --include-ignored
-        cargo hack test --locked --workspace --feature-powerset -- --include-ignored
+        if [[ $1 != gpu ]]; then
+            cargo test --locked --workspace --all-features --doc -- --include-ignored
+            cargo hack test --locked --workspace --feature-powerset \
+                "${assurance_args[@]}" -- --include-ignored
+        fi
         ;;
-    coverage)
+    coverage | coverage-cpu)
         require_tool cargo-llvm-cov
         if empty_scaffold; then
             printf 'Coverage: not applicable to the exact documentation-only scaffold.\n'
             exit 0
         fi
-        cargo llvm-cov --locked --workspace --all-features \
+        mkdir -p target/assurance
+        assurance_profile cpu
+        rm -f target/assurance/coverage-cpu.json
+        coverage_result=0
+        cargo llvm-cov --locked --workspace --all-features "${assurance_args[@]}" \
             --include-build-script \
+            --json --output-path target/assurance/coverage-cpu.json \
             --fail-uncovered-lines 0 --fail-uncovered-functions 0 --fail-uncovered-regions 0 \
-            -- --include-ignored
+            -- --include-ignored || coverage_result=$?
+        if [[ -f target/assurance/coverage-cpu.json ]]; then
+            python3 scripts/compare_assurance_coverage.py "$root" \
+                target/assurance/coverage-cpu.json target/assurance/coverage-cpu.json
+        fi
+        if ((coverage_result != 0)); then exit "$coverage_result"; fi
+        if [[ $1 == coverage ]]; then
+            cargo llvm-cov --locked --workspace --all-features --include-build-script \
+                --json --output-path target/assurance/coverage-native.json \
+                --fail-uncovered-lines 0 --fail-uncovered-functions 0 --fail-uncovered-regions 0 \
+                -- --include-ignored
+            python3 scripts/compare_assurance_coverage.py "$root" \
+                target/assurance/coverage-cpu.json target/assurance/coverage-native.json
+        fi
         ;;
-    branches)
+    branches | branches-cpu)
         require_tool cargo-llvm-cov
         if empty_scaffold; then
             printf 'Branch coverage: not applicable to the documentation-only scaffold.\n'
             exit 0
         fi
         mkdir -p target/coverage
-        cargo +"$PANCAKE_NIGHTLY" llvm-cov --locked --workspace --all-features \
-            --include-build-script --branch --doctests --json \
-            --output-path target/coverage/branches.json \
+        assurance_profile cpu
+        cargo +"$PANCAKE_NIGHTLY" llvm-cov --locked --workspace --all-features "${assurance_args[@]}" \
+            --include-build-script --branch --no-report -- --include-ignored
+        # cargo-llvm-cov forbids --lib with --doctests. Accumulate the separate
+        # documentation-only run without starting native GPU integration tests.
+        rm -f target/coverage/branches-cpu.json
+        coverage_result=0
+        cargo +"$PANCAKE_NIGHTLY" llvm-cov --locked --workspace --all-features --doc \
+            --include-build-script --branch --no-clean --json \
+            --output-path target/coverage/branches-cpu.json \
             --fail-uncovered-lines 0 --fail-uncovered-functions 0 --fail-uncovered-regions 0 \
-            -- --include-ignored
+            -- --include-ignored || coverage_result=$?
+        if [[ -f target/coverage/branches-cpu.json ]]; then
+            python3 scripts/compare_assurance_coverage.py "$root" \
+                target/coverage/branches-cpu.json target/coverage/branches-cpu.json
+        fi
+        if ((coverage_result != 0)); then exit "$coverage_result"; fi
         if ! jq -e '.data | length > 0 and all(.[];
             .totals | all(.lines, .functions, .regions, .branches; .count == .covered)
-        )' target/coverage/branches.json; then
+        )' target/coverage/branches-cpu.json; then
             printf 'Uncovered branches or other coverage deficits remain.\n' >&2
             exit 1
+        fi
+        if [[ $1 == branches ]]; then
+            cargo +"$PANCAKE_NIGHTLY" llvm-cov --locked --workspace --all-features \
+                --include-build-script --branch --doctests --json \
+                --output-path target/coverage/branches.json \
+                --fail-uncovered-lines 0 --fail-uncovered-functions 0 --fail-uncovered-regions 0 \
+                -- --include-ignored
+            python3 scripts/compare_assurance_coverage.py "$root" \
+                target/coverage/branches-cpu.json target/coverage/branches.json
         fi
         ;;
     deps)
@@ -135,25 +200,33 @@ case ${1:-all} in
         cargo mutants --cap-lints true --all-features --in-place --timeout 60 \
             --build-timeout 180 -- --locked -- --include-ignored
         ;;
-    nightly)
+    nightly | nightly-cpu)
         # Miri checks pure host contracts. Native integration tests below exercise
         # LLVM JIT and GPU FFI, which Miri cannot interpret (mach_host_self on macOS).
         MIRIFLAGS="-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check" \
             cargo +"$PANCAKE_NIGHTLY" miri test --locked --workspace --all-features --lib -- --include-ignored
         for seed in 1 42; do
+            assurance_args=()
+            if [[ $1 == nightly-cpu ]]; then assurance_profile cpu; fi
             RUSTFLAGS="-Dwarnings -Zrandomize-layout -Zlayout-seed=$seed" \
-                cargo +"$PANCAKE_NIGHTLY" test --locked --workspace --all-features -- --include-ignored
+                cargo +"$PANCAKE_NIGHTLY" test --locked --workspace --all-features \
+                    "${assurance_args[@]}" -- --include-ignored
         done
         ;;
-    sanitizer)
+    sanitizer | sanitizer-gpu)
         kind=${2:?Usage: check.sh sanitizer address|thread (Linux x86_64 only)}
         case "$kind" in
             address | thread) ;;
             *) printf 'Unknown sanitizer: %s\n' "$kind" >&2; exit 2 ;;
         esac
+        if [[ $1 == sanitizer-gpu ]]; then
+            assurance_profile gpu
+        else
+            assurance_profile cpu
+        fi
         RUSTFLAGS="-Dwarnings -Zsanitizer=$kind" \
             cargo +"$PANCAKE_NIGHTLY" test -Zbuild-std --locked \
-                --target x86_64-unknown-linux-gnu --workspace --all-features --lib --tests \
+                --target x86_64-unknown-linux-gnu --workspace --all-features "${assurance_args[@]}" \
                 -- --include-ignored
         ;;
     guardrails)
@@ -168,7 +241,7 @@ case ${1:-all} in
         done
         ;;
     *)
-        printf 'Usage: check.sh [all|fast|test|coverage|branches|deps|mutants|nightly|sanitizer|guardrails]\n' >&2
+        printf 'Usage: check.sh [all|fast|test|test-cpu|gpu|coverage|coverage-cpu|branches|branches-cpu|deps|mutants|nightly|nightly-cpu|sanitizer|sanitizer-gpu|guardrails]\n' >&2
         exit 2
         ;;
 esac

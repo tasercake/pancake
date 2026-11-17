@@ -15,6 +15,7 @@ mkdir -p "$fixture/src"
 printf '//! Guardrail fixture bootstrap.\n' >"$fixture/src/lib.rs"
 mkdir -p "$fixture/scripts"
 cp "$root/scripts/check.sh" "$root/scripts/tool-versions.sh" "$fixture/scripts/"
+cp "$root/scripts/assurance_targets.py" "$root/scripts/compare_assurance_coverage.py" "$fixture/scripts/"
 cd "$fixture"
 export CARGO_TARGET_DIR="$root/target/guardrail-build"
 cargo generate-lockfile --offline --manifest-path "$fixture/Cargo.toml"
@@ -114,7 +115,7 @@ mod tests {
     }
 }
 RS
-    reject 'Missed Lines' bash scripts/check.sh coverage
+    reject 'uncovered CPU lines' bash scripts/check.sh coverage
 
     cat >src/lib.rs <<'RS'
 //! Negative fixture.
@@ -155,7 +156,7 @@ mod tests {
     }
 }
 RS
-    reject 'Uncovered branches' bash scripts/check.sh branches
+    reject 'uncovered CPU branches' bash scripts/check.sh branches
 
     cat >src/lib.rs <<'RS'
 //! Positive control: a small, fully tested contract.
