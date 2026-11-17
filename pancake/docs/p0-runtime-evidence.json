@@ -1097,6 +1097,41 @@
       "wgpu device/driver qualification",
       "isolated native GUI test access",
       "all other hardware/runtime combinations"
-    ]
+    ],
+    "tool_inventory_probe": {
+      "date": "2026-11-17",
+      "exit_code": 0,
+      "scope": "Read-only hostname/uname/lscpu/nvidia-smi, command -v, --version if executable exists, selected dpkg-query. No installs/services/sessions/compilation/remote jobs.",
+      "cpu_model": "AMD Ryzen 9 7950X3D 16-Core Processor",
+      "logical_cpu_count": 32,
+      "available_on_nonlogin_path": [
+        "dbus-run-session",
+        "gdbus"
+      ],
+      "not_on_nonlogin_path": [
+        "rustc",
+        "cargo",
+        "nvcc",
+        "llvm-config",
+        "llvm-config-17",
+        "llvm-config-18",
+        "llvm-config-19",
+        "llvm-config-20",
+        "llvm-config-21",
+        "llvm-config-22",
+        "llvm-config-23",
+        "Xvfb",
+        "openbox",
+        "at-spi-bus-launcher"
+      ],
+      "installed_packages": {
+        "at-spi2-core": "2.52.0-1build1",
+        "gir1.2-atspi-2.0:amd64": "2.52.0-1build1",
+        "libatk-bridge2.0-0t64:amd64": "2.52.0-1build1",
+        "libatk1.0-0t64:amd64": "2.52.0-1build1",
+        "python3-gi": "3.48.2-1"
+      },
+      "interpretation": "Not on the non-login SSH PATH does not prove not installed. Installed AT-SPI packages do not prove active native UI access. No AMD/Intel GPU inventory was performed; those GPUs remain unknown."
+    }
   }
 }

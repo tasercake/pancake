@@ -217,6 +217,18 @@ Linux 6.8.0-147-generic x86_64
 NVIDIA GeForce RTX 3090, 580.178.04, 24576 MiB
 ```
 
+A second bounded, read-only inventory found an AMD Ryzen 9 7950X3D 16-Core CPU
+with 32 logical CPUs. `dbus-run-session` and `gdbus` are on the non-login SSH
+PATH. `rustc`, `cargo`, `nvcc`, `llvm-config` (including versioned 17-23 names),
+`Xvfb`, `openbox`, and `at-spi-bus-launcher` are not on that PATH. This is not
+proof those tools are uninstalled elsewhere.
+
+Selected installed packages are `at-spi2-core`, `gir1.2-atspi-2.0`, ATK and its
+bridge at 2.52.0-1build1, plus `python3-gi` 3.48.2-1. Their presence does not
+establish an active isolated GUI or permission to drive it. No AMD/Intel GPU
+inventory was performed; those GPUs remain unknown rather than absent. There
+were no installs, service/session changes, compilation, or remote test jobs.
+
 Next decision: choose a dependency version/feature/upstream-fix strategy that
 passes the unchanged duplicate/advisory policies, and review concrete licenses.
 Then execute meaningful test-first safe CPU/wgpu kernels and complete the real
