@@ -1,0 +1,10 @@
+--- source.lock
++++ Cargo.lock
+@@ -1329,6 +1329,7 @@
+  "cubecl-ir",
+  "cubecl-metal",
+  "cubecl-runtime",
++ "cubecl-std",
+  "cubecl-wgpu",
+  "half",
+ ]

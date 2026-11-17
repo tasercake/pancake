@@ -1,0 +1,731 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-17",
+  "candidate_manifest": "[package]\nname = \"slint-cubecl-viewer\"\nversion = \"0.1.0\"\nedition = \"2024\"\npublish = false\nlicense = \"GPL-3.0-or-later\"\n[workspace]\n[dependencies]\nslint = { version = \"=1.19.0\", default-features = false, features = [\"std\", \"backend-winit\", \"renderer-femtovg-wgpu\", \"unstable-wgpu-30\", \"compat-1-18\", \"accessibility\"] }\ncubecl = { version = \"=0.11.3\", default-features = false, features = [\"std\", \"stdlib\", \"cpu\", \"wgpu\"] }\ncubecl-wgpu = \"=0.11.3\"\nbytemuck = { version = \"1.24\", features = [\"derive\"] }\nserde_json = \"1\"\nimage = { version = \"0.25\", default-features = false, features = [\"png\", \"jpeg\", \"tiff\"] }\n",
+  "lockfile": {
+    "source_commit": "0c83870",
+    "source_path": "experiments/slint-cubecl-viewer/Cargo.lock",
+    "audit_sha256": "35527f923ef4280913d33ec73c21d238a05da0781b95f3b85e567c4236b34731",
+    "source_sha256": "cccdb774fb71cb04aab186618def01ffd46041c46c3172f69db077d451b37c96",
+    "reconstruction_patch": "pancake/docs/p0-runtime-lock.patch",
+    "only_lock_change": "cubecl 0.11.3 resolved dependency list gains cubecl-std when stdlib feature is enabled; no package versions change."
+  },
+  "policy_sha256": "4ac2d6961fef853e89cb7f2fdfbef52a68ff5d272f1a30187a242bfb67718d5c",
+  "metadata_sha256": "aba9c072f7ab47a8b82d2f4ac2293bb83d98d10b15d92258bc0c84a6e6492436",
+  "metadata_package_count_unfiltered": 792,
+  "command": "pancake/target/tools/bin/cargo-deny --manifest-path pancake/target/p0-runtime-audit/Cargo.toml --config pancake/deny.toml --format json check --deny warnings",
+  "deny_exit_code": 7,
+  "diagnostic_counts": {
+    "rejected": 653,
+    "no-license-field": 1,
+    "duplicate": 41,
+    "unmaintained": 6
+  },
+  "duplicate_groups": [
+    {
+      "message": "found 2 duplicate entries for crate 'allocator-api2'",
+      "crates": [
+        {
+          "name": "allocator-api2",
+          "version": "0.2.21"
+        },
+        {
+          "name": "allocator-api2",
+          "version": "0.4.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'base64'",
+      "crates": [
+        {
+          "name": "base64",
+          "version": "0.22.1"
+        },
+        {
+          "name": "base64",
+          "version": "0.23.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'bitflags'",
+      "crates": [
+        {
+          "name": "bitflags",
+          "version": "1.3.2"
+        },
+        {
+          "name": "bitflags",
+          "version": "2.13.2"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'block2'",
+      "crates": [
+        {
+          "name": "block2",
+          "version": "0.5.1"
+        },
+        {
+          "name": "block2",
+          "version": "0.6.2"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'calloop'",
+      "crates": [
+        {
+          "name": "calloop",
+          "version": "0.13.0"
+        },
+        {
+          "name": "calloop",
+          "version": "0.14.5"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'calloop-wayland-source'",
+      "crates": [
+        {
+          "name": "calloop-wayland-source",
+          "version": "0.3.0"
+        },
+        {
+          "name": "calloop-wayland-source",
+          "version": "0.4.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'convert_case'",
+      "crates": [
+        {
+          "name": "convert_case",
+          "version": "0.10.0"
+        },
+        {
+          "name": "convert_case",
+          "version": "0.11.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'cpufeatures'",
+      "crates": [
+        {
+          "name": "cpufeatures",
+          "version": "0.2.17"
+        },
+        {
+          "name": "cpufeatures",
+          "version": "0.3.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'darling'",
+      "crates": [
+        {
+          "name": "darling",
+          "version": "0.20.11"
+        },
+        {
+          "name": "darling",
+          "version": "0.24.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'darling_core'",
+      "crates": [
+        {
+          "name": "darling_core",
+          "version": "0.20.11"
+        },
+        {
+          "name": "darling_core",
+          "version": "0.24.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'darling_macro'",
+      "crates": [
+        {
+          "name": "darling_macro",
+          "version": "0.20.11"
+        },
+        {
+          "name": "darling_macro",
+          "version": "0.24.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'downcast-rs'",
+      "crates": [
+        {
+          "name": "downcast-rs",
+          "version": "1.2.1"
+        },
+        {
+          "name": "downcast-rs",
+          "version": "2.0.2"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'foldhash'",
+      "crates": [
+        {
+          "name": "foldhash",
+          "version": "0.1.5"
+        },
+        {
+          "name": "foldhash",
+          "version": "0.2.0"
+        }
+      ]
+    },
+    {
+      "message": "found 3 duplicate entries for crate 'getrandom'",
+      "crates": [
+        {
+          "name": "getrandom",
+          "version": "0.2.17"
+        },
+        {
+          "name": "getrandom",
+          "version": "0.3.4"
+        },
+        {
+          "name": "getrandom",
+          "version": "0.4.3"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'glow'",
+      "crates": [
+        {
+          "name": "glow",
+          "version": "0.17.0"
+        },
+        {
+          "name": "glow",
+          "version": "0.18.0"
+        }
+      ]
+    },
+    {
+      "message": "found 4 duplicate entries for crate 'hashbrown'",
+      "crates": [
+        {
+          "name": "hashbrown",
+          "version": "0.14.5"
+        },
+        {
+          "name": "hashbrown",
+          "version": "0.15.5"
+        },
+        {
+          "name": "hashbrown",
+          "version": "0.16.1"
+        },
+        {
+          "name": "hashbrown",
+          "version": "0.17.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'hi_sparse_bitset'",
+      "crates": [
+        {
+          "name": "hi_sparse_bitset",
+          "version": "0.9.0"
+        },
+        {
+          "name": "hi_sparse_bitset",
+          "version": "0.10.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'itertools'",
+      "crates": [
+        {
+          "name": "itertools",
+          "version": "0.12.1"
+        },
+        {
+          "name": "itertools",
+          "version": "0.15.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'linux-raw-sys'",
+      "crates": [
+        {
+          "name": "linux-raw-sys",
+          "version": "0.4.15"
+        },
+        {
+          "name": "linux-raw-sys",
+          "version": "0.12.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'miniz_oxide'",
+      "crates": [
+        {
+          "name": "miniz_oxide",
+          "version": "0.8.9"
+        },
+        {
+          "name": "miniz_oxide",
+          "version": "0.9.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'nom'",
+      "crates": [
+        {
+          "name": "nom",
+          "version": "7.1.3"
+        },
+        {
+          "name": "nom",
+          "version": "8.0.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'objc2'",
+      "crates": [
+        {
+          "name": "objc2",
+          "version": "0.5.3"
+        },
+        {
+          "name": "objc2",
+          "version": "0.6.5"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'objc2-app-kit'",
+      "crates": [
+        {
+          "name": "objc2-app-kit",
+          "version": "0.2.2"
+        },
+        {
+          "name": "objc2-app-kit",
+          "version": "0.3.2"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'objc2-foundation'",
+      "crates": [
+        {
+          "name": "objc2-foundation",
+          "version": "0.2.2"
+        },
+        {
+          "name": "objc2-foundation",
+          "version": "0.3.2"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'prettyplease'",
+      "crates": [
+        {
+          "name": "prettyplease",
+          "version": "0.2.37"
+        },
+        {
+          "name": "prettyplease",
+          "version": "0.3.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'rand'",
+      "crates": [
+        {
+          "name": "rand",
+          "version": "0.9.5"
+        },
+        {
+          "name": "rand",
+          "version": "0.10.4"
+        }
+      ]
+    },
+    {
+      "message": "found 3 duplicate entries for crate 'rand_core'",
+      "crates": [
+        {
+          "name": "rand_core",
+          "version": "0.6.4"
+        },
+        {
+          "name": "rand_core",
+          "version": "0.9.5"
+        },
+        {
+          "name": "rand_core",
+          "version": "0.10.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'rustc-hash'",
+      "crates": [
+        {
+          "name": "rustc-hash",
+          "version": "1.1.0"
+        },
+        {
+          "name": "rustc-hash",
+          "version": "2.1.3"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'rustix'",
+      "crates": [
+        {
+          "name": "rustix",
+          "version": "0.38.44"
+        },
+        {
+          "name": "rustix",
+          "version": "1.1.6"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'shlex'",
+      "crates": [
+        {
+          "name": "shlex",
+          "version": "1.3.0"
+        },
+        {
+          "name": "shlex",
+          "version": "2.0.1"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'smithay-client-toolkit'",
+      "crates": [
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.19.2"
+        },
+        {
+          "name": "smithay-client-toolkit",
+          "version": "0.20.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'smol_str'",
+      "crates": [
+        {
+          "name": "smol_str",
+          "version": "0.2.2"
+        },
+        {
+          "name": "smol_str",
+          "version": "0.3.7"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'strum'",
+      "crates": [
+        {
+          "name": "strum",
+          "version": "0.26.3"
+        },
+        {
+          "name": "strum",
+          "version": "0.28.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'strum_macros'",
+      "crates": [
+        {
+          "name": "strum_macros",
+          "version": "0.26.4"
+        },
+        {
+          "name": "strum_macros",
+          "version": "0.28.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'syn'",
+      "crates": [
+        {
+          "name": "syn",
+          "version": "2.0.119"
+        },
+        {
+          "name": "syn",
+          "version": "3.0.10"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'thiserror'",
+      "crates": [
+        {
+          "name": "thiserror",
+          "version": "1.0.69"
+        },
+        {
+          "name": "thiserror",
+          "version": "2.0.21"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'thiserror-impl'",
+      "crates": [
+        {
+          "name": "thiserror-impl",
+          "version": "1.0.69"
+        },
+        {
+          "name": "thiserror-impl",
+          "version": "2.0.21"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'tiny-skia'",
+      "crates": [
+        {
+          "name": "tiny-skia",
+          "version": "0.11.4"
+        },
+        {
+          "name": "tiny-skia",
+          "version": "0.12.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'tiny-skia-path'",
+      "crates": [
+        {
+          "name": "tiny-skia-path",
+          "version": "0.11.4"
+        },
+        {
+          "name": "tiny-skia-path",
+          "version": "0.12.0"
+        }
+      ]
+    },
+    {
+      "message": "found 2 duplicate entries for crate 'unicode-width'",
+      "crates": [
+        {
+          "name": "unicode-width",
+          "version": "0.1.14"
+        },
+        {
+          "name": "unicode-width",
+          "version": "0.2.3"
+        }
+      ]
+    },
+    {
+      "message": "found 3 duplicate entries for crate 'windows-sys'",
+      "crates": [
+        {
+          "name": "windows-sys",
+          "version": "0.52.0"
+        },
+        {
+          "name": "windows-sys",
+          "version": "0.59.0"
+        },
+        {
+          "name": "windows-sys",
+          "version": "0.61.2"
+        }
+      ]
+    }
+  ],
+  "advisories": [
+    {
+      "id": "RUSTSEC-2024-0436",
+      "crate": "paste",
+      "title": "paste - no longer maintained",
+      "path": [
+        "slint-cubecl-viewer@0.1.0",
+        "cubecl@0.11.3",
+        "cubecl-core@0.11.4",
+        "paste@1.0.15"
+      ]
+    },
+    {
+      "id": "RUSTSEC-2026-0441",
+      "crate": "pin-utils",
+      "title": "`pin-utils` is unmaintained",
+      "path": [
+        "slint-cubecl-viewer@0.1.0",
+        "slint@1.19.0",
+        "slint-macros@1.19.0",
+        "spin_on@0.1.1",
+        "pin-utils@0.1.1"
+      ]
+    },
+    {
+      "id": "RUSTSEC-2026-0192",
+      "crate": "ttf-parser",
+      "title": "`ttf-parser` is unmaintained",
+      "path": [
+        "slint-cubecl-viewer@0.1.0",
+        "slint@1.19.0",
+        "i-slint-backend-selector@1.19.0",
+        "i-slint-backend-winit@1.19.0",
+        "winit@0.30.13",
+        "sctk-adwaita@0.10.1",
+        "ab_glyph@0.2.32",
+        "owned_ttf_parser@0.25.1",
+        "ttf-parser@0.25.1"
+      ]
+    },
+    {
+      "id": "RUSTSEC-2026-0371",
+      "crate": "zbus_names",
+      "title": "`zbus_names` is unmaintained",
+      "path": [
+        "slint-cubecl-viewer@0.1.0",
+        "slint@1.19.0",
+        "i-slint-backend-selector@1.19.0",
+        "i-slint-backend-winit@1.19.0",
+        "zbus@5.19.0",
+        "zbus_names@4.3.5"
+      ]
+    },
+    {
+      "id": "RUSTSEC-2026-0370",
+      "crate": "zvariant",
+      "title": "`zvariant` is unmaintained",
+      "path": [
+        "slint-cubecl-viewer@0.1.0",
+        "slint@1.19.0",
+        "i-slint-backend-selector@1.19.0",
+        "i-slint-backend-winit@1.19.0",
+        "zbus@5.19.0",
+        "zvariant@5.15.1"
+      ]
+    },
+    {
+      "id": "RUSTSEC-2026-0372",
+      "crate": "zvariant_derive",
+      "title": "`zvariant_derive` is unmaintained",
+      "path": [
+        "slint-cubecl-viewer@0.1.0",
+        "slint@1.19.0",
+        "i-slint-backend-selector@1.19.0",
+        "i-slint-backend-winit@1.19.0",
+        "zbus@5.19.0",
+        "zvariant@5.15.1",
+        "zvariant_derive@5.15.1"
+      ]
+    }
+  ],
+  "missing_license": [
+    {
+      "message": "license expression was not specified in manifest for crate 'cfg_block = 0.1.1'",
+      "path": [
+        "slint-cubecl-viewer@0.1.0",
+        "cubecl@0.11.3",
+        "cubecl-environment@0.11.4",
+        "turso@0.8.3",
+        "turso_core@0.8.3",
+        "cfg_block@0.1.1"
+      ]
+    }
+  ],
+  "foundational_packages": [
+    {
+      "name": "cubecl",
+      "version": "0.11.3",
+      "license": "MIT OR Apache-2.0"
+    },
+    {
+      "name": "cubecl-core",
+      "version": "0.11.4",
+      "license": "MIT OR Apache-2.0"
+    },
+    {
+      "name": "cubecl-cpu",
+      "version": "0.11.4",
+      "license": "MIT OR Apache-2.0"
+    },
+    {
+      "name": "cubecl-std",
+      "version": "0.11.4",
+      "license": "MIT OR Apache-2.0"
+    },
+    {
+      "name": "cubecl-wgpu",
+      "version": "0.11.3",
+      "license": "MIT OR Apache-2.0"
+    },
+    {
+      "name": "llvm-sys",
+      "version": "231.0.2",
+      "license": "MIT"
+    },
+    {
+      "name": "slint",
+      "version": "1.19.0",
+      "license": "GPL-3.0-only OR LicenseRef-Slint-Royalty-free-2.0 OR LicenseRef-Slint-Software-3.0"
+    },
+    {
+      "name": "tracel-llvm-bundler",
+      "version": "23.1.0-4",
+      "license": "MIT OR Apache-2.0"
+    },
+    {
+      "name": "wgpu",
+      "version": "30.0.2",
+      "license": "MIT OR Apache-2.0"
+    }
+  ],
+  "sha256_logs": {
+    "deny.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "deny.log": "e424c5e24eceb85bc1ad1fc1e4dbfb42d99ad093f7bef1fa5d6d749a39c2acde"
+  },
+  "license_review": "Ordinary reviewed SPDX additions are permitted for actual dependencies. No policy identifiers were added because this candidate independently fails unchanged duplicate/advisory policy and no application dependency was adopted.",
+  "gate_verdicts": {
+    "P0.03": "blocked: candidate duplicate-version/advisory/license-metadata policy failures",
+    "P0.04": "not_run: safe TensorHandle API route identified; no safe custom kernel executed",
+    "P0.05": "blocked: real native JIT/GPU integration not qualified under existing Miri/all-features/coverage gates",
+    "P0.06": "not_run: no candidate runtime adopted or shared kernel executed"
+  }
+}
