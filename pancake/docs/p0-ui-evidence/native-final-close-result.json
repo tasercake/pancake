@@ -1,0 +1,2540 @@
+{
+  "initial": {
+    "nodes": [
+      {
+        "path": [
+          0
+        ],
+        "id": "",
+        "role": "AXApplication",
+        "title": "pancake-ui-qualification",
+        "value": "pancake-ui-qualification",
+        "description": "",
+        "enabled": false,
+        "position": [
+          0,
+          0
+        ],
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "path": [
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXWindow",
+        "title": "Pancake P0 native qualification",
+        "value": "Pancake P0 native qualification",
+        "description": "",
+        "enabled": true,
+        "position": [
+          360,
+          194
+        ],
+        "size": [
+          720,
+          630
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXStaticText",
+        "title": "Safe Slint + CubeCL preview",
+        "value": "Safe Slint + CubeCL preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          206
+        ],
+        "size": [
+          316,
+          26
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          1
+        ],
+        "id": "preview",
+        "role": "AXGroup",
+        "title": "Computed preview",
+        "value": "Computed preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          246
+        ],
+        "size": [
+          512,
+          384
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          2
+        ],
+        "id": "toggle-pattern",
+        "role": "AXButton",
+        "title": "Toggle pattern",
+        "value": "Toggle pattern",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          642
+        ],
+        "size": [
+          181,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          3
+        ],
+        "id": "start-job",
+        "role": "AXButton",
+        "title": "Start 128 batches",
+        "value": "Start 128 batches",
+        "description": "",
+        "enabled": true,
+        "position": [
+          569,
+          642
+        ],
+        "size": [
+          202,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          4
+        ],
+        "id": "cancel-job",
+        "role": "AXButton",
+        "title": "Cancel",
+        "value": "Cancel",
+        "description": "",
+        "enabled": false,
+        "position": [
+          780,
+          642
+        ],
+        "size": [
+          135,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          5
+        ],
+        "id": "ping-ui",
+        "role": "AXButton",
+        "title": "Ping UI",
+        "value": "Ping UI",
+        "description": "",
+        "enabled": true,
+        "position": [
+          923,
+          642
+        ],
+        "size": [
+          136,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          6
+        ],
+        "id": "worker-state",
+        "role": "AXStaticText",
+        "title": "Ready",
+        "value": "Ready",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          686
+        ],
+        "size": [
+          122,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          7
+        ],
+        "id": "pattern-state",
+        "role": "AXStaticText",
+        "title": "Pattern A",
+        "value": "Pattern A",
+        "description": "",
+        "enabled": true,
+        "position": [
+          512,
+          686
+        ],
+        "size": [
+          140,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          8
+        ],
+        "id": "completed-batches",
+        "role": "AXStaticText",
+        "title": "1",
+        "value": "1",
+        "description": "",
+        "enabled": true,
+        "position": [
+          662,
+          686
+        ],
+        "size": [
+          92,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          9
+        ],
+        "id": "submitted-batches",
+        "role": "AXStaticText",
+        "title": "1",
+        "value": "1",
+        "description": "",
+        "enabled": true,
+        "position": [
+          764,
+          686
+        ],
+        "size": [
+          92,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          10
+        ],
+        "id": "ui-count",
+        "role": "AXStaticText",
+        "title": "0",
+        "value": "0",
+        "description": "",
+        "enabled": true,
+        "position": [
+          866,
+          686
+        ],
+        "size": [
+          92,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          11
+        ],
+        "id": "cache-peak",
+        "role": "AXStaticText",
+        "title": "1",
+        "value": "1",
+        "description": "",
+        "enabled": true,
+        "position": [
+          968,
+          686
+        ],
+        "size": [
+          92,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          12
+        ],
+        "id": "interop-state",
+        "role": "AXStaticText",
+        "title": "Shared device + queue confirmed",
+        "value": "Shared device + queue confirmed",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          718
+        ],
+        "size": [
+          206,
+          14
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          13
+        ],
+        "id": "budget-state",
+        "role": "AXStaticText",
+        "title": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=1;texture_bytes=786432;root_u32_staging_bound=25165824",
+        "value": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=1;texture_bytes=786432;root_u32_staging_bound=25165824",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          746
+        ],
+        "size": [
+          680,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          14
+        ],
+        "id": "device-state",
+        "role": "AXStaticText",
+        "title": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "value": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          790
+        ],
+        "size": [
+          269,
+          13
+        ]
+      }
+    ],
+    "pid": 42308,
+    "frontmost": true
+  },
+  "pattern_changed": {
+    "nodes": [
+      {
+        "path": [
+          0
+        ],
+        "id": "",
+        "role": "AXApplication",
+        "title": "pancake-ui-qualification",
+        "value": "pancake-ui-qualification",
+        "description": "",
+        "enabled": false,
+        "position": [
+          0,
+          0
+        ],
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "path": [
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXWindow",
+        "title": "Pancake P0 native qualification",
+        "value": "Pancake P0 native qualification",
+        "description": "",
+        "enabled": true,
+        "position": [
+          360,
+          194
+        ],
+        "size": [
+          720,
+          630
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXStaticText",
+        "title": "Safe Slint + CubeCL preview",
+        "value": "Safe Slint + CubeCL preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          206
+        ],
+        "size": [
+          316,
+          26
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          1
+        ],
+        "id": "preview",
+        "role": "AXGroup",
+        "title": "Computed preview",
+        "value": "Computed preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          246
+        ],
+        "size": [
+          512,
+          384
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          2
+        ],
+        "id": "toggle-pattern",
+        "role": "AXButton",
+        "title": "Toggle pattern",
+        "value": "Toggle pattern",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          642
+        ],
+        "size": [
+          181,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          3
+        ],
+        "id": "start-job",
+        "role": "AXButton",
+        "title": "Start 128 batches",
+        "value": "Start 128 batches",
+        "description": "",
+        "enabled": true,
+        "position": [
+          569,
+          642
+        ],
+        "size": [
+          202,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          4
+        ],
+        "id": "cancel-job",
+        "role": "AXButton",
+        "title": "Cancel",
+        "value": "Cancel",
+        "description": "",
+        "enabled": false,
+        "position": [
+          780,
+          642
+        ],
+        "size": [
+          135,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          5
+        ],
+        "id": "ping-ui",
+        "role": "AXButton",
+        "title": "Ping UI",
+        "value": "Ping UI",
+        "description": "",
+        "enabled": true,
+        "position": [
+          923,
+          642
+        ],
+        "size": [
+          136,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          6
+        ],
+        "id": "worker-state",
+        "role": "AXStaticText",
+        "title": "Ready",
+        "value": "Ready",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          686
+        ],
+        "size": [
+          122,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          7
+        ],
+        "id": "pattern-state",
+        "role": "AXStaticText",
+        "title": "Pattern B",
+        "value": "Pattern B",
+        "description": "",
+        "enabled": true,
+        "position": [
+          512,
+          686
+        ],
+        "size": [
+          140,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          8
+        ],
+        "id": "completed-batches",
+        "role": "AXStaticText",
+        "title": "1",
+        "value": "1",
+        "description": "",
+        "enabled": true,
+        "position": [
+          662,
+          686
+        ],
+        "size": [
+          92,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          9
+        ],
+        "id": "submitted-batches",
+        "role": "AXStaticText",
+        "title": "1",
+        "value": "1",
+        "description": "",
+        "enabled": true,
+        "position": [
+          764,
+          686
+        ],
+        "size": [
+          92,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          10
+        ],
+        "id": "ui-count",
+        "role": "AXStaticText",
+        "title": "0",
+        "value": "0",
+        "description": "",
+        "enabled": true,
+        "position": [
+          866,
+          686
+        ],
+        "size": [
+          92,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          11
+        ],
+        "id": "cache-peak",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          968,
+          686
+        ],
+        "size": [
+          92,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          12
+        ],
+        "id": "interop-state",
+        "role": "AXStaticText",
+        "title": "Shared device + queue confirmed",
+        "value": "Shared device + queue confirmed",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          718
+        ],
+        "size": [
+          206,
+          14
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          13
+        ],
+        "id": "budget-state",
+        "role": "AXStaticText",
+        "title": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "value": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          746
+        ],
+        "size": [
+          680,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          14
+        ],
+        "id": "device-state",
+        "role": "AXStaticText",
+        "title": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "value": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          790
+        ],
+        "size": [
+          269,
+          13
+        ]
+      }
+    ],
+    "pid": 42308,
+    "frontmost": true
+  },
+  "running": {
+    "nodes": [
+      {
+        "path": [
+          0
+        ],
+        "id": "",
+        "role": "AXApplication",
+        "title": "pancake-ui-qualification",
+        "value": "pancake-ui-qualification",
+        "description": "",
+        "enabled": false,
+        "position": [
+          0,
+          0
+        ],
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "path": [
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXWindow",
+        "title": "Pancake P0 native qualification",
+        "value": "Pancake P0 native qualification",
+        "description": "",
+        "enabled": true,
+        "position": [
+          360,
+          194
+        ],
+        "size": [
+          720,
+          630
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXStaticText",
+        "title": "Safe Slint + CubeCL preview",
+        "value": "Safe Slint + CubeCL preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          206
+        ],
+        "size": [
+          316,
+          26
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          1
+        ],
+        "id": "preview",
+        "role": "AXGroup",
+        "title": "Computed preview",
+        "value": "Computed preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          246
+        ],
+        "size": [
+          512,
+          384
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          2
+        ],
+        "id": "toggle-pattern",
+        "role": "AXButton",
+        "title": "Toggle pattern",
+        "value": "Toggle pattern",
+        "description": "",
+        "enabled": false,
+        "position": [
+          380,
+          642
+        ],
+        "size": [
+          181,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          3
+        ],
+        "id": "start-job",
+        "role": "AXButton",
+        "title": "Start 128 batches",
+        "value": "Start 128 batches",
+        "description": "",
+        "enabled": false,
+        "position": [
+          569,
+          642
+        ],
+        "size": [
+          202,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          4
+        ],
+        "id": "cancel-job",
+        "role": "AXButton",
+        "title": "Cancel",
+        "value": "Cancel",
+        "description": "",
+        "enabled": true,
+        "position": [
+          780,
+          642
+        ],
+        "size": [
+          135,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          5
+        ],
+        "id": "ping-ui",
+        "role": "AXButton",
+        "title": "Ping UI",
+        "value": "Ping UI",
+        "description": "",
+        "enabled": true,
+        "position": [
+          923,
+          642
+        ],
+        "size": [
+          136,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          6
+        ],
+        "id": "worker-state",
+        "role": "AXStaticText",
+        "title": "Running",
+        "value": "Running",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          686
+        ],
+        "size": [
+          132,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          7
+        ],
+        "id": "pattern-state",
+        "role": "AXStaticText",
+        "title": "Pattern B",
+        "value": "Pattern B",
+        "description": "",
+        "enabled": true,
+        "position": [
+          522,
+          686
+        ],
+        "size": [
+          138,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          8
+        ],
+        "id": "completed-batches",
+        "role": "AXStaticText",
+        "title": "1",
+        "value": "1",
+        "description": "",
+        "enabled": true,
+        "position": [
+          670,
+          686
+        ],
+        "size": [
+          90,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          9
+        ],
+        "id": "submitted-batches",
+        "role": "AXStaticText",
+        "title": "1",
+        "value": "1",
+        "description": "",
+        "enabled": true,
+        "position": [
+          770,
+          686
+        ],
+        "size": [
+          90,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          10
+        ],
+        "id": "ui-count",
+        "role": "AXStaticText",
+        "title": "0",
+        "value": "0",
+        "description": "",
+        "enabled": true,
+        "position": [
+          870,
+          686
+        ],
+        "size": [
+          90,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          11
+        ],
+        "id": "cache-peak",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          970,
+          686
+        ],
+        "size": [
+          90,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          12
+        ],
+        "id": "interop-state",
+        "role": "AXStaticText",
+        "title": "Shared device + queue confirmed",
+        "value": "Shared device + queue confirmed",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          718
+        ],
+        "size": [
+          206,
+          14
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          13
+        ],
+        "id": "budget-state",
+        "role": "AXStaticText",
+        "title": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "value": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          746
+        ],
+        "size": [
+          680,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          14
+        ],
+        "id": "device-state",
+        "role": "AXStaticText",
+        "title": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "value": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          790
+        ],
+        "size": [
+          269,
+          13
+        ]
+      }
+    ],
+    "pid": 42308,
+    "frontmost": true
+  },
+  "responsive": {
+    "nodes": [
+      {
+        "path": [
+          0
+        ],
+        "id": "",
+        "role": "AXApplication",
+        "title": "pancake-ui-qualification",
+        "value": "pancake-ui-qualification",
+        "description": "",
+        "enabled": false,
+        "position": [
+          0,
+          0
+        ],
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "path": [
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXWindow",
+        "title": "Pancake P0 native qualification",
+        "value": "Pancake P0 native qualification",
+        "description": "",
+        "enabled": true,
+        "position": [
+          360,
+          194
+        ],
+        "size": [
+          720,
+          630
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXStaticText",
+        "title": "Safe Slint + CubeCL preview",
+        "value": "Safe Slint + CubeCL preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          206
+        ],
+        "size": [
+          316,
+          26
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          1
+        ],
+        "id": "preview",
+        "role": "AXGroup",
+        "title": "Computed preview",
+        "value": "Computed preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          246
+        ],
+        "size": [
+          512,
+          384
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          2
+        ],
+        "id": "toggle-pattern",
+        "role": "AXButton",
+        "title": "Toggle pattern",
+        "value": "Toggle pattern",
+        "description": "",
+        "enabled": false,
+        "position": [
+          380,
+          642
+        ],
+        "size": [
+          181,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          3
+        ],
+        "id": "start-job",
+        "role": "AXButton",
+        "title": "Start 128 batches",
+        "value": "Start 128 batches",
+        "description": "",
+        "enabled": false,
+        "position": [
+          569,
+          642
+        ],
+        "size": [
+          202,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          4
+        ],
+        "id": "cancel-job",
+        "role": "AXButton",
+        "title": "Cancel",
+        "value": "Cancel",
+        "description": "",
+        "enabled": true,
+        "position": [
+          780,
+          642
+        ],
+        "size": [
+          135,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          5
+        ],
+        "id": "ping-ui",
+        "role": "AXButton",
+        "title": "Ping UI",
+        "value": "Ping UI",
+        "description": "",
+        "enabled": true,
+        "position": [
+          923,
+          642
+        ],
+        "size": [
+          136,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          6
+        ],
+        "id": "worker-state",
+        "role": "AXStaticText",
+        "title": "Running",
+        "value": "Running",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          686
+        ],
+        "size": [
+          132,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          7
+        ],
+        "id": "pattern-state",
+        "role": "AXStaticText",
+        "title": "Pattern B",
+        "value": "Pattern B",
+        "description": "",
+        "enabled": true,
+        "position": [
+          522,
+          686
+        ],
+        "size": [
+          138,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          8
+        ],
+        "id": "completed-batches",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          670,
+          686
+        ],
+        "size": [
+          90,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          9
+        ],
+        "id": "submitted-batches",
+        "role": "AXStaticText",
+        "title": "3",
+        "value": "3",
+        "description": "",
+        "enabled": true,
+        "position": [
+          770,
+          686
+        ],
+        "size": [
+          90,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          10
+        ],
+        "id": "ui-count",
+        "role": "AXStaticText",
+        "title": "1",
+        "value": "1",
+        "description": "",
+        "enabled": true,
+        "position": [
+          870,
+          686
+        ],
+        "size": [
+          90,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          11
+        ],
+        "id": "cache-peak",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          970,
+          686
+        ],
+        "size": [
+          90,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          12
+        ],
+        "id": "interop-state",
+        "role": "AXStaticText",
+        "title": "Shared device + queue confirmed",
+        "value": "Shared device + queue confirmed",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          718
+        ],
+        "size": [
+          206,
+          14
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          13
+        ],
+        "id": "budget-state",
+        "role": "AXStaticText",
+        "title": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=1;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "value": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=1;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          746
+        ],
+        "size": [
+          680,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          14
+        ],
+        "id": "device-state",
+        "role": "AXStaticText",
+        "title": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "value": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          790
+        ],
+        "size": [
+          269,
+          13
+        ]
+      }
+    ],
+    "pid": 42308,
+    "frontmost": true
+  },
+  "cancelled": {
+    "nodes": [
+      {
+        "path": [
+          0
+        ],
+        "id": "",
+        "role": "AXApplication",
+        "title": "pancake-ui-qualification",
+        "value": "pancake-ui-qualification",
+        "description": "",
+        "enabled": false,
+        "position": [
+          0,
+          0
+        ],
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "path": [
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXWindow",
+        "title": "Pancake P0 native qualification",
+        "value": "Pancake P0 native qualification",
+        "description": "",
+        "enabled": true,
+        "position": [
+          360,
+          194
+        ],
+        "size": [
+          720,
+          630
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXStaticText",
+        "title": "Safe Slint + CubeCL preview",
+        "value": "Safe Slint + CubeCL preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          206
+        ],
+        "size": [
+          316,
+          26
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          1
+        ],
+        "id": "preview",
+        "role": "AXGroup",
+        "title": "Computed preview",
+        "value": "Computed preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          246
+        ],
+        "size": [
+          512,
+          384
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          2
+        ],
+        "id": "toggle-pattern",
+        "role": "AXButton",
+        "title": "Toggle pattern",
+        "value": "Toggle pattern",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          642
+        ],
+        "size": [
+          181,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          3
+        ],
+        "id": "start-job",
+        "role": "AXButton",
+        "title": "Start 128 batches",
+        "value": "Start 128 batches",
+        "description": "",
+        "enabled": true,
+        "position": [
+          569,
+          642
+        ],
+        "size": [
+          202,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          4
+        ],
+        "id": "cancel-job",
+        "role": "AXButton",
+        "title": "Cancel",
+        "value": "Cancel",
+        "description": "",
+        "enabled": false,
+        "position": [
+          780,
+          642
+        ],
+        "size": [
+          135,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          5
+        ],
+        "id": "ping-ui",
+        "role": "AXButton",
+        "title": "Ping UI",
+        "value": "Ping UI",
+        "description": "",
+        "enabled": true,
+        "position": [
+          923,
+          642
+        ],
+        "size": [
+          136,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          6
+        ],
+        "id": "worker-state",
+        "role": "AXStaticText",
+        "title": "Cancelled",
+        "value": "Cancelled",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          686
+        ],
+        "size": [
+          139,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          7
+        ],
+        "id": "pattern-state",
+        "role": "AXStaticText",
+        "title": "Pattern B",
+        "value": "Pattern B",
+        "description": "",
+        "enabled": true,
+        "position": [
+          529,
+          686
+        ],
+        "size": [
+          136,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          8
+        ],
+        "id": "completed-batches",
+        "role": "AXStaticText",
+        "title": "3",
+        "value": "3",
+        "description": "",
+        "enabled": true,
+        "position": [
+          676,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          9
+        ],
+        "id": "submitted-batches",
+        "role": "AXStaticText",
+        "title": "3",
+        "value": "3",
+        "description": "",
+        "enabled": true,
+        "position": [
+          774,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          10
+        ],
+        "id": "ui-count",
+        "role": "AXStaticText",
+        "title": "1",
+        "value": "1",
+        "description": "",
+        "enabled": true,
+        "position": [
+          873,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          11
+        ],
+        "id": "cache-peak",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          971,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          12
+        ],
+        "id": "interop-state",
+        "role": "AXStaticText",
+        "title": "Shared device + queue confirmed",
+        "value": "Shared device + queue confirmed",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          718
+        ],
+        "size": [
+          206,
+          14
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          13
+        ],
+        "id": "budget-state",
+        "role": "AXStaticText",
+        "title": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "value": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          746
+        ],
+        "size": [
+          680,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          14
+        ],
+        "id": "device-state",
+        "role": "AXStaticText",
+        "title": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "value": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          790
+        ],
+        "size": [
+          269,
+          13
+        ]
+      }
+    ],
+    "pid": 42308,
+    "frontmost": true
+  },
+  "stopped": {
+    "nodes": [
+      {
+        "path": [
+          0
+        ],
+        "id": "",
+        "role": "AXApplication",
+        "title": "pancake-ui-qualification",
+        "value": "pancake-ui-qualification",
+        "description": "",
+        "enabled": false,
+        "position": [
+          0,
+          0
+        ],
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "path": [
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXWindow",
+        "title": "Pancake P0 native qualification",
+        "value": "Pancake P0 native qualification",
+        "description": "",
+        "enabled": true,
+        "position": [
+          360,
+          194
+        ],
+        "size": [
+          720,
+          630
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXStaticText",
+        "title": "Safe Slint + CubeCL preview",
+        "value": "Safe Slint + CubeCL preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          206
+        ],
+        "size": [
+          316,
+          26
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          1
+        ],
+        "id": "preview",
+        "role": "AXGroup",
+        "title": "Computed preview",
+        "value": "Computed preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          246
+        ],
+        "size": [
+          512,
+          384
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          2
+        ],
+        "id": "toggle-pattern",
+        "role": "AXButton",
+        "title": "Toggle pattern",
+        "value": "Toggle pattern",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          642
+        ],
+        "size": [
+          181,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          3
+        ],
+        "id": "start-job",
+        "role": "AXButton",
+        "title": "Start 128 batches",
+        "value": "Start 128 batches",
+        "description": "",
+        "enabled": true,
+        "position": [
+          569,
+          642
+        ],
+        "size": [
+          202,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          4
+        ],
+        "id": "cancel-job",
+        "role": "AXButton",
+        "title": "Cancel",
+        "value": "Cancel",
+        "description": "",
+        "enabled": false,
+        "position": [
+          780,
+          642
+        ],
+        "size": [
+          135,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          5
+        ],
+        "id": "ping-ui",
+        "role": "AXButton",
+        "title": "Ping UI",
+        "value": "Ping UI",
+        "description": "",
+        "enabled": true,
+        "position": [
+          923,
+          642
+        ],
+        "size": [
+          136,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          6
+        ],
+        "id": "worker-state",
+        "role": "AXStaticText",
+        "title": "Cancelled",
+        "value": "Cancelled",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          686
+        ],
+        "size": [
+          139,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          7
+        ],
+        "id": "pattern-state",
+        "role": "AXStaticText",
+        "title": "Pattern B",
+        "value": "Pattern B",
+        "description": "",
+        "enabled": true,
+        "position": [
+          529,
+          686
+        ],
+        "size": [
+          136,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          8
+        ],
+        "id": "completed-batches",
+        "role": "AXStaticText",
+        "title": "3",
+        "value": "3",
+        "description": "",
+        "enabled": true,
+        "position": [
+          676,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          9
+        ],
+        "id": "submitted-batches",
+        "role": "AXStaticText",
+        "title": "3",
+        "value": "3",
+        "description": "",
+        "enabled": true,
+        "position": [
+          774,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          10
+        ],
+        "id": "ui-count",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          873,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          11
+        ],
+        "id": "cache-peak",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          971,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          12
+        ],
+        "id": "interop-state",
+        "role": "AXStaticText",
+        "title": "Shared device + queue confirmed",
+        "value": "Shared device + queue confirmed",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          718
+        ],
+        "size": [
+          206,
+          14
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          13
+        ],
+        "id": "budget-state",
+        "role": "AXStaticText",
+        "title": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "value": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          746
+        ],
+        "size": [
+          680,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          14
+        ],
+        "id": "device-state",
+        "role": "AXStaticText",
+        "title": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "value": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          790
+        ],
+        "size": [
+          269,
+          13
+        ]
+      }
+    ],
+    "pid": 42308,
+    "frontmost": true
+  },
+  "reused": {
+    "nodes": [
+      {
+        "path": [
+          0
+        ],
+        "id": "",
+        "role": "AXApplication",
+        "title": "pancake-ui-qualification",
+        "value": "pancake-ui-qualification",
+        "description": "",
+        "enabled": false,
+        "position": [
+          0,
+          0
+        ],
+        "size": [
+          0,
+          0
+        ]
+      },
+      {
+        "path": [
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXWindow",
+        "title": "Pancake P0 native qualification",
+        "value": "Pancake P0 native qualification",
+        "description": "",
+        "enabled": true,
+        "position": [
+          360,
+          194
+        ],
+        "size": [
+          720,
+          630
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          0
+        ],
+        "id": "",
+        "role": "AXStaticText",
+        "title": "Safe Slint + CubeCL preview",
+        "value": "Safe Slint + CubeCL preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          206
+        ],
+        "size": [
+          316,
+          26
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          1
+        ],
+        "id": "preview",
+        "role": "AXGroup",
+        "title": "Computed preview",
+        "value": "Computed preview",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          246
+        ],
+        "size": [
+          512,
+          384
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          2
+        ],
+        "id": "toggle-pattern",
+        "role": "AXButton",
+        "title": "Toggle pattern",
+        "value": "Toggle pattern",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          642
+        ],
+        "size": [
+          181,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          3
+        ],
+        "id": "start-job",
+        "role": "AXButton",
+        "title": "Start 128 batches",
+        "value": "Start 128 batches",
+        "description": "",
+        "enabled": true,
+        "position": [
+          569,
+          642
+        ],
+        "size": [
+          202,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          4
+        ],
+        "id": "cancel-job",
+        "role": "AXButton",
+        "title": "Cancel",
+        "value": "Cancel",
+        "description": "",
+        "enabled": false,
+        "position": [
+          780,
+          642
+        ],
+        "size": [
+          135,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          5
+        ],
+        "id": "ping-ui",
+        "role": "AXButton",
+        "title": "Ping UI",
+        "value": "Ping UI",
+        "description": "",
+        "enabled": true,
+        "position": [
+          923,
+          642
+        ],
+        "size": [
+          136,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          6
+        ],
+        "id": "worker-state",
+        "role": "AXStaticText",
+        "title": "Cancelled",
+        "value": "Cancelled",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          686
+        ],
+        "size": [
+          139,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          7
+        ],
+        "id": "pattern-state",
+        "role": "AXStaticText",
+        "title": "Pattern B",
+        "value": "Pattern B",
+        "description": "",
+        "enabled": true,
+        "position": [
+          529,
+          686
+        ],
+        "size": [
+          136,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          8
+        ],
+        "id": "completed-batches",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          676,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          9
+        ],
+        "id": "submitted-batches",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          774,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          10
+        ],
+        "id": "ui-count",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          873,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          11
+        ],
+        "id": "cache-peak",
+        "role": "AXStaticText",
+        "title": "2",
+        "value": "2",
+        "description": "",
+        "enabled": true,
+        "position": [
+          971,
+          686
+        ],
+        "size": [
+          88,
+          24
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          12
+        ],
+        "id": "interop-state",
+        "role": "AXStaticText",
+        "title": "Shared device + queue confirmed",
+        "value": "Shared device + queue confirmed",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          718
+        ],
+        "size": [
+          206,
+          14
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          13
+        ],
+        "id": "budget-state",
+        "role": "AXStaticText",
+        "title": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "value": "compile_ms=252;cmd_slots=1;preview_slots=1;u16_live=0;u16_peak=2;u16_bytes=12582912;rgba_live=0;rgba_peak=1;rgba_bytes=786432;texture_peak=2;texture_bytes=1572864;root_u32_staging_bound=25165824",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          746
+        ],
+        "size": [
+          680,
+          36
+        ]
+      },
+      {
+        "path": [
+          0,
+          0,
+          14
+        ],
+        "id": "device-state",
+        "role": "AXStaticText",
+        "title": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "value": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+        "description": "",
+        "enabled": true,
+        "position": [
+          380,
+          790
+        ],
+        "size": [
+          269,
+          13
+        ]
+      }
+    ],
+    "pid": 42308,
+    "frontmost": true
+  },
+  "cache_peak": 2,
+  "completed_before_cancel": 3,
+  "budget": {
+    "compile_ms": 252,
+    "cmd_slots": 1,
+    "preview_slots": 1,
+    "u16_live": 0,
+    "u16_peak": 2,
+    "u16_bytes": 12582912,
+    "rgba_live": 0,
+    "rgba_peak": 1,
+    "rgba_bytes": 786432,
+    "texture_peak": 2,
+    "texture_bytes": 1572864,
+    "root_u32_staging_bound": 25165824
+  },
+  "device": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+  "normal_exit_status": 0
+}

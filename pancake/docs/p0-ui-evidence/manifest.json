@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-17",
+  "root_kernel_commit": "572e601 (identical cherry-pick 8158887)",
+  "root_kernel_sha256": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+  "native": {
+    "device": "NVIDIA GeForce RTX 3090 / Vulkan / DiscreteGpu",
+    "normal_exit_status": 0,
+    "first_cancel_completed": 3,
+    "reuse_cancel_completed": 2,
+    "budget": {
+      "compile_ms": 252,
+      "cmd_slots": 1,
+      "preview_slots": 1,
+      "u16_live": 0,
+      "u16_peak": 2,
+      "u16_bytes": 12582912,
+      "rgba_live": 0,
+      "rgba_peak": 1,
+      "rgba_bytes": 786432,
+      "texture_peak": 2,
+      "texture_bytes": 1572864,
+      "root_u32_staging_bound": 25165824
+    },
+    "binary": {
+      "sha256": "00edaec85a9a485332aaa2becd2a21842116a01b1dca2ac16767ecb2ad7ebf10",
+      "bytes": 1001110304
+    }
+  },
+  "source": {
+    "qualification/p0-ui/Cargo.lock": {
+      "sha256": "aecc5eec4fa8391e01b509e792633f593768d1072abdba87a75a6e34ad38aa82",
+      "bytes": 207931
+    },
+    "qualification/p0-ui/Cargo.toml": {
+      "sha256": "99ab14bf3e825c7fe3d2f5ef9114269281c174672c6d12cef6d7e5ab8c12ff3d",
+      "bytes": 4146
+    },
+    "qualification/p0-ui/README.md": {
+      "sha256": "c47c5651a0db0b2cdcfae64c3ab77075f6abf933f238a7d5b5324140429c1da6",
+      "bytes": 2002
+    },
+    "qualification/p0-ui/check-macro-negative.sh": {
+      "sha256": "ab891508770a9a97dae3c59ac3ac33d6051c39bf17d9caf26154d18fb65b41e2",
+      "bytes": 1510
+    },
+    "qualification/p0-ui/check.sh": {
+      "sha256": "c2f1d9842d9eb788972af3c98142a276b8442fbb648bb3e3d38369ea5a6382f5",
+      "bytes": 1840
+    },
+    "qualification/p0-ui/dependency-review.json": {
+      "sha256": "6e7dab073b346b0d05fb14c9f83fcdb0a2ca3e7e21e9bd4632bcb07b249ebc31",
+      "bytes": 1137
+    },
+    "qualification/p0-ui/oracle.py": {
+      "sha256": "3ce3459ff3bcb154bd171379896967d6ce0c484d82912d6a69a25c9800579677",
+      "bytes": 6910
+    },
+    "qualification/p0-ui/probes/macro_forbid.rs": {
+      "sha256": "db72e10060631552cdd3b9bfc48048477d4bf2a25a8b844025ab619b3f473721",
+      "bytes": 533
+    },
+    "qualification/p0-ui/review.py": {
+      "sha256": "1dc64956762f9b5d4b3cb5cc9733d422f29b8fbdfbc454a1a588cf542e72451c",
+      "bytes": 1203
+    },
+    "qualification/p0-ui/src/lib.rs": {
+      "sha256": "1a8baaa0f220e7751c5f8a81082f102f7a3a568c360cda413a711ce544010a52",
+      "bytes": 6336
+    },
+    "qualification/p0-ui/src/main.rs": {
+      "sha256": "1e0bbb74c6730a3fe345e9baed2332bcf8df3ded1eda1a1f7999efdedf88bc39",
+      "bytes": 12290
+    },
+    "qualification/p0-ui/src/qualification.slint": {
+      "sha256": "abf120ad648358974b2383fdaa5da687ca91001b7c36d4c6a40eb58e03d815fa",
+      "bytes": 2946
+    },
+    "qualification/p0-ui/src/worker.rs": {
+      "sha256": "9dc724f104c72863bf16725217194ba7d39c8d902b14c078cc6fbaa47f80c033",
+      "bytes": 9611
+    }
+  },
+  "artifacts": {
+    "after.png": {
+      "sha256": "4eae74f359594819ddfac2b89fcdc3459546f00769df754bf0ec25e172bd0a22",
+      "bytes": 43301
+    },
+    "before.png": {
+      "sha256": "ce9443d218ca1bddec9a1052dc94fac02a50680aa4385e5231a50cf41af86441",
+      "bytes": 42818
+    },
+    "checks.log": {
+      "sha256": "673959cf76beee26e084706d6b6ab9cae98e2e81f2ef804eb690bcbc961813b8",
+      "bytes": 2058
+    },
+    "macro-forbid-negative.log": {
+      "sha256": "22aec369e5089475caff9af446c7878b45db1f65cb3cddfa9ffc2d729928b531",
+      "bytes": 2254
+    },
+    "native-build.log": {
+      "sha256": "4993efd24306c77a810c204dc1a5174dc306aa61179f9eb568584b0998d4b73b",
+      "bytes": 151
+    },
+    "native-close-desktop-desktop.log.gz": {
+      "sha256": "31d49506b2ad747020f65e66a95ab4efae97a8b183b48eb7ee11721ff1fb94d5",
+      "bytes": 371
+    },
+    "native-close-failure-tree.json.gz": {
+      "sha256": "16b6266f43a468a2816a9eac9e10d80bff5b9ad22717ded465ab13546a166ecf",
+      "bytes": 888
+    },
+    "native-close-shutdown.json.gz": {
+      "sha256": "c55fcaa170a7c5427f161eff0a2f9190610aab184721860a714ed67b6a63cd97",
+      "bytes": 161
+    },
+    "native-close-ui-actions.jsonl.gz": {
+      "sha256": "d3b208fdeb2a5ac2309896f2b662ade6126492cdfb860a836f2c742cac27fd36",
+      "bytes": 3168
+    },
+    "native-final-application.log.gz": {
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "bytes": 20
+    },
+    "native-final-close-application.log.gz": {
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "bytes": 20
+    },
+    "native-final-close-desktop-desktop.log.gz": {
+      "sha256": "c5f268e2d89389d86e09dd09ebcd3c22032ae8ab079f993c0df2a9ccd52894cb",
+      "bytes": 372
+    },
+    "native-final-close-result.json": {
+      "sha256": "c8b154432699c72e8c491d014992a31e0ab58a7f271ab672f3d503603836bb40",
+      "bytes": 48943
+    },
+    "native-final-close-shutdown.json": {
+      "sha256": "37f8086e7ddcf95d8f116b02b80c33012c282b5126de877fcbde46cbfda51e9c",
+      "bytes": 78
+    },
+    "native-final-close-ui-actions.jsonl.gz": {
+      "sha256": "dba8d924acd850e0f8574114a04d8c4ee470a92ea5582ff11aeda60e8b8bf7fe",
+      "bytes": 1817
+    },
+    "native-final-close-ui-driver.stderr.gz": {
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "bytes": 20
+    },
+    "native-final-desktop-desktop.log.gz": {
+      "sha256": "941e8583f15c39b7e6e4c5dacfaebcb1a68ce599d637172aeecbf49406093102",
+      "bytes": 372
+    },
+    "native-final-result.json": {
+      "sha256": "4300c407f02bd5690e1ea3ea210165d2aa2020a7e99a7ec1b64380b5ff79d7c2",
+      "bytes": 48916
+    },
+    "native-final-shutdown.json": {
+      "sha256": "cdd89336f48c4aeca678280b6c2aae41ba545fe48cb4f1372791a933d9692d85",
+      "bytes": 192
+    },
+    "native-final-ui-actions.jsonl.gz": {
+      "sha256": "22946201127f3c8fd9e0d61ae8ca6d8ca47f8c5d283fdd279297fe6a9e1b3be7",
+      "bytes": 3068
+    },
+    "native-final-ui-driver.stderr.gz": {
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "bytes": 20
+    },
+    "native-red-enabled-desktop-desktop.log.gz": {
+      "sha256": "8deb8cace52c2865fd10e3d9af2a84fe5f22648e16970e7c1cf60e9830e79dea",
+      "bytes": 370
+    },
+    "native-red-enabled-failure-tree.json.gz": {
+      "sha256": "55e8a925d540b9c748c3c8146f2a58f743fd6b3141784a51c5998912b73f10ce",
+      "bytes": 239
+    },
+    "native-red-enabled-shutdown.json.gz": {
+      "sha256": "68452b29b34ae0a8de77f1bda332b01bd87e3f08474ddfa56a93cdbc841d3d9e",
+      "bytes": 162
+    },
+    "native-red-enabled-ui-actions.jsonl.gz": {
+      "sha256": "c35e3ebc394174a17ba6cdb243b3d4cba383be46737df8beb5d4121dd024f294",
+      "bytes": 874
+    },
+    "native-shutdown-desktop-desktop.log.gz": {
+      "sha256": "b43293171984aa914aae3a6e2b756e858c66585468f6da2f0e6c07500bcd3fd1",
+      "bytes": 372
+    },
+    "native-shutdown-failure-tree.json.gz": {
+      "sha256": "c7158859372a26b038aa2d5b12b37266df16e1cf1c50611d31200ce8ed41587c",
+      "bytes": 887
+    },
+    "native-shutdown-negative.log": {
+      "sha256": "2761655218ab014be5a18cd48d606eeb946da5c633b09245f25a28471695a43b",
+      "bytes": 1054
+    },
+    "native-shutdown-shutdown.json.gz": {
+      "sha256": "0ca02e2b4445b41054b8cc5cc979067a50cb98da669bf6bcf02ad4a420e05099",
+      "bytes": 162
+    },
+    "native-shutdown-ui-actions.jsonl.gz": {
+      "sha256": "f6a90f7b34e7c96539332a2e8972b6edb8fa97ef544676e295f6a9ac8ef759d8",
+      "bytes": 3132
+    },
+    "remote-hashes.json": {
+      "sha256": "f7105a98ebae9f79398dddb11973b0b4c9e2c7550d03e961ae89e1b9329fb47f",
+      "bytes": 1682
+    }
+  }
+}

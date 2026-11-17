@@ -1,0 +1,33 @@
+    Blocking waiting for file lock on build directory
+    Checking pancake-ui-qualification v0.1.0 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/qualification/p0-ui)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.76s
+ Documenting pancake-ui-qualification v0.1.0 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/qualification/p0-ui)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.16s
+   Generated /Users/krishna/Documents/focus-stacking/.worktrees/p0-unblock/pancake/target/doc/pancake_ui_qualification/index.html
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.36s
+     Running unittests src/lib.rs (/Users/krishna/Documents/focus-stacking/.worktrees/p0-unblock/pancake/target/debug/build/pancake-ui-qualification/060140ab54d4f224/out/pancake_ui_qualification-060140ab54d4f224)
+
+running 2 tests
+test tests::cache_evicts_and_releases_at_fixed_capacity ... ok
+test tests::known_image_and_preview_bytes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/Users/krishna/Documents/focus-stacking/.worktrees/p0-unblock/pancake/target/debug/build/pancake-ui-qualification/27eaae30bfe59979/out/pancake_ui_qualification-27eaae30bfe59979)
+
+running 2 tests
+test worker::tests::bounded_slots_release_real_owned_allocations ... ok
+test worker::tests::explicit_shutdown_ignores_retained_command_owners ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests pancake_ui_qualification
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+advisories ok, bans ok, sources ok
+Analyzing dependencies of crates in /Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/qualification/p0-ui/Cargo.toml...
+Done!
+cargo-machete didn't find any unused dependencies in /Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/qualification/p0-ui/Cargo.toml. Good job!

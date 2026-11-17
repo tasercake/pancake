@@ -3,11 +3,13 @@
 The new independent `numerical_cases` oracle passes on **native Apple Metal**
 and **native NVIDIA CUDA**. The retained Linux HIP profile also compiles and
 links without a ROCm installation; HIP execution was not attempted.
+The same new oracle also passes on physical **NVIDIA Vulkan through wgpu**.
 
 | Native profile | Actual result |
 | --- | --- |
 | Metal: Apple M4 Pro, `msl_Apple M4 Pro` | All shared variance/budget/reuse checks pass. Live usage stays 0 allocations / 0 bytes after warm-up and eight repeated completed rounds. |
 | CUDA: RTX 3090, `ptx_sm86`, driver 580.178.04, NVRTC 12.5 | Same unchanged oracle passes. Live usage stays 8 allocations / 128 bytes after warm-up and eight repeated completed rounds. |
+| wgpu Vulkan: RTX 3090, `DiscreteGpu`, driver 580.178.04 | New variance/reuse oracle and separate core GPU blur both pass. Live usage stays 8 allocations / 512 bytes; reserved bytes stay 13,778,496. Adapter receipt explicitly confirms Vulkan and rejects software GPU fallback. |
 | Linux HIP compile/link | `cargo test --locked --features cubecl/hip --test cpu_numerical_contract --no-run -j2` exits 0 and produces a linked x86-64 ELF. No missing dynamic dependencies. No `hipconfig`, `/opt/rocm`, `HIP_PATH` or `ROCM_PATH`; no SDK installation or AMD hardware claim. |
 
 The oracle checks centered variance `[8,0,2]`, bright low-bit variance `1.25`,
@@ -19,6 +21,8 @@ are not reused as evidence for it.
 The request guard is **8 MiB of logical working data**. Both native allocators
 retain **12 MiB reserved** before and after reuse. The guard is not a physical
 GPU/driver reservation cap, process RSS limit or half-memory performance result.
+The Vulkan allocator likewise retains 13,778,496 bytes; its live and reserved
+usage are unchanged after the repeated completed jobs.
 
 ## Immutable source and exact profiles
 
@@ -41,6 +45,8 @@ archive, then run from that archive's `pancake/` directory:
 cargo +1.100.0 test --locked --features cubecl/metal-native --test native_numerical_contract -j2 -- --test-threads=1
 CUDARC_CUDA_VERSION=12050 LD_LIBRARY_PATH=/opt/pancake-cuda/lib64 cargo +1.100.0 test --locked --features cubecl/cuda --test native_numerical_contract -j2 -- --test-threads=1
 cargo +1.100.0 test --locked --features cubecl/hip --test cpu_numerical_contract --no-run -j2
+cargo +1.100.0 test --locked --test gpu_numerical_contract -j2 -- --test-threads=1
+cargo +1.100.0 test --locked --test kernel_contract wgpu_blur_matches_independent_values -j2 -- --exact --test-threads=1
 ```
 
 Linux used the existing task container, Rust 1.100.0, `CARGO_HOME=/opt/pancake-cargo`,

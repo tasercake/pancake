@@ -35,12 +35,11 @@ jobs:
       - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
         with:
           tool: cargo-nextest@0.9.152,cargo-hack@0.6.46,shellcheck@0.11.0
-      - name: Install pinned actionlint from its Go module
-        run: |
-          source scripts/tool-versions.sh
-          export GOBIN="$RUNNER_TEMP/pancake-lint-tools"
-          go install "github.com/rhysd/actionlint/cmd/actionlint@v$PANCAKE_ACTIONLINT_VERSION"
-          printf '%s\n' "$GOBIN" >> "$GITHUB_PATH"
+      - name: Provision Linux native build dependencies
+        if: runner.os == 'Linux'
+        run: bash scripts/ci-linux-native-deps.sh
+      - name: Install checksum-pinned actionlint release
+        run: bash scripts/install-actionlint.sh "$RUNNER_TEMP/pancake-lint-tools"
       - run: bash scripts/check.sh fast
       - run: bash scripts/check.sh test-cpu
 
@@ -63,6 +62,8 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+      - name: Provision Linux native build dependencies
+        run: bash scripts/ci-linux-native-deps.sh
       - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
         with:
           tool: cargo-llvm-cov@0.9.1,cargo-deny@0.20.2,cargo-mutants@27.1.0,cargo-machete@0.9.2
@@ -72,7 +73,7 @@ jobs:
           rustup toolchain install "$PANCAKE_NIGHTLY" --profile minimal --component llvm-tools-preview
       - run: bash scripts/check.sh coverage-cpu
       - run: bash scripts/check.sh deps
-      - run: bash scripts/check.sh mutants
+      - run: bash scripts/check.sh mutants-cpu
       - run: bash scripts/check.sh guardrails
 
   nightly:
@@ -83,6 +84,8 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+      - name: Provision Linux native build dependencies
+        run: bash scripts/ci-linux-native-deps.sh
       - name: Install pinned nightly
         run: |
           source scripts/tool-versions.sh
@@ -105,6 +108,8 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+      - name: Provision Linux native build dependencies
+        run: bash scripts/ci-linux-native-deps.sh
       - name: Install pinned nightly
         run: |
           source scripts/tool-versions.sh

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "red_run": 44090076402,
+  "red_source": "85ae9433f35220761d390e5aa4a90eb3363114c3",
+  "jobs": {
+    "macos": 134062600628,
+    "ubuntu-platform": 134062600822,
+    "assurance": 134062600630,
+    "nightly": 134062600385,
+    "asan": 134062600780,
+    "tsan": 134062601186
+  },
+  "artifacts": {
+    "actionlint-macos-arm64.log": {
+      "bytes": 96,
+      "sha256": "2f40fa9e505771c4dd7ff4b6ed601e587f52744935b72906e55b21a9a7c1ce1b"
+    },
+    "native-deps-host-refused.log": {
+      "bytes": 71,
+      "sha256": "d89a5dfc8d6caaa48cffa1e5690a14112014d123a15dbc526dd45e4ce640a1da"
+    },
+    "red-asan.log.gz": {
+      "bytes": 18972,
+      "sha256": "6eb691a07c6ec8233a2c1f4e9acde246560f6c8525395caa6d6d9e20d969a351",
+      "uncompressed_bytes": 80003
+    },
+    "red-assurance.log.gz": {
+      "bytes": 20288,
+      "sha256": "79318e24fe4224f5fa342db2881e6e00304797cd25d8a1a7e814f91047d6372d",
+      "uncompressed_bytes": 83376
+    },
+    "red-macos.log.gz": {
+      "bytes": 5186,
+      "sha256": "d4a2ce326d2d1ef57585269317ad3a40e9ee8328efc5fe48d955ef14d5db62e1",
+      "uncompressed_bytes": 22646
+    },
+    "red-nightly.log.gz": {
+      "bytes": 19405,
+      "sha256": "ebc7444aa293e1f4ddc052596f91edac76677862c58bf9b253fdeddd251451f0",
+      "uncompressed_bytes": 80528
+    },
+    "red-tsan.log.gz": {
+      "bytes": 18977,
+      "sha256": "c81f1195928ad4923b36a0717c6699501e074ab8ff345076581ad8d64778b80b",
+      "uncompressed_bytes": 80002
+    },
+    "red-ubuntu-platform.log.gz": {
+      "bytes": 5764,
+      "sha256": "eba35e7df1825f46344dd1d82398359147725e2cee73d0a5719d209119d599e8",
+      "uncompressed_bytes": 23636
+    }
+  }
+}

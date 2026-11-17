@@ -1,0 +1,13 @@
+{
+  "scope": "Windows x86-64 MSVC root CPU/wgpu/Slint compile+link only; no Windows execution/driver/UI claim",
+  "source_commit": "85ae9433f35220761d390e5aa4a90eb3363114c3",
+  "run_id": 44090076402,
+  "job_id": 134062600663,
+  "url": "https://github.com/tasercake/focus-stacking/actions/runs/44090076402/job/134062600663",
+  "conclusion": "success",
+  "command": "cargo test --locked --workspace --all-targets --all-features --target x86_64-pc-windows-msvc --no-run",
+  "started_at": "2026-11-17T13:10:28Z",
+  "completed_at": "2026-11-17T13:18:16Z",
+  "raw_log_sha256": "17defdc33539c647d637e28de6a955ea3a4e7793801e352d07c3d9dde15cc636",
+  "other_jobs_in_run": "Failed runner setup, not claimed as passes; fixing missing fontconfig/Go and exact actionlint version while preserving checks"
+}

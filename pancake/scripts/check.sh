@@ -89,7 +89,8 @@ case ${1:-all} in
             cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
         cargo doc --locked --workspace --all-features --no-deps --document-private-items
         shellcheck --source-path=SCRIPTDIR --external-sources \
-            scripts/bootstrap.sh scripts/check.sh scripts/test-guardrails.sh .githooks/*
+            scripts/bootstrap.sh scripts/check.sh scripts/test-guardrails.sh \
+            scripts/install-actionlint.sh scripts/ci-linux-native-deps.sh .githooks/*
         actionlint "$root/../.github/workflows/pancake.yml"
         ;;
     test | test-cpu | gpu)
@@ -195,10 +196,16 @@ case ${1:-all} in
             check advisories bans sources --deny warnings
         python3 scripts/check_unused_dependencies.py target/dependency-policy/metadata.json
         ;;
-    mutants)
+    mutants | mutants-cpu)
         require_tool cargo-mutants
-        cargo mutants --cap-lints true --all-features --in-place --timeout 60 \
-            --build-timeout 180 -- --locked -- --include-ignored
+        if [[ $1 == mutants-cpu ]]; then
+            assurance_profile cpu
+            cargo mutants --cap-lints true --all-features --in-place --timeout 60 \
+                --build-timeout 180 -- --locked "${assurance_args[@]}" -- --include-ignored
+        else
+            cargo mutants --cap-lints true --all-features --in-place --timeout 60 \
+                --build-timeout 180 -- --locked -- --include-ignored
+        fi
         ;;
     nightly | nightly-cpu)
         # Miri checks pure host contracts. Native integration tests below exercise

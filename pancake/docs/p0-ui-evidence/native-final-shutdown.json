@@ -1,0 +1,7 @@
+{
+  "pid": 30932,
+  "returncode": -15,
+  "forced": true,
+  "status": "forced",
+  "close_error": "Command '['/work/pancake/target/debug/pancake-ui-qualification']' timed out after 0 seconds"
+}

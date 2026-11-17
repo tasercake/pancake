@@ -1,0 +1,55 @@
+[
+  {
+    "kind": "test_binary",
+    "source": "target/x86_64-unknown-linux-gnu/debug/build/pancake/6682eb367407804f/out/pancake-6682eb367407804f",
+    "path": "bin/pancake-6682eb367407804f",
+    "sha256": "5e72a93413e89bd9f5ab9743f0ceca9eb11783ab58043371fb829a7d4f71177b"
+  },
+  {
+    "kind": "test_binary",
+    "source": "target/x86_64-unknown-linux-gnu/debug/build/pancake/f2e2ccb999e751b0/out/cpu_kernel_contract-f2e2ccb999e751b0",
+    "path": "bin/cpu_kernel_contract-f2e2ccb999e751b0",
+    "sha256": "e2cbaebc7277f823f431b89cbcd5bf3f2eed4e3ffd46b0a8e71f077dac22885e"
+  },
+  {
+    "kind": "test_binary",
+    "source": "target/x86_64-unknown-linux-gnu/debug/build/pancake/742d4ea8b8fd21c3/out/cpu_numerical_contract-742d4ea8b8fd21c3",
+    "path": "bin/cpu_numerical_contract-742d4ea8b8fd21c3",
+    "sha256": "36c9972f415f1d2e3ddbc4eedc21374dc908936be55005702a3b706a3bcd1186"
+  },
+  {
+    "kind": "runtime_library",
+    "source": "/lib/x86_64-linux-gnu/libm.so.6",
+    "resolved_source": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+    "path": "lib/libm.so.6",
+    "sha256": "7f2ca87f652f56b094462474b076749e90e689d0ecb9cb63c7679820b271b4e7"
+  },
+  {
+    "kind": "runtime_library",
+    "source": "/lib/x86_64-linux-gnu/libstdc++.so.6",
+    "resolved_source": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30",
+    "path": "lib/libstdc++.so.6",
+    "sha256": "e7848e32af4932840ba775169041759a2a8dd5a008af360e5c55bce506eebcf4"
+  },
+  {
+    "kind": "runtime_library",
+    "source": "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "resolved_source": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "path": "lib/libgcc_s.so.1",
+    "sha256": "2bd1552c47799ef67e701e81d4383061fd76059868e446e63560f0dd0d5ec14e"
+  },
+  {
+    "kind": "runtime_library",
+    "source": "/lib/x86_64-linux-gnu/libc.so.6",
+    "resolved_source": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+    "path": "lib/libc.so.6",
+    "sha256": "6b4a45352fd0c540a9c7c718f35ce8c8e46a4e482f9d3885a910c32d1a0e1421"
+  },
+  {
+    "kind": "runtime_library",
+    "source": "/lib64/ld-linux-x86-64.so.2",
+    "resolved_source": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+    "path": "lib/ld-linux-x86-64.so.2",
+    "sha256": "02bcda52c1a5dfc236f94d9e5255b4a0e26347d8a372a5223b650e31f291ce3c"
+  }
+]

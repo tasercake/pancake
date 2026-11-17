@@ -1,0 +1,126 @@
+[package]
+name = "pancake-ui-qualification"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.100"
+license = "GPL-3.0-or-later"
+description = "Isolated native Slint and shared-compute P0 qualification"
+repository = "https://github.com/tasercake/focus-stacking"
+readme = "README.md"
+keywords = ["photography", "gpu", "ui"]
+categories = ["multimedia::images"]
+publish = false
+
+[workspace]
+members = ["."]
+resolver = "3"
+
+[lints]
+workspace = true
+
+[dependencies]
+pancake = { path = "../../pancake", version = "=0.1.0" }
+cubecl = { version = "=0.11.4", default-features = false, features = ["std", "stdlib", "cpu", "wgpu"] }
+slint = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "unstable-wgpu-30", "compat-1-18", "accessibility"] }
+slint-interpreter = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "compat-1-18", "accessibility"] }
+wgpu = { version = "=30.0.2", default-features = false, features = ["std", "wgsl", "metal", "vulkan", "dx12"] }
+
+[patch.crates-io]
+cubecl-core = { path = "../../pancake/vendor/cubecl-core-0.11.4" }
+cubecl-macros = { path = "../../pancake/vendor/cubecl-macros-0.11.4" }
+cubecl-std = { path = "../../pancake/vendor/cubecl-std-0.11.4" }
+cubecl-cpp = { path = "../../pancake/vendor/cubecl-cpp-0.11.4" }
+cubecl-hip = { path = "../../pancake/vendor/cubecl-hip-0.11.4" }
+cubecl-spirv = { path = "../../pancake/vendor/cubecl-spirv-0.11.4" }
+spin_on = { path = "../../pancake/vendor/spin_on-0.1.1" }
+rowan = { path = "../../pancake/vendor/rowan-0.17.0" }
+
+[workspace.lints.rust]
+warnings = { level = "deny", priority = -2 }
+future_incompatible = { level = "deny", priority = -1 }
+rust_2018_idioms = { level = "deny", priority = -1 }
+unused = { level = "deny", priority = -1 }
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "forbid"
+non_ascii_idents = "forbid"
+elided_lifetimes_in_paths = "deny"
+explicit_outlives_requirements = "deny"
+let_underscore_drop = "deny"
+macro_use_extern_crate = "deny"
+meta_variable_misuse = "deny"
+missing_debug_implementations = "deny"
+missing_docs = "deny"
+trivial_casts = "deny"
+trivial_numeric_casts = "deny"
+unexpected_cfgs = "deny"
+unfulfilled_lint_expectations = "deny"
+unreachable_pub = "deny"
+unused_crate_dependencies = "deny"
+unused_import_braces = "deny"
+unused_lifetimes = "deny"
+unused_macro_rules = "deny"
+unused_qualifications = "deny"
+unused_results = "deny"
+variant_size_differences = "deny"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+cargo = { level = "deny", priority = -1 }
+# The full restriction group contains conflicting lints. Select useful ones.
+allow_attributes = "deny"
+allow_attributes_without_reason = "deny"
+arithmetic_side_effects = "deny"
+as_conversions = "deny"
+assertions_on_result_states = "deny"
+dbg_macro = "deny"
+default_numeric_fallback = "deny"
+empty_drop = "deny"
+exit = "deny"
+expect_used = "deny"
+filetype_is_file = "deny"
+float_cmp_const = "deny"
+get_unwrap = "deny"
+indexing_slicing = "deny"
+infinite_loop = "deny"
+large_include_file = "deny"
+lossy_float_literal = "deny"
+mem_forget = "deny"
+missing_assert_message = "deny"
+missing_docs_in_private_items = "deny"
+multiple_unsafe_ops_per_block = "deny"
+panic = "deny"
+panic_in_result_fn = "deny"
+print_stderr = "deny"
+print_stdout = "deny"
+rc_buffer = "deny"
+rc_mutex = "deny"
+rest_pat_in_fully_bound_structs = "deny"
+str_to_string = "deny"
+string_slice = "deny"
+todo = "deny"
+try_err = "deny"
+undocumented_unsafe_blocks = "deny"
+unimplemented = "deny"
+unnecessary_safety_comment = "deny"
+unnecessary_safety_doc = "deny"
+unnecessary_self_imports = "deny"
+unreachable = "deny"
+unused_result_ok = "deny"
+unwrap_used = "deny"
+verbose_file_reads = "deny"
+
+[workspace.lints.rustdoc]
+all = { level = "deny", priority = -1 }
+missing_crate_level_docs = "deny"
+unescaped_backticks = "deny"
+
+[profile.release]
+overflow-checks = true
+lto = "thin"
+codegen-units = 1
+
+[profile.test]
+overflow-checks = true
+debug-assertions = true

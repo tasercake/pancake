@@ -107,8 +107,20 @@ It does not implement the full application before implementation starts.
 | Earlier blocker | Required architectural proof in P0 | Required later acceptance |
 |---|---|---|
 | Linux GPU ASan | Actual CPU ASan/TSan on all owned host source; CPU/native source-universe coverage guard; mandatory real GPU tests. Preserve explicit GPU-sanitizer follow-up, with no suppression. | P9: investigate CubeCL/driver GPU ASan failure and final integrated regression. No GPU sanitizer pass is claimed before one exists. |
-| RAW compatibility / T50 | Safe full Bayer DNG development and genuine RGB16 output; selected crop/color policy; real codec precision APIs. | P2: proprietary-camera crop/render parity, all file/error/orientation cases, and acquire/hash-freeze T50 before matched comparisons. P10: complete unchanged real-data performance protocol. |
+| RAW compatibility / T50 | Safe full Bayer DNG development and genuine RGB16 output; selected crop/color policy; real codec precision APIs. | P2: proprietary-camera crop/render parity, all file/error/orientation cases, and acquire/hash-freeze T50 before matched comparisons. P10: complete unchanged numeric/quality protocol, with generated T50 labelled and other corpora real. |
 | Complete numerical/UI/lifecycle/performance slices | Real blur and stable f32 reduction, u16 precision, shape/budget errors, resource reuse; safe shared Slint/wgpu handles; actual native input/pixels and responsive cancellable reusable worker. | P3–P5: all methods/registration; P6–P8: full job/UI/lifecycle; P9: packages/full suite; P10: final speed/memory/latency targets. Start timing the first complete pipeline. |
+
+### T50 input policy — later user instruction
+
+User has no suitable local T50 source and authorizes generation or temporary
+open-source download, with cleanup. Use a deterministic **GENERATED** native
+6000×4000, genuine RGB16 ZIP-TIFF 50-frame scale workload, with known focus
+variation and independent full decode/hash verification. Retain generator, seed,
+ordered file/pixel hashes and cleanup receipt; remove generated images after
+qualification. This changes T50's earlier real-photo-only input condition before
+any matched candidate measurement. It does not change thresholds, case oracles,
+precision or the real R50/D150/E9 requirements. Regenerate the exact set for later
+benchmarks; do not present synthetic scale results as real-camera quality.
 
 ## 3. Ordered P0 gates and progress
 
@@ -121,22 +133,27 @@ Every PASS needs source/lock/device provenance, commands and a real result in th
 | Gate, in order | Architectural minimum / progress | Later requirement or reopening condition |
 |---|---|---|
 | **P0.02 — access** | **PASS.** Apple CPU/GPU and Linux NVIDIA CPU/GPU reachable; private Linux Xvfb/AT-SPI can use physical GPU. Dedicated macOS guest SSH/Aqua route qualified. | P7/P9: current guest application AX/Automation identity, full workflows and packages. Never use host desktop input. New required hardware reopens access. |
-| **P0.03 — foundation and builds** | **VERIFYING.** Slint 1.19, CubeCL 0.11.4, wgpu 30.0.2; selected safe codec/RAW/color APIs; available native runtime builds. Combined graph resolves, metadata only. Retained Windows/HIP build receipts tracked in work log. | P2: actual combined consumer build/audit; P9: packaged native dependencies/signing. A missing critical API or incompatible graph reopens P0. |
+| **P0.03 — foundation and builds** | **PASS build minimum; CI setup fixes in progress.** Slint 1.19, CubeCL 0.11.4, wgpu 30.0.2; selected safe codec/RAW/color APIs; available native runtime builds. Combined graph resolves, metadata only. Actual Windows MSVC all-target build/link and Linux HIP build pass; receipts in work log. | P2: actual combined consumer build/audit; P9: packaged native dependencies/signing. A missing critical API or incompatible graph reopens P0. |
 | **P0.04 — safe launch/resources** | **PASS.** Safe typed handles and checked launch under authored unsafe-forbid; nonzero/length/overflow validation, pre-runtime byte budgets, recoverable readback failures and repeated-job ownership tests. | P2/P3: dtype/decoder bounds and tile halos as consumers appear. New unsafe or unbounded ownership requires review. |
-| **P0.05 — assurance** | **VERIFYING.** Strict CPU/native zero-uncovered-source comparison, mutation/branch/layout/Miri gates; actual Linux CPU ASan/TSan. Physical GPU tests remain mandatory. | P9: external GPU-ASan investigation and complete integrated assurance. No ignored test, sanitizer suppression or production-source exclusion. |
-| **P0.06 — portable execution** | **VERIFYING.** Same u16 blur already passes ARM64/x86 CPU, wgpu Metal/Vulkan, native Metal/CUDA. New f32 reduction/budget/reuse proof is being rerun on required profiles. | P3–P5: full primitive/method battery. GPU software adapters cannot satisfy physical execution. Runtime/backend changes reopen qualification. |
-| **P0.07 — interop/bounds** | **VERIFYING.** Real Slint/CubeCL shared device/queue, finite cached textures/planes/staging, bounded worker state and explicit native-to-display transfer boundary. | P3/P7: production tile halos, decode/cache pressure, retained full-precision results. RGBA8 preview is not HDR or export precision. No zero-copy claim. |
+| **P0.05 — assurance** | **PASS for current production root library.** Strict CPU/native zero-uncovered-source comparison, mutation/branch/layout/Miri gates and actual Linux CPU ASan/TSan pass. Standalone UI/codec source has separate qualification, not full source-coverage/sanitizer approval. Physical GPU tests remain mandatory. | P9: external GPU-ASan investigation and complete integrated assurance. No ignored test, sanitizer suppression or production-source exclusion. |
+| **P0.06 — portable execution** | **PASS.** Same u16 blur and new centered f32 variance/budget/reuse oracle pass ARM64/x86 CPU, wgpu Metal/Vulkan and native Metal/CUDA. HIP compiles/links without execution. | P3–P5: full primitive/method battery. GPU software adapters cannot satisfy physical execution. Runtime/backend changes reopen qualification. |
+| **P0.07 — interop/bounds** | **PASS.** Real Slint/CubeCL shared device/queue, finite cached textures/planes/staging, bounded worker state and explicit presentation-copy boundary. Native close exits cleanly after explicit cancellation/shutdown. | P3/P7: production tile halos, decode/cache pressure, retained full-precision results. RGBA8 preview is not HDR or export precision. No zero-copy claim. |
 | **P0.08 — initial I/O** | **PASS.** Full suite-generated Bayer DNG → genuine RGB16 validated independently; safe owned Rawler API, bounded two-worker pool. PNG16/TIFF16/f32 TIFF/EXR and ICC precision proofs retained. | P2: Canon crop/render parity, other cameras, orientation/alpha/grayscale, Unicode, file limits and atomic failed-export retention. No camera-specific crop constants. |
-| **P0.09 — numerical risk** | **PASS on Apple; required-profile reruns tracked in .06.** Exact full-range u16 blur and centered f32 row variance handle bright/flat/narrow/odd inputs; checked budget limits and warm repeated resource reuse. | P3/P5: FFT/resize/warp/pyramid/reconstruction and full per-case determinism. No f16/f64 requirement, vendor algorithm copy or relaxed tolerance. |
+| **P0.09 — numerical risk** | **PASS minimum on all required profiles; see .06.** Exact full-range u16 blur and centered f32 row variance handle bright/flat/narrow/odd inputs; checked budget limits and warm repeated resource reuse. | P3/P5: FFT/resize/warp/pyramid/reconstruction and full per-case determinism. No f16/f64 requirement, vendor algorithm copy or relaxed tolerance. |
 | **P0.10 — methods/slabs** | **TRANSFERRED to P3/P4.** No five-method/slab pass claimed. | Weighted/depth, Laplacian/Hybrid/exposure, auto parameters, 4+4+1 exposure tree, slabs and precision acceptance. |
 | **P0.11 — registration/crop** | **TRANSFERRED to P5.** No registration pass claimed. | Known-transform oracles, all reference modes, ambiguous motion, breathing, confidence, crop and drift. One CubeCL production pipeline. |
-| **P0.12 — worker mechanism** | **VERIFYING.** Actual compute progresses while native Ping responds; cancel stops new work and reused worker starts/cancels second job. | P6: full job/device/error/fallback/queue semantics, generation IDs and source/export preservation. |
-| **P0.13 — native UI mechanism** | **VERIFYING.** Unchanged Linux native driver clicks actual Slint controls, reads state and validates changed pixels. Selected safe interpreter avoids generated first-party unsafe. | P7: every required control, menus, panels, viewer/collection/crop and GUI/CLI parity. Upstream Rowan runtime limitation remains explicit. |
+| **P0.12 — worker mechanism** | **PASS.** Actual compute progresses while native Ping responds; cancel stops new work and reused worker starts/cancels second job. | P6: full job/device/error/fallback/queue semantics, generation IDs and source/export preservation. |
+| **P0.13 — native UI mechanism** | **PASS.** Unchanged Linux native driver clicks actual Slint controls, reads state and validates changed pixels. Selected safe interpreter avoids generated first-party unsafe. | P7: every required control, menus, panels, viewer/collection/crop and GUI/CLI parity. Upstream Rowan runtime limitation remains explicit. |
 | **P0.14 — complete lifecycle** | **TRANSFERRED to P8.** Minimal worker proof belongs to .12; no 64-frame scenario or 250 ms acceptance pass claimed. | P8: unchanged real 64-frame Laplacian/breathing pause/resume/cancel/reuse scenario. P10: 30-request latency campaign. No sleeps or business hooks. |
 | **P0.15 — verification route** | **PASS minimum.** Private native Linux input plus physical GPU and task-owned guest access exist; source/contract/hash receipts retained. No full case-accounting pass claimed. | P9: matched packages, launch/argv/settings, guest export, physical-GPU full workflow. |
 | **P0.16 — performance** | **TRANSFERRED to first complete pipeline/P10.** Targets and protocol frozen in .01. Historical single-job reference diagnostics retained; no speed/memory/latency improvement claimed. | Begin measurements at first working pipeline. Freeze T50 before comparisons. P10 requires equal quality, matched hardware/settings, warm/cold/RSS/GPU-memory/viewer statistics. |
 
 ### Assurance boundary and explicit limits
+
+The current production root library has the complete coverage/sanitizer proof
+below. Standalone UI and codec workspaces have their own strict lint, unit and
+functional proofs; they do not inherit a root-library coverage or sanitizer pass.
+Integrated production consumers must meet all owned-source gates when introduced.
 
 Pure host contracts run under strict Miri. Actual CPU JIT and GPU kernels run in
 native integration tests. Linux CPU ASan/TSan exercises authored allocation,
@@ -149,9 +166,14 @@ may disappear by moving its test into a GPU target.
 Neither ASan nor Miri proves GPU shaders, LLVM-generated machine code, proprietary
 drivers or all third-party unsafe sound. The existing GPU-ASan device failure
 and external loader leak stay visible for P9, with an executable diagnostic
-profile. Slint interpreter adds its compiler/Rowan to runtime trusted dependencies;
-Rowan's pre-existing ARC strict-Miri failure is not called a passing test. The
-narrow Rowan layout patch does not repair that upstream ARC implementation.
+profile. Slint interpreter adds its compiler/Rowan to runtime trusted dependencies. P0
+accepts only repository-owned embedded UI source through the safe API, with this
+trust limit explicit. Rowan parser runs at startup; its ARC strict-Miri failure
+was reproduced in separate upstream probes, not an end-to-end UI Miri run. The
+layout patch does not repair ARC. **P9 release condition:** explicitly review and
+record continued interpreter/Rowan trust, or adopt a reviewed generated-bindings
+boundary. Compiled glue can remove runtime parser exposure as well as startup
+cost; it requires its own narrow policy review. This can stop release, not P1.
 
 P0.01's unchanged [targets](performance-targets.json): at least **2×** warm
 completed-job speed, at most **50%** peak memory, non-regressing cold median,
@@ -257,15 +279,15 @@ passing cases in regression selections. Do not merge placeholders as passes.
 |---|---|
 | **P0 — architecture qualification** | Close active P0.01–P0.17 minima above. Retain explicit transfers and unresolved third-party/tool limits. No full application or performance pass. |
 | **P1 — CLI integration** | Shared validated config, help/errors, path/glob/deduplication, resource limits and real diagnostics. Build runnable release CLI; test arguments, help, and rejection paths. |
-| **P2 — complete I/O** | Integrate selected codecs/Rawler/color into actual audited consumer. Complete DNG, precision, camera crop/render parity, orientation, grayscale/alpha, Unicode, malformed/oversized inputs, atomic export and source immutability. Acquire/freeze real T50 before matched performance comparisons. |
+| **P2 — complete I/O** | Integrate selected codecs/Rawler/color into actual audited consumer. Complete DNG, precision, camera crop/render parity, orientation, grayscale/alpha, Unicode, malformed/oversized inputs, atomic export and source immutability. Regenerate/hash-verify approved generated T50 before matched scale comparisons; keep R50/D150/E9 real. |
 | **P3 — primitives/basic fusion** | Implement shared resize/pyramids/focus/reduction resources, weighted average and depth map. Independent precision/shape/flat/tie oracles and applicable CPU/GPU device cases. |
 | **P4 — all methods/slabs** | Complete Laplacian, Hybrid, exposure and slabs, auto parameters, reports and 4+4+1 batch semantics. Pass full numerical cases before optimization. Start equal-quality full-pipeline timing as soon as executable. |
 | **P5 — registration/crop** | Implement/qualify transforms, multiscale FFT/refinement/confidence and all references, breathing, high precision, legacy switch, mixed dimensions, crop and slab drift. Known-transform independent oracles; no divergent OpenCV CPU path. |
 | **P6 — devices/resilience** | Complete device qualification/selection, truthful telemetry, bounded queues, pause/cancel, stale messages and errors. Pass all 341 host cases. Keep genuine-driver-trigger test gap explicit. |
 | **P7 — complete Slint workflow** | Build all controls, gestures, native panels, collections, retained results, comparison, export, viewport and crop on qualified safe UI/resource boundary. Native workflow and GUI/CLI parity; requalify guest AX identity. |
 | **P8 — desktop/lifecycle** | Preferences, history/context, About/Lightroom, unsaved/error workflows. Run unchanged real 64-frame lifecycle with no artificial delay. All 34 VM-compatible GUI cases pass; physical GPU case remains separate. |
-| **P9 — packages/required matrix** | Complete matching packages and native libraries, guest/physical-GPU GUI, integrated assurance and GPU-ASan investigation. Required Apple/NVIDIA runtime tests plus retained target/backend builds. AMD/Intel GPU and Windows runtime best effort; label unrun lanes unverified. |
-| **P10 — performance/release** | Full frozen real-data/quality protocol: 2× warm speed, ≤50% memory, non-regressing cold median and viewer/lifecycle limits. Required assurance/build/package receipts and explicit best-effort labels. No target edits after seeing results. |
+| **P9 — packages/required matrix** | Complete matching packages and native libraries, guest/physical-GPU GUI, integrated assurance, GPU-ASan investigation and explicit interpreter/Rowan release-boundary decision. Required Apple/NVIDIA runtime tests plus retained target/backend builds. AMD/Intel GPU and Windows runtime best effort; label unrun lanes unverified. |
+| **P10 — performance/release** | Full frozen numeric/quality protocol (generated T50 scale; real R50/D150/E9): 2× warm speed, ≤50% memory, non-regressing cold median and viewer/lifecycle limits. Required assurance/build/package receipts and explicit best-effort labels. No target edits after seeing results. |
 
 Use shared host math for small solves and control. RustFFT/OpenCV may be local
 independent test oracles; they must not become separate production CPU algorithms.

@@ -1,0 +1,33 @@
+{
+  "image_id": "sha256:a62a6676db6b68fd1aa959a36ce361a002b74f0936d3e38db544420d9b164990",
+  "user": "65534:65534",
+  "runtime": "runc",
+  "network": "none",
+  "privileged": false,
+  "cap_drop": [
+    "ALL"
+  ],
+  "security_options": [
+    "seccomp=unconfined",
+    "no-new-privileges"
+  ],
+  "readonly_rootfs": true,
+  "tmpfs": {
+    "/tmp": "rw,nosuid,nodev,size=256m,mode=1777"
+  },
+  "mounts": [
+    {
+      "source": "/tmp/pancake-p0-tsan-cpu-20261117-02696fd",
+      "destination": "/probe",
+      "rw": false
+    },
+    {
+      "source": "/tmp/pancake-p0-tsan-cpu-20261117-02696fd/lib/ld-linux-x86-64.so.2",
+      "destination": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "rw": false
+    }
+  ],
+  "exit_code": 0,
+  "status": "exited",
+  "verified_closure_files": 8
+}

@@ -14,8 +14,8 @@ caches remain ignored; their manifests identify retained locations and hashes.
 |---|---|---|
 | Dependency and safe API choices | Slint 1.19.0, CubeCL 0.11.4, wgpu 30.0.2; safe TensorHandle kernels; Rawler 0.8.0 plus image/tiff/exr/lcms2. License gate removed. Exact expiring dependency reviews enforced. | Actual integrated consumers must build and pass policy; new architectural choices reopen P0. |
 | Numerical / UI proofs | Blur, stable f32 variance, checked budgets and repeated ownership; native Slint controls, actual pixels and cancellable reusable worker. Final required-profile receipts below. | Full numerical methods P3–P5; job/UI/lifecycle P6–P8. |
-| Assurance / builds | Final local aggregate, Linux CPU ASan/TSan and Windows build receipts being collected. GPU-ASan failure remains an explicit external-runtime follow-up. | Complete application assurance and packages P9. |
-| Full product / performance | **Not run.** No Pancake CLI/GUI application or complete stacking job yet. Targets frozen; three real corpora retained; T50 still missing. | P1–P10, with T50 before matched comparisons. |
+| Assurance / builds | Local aggregate, Linux CPU ASan/TSan and Windows build receipts pass; hosted CI setup corrections remain under validation. GPU-ASan failure remains an explicit external-runtime follow-up. | Complete application assurance and packages P9. |
+| Full product / performance | **Not run.** No Pancake CLI/GUI application or complete stacking job yet. Targets frozen; three real corpora retained; generated T50 qualification/cleanup is in progress after explicit user authorization. | P1–P10, with T50 before matched comparisons. |
 
 ## 2. Evidence chronology
 
@@ -166,7 +166,9 @@ both complete the unchanged variance/budget/reuse oracle. Metal live allocations
 return to zero; CUDA retains eight / 128 bytes, unchanged after eight rounds.
 Both reserve 12 MiB before/after. Linux HIP `--no-run` compiles/links an ELF
 without ROCm/hipconfig or missing dynamic dependencies. No HIP execution claim.
-New Vulkan reduction receipt is still being collected separately.
+New Vulkan reduction also passes on physical RTX 3090: eight live allocations /
+512 bytes and 13,778,496 reserved bytes remain unchanged. Its numerical and
+separate original blur logs are retained with exact adapter identity.
 
 ## 7. Assurance: observed failures and adopted boundary
 
@@ -200,7 +202,7 @@ or successful runtime test. Final TSan rebuilds standard library correctly.
 
 ### Enforced P0 host boundary
 
-[`p0-host-assurance.md`](p0-host-assurance.md) owns exact design. Library plus
+[`p0-host-assurance.md`](p0-host-assurance.md) owns exact design. Current production root library plus
 every `cpu_*` integration target run under Linux ASan/TSan. Same production
 allocation, launch, IR construction and readback execute through CubeCL CPU,
 without scalar replacement. Full native GPU targets remain mandatory under
@@ -209,7 +211,9 @@ without scalar replacement. Full native GPU targets remain mandatory under
 CPU-only and native coverage each require zero uncovered owned source, including
 build.rs when present. Function/region identity comparison requires all native
 production source to occur in CPU collection; unknown production layouts fail
-closed. No authored source exclusion, ignored test, sanitizer suppression or
+closed. Standalone UI/codec workspaces are separate test-only qualification, without
+root-library sanitizer/full-source-coverage approval. No owned production root
+source exclusion, ignored test, sanitizer suppression or
 GPU-only host path loophole was added. Nine focused guards cover these rules.
 `sanitizer-gpu` preserves explicit P9 diagnostic route.
 
@@ -221,6 +225,11 @@ GPU or capabilities; read-only staged inputs, no-new-privileges and seccomp
 unconfined let TSan change its own personality. Full provenance is retained in
 the final assurance receipt. No host
 sysctl, ASLR policy or driver change is used.
+
+Final Linux [receipt](p0-host-assurance-evidence/receipt.json) and bounded logs
+retain both actual nine-test ASan and nine-test TSan passes, source/standard-library
+identity and exact closure hashes. This proof applies to the current production
+root library, not all standalone qualification source.
 
 ## 8. RAW, codec, color and precision evidence
 
@@ -270,12 +279,14 @@ P2 must integrate and audit the real consumer graph.
 Earlier `orb list` unexpectedly attempted VM startup and timed out; it was not a
 passive inventory success. Subsequent work uses known existing SSH/container
 routes. Container lifecycle is coordinated between worktrees. Task-only derived
-compiler objects may be reclaimed to preserve 15 GiB free disk; source, photos,+evidence and active caches are preserved. No personal photo library was scanned.
+compiler objects may be reclaimed to preserve 15 GiB free disk; source, photos,
+evidence and active caches are preserved. No personal photo library was scanned.
 
 ## 10. Native Slint, interop and worker proof
 
-Final safe UI qualification and detailed receipts are retained separately by the
-UI worktree. The actual native Linux oracle observes Slint controls, uses real
+Final safe UI qualification and detailed receipts are retained in
+[p0-ui-qualification.md](p0-ui-qualification.md) and
+[p0-ui-evidence/manifest.json](p0-ui-evidence/manifest.json). The actual native Linux oracle observes Slint controls, uses real
 AT-SPI/XTest input, checks rendered samples and exercises a real compute worker.
 It does not add Pancake business operations to the driver.
 
@@ -286,20 +297,29 @@ first-party policy and same Slint/wgpu renderer. Startup compiler overhead and
 Rowan runtime trust are explicit costs; compiled UI remains a separately reviewed
 future optimization, not an unrecorded safety exception.
 
-Rowan original and patched `arc.rs:264` strict-Miri failure is reachable during
-runtime UI compilation. Error reports invalid Stacked Borrows retag; that model
-is experimental. Native success is not a proof of soundness. No upstream ARC
-rewrite, Miri exclusion or claim of full UI Miri coverage was introduced.
+Slint's Rowan parser executes during runtime UI compilation. Separate original
+and layout-patched upstream probes reproduce the ARC strict-Miri error at
+`arc.rs:264`. This is not an end-to-end UI Miri run or proof that the embedded
+component triggers that same operation. The error reports an invalid Stacked
+Borrows retag; that model is experimental. Native success is not a proof of
+soundness. No upstream ARC
+rewrite, Miri exclusion or claim of full UI Miri coverage was introduced. P0
+records trusted repository-owned embedded-source use only. P9 must explicitly
+review/record the release interpreter/Rowan boundary or adopt reviewed generated
+bindings; this is a visible release condition, not a deferred P0 proof.
 
-Resource high-water bounds: two 512×384 RGBA textures (786,432 bytes each), two
-2048×1536 u16 planes (12,582,912 bytes total), one 786,432-byte RGBA staging
-buffer, one command slot and one pending preview. Actual CubeCL blur runs on
-worker; explicit CPU packing/upload to shared texture is conservative bridge,
+Resource bounds: two 512×384 RGBA textures (786,432 bytes each), two
+2048×1536 u16 planes (12,582,912 bytes total), RGBA staging observed peak one
+786,432-byte buffer with structural maximum three (producer/queued/presenter),
+one command slot and one pending preview.
+Root blur separately uses a 25,165,824-byte logical u32 input/output-buffer bound;
+Its complete conservative working-data admission includes other storage too.
+Actual CubeCL blur runs on worker; explicit CPU packing/upload to shared texture is conservative bridge,
 not zero-copy. These counts are not total RSS or GPU peak. Full caches, retained
 results, image tiling and 64-frame lifecycle remain P3/P7/P8 acceptance.
 
-Informational one-run compile+instantiate measurement: 245 ms. Debug harness
-binary 1,000,870,008 bytes includes LLVM, Slint interpreter and debug symbols;
+Final one-run compile+instantiate observation: 252 ms. Final debug harness
+binary 1,001,110,304 bytes includes LLVM, Slint interpreter and debug symbols;
 there is no release or interpreter-only size-delta claim. These values do not
 establish final cold-start or viewer-latency targets.
 
@@ -310,7 +330,7 @@ establish final cold-start or viewer-latency targets.
 | D150 | 150 distinct optical-focus amber-mite frames, 2304×1728 original JPEG8, selected from 152. Source/archive/file hashes and CC BY4.0 evidence retained. |
 | E9 | Nine distinct Balloons exposure brackets, 512×339 original PNG8; actual exposure domain, not focus frames or repeated sources. Rights evidence retained. |
 | R50 | First 50 consecutive pinned Canon CR3 files, original hashes all distinct; visible 5118×3412, sensor 14-bit stored u16. Full LibRaw decode of all 50 complete. Below T50 resolution. |
-| T50 | **Not selected.** Needs 50 real native ≥6000×4000 optical-focus frames with genuine high-bit input, recorded common crop and RGB16 ZIP TIFF. No upscaling, repeated paths or 8-bit promotion. Required P2/pre-comparison. |
+| T50 | Earlier real-photo-only slot is explicitly superseded by later user permission to generate temporary data. Deterministic 50-frame native 6000×4000 genuine RGB16 ZIP-TIFF scale qualification/cleanup is in progress. Retain recipe/hashes; no real-camera quality or full-job timing claim. |
 | Acquisition | Initial unique payload 214,404,651 bytes plus R50 442,098,996 = 656,503,647 bytes, below unchanged 2,147,483,648-byte cap. D01 disabled/untouched. D05 acquired but unused in benchmarks; no photos redistributed. |
 
 Original data stay in retained ignored `p0-performance` and `p0-unblock` worktrees;
@@ -339,9 +359,24 @@ kernel/layout test; final command must rerun after compatible argument handling.
 
 ## 12. Final execution receipts and closure
 
-Final local aggregate, Linux memory-checker, native reduction, retained build and
-UI artifact receipts will be recorded here before marking P0 closed. Source
-coverage reports must name this worktree's final source, not a parallel cache.
+The complete local aggregate passes at source snapshot
+`85ae9433f35220761d390e5aa4a90eb3363114c3` through the unmodified pre-push hook.
+[Exact receipt](p0-close-evidence/local-aggregate.json) and complete gzip logs,
+four raw coverage reports and mutation outcomes are retained. Both CPU/native
+reports name this worktree's root production source: **139/139 lines, 14/14
+functions, 143/143 regions, 14/14 branches**; **79/79** mutations caught, zero
+missed/unviable/timeouts. Five strict Miri tests, 11 native debug/release tests,
+all 11 tests under both layout seeds and ten guardrail outcomes pass.
+
+[CI run 44090076402](https://github.com/tasercake/focus-stacking/actions/runs/44090076402)
+checks the same application/lock/script/workflow snapshot on the isolated
+`codex/p0-close` branch. Windows MSVC all-target build/link **passes** (job `134062600663`), with
+[full log/receipt](p0-close-evidence/windows-msvc-build.json); it never runs
+Windows device/UI tests. Other jobs in that first run fail runner setup: missing
+fontconfig headers, absent Go on macOS and Go-built actionlint's `v1.7.12`
+version field. These are not passing CI results. Shared native-package setup,
+checksum-pinned release actionlint and hosted CPU mutation routing are being fixed. Subsequent evidence-only integration must retain exact
+production-source/lock equivalence rather than pretending CI tested new code.
 
 Reproduction entry points, from repository root:
 

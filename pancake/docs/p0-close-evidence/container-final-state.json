@@ -1,0 +1,26 @@
+{
+  "route": "krishna-desktop",
+  "container": "pancake-p0-linux-20261117",
+  "pre_stop_active_qualification_processes": 0,
+  "pre_stop_live_infrastructure": [
+    "PID1 sleep infinity"
+  ],
+  "pre_stop_defunct_processes": 27,
+  "command": [
+    "docker",
+    "stop",
+    "--timeout",
+    "10",
+    "pancake-p0-linux-20261117"
+  ],
+  "command_started_utc": "2026-11-17T13:30:58.385495+00:00",
+  "command_completed_utc": "2026-11-17T13:31:08.666080+00:00",
+  "command_exit_code": 0,
+  "final_status": "exited",
+  "final_running": false,
+  "container_exit_code": 137,
+  "container_finished_at": "2026-11-17T13:31:08.434235566Z",
+  "container_retained": true,
+  "cache_source_evidence_retained": true,
+  "other_containers_or_host_settings_changed": false
+}

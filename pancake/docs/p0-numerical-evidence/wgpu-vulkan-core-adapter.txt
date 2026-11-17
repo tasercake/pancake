@@ -1,0 +1,22 @@
+backend = Vulkan
+adapter = AdapterInfo {
+    name: "NVIDIA GeForce RTX 3090",
+    vendor: 4318,
+    device: 8708,
+    device_type: DiscreteGpu,
+    device_pci_bus_id: "0000:01:00.0",
+    driver: "NVIDIA",
+    driver_info: "580.178.04",
+    backend: Vulkan,
+    subgroup_min_size: 32,
+    subgroup_max_size: 32,
+    transient_saves_memory: Some(
+        false,
+    ),
+    limit_bucket: None,
+}
+cpu = DeviceIdentity {
+    name: "AMD Ryzen 9 7950X3D 16-Core Processor",
+    fingerprint: "cpu_x86_64_load-512_f16-chain",
+    physical: None,
+}

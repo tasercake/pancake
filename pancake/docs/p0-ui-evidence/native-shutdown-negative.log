@@ -1,0 +1,15 @@
+    Blocking waiting for file lock on build directory
+   Compiling pancake-ui-qualification v0.1.0 (/work/p0-ui/qualification/p0-ui)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 09s
+Traceback (most recent call last):
+  File "/work/p0-ui/qualification/p0-ui/oracle.py", line 114, in <module>
+    run(arguments.binary.resolve(), arguments.directory.resolve())
+  File "/work/p0-ui/qualification/p0-ui/oracle.py", line 98, in run
+    result["normal_exit_status"] = process.wait(timeout=10)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.local/share/uv/python/cpython-3.12.12-linux-x86_64-gnu/lib/python3.12/subprocess.py", line 1264, in wait
+    return self._wait(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.local/share/uv/python/cpython-3.12.12-linux-x86_64-gnu/lib/python3.12/subprocess.py", line 2045, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['/work/pancake/target/debug/pancake-ui-qualification']' timed out after 10 seconds

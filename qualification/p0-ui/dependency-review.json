@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "base_ledger_sha256": "02ce3ddfb5d9e24be0064d3f87f0c87166140d657ef771127351165e5b9734dc",
+  "parent_additions": [
+    {
+      "name": "hashbrown",
+      "version": "0.16.1",
+      "parent": {
+        "name": "slint-interpreter",
+        "version": "1.19.0",
+        "requirement": "^0.16"
+      },
+      "reason": "Pinned interpreter uses its own internal map generation; no hashbrown type crosses GPU/window resource boundaries."
+    },
+    {
+      "name": "smol_str",
+      "version": "0.3.7",
+      "parent": {
+        "name": "slint-interpreter",
+        "version": "1.19.0",
+        "requirement": "^0.3.1"
+      },
+      "reason": "Pinned interpreter stores internal property and identifier strings; this private generation does not cross typed GPU resource boundaries."
+    },
+    {
+      "name": "syn",
+      "version": "3.0.10",
+      "parent": {
+        "name": "bindgen",
+        "version": "0.73.2",
+        "requirement": ">=2, <4"
+      },
+      "reason": "Existing bindgen accepts syn2 or syn3; this locked host-code-generation resolution selects the already reviewed syn3 version."
+    }
+  ]
+}

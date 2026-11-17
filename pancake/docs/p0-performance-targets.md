@@ -37,11 +37,13 @@ passing by omission.
 These are recipes, not selected benchmark identities. Input hashes, exposure
 metadata, exact dimensions, rights, conversion commands and selected frame order
 must be frozen before a qualification baseline. Never repeat a frame or upscale
-small images to satisfy a missing real workload.
+small images to satisfy a missing real workload. A later explicit user decision
+authorizes deterministic generated T50 scale inputs and cleanup; it does not
+authorize synthetic substitutes for R50/D150/E9.
 
 | Slot | Required input | Methods and geometry |
 |---|---|---|
-| T50 | 50 distinct real focus frames, 6000x4000 RGB16 lossless ZIP/Deflate TIFF. A common recorded crop from larger native images is allowed; resizing is not. | Laplacian, Hybrid, weighted average, depth map; similarity alignment; first reference. |
+| T50 | 50 distinct deterministic generated focal-scale frames, native 6000x4000 genuine RGB16 ZIP/Deflate TIFF. Freeze generator/seed/ordered hashes, label GENERATED and clean up after qualification. No 8-bit promotion or resize; regenerate exact bytes before later comparisons. | Laplacian, Hybrid, weighted average, depth map; similarity alignment; first reference. |
 | R50 | 50 distinct real native camera RAW focus frames; native dimensions and metadata recorded. No embedded-thumbnail substitute. | Same four focus methods and alignment. |
 | D150 | 150 distinct real deep-focus frames at fixed native resolution, native supported camera files or losslessly derived TIFF. Record true source precision. | Same four methods; breathing alignment; slabs of 40 with overlap 4. |
 | E9 | Nine distinct real fixed-focus exposure-bracket frames; original supported files or provenance-pinned float TIFF derivatives. | Exposure fusion only, Euclidean alignment; current 4+4+1 batch semantics. This is not a focus-stack speed test. |
@@ -111,7 +113,9 @@ unified-memory footprint measurements or target passes.
 The diagnostic jobs use kernel 3/levels 4 instead of the frozen 6/8 profile;
 auto-crop is absent, and E9 has no alignment instead of Euclidean alignment.
 They cannot become qualified baselines without the matched profile and full
-sampling/validation protocol. T50/R50 remain unselected. No candidate timing or
-native input-latency result exists. P0.01 remains blocked until the complete
-real corpus and support matrix are qualified; P0.16 remains unexecuted until
-real candidate code and valid matched baselines exist.
+sampling/validation protocol. R50 is now selected and fully decoded; T50 uses
+the subsequently authorized deterministic generated recipe. No candidate full-job
+timing or native input-latency target result exists. Under the adopted smaller
+P0, complete matched comparisons belong to the first full pipeline/P10, not the
+P0 architecture exit. See the [work log](p0-work-log.md) for actual input and
+cleanup receipts, and the plan for current scope.

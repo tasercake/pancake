@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-17",
+  "compiled_snapshot_commit": "02696fd",
+  "equivalent_parent_changes": [
+    "572e601",
+    "65185d9"
+  ],
+  "routing_commit": "a1c7724",
+  "later_launcher_only_fix": "1f21cb9",
+  "identity": {
+    "rust_and_cargo_files_match_final_checkout": true,
+    "library_sha256": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+    "launcher_delta": "Later Bash 3.2 fix changes only native nightly dispatch; sanitizer commands and compiled Rust/Cargo inputs are unchanged.",
+    "rust_toolchain": "nightly-2026-11-15",
+    "rustc": "1.102.0-nightly (5f4effd57 2026-11-13)",
+    "rustc_commit": "5f4effd579500175af844241eb179e756190f1e7",
+    "rustc_llvm": "23.1.5",
+    "host": "x86_64-unknown-linux-gnu",
+    "cpu": "AMD Ryzen 9 7950X3D"
+  },
+  "asan": {
+    "command": "bash scripts/check.sh sanitizer address",
+    "build_flags": "-Dwarnings -Zsanitizer=address; -Zbuild-std; --target x86_64-unknown-linux-gnu; --locked --workspace --all-features --lib --test cpu_kernel_contract --test cpu_numerical_contract",
+    "exit_code": 0,
+    "unit_tests_passed": 5,
+    "cpu_kernel_tests_passed": 2,
+    "cpu_numerical_tests_passed": 2,
+    "leak_or_memory_error_reported": false,
+    "log": "asan-final-shape.log.gz",
+    "binaries": "asan-final-shape-binaries.sha256",
+    "sources": "asan-final-shape-source.sha256"
+  },
+  "tsan": {
+    "build_command": "bash scripts/check.sh sanitizer thread",
+    "build_flags": "-Dwarnings -Zsanitizer=thread; -Zbuild-std; --target x86_64-unknown-linux-gnu; --locked --workspace --all-features --lib --test cpu_kernel_contract --test cpu_numerical_contract",
+    "default_container_exit_code": 66,
+    "default_container_tests_executed": 0,
+    "privileged_exec_exit_code": 66,
+    "privileged_exec_tests_executed": 0,
+    "default_failure": "ThreadSanitizer incompatible memory layout; unable to disable ASLR under inherited seccomp.",
+    "actual_qualification": "Same three compiled test binaries and five ldd runtime libraries executed once in isolated ephemeral CPU-only container.",
+    "arguments": [
+      "--include-ignored"
+    ],
+    "exit_code": 0,
+    "unit_tests_passed": 5,
+    "cpu_kernel_tests_passed": 2,
+    "cpu_numerical_tests_passed": 2,
+    "race_reported": false,
+    "hash_verified_closure_files": 8,
+    "log": "linux-tsan-isolated.log",
+    "closure": "tsan-closure-manifest.json",
+    "container_receipt": "tsan-execution-receipt.json",
+    "runtime_limits": "Non-root65534;all capabilities dropped;no-new-privileges;network none;read-only rootfs and input mounts;256MiB writable tmpfs;seccomp unconfined for this disposable process context only.",
+    "host_sysctl_driver_changes": false,
+    "ephemeral_container_removed": true
+  },
+  "coverage_control": {
+    "producer": "Parent integration checkout; exclusive instrumented collection.",
+    "source_commit": "85ae9433f35220761d390e5aa4a90eb3363114c3",
+    "producer_receipt": "../p0-close-evidence/local-aggregate.json",
+    "producer_receipt_sha256": "99794bd9caa0bea76e388dc39e4544ae262fbadfbbb94832599c994010dbcad6",
+    "full_all_exit_code": 0,
+    "full_all_via": "Unmodified pre-push hook",
+    "source": "pancake/src/lib.rs",
+    "source_sha256": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+    "cpu_and_native": {
+      "lines": [
+        139,
+        139
+      ],
+      "functions": [
+        14,
+        14
+      ],
+      "regions": [
+        143,
+        143
+      ],
+      "branches": [
+        14,
+        14
+      ]
+    },
+    "source_universe_guard": "passed",
+    "mutations": {
+      "total_mutants": 79,
+      "caught": 79,
+      "missed": 0,
+      "unviable": 0,
+      "timeout": 0
+    },
+    "strict_miri_host_tests": 5,
+    "native_tests_each_profile": 11,
+    "layout_seeds": [
+      1,
+      42
+    ],
+    "guardrail_outcomes_passed": 10,
+    "coverage_report_sha256": {
+      "target/assurance/coverage-cpu.json": "8bc2b2bd6bfa476fbbc96e726e8845fe8f1eeab82e33c7222c89e01a480722c3",
+      "target/assurance/coverage-native.json": "839d1dd9f7cc47797c4293b33d22423ac24f1879a0788be14eaa7db2ee52af5d",
+      "target/coverage/branches-cpu.json": "acbd5e727f2dd860ec9251cabcb00e9dec7362361b229d4ef8f139ab490d7977",
+      "target/coverage/branches.json": "9c2c037ae02677620a9696637422c425f1d21ca2a00d9be8a190f3cacbc8deef"
+    }
+  },
+  "scope_limits": [
+    "GPU shaders and LLVM JIT machine code/prebuilt backend libraries are not instrumented by Rust sanitizers.",
+    "GPU ASan device-acquisition/loader defect remains explicit P9 follow-up; no suppression or sanitizer-gpu removal.",
+    "Separate UI qualification workspace is not included in this production-core CPU coverage result.",
+    "Actual Windows MSVC build/link result belongs to CI and is not claimed here."
+  ],
+  "cleanup": {
+    "removed": "Owned ephemeral TSan container, its duplicate staged binary/lib copies and derived explicit-target TSan build cache after logs/source/binary hashes retained.",
+    "retained": "Original task container, native/UI/CUDA debug cache and source/data inputs.",
+    "minimum_disk_reserve_gib": 15,
+    "observed_free_after_staging_cleanup_gib": 27,
+    "observed_free_after_final_asan_gib": 21
+  },
+  "artifacts": [
+    {
+      "path": "asan-final-shape-binaries.sha256",
+      "bytes": 519,
+      "sha256": "81c2d1d6ecc23bb975962901942e9be077e853ea4ed00f5dca1297ca2d8758ef"
+    },
+    {
+      "path": "asan-final-shape-source.sha256",
+      "bytes": 408,
+      "sha256": "04ec135e8a3e2fc790a143af2e209072d7ac5946973b61421586b802fbda3efd"
+    },
+    {
+      "path": "asan-final-shape.log.gz",
+      "bytes": 4141,
+      "sha256": "d243eed70ae5e919d4c01ac5415a6d7ff069d43c6f8b699b455e212bf81df148"
+    },
+    {
+      "path": "linux-tsan-isolated.log",
+      "bytes": 1765,
+      "sha256": "52dab47eb27ab0e2b973931eef49b7f2a4ca0e33e0e7e94ceaedb71fd08c234a"
+    },
+    {
+      "path": "tsan-closure-manifest.json",
+      "bytes": 2240,
+      "sha256": "6cfb48d32b52c10a29a8efeb1efd2dc74a60d55cf668437dbd4530c9a3ff1787"
+    },
+    {
+      "path": "tsan-execution-receipt.json",
+      "bytes": 787,
+      "sha256": "eda3d5c120a1d1c7bc00927447f49a05f3fb3d9d0262e15932f9b90dfd970e45"
+    },
+    {
+      "path": "tsan-final-privileged-exec.log.gz",
+      "bytes": 629,
+      "sha256": "cbb1b9a179ddd2af129b8f6f4410ae39a56861c8489814273dec28e718cba333"
+    },
+    {
+      "path": "tsan-final.log.gz",
+      "bytes": 4071,
+      "sha256": "8c74ec4e544215c41f6bada87848529ceced3093290b6b28af6fdb4719c2b7de"
+    },
+    {
+      "path": "tsan-source-manifest.json",
+      "bytes": 1404,
+      "sha256": "1a7078f13ff2469038db617204f301110547f0b264ff778f0397dfb1a6188eaa"
+    }
+  ]
+}

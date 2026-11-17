@@ -1,0 +1,27 @@
+warning: patch `cubecl-core v0.11.4 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/pancake/vendor/cubecl-core-0.11.4)` was not used in the crate graph
+warning: patch `cubecl-cpp v0.11.4 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/pancake/vendor/cubecl-cpp-0.11.4)` was not used in the crate graph
+warning: patch `cubecl-hip v0.11.4 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/pancake/vendor/cubecl-hip-0.11.4)` was not used in the crate graph
+warning: patch `cubecl-macros v0.11.4 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/pancake/vendor/cubecl-macros-0.11.4)` was not used in the crate graph
+warning: patch `cubecl-spirv v0.11.4 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/pancake/vendor/cubecl-spirv-0.11.4)` was not used in the crate graph
+warning: patch `cubecl-std v0.11.4 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/pancake/vendor/cubecl-std-0.11.4)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Checking pancake-ui-macro-negative v0.1.0 (/Users/krishna/Documents/focus-stacking/.worktrees/p0-close-ui/artifacts/p0-ui-macro-negative)
+error[E0453]: allow(unsafe_code) incompatible with previous forbid
+  --> src/main.rs:5:1
+   |
+ 5 | / slint::slint! {
+ 6 | |     #[edition = "1.19"]
+ 7 | |     export component ForbiddenMacroWindow inherits Window {
+ 8 | |         title: "Negative compile fixture";
+ 9 | |     }
+10 | | }
+   | |_^ overruled by previous forbid
+   |
+   = note: `forbid` lint level was set on command line (`-F unsafe_code`)
+   = note: this error originates in the macro `ItemTreeVTable_static` which comes from the expansion of the macro `slint::slint` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+For more information about this error, try `rustc --explain E0453`.
+error: could not compile `pancake-ui-macro-negative` (bin "pancake-ui-macro-negative") due to 1 previous error

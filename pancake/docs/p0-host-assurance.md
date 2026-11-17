@@ -49,14 +49,37 @@ cannot run with ASan was introduced.
 
 ## Validation status
 
-The routing and source-universe guards have nine focused regression tests,
-including native-only host regions, unknown integration targets and a changed
-production source layout. On the initial blur-only source snapshot, CPU/native
-line/function/region coverage and nightly branch coverage passed the comparison;
-all ten real-tool guardrail outcomes passed. Final source hashes and actual Linux
-sanitizer outcomes will be recorded after the numerical/budget implementation is
-integrated. Those results are not claimed by this initial routing change.
+The final compiled core includes the numerical/budget change `572e601` and shape
+error oracle `65185d9`. The retained
+[receipt](p0-host-assurance-evidence/receipt.json) records exact source, lockfile,
+binary and runtime-library hashes. Compiled Rust/Cargo hashes match the final
+checkout. The later `1f21cb9` change fixes only Bash 3.2 native nightly dispatch;
+it changes no compiled source or sanitizer argument.
 
-Windows workflow syntax was checked with pinned actionlint. An actual MSVC build
-has not been run locally; its result must come from the required Windows job.
-No branch was pushed or remote workflow dispatched by this agent.
+| Actual check | Result |
+|---|---|
+| Linux ASan, normal owned task container | **Pass:** five host unit tests plus two CPU kernel and two CPU numerical tests; exit 0; no memory/leak report. Std and project rebuilt with ASan. |
+| Linux TSan, default container and privileged exec | **Did not execute tests:** both stop before the first test with exit 66 because inherited seccomp prevents TSan's ASLR compatibility setup. These are retained failures, not race results. |
+| Linux TSan, isolated exact-binary route | **Pass:** same nine tests, exit 0, no race report. Three binaries and five runtime libraries were copied without rebuilding, hash-verified, and mounted read-only. |
+| Parent final full-all, tested source `85ae943` | **Pass via unmodified pre-push hook:** CPU/native 139/139 lines, 14/14 functions, 143/143 regions, 14/14 branches; source-universe guard passed. 79/79 mutants caught, five strict Miri tests, 11 native tests per debug/release/layout profile, ten guardrail outcomes. |
+
+The TSan qualification container used the exact existing base image, UID 65534,
+zero capabilities, no network, no-new-privileges, read-only inputs/root filesystem
+and a small writable tmpfs. Only its seccomp policy was unconfined so the sanitizer
+could perform its own process-level address-layout setup. No host sysctl, driver
+or persistent container privilege/configuration was changed. The ephemeral
+container and duplicate staged binaries were removed after evidence retention.
+This is an actual isolated TSan pass, not a claim that the default container's
+`check.sh sanitizer thread` succeeded.
+
+The routing/source guards have nine focused regression tests; all ten real-tool
+guardrail outcomes passed. One shared-cache coverage collection contained foreign
+worktree paths and was rejected. It is not a source finding or accepted coverage
+result. Instrumented coverage/profile collection must have one owner; only normal
+build/test caches may be shared across parallel worktrees. No source exclusion was
+used to hide that contamination.
+
+Windows workflow syntax passed pinned actionlint. The
+[final integration full-all receipt](p0-close-evidence/local-aggregate.json)
+is retained by its producer. Actual MSVC build/link results remain separate and
+are not claimed here. This agent pushed no branch or workflow dispatch.
