@@ -8,6 +8,11 @@ use pancake::{blur_horizontal_u16_bounded, row_variance_u16};
 /// # Errors
 /// Returns a runtime failure or independently known numerical mismatch.
 pub fn check_variance(device: &Device) -> Result<(), String> {
+    if row_variance_u16(device, 0, 1, &[], 1_000)
+        != Err("image dimensions must be nonzero".to_owned())
+    {
+        return Err("variance shape error did not propagate".to_owned());
+    }
     let input = [
         0, 2, 4, 6, 8, 65_535, 65_535, 65_535, 65_535, 65_535, 65_531, 65_532, 65_533, 65_534,
         65_535,
