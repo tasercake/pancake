@@ -723,9 +723,346 @@
   },
   "license_review": "Ordinary reviewed SPDX additions are permitted for actual dependencies. No policy identifiers were added because this candidate independently fails unchanged duplicate/advisory policy and no application dependency was adopted.",
   "gate_verdicts": {
-    "P0.03": "blocked: candidate duplicate-version/advisory/license-metadata policy failures",
+    "P0.03": "blocked: minimal latest-compatible released candidate retains 30 duplicate groups and six unmaintained notices; expected routine license review separately required",
     "P0.04": "not_run: safe TensorHandle API route identified; no safe custom kernel executed",
     "P0.05": "blocked: real native JIT/GPU integration not qualified under existing Miri/all-features/coverage gates",
     "P0.06": "not_run: no candidate runtime adopted or shared kernel executed"
-  }
+  },
+  "candidate_attempts": [
+    {
+      "id": "A",
+      "description": "Viewer-derived graph with CPU/stdlib added; retains direct codecs/utilities and direct cubecl-wgpu defaults.",
+      "manifest": "[package]\nname = \"slint-cubecl-viewer\"\nversion = \"0.1.0\"\nedition = \"2024\"\npublish = false\nlicense = \"GPL-3.0-or-later\"\n[workspace]\n[dependencies]\nslint = { version = \"=1.19.0\", default-features = false, features = [\"std\", \"backend-winit\", \"renderer-femtovg-wgpu\", \"unstable-wgpu-30\", \"compat-1-18\", \"accessibility\"] }\ncubecl = { version = \"=0.11.3\", default-features = false, features = [\"std\", \"stdlib\", \"cpu\", \"wgpu\"] }\ncubecl-wgpu = \"=0.11.3\"\nbytemuck = { version = \"1.24\", features = [\"derive\"] }\nserde_json = \"1\"\nimage = { version = \"0.25\", default-features = false, features = [\"png\", \"jpeg\", \"tiff\"] }\n",
+      "lock_sha256": "35527f923ef4280913d33ec73c21d238a05da0781b95f3b85e567c4236b34731",
+      "lock_reconstruction_patch": "pancake/docs/p0-runtime-lock.patch",
+      "metadata_sha256": "aba9c072f7ab47a8b82d2f4ac2293bb83d98d10b15d92258bc0c84a6e6492436",
+      "package_count_unfiltered": 792,
+      "resolved_foundation": [
+        {
+          "name": "cubecl",
+          "version": "0.11.3"
+        },
+        {
+          "name": "cubecl-wgpu",
+          "version": "0.11.3"
+        },
+        {
+          "name": "slint",
+          "version": "1.19.0"
+        },
+        {
+          "name": "wgpu",
+          "version": "30.0.2"
+        }
+      ],
+      "deny_exit_code": 7,
+      "diagnostic_counts": {
+        "rejected": 653,
+        "no-license-field": 1,
+        "duplicate": 41,
+        "unmaintained": 6
+      },
+      "remaining_duplicate_groups": [
+        "found 2 duplicate entries for crate 'allocator-api2'",
+        "found 2 duplicate entries for crate 'base64'",
+        "found 2 duplicate entries for crate 'bitflags'",
+        "found 2 duplicate entries for crate 'block2'",
+        "found 2 duplicate entries for crate 'calloop'",
+        "found 2 duplicate entries for crate 'calloop-wayland-source'",
+        "found 2 duplicate entries for crate 'convert_case'",
+        "found 2 duplicate entries for crate 'cpufeatures'",
+        "found 2 duplicate entries for crate 'darling'",
+        "found 2 duplicate entries for crate 'darling_core'",
+        "found 2 duplicate entries for crate 'darling_macro'",
+        "found 2 duplicate entries for crate 'downcast-rs'",
+        "found 2 duplicate entries for crate 'foldhash'",
+        "found 3 duplicate entries for crate 'getrandom'",
+        "found 2 duplicate entries for crate 'glow'",
+        "found 4 duplicate entries for crate 'hashbrown'",
+        "found 2 duplicate entries for crate 'hi_sparse_bitset'",
+        "found 2 duplicate entries for crate 'itertools'",
+        "found 2 duplicate entries for crate 'linux-raw-sys'",
+        "found 2 duplicate entries for crate 'miniz_oxide'",
+        "found 2 duplicate entries for crate 'nom'",
+        "found 2 duplicate entries for crate 'objc2'",
+        "found 2 duplicate entries for crate 'objc2-app-kit'",
+        "found 2 duplicate entries for crate 'objc2-foundation'",
+        "found 2 duplicate entries for crate 'prettyplease'",
+        "found 2 duplicate entries for crate 'rand'",
+        "found 3 duplicate entries for crate 'rand_core'",
+        "found 2 duplicate entries for crate 'rustc-hash'",
+        "found 2 duplicate entries for crate 'rustix'",
+        "found 2 duplicate entries for crate 'shlex'",
+        "found 2 duplicate entries for crate 'smithay-client-toolkit'",
+        "found 2 duplicate entries for crate 'smol_str'",
+        "found 2 duplicate entries for crate 'strum'",
+        "found 2 duplicate entries for crate 'strum_macros'",
+        "found 2 duplicate entries for crate 'syn'",
+        "found 2 duplicate entries for crate 'thiserror'",
+        "found 2 duplicate entries for crate 'thiserror-impl'",
+        "found 2 duplicate entries for crate 'tiny-skia'",
+        "found 2 duplicate entries for crate 'tiny-skia-path'",
+        "found 2 duplicate entries for crate 'unicode-width'",
+        "found 3 duplicate entries for crate 'windows-sys'"
+      ],
+      "advisories": [
+        {
+          "id": "RUSTSEC-2024-0436",
+          "package": "paste"
+        },
+        {
+          "id": "RUSTSEC-2026-0441",
+          "package": "pin-utils"
+        },
+        {
+          "id": "RUSTSEC-2026-0192",
+          "package": "ttf-parser"
+        },
+        {
+          "id": "RUSTSEC-2026-0371",
+          "package": "zbus_names"
+        },
+        {
+          "id": "RUSTSEC-2026-0370",
+          "package": "zvariant"
+        },
+        {
+          "id": "RUSTSEC-2026-0372",
+          "package": "zvariant_derive"
+        }
+      ],
+      "compiled": false,
+      "kernel_executed": false,
+      "sha256_logs": {
+        "deny.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "deny.log": "e424c5e24eceb85bc1ad1fc1e4dbfb42d99ad093f7bef1fa5d6d749a39c2acde"
+      },
+      "metadata_toolchain": "seeded lock metadata only; no compilation"
+    },
+    {
+      "id": "B",
+      "description": "Required minimal two-dependency foundation; no direct codecs/utilities or direct cubecl-wgpu default-feature activation; software renderer retained.",
+      "manifest": "[package]\nname = \"pancake-runtime-qualification\"\nversion = \"0.1.0\"\nedition = \"2024\"\npublish = false\nlicense = \"GPL-3.0-or-later\"\n[workspace]\n[dependencies]\nslint = { version = \"=1.19.0\", default-features = false, features = [\"std\", \"backend-winit\", \"renderer-femtovg-wgpu\", \"renderer-software\", \"unstable-wgpu-30\", \"compat-1-18\", \"accessibility\"] }\ncubecl = { version = \"=0.11.3\", default-features = false, features = [\"std\", \"stdlib\", \"cpu\", \"wgpu\"] }\n",
+      "lock_sha256": "60423ab0f44607e7c0f629e042d72fd56a7fb304d272cfb75fe2d43e4a412ecd",
+      "lock_reconstruction_patch": "pancake/docs/p0-runtime-minimal-lock.patch",
+      "metadata_sha256": "245bc27e6229f8f86e01c80848d48f10dcf4ba6ffb7177ab865c9813a9c4d331",
+      "package_count_unfiltered": 791,
+      "resolved_foundation": [
+        {
+          "name": "cubecl",
+          "version": "0.11.3"
+        },
+        {
+          "name": "cubecl-wgpu",
+          "version": "0.11.3"
+        },
+        {
+          "name": "slint",
+          "version": "1.19.0"
+        },
+        {
+          "name": "wgpu",
+          "version": "30.0.2"
+        }
+      ],
+      "deny_exit_code": 7,
+      "diagnostic_counts": {
+        "rejected": 561,
+        "duplicate": 30,
+        "unmaintained": 6
+      },
+      "remaining_duplicate_groups": [
+        "found 2 duplicate entries for crate 'bitflags'",
+        "found 2 duplicate entries for crate 'block2'",
+        "found 2 duplicate entries for crate 'calloop'",
+        "found 2 duplicate entries for crate 'calloop-wayland-source'",
+        "found 2 duplicate entries for crate 'convert_case'",
+        "found 2 duplicate entries for crate 'cpufeatures'",
+        "found 2 duplicate entries for crate 'darling'",
+        "found 2 duplicate entries for crate 'darling_core'",
+        "found 2 duplicate entries for crate 'darling_macro'",
+        "found 2 duplicate entries for crate 'downcast-rs'",
+        "found 2 duplicate entries for crate 'foldhash'",
+        "found 3 duplicate entries for crate 'getrandom'",
+        "found 2 duplicate entries for crate 'glow'",
+        "found 4 duplicate entries for crate 'hashbrown'",
+        "found 2 duplicate entries for crate 'hi_sparse_bitset'",
+        "found 2 duplicate entries for crate 'linux-raw-sys'",
+        "found 2 duplicate entries for crate 'miniz_oxide'",
+        "found 2 duplicate entries for crate 'objc2'",
+        "found 2 duplicate entries for crate 'objc2-app-kit'",
+        "found 2 duplicate entries for crate 'objc2-foundation'",
+        "found 2 duplicate entries for crate 'rustc-hash'",
+        "found 2 duplicate entries for crate 'rustix'",
+        "found 2 duplicate entries for crate 'smithay-client-toolkit'",
+        "found 2 duplicate entries for crate 'smol_str'",
+        "found 2 duplicate entries for crate 'syn'",
+        "found 2 duplicate entries for crate 'thiserror'",
+        "found 2 duplicate entries for crate 'thiserror-impl'",
+        "found 2 duplicate entries for crate 'tiny-skia'",
+        "found 2 duplicate entries for crate 'tiny-skia-path'",
+        "found 3 duplicate entries for crate 'windows-sys'"
+      ],
+      "advisories": [
+        {
+          "id": "RUSTSEC-2024-0436",
+          "package": "paste"
+        },
+        {
+          "id": "RUSTSEC-2026-0441",
+          "package": "pin-utils"
+        },
+        {
+          "id": "RUSTSEC-2026-0192",
+          "package": "ttf-parser"
+        },
+        {
+          "id": "RUSTSEC-2026-0371",
+          "package": "zbus_names"
+        },
+        {
+          "id": "RUSTSEC-2026-0370",
+          "package": "zvariant"
+        },
+        {
+          "id": "RUSTSEC-2026-0372",
+          "package": "zvariant_derive"
+        }
+      ],
+      "compiled": false,
+      "kernel_executed": false,
+      "sha256_logs": {
+        "deny.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "deny.log": "7df48db23b6dee0a58639fed92c806d9a6390d1bee162d7839c71744fa2ea0b2"
+      },
+      "metadata_toolchain": "1.100.0"
+    },
+    {
+      "id": "C",
+      "description": "Candidate B refreshed to highest compatible released patch graph using Cargo/Rust 1.100.0; no prerelease, fork, policy ignore, duplicate skip, or required-feature removal.",
+      "manifest": "[package]\nname = \"pancake-runtime-qualification\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.100\"\npublish = false\nlicense = \"GPL-3.0-or-later\"\n[workspace]\n[dependencies]\nslint = { version = \"~1.19.0\", default-features = false, features = [\"std\", \"backend-winit\", \"renderer-femtovg-wgpu\", \"renderer-software\", \"unstable-wgpu-30\", \"compat-1-18\", \"accessibility\"] }\ncubecl = { version = \"~0.11.0\", default-features = false, features = [\"std\", \"stdlib\", \"cpu\", \"wgpu\"] }\n",
+      "lock_sha256": "bde892b83be2255d55c29155e1aded438570a5460fc78922cc9e597338ac1025",
+      "lock_reconstruction_patch": "pancake/docs/p0-runtime-refreshed-lock.patch",
+      "metadata_sha256": "086fc10ec116c8617c40b4ef5613badc6d5e7bf8dc0fc3a56a7aaa646febe58f",
+      "package_count_unfiltered": 791,
+      "resolved_foundation": [
+        {
+          "name": "cubecl",
+          "version": "0.11.4"
+        },
+        {
+          "name": "cubecl-wgpu",
+          "version": "0.11.4"
+        },
+        {
+          "name": "slint",
+          "version": "1.19.0"
+        },
+        {
+          "name": "wgpu",
+          "version": "30.0.2"
+        }
+      ],
+      "deny_exit_code": 7,
+      "diagnostic_counts": {
+        "rejected": 561,
+        "duplicate": 30,
+        "unmaintained": 6
+      },
+      "remaining_duplicate_groups": [
+        "found 2 duplicate entries for crate 'bitflags'",
+        "found 2 duplicate entries for crate 'block2'",
+        "found 2 duplicate entries for crate 'calloop'",
+        "found 2 duplicate entries for crate 'calloop-wayland-source'",
+        "found 2 duplicate entries for crate 'convert_case'",
+        "found 2 duplicate entries for crate 'cpufeatures'",
+        "found 2 duplicate entries for crate 'darling'",
+        "found 2 duplicate entries for crate 'darling_core'",
+        "found 2 duplicate entries for crate 'darling_macro'",
+        "found 2 duplicate entries for crate 'downcast-rs'",
+        "found 2 duplicate entries for crate 'foldhash'",
+        "found 3 duplicate entries for crate 'getrandom'",
+        "found 2 duplicate entries for crate 'glow'",
+        "found 4 duplicate entries for crate 'hashbrown'",
+        "found 2 duplicate entries for crate 'hi_sparse_bitset'",
+        "found 2 duplicate entries for crate 'linux-raw-sys'",
+        "found 2 duplicate entries for crate 'miniz_oxide'",
+        "found 2 duplicate entries for crate 'objc2'",
+        "found 2 duplicate entries for crate 'objc2-app-kit'",
+        "found 2 duplicate entries for crate 'objc2-foundation'",
+        "found 2 duplicate entries for crate 'rustc-hash'",
+        "found 2 duplicate entries for crate 'rustix'",
+        "found 2 duplicate entries for crate 'smithay-client-toolkit'",
+        "found 2 duplicate entries for crate 'smol_str'",
+        "found 2 duplicate entries for crate 'syn'",
+        "found 2 duplicate entries for crate 'thiserror'",
+        "found 2 duplicate entries for crate 'thiserror-impl'",
+        "found 2 duplicate entries for crate 'tiny-skia'",
+        "found 2 duplicate entries for crate 'tiny-skia-path'",
+        "found 3 duplicate entries for crate 'windows-sys'"
+      ],
+      "advisories": [
+        {
+          "id": "RUSTSEC-2024-0436",
+          "package": "paste"
+        },
+        {
+          "id": "RUSTSEC-2026-0441",
+          "package": "pin-utils"
+        },
+        {
+          "id": "RUSTSEC-2026-0192",
+          "package": "ttf-parser"
+        },
+        {
+          "id": "RUSTSEC-2026-0371",
+          "package": "zbus_names"
+        },
+        {
+          "id": "RUSTSEC-2026-0370",
+          "package": "zvariant"
+        },
+        {
+          "id": "RUSTSEC-2026-0372",
+          "package": "zvariant_derive"
+        }
+      ],
+      "compiled": false,
+      "kernel_executed": false,
+      "sha256_logs": {
+        "deny.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "deny.log": "a6b1a04cfdd3d9f70a5c9d04cdce5cb21726b6b5303badbad0b086370a266c47"
+      },
+      "metadata_toolchain": "1.100.0"
+    }
+  ],
+  "retained_candidate": "C",
+  "decisive_constraints": [
+    {
+      "owner": "i-slint-renderer-femtovg 1.19.0",
+      "requirement": "glow ^0.18",
+      "other_owner": "wgpu-hal 30.0.2",
+      "other_requirement": "glow ^0.17",
+      "reason": "Disjoint 0.x compatibility ranges; Slint wgpu dependency enables default features additively."
+    },
+    {
+      "owner": "winit 0.30.13 on Apple",
+      "requirement": "objc2 ^0.5.2",
+      "other_owner": "wgpu-hal 30.0.2 on Apple",
+      "other_requirement": "objc2 ^0.6.3",
+      "reason": "Disjoint 0.x compatibility ranges across required windowing/rendering paths."
+    },
+    {
+      "owner": "cubecl-core 0.11.4",
+      "requirement": "paste ^1",
+      "reason": "Selected paste 1.0.15 has RUSTSEC-2024-0436; swapping crate identity/API requires upstream change, not a compatible lockfile update."
+    },
+    {
+      "owner": "i-slint-backend-winit 1.19.0 on Linux",
+      "requirement": "zbus ^5.14.0",
+      "other_owner": "zbus 5.19.0",
+      "other_requirement": "zvariant ^5.14.0 and zbus_names ^4.3.4",
+      "reason": "Unmaintained split crates remain in the declared major ranges; migration to zbus6 cannot be selected by compatible patch resolution."
+    }
+  ]
 }

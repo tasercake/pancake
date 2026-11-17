@@ -1,0 +1,155 @@
+--- source.lock
++++ Cargo.lock
+@@ -1329,6 +1329,7 @@
+  "cubecl-ir",
+  "cubecl-metal",
+  "cubecl-runtime",
++ "cubecl-std",
+  "cubecl-wgpu",
+  "half",
+ ]
+@@ -2305,12 +2306,6 @@
+ checksum = "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223"
+ 
+ [[package]]
+-name = "fax"
+-version = "0.2.7"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "caf1079563223d5d59d83c85886a56e586cfd5c1a26292e971a0fa266531ac5a"
+-
+-[[package]]
+ name = "fdeflate"
+ version = "0.3.7"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -3033,6 +3028,7 @@
+ checksum = "0c37b8172486f2c8afc5c98305b66a8b4ac3612bcec2343db556497ae3652727"
+ dependencies = [
+  "ash",
++ "bytemuck",
+  "calloop 0.14.5",
+  "cfg_aliases",
+  "drm 0.14.1",
+@@ -3042,6 +3038,7 @@
+  "i-slint-core",
+  "i-slint-renderer-femtovg",
+  "i-slint-renderer-skia",
++ "i-slint-renderer-software",
+  "memmap2",
+  "nix",
+  "pkg-config",
+@@ -3056,6 +3053,7 @@
+ dependencies = [
+  "cfg_aliases",
+  "i-slint-backend-linuxkms",
++ "i-slint-backend-testing",
+  "i-slint-backend-winit",
+  "i-slint-common",
+  "i-slint-core",
+@@ -3065,6 +3063,19 @@
+ ]
+ 
+ [[package]]
++name = "i-slint-backend-testing"
++version = "1.19.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "25cdec66aab9237b0b56495f9cf5c2c392043fabf33bd2070bf5fdb5adb666f3"
++dependencies = [
++ "cfg_aliases",
++ "i-slint-common",
++ "i-slint-core",
++ "i-slint-renderer-software",
++ "vtable",
++]
++
++[[package]]
+ name = "i-slint-backend-winit"
+ version = "1.19.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -3074,6 +3085,7 @@
+  "accesskit_winit",
+  "arboard",
+  "block2 0.6.2",
++ "bytemuck",
+  "cfg_aliases",
+  "futures",
+  "glutin",
+@@ -3083,6 +3095,8 @@
+  "i-slint-core-macros",
+  "i-slint-renderer-femtovg",
+  "i-slint-renderer-skia",
++ "i-slint-renderer-software",
++ "imgref",
+  "itertools 0.15.0",
+  "lyon_path",
+  "muda",
+@@ -3093,6 +3107,7 @@
+  "objc2-ui-kit 0.3.2",
+  "pin-weak",
+  "raw-window-handle",
++ "rgb",
+  "scoped-tls-hkt",
+  "scopeguard",
+  "smithay-clipboard",
+@@ -3583,7 +3598,6 @@
+  "moxcms",
+  "num-traits",
+  "png",
+- "tiff",
+  "zune-core",
+  "zune-jpeg",
+ ]
+@@ -4815,6 +4829,14 @@
+ checksum = "e3b7bb0ecf2e447b1f20ee94ee79ef6eed1e9d4b3c36ce1903b9dea3bf205523"
+ dependencies = [
+  "bytemuck",
++]
++
++[[package]]
++name = "pancake-runtime-qualification"
++version = "0.1.0"
++dependencies = [
++ "cubecl",
++ "slint",
+ ]
+ 
+ [[package]]
+@@ -6048,18 +6070,6 @@
+  "slint-macros",
+  "vtable",
+  "wgpu",
+-]
+-
+-[[package]]
+-name = "slint-cubecl-viewer"
+-version = "0.1.0"
+-dependencies = [
+- "bytemuck",
+- "cubecl",
+- "cubecl-wgpu",
+- "image",
+- "serde_json",
+- "slint",
+ ]
+ 
+ [[package]]
+@@ -6505,20 +6515,6 @@
+ checksum = "1ad99c4c6d32803332c548b1af0540b357b3f5fc0be8f6c6bfe8b2e6ae784070"
+ dependencies = [
+  "cfg-if",
+-]
+-
+-[[package]]
+-name = "tiff"
+-version = "0.11.3"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "b63feaf3343d35b6ca4d50483f94843803b0f51634937cc2ec519fc32232bc52"
+-dependencies = [
+- "fax",
+- "flate2",
+- "half",
+- "quick-error",
+- "weezl",
+- "zune-jpeg",
+ ]
+ 
+ [[package]]

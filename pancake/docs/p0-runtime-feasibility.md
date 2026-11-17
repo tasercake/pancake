@@ -5,7 +5,10 @@ Execution host: macOS 26.2 / 25C56, ARM64. Scope: P0.03-P0.06.
 
 ## Result
 
-**The audited dependency candidate is blocked by current dependency policy.**
+**Three bounded dependency candidates fail current dependency policy.** The
+minimal compatible-patch candidate still has **30 duplicate groups and six
+unmaintained advisories**. This conclusion is not based only on the original
+overbroad viewer dependency graph.
 No application dependency, unsafe statement, advisory ignore, duplicate-version
 skip, coverage exception, or runtime code was added to Pancake. No custom safe
 kernel ran, so P0.04 and P0.06 are not passed. The successful empty-scaffold
@@ -19,7 +22,7 @@ artifact hashes.
 
 | Gate | Status | Evidence |
 |---|---|---|
-| P0.03 | **Blocked for this candidate** | `cargo-deny` exits 7: 41 duplicate groups, six unmaintained advisories, one missing license declaration, and expected license allowlist failures. |
+| P0.03 | **Blocked for tested candidates** | All three `cargo-deny` runs exit 7. Minimal/current compatible patch graph retains 30 duplicate groups and six unmaintained advisories, separate from expected license review. |
 | P0.04 | Not run; API route identified | Safe `TensorHandle::empty` / `into_arg()` and checked `#[cube(launch)]` exist in installed source. No compilation or completed custom-kernel execution was claimed. |
 | P0.05 | Blocked / unqualified | Existing all-features Miri tests cannot be assumed to execute native LLVM JIT/GPU integration. A real verification split has not been designed or proven. Empty-scaffold results do not satisfy this gate. |
 | P0.06 | Not run | No native CPU/wgpu or other-runtime kernel battery was executed under a policy-compliant adopted dependency graph. |
@@ -31,6 +34,28 @@ The starting lock is the viewer experiment at commit `0c83870`, path
 features to investigate safe tensor-backed CPU/wgpu launches. The only lock
 change is adding `cubecl-std` to CubeCL's dependency list; package versions are
 unchanged. Apply [the lock patch](p0-runtime-lock.patch) to reconstruct it.
+
+### Bounded follow-up: minimal features and compatible released patches
+
+| Attempt | Required features and resolution | Result |
+|---|---|---|
+| A | Original viewer-derived manifest below, adding CubeCL CPU/stdlib. | 41 duplicate groups; six unmaintained notices; one missing-license error; 653 allowlist rejection diagnostics. |
+| B | Only two direct dependencies, defaults disabled: Slint 1.19.0 with `std`, `backend-winit`, `renderer-femtovg-wgpu`, `renderer-software`, `unstable-wgpu-30`, `compat-1-18`, `accessibility`; CubeCL 0.11.3 with `std`, `stdlib`, `cpu`, `wgpu`. | 30 duplicate groups; six unmaintained notices; missing-license error removed; 561 allowlist rejection diagnostics. |
+| C | B's required features, refreshed by Cargo/Rust 1.100.0 within `slint ~1.19.0` and `cubecl ~0.11.0`. Resolves Slint 1.19.0, CubeCL/cubecl-wgpu 0.11.4, one wgpu 30.0.2. | Same 30 duplicate groups and six notices. No prerelease, fork, missing accessibility, or platform-feature deletion. |
+
+B removes avoidable direct codec/utility and direct cubecl-wgpu default-feature
+activation. It retains native CPU, stdlib safe tensor APIs, all winit platform
+paths, accessibility, portable GPU rendering, and software presentation. Thus it
+does not obtain a better result by dropping required capabilities. Fresh C
+resolution confirms that compatible released patches do not remove the decisive
+conflicts. Cargo metadata for B and the patch refresh/metadata for C were verified
+under Rust 1.100.0. Metadata success is not compilation or kernel execution.
+
+Exact manifests, hashes, diagnostic counts, and all remaining duplicate groups
+are in `candidate_attempts` in the evidence JSON. Reconstruct B/C from the source
+lock using [B's patch](p0-runtime-minimal-lock.patch) or
+[C's patch](p0-runtime-refreshed-lock.patch). Later tables retain A's initial
+diagnostics for history; C is the final retained result.
 
 | Package | Resolved version | Relevant declaration |
 |---|---|---|
@@ -79,7 +104,18 @@ source. `i-slint-renderer-femtovg` 1.19.0 requires `glow` 0.18, while wgpu-hal
 features, so adding `default-features = false` to a separate application wgpu
 dependency cannot subtract those features. Other duplicate groups include
 multiple `hashbrown`, `getrandom`, `objc2`, `syn`, and `windows-sys` versions.
-The complete rejected groups are in the evidence JSON.
+The complete rejected groups are in the evidence JSON. Two concrete retained
+constraints explain why ordinary application pins cannot eliminate every
+duplicate: Slint/FemtoVG requires `glow ^0.18`, while wgpu-hal requires
+`glow ^0.17`; on Apple, winit requires `objc2 ^0.5.2`, while wgpu-hal requires
+`objc2 ^0.6.3`. Both pairs have disjoint compatibility ranges.
+
+Unmaintained notices also persist beyond removable codecs/default features.
+CubeCL-core 0.11.4 directly requires `paste ^1`. Slint's Linux winit backend
+requires `zbus ^5.14.0`; zbus 5.19.0 requires `zvariant ^5.14.0` and
+`zbus_names ^4.3.4`. A migration to the maintained zbus 6 API family cannot be
+selected within those declared major ranges. It requires upstream source/API
+alignment or a different compatible upstream release, not an advisory ignore.
 
 The current direct declarations include `MIT OR Apache-2.0` for CubeCL/wgpu and
 their runtime crates, and Slint's choice of `GPL-3.0-only` or its alternative
@@ -172,4 +208,7 @@ candidate dependency-policy failure.
 Next decision: choose a dependency version/feature/upstream-fix strategy that
 passes the unchanged duplicate/advisory policies, and review concrete licenses.
 Then execute meaningful test-first safe CPU/wgpu kernels and complete the real
-assurance design. No direct merge of this candidate graph is recommended.
+assurance design. No direct merge of a tested candidate graph is recommended.
+No custom kernel was compiled or executed in any of the three attempts. Under
+the bounded no-fork/no-ignore/no-feature-removal constraint, continuation into
+adopted runtime code would leave a known failing dependency gate unresolved.
