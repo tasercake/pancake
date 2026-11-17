@@ -182,7 +182,19 @@
       "source_format": "PNG"
     },
     "T50": "not_selected",
-    "R50": "not_selected",
+    "R50": {
+      "selected_id": "R50-sood-first50",
+      "manifest_sha256": "dd7a7e8a396d16e952d3d24d258afc1e05b77bb1664b179d3a43a7f66e413fab",
+      "native_frames": 50,
+      "decoded_dimensions": [
+        5118,
+        3412
+      ],
+      "sensor_precision_bits": 14,
+      "input_format": "Canon CR3",
+      "retained_data_worktree": "/Users/krishna/Documents/focus-stacking/.worktrees/p0-unblock",
+      "qualification": "50 full RAW decodes with rawpy0.26.1/LibRaw; no Pancake decoder or performance pass"
+    },
     "qualification_baseline": "not_measured_to_frozen_profile_or_sample_protocol",
     "retained_data_worktree": "/Users/krishna/Documents/focus-stacking/.worktrees/p0-performance",
     "frame_path_resolution": "Native frame paths in performance-corpus.json are relative to retained_data_worktree, not the main checkout. Metadata integration does not copy images."

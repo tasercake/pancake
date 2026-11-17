@@ -1,7 +1,7 @@
 # P0 real corpus and preliminary reference baseline
 
 Date: 2026-11-17, Asia/Singapore. Worktree: `codex/p0-performance`, based on
-`8fcbc52`. Status: real D150/E9 corpus acquired and pinned; two preliminary
+`8fcbc52`. Status: real D150/E9/R50 corpus acquired and pinned; two preliminary
 reference CPU jobs completed. **No performance target or P0.16 pass is claimed.**
 
 ## Corpus selection
@@ -11,7 +11,7 @@ reference CPU jobs completed. **No performance target or P0.16 pass is claimed.*
 | D150-native-dorsal | First 150 source-filename-sorted frames from the 152-frame amber mite dorsal optical focal stack; 2304x1728 RGB JPEG | Original 8-bit photographs. No upscale, duplicated frame, or artificial precision promotion. Not the 24 MP RGB16 TIFF workload. |
 | E9-native-balloons | All nine Balloons photographic exposure brackets from Waterloo MEF; 512x339 RGB PNG | Original 8-bit exposure images. Correct exposure-fusion domain, separate from focus stacking; nine frames exercise 4+4+1 batching. |
 | T50 | Not selected | Still needs 50 real 6000x4000 genuine RGB16 ZIP TIFF sources. |
-| R50 | Not selected | Still needs 50 real native RAW frames with pinned provenance. |
+| R50-sood-first50 | First 50 consecutive Canon EOS R5 Mark II CR3 files, frame_000–049; full visible decode 5118x3412 RGB | 14-bit sensor RAW, stored as uint16. All files hash-verified and full RAW decoded with LibRaw. Below T50 resolution. |
 
 Sources are the existing Bokehforge frozen selections:
 
@@ -75,8 +75,8 @@ The present numbers cannot establish any of those relative targets.
 
 Remaining work includes the other three focus methods, full sampling protocol,
 actual GPU jobs/runtime identity, same-quality Pancake comparisons, full
-precision/geometry validation, and viewer/lifecycle latency. T50/R50 acquisition
-remains open. No real photograph is resized or converted from 8-bit into claimed
+precision/geometry validation, and viewer/lifecycle latency. T50 acquisition remains open. R50 acquisition and full RAW corpus decoding are
+complete; no matched R50 job baseline has been measured. No real photograph is resized or converted from 8-bit into claimed
 genuine 16-bit evidence to fill those gaps.
 
 ## Reproduction
@@ -88,3 +88,23 @@ manifest/log/archive hashes, unique native input hashes, output decoding, and
 local links passed. Scaffold checks still contain zero application tests; no
 application coverage percentage is claimed. Remote/platform/sanitizer, GPU,
 full statistical, viewer, and lifecycle qualification runs were not performed.
+
+## R50 acquisition update
+
+New payload: 442,098,996 bytes. Cumulative unique corpus acquisition:
+656,503,647 bytes, within unchanged 2,147,483,648-byte budget. Full 999-frame
+source is approximately 8.96 GB; only this explicit 50-frame subset was acquired.
+Bokehforge config, full-source download policy and disabled D01 remain unchanged.
+RAW files stay ignored under the retained `codex/p0-unblock` worktree,
+`datasets/p0-d02/raw/`. No original image is committed.
+
+All 50 images completed `rawpy 0.26.1`/LibRaw full-image postprocessing using
+`output_bps=16`, `use_camera_wb=True`, `no_auto_bright=True` and other defaults.
+Decoded shape: 3412x5118x3; dtype: uint16. Sensor white level: 16383; nonzero low
+eight bits confirmed in every visible RAW plane. This is genuine higher-than-8-bit
+source precision; it does not claim a 16-bit sensor ADC. Manifest records engine
+versions, parameters, original/decoded dimensions, source rights and file hashes.
+
+This resolves R50 source selection, not the Rust decoder, complete baseline or
+P0.08 gate. T50 still needs 50 distinct native sources at least 6000x4000; these
+files cannot fill that requirement without disallowed upscaling.

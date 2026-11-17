@@ -80,21 +80,19 @@ application/kernel work.
 
 | Gate | Current marker | Evidence and remaining condition |
 |---|---|---|
-| P0.01 | **BLOCKED; drift/targets complete, real corpus partial** | Snapshot drift reviewed/adopted; concrete [performance targets](p0-performance-targets.md) frozen. Real D150/E9 inputs pinned and [single reference diagnostics](p0-performance-baseline.md) completed. T50/R50 and full supported matrix remain unqualified; baseline protocol incomplete. |
-| P0.02 | **BLOCKED; Apple/NVIDIA access identified** | [Hardware audit](p0-hardware-test-lanes.md): local M4 Pro and reachable existing Linux x86-64 RTX 3090 host identified; native runtime/GUI execution unqualified. AMD/Intel/Windows access and guest login remain unresolved. Linux private desktop is a valid physical-GPU route. |
-| P0.03 | **BLOCKED; candidate graph rejected** | [Runtime audit](p0-runtime-feasibility.md): three actual cargo-deny candidate failures: the minimal patch-refreshed graph still has 30 duplicate-version groups and six unmaintained advisories; narrowing removed the original missing-license error. GPL-only allowlist additions need routine concrete license review; they do not resolve the independent graph blockers. No candidate dependencies adopted. |
-| P0.04 | **NOT RUN; static API route identified** | Safe tensor-backed launch APIs found in installed source; no policy-compliant custom kernel compiled or executed. |
-| P0.05 | **BLOCKED / NOT QUALIFIED** | All local empty-scaffold gates pass; real executable Slint/JIT coverage/Miri/sanitizer design remains unproven. Empty-source success does not qualify this gate. |
-| P0.06 | **NOT RUN; prerequisites blocked** | No shared kernel battery executed under an adopted policy-compliant graph; promised hardware access also incomplete. |
+| P0.02 | **BLOCKED; available Apple/NVIDIA paths execute** | Native ARM64/x86-64 CPU and physical Apple Metal/NVIDIA Vulkan shared-kernel tests pass. Dedicated Linux container has Xvfb/Openbox/private D-Bus/AT-SPI and physical GPU access; actual suite desktop constructor passed. User confirms no AMD/Intel/Windows test hosts/runners. macOS guest login remains unresolved. |
+| P0.03 | **IN PROGRESS; dependency policy rejection resolved for foundation** | User removed license allowlist/gate. Slint 1.19.0 + CubeCL 0.11.4 + wgpu 30.0.2 build together. Narrow paste/pin-utils replacements plus exact duplicate/advisory reviews make actual cargo-deny advisories/bans/sources pass. Codec/RAW/color/native-runtime/package graph and full assurance remain under qualification; not a complete gate pass. |
+| P0.04 | **IN PROGRESS; safe blur launch proven** | Same checked TensorHandle kernel runs under application unsafe-forbid on Apple CPU/Metal and Linux CPU/Vulkan; malformed shapes fail before runtime creation. Remaining capacity/aliasing/decoder/texture/native boundaries require proof. |
+| P0.05 | **IN PROGRESS; executable assurance gaps measured** | Real native tests pass. Strict coverage exposed retained non-executable CubeCL host DSL function and untested host errors; macro/lint and Miri/native boundaries being fixed without broad exclusions. No executable 100% coverage, mutation or full Miri/sanitizer pass claimed. |
+| P0.06 | **BLOCKED; six available execution paths pass blur** | Identical u16 blur passes ARM64 CPU LLVM JIT, Apple Metal/wgpu, x86-64 CPU LLVM JIT and physical RTX 3090 Vulkan/wgpu. Native CUDA and native Metal also pass the blur probe. User confirms no AMD/Intel test access; HIP and full kernel battery remain unqualified. |
 | P0.07 | **NOT RUN** | Historical viewer interop experiment exists; production-safe bounded cache/ownership design and its measurements are unqualified. |
-| P0.08 | **NOT RUN** | Actual safe RAW/codec/color qualification remains pending. |
-| P0.09 | **NOT RUN** | Precision/determinism/FFT kernel qualification requires a viable graph and real execution. |
+| P0.08 | **IN PROGRESS; real RAW inputs qualified** | All 50 R50 CR3 files fully decoded by reference LibRaw, low-bit precision verified. Safe Rust RAW/codec/color dependency selection and roundtrip/malformed-input proof now executing; corpus evidence alone does not pass decoder gate. |
+| P0.09 | **IN PROGRESS; u16 blur subset passes** | Independent exact u16 values, clamped one-pixel borders, odd dimensions and workgroup tails pass on CPU/Metal/Vulkan. Remaining resize/pyramids/warp/variance/reduction/FFT/determinism battery still required. |
 | P0.10 | **NOT RUN** | No five-method/slab numerical slice implemented or qualified. |
 | P0.11 | **NOT RUN** | Registration/crop numerical feasibility not executed. |
 | P0.12 | **NOT RUN** | Real job/device/error mechanisms not implemented or qualified. |
 | P0.13 | **NOT RUN** | No actual Slint accessibility replay through current native driver. |
 | P0.14 | **NOT RUN** | No actual worker lifecycle replay; no artificial timing substitute introduced. |
-| P0.15 | **NOT RUN; routes reviewed** | Existing Linux native route and macOS VM constraints inspected; Pancake binary/GUI deployment and physical-GPU completion not executed. |
 | P0.16 | **NOT RUN; reference diagnostics available** | D150 Hybrid CPU 30.585 s, peak RSS 2,897,117,184 bytes; E9 exposure CPU 0.877 s, peak RSS 237,469,696 bytes, each n=1. These use a reduced/mismatched profile and no matched Pancake job; no target, warm/cold statistic, half-memory or quality-equivalence pass. |
 | P0.17 | **BLOCKED** | P0 is not complete; P1 cannot start with these open gates. |
 
