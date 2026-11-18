@@ -60,7 +60,8 @@ impl Options {
                 let name = value
                     .to_str()
                     .ok_or("PANCAKE_RUNTIME must be valid UTF-8")?;
-                name.parse()
+                name.parse::<RuntimeOverride>()
+                    .map_err(|error| format!("invalid PANCAKE_RUNTIME {name:?}: {error}"))
             })
             .transpose()?;
         Ok(Self {
