@@ -20,7 +20,8 @@ fn cpu_advanced_fusion() -> Result<(), String> {
     advanced_fusion_cases::check_constant(&device)?;
     advanced_fusion_cases::check_focus(&device)?;
     advanced_fusion_cases::check_exposure_batches(&device)?;
-    advanced_fusion_cases::check_exposure_precision(&device)
+    advanced_fusion_cases::check_exposure_precision(&device)?;
+    advanced_fusion_cases::check_exposure_specialization(&device)
 }
 
 /// Invalid dimensions and budget fail without touching the unavailable runtime.

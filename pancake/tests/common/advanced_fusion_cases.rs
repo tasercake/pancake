@@ -175,3 +175,46 @@ pub fn check_constant(device: &cubecl::Device) -> Result<(), String> {
     }
     Ok(())
 }
+
+/// A change of raster size alone should reuse the same compiled exposure kernels.
+///
+/// # Errors
+/// Returns an execution failure or differing `CubeCL` kernel identities.
+pub fn check_exposure_specialization(device: &cubecl::Device) -> Result<(), String> {
+    use cubecl::launched::LaunchedKernels;
+
+    let run = |width: usize, height: usize| {
+        let collection = LaunchedKernels::new();
+        let mut accumulator = AdvancedAccumulator::new(
+            device,
+            width,
+            height,
+            AdvancedMethod::Exposure,
+            6,
+            4,
+            1 << 23,
+        )?;
+        let samples = width
+            .checked_mul(height)
+            .and_then(|count| count.checked_mul(3))
+            .ok_or("specialization test image exceeds addressing")?;
+        accumulator.add_frame(&vec![0.3_f32; samples])?;
+        accumulator.add_frame(&vec![0.6_f32; samples])?;
+        let image = accumulator.finish()?;
+        if image.len() != samples || image.iter().any(|sample| (sample - 0.45_f32).abs() > 1e-6) {
+            return Err("the specialization test did not complete exposure fusion".to_owned());
+        }
+        Ok(collection.finish())
+    };
+    let small = run(33, 19)?;
+    let large = run(193, 129)?;
+    if small.is_empty() || small != large {
+        return Err(format!(
+            "image sizes require different exposure kernel keys: small {}, large {}, common {}",
+            small.len(),
+            large.len(),
+            small.intersection(&large).count()
+        ));
+    }
+    Ok(())
+}
