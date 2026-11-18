@@ -73,3 +73,19 @@ cargo mutants --package pancake --file src/job/lifecycle.rs \
 
 [Selection](mutation-selection.txt), [outcomes](mutation-outcomes.json) and
 [command log](mutation.log).
+
+### Resume timeout follow-up
+
+At `5056563`, tests check the actual resumed state before joining the
+worker and cancel for cleanup if the acknowledgement did not release the
+pause. Product source and lock are identical to `2375efa`. The original
+18-mutant run and timeout remain recorded above.
+
+The native library and job selection passed 26 tests and the workspace
+`fast` gate passed. Repeating the same mutation command with the selection
+`replace JobControl::resume -> Result<bool, String> with Ok\(true\)$`
+passed its unmutated baseline and caught its one mutant in 42 seconds
+overall. The mutant failed a test assertion and the rerun returned exit 0.
+[Native tests](resume-proof-native.log.gz), [fast gate](resume-proof-fast.log.gz),
+[mutation outcomes](resume-mutation-outcomes.json) and
+[command log](resume-mutation.log).

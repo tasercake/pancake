@@ -1,0 +1,125 @@
+{
+  "outcomes": [
+    {
+      "scenario": "Baseline",
+      "summary": "Success",
+      "log_path": "log/baseline.log",
+      "diff_path": null,
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 7.574825226,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 25.232242128,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_stack_plan"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": {
+        "Mutant": {
+          "name": "src/job/lifecycle.rs:226:9: replace JobControl::resume -> Result<bool, String> with Ok(true)",
+          "package": "pancake",
+          "file": "src/job/lifecycle.rs",
+          "function": {
+            "function_name": "JobControl::resume",
+            "return_type": "-> Result<bool, String>",
+            "span": {
+              "start": {
+                "line": 220,
+                "column": 5
+              },
+              "end": {
+                "line": 234,
+                "column": 6
+              }
+            }
+          },
+          "span": {
+            "start": {
+              "line": 226,
+              "column": 9
+            },
+            "end": {
+              "line": 233,
+              "column": 17
+            }
+          },
+          "replacement": "Ok(true)",
+          "genre": "FnValue"
+        }
+      },
+      "summary": "CaughtMutant",
+      "log_path": "log/src__job__lifecycle.rs_line_226_col_9.log",
+      "diff_path": "diff/src__job__lifecycle.rs_line_226_col_9.diff",
+      "phase_results": [
+        {
+          "phase": "Build",
+          "duration": 8.789986936,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 0.902463275,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--locked",
+            "--lib",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_stack_plan"
+          ]
+        }
+      ]
+    }
+  ],
+  "total_mutants": 1,
+  "missed": 0,
+  "caught": 1,
+  "timeout": 0,
+  "unviable": 0,
+  "success": 0,
+  "start_time": "2026-11-18T04:49:51.398134814Z",
+  "end_time": "2026-11-18T04:50:33.901001837Z",
+  "cargo_mutants_version": "27.1.0"
+}
