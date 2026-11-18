@@ -3,7 +3,6 @@
 #[path = "common/numerical_cases.rs"]
 pub mod numerical_cases;
 
-use slint as _;
 use wgpu as _;
 
 /// Physical GPU must execute the same kernel and preserve independent values.

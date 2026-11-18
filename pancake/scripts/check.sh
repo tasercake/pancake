@@ -82,7 +82,8 @@ case ${1:-all} in
         require_tool actionlint "$PANCAKE_ACTIONLINT_VERSION"
         require_tool shellcheck "$PANCAKE_SHELLCHECK_VERSION"
         python3 -m unittest scripts/test_dependency_policy.py scripts/test_guardrail_manifest.py \
-            scripts/test_assurance_targets.py scripts/test_assurance_coverage.py scripts/test_miri_host_policy.py scripts/test_pre_commit.py
+            scripts/test_assurance_targets.py scripts/test_assurance_coverage.py scripts/test_miri_host_policy.py scripts/test_pre_commit.py \
+            scripts/test_headless_dependencies.py
         python3 scripts/miri_host_policy.py "$root" validate
         dependency_policy
         cargo fmt --all -- --check

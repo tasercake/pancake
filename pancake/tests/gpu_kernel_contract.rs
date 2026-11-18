@@ -2,7 +2,6 @@
 
 include!("common/kernel_cases.rs");
 
-use slint as _;
 
 /// GPU availability is a qualification requirement, so failures are not skipped.
 ///
