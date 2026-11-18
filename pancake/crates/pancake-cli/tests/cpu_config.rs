@@ -191,7 +191,7 @@ fn path_component_too_long_is_a_real_access_error() -> Result<(), Box<dyn Error>
     let long = "a".repeat(1024);
     rejection(&[directory.path().join(&long)], "cannot access input")?;
     let prefix = directory.path().join("folder?").join(long);
-    rejection(&[prefix.clone()], "cannot access input")?;
+    rejection(std::slice::from_ref(&prefix), "cannot access input")?;
     rejection(&[prefix.join("*.png")], "cannot access input")
 }
 
