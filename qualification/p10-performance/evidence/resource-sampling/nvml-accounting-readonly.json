@@ -1,0 +1,40 @@
+{
+  "device_uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+  "driver": "580.178.04",
+  "scope": "read-only NVML capability inquiry",
+  "probes": {
+    "get_mode": {
+      "code": 0,
+      "name": "Success",
+      "value": 0
+    },
+    "get_buffer_size": {
+      "code": 0,
+      "name": "Success",
+      "value": 4000
+    },
+    "get_pid_count": {
+      "code": 7,
+      "name": "Insufficient Size",
+      "value": 0
+    }
+  },
+  "prior_benchmark_pids": {
+    "1429305": {
+      "code": 6,
+      "name": "Not Found",
+      "max_memory_usage": null,
+      "is_running": null,
+      "start_time": null
+    },
+    "1429248": {
+      "code": 6,
+      "name": "Not Found",
+      "max_memory_usage": null,
+      "is_running": null,
+      "start_time": null
+    }
+  },
+  "recorded_at": "2026-11-18T13:37:36+08:00",
+  "observed_pid_source": "exact 12f2151 first-warm physical samples, one GPU PID per app"
+}
