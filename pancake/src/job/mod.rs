@@ -232,6 +232,7 @@ pub fn run_controlled(
     control: &JobControl,
     progress: impl FnMut(JobSnapshot),
 ) -> Result<StackResult, JobError> {
+    control.claim(config.inputs().len())?;
     let outcome = execute(config, options, control, progress);
     match &outcome {
         Ok(_) => control.finish(true)?,
