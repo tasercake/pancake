@@ -464,3 +464,109 @@ fn worker_reports_a_failed_generation_and_accepts_recovery() -> Result<(), Strin
         "closed worker reported the wrong error",
     )
 }
+
+/// A real stack waits at a drained boundary and publishes only after resume.
+///
+/// # Errors
+/// Returns fixture, lifecycle, numerical or atomic publication errors.
+#[test]
+fn paused_stack_resumes_and_publishes_only_its_completed_generation() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let inputs = sources(directory.path())?;
+    let output = directory.path().join("retained.png");
+    let previous = b"prior result";
+    std::fs::write(&output, previous).map_err(|error| error.to_string())?;
+    let config = request(&inputs, &output)?;
+    let control = JobControl::new(Generation::from_counter(8), inputs.len())?;
+    let controller = control.clone();
+    let (requested, seen) = std::sync::mpsc::sync_channel(1);
+    let worker = std::thread::spawn(move || {
+        run_controlled(config, &Options::default(), &controller, |progress| {
+            if progress.completed == 1 {
+                drop(requested.send(controller.pause()));
+            }
+        })
+    });
+    let verification = (|| {
+        require(
+            seen.recv_timeout(Duration::from_secs(5))
+                .map_err(|error| error.to_string())??,
+            "running job refused an actual pause",
+        )?;
+        let started = Instant::now();
+        loop {
+            let snapshot = control.snapshot()?;
+            if snapshot.state == JobState::Paused {
+                require(
+                    snapshot.completed == 1
+                        && snapshot.pause_acknowledged.is_some()
+                        && std::fs::read(&output).map_err(|error| error.to_string())? == previous,
+                    "paused job submitted another frame or replaced the export",
+                )?;
+                break;
+            }
+            if started.elapsed() >= Duration::from_secs(5) {
+                return Err("worker never acknowledged the pause".to_owned());
+            }
+            std::thread::yield_now();
+        }
+        require(
+            control.resume()?,
+            "the acknowledged pause refused to resume",
+        )
+    })();
+    if verification.is_err() {
+        drop(control.cancel());
+    }
+    let outcome = worker.join().map_err(|_| "stack executor did not return")?;
+    verification?;
+    let result = outcome.map_err(|error| error.to_string())?;
+    let finished = control.snapshot()?;
+    require(
+        finished.state == JobState::Completed
+            && finished.completed == inputs.len()
+            && decode(&output)?.samples() == result.image().samples(),
+        "resumed job did not complete and preserve the actual samples",
+    )
+}
+
+/// Invalid observer metadata leaves the published export and source bytes intact.
+///
+/// # Errors
+/// Returns fixture, execution, I/O or observer-diagnostic errors.
+#[cfg(unix)]
+#[test]
+fn observer_handles_non_unicode_paths_without_fabricating_geometry() -> Result<(), String> {
+    use std::os::unix::ffi::OsStrExt;
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let originals = sources(directory.path())?;
+    let [first, second] = originals;
+    let opaque = directory
+        .path()
+        .join(std::ffi::OsStr::from_bytes(b"frame-\xff.png"));
+    std::fs::rename(&second, &opaque).map_err(|error| error.to_string())?;
+    let output = directory.path().join("retained.png");
+    let events = directory.path().join("events.jsonl");
+    let expected = decode(&first)?;
+    let original = std::fs::read(&opaque).map_err(|error| error.to_string())?;
+    let options = Options {
+        events_path: Some(events.clone()),
+        ..Options::default()
+    };
+    let result = run(
+        request(&[first, opaque.clone()], &output)?,
+        &options,
+        |_| {},
+    )
+    .map_err(|error| error.to_string())?;
+    require(
+        decode(&output)?.samples() == expected.samples()
+            && !events.exists()
+            && result
+                .warnings()
+                .iter()
+                .any(|warning| warning.contains("UTF-8 source paths"))
+            && std::fs::read(opaque).map_err(|error| error.to_string())? == original,
+        "observer replaced undisplayable names or affected the real output or source",
+    )
+}

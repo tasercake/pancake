@@ -325,3 +325,51 @@ fn ticket_input_count_must_match_before_processing() -> Result<(), String> {
         "mismatched ticket reached numerical submission",
     )
 }
+
+/// An interactive crop is the exact rectangle used by automatic export.
+///
+/// # Errors
+/// Returns source, registration, or result geometry errors.
+#[test]
+fn manual_and_automatic_crop_preserve_the_same_pixels() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let original = textured(63, 49, 0)?;
+    let shifted = textured(63, 49, 3)?;
+    let inputs = create_sources(directory.path(), [&original, &shifted, &original])?;
+    let settings = JobSettings {
+        method: Method::WeightedAverage,
+        alignment: AlignmentMode::Translation,
+        device: DevicePreference::Cpu,
+        max_precision: true,
+        ..JobSettings::default()
+    };
+    let options = Options::default();
+    let full = run(JobConfig::new(&inputs, None, settings)?, &options, |_| {})
+        .map_err(|error| error.to_string())?;
+    let interactive = full
+        .manually_cropped()?
+        .ok_or("shifted stack lacks a manual crop")?;
+    let automatic = run(
+        JobConfig::new(
+            &inputs,
+            None,
+            JobSettings {
+                auto_crop: true,
+                ..settings
+            },
+        )?,
+        &options,
+        |_| {},
+    )
+    .map_err(|error| error.to_string())?;
+    require(
+        full.crop() == full.canvas()
+            && automatic.crop() != automatic.canvas()
+            && full.safe_crop() == Some(automatic.crop())
+            && [interactive.width(), interactive.height()]
+                == [automatic.image().width(), automatic.image().height()]
+            && interactive.samples() == automatic.image().samples()
+            && automatic.manually_cropped()?.is_none(),
+        "manual cropping failed to retain the automatic crop's exact geometry and samples",
+    )
+}

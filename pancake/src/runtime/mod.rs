@@ -214,12 +214,13 @@ impl SelectedRuntime {
             .map_err(|error| RuntimeExecutionError::from_server_error(&error))
     }
 
-    /// Check a workload against the total byte capacity if it is reported.
+    /// Check a fresh or reused runtime against the new job's working budget.
     ///
     /// # Errors
     ///
-    /// Returns an error if the request cannot fit in the capacity.
-    fn check_capacity(&self, budget_bytes: usize) -> Result<(), String> {
+    /// Rejects budgets smaller than the probe or larger than reported capacity.
+    pub(crate) fn check_job_budget(&self, budget_bytes: usize) -> Result<(), String> {
+        check_request(None, budget_bytes)?;
         if let Some(capacity) = self.memory_capacity_bytes {
             let required = u64::try_from(budget_bytes).map_err(|error| error.to_string())?;
             if required > capacity {
@@ -379,7 +380,7 @@ fn qualify_native(
     catch_unwind(|| {
         let device = get_device().map_err(|error| format!("{name} unavailable: {error}"))?;
         let result = qualify_device(device, backend, name, None)?;
-        result.check_capacity(budget_bytes)?;
+        result.check_job_budget(budget_bytes)?;
         Ok(result)
     })
     .map_err(|payload| {
