@@ -86,6 +86,16 @@ fn settings_reject_invalid_values() -> Result<(), String> {
         ..defaults
     }
     .validate()?;
+    JobSettings {
+        kernel_size: 63,
+        pyramid_levels: 32,
+        scale_factor: 128,
+        slab_size: 4096,
+        slab_overlap: 4095,
+        quality: 100,
+        ..defaults
+    }
+    .validate()?;
     invalid_settings(defaults)
 }
 
@@ -129,6 +139,13 @@ fn invalid_settings(defaults: JobSettings) -> Result<(), String> {
                 ..defaults
             },
             "--quality",
+        ),
+        (
+            JobSettings {
+                max_scale_step: 0.0,
+                ..defaults
+            },
+            "--max-scale-step",
         ),
         (
             JobSettings {
@@ -182,6 +199,30 @@ fn invalid_settings(defaults: JobSettings) -> Result<(), String> {
         {
             return Err(format!("expected diagnostic for {flag} in {settings:?}"));
         }
+    }
+    Ok(())
+}
+
+/// An interrupted directory stream must identify the directory and return an error.
+///
+/// # Errors
+/// Returns a parser or missing diagnostic error.
+#[test]
+fn failed_directory_read_keeps_its_path() -> Result<(), String> {
+    let directory = std::path::Path::new("failed-directory");
+    let matcher = glob::Pattern::new("*.png").map_err(|error| error.to_string())?;
+    let error = std::io::Error::other("directory read interrupted");
+    let mut output = Vec::new();
+    let outcome = super::paths::scan_entries(
+        &mut std::iter::once(Err(error)),
+        directory,
+        &matcher,
+        &mut std::iter::repeat_n((), 1),
+        &mut output,
+    );
+    let expected = Err("cannot access input failed-directory: directory read interrupted".into());
+    if outcome != expected || !output.is_empty() {
+        return Err(format!("directory iterator error was lost: {outcome:?}"));
     }
     Ok(())
 }
