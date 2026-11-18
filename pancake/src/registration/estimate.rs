@@ -17,6 +17,8 @@ const MIN_SIDE: u16 = 12;
 const SEARCH_STRIDE: u16 = 4;
 /// Conservative minimum aligned correlation for structure to agree.
 const MIN_CORRELATION: f32 = 0.75;
+/// Minimum absolute correlation advantage for a distinct motion hypothesis.
+const MIN_CORRELATION_ADVANTAGE: f32 = 0.006;
 /// Fraction of unregistered detail error that the fit must remove.
 const MIN_ERROR_REDUCTION: f32 = 0.35;
 
@@ -165,8 +167,9 @@ fn prepare_thumbnail(
 /// Coarse spectral and integer matching seed subpixel correlation refinement. Scoring
 /// normalizes gain and bias and compares a fixed interior region. A proposed
 /// transform must be plausible and explain enough detail error to beat identity.
-/// Large unsupported scale or rotation, repeated peaks and focus-only changes
-/// therefore leave an explicit low-confidence identity. The returned matrix
+/// Translations that move a full scoring sample also need to beat the reference's
+/// similarity to itself at that displacement. A repeated structure can match
+/// strongly after defocus without establishing a unique registration. The returned matrix
 /// is lifted from thumbnail back to the common full-resolution canvas.
 ///
 /// # Errors
@@ -211,7 +214,10 @@ pub fn estimate_pair(
     let (parameters, score) = search.run(translation, baseline, max_precision)?;
     let improvement = score - baseline;
     let removed = improvement / (1.0 - baseline);
-    if score < MIN_CORRELATION || improvement < 0.006 || removed < MIN_ERROR_REDUCTION {
+    if score < MIN_CORRELATION
+        || improvement < MIN_CORRELATION_ADVANTAGE
+        || removed < MIN_ERROR_REDUCTION
+    {
         return Ok(Estimate::UNCERTAIN);
     }
     let map = coordinates.convert(model, parameters)?;
@@ -228,6 +234,12 @@ pub fn estimate_pair(
     } else {
         map
     };
+    if dx.abs().max(dy.abs()) >= f32::from(stride) {
+        let repeated = one(&pair.reference_correlation(&[chosen], stride)?)?;
+        if score <= repeated + MIN_CORRELATION_ADVANTAGE {
+            return Ok(Estimate::UNCERTAIN);
+        }
+    }
     let full = [
         usize::from(source.canvas.width),
         usize::from(source.canvas.height),
