@@ -11,6 +11,7 @@ import sys
 import time
 import uuid
 import zlib
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -409,16 +410,22 @@ def new_receipt(output, receipt):
         raise ValueError("Receipt must be a new file outside the generated directory")
 
 
-def write_receipt(receipt, data):
-    """Publish the receipt once while preserving any preexisting file."""
-    with receipt.open("x") as stream:
-        try:
-            json.dump(data, stream, indent=2, sort_keys=True)
-            stream.write("\n")
-            stream.flush()
-        except BaseException:
-            receipt.unlink()
-            raise
+@contextmanager
+def open_new_receipt(receipt):
+    """Reserve the receipt destination without replacing another writer's file."""
+    stream = receipt.open("x")
+    try:
+        with stream:
+            yield stream
+    except BaseException:
+        receipt.unlink(missing_ok=True)
+        raise
+
+
+def write_receipt(stream, data):
+    """Write a completed receipt to a reserved file."""
+    json.dump(data, stream, indent=2, sort_keys=True)
+    stream.write("\n")
 
 
 def frozen_plan(reference, recipe, specs):
@@ -470,16 +477,17 @@ def cleanup_materialized(output, receipt, materialization):
         raise ValueError("Materialization receipt does not own this output directory")
     recipe = Recipe(**data["recipe"])
     frozen_plan(data, recipe, list(image_specs(recipe)))
-    deleted = cleanup_owned(output, data["ownership_token"], data["files"])
-    write_receipt(
-        receipt,
-        {
-            "schema_version": 1,
-            "mode": "cleanup",
-            "materialization_receipt_sha256": digest,
-            "cleanup": cleanup_observation(output, deleted),
-        },
-    )
+    with open_new_receipt(receipt) as stream:
+        deleted = cleanup_owned(output, data["ownership_token"], data["files"])
+        write_receipt(
+            stream,
+            {
+                "schema_version": 1,
+                "mode": "cleanup",
+                "materialization_receipt_sha256": digest,
+                "cleanup": cleanup_observation(output, deleted),
+            },
+        )
 
 
 def generate(recipe, output, receipt, reserve, max_bytes=None, reference_path=None):
@@ -603,7 +611,8 @@ def generate(recipe, output, receipt, reserve, max_bytes=None, reference_path=No
             data["ownership_token"] = token
             data["reference_receipt_sha256"] = reference_digest
             data["limits"]["full_set_preflight_bytes"] = preflight_bytes
-        write_receipt(receipt, data)
+        with open_new_receipt(receipt) as stream:
+            write_receipt(stream, data)
     except BaseException:
         if reference is not None and owns_directory(output, token):
             for path in attempted:

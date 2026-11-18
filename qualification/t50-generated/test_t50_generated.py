@@ -7,9 +7,16 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
-from t50_generated import Recipe, cleanup_owned, render_tile
+from t50_generated import (
+    Recipe,
+    cleanup_materialized,
+    cleanup_owned,
+    new_receipt,
+    render_tile,
+)
 from t50_oracle import scalar_pixel
 
 
@@ -210,6 +217,34 @@ class StorageAndCleanupContracts(unittest.TestCase):
             self.assertEqual(data["cleanup"]["remaining_tiff_count"], 0)
             self.assertEqual(unrelated.read_bytes(), b"not owned by generator")
             self.assertEqual(list(output.glob("*.tif")), [])
+
+    def test_cleanup_preserves_images_if_a_writer_claims_its_receipt_path(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            frozen = self.frozen_fixture(root)
+            output, receipt = root / "complete", root / "materialization.json"
+            result = subprocess.run(
+                self.command(output, receipt) + ["--materialize-from", str(frozen)],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            cleanup = root / "cleanup.json"
+
+            def concurrent_receipt_writer(directory, path):
+                new_receipt(directory, path)
+                path.write_text("other writer's existing receipt")
+
+            with (
+                patch(
+                    "t50_generated.new_receipt", side_effect=concurrent_receipt_writer
+                ),
+                self.assertRaises(FileExistsError),
+            ):
+                cleanup_materialized(output, cleanup, receipt)
+            self.assertEqual(cleanup.read_text(), "other writer's existing receipt")
+            self.assertEqual(len(list(output.glob("*.tif"))), 9)
 
     def test_materialization_preflights_full_set_before_creating_directory(self):
         with tempfile.TemporaryDirectory() as directory:
