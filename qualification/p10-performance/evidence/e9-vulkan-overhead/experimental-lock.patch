@@ -1,0 +1,5 @@
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1920,2 +1919,0 @@
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "413caaf7eaf52cb5922f1e9e766fea404fd1dd549d10f3500e22b61c70b63a10"

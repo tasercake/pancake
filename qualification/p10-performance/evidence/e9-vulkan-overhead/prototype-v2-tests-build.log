@@ -1,0 +1,4 @@
+   Compiling pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/vulkan-overhead/pancake)
+    Finished `release` profile [optimized] target(s) in 1m 00s
+  Executable tests/cpu_runtime_contract.rs (target/release/build/pancake/0c68a181d81c9293/out/cpu_runtime_contract-0c68a181d81c9293)
+  Executable tests/gpu_runtime_contract.rs (target/release/build/pancake/d67e61707db8ef17/out/gpu_runtime_contract-d67e61707db8ef17)

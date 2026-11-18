@@ -1,0 +1,16 @@
+   Compiling pliron v0.19.0
+   Compiling cubecl-ir v0.11.4
+   Compiling pliron-llvm v0.19.0
+   Compiling cubecl-monitoring v0.11.4
+   Compiling cubecl-runtime v0.11.4
+   Compiling cubecl-core v0.11.4 (/tmp/pancake-worktrees.t3paqgWM/vulkan-overhead/pancake/vendor/cubecl-core-0.11.4)
+   Compiling cubecl-server v0.11.4
+   Compiling cubecl-opt v0.11.4
+   Compiling cubecl-std v0.11.4 (/tmp/pancake-worktrees.t3paqgWM/vulkan-overhead/pancake/vendor/cubecl-std-0.11.4)
+   Compiling cubecl-llvm v0.11.4
+   Compiling cubecl-wgpu v0.11.4 (/tmp/pancake-worktrees.t3paqgWM/vulkan-overhead/artifacts/vulkan-overhead/cubecl-wgpu-0.11.4)
+   Compiling cubecl-cpu v0.11.4
+   Compiling cubecl v0.11.4
+   Compiling pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/vulkan-overhead/pancake)
+   Compiling pancake-cli v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/vulkan-overhead/pancake/crates/pancake-cli)
+    Finished `release` profile [optimized] target(s) in 2m 17s
