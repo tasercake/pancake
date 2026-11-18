@@ -1,0 +1,29 @@
+{
+  "app_sha256": "57053ae2b7e15e4e5f21559149b0e8dc17d43dec7f218169c799ce194e5b3598",
+  "command": [
+    "dbus-run-session",
+    "--",
+    "strace",
+    "-f",
+    "-e",
+    "trace=execve",
+    "-o",
+    "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-package-smoke/entry-5216ba4/entry.strace",
+    "gio",
+    "launch",
+    "/tmp/p9-desktop-entry-eebwj559/package/usr/share/applications/pancake.desktop",
+    "/tmp/p9-desktop-entry-eebwj559/left image.png",
+    "/tmp/p9-desktop-entry-eebwj559/right ñ 🥞 image.png"
+  ],
+  "display": ":2",
+  "window_observed": true,
+  "actual_argv": [
+    "/tmp/p9-desktop-entry-eebwj559/package/usr/bin/pancake-gui",
+    "/tmp/p9-desktop-entry-eebwj559/left image.png",
+    "/tmp/p9-desktop-entry-eebwj559/right ñ 🥞 image.png"
+  ],
+  "input_sha256": {
+    "left image.png": "f62cc33bbe0045701100dae1eeab8e72037bede815ad9f8b0722284be025b1fc",
+    "right ñ 🥞 image.png": "ddb79d247297ab20672d1037901efd9f971a2ee351a5ff2d4be5f44acf0b3092"
+  }
+}

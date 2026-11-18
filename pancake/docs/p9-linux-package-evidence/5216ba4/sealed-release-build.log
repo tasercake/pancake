@@ -1,0 +1,13 @@
+5216ba4227e14033483a21bb5eca1c6c168ef840
+639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd  Cargo.lock
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+    Finished `release` profile [optimized] target(s) in 0.26s
+d0554ce43411b39da66bd04ea5de82b2cc74384e8bb576b5ec74408aa5c6da12  target/release/pancake-cli
+57053ae2b7e15e4e5f21559149b0e8dc17d43dec7f218169c799ce194e5b3598  target/release/pancake-gui
