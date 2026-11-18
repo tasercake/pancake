@@ -1,0 +1,19 @@
+{
+  "removed": [
+    {
+      "path": "cuda/warm-01/candidate/complete.tif",
+      "file_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+      "pixel_sha256": "00370e27a5da2a592572ca13cfcae3206ba33feec51b1f3d0333c5be14920d57",
+      "bytes": 1031446,
+      "review_receipt_sha256": "4e5d2a0a111d6ef875141fc9e8e0f58958c6502b6e238454ca054ced7d21f8cd"
+    },
+    {
+      "path": "cuda/warm-01/reference/complete.tif",
+      "file_sha256": "d996075e27f6bdccafcb2f6fa1fd260bcdc814264c8883a4679906fa17918d25",
+      "pixel_sha256": "42167e60f3ef006d0e3093bef7c3c1fd609ea8a53ec8db43d6db0c4cc913e547",
+      "bytes": 1019098,
+      "review_receipt_sha256": "4e5d2a0a111d6ef875141fc9e8e0f58958c6502b6e238454ca054ced7d21f8cd"
+    }
+  ],
+  "remaining_tiffs": 0
+}
