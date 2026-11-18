@@ -1,9 +1,8 @@
 # P5 registration core verification
 
-The registration core passed its focused Linux CPU and physical NVIDIA Vulkan
-checks on 2026-11-18. The release CLI still needs to pass the 64 P5 roadmap
-cases through the complete job, export and telemetry paths. The component
-checks below supply zero case passes.
+The headless release CLI passed all 64 P5 roadmap cases on 2026-11-18 on
+Linux CPU and physical NVIDIA Vulkan. The integrated run below supplies the
+64 passes. The separate component checks qualify the geometry directly.
 
 - Tested source `faeca6a86073f6e9efcccdffc8dcfaa8e0ed7e53` with Rust 1.100.0.
 - Cargo lock SHA-256 `f2603e6cb6e669617a5ef4098cfa9a27f042edd3e380be2e6c3e57820a32700f`.
@@ -49,8 +48,8 @@ CLIPPY_CONF_DIR="$PWD/target/dependency-policy/clippy" cargo clippy --locked \
 The independent exploratory fixture probe is reproducible from the repository
 root with these commands. Remove the generated artifacts after inspection.
 
-Native CUDA, Apple, complete job recovery, end-to-end case accounting and
-workspace-wide assurance remain pending on the integrated revision.
+Native CUDA, Apple and workspace-wide assurance remain separate release
+obligations. This scope retains Linux CPU and physical NVIDIA Vulkan evidence.
 
 ## Elongated-canvas regression
 
@@ -64,3 +63,21 @@ error on CPU high precision and RTX 3090 Vulkan ordinary precision respectively.
 little-endian float data from those fixture PNGs, normalized by dividing
 decoded channel values by 255, in `artifacts/p5/cascade-probe/wide-{0,1}.f32`.
 [Probe source](p5-registration-evidence/cascade-probe.rs.txt).
+
+## Integrated release result
+
+The largest error at the measured corners and center was 0.078271px for
+affine registration with previous-frame reference, within 1px. Both
+4097×257 recovery cascade outputs had zero RGB error inside the tested
+region. The physical GPU case reported the NVIDIA RTX 3090 on `wgpu-vulkan`
+at PCI `0000:01:00.0`, `physical_gpu=true`, with no fallback. The unchanged
+runner verified input and output hashes and decoded pixels on the real
+CLI. A preliminary four-case diagnostic at the older release is excluded
+from this count.
+
+Replay from the repository root with the matching verified executable staged
+at `pancake/target/release/pancake-cli`.
+
+Sources and generated exports are reconstructible from the immutable
+fixture definitions. The report retains their validated hashes. This
+64-ID slice requires regression coverage on the final release revision.
