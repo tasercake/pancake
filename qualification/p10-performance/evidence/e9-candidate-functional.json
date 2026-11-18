@@ -1,0 +1,510 @@
+{
+  "kind": "single functional CPU diagnostic; no elapsed comparable timing",
+  "binary_sha256": "8c96ad652487f8628e53b44dfa014ff65b3da84da3acfa98ab0e56d26d09201a",
+  "cargo_lock_sha256": "012cda6d161124eef8ecc3c5c6a4fed8db881e5f7606f4b9d7aee5f766f1a879",
+  "descriptor_sha256": "f774e9e080fb49e2f82f11923668db6212ccea83f2924b370dbba1d508c2bfc8",
+  "performance_targets_sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc",
+  "workload": "E9.exposure_fusion.cpu",
+  "input_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+  "ordered_inputs": [
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0163.png",
+      "sha256": "65bef59ae2cffaac5a0401780c884fc1f0cb87c3fb6ba7057213bbb03b775f9d",
+      "bytes": 112938,
+      "shape": [
+        339,
+        512,
+        3
+      ],
+      "native_mode": "RGB",
+      "native_sample_precision_bits": 8
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0164.png",
+      "sha256": "37094f4247a7e5cac3af1876137f42c88263ace0d075d99daec7b1e796e33ad0",
+      "bytes": 133941,
+      "shape": [
+        339,
+        512,
+        3
+      ],
+      "native_mode": "RGB",
+      "native_sample_precision_bits": 8
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0165.png",
+      "sha256": "8582dc34b2035c4daafc5784a9f7191a6aff3161a7fd54b4d493c45145d6a8e6",
+      "bytes": 154601,
+      "shape": [
+        339,
+        512,
+        3
+      ],
+      "native_mode": "RGB",
+      "native_sample_precision_bits": 8
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0166.png",
+      "sha256": "5fc9ade7715c0110ec5b4d18777ce2718c2f70946fa23833222b98b425b2ca7c",
+      "bytes": 175787,
+      "shape": [
+        339,
+        512,
+        3
+      ],
+      "native_mode": "RGB",
+      "native_sample_precision_bits": 8
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0167.png",
+      "sha256": "530a91ac82e4406acc23913088efb0ab0d056e686345088e41f60e4fc6176f60",
+      "bytes": 191648,
+      "shape": [
+        339,
+        512,
+        3
+      ],
+      "native_mode": "RGB",
+      "native_sample_precision_bits": 8
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0168.png",
+      "sha256": "5c7ed4b5bba42b52c93eeaaf462b1531717d1abd43938445a1e6bea9c19c1ae3",
+      "bytes": 211350,
+      "shape": [
+        339,
+        512,
+        3
+      ],
+      "native_mode": "RGB",
+      "native_sample_precision_bits": 8
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0169.png",
+      "sha256": "4f26850b1aee4fe40ab0f060fc24568f54e637d9b5158b74c4a99a865c991e35",
+      "bytes": 228010,
+      "shape": [
+        339,
+        512,
+        3
+      ],
+      "native_mode": "RGB",
+      "native_sample_precision_bits": 8
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0170.png",
+      "sha256": "e20b37e52a492042647c15edb5e9f45990e5bd585f38d1fc14282e95752597da",
+      "bytes": 214462,
+      "shape": [
+        339,
+        512,
+        3
+      ],
+      "native_mode": "RGB",
+      "native_sample_precision_bits": 8
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0171.png",
+      "sha256": "029ae94dfcc2d105a2ee2f91e5d535820c00e9e73c6b4bdf7b0ba690df670c32",
+      "bytes": 202755,
+      "shape": [
+        339,
+        512,
+        3
+      ],
+      "native_mode": "RGB",
+      "native_sample_precision_bits": 8
+    }
+  ],
+  "hardware": {
+    "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+    "cpu_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "kernel": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+    "os_release": {
+      "NAME": "Ubuntu",
+      "ID": "ubuntu",
+      "PRETTY_NAME": "Ubuntu 24.04.5 LTS",
+      "VERSION_ID": "24.04",
+      "VERSION": "24.04.5 LTS (Noble Numbat)",
+      "VERSION_CODENAME": "noble",
+      "ID_LIKE": "debian",
+      "HOME_URL": "https://www.ubuntu.com/",
+      "SUPPORT_URL": "https://help.ubuntu.com/",
+      "BUG_REPORT_URL": "https://bugs.launchpad.net/ubuntu/",
+      "PRIVACY_POLICY_URL": "https://www.ubuntu.com/legal/terms-and-policies/privacy-policy",
+      "UBUNTU_CODENAME": "noble",
+      "LOGO": "ubuntu-logo"
+    },
+    "frequency_policy": {
+      "/sys/devices/system/cpu/cpufreq/policy11": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy8": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy6": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy28": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy18": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy4": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy26": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy16": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy2": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy24": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy14": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy0": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy22": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy12": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy9": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy30": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy20": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy10": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy7": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy29": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy19": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy5": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy27": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy17": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy3": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy25": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy15": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy1": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy23": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy13": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy31": "powersave",
+      "/sys/devices/system/cpu/cpufreq/policy21": "powersave"
+    },
+    "timer": {
+      "python": "3.12.12 (main, Feb 12 2026, 00:42:14) [Clang 21.1.4 ]",
+      "clock": {
+        "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+        "monotonic": true,
+        "adjustable": false,
+        "resolution": 1e-09
+      }
+    },
+    "memory": "Linux procfs session sum and NVIDIA NVML per PID; sampled, transient peaks can be missed",
+    "validator": {
+      "numpy": "2.5.4",
+      "tifffile": "2026.11.12",
+      "imagecodecs": "2026.11.11"
+    }
+  },
+  "argv": [
+    "--input",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0163.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0164.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0165.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0166.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0167.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0168.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0169.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0170.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0171.png",
+    "--output",
+    "--cpu",
+    "--method",
+    "exposure_fusion",
+    "--align",
+    "--alignment-mode",
+    "euclidean",
+    "--alignment-ref",
+    "first",
+    "--kernel-size",
+    "6",
+    "--pyramid-levels",
+    "8",
+    "--scale-factor",
+    "6",
+    "--slab-size",
+    "0",
+    "--slab-overlap",
+    "0",
+    "--bit-depth",
+    "16",
+    "--auto-crop"
+  ],
+  "cwd": "/tmp/pancake-worktrees.t3paqgWM/p6-job/pancake",
+  "environment": {
+    "PANCAKE_DEFAULT_DEVICE": "cpu"
+  },
+  "returncode": 0,
+  "output": {
+    "shape": [
+      339,
+      512,
+      3
+    ],
+    "dtype": "uint16",
+    "sha256": "5c8e611dbd667a08c04cccd131dd57390106d6bb38421836b08dcda43469749b",
+    "pixel_sha256": "13e18830dd56134022c8b0ccf602298499f67a9e39ff9216b36c9c64626c987a",
+    "bytes": 1041634,
+    "minimum": 0,
+    "maximum": 65535
+  },
+  "completion": {
+    "actual_backend": "cpu",
+    "alignment_transforms": {
+      "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0163.png": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0164.png": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0165.png": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0166.png": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0167.png": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0168.png": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0169.png": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0170.png": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0171.png": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ]
+    },
+    "completed": true,
+    "device": "AMD Ryzen 9 7950X3D 16-Core Processor",
+    "device_fingerprint": "cpu_x86_64_load-512_f16-chain",
+    "device_pci_address": null,
+    "event": "stack_complete",
+    "fallback_reason": null,
+    "physical_gpu": false,
+    "runtime": "cpu",
+    "sequential_transforms": [
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ]
+    ]
+  },
+  "status": "pass",
+  "inputs_unchanged": true,
+  "stdout_sha256": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "events_sha256": "8a64e3b62f5990c4ad491c1ef6d7da425e99120da3e592f5cec062bf672c0993",
+  "temporary_output_removed": true
+}
