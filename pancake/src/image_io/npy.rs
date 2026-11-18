@@ -110,12 +110,12 @@ pub(super) fn decode(mut input: impl Read) -> Result<RgbImage, String> {
     let dtype = SampleType::from_header(&header)?;
     for _ in 0..pixel_count {
         let first = dtype.read(&mut input).map_err(|error| error.to_string())?;
-        if layout != ArrayLayout::Rgb {
-            samples.extend([first; 3]);
-        } else {
+        if layout == ArrayLayout::Rgb {
             let second = dtype.read(&mut input).map_err(|error| error.to_string())?;
             let third = dtype.read(&mut input).map_err(|error| error.to_string())?;
             samples.extend([first, second, third]);
+        } else {
+            samples.extend([first; 3]);
         }
     }
     if input.read(&mut [0_u8]).map_err(|error| error.to_string())? != 0 {
