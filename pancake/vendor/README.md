@@ -13,6 +13,7 @@ regression code and forbids unsafe Rust.
 | `spin_on` 0.1.1 | Replace `pin_utils::pin_mut!` with `core::pin::pin!`; remove `pin-utils` | Same future is pinned on stack before its first poll; no allocation. Declare Rust 1.68, when the standard macro became stable. Replace deprecated atomic spin hint with its standard `core::hint::spin_loop` successor. Update dependency-count documentation. |
 | `cubecl-macros` 0.11.4 | Honor the existing `expand_only` flag for functions | Opt-in removal of the nonexecuted host DSL stub. Checked launch and device IR generation remain; unflagged functions retain their original behavior. Three compile contracts check these guarantees. |
 | `rowan` 0.17.0 | Give private `GreenChild` enum explicit `repr(u32)` | Preserve its asserted 16-byte layout under both randomized layout seeds. Native regression tests exercise node/token clone, drop, offsets and payload access. Existing ARC implementation is unchanged; separate upstream Miri failures are recorded. |
+| `oneshot` 0.2.1 | Acquire on the blocking receive's initial state load and receive-registration exchange | Replace four standalone acquire fences in `Receiver::recv` with synchronization recognized by ThreadSanitizer. The exchange continues to release the waker. |
 
 No crate is relabelled as another API major. `cubecl-ir` has no production
 `paste` dependency and is not patched. Published backend **dev** dependencies
@@ -25,6 +26,14 @@ does not remove or certify those implementations. Pancake's first-party
 original no-op raw waker is unchanged. It uses null-free static data, does not
 allocate or dereference the raw pointer, and has inert wake/drop operations.
 The executor still busy-polls; this is not a new scheduler for application jobs.
+
+The `oneshot` patch retains the archived package's existing sender, raw
+pointer, and deallocation code. The terminal state read now acquires the
+message publication before any data access or free. The blocked receive path
+still acquires the terminal state after it wakes. The crate's remaining
+methods retain upstream behavior and remain within the third-party trust
+boundary. The [P9 audit](../docs/p9-tsan-audit/3dc9bcf/README.md) records the
+original warning and the controlled comparison.
 
 ## Integration boundary
 
@@ -42,6 +51,7 @@ cubecl-hip = { path = "vendor/cubecl-hip-0.11.4" }
 cubecl-spirv = { path = "vendor/cubecl-spirv-0.11.4" }
 spin_on = { path = "vendor/spin_on-0.1.1" }
 rowan = { path = "vendor/rowan-0.17.0" }
+oneshot = { path = "vendor/oneshot-0.2.1" }
 ```
 
 Keep the resolved lockfile. Do not edit registry cache files. Remove overrides
