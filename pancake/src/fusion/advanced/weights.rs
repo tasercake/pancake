@@ -3,7 +3,8 @@
 use cubecl::prelude::*;
 use cubecl::std::tensor::TensorHandle;
 
-use super::super::buffers::{ImageShape, elementwise, empty};
+use super::super::buffers::{ImageShape, empty};
+use super::elementwise;
 use super::pyramid::{clamp_after, clamp_before};
 
 /// Produce focus weights or Mertens-style contrast and saturation weights.

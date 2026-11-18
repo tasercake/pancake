@@ -15,7 +15,7 @@ mod tests;
 
 pub use plan::{AutomaticParameters, automatic_parameters, slab_ranges};
 
-use super::buffers::{ImageShape, elementwise, empty, read_image, upload};
+use super::buffers::{ImageShape, empty, read_image, upload};
 use levels::Level;
 use pyramid::{grids, reconstruct, reduce};
 
@@ -319,4 +319,19 @@ fn validate_buffer_limit(grid: ImageShape, limit: u64) -> Result<(), String> {
         ));
     }
     Ok(())
+}
+
+/// Reuse one kernel specialization through all pyramid levels.
+///
+/// Choose the device's normal full workgroup once by policy. Every multiscale
+/// kernel bounds its own tail lanes, so shrinking levels only change the number
+/// of groups. Otherwise small levels repeatedly compile the same operation.
+fn elementwise(client: &Client, elements: usize) -> (CubeCount, CubeDim) {
+    let workgroup_limit = client.properties().hardware.max_units_per_cube;
+    let full_workgroup = usize::try_from(workgroup_limit).unwrap_or(usize::MAX);
+    let dimensions = CubeDim::new(client, full_workgroup);
+    (
+        cubecl::calculate_cube_count_elemwise(client, elements, dimensions),
+        dimensions,
+    )
 }

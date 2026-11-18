@@ -4,8 +4,9 @@ use cubecl::prelude::*;
 use cubecl::server::Handle;
 use cubecl::std::tensor::TensorHandle;
 
-use super::super::buffers::{ImageShape, elementwise, empty};
+use super::super::buffers::{ImageShape, empty};
 use super::AdvancedMethod;
+use super::elementwise;
 use super::pyramid::expanded;
 
 /// Persistent statistics for Hybrid's winner-versus-soft-weight blend.
