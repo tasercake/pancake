@@ -6,14 +6,18 @@ use std::panic;
 use std::path::Path;
 use std::sync::{Arc, LazyLock};
 
-use image::metadata::Orientation;
+use image::{DynamicImage, ImageBuffer, metadata::Orientation};
 use rawler::decoders::{Decoder, FormatHint, RawDecodeParams, WellKnownIFD};
 use rawler::formats::bmff::Bmff;
-use rawler::imgop::develop::RawDevelop;
+use rawler::imgop::convert_from_f32_scaled_u16;
+use rawler::imgop::develop::{Intermediate, RawDevelop};
 use rawler::rawsource::RawSource;
 use rawler::tags::TiffCommonTag;
 
 use super::{RgbImage, checked_pixel_count, raster_to_rgb};
+
+#[cfg(test)]
+mod tests;
 
 /// Maximum owned encoded RAW bytes, separate from raster allocation limits.
 const MAX_RAW_BYTES: u64 = 256 * 1024 * 1024;
@@ -71,16 +75,28 @@ fn develop(source: &RawSource) -> Result<RgbImage, String> {
         .raw_image(source, &RawDecodeParams::default(), false)
         .map_err(|error| error.to_string())?;
     let _count = checked_pixel_count(raw.width, raw.height)?;
-    let mut developed = RawDevelop::default()
+    let intermediate = RawDevelop::default()
         .develop_intermediate(&raw)
-        .map_err(|error| error.to_string())?
-        .to_dynamic_image()
+        .map_err(|error| error.to_string())?;
+    let mut developed = developed_raster(intermediate)
         .ok_or_else(|| "camera RAW did not produce a developed raster".to_owned())?;
     let orientation = u8::try_from(raw.orientation.to_u16()).map_err(|error| error.to_string())?;
     if let Some(orientation) = Orientation::from_exif(orientation) {
         developed.apply_orientation(orientation);
     }
     raster_to_rgb(developed, None, None)
+}
+
+/// Quantize developed RGB in its existing contiguous channel order.
+fn developed_raster(intermediate: Intermediate) -> Option<DynamicImage> {
+    let Intermediate::ThreeColor(pixels) = intermediate else {
+        return intermediate.to_dynamic_image();
+    };
+    let dimensions = pixels.dim();
+    let width = u32::try_from(dimensions.w).ok()?;
+    let height = u32::try_from(dimensions.h).ok()?;
+    let codes = convert_from_f32_scaled_u16(pixels.pixels().as_flattened(), 0, u16::MAX);
+    ImageBuffer::from_raw(width, height, codes).map(DynamicImage::ImageRgb16)
 }
 
 /// Inspect the Rawler-selected DNG image IFD before unpacking compressed samples.
