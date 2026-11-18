@@ -84,7 +84,7 @@ fn reveal_native(path: &std::path::Path) -> Result<(), String> {
 }
 
 #[cfg(target_os = "linux")]
-pub use linux::{FileAction, SourceAction, open_file, open_source, show_file, show_source};
+pub use linux::{FileAction, SourceAction, open_file, open_source};
 
 /// Same-process GTK menu implementation for Linux.
 #[cfg(target_os = "linux")]
@@ -98,7 +98,7 @@ mod linux {
         self,
         prelude::{DeviceExt as _, SeatExt as _},
     };
-    use gtk::glib::{MainLoop, idle_add_local_once};
+    use gtk::glib::idle_add_local_once;
     use gtk::prelude::{GtkMenuExt as _, GtkMenuItemExt as _, MenuShellExt as _, WidgetExt as _};
     use gtk::{Menu, MenuItem, SeparatorMenuItem};
 
@@ -135,24 +135,6 @@ mod linux {
         Dispatch(FileAction),
     }
 
-    /// Display the real file menu until the user invokes a command or dismisses it.
-    ///
-    /// # Errors
-    ///
-    /// Returns GTK or display errors.
-    pub fn show_file(recent: &[PathBuf]) -> Result<Option<FileAction>, String> {
-        let first = file_popup(None)?;
-        let selected = if matches!(first, Some(FileChoice::ShowRecent)) {
-            file_popup(Some(recent))?
-        } else {
-            first
-        };
-        Ok(selected.and_then(|choice| match choice {
-            FileChoice::Dispatch(action) => Some(action),
-            FileChoice::ShowRecent => None,
-        }))
-    }
-
     /// Open the file menu and dispatch one native action when it closes.
     ///
     /// # Errors
@@ -185,18 +167,6 @@ mod linux {
             FileChoice::Dispatch(action) => Some(action),
             FileChoice::ShowRecent => None,
         }
-    }
-
-    /// Open a native File popup, with or without the expanded recent entries.
-    ///
-    /// GTK classifies attached submenu owners as menu containers. An action
-    /// that expands entries on demand retains the real, operable menu-item role.
-    ///
-    /// # Errors
-    ///
-    /// Returns GTK or display errors.
-    fn file_popup(recent: Option<&[PathBuf]>) -> Result<Option<FileChoice>, String> {
-        build_file_popup(recent)?.show()
     }
 
     /// Build actual GTK items for the desired level of the File menu.
@@ -263,15 +233,6 @@ mod linux {
         } else {
             name.unwrap_or(path.as_os_str()).to_string_lossy()
         }
-    }
-
-    /// Display the real source context menu.
-    ///
-    /// # Errors
-    ///
-    /// Returns GTK or display errors.
-    pub fn show_source() -> Result<Option<SourceAction>, String> {
-        build_source_popup()?.show()
     }
 
     /// Open the source context menu and deliver one selected action.
@@ -384,24 +345,6 @@ mod linux {
             self.menu.append(&row);
         }
 
-        /// Anchor the menu at the real pointer and return after GTK closes it.
-        ///
-        /// # Errors
-        ///
-        /// Returns an unavailable display or pointer.
-        fn show(self) -> Result<Option<Action>, String> {
-            let anchor = Anchor::pointer()?;
-            let main_loop = MainLoop::new(None, false);
-            let end = main_loop.clone();
-            let _deactivated = self.menu.connect_deactivate(move |_| end.quit());
-            anchor.popup(&self.menu);
-            if self.menu.is_mapped() {
-                main_loop.run();
-            }
-            let chosen = self.action.borrow_mut().take();
-            Ok(chosen)
-        }
-
         /// Present the popup without entering a nested GTK main loop.
         fn present(self, anchor: &Anchor, completion: impl FnOnce(Option<Action>) + 'static) {
             // Keep the native widget alive through deactivation, then release
@@ -412,7 +355,7 @@ mod linux {
             let _handler = self.menu.connect_deactivate(move |_| {
                 if let Some((menu, complete)) = release.borrow_mut().take() {
                     let selection = Rc::clone(&selected);
-                    let _source = idle_add_local_once(move || {
+                    let _delivery = idle_add_local_once(move || {
                         let chosen = selection.borrow_mut().take();
                         drop(menu);
                         complete(chosen);
@@ -423,7 +366,7 @@ mod linux {
             if !self.menu.is_mapped()
                 && let Some((_, complete)) = pending.borrow_mut().take()
             {
-                let _source = idle_add_local_once(move || complete(None));
+                let _delivery = idle_add_local_once(move || complete(None));
             }
         }
     }

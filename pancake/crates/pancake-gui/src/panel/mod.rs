@@ -18,18 +18,6 @@ pub enum Picker<'a> {
     Save(&'a str),
 }
 
-/// Use the platform dialog with a cancellation result distinct from an error.
-///
-/// # Errors
-///
-/// Returns a platform dialog or path-resolution error.
-#[cfg(target_os = "linux")]
-pub fn select(window: &ComponentInstance, kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
-    let selected = linux::choose(kind);
-    restore_focus(window);
-    selected
-}
-
 /// Present the native Linux file panel without blocking the Slint event loop.
 ///
 /// # Errors
@@ -42,22 +30,6 @@ pub fn open(
     completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
 ) -> Result<(), String> {
     linux::open(kind, completion)
-}
-
-/// Present a system file panel and deliver its native result.
-///
-/// # Errors
-///
-/// Returns a native panel error through the completion callback. An empty
-/// selection is cancellation.
-#[cfg(any(target_os = "macos", target_os = "windows"))]
-pub fn open(
-    window: &ComponentInstance,
-    kind: Picker<'_>,
-    completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
-) -> Result<(), String> {
-    completion(select(window, kind));
-    Ok(())
 }
 
 /// Return focus from a native GTK popup to its actual Slint owner.
@@ -75,9 +47,18 @@ pub fn restore_focus(window: &ComponentInstance) {
         .with_winit_window(slint::winit_030::winit::window::Window::focus_window);
 }
 
-/// Use the platform dialog with native window parenting.
+/// Present the platform dialog with native window parenting.
+///
+/// # Errors
+///
+/// Returns an error if the platform picker reports a setup failure.
+/// The current system picker represents cancellation as an empty selection.
 #[cfg(any(target_os = "macos", target_os = "windows"))]
-pub fn select(window: &ComponentInstance, kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
+pub fn open(
+    window: &ComponentInstance,
+    kind: Picker<'_>,
+    completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
+) -> Result<(), String> {
     use slint::ComponentHandle as _;
 
     let panel = rfd::FileDialog::new().set_parent(&window.window().window_handle());
@@ -98,7 +79,8 @@ pub fn select(window: &ComponentInstance, kind: Picker<'_>) -> Result<Vec<PathBu
             .into_iter()
             .collect(),
     };
-    Ok(selected)
+    completion(Ok(selected));
+    Ok(())
 }
 
 /// Dispatch pending native panel events when the Slint event loop owns the UI.

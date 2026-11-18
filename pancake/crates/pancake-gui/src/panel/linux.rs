@@ -13,24 +13,6 @@ use gtk::{Dialog, Entry, FileChooserAction, FileChooserWidget, Label, Orientatio
 
 use super::Picker;
 
-/// Open a real synchronous desktop panel on the UI thread.
-///
-/// # Errors
-///
-/// Returns unavailable desktop, lost path entry, or working-directory errors.
-pub(super) fn choose(kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
-    let (dialog, chooser, entry) = build(kind)?;
-    dialog.show_all();
-    let response = dialog.run();
-    let outcome = if response == ResponseType::Accept {
-        selected(matches!(kind, Picker::Save(_)), &chooser, &entry)
-    } else {
-        Ok(Vec::new())
-    };
-    close(&dialog);
-    outcome
-}
-
 /// Present a desktop panel and deliver one accepted path set or cancellation.
 ///
 /// Slint continues dispatching its own input while the host services GTK's

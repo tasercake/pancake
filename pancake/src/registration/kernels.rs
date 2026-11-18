@@ -188,11 +188,38 @@ impl Pair {
     /// # Errors
     ///
     /// Returns an error for oversized score buffers or failed GPU readback.
+    pub(super) fn correlation(&self, maps: &[Affine], stride: u16) -> Result<Vec<f32>, String> {
+        self.correlate(&self.source, maps, stride)
+    }
+
+    /// Evaluate how closely a displaced reference repeats its original texture.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for oversized score buffers or failed device readback.
+    pub(super) fn reference_correlation(
+        &self,
+        maps: &[Affine],
+        stride: u16,
+    ) -> Result<Vec<f32>, String> {
+        self.correlate(&self.reference, maps, stride)
+    }
+
+    /// Use the same sample grid and moment reduction for both kinds of candidate.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for oversized score buffers or failed device readback.
     #[expect(
         clippy::arithmetic_side_effects,
         reason = "the fixed fractional border cannot consume an axis and stride is 1, 2, or 4"
     )]
-    pub(super) fn correlation(&self, maps: &[Affine], stride: u16) -> Result<Vec<f32>, String> {
+    fn correlate(
+        &self,
+        moving: &TensorHandle,
+        maps: &[Affine],
+        stride: u16,
+    ) -> Result<Vec<f32>, String> {
         let w = usize::from(self.extent.width);
         let h = usize::from(self.extent.height);
         let border_x = w / 8;
@@ -234,7 +261,7 @@ impl Pair {
             cubes,
             dim,
             self.reference.clone().into_arg(),
-            self.source.clone().into_arg(),
+            moving.clone().into_arg(),
             maps_device.into_arg(),
             metadata.into_arg(),
             output.clone().into_arg(),

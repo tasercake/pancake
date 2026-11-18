@@ -1,0 +1,59 @@
+{
+  "source_revision": "5e102447ad95c641eb773d9fdf94f2bc3757b81d",
+  "binary_sha256": "3ac6abaecc1bbd5743efd2abc6879a43d4b17294514b7bc209a05227d613ccbb",
+  "cargo_lock_sha256": "012cda6d161124eef8ecc3c5c6a4fed8db881e5f7606f4b9d7aee5f766f1a879",
+  "ignores_display_environment": true,
+  "requested_runtime_override": "wgpu",
+  "argv": [
+    "/tmp/pancake-worktrees.t3paqgWM/p5-registration/pancake/target/release/pancake-cli",
+    "--input",
+    "/tmp/pancake-worktrees.t3paqgWM/p10-bench/artifacts/p10-scale-preflight/t50-pair/focus_000.tif",
+    "/tmp/pancake-worktrees.t3paqgWM/p10-bench/artifacts/p10-scale-preflight/t50-pair/focus_006.tif",
+    "--output",
+    "/tmp/pancake-worktrees.t3paqgWM/p5-registration/artifacts/p10-registration/green-t50/result.tif",
+    "--gpu",
+    "--method",
+    "hybrid",
+    "--align",
+    "--alignment-mode",
+    "similarity",
+    "--alignment-ref",
+    "first",
+    "--kernel-size",
+    "6",
+    "--pyramid-levels",
+    "8",
+    "--scale-factor",
+    "6",
+    "--slab-size",
+    "0",
+    "--slab-overlap",
+    "0",
+    "--bit-depth",
+    "16",
+    "--auto-crop",
+    "--gpu-id",
+    "0"
+  ],
+  "input_sha256": {
+    "/tmp/pancake-worktrees.t3paqgWM/p10-bench/artifacts/p10-scale-preflight/t50-pair/focus_000.tif": "22321de901e18d3c655f96268b78e2c5fb7121d57d3734cff67d2bd761c1c78c",
+    "/tmp/pancake-worktrees.t3paqgWM/p10-bench/artifacts/p10-scale-preflight/t50-pair/focus_006.tif": "56751feb8fcee6013ce48f6eed07df537dcb4bbd0d292eb71fb598d865920a11"
+  },
+  "output": {
+    "sha256": "fa6458a28a5d66ef2fa2a9fb4491102880ee918efc5c1bee77ec529344a84699",
+    "shape": [
+      3998,
+      5998,
+      3
+    ],
+    "dtype": "uint16",
+    "min": 6073,
+    "max": 58974
+  },
+  "exact_identity_transforms": 2,
+  "inputs_unchanged": true,
+  "events_sha256": "05d7e02a777bcf73dbebceb5b88c7ce053362196526902f1824987ff20b4f279",
+  "actual_runtime": "wgpu-vulkan",
+  "physical_device": "NVIDIA GeForce RTX 3090",
+  "status": "functional_pass"
+}

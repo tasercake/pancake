@@ -29,6 +29,18 @@ fn crop_and_warp_preserve_rgb_coordinates(device: &cubecl::Device) -> Result<(),
             "symmetric crop lacks expected interpolation margin: {crop:?}"
         ));
     }
+    if symmetric_crop(25, 23, &[Affine::IDENTITY])? != Bounds::new(1, 1, 23, 21)? {
+        return Err(
+            "aligned identity crop did not preserve the one-pixel interpolation margin".to_owned(),
+        );
+    }
+    if symmetric_crop(25, 23, &[])? != Bounds::new(0, 0, 25, 23)? {
+        return Err("cropping without registration changed the canvas".to_owned());
+    }
+    let horizontal = Affine::from_matrix([[1.0, 0.0, 2.0], [0.0, 1.0, 0.0]])?;
+    if symmetric_crop(25, 23, &[horizontal])? != Bounds::new(3, 1, 19, 21)? {
+        return Err("a stationary axis lost its interpolation margin".to_owned());
+    }
     Ok(())
 }
 
