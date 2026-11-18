@@ -10,12 +10,16 @@ The workspace retains the archive under
 binaries match the release build hashes, their linked libraries resolve, and
 the desktop entry validates. APT simulated installation with the installed
 dependency set. The native installation test used rootless extraction into a
-temporary directory and executed the resulting binaries.
+temporary directory and executed the resulting binaries. A separate private
+desktop run launched the packaged desktop entry through `gio`, observed its
+Pancake window and checked the live process arguments. Both file paths arrived
+as individual arguments, including a path with spaces and non-BMP Unicode.
 
 This checkpoint predates subsequent GUI and registration changes. Its receipts
 apply to the exact `0859deb` binary, lock and descriptor. Final platform and
 full-case acceptance need a combined revision and fresh matching runs.
 
 - [Package and smoke receipt](0859deb/receipt.json)
+- [Packaged desktop entry launch and argv](0859deb/desktop-entry-receipt.json)
 - [Native launch and Slint source-path check](0859deb/slint-receipt.json)
 - [APT simulation](0859deb/apt-simulation.txt)
