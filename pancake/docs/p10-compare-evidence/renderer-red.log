@@ -1,0 +1,17 @@
+07d74bbdc898b94eeb837fded780705ff224b81d
+   Compiling pancake-gui v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/crates/pancake-gui)
+    Finished `test` profile [unoptimized] target(s) in 1.85s
+     Running unittests src/main.rs (target/debug/build/pancake-gui/feaf22877c3626eb/out/pancake_gui-feaf22877c3626eb)
+
+running 1 test
+Error: "the default split must show the source at the left edge at (280, 305): expected Rgb { r: 13, g: 229, b: 91 }, got Rgb { r: 237, g: 19, b: 63 }"
+test tests::comparison_clips_source_to_left_of_split ... FAILED
+
+failures:
+
+failures:
+    tests::comparison_clips_source_to_left_of_split
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.55s
+
+error: test failed, to rerun pass `-p pancake-gui --bin pancake-gui`

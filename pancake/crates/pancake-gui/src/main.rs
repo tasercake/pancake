@@ -18,6 +18,9 @@ pub mod preview;
 pub mod session;
 pub mod sources;
 
+#[cfg(test)]
+mod tests;
+
 /// Repository-owned declarative presentation.
 const WINDOW: &str = include_str!("workspace.slint");
 
