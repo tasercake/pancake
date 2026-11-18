@@ -137,6 +137,40 @@ duplicate entry. Clap's derive proc macro parses Rust input and generates the
 CLI parser. All `syn` ASTs stay within their own proc-macro expansions. The
 duplicate exception keeps its original expiry.
 
+## P7 native desktop graph
+
+The locked GUI crate adds Slint 1.19 with its safe interpreter, GTK 3.24 file
+panels on Linux, and rfd 0.18 native panels on macOS and Windows. The source
+patches for Rowan and spin_on remain active in the GUI graph. Detecting both
+toolkits in the same target or reaching either from the core or CLI fails
+the resolved-graph regression. Linux hosted builds provision `libgtk-3-dev`
+and check the selected GTK pkg-config minimum before compiling.
+
+The desktop target union adds exact parent paths for existing duplicate
+versions, including GLib/Cairo bitflags, GTK/GLib proc-macro syntax, and rfd
+AppKit/Windows bindings. Two exact Uniform Type Identifiers versions are
+reviewed for Clippy's all-target inventory. The UIKit version appears only
+in dormant iOS metadata. rfd uses the AppKit version for local filename
+filters. The cargo-deny target union does not skip that pair. Existing
+Slint-induced duplicate skips are restored only where the desktop target union
+reports the exact older version again.
+
+The locked GTK3 graph produces no additional advisory IDs in pinned Cargo-deny.
+[RustSec's GTK3 advisory](https://rustsec.org/advisories/RUSTSEC-2024-0415.html)
+records its withdrawal after upstream development resumed. The five existing
+maintenance reviews retain their original expiry. The Chrono review binds
+both the retained Rawler and reactivated Slint paths to their original
+reviewed versions.
+
+Canonical Miri still runs every first-party library test on Darwin. GTK,
+rfd and Slint are isolated in the GUI binary, whose native checks stay in
+the workspace CPU, coverage, layout and sanitizer selectors. The reviewed
+source inventory now pins the embedded Slint declaration with the Rust and
+Cargo inputs. Mutation generation and the associated test suite now span
+the workspace. The locked draft listed 2,261 mutations with this selection,
+including six CLI mutations and 135 GUI mutations. That is an inventory,
+with actual outcomes recorded by the applicable mutation gate.
+
 ## Unused dependencies
 
 `check_unused_dependencies.py` passes each actual first-party workspace manifest
