@@ -1,0 +1,19 @@
+//! Isolated linkage check for the production native services.
+#[path = "../../../../pancake/crates/pancake-gui/src/history.rs"]
+pub mod history;
+
+#[cfg(feature = "native")]
+extern crate self as slint_interpreter;
+
+/// Stub for the unused Slint parent on the Linux panel backend.
+#[cfg(feature = "native")]
+#[derive(Debug)]
+pub struct ComponentInstance;
+
+#[cfg(feature = "native")]
+#[path = "../../../../pancake/crates/pancake-gui/src/panel/mod.rs"]
+pub mod panel;
+
+#[cfg(feature = "native")]
+#[path = "../../../../pancake/crates/pancake-gui/src/desktop_menu.rs"]
+pub mod desktop_menu;

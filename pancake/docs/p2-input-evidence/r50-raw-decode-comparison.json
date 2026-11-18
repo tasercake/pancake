@@ -1,0 +1,44 @@
+{
+  "runtime": "rawpy 0.26.1, LibRaw (0, 22, 0)",
+  "reference_settings": {
+    "use_camera_wb": true,
+    "no_auto_bright": true,
+    "output_bps": 16
+  },
+  "pancake_shape": [
+    3392,
+    5088,
+    3
+  ],
+  "libraw_full_shape": [
+    3412,
+    5118,
+    3
+  ],
+  "common_explicit_camera_crop": [
+    3392,
+    5088,
+    3
+  ],
+  "metadata": {
+    "raw_height": 3574,
+    "raw_width": 5376,
+    "height": 3412,
+    "width": 5118,
+    "top_margin": 162,
+    "left_margin": 258,
+    "iheight": 3412,
+    "iwidth": 5118,
+    "pixel_aspect": 1.0,
+    "flip": 0,
+    "crop_left_margin": 272,
+    "crop_top_margin": 172,
+    "crop_width": 5088,
+    "crop_height": 3392
+  },
+  "source_sha256": "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca",
+  "rawler_f32_pixels_sha256": "688513e0fb134cea138c1c9bb5a59a8f9edeb712400c09ed3872e77344a5e2b8",
+  "mean_abs_normalized": 0.07557162642478943,
+  "p99_abs_normalized": 0.09413290023803711,
+  "max_abs_normalized": 0.7883878946304321
+}

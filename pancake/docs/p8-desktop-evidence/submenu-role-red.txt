@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/tmp/pancake-worktrees.t3paqgWM/p8-desktop/artifacts/p8-native/native_probe.py", line 58, in <module>
+    recent(ui)
+  File "/tmp/pancake-worktrees.t3paqgWM/p8-desktop/artifacts/p8-native/native_probe.py", line 32, in recent
+    assert item["role"] == "AXMenuItem", item
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'path': [0, 1, 0, 2], 'id': 'recent.open', 'role': 'AXMenu', 'title': 'Open Recent', 'value': 'Open Recent', 'description': '', 'enabled': True, 'position': [428, 504], 'size': [168, 27]}

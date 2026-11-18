@@ -58,7 +58,8 @@ shared GPU/window crate; native runtime/interop tests are still required.
 
 ## Temporary maintenance notices
 
-Only the five reviewed **unmaintained** IDs below may receive exceptions. Other
+Only the five reviewed **unmaintained** IDs below may receive exceptions when
+the configured target graph requires them. Other
 advisories, including any new security issue for these crates, remain enforced.
 Cargo-deny ignores advisory IDs globally, so the helper additionally binds each ID
 to exact active package versions and their reviewed immediate parent paths.
@@ -106,6 +107,80 @@ The review expires on 2026-12-17 and remains bound to exact package versions,
 parent versions and declared requirements. No date/time dependency or upstream
 source was replaced here. A maintained replacement still needs compatible
 parsing/formatting, invalid-input, calendar and local-time behavior checks.
+
+### P1 headless dependency graph
+
+The workspace resolves the core and CLI without Slint or its window toolkits.
+The isolated P0 UI qualification preserves exact
+Slint and Slint Interpreter pins for the separate GUI consumer. The core retains the exact CubeCL and wgpu versions and selected backend features,
+including wgpu-hal's dynamic EGL/Wayland loader support. The graph regression
+checks both headless packages across supported targets. It accepts the low-level
+`wayland-sys` loader and rejects the Slint, winit, X11 and Wayland client graphs.
+
+Removing Slint makes the Chrono maintenance ignore and five cargo-deny skips
+unneeded for the headless target union. The affected skips are `getrandom`
+0.3.4, `glow` 0.17.0, `linux-raw-sys` 0.4.15, `rustix` 0.38.44 and
+`windows-sys` 0.52.0. The audit still checks dormant, Clippy-relevant version
+and parent edges. The previous Chrono review remains in the P0 ledger at
+`34dd609`; reuse requires an active target graph with unchanged reviewed
+versions and relationships before the original expiry.
+
+Bounded image diagnostics activate a new Chrono consumer in Rawler. The exact
+maintenance review records Rawler 0.8.0's date and metadata calls and retains the
+original expiry. This does not restore the Slint paths to the headless graph.
+The codec graph also adds reviewed container, parser and compression generations
+to the exact duplicate ledger. The pinned Cargo-deny target union finishes with
+advisories, bans and sources checked with warnings denied.
+
+Clap 4.6.8 adds a reviewed compile-time parent to the existing `syn` 3.0.10
+duplicate entry. Clap's derive proc macro parses Rust input and generates the
+CLI parser. All `syn` ASTs stay within their own proc-macro expansions. The
+duplicate exception keeps its original expiry.
+
+## P7 native desktop graph
+
+The locked GUI crate adds Slint 1.19 with its safe interpreter, GTK 3.24 file
+panels and ATK accessibility on Linux, and rfd 0.18 native panels on macOS
+and Windows. The source
+patches for Rowan and spin_on remain active in the GUI graph. Detecting both
+toolkits in the same target or reaching either from the core or CLI fails
+the resolved-graph regression. Linux hosted builds provision `libgtk-3-dev`
+and check the GTK 3.24 and ATK 2.34 pkg-config minimums before compiling.
+
+The desktop target union adds exact parent paths for existing duplicate
+versions, including GLib/Cairo bitflags, GTK/GLib proc-macro syntax, and rfd
+AppKit/Windows bindings. Two exact Uniform Type Identifiers versions are
+reviewed for Clippy's all-target inventory. The UIKit version appears only
+in dormant iOS metadata. rfd uses the AppKit version for local filename
+filters. The cargo-deny target union does not skip that pair. Existing
+Slint-induced duplicate skips are restored only where the desktop target union
+reports the exact older version again.
+
+The locked GTK3 graph produces no additional advisory IDs in pinned Cargo-deny.
+[RustSec's GTK3 advisory](https://rustsec.org/advisories/RUSTSEC-2024-0415.html)
+records its withdrawal after upstream development resumed. The five existing
+maintenance reviews retain their original expiry. The Chrono review binds
+both the retained Rawler and reactivated Slint paths to their original
+reviewed versions.
+
+The Linux-only dialog handoff adds exact GDK X11 bindings 0.19.0,
+their matching sys crate, and X11 2.21.0. The GUI also declares x11rb 0.13.2
+directly, using the version already resolved for winit. GDK X11 associates
+the GTK panel with its actual X11 owner window. x11rb reads the current
+window-relative pointer position when a real button event arrives after a
+panel closes. The development package already supplies the native GDK X11
+and X11 edges. The graph regression and Linux pkg-config probe check both
+explicitly. The configured Cargo-deny audit adds no duplicate or advisory
+exception for these packages.
+
+Canonical Miri still runs every first-party library test on Darwin. GTK,
+rfd and Slint are isolated in the GUI binary, whose native checks stay in
+the workspace CPU, coverage, layout and sanitizer selectors. The reviewed
+source inventory now pins the embedded Slint declaration with the Rust and
+Cargo inputs. Mutation generation and the associated test suite now span
+the workspace. The locked draft listed 2,261 mutations with this selection,
+including six CLI mutations and 135 GUI mutations. That is an inventory,
+with actual outcomes recorded by the applicable mutation gate.
 
 ## Unused dependencies
 

@@ -178,6 +178,11 @@
           "requirement": "^2.2.1"
         },
         {
+          "name": "cairo-rs",
+          "version": "0.22.11",
+          "requirement": "^2.10"
+        },
+        {
           "name": "calloop",
           "version": "0.13.0",
           "requirement": "^2.4"
@@ -221,6 +226,11 @@
           "name": "gbm",
           "version": "0.18.0",
           "requirement": "^2"
+        },
+        {
+          "name": "glib",
+          "version": "0.22.11",
+          "requirement": "^2.10"
         },
         {
           "name": "glutin",
@@ -610,6 +620,11 @@
           "requirement": "^0.6.2"
         },
         {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
           "name": "objc2-core-foundation",
           "version": "0.3.2",
           "requirement": ">=0.6.1, <0.8.0"
@@ -633,6 +648,11 @@
           "name": "objc2-ui-kit",
           "version": "0.3.2",
           "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
+          "requirement": "^0.6.0"
         },
         {
           "name": "wgpu-hal",
@@ -1273,9 +1293,19 @@
           "name": "gpu-allocator",
           "version": "0.28.0",
           "requirement": "^0.16.0"
+        },
+        {
+          "name": "libflate_lz77",
+          "version": "2.3.0",
+          "requirement": "^0.16"
+        },
+        {
+          "name": "slint-interpreter",
+          "version": "1.19.0",
+          "requirement": "^0.16"
         }
       ],
-      "reviewed_on": "2026-11-17",
+      "reviewed_on": "2026-11-18",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
       "cargo_deny_skip": true
@@ -1426,6 +1456,22 @@
       "expires_on": "2027-02-15",
       "clippy_allow": true,
       "cargo_deny_skip": false
+    },
+    {
+      "name": "itertools",
+      "version": "0.14.0",
+      "reason": "Rawler calibrates camera samples with private 0.14 iterator adapters while CubeCL and Slint require 0.15; these types do not cross the public image or device boundary.",
+      "parents": [
+        {
+          "name": "rawler",
+          "version": "0.8.0",
+          "requirement": "^0.14"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": true,
+      "clippy_allow": true
     },
     {
       "name": "itertools",
@@ -1644,6 +1690,22 @@
     },
     {
       "name": "linux-raw-sys",
+      "version": "0.12.1",
+      "reason": "Rustix generations require their matching Linux syscall bindings. Binding types remain internal to each syscall wrapper.",
+      "parents": [
+        {
+          "name": "rustix",
+          "version": "1.1.6",
+          "requirement": "^0.12"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "linux-raw-sys",
       "version": "0.4.15",
       "reason": "Rustix generations require their matching Linux syscall bindings. Binding types remain internal to each syscall wrapper.",
       "parents": [
@@ -1675,33 +1737,22 @@
       "cargo_deny_skip": false
     },
     {
-      "name": "linux-raw-sys",
-      "version": "0.12.1",
-      "reason": "Rustix generations require their matching Linux syscall bindings. Binding types remain internal to each syscall wrapper.",
-      "parents": [
-        {
-          "name": "rustix",
-          "version": "1.1.6",
-          "requirement": "^0.12"
-        }
-      ],
-      "reviewed_on": "2026-11-17",
-      "expires_on": "2027-02-15",
-      "clippy_allow": true,
-      "cargo_deny_skip": false
-    },
-    {
       "name": "miniz_oxide",
       "version": "0.8.9",
       "reason": "Image/compression and backtrace parents require different decompression APIs; each owns its buffers and decompressor state.",
       "parents": [
+        {
+          "name": "exr",
+          "version": "1.74.3",
+          "requirement": "^0.8.0"
+        },
         {
           "name": "png",
           "version": "0.18.1",
           "requirement": "^0.8"
         }
       ],
-      "reviewed_on": "2026-11-17",
+      "reviewed_on": "2026-11-18",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
       "cargo_deny_skip": true
@@ -2003,8 +2054,18 @@
           "requirement": ">=0.6.2, <0.8.0"
         },
         {
+          "name": "objc2-uniform-type-identifiers",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
           "name": "raw-window-metal",
           "version": "1.1.0",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.6.0"
         },
         {
@@ -2087,6 +2148,11 @@
         {
           "name": "muda",
           "version": "0.21.2",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.3.0"
         },
         {
@@ -2262,8 +2328,18 @@
           "requirement": "^0.3.2"
         },
         {
+          "name": "objc2-uniform-type-identifiers",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
           "name": "raw-window-metal",
           "version": "1.1.0",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.3.0"
         },
         {
@@ -2449,6 +2525,43 @@
       "cargo_deny_skip": false
     },
     {
+      "name": "objc2-uniform-type-identifiers",
+      "version": "0.2.2",
+      "reason": "UIKit needs its matching Uniform Type Identifiers binding generation in dormant iOS metadata. AppKit and rfd use the other generation to build native macOS panel filters. Platform panel types stay inside their own toolkit.",
+      "parents": [
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
+    },
+    {
+      "name": "objc2-uniform-type-identifiers",
+      "version": "0.3.2",
+      "reason": "UIKit needs its matching Uniform Type Identifiers binding generation in dormant iOS metadata. AppKit and rfd use the other generation to build native macOS panel filters. Platform panel types stay inside their own toolkit.",
+      "parents": [
+        {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
+          "requirement": "^0.3.0"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
+    },
+    {
       "name": "prettyplease",
       "version": "0.2.37",
       "reason": "Different bindgen and CubeCL macro generations require distinct host syntax-printer APIs; generated Rust text crosses the boundary, not syntax-tree objects.",
@@ -2519,6 +2632,27 @@
     },
     {
       "name": "rand",
+      "version": "0.10.4",
+      "reason": "Optional monitoring/test-scheduler parents and CubeCL environment support require different random APIs; each parent owns its generators and produces plain values.",
+      "parents": [
+        {
+          "name": "cubecl-environment",
+          "version": "0.11.4",
+          "requirement": "^0.10.0"
+        },
+        {
+          "name": "twox-hash",
+          "version": "2.1.5",
+          "requirement": ">=0.9.0, <=0.11.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand",
       "version": "0.8.8",
       "reason": "Optional monitoring/test-scheduler parents and CubeCL environment support require different random APIs; each parent owns its generators and produces plain values.",
       "parents": [
@@ -2555,27 +2689,6 @@
       "cargo_deny_skip": false
     },
     {
-      "name": "rand",
-      "version": "0.10.4",
-      "reason": "Optional monitoring/test-scheduler parents and CubeCL environment support require different random APIs; each parent owns its generators and produces plain values.",
-      "parents": [
-        {
-          "name": "cubecl-environment",
-          "version": "0.11.4",
-          "requirement": "^0.10.0"
-        },
-        {
-          "name": "twox-hash",
-          "version": "2.1.5",
-          "requirement": ">=0.9.0, <=0.11.0"
-        }
-      ],
-      "reviewed_on": "2026-11-17",
-      "expires_on": "2027-02-15",
-      "clippy_allow": true,
-      "cargo_deny_skip": false
-    },
-    {
       "name": "rand_chacha",
       "version": "0.3.1",
       "reason": "Rand generations require matching ChaCha generator APIs; generator state stays private to each parent random implementation.",
@@ -2600,6 +2713,32 @@
           "name": "rand",
           "version": "0.9.5",
           "requirement": "^0.9.0"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "rand_core",
+      "version": "0.10.1",
+      "reason": "Rand/crypto generations require distinct RNG-trait APIs; generators remain parent-local and no cross-generation RNG object is shared.",
+      "parents": [
+        {
+          "name": "chacha20",
+          "version": "0.10.2",
+          "requirement": "^0.10"
+        },
+        {
+          "name": "getrandom",
+          "version": "0.4.3",
+          "requirement": "^0.10.0"
+        },
+        {
+          "name": "rand",
+          "version": "0.10.4",
+          "requirement": "^0.10.0"
         }
       ],
       "reviewed_on": "2026-11-17",
@@ -2657,32 +2796,6 @@
           "name": "rand_chacha",
           "version": "0.9.0",
           "requirement": "^0.9.0"
-        }
-      ],
-      "reviewed_on": "2026-11-17",
-      "expires_on": "2027-02-15",
-      "clippy_allow": true,
-      "cargo_deny_skip": false
-    },
-    {
-      "name": "rand_core",
-      "version": "0.10.1",
-      "reason": "Rand/crypto generations require distinct RNG-trait APIs; generators remain parent-local and no cross-generation RNG object is shared.",
-      "parents": [
-        {
-          "name": "chacha20",
-          "version": "0.10.2",
-          "requirement": "^0.10"
-        },
-        {
-          "name": "getrandom",
-          "version": "0.4.3",
-          "requirement": "^0.10.0"
-        },
-        {
-          "name": "rand",
-          "version": "0.10.4",
-          "requirement": "^0.10.0"
         }
       ],
       "reviewed_on": "2026-11-17",
@@ -2968,6 +3081,43 @@
       "cargo_deny_skip": false
     },
     {
+      "name": "serde_spanned",
+      "version": "0.6.9",
+      "reason": "Rawler's embedded camera catalog compiler uses TOML 0.8 and its serde spans; CubeCL runtime settings use TOML 1.2. Parsed configuration and spans remain private.",
+      "parents": [
+        {
+          "name": "toml",
+          "version": "0.8.23",
+          "requirement": "^0.6.9"
+        },
+        {
+          "name": "toml_edit",
+          "version": "0.22.27",
+          "requirement": "^0.6.9"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": true,
+      "clippy_allow": true
+    },
+    {
+      "name": "serde_spanned",
+      "version": "1.1.3",
+      "reason": "Rawler's embedded camera catalog compiler uses TOML 0.8 and its serde spans; CubeCL runtime settings use TOML 1.2. Parsed configuration and spans remain private.",
+      "parents": [
+        {
+          "name": "toml",
+          "version": "1.2.1+spec-1.1.0",
+          "requirement": "^1.1.3"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
+    },
+    {
       "name": "shlex",
       "version": "1.3.0",
       "reason": "Legacy and current binding/native-build generators require different shell-tokenizer APIs; these host-side token streams stay inside each build tool.",
@@ -3064,6 +3214,11 @@
       "parents": [
         {
           "name": "i-slint-compiler",
+          "version": "1.19.0",
+          "requirement": "^0.3.1"
+        },
+        {
+          "name": "slint-interpreter",
           "version": "1.19.0",
           "requirement": "^0.3.1"
         }
@@ -3213,6 +3368,11 @@
           "requirement": "^2.0"
         },
         {
+          "name": "enumn",
+          "version": "0.1.14",
+          "requirement": "^2.0.46"
+        },
+        {
           "name": "jni-macros",
           "version": "0.22.4",
           "requirement": "^2.0"
@@ -3226,6 +3386,11 @@
           "name": "miette-derive",
           "version": "7.6.0",
           "requirement": "^2.0.87"
+        },
+        {
+          "name": "multiversion-macros",
+          "version": "0.8.1",
+          "requirement": "^2.0.1"
         },
         {
           "name": "num_enum_derive",
@@ -3318,7 +3483,7 @@
           "requirement": "^2.0.46"
         }
       ],
-      "reviewed_on": "2026-11-17",
+      "reviewed_on": "2026-11-18",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
       "cargo_deny_skip": true
@@ -3339,9 +3504,19 @@
           "requirement": "^3"
         },
         {
+          "name": "bindgen",
+          "version": "0.73.2",
+          "requirement": ">=2, <4"
+        },
+        {
           "name": "bytemuck_derive",
           "version": "1.12.1",
           "requirement": "^3"
+        },
+        {
+          "name": "clap_derive",
+          "version": "4.6.8",
+          "requirement": "^3.0.10"
         },
         {
           "name": "const-field-offset-macro",
@@ -3381,6 +3556,16 @@
         {
           "name": "futures-macro",
           "version": "0.3.34",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "glib-macros",
+          "version": "0.22.11",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "gtk3-macros",
+          "version": "0.19.0",
           "requirement": "^3.0"
         },
         {
@@ -3469,7 +3654,7 @@
           "requirement": "^3.0"
         }
       ],
-      "reviewed_on": "2026-11-17",
+      "reviewed_on": "2026-11-18",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
       "cargo_deny_skip": false
@@ -3596,6 +3781,11 @@
           "requirement": "^2"
         },
         {
+          "name": "rawler",
+          "version": "0.8.0",
+          "requirement": "^2.0"
+        },
+        {
           "name": "redox_users",
           "version": "0.5.3",
           "requirement": "^2.0"
@@ -3641,7 +3831,7 @@
           "requirement": "^2.0.12"
         }
       ],
-      "reviewed_on": "2026-11-17",
+      "reviewed_on": "2026-11-18",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
       "cargo_deny_skip": false
@@ -3748,6 +3938,132 @@
       "cargo_deny_skip": false
     },
     {
+      "name": "toml",
+      "version": "0.8.23",
+      "reason": "Rawler 0.8 pins TOML 0.8 for embedded camera data and build-time camera tables. CubeCL configuration needs the 1.x format API; neither exports TOML document types.",
+      "parents": [
+        {
+          "name": "rawler",
+          "version": "0.8.0",
+          "requirement": "=0.8"
+        },
+        {
+          "name": "rawler",
+          "version": "0.8.0",
+          "requirement": "^0.8"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": true,
+      "clippy_allow": true
+    },
+    {
+      "name": "toml",
+      "version": "1.2.1+spec-1.1.0",
+      "reason": "Rawler 0.8 pins TOML 0.8 for embedded camera data and build-time camera tables. CubeCL configuration needs the 1.x format API; neither exports TOML document types.",
+      "parents": [
+        {
+          "name": "cubecl-environment",
+          "version": "0.11.4",
+          "requirement": "^1"
+        },
+        {
+          "name": "cubecl-runtime",
+          "version": "0.11.4",
+          "requirement": "^1"
+        },
+        {
+          "name": "skia-bindings",
+          "version": "0.157.0",
+          "requirement": "^1.0.3"
+        },
+        {
+          "name": "system-deps",
+          "version": "9.0.1",
+          "requirement": "^1"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
+    },
+    {
+      "name": "toml_datetime",
+      "version": "0.6.11",
+      "reason": "Rawler's embedded camera table TOML reader and CubeCL runtime settings use different TOML APIs; date values stay private to their dependency.",
+      "parents": [
+        {
+          "name": "toml",
+          "version": "0.8.23",
+          "requirement": "^0.6.11"
+        },
+        {
+          "name": "toml_edit",
+          "version": "0.22.27",
+          "requirement": "^0.6.11"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": true,
+      "clippy_allow": true
+    },
+    {
+      "name": "toml_datetime",
+      "version": "1.1.3+spec-1.1.0",
+      "reason": "Rawler's embedded camera table TOML reader and CubeCL runtime settings use different TOML APIs; date values stay private to their dependency.",
+      "parents": [
+        {
+          "name": "toml",
+          "version": "1.2.1+spec-1.1.0",
+          "requirement": "^1.1.3"
+        },
+        {
+          "name": "toml_edit",
+          "version": "0.25.19+spec-1.1.0",
+          "requirement": "^1.1.3"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
+    },
+    {
+      "name": "toml_edit",
+      "version": "0.22.27",
+      "reason": "Rawler's camera table build uses TOML 0.8 editing types. Procedural macro dependency discovery uses the newer 0.25 generation; both stay inside dependency compilation or metadata parsing.",
+      "parents": [
+        {
+          "name": "toml",
+          "version": "0.8.23",
+          "requirement": "^0.22.27"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": true,
+      "clippy_allow": true
+    },
+    {
+      "name": "toml_edit",
+      "version": "0.25.19+spec-1.1.0",
+      "reason": "Rawler's camera table build uses TOML 0.8 editing types. Procedural macro dependency discovery uses the newer 0.25 generation; both stay inside dependency compilation or metadata parsing.",
+      "parents": [
+        {
+          "name": "proc-macro-crate",
+          "version": "3.5.0",
+          "requirement": "^0.25.0"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
+    },
+    {
       "name": "unicode-width",
       "version": "0.1.14",
       "reason": "Diagnostic renderers require different Unicode width APIs; each computes scalar widths locally without sharing layout objects.",
@@ -3777,6 +4093,22 @@
           "name": "codespan-reporting",
           "version": "0.13.1",
           "requirement": ">=0.1, <0.3"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2027-02-15",
+      "clippy_allow": true,
+      "cargo_deny_skip": false
+    },
+    {
+      "name": "windows-core",
+      "version": "0.100.0",
+      "reason": "Desktop graphics/accessibility wrappers and optional generator support require different Windows core bindings; their native wrappers remain parent-owned.",
+      "parents": [
+        {
+          "name": "generator",
+          "version": "0.8.12",
+          "requirement": "^0.100"
         }
       ],
       "reviewed_on": "2026-11-17",
@@ -3841,14 +4173,14 @@
       "cargo_deny_skip": false
     },
     {
-      "name": "windows-core",
+      "name": "windows-implement",
       "version": "0.100.0",
-      "reason": "Desktop graphics/accessibility wrappers and optional generator support require different Windows core bindings; their native wrappers remain parent-owned.",
+      "reason": "Matching Windows core generations require corresponding implementation macros; host-generated interfaces stay within each core binding family.",
       "parents": [
         {
-          "name": "generator",
-          "version": "0.8.12",
-          "requirement": "^0.100"
+          "name": "windows-core",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
         }
       ],
       "reviewed_on": "2026-11-17",
@@ -3873,9 +4205,9 @@
       "cargo_deny_skip": false
     },
     {
-      "name": "windows-implement",
+      "name": "windows-interface",
       "version": "0.100.0",
-      "reason": "Matching Windows core generations require corresponding implementation macros; host-generated interfaces stay within each core binding family.",
+      "reason": "Matching Windows core generations require corresponding interface macros; host-generated interfaces stay within each core binding family.",
       "parents": [
         {
           "name": "windows-core",
@@ -3905,12 +4237,22 @@
       "cargo_deny_skip": false
     },
     {
-      "name": "windows-interface",
+      "name": "windows-link",
       "version": "0.100.0",
-      "reason": "Matching Windows core generations require corresponding interface macros; host-generated interfaces stay within each core binding family.",
+      "reason": "Different Windows binding families require distinct symbol-link helper generations; symbol declarations remain inside the native wrapper that uses them.",
       "parents": [
         {
           "name": "windows-core",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
+        },
+        {
+          "name": "windows-result",
+          "version": "0.100.0",
+          "requirement": "^0.100.0"
+        },
+        {
+          "name": "windows-strings",
           "version": "0.100.0",
           "requirement": "^0.100.0"
         }
@@ -4002,22 +4344,12 @@
       "cargo_deny_skip": false
     },
     {
-      "name": "windows-link",
+      "name": "windows-result",
       "version": "0.100.0",
-      "reason": "Different Windows binding families require distinct symbol-link helper generations; symbol declarations remain inside the native wrapper that uses them.",
+      "reason": "Different Windows core families require matching HRESULT/result wrappers; parent-owned error wrappers are handled through documented APIs.",
       "parents": [
         {
           "name": "windows-core",
-          "version": "0.100.0",
-          "requirement": "^0.100.0"
-        },
-        {
-          "name": "windows-result",
-          "version": "0.100.0",
-          "requirement": "^0.100.0"
-        },
-        {
-          "name": "windows-strings",
           "version": "0.100.0",
           "requirement": "^0.100.0"
         }
@@ -4049,9 +4381,9 @@
       "cargo_deny_skip": false
     },
     {
-      "name": "windows-result",
+      "name": "windows-strings",
       "version": "0.100.0",
-      "reason": "Different Windows core families require matching HRESULT/result wrappers; parent-owned error wrappers are handled through documented APIs.",
+      "reason": "Different Windows core families require matching native string wrappers; native string ownership stays within its binding family.",
       "parents": [
         {
           "name": "windows-core",
@@ -4073,22 +4405,6 @@
           "name": "windows-core",
           "version": "0.62.2",
           "requirement": "^0.5.1"
-        }
-      ],
-      "reviewed_on": "2026-11-17",
-      "expires_on": "2027-02-15",
-      "clippy_allow": true,
-      "cargo_deny_skip": false
-    },
-    {
-      "name": "windows-strings",
-      "version": "0.100.0",
-      "reason": "Different Windows core families require matching native string wrappers; native string ownership stays within its binding family.",
-      "parents": [
-        {
-          "name": "windows-core",
-          "version": "0.100.0",
-          "requirement": "^0.100.0"
         }
       ],
       "reviewed_on": "2026-11-17",
@@ -4183,6 +4499,11 @@
           "requirement": "^0.61.2"
         },
         {
+          "name": "gio-sys",
+          "version": "0.22.11",
+          "requirement": ">=0.52, <=0.61"
+        },
+        {
           "name": "home",
           "version": "0.5.12",
           "requirement": "^0.61"
@@ -4200,6 +4521,11 @@
         {
           "name": "polling",
           "version": "3.11.0",
+          "requirement": "^0.61"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.61"
         },
         {
@@ -4242,9 +4568,172 @@
       "expires_on": "2027-02-15",
       "clippy_allow": true,
       "cargo_deny_skip": false
+    },
+    {
+      "name": "winnow",
+      "version": "0.7.15",
+      "reason": "Rawler depends on the TOML 0.8 parser while core dependency metadata and accessibility use the newer TOML parser generation; parse state and borrowed text do not cross those boundaries.",
+      "parents": [
+        {
+          "name": "toml_edit",
+          "version": "0.22.27",
+          "requirement": "^0.7.10"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": true,
+      "clippy_allow": true
+    },
+    {
+      "name": "winnow",
+      "version": "1.0.5",
+      "reason": "Rawler depends on the TOML 0.8 parser while core dependency metadata and accessibility use the newer TOML parser generation; parse state and borrowed text do not cross those boundaries.",
+      "parents": [
+        {
+          "name": "toml",
+          "version": "1.2.1+spec-1.1.0",
+          "requirement": "^1.0.0"
+        },
+        {
+          "name": "toml_edit",
+          "version": "0.25.19+spec-1.1.0",
+          "requirement": "^1.0.0"
+        },
+        {
+          "name": "toml_parser",
+          "version": "1.1.5+spec-1.1.0",
+          "requirement": "^1.0.0"
+        },
+        {
+          "name": "zbus",
+          "version": "5.19.0",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "zbus_names",
+          "version": "4.3.5",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "zbus_xml",
+          "version": "5.2.1",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "zvariant",
+          "version": "5.15.1",
+          "requirement": "^1.0"
+        },
+        {
+          "name": "zvariant_utils",
+          "version": "4.2.0",
+          "requirement": "^1.0"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
     }
   ],
   "advisory_exceptions": [
+    {
+      "name": "chrono",
+      "version": "0.4.45",
+      "reason": "Temporary maintenance-only exception for Slint 1.19 date/calendar APIs plus Rawler camera metadata and exact dormant Turso metadata paths; replacement must preserve date/text/calendar/local-time and SQL timestamp behavior.",
+      "parents": [
+        {
+          "name": "i-slint-core",
+          "version": "1.19.0",
+          "requirement": "^0.4"
+        },
+        {
+          "name": "rawler",
+          "version": "0.8.0",
+          "requirement": "^0.4"
+        },
+        {
+          "name": "turso_core",
+          "version": "0.8.3",
+          "requirement": "^0.4.42"
+        },
+        {
+          "name": "turso_ext",
+          "version": "0.8.3",
+          "requirement": "^0.4.42"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2026-12-17",
+      "id": "RUSTSEC-2026-0543",
+      "exposure_review": "Active i-slint-core date_time.rs parses UI date/format strings, computes calendar month/weekday values, formats dates and reads Local::now plus system clock/timezone. Full metadata also includes dormant Turso_core/ext paths: SQL timestamp/date/RFC3339 parsing and arithmetic, timezone conversion, clock/pragma date values and VFS current-time formatting. Rawler 0.8 provides EXIF modification-time parsing and local offset fallback in RawMetadata::last_modified and writes a local timestamp during RAW-to-DNG conversion. Pancake calls camera sensor unpacking and development, which use neither metadata time conversion nor RAW-to-DNG export. The exception covers this exact resolved Rawler parent; no security advisory is downgraded.",
+      "removal_condition": "Adopt maintained date/time implementations through compatible upstream releases or a separately reviewed migration; validate parsing/formatting, invalid inputs, calendar/local-time boundaries and any activated SQL timestamp paths before removing this review.",
+      "advisory_review": {
+        "date": "2026-09-14",
+        "informational": "unmaintained",
+        "patched_versions": [],
+        "url": "https://github.com/chronotope/chrono/issues/1768",
+        "advisory_sha256": "18424c6a155f754151a55ce9fb73376bf66f3709d81750d921f5293da91ccc59",
+        "classification": "Maintenance notice; no security vulnerability classification is downgraded."
+      },
+      "source_review": [
+        {
+          "package": "i-slint-core",
+          "version": "1.19.0",
+          "file": "date_time.rs",
+          "sha256": "8f19a965b75f2e27ff217d4493195547a220a060a57ac9f5bca499d03e6e2f55"
+        },
+        {
+          "package": "turso_core",
+          "version": "0.8.3",
+          "file": "functions/datetime.rs",
+          "sha256": "756f802dea07e41a6484a5a7b574e31df03070cdedbbbfb715824722b8a0140e"
+        },
+        {
+          "package": "turso_core",
+          "version": "0.8.3",
+          "file": "time/mod.rs",
+          "sha256": "898d7fa8b6afa949062ecc441f3e8944f1dfa870127b02fc176b320f5f44e81b"
+        },
+        {
+          "package": "turso_core",
+          "version": "0.8.3",
+          "file": "time/internal.rs",
+          "sha256": "91c21503e4bffd8da8a4b47e5c109a77340a34b7f0a739bb7382bc566dbfddee"
+        },
+        {
+          "package": "turso_core",
+          "version": "0.8.3",
+          "file": "io/clock.rs",
+          "sha256": "9eb5070e2f158f18f750e41c1b3fca6a9e7b33742fc77f3cc4afa9fa1a3e7cf7"
+        },
+        {
+          "package": "turso_core",
+          "version": "0.8.3",
+          "file": "translate/pragma.rs",
+          "sha256": "314657dd79a531dc20ffcee79f5a2114848885872d5e6d8276fdef30b91a87e7"
+        },
+        {
+          "package": "turso_ext",
+          "version": "0.8.3",
+          "file": "src/vfs_modules.rs",
+          "sha256": "56e633b8bc6678f4b1e1163f2235b9e46070199621229ea93d3482907930e425"
+        },
+        {
+          "package": "rawler",
+          "version": "0.8.0",
+          "file": "decoders/mod.rs",
+          "sha256": "3f4133be5b20e560f3ff47f20fb14c0719c1b572eb40347802e3f876854e96ce"
+        },
+        {
+          "package": "rawler",
+          "version": "0.8.0",
+          "file": "dng/convert.rs",
+          "sha256": "16e31028952a9aa92199a348bf48c9fcba137a88c69cafaf1eef078b7ce733fd"
+        }
+      ]
+    },
     {
       "name": "ttf-parser",
       "version": "0.25.1",
@@ -4261,6 +4750,38 @@
       "id": "RUSTSEC-2026-0192",
       "exposure_review": "Runtime system-font bytes selected by fc-match are memory-mapped and parsed by sctk-adwaita AbGlyphTitleText; embedded Cantarell is fallback. This is not compile-only. No photo-import parser exposure is claimed; malicious or corrupt installed font data remains an exposure.",
       "removal_condition": "Replace or upgrade the Wayland titlebar parser stack without dropping titlebars; validate Linux system-font selection and fallback."
+    },
+    {
+      "name": "zbus_names",
+      "version": "4.3.5",
+      "reason": "Temporary maintenance exception for zbus 5 name types required by the current accessibility/settings APIs; coordinated zbus 6 migration remains open.",
+      "parents": [
+        {
+          "name": "atspi-common",
+          "version": "0.13.0",
+          "requirement": "^4.1.1"
+        },
+        {
+          "name": "zbus",
+          "version": "5.19.0",
+          "requirement": "^4.3.4"
+        },
+        {
+          "name": "zbus_macros",
+          "version": "5.19.0",
+          "requirement": "^4.3.4"
+        },
+        {
+          "name": "zbus_xml",
+          "version": "5.2.1",
+          "requirement": "^4.3.4"
+        }
+      ],
+      "reviewed_on": "2026-11-17",
+      "expires_on": "2026-12-17",
+      "id": "RUSTSEC-2026-0371",
+      "exposure_review": "Runtime D-Bus names from accessibility/settings session-bus traffic are parsed/validated; local peers can supply input. Disabling accessibility to hide this dependency is not accepted.",
+      "removal_condition": "Migrate the coordinated zbus/AT-SPI name-type APIs and validate desktop settings and accessibility."
     },
     {
       "name": "zvariant",
@@ -4315,38 +4836,6 @@
       "removal_condition": "Migrate Slint, accesskit_unix, atspi, atspi-common and atspi-proxies together to zbus 6; validate native accessibility/settings."
     },
     {
-      "name": "zbus_names",
-      "version": "4.3.5",
-      "reason": "Temporary maintenance exception for zbus 5 name types required by the current accessibility/settings APIs; coordinated zbus 6 migration remains open.",
-      "parents": [
-        {
-          "name": "atspi-common",
-          "version": "0.13.0",
-          "requirement": "^4.1.1"
-        },
-        {
-          "name": "zbus",
-          "version": "5.19.0",
-          "requirement": "^4.3.4"
-        },
-        {
-          "name": "zbus_macros",
-          "version": "5.19.0",
-          "requirement": "^4.3.4"
-        },
-        {
-          "name": "zbus_xml",
-          "version": "5.2.1",
-          "requirement": "^4.3.4"
-        }
-      ],
-      "reviewed_on": "2026-11-17",
-      "expires_on": "2026-12-17",
-      "id": "RUSTSEC-2026-0371",
-      "exposure_review": "Runtime D-Bus names from accessibility/settings session-bus traffic are parsed/validated; local peers can supply input. Disabling accessibility to hide this dependency is not accepted.",
-      "removal_condition": "Migrate the coordinated zbus/AT-SPI name-type APIs and validate desktop settings and accessibility."
-    },
-    {
       "name": "zvariant_derive",
       "version": "5.15.1",
       "reason": "Temporary maintenance exception for code generation paired with zvariant 5; upgrading it independently would break generated wire-type implementations.",
@@ -4362,85 +4851,6 @@
       "id": "RUSTSEC-2026-0372",
       "exposure_review": "Host proc macro generates variant serialization/deserialization implementations used by runtime D-Bus accessibility/settings. The macro itself handles Rust syntax, while generated code handles session-bus input.",
       "removal_condition": "Migrate with zvariant and zbus 6; validate generated wire contracts and native accessibility/settings."
-    },
-    {
-      "name": "chrono",
-      "version": "0.4.45",
-      "reason": "Temporary maintenance-only exception for Slint 1.19 date/calendar APIs and exact dormant Turso metadata paths; replacement must preserve date/text/calendar/local-time and SQL timestamp behavior.",
-      "parents": [
-        {
-          "name": "i-slint-core",
-          "version": "1.19.0",
-          "requirement": "^0.4"
-        },
-        {
-          "name": "turso_core",
-          "version": "0.8.3",
-          "requirement": "^0.4.42"
-        },
-        {
-          "name": "turso_ext",
-          "version": "0.8.3",
-          "requirement": "^0.4.42"
-        }
-      ],
-      "reviewed_on": "2026-11-17",
-      "expires_on": "2026-12-17",
-      "id": "RUSTSEC-2026-0543",
-      "exposure_review": "Active i-slint-core date_time.rs parses UI date/format strings, computes calendar month/weekday values, formats dates and reads Local::now plus system clock/timezone. Full metadata also includes dormant Turso_core/ext paths: SQL timestamp/date/RFC3339 parsing and arithmetic, timezone conversion, clock/pragma date values and VFS current-time formatting. Runtime text/database/OS-time inputs are reviewed; these uses are not compile-only or image/RAW decoding. Current normal cargo tree reaches Chrono through Slint only.",
-      "removal_condition": "Adopt maintained date/time implementations through compatible upstream releases or a separately reviewed migration; validate parsing/formatting, invalid inputs, calendar/local-time boundaries and any activated SQL timestamp paths before removing this review.",
-      "advisory_review": {
-        "date": "2026-09-14",
-        "informational": "unmaintained",
-        "patched_versions": [],
-        "url": "https://github.com/chronotope/chrono/issues/1768",
-        "advisory_sha256": "18424c6a155f754151a55ce9fb73376bf66f3709d81750d921f5293da91ccc59",
-        "classification": "Maintenance notice; no security vulnerability classification is downgraded."
-      },
-      "source_review": [
-        {
-          "package": "i-slint-core",
-          "version": "1.19.0",
-          "file": "date_time.rs",
-          "sha256": "8f19a965b75f2e27ff217d4493195547a220a060a57ac9f5bca499d03e6e2f55"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "functions/datetime.rs",
-          "sha256": "756f802dea07e41a6484a5a7b574e31df03070cdedbbbfb715824722b8a0140e"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "time/mod.rs",
-          "sha256": "898d7fa8b6afa949062ecc441f3e8944f1dfa870127b02fc176b320f5f44e81b"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "time/internal.rs",
-          "sha256": "91c21503e4bffd8da8a4b47e5c109a77340a34b7f0a739bb7382bc566dbfddee"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "io/clock.rs",
-          "sha256": "9eb5070e2f158f18f750e41c1b3fca6a9e7b33742fc77f3cc4afa9fa1a3e7cf7"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "translate/pragma.rs",
-          "sha256": "314657dd79a531dc20ffcee79f5a2114848885872d5e6d8276fdef30b91a87e7"
-        },
-        {
-          "package": "turso_ext",
-          "version": "0.8.3",
-          "file": "src/vfs_modules.rs",
-          "sha256": "56e633b8bc6678f4b1e1163f2235b9e46070199621229ea93d3482907930e425"
-        }
-      ]
     }
   ]
 }

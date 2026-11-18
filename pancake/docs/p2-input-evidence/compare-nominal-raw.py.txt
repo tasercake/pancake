@@ -1,0 +1,30 @@
+import sys,json
+from pathlib import Path
+import numpy as np
+import rawpy
+case, capture, output = map(Path, sys.argv[1:])
+with capture.open('rb') as data:
+    width, height, nominal = data.readline().decode().split()
+    candidate = np.fromfile(data, dtype='<f4').reshape(int(height), int(width),3)
+with rawpy.imread(str(case)) as raw:
+    s = raw.sizes
+    reference_full = raw.postprocess(
+        use_camera_wb=True, no_auto_bright=True, output_bps=16,
+        gamma=(1.0,1.0), demosaic_algorithm=rawpy.DemosaicAlgorithm.PPG, adjust_maximum_thr=0,
+    )
+    measured_sensor_max = int(raw.raw_image_visible.max())
+left = s.crop_left_margin-s.left_margin
+top = s.crop_top_margin-s.top_margin
+reference = reference_full[top:top+s.crop_height,left:left+s.crop_width].astype(np.float32)/65535.0
+error = np.abs(candidate-reference)
+result = {
+    "nominal_camera_max_from_cmp1_sensor_bits":int(nominal),
+    "actual_max_libraw_visible_mosaic":measured_sensor_max,
+    "unadjusted_mean_absolute_error":float(error.mean()),
+    "unadjusted_max_absolute_error":float(error.max()),
+    "unadjusted_p99_absolute_error":float(np.quantile(error,0.99)),
+    "unadjusted_p99_absolute_error_interior_16px":float(np.quantile(error[16:-16,16:-16],0.99)),
+    "comparison_recipe":"Both linear, PPG, camera WB, no auto brightness, camera metadata crop overlap, nominal sensor max from CMP1 tag, no LibRaw measured-max adjustment.",
+}
+print(json.dumps(result,indent=2))
+output.write_text(json.dumps(result,indent=2)+'\n')

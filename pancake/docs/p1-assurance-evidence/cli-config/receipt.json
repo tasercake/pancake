@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-11-18T10:09:41+08:00",
+  "scope": "Authored command-line entry point, settings, and path discovery",
+  "lane": "Linux host CPU",
+  "hardware": {
+    "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+    "os": "Linux 6.8.0-147-generic x86_64"
+  },
+  "fixtures": [
+    "Valid 2x1 RGB8 PNG pair discovered by quoted relative glob, and a malformed hidden image excluded by the glob",
+    "Malformed PNG, DNG, NPY, and unknown file pairs; previous export sentinel retained",
+    "Exact 4096 canonical file count boundary and 16,384 total input/scan entries",
+    "Large path components, actual disconnected console pipes, literal bracketed paths, and dangling matched symlinks"
+  ],
+  "source_revision": "7ee2299f7c6b5a0c8be06aeeb2da7796e8710ce6",
+  "cargo_lock_sha256": "3ddbc2bdae9eff3e8a5284e09d614684a1145fb384a46c59ad307acf17ea34bf",
+  "tested_source_sha256": {
+    "crates/pancake-cli/src/main.rs": "b62072858f4635f88fa2769e31507d68980f27cf38bf6fc31be59643d5542b13",
+    "crates/pancake-cli/src/tests.rs": "706708dfe172328478ade337b387aa6e271a23f38a4955913cc972afb601deab",
+    "crates/pancake-cli/tests/cpu_cli.rs": "55ec452bf1af5981a1346b9269c305567d3e8863605d125502e25f04b978552e",
+    "crates/pancake-cli/tests/cpu_config.rs": "5f0986c69ac993ae3690c98eb3d1577d1a7b8eef846b8268233ea73042b582f8",
+    "src/config.rs": "d650b110722a19339b0aa7c9d987ae61e3e4ec1b582480fbfab5f1f36cd9f24f",
+    "src/config/paths.rs": "f38808b8399c489a5a1f252628dff540b28bcacabb3a8b4d8311412b05ca5660",
+    "src/config/tests.rs": "64f34d3e1b4f87a8d6a5d59a17a326b978d8736c95016560eff909cb48035079"
+  },
+  "rustc_stable": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "rustc_nightly": "rustc 1.102.0-nightly (5f4effd57 2026-11-13)",
+  "cargo_environment": {
+    "CARGO_BUILD_JOBS": "4",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+  },
+  "strict_fast": {
+    "command": "bash scripts/check.sh fast",
+    "returncode": 0,
+    "script_tests_passed": 40,
+    "log": {
+      "file": "fast.log.gz",
+      "archive_sha256": "ab6ca110e95c0b3167d872e206919b4c8d528a6ea72a48b88b81833dcd74e627",
+      "original_sha256": "7896d92046f3135173dc1045e743a57ddd1946bd09aa232f6bf2469af7821d8e"
+    }
+  },
+  "focused_stable": {
+    "command": "cargo llvm-cov --locked --workspace --lib --bins --test cpu_cli --test cpu_config --json --output-path <report>",
+    "native_tests_passed": 26,
+    "scope": {
+      "crates/pancake-cli/src/main.rs": {
+        "branches": {
+          "covered": 0,
+          "total": 0
+        },
+        "functions": {
+          "covered": 3,
+          "total": 3
+        },
+        "lines": {
+          "covered": 78,
+          "total": 78
+        },
+        "regions": {
+          "covered": 70,
+          "total": 70
+        }
+      },
+      "src/config.rs": {
+        "branches": {
+          "covered": 0,
+          "total": 0
+        },
+        "functions": {
+          "covered": 11,
+          "total": 11
+        },
+        "lines": {
+          "covered": 121,
+          "total": 121
+        },
+        "regions": {
+          "covered": 113,
+          "total": 113
+        }
+      },
+      "src/config/paths.rs": {
+        "branches": {
+          "covered": 0,
+          "total": 0
+        },
+        "functions": {
+          "covered": 16,
+          "total": 16
+        },
+        "lines": {
+          "covered": 125,
+          "total": 125
+        },
+        "regions": {
+          "covered": 133,
+          "total": 133
+        }
+      }
+    },
+    "report": {
+      "file": "stable.json.gz",
+      "archive_sha256": "53ab3435b9e82499d70ec673a82e471798c9f59cc3e54f860bd53d77accffbc6",
+      "original_sha256": "53658bc185b49336e322d0b57e1f884253a217620a51098e121b71cd6a9e84dc"
+    }
+  },
+  "focused_nightly_branches": {
+    "command": "cargo +nightly-2026-11-15 llvm-cov --locked --workspace --lib --bins --test cpu_cli --test cpu_config --branch --json --output-path <report>",
+    "native_tests_passed": 26,
+    "scope": {
+      "crates/pancake-cli/src/main.rs": {
+        "branches": {
+          "covered": 14,
+          "total": 14
+        },
+        "functions": {
+          "covered": 3,
+          "total": 3
+        },
+        "lines": {
+          "covered": 78,
+          "total": 78
+        },
+        "regions": {
+          "covered": 70,
+          "total": 70
+        }
+      },
+      "src/config.rs": {
+        "branches": {
+          "covered": 24,
+          "total": 24
+        },
+        "functions": {
+          "covered": 11,
+          "total": 11
+        },
+        "lines": {
+          "covered": 121,
+          "total": 121
+        },
+        "regions": {
+          "covered": 113,
+          "total": 113
+        }
+      },
+      "src/config/paths.rs": {
+        "branches": {
+          "covered": 22,
+          "total": 22
+        },
+        "functions": {
+          "covered": 16,
+          "total": 16
+        },
+        "lines": {
+          "covered": 125,
+          "total": 125
+        },
+        "regions": {
+          "covered": 133,
+          "total": 133
+        }
+      }
+    },
+    "report": {
+      "file": "branches.json.gz",
+      "archive_sha256": "eac872586fd2a5ef4b1657788387dba996cd75b1b91569f47ed80d983007bcab",
+      "original_sha256": "9add18a320264cdf52a1a84ea5a3c7add706a0fb416c4b08b30eba432b795664"
+    }
+  },
+  "focused_mutation": {
+    "source_revision": "f69a639f2b40fb3b43376c692f6d8f87f9da36ee",
+    "cargo_lock_sha256": "81e106af0ed12e69f7c1bb301ebafde68447f62b24bbe1ba3c2483172ebc1e32",
+    "command": "cargo mutants --workspace --test-workspace true --file 'src/config.rs' --file 'src/config/paths.rs' --file 'crates/pancake-cli/src/main.rs' --no-shuffle --cap-lints true --all-features --in-place --timeout 60 --build-timeout 180 --output <report> -- --locked --lib --bins --test cpu_cli --test cpu_config -- --include-ignored",
+    "matches_integrated_source_hashes": true,
+    "outcomes": {
+      "total_mutants": 88,
+      "caught": 85,
+      "unviable": 3,
+      "missed": 0,
+      "timeout": 0
+    },
+    "report": {
+      "file": "mutation-outcomes.json.gz",
+      "archive_sha256": "fea88a5631f4ad39eca2c9a931c6c1b9098d055e38a2e811347cd3c1cee1ea2b",
+      "original_sha256": "2db52547d16d08811a1b3fe9e713aebb02e8a5ef1d74044d7b4aac56a7735c8e"
+    },
+    "unviable_build_logs": [
+      {
+        "file": "mutation-unviable-51.log.gz",
+        "archive_sha256": "3be7f9c12e401157db100dcc6d2ecdf0cb6bad06706c370d0adf48d32a89609d",
+        "original_sha256": "35bab6a8a4d5fbd580b524e8da8fe7b9b51fc9d754b48ab9670d3c35da729ff3"
+      },
+      {
+        "file": "mutation-unviable-52.log.gz",
+        "archive_sha256": "75fd46d91610198991694e2929397e3a81a435b6bb752812fd106bc16d003385",
+        "original_sha256": "b5f1d00ec28f0c1c4be7acb67e9af66c38139263af6b36a5e32974bf755ec08e"
+      },
+      {
+        "file": "mutation-unviable-85.log.gz",
+        "archive_sha256": "35975489799a0ac2f0b6554836dcfafd86e60214760543f74a87eed110445022",
+        "original_sha256": "75d03bfdce23575d775eaca49628db1d826d7deebb061d1bdb7538d60f7d7cc1"
+      }
+    ]
+  }
+}

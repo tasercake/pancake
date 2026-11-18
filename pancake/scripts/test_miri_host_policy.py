@@ -58,6 +58,47 @@ class MiriHostPolicyTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('production source inventory changed', result.stderr)
 
+    def test_workspace_crate_manifest_and_source_require_reviewed_hashes(self):
+        cli = self.root / 'crates/pancake-cli'
+        (cli / 'src').mkdir(parents=True)
+        files = {'crates/pancake-cli/Cargo.toml': '[package]\n',
+                 'crates/pancake-cli/src/main.rs': 'fn main() {}\n'}
+        for name, content in files.items():
+            (self.root / name).write_text(content)
+        missing = self.invoke('Darwin', 'validate')
+        self.assertNotEqual(missing.returncode, 0)
+        self.assertIn('production source inventory changed', missing.stderr)
+
+        self.policy['reviewed_files'].update(
+            {name: hashlib.sha256(content.encode()).hexdigest() for name, content in files.items()}
+        )
+        (self.root / 'assurance-platforms.json').write_text(json.dumps(self.policy))
+        reviewed = self.invoke('Darwin', 'validate')
+        self.assertEqual(reviewed.returncode, 0, reviewed.stderr)
+        (cli / 'Cargo.toml').write_text('[package]\nname = "changed"\n')
+        changed = self.invoke('Darwin', 'validate')
+        self.assertNotEqual(changed.returncode, 0)
+        self.assertIn('changed reviewed file crates/pancake-cli/Cargo.toml', changed.stderr)
+
+    def test_embedded_slint_source_requires_reviewed_hash(self):
+        gui = self.root / 'crates/pancake-gui'
+        (gui / 'src').mkdir(parents=True)
+        files = {'crates/pancake-gui/Cargo.toml': '[package]\n',
+                 'crates/pancake-gui/src/main.rs': 'fn main() {}\n',
+                 'crates/pancake-gui/src/workspace.slint': 'export component Window {}\n'}
+        for name, content in files.items():
+            (self.root / name).write_text(content)
+        self.policy['reviewed_files'].update(
+            {name: hashlib.sha256(content.encode()).hexdigest() for name, content in files.items()}
+        )
+        (self.root / 'assurance-platforms.json').write_text(json.dumps(self.policy))
+        reviewed = self.invoke('Darwin', 'validate')
+        self.assertEqual(reviewed.returncode, 0, reviewed.stderr)
+        (gui / 'src/workspace.slint').write_text('export component Different {}\n')
+        changed = self.invoke('Darwin', 'validate')
+        self.assertNotEqual(changed.returncode, 0)
+        self.assertIn('changed reviewed file crates/pancake-gui/src/workspace.slint', changed.stderr)
+
     def test_dependency_resolution_and_unknown_platform_fail_closed(self):
         (self.root / 'Cargo.lock').write_text('version = 5\n')
         result = self.invoke('Darwin', 'validate')

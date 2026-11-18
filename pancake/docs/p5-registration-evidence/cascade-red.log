@@ -1,0 +1,2 @@
+Estimate { transform: Affine { rows: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]] }, confidence: 0.0 } gives 2px max interior-corner error
+Error: "wide fixture registration exceeds 0.05px"

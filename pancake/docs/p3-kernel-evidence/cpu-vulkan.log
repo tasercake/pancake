@@ -1,0 +1,16 @@
+   Compiling pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p3-fusion/pancake)
+    Finished `test` profile [unoptimized] target(s) in 0.82s
+     Running tests/cpu_fusion_contract.rs (target/debug/build/pancake/b7792346670491d8/out/cpu_fusion_contract-b7792346670491d8)
+
+running 2 tests
+test invalid_requests_do_not_produce_a_result ... ok
+test cpu_fusion_and_resize ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+     Running tests/gpu_fusion_contract.rs (target/debug/build/pancake/1968748387c1d8e7/out/gpu_fusion_contract-1968748387c1d8e7)
+
+running 1 test
+test physical_gpu_fusion_and_resize ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s

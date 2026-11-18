@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import math
 import platform
 import resource
 import shutil
@@ -10,6 +11,7 @@ import sys
 import time
 import uuid
 import zlib
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -26,12 +28,20 @@ def file_hash(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def owns_directory(output, token):
+    """Check that the run still owns its directory and regular marker."""
+    marker = output / "ownership.json"
+    return (
+        not output.is_symlink()
+        and not marker.is_symlink()
+        and marker.is_file()
+        and json.loads(marker.read_text())["token"] == token
+    )
+
+
 def cleanup_owned(output, token, records):
     """Delete only an authenticated, fully verified set of this run's files."""
-    if (
-        output.is_symlink()
-        or json.loads((output / "ownership.json").read_text())["token"] != token
-    ):
+    if not owns_directory(output, token):
         raise ValueError("Cleanup ownership does not match this run")
     paths = []
     for record in records:
@@ -370,16 +380,134 @@ def write_and_verify(path, recipe, focus, role, reserve):
     }
 
 
-def generate(recipe, output, receipt, reserve, max_bytes):
-    """Create a new owned directory, qualify every native image, then remove images."""
+def image_specs(recipe):
+    """Yield every frame and truth image in frozen order with safe byte bounds."""
+    tiles = ((recipe.width + recipe.tile - 1) // recipe.tile) * (
+        (recipe.height + recipe.tile - 1) // recipe.tile
+    )
+    image_bytes = tiles * recipe.tile**2 * 2
+    metadata_bytes = 4 * 1024 * 1024
+    rgb_bound = 6 * image_bytes + metadata_bytes
+    for index in range(recipe.frames):
+        yield index, "focus_frame", f"focus_{index:03d}.tif", rgb_bound
+    yield None, "sharp_truth", "sharp_truth.tif", rgb_bound
+    yield None, "depth_truth", "depth_truth.tif", 2 * image_bytes + metadata_bytes
+
+
+def read_receipt(path):
+    """Parse the receipt and hash the exact same bytes."""
+    content = path.read_bytes()
+    return json.loads(content), hashlib.sha256(content).hexdigest()
+
+
+def new_receipt(output, receipt):
+    """Require an unused receipt path outside the generated image directory."""
     if (
         receipt.exists()
         or not receipt.parent.is_dir()
         or receipt.is_relative_to(output)
     ):
         raise ValueError("Receipt must be a new file outside the generated directory")
-    free_before = require_free(output.parent, reserve, 4 * 1024 * 1024)
-    output.mkdir()
+
+
+@contextmanager
+def open_new_receipt(receipt):
+    """Reserve the receipt destination without replacing another writer's file."""
+    stream = receipt.open("x")
+    try:
+        with stream:
+            yield stream
+    except BaseException:
+        receipt.unlink(missing_ok=True)
+        raise
+
+
+def write_receipt(stream, data):
+    """Write a completed receipt to a reserved file."""
+    json.dump(data, stream, indent=2, sort_keys=True)
+    stream.write("\n")
+
+
+def frozen_plan(reference, recipe, specs):
+    """Validate frozen file identities and bound the largest disk write."""
+    if (
+        reference["schema_version"] != 1
+        or reference["dataset_kind"] != "GENERATED_SYNTHETIC_FOCAL_SCALE"
+        or reference["recipe"] != asdict(recipe)
+        or len(reference["files"]) != len(specs)
+    ):
+        raise ValueError("Frozen receipt does not match the requested recipe")
+    retained_bytes = 0
+    write_budget = 0
+    for (focus, role, name, upper_bound), record in zip(
+        specs, reference["files"], strict=True
+    ):
+        size = record["bytes"]
+        if (
+            (record["focus"], record["role"], record["name"]) != (focus, role, name)
+            or not isinstance(size, int)
+            or not 0 < size <= upper_bound
+        ):
+            raise ValueError(f"Frozen receipt has invalid identity or size for {name}")
+        write_budget = max(write_budget, retained_bytes + upper_bound)
+        # A small per-file allowance covers normal allocation granularity.
+        retained_bytes += size + 4096
+    return write_budget
+
+
+def cleanup_observation(output, deleted):
+    """Describe deleted images and any TIFFs still on disk."""
+    return {
+        "owned_output_directory": str(output),
+        "deleted_image_count": len(deleted),
+        "deleted_bytes": sum(item["bytes"] for item in deleted),
+        "deleted_files": deleted,
+        "remaining_tiff_count": len(list(output.glob("*.tif"))),
+        "ownership_marker_retained": True,
+    }
+
+
+def cleanup_materialized(output, receipt, materialization):
+    """Authenticate, rehash and delete the full set after its last job."""
+    new_receipt(output, receipt)
+    data, digest = read_receipt(materialization)
+    if data["mode"] != "materialized" or data["cleanup"][
+        "owned_output_directory"
+    ] != str(output):
+        raise ValueError("Materialization receipt does not own this output directory")
+    recipe = Recipe(**data["recipe"])
+    frozen_plan(data, recipe, list(image_specs(recipe)))
+    with open_new_receipt(receipt) as stream:
+        deleted = cleanup_owned(output, data["ownership_token"], data["files"])
+        write_receipt(
+            stream,
+            {
+                "schema_version": 1,
+                "mode": "cleanup",
+                "materialization_receipt_sha256": digest,
+                "cleanup": cleanup_observation(output, deleted),
+            },
+        )
+
+
+def generate(recipe, output, receipt, reserve, max_bytes=None, reference_path=None):
+    """Generate owned TIFFs sequentially or retain the exact frozen full set."""
+    new_receipt(output, receipt)
+    specs = list(image_specs(recipe))
+    reference = None
+    reference_digest = None
+    preflight_bytes = 4 * 1024 * 1024
+    if reference_path is not None:
+        reference, reference_digest = read_receipt(reference_path)
+        preflight_bytes = frozen_plan(reference, recipe, specs)
+        if max_bytes is not None and preflight_bytes > max_bytes:
+            raise ValueError(
+                f"Generated-byte cap cannot fit the full frozen set: need {preflight_bytes}"
+            )
+    if max_bytes is None:
+        max_bytes = preflight_bytes if reference is not None else 1490980001
+    free_before = require_free(output.parent, reserve, preflight_bytes)
+    output.mkdir(mode=0o700)
     token = str(uuid.uuid4())
     (output / "ownership.json").write_text(
         json.dumps(
@@ -390,123 +518,148 @@ def generate(recipe, output, receipt, reserve, max_bytes):
     start = time.monotonic()
     files = []
     deleted = []
-    for focus, role, name in [
-        (i, "focus_frame", f"focus_{i:03d}.tif") for i in range(recipe.frames)
-    ] + [
-        (None, "sharp_truth", "sharp_truth.tif"),
-        (None, "depth_truth", "depth_truth.tif"),
-    ]:
-        # Conservative raw-size bound plus headers; compression cannot consume the whole budget.
-        upper_bound = ((recipe.width + recipe.tile - 1) // recipe.tile) * (
-            (recipe.height + recipe.tile - 1) // recipe.tile
-        ) * recipe.tile**2 * (2 if role == "depth_truth" else 6) * 2 + 4 * 1024 * 1024
-        if upper_bound > max_bytes:
-            raise ValueError("Generated-byte cap cannot safely fit another TIFF")
-        require_free(output, reserve, upper_bound)
-        record = write_and_verify(output / name, recipe, focus, role, reserve)
-        files.append(record)
-        deleted.extend(cleanup_owned(output, token, [record]))
-        print(
-            json.dumps(
-                {
-                    "verified": name,
-                    "bytes": record["bytes"],
-                    "unique_values": record["unique_values"],
-                }
+    attempted = []
+    try:
+        for index, (focus, role, name, upper_bound) in enumerate(specs):
+            if upper_bound > max_bytes:
+                raise ValueError("Generated-byte cap cannot safely fit another TIFF")
+            require_free(output, reserve, upper_bound)
+            path = output / name
+            attempted.append(path)
+            record = write_and_verify(path, recipe, focus, role, reserve)
+            if reference is not None and record != reference["files"][index]:
+                raise ValueError(f"Frozen byte or pixel hash mismatch: {name}")
+            files.append(record)
+            if reference is None:
+                deleted.extend(cleanup_owned(output, token, [record]))
+            print(
+                json.dumps(
+                    {
+                        "verified": name,
+                        "bytes": record["bytes"],
+                        "unique_values": record["unique_values"],
+                    }
+                ),
+                flush=True,
+            )
+        focus_hashes = {
+            record["decoded_pixel_sha256"]
+            for record in files
+            if record["role"] == "focus_frame"
+        }
+        if len(focus_hashes) != recipe.frames:
+            raise ValueError("Generated focal frames are not all distinct")
+        retained = reference is not None
+        generated_bytes = sum(record["bytes"] for record in files)
+        data = {
+            "schema_version": 1,
+            "dataset_kind": "GENERATED_SYNTHETIC_FOCAL_SCALE",
+            "frame_count": recipe.frames,
+            "mode": "materialized" if retained else "sequential",
+            "maximum_simultaneous_image_files": len(files) if retained else 1,
+            "total_generated_tiff_bytes": generated_bytes,
+            "peak_retained_tiff_bytes": (
+                generated_bytes
+                if retained
+                else max(record["bytes"] for record in files)
             ),
-            flush=True,
-        )
-    focus_hashes = {
-        record["decoded_pixel_sha256"]
-        for record in files
-        if record["role"] == "focus_frame"
-    }
-    if len(focus_hashes) != recipe.frames:
-        raise ValueError("Generated focal frames are not all distinct")
-    data = {
-        "schema_version": 1,
-        "dataset_kind": "GENERATED_SYNTHETIC_FOCAL_SCALE",
-        "frame_count": recipe.frames,
-        "maximum_simultaneous_image_files": 1,
-        "total_generated_tiff_bytes": sum(record["bytes"] for record in files),
-        "peak_retained_tiff_bytes": max(record["bytes"] for record in files),
-        "recipe": asdict(recipe),
-        "generator_license": "GPL-3.0-or-later",
-        "generated_pixels_license": "CC0-1.0",
-        "acquired_download_bytes": 0,
-        "precision": "Direct native uint16 arithmetic; no 8-bit input, resize or intensity promotion",
-        "conversion": "none; native RGB16 ZIP TIFF; converted hash equals decoded hash",
-        "pixel_hash_order": "TIFF tile-row-major; trim each tile to native image bounds; C-order little-endian uint16 per tile",
-        "known_truth": {
-            "depth": "floor(x*frames/width)",
-            "defocus_radius": "abs(depth-focus)",
-            "sharp_truth": "focus=None; all radii zero",
-            "scope": "Deterministic variable-defocus scale workload; not photographs or a physical lens model",
-        },
-        "limits": {
-            "reserve_bytes": reserve,
-            "max_generated_bytes": max_bytes,
-            "maximum_decode_workers": 1,
-            "full_frame_buffers": 0,
-            "decode_buffer_bytes": 8 * 1024 * 1024,
-        },
-        "versions": {
-            "python": platform.python_version(),
-            "numpy": np.__version__,
-            "tifffile": tifffile.__version__,
-            "imagecodecs": imagecodecs.__version__,
-            "zlib": zlib.ZLIB_VERSION,
-            "platform": platform.platform(),
-        },
-        "sources": {
-            name: file_hash(Path(__file__).with_name(name))
-            for name in ("t50_generated.py", "t50_oracle.py", "test_t50_generated.py")
-        },
-        "files": files,
-        "elapsed_seconds": time.monotonic() - start,
-        "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        * (1 if sys.platform == "darwin" else 1024),
-        "free_disk_before_bytes": free_before,
-        "free_disk_after_bytes": shutil.disk_usage(output).free,
-        "cleanup": {
-            "owned_output_directory": str(output.resolve()),
-            "deleted_image_count": len(deleted),
-            "deleted_bytes": sum(item["bytes"] for item in deleted),
-            "deleted_files": deleted,
-            "remaining_tiff_count": len(list(output.glob("*.tif"))),
-            "ownership_marker_retained": True,
-        },
-    }
-    with receipt.open("x") as stream:
-        json.dump(data, stream, indent=2, sort_keys=True)
-        stream.write("\n")
+            "recipe": asdict(recipe),
+            "generator_license": "GPL-3.0-or-later",
+            "generated_pixels_license": "CC0-1.0",
+            "acquired_download_bytes": 0,
+            "precision": "Direct native uint16 arithmetic; no 8-bit input, resize or intensity promotion",
+            "conversion": "none; native RGB16 ZIP TIFF; converted hash equals decoded hash",
+            "pixel_hash_order": "TIFF tile-row-major; trim each tile to native image bounds; C-order little-endian uint16 per tile",
+            "known_truth": {
+                "depth": "floor(x*frames/width)",
+                "defocus_radius": "abs(depth-focus)",
+                "sharp_truth": "focus=None; all radii zero",
+                "scope": "Deterministic variable-defocus scale workload; not photographs or a physical lens model",
+            },
+            "limits": {
+                "reserve_bytes": reserve,
+                "max_generated_bytes": max_bytes,
+                "maximum_decode_workers": 1,
+                "full_frame_buffers": 0,
+                "decode_buffer_bytes": 8 * 1024 * 1024,
+            },
+            "versions": {
+                "python": platform.python_version(),
+                "numpy": np.__version__,
+                "tifffile": tifffile.__version__,
+                "imagecodecs": imagecodecs.__version__,
+                "zlib": zlib.ZLIB_VERSION,
+                "platform": platform.platform(),
+            },
+            "sources": {
+                name: file_hash(Path(__file__).with_name(name))
+                for name in (
+                    "t50_generated.py",
+                    "t50_oracle.py",
+                    "test_t50_generated.py",
+                )
+            },
+            "files": files,
+            "elapsed_seconds": time.monotonic() - start,
+            "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+            * (1 if sys.platform == "darwin" else 1024),
+            "free_disk_before_bytes": free_before,
+            "free_disk_after_bytes": shutil.disk_usage(output).free,
+            "cleanup": cleanup_observation(output, deleted),
+        }
+        if retained:
+            data["ownership_token"] = token
+            data["reference_receipt_sha256"] = reference_digest
+            data["limits"]["full_set_preflight_bytes"] = preflight_bytes
+        with open_new_receipt(receipt) as stream:
+            write_receipt(stream, data)
+    except BaseException:
+        if reference is not None and owns_directory(output, token):
+            for path in attempted:
+                path.unlink(missing_ok=True)
+        raise
     return data
 
 
 def main():
-    """Run an explicitly GENERATED qualification and leave evidence, not image data."""
+    """Qualify the generated workload, stage it for measurement, or clean it up."""
     parser = argparse.ArgumentParser(description=__doc__)
     for name, default in asdict(Recipe()).items():
         parser.add_argument("--" + name, type=int, default=default)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--receipt", type=Path, required=True)
     parser.add_argument("--reserve-gib", type=float, default=15)
-    parser.add_argument("--max-generated-bytes", type=int, default=1490980001)
+    parser.add_argument("--max-generated-bytes", type=int)
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--materialize-from", type=Path, metavar="FROZEN_RECEIPT")
+    modes.add_argument("--cleanup-from", type=Path, metavar="MATERIALIZATION_RECEIPT")
     args = parser.parse_args()
     try:
+        output, receipt = args.output.absolute(), args.receipt.absolute()
+        if output.is_symlink() or receipt.is_symlink():
+            raise ValueError("Output and receipt cannot be symbolic links")
+        output, receipt = output.resolve(), receipt.resolve()
+        if args.cleanup_from is not None:
+            cleanup_materialized(output, receipt, args.cleanup_from)
+            return
         recipe = Recipe(**{name: getattr(args, name) for name in asdict(Recipe())})
-        if args.reserve_gib < 0 or args.max_generated_bytes <= 0:
+        if (
+            not math.isfinite(args.reserve_gib)
+            or args.reserve_gib < 0
+            or (args.max_generated_bytes is not None and args.max_generated_bytes <= 0)
+        ):
             raise ValueError(
-                "Resource limits must be nonnegative reserve and positive byte cap"
+                "Resource limits must be a finite nonnegative reserve and positive byte cap"
             )
         generate(
             recipe,
-            args.output.resolve(),
-            args.receipt.resolve(),
+            output,
+            receipt,
             int(args.reserve_gib * 1024**3),
             args.max_generated_bytes,
+            args.materialize_from,
         )
-    except (ValueError, OSError) as error:
+    except (ValueError, OSError, KeyError, TypeError) as error:
         parser.exit(1, f"{error}\n")
 
 

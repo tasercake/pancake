@@ -13,12 +13,18 @@ def covered_regions(report, root):
         for function in data["functions"]:
             for region in function["regions"]:
                 filename = Path(function["filenames"][region[5]]).resolve()
-                if not (filename.is_relative_to(root / "src") or filename == root / "build.rs"):
-                    if filename.is_relative_to(root) and not filename.is_relative_to(root / "tests"):
-                        raise ValueError(f"unclassified source layout requires review: {filename}")
+                if not filename.is_relative_to(root):
                     continue
+                relative = filename.relative_to(root)
+                crate_path = (Path(*relative.parts[2:])
+                              if relative.parts[0] == "crates" and len(relative.parts) > 2
+                              else relative)
+                if crate_path.is_relative_to("tests"):
+                    continue
+                if not (crate_path.is_relative_to("src") or crate_path == Path("build.rs")):
+                    raise ValueError(f"unclassified source layout requires review: {filename}")
                 if region[7] == 0 and region[4] > 0:
-                    result.add((function["name"], str(filename.relative_to(root)), *region[:4]))
+                    result.add((function["name"], relative.as_posix(), *region[:4]))
     return result
 
 

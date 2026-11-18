@@ -1,0 +1,10 @@
+runtime=cpu
+backend=cpu
+device=AMD Ryzen 9 7950X3D 16-Core Processor
+fingerprint=cpu_x86_64_load-512_f16-chain
+device_pci_address=None
+physical_gpu=false
+maximum_allocation_bytes=67047579648
+capacity_bytes=Some(67047579648)
+fallback_reason=Some("wgpu Vulkan found no physical GPU; cuda unavailable: this build does not link the Cuda runtime: turn on its `cubecl` feature")
+wgpu_adapter=None

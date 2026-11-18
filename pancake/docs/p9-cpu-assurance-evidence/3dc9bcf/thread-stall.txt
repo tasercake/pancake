@@ -1,0 +1,12 @@
+2026-11-18T11:06:42+08:00
+3dc9bcf3c30605badea2f7b2ee2840075507b6c3
+Exact TSAN child executable /tmp/pancake-worktrees.t3paqgWM/assurance/pancake/target/host-sanitizer-thread/x86_64-unknown-linux-gnu/debug/build/pancake/68a815e7aaac3576/out/cpu_advanced_fusion-68a815e7aaac3576
+    PID    PPID     ELAPSED     TIME %CPU %MEM NLWP STAT WCHAN              COMMAND
+ 224944  198543       06:04 03:01:47 2989  0.5   36 Sl   futex_wait_queue   /tmp/pancake-worktrees.t3paqgWM/assurance/pancake/target/host-sanitizer-thread/x86_64-unknown-linux-gnu/debug/build/pancake/68a815e7aaac3576/out/cpu_advanced_fusion-68a815e7aaac3576 --include-ignored
+     28 DSD-0-0         Rl   -
+      5 DSD-0-0         Sl   futex_wait_queue
+      2 cpu_advanced_fu Sl   futex_wait_queue
+      1 cpu_advanced_fu Sl   hrtimer_nanosleep
+      1                      WCHAN
+pid 224944's current affinity list: 0-31
+Terminating this stalled test-owned process with SIGTERM.

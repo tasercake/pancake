@@ -1,0 +1,23 @@
+   Compiling cubecl-ir v0.11.4
+   Compiling cubecl-runtime v0.11.4
+   Compiling cudarc v0.19.10
+   Compiling cubecl-llvm v0.11.4
+   Compiling libloading v0.9.1
+   Compiling cubecl-cpp v0.11.4 (/tmp/pancake-worktrees.t3paqgWM/p3-fusion/pancake/vendor/cubecl-cpp-0.11.4)
+   Compiling cubecl v0.11.4
+   Compiling cubecl-cuda v0.11.4
+   Compiling cubecl-monitoring v0.11.4
+   Compiling cubecl-core v0.11.4 (/tmp/pancake-worktrees.t3paqgWM/p3-fusion/pancake/vendor/cubecl-core-0.11.4)
+   Compiling cubecl-server v0.11.4
+   Compiling cubecl-opt v0.11.4
+   Compiling cubecl-std v0.11.4 (/tmp/pancake-worktrees.t3paqgWM/p3-fusion/pancake/vendor/cubecl-std-0.11.4)
+   Compiling cubecl-wgpu v0.11.4
+   Compiling cubecl-cpu v0.11.4
+   Compiling pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p3-fusion/pancake)
+    Finished `test` profile [unoptimized] target(s) in 27.56s
+     Running tests/gpu_fusion_contract.rs (target/debug/build/pancake/b7d18d84044a7519/out/gpu_fusion_contract-b7d18d84044a7519)
+
+running 1 test
+test physical_gpu_fusion_and_resize ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s

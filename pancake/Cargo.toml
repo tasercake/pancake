@@ -3,7 +3,7 @@ name = "pancake"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.100"
-description = "Rust focus-stacking application scaffold"
+description = "Shared focus-stacking and image-compute core"
 license = "GPL-3.0-or-later"
 repository = "https://github.com/tasercake/focus-stacking"
 homepage = "https://github.com/tasercake/focus-stacking/tree/main/pancake"
@@ -13,13 +13,25 @@ categories = ["multimedia::images"]
 publish = false
 
 [workspace]
-members = ["."]
+members = [".", "crates/pancake-cli", "crates/pancake-gui"]
 exclude = ["vendor/*"]
 resolver = "3"
 
 [dependencies]
+bytemuck = "=1.25.2"
 cubecl = { version = "=0.11.4", default-features = false, features = ["std", "stdlib", "cpu", "wgpu"] }
-slint = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "unstable-wgpu-30", "compat-1-18", "accessibility"] }
+glob = "=0.3.4"
+image = { version = "=0.25.10", default-features = false, features = ["bmp", "png", "tiff", "exr", "jpeg"] }
+png = "=0.18.1"
+rawler = { version = "=0.8.0", default-features = false }
+rayon = "=1.12.0"
+same-file = "=1.0.6"
+serde_json = "=1.0.154"
+tempfile = "=3.27.0"
+tiff = "=0.11.3"
+wgpu.workspace = true
+
+[workspace.dependencies]
 wgpu = { version = "=30.0.2", default-features = false, features = ["std", "wgsl", "metal", "vulkan", "dx12"] }
 
 [patch.crates-io]

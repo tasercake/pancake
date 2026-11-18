@@ -1,0 +1,817 @@
+import { Button, CheckBox, ComboBox, LineEdit, Palette, ScrollView } from "std-widgets.slint";
+
+// A label for the settings panels and inspector.
+component SectionLabel inherits Text {
+    color: Palette.foreground;
+    font-size: 16px;
+    font-weight: 600;
+    vertical-alignment: center;
+    height: 28px;
+}
+
+// A labelled numerical entry, committed when the user leaves the field.
+component Parameter inherits HorizontalLayout {
+    in property <string> label;
+    in property <string> identifier;
+    in-out property <string> value;
+    height: 32px;
+    spacing: 6px;
+    Text {
+        text: root.label;
+        color: Palette.foreground;
+        vertical-alignment: center;
+        horizontal-stretch: 1;
+    }
+    LineEdit {
+        text <=> root.value;
+        width: 84px;
+        accessible-id: root.identifier;
+        accessible-label: root.label;
+    }
+}
+
+// Read-only native state and rendered geometry share the same bindings.
+component ViewCanvas inherits Rectangle {
+    in property <image> primary-image;
+    in property <int> image-width;
+    in property <int> image-height;
+    in property <int> image-x;
+    in property <int> image-y;
+    in property <int> frame-width: image-width;
+    in property <int> frame-height: image-height;
+    in property <int> selected-source: -1;
+    in property <image> comparison-image;
+    in property <bool> comparing;
+    in property <bool> cropped;
+    in property <string> result-method: "";
+    callback next-source(int);
+
+    property <bool> has-image: root.image-width > 0 && root.image-height > 0;
+    property <bool> fit-mode: true;
+    property <float> fit-scale: root.has-image
+        ? min(root.width / (root.frame-width * 1px), root.height / (root.frame-height * 1px))
+        : 1;
+    property <float> detail-scale: 1;
+    out property <float> zoom: root.fit-mode ? root.fit-scale : root.detail-scale;
+    property <float> manual-x: 0;
+    property <float> manual-y: 0;
+    property <float> center-x: root.fit-mode ? root.frame-width / 2 : root.manual-x;
+    property <float> center-y: root.fit-mode ? root.frame-height / 2 : root.manual-y;
+    property <float> initial-x;
+    property <float> initial-y;
+    property <float> split: 0.5;
+    property <length> picture-x: root.width / 2 - root.center-x * root.zoom * 1px;
+    property <length> picture-y: root.height / 2 - root.center-y * root.zoom * 1px;
+
+    clip: true;
+    background: #141619;
+    accessible-role: image;
+    accessible-id: "viewer";
+    accessible-label: "Image viewer";
+    accessible-description:
+        "{\"has_image\":\{root.has-image ? "true" : "false"},"
+        + "\"zoom\":\{root.zoom},\"center\":[\{root.center-x},\{root.center-y}],"
+        + "\"compare\":\{root.comparing ? "true" : "false"},\"split\":\{root.split},"
+        + "\"fit\":\{root.fit-mode ? "true" : "false"},"
+        + "\"source_index\":\{root.selected-source < 0 ? "null" : "\{root.selected-source + 1}"},"
+        + "\"result_method\":\"\{root.result-method}\","
+        + "\"cropped\":\{root.cropped ? "true" : "false"}}";
+
+    public function fit-image() {
+        root.fit-mode = true;
+        root.focus-viewer();
+    }
+
+    function focus-viewer() {
+        viewer-keys.focus();
+    }
+
+    public function set-zoom(scale: float) {
+        root.manual-x = root.center-x;
+        root.manual-y = root.center-y;
+        root.fit-mode = false;
+        root.detail-scale = max(0.01, min(256, scale));
+        root.focus-viewer();
+    }
+
+    Image {
+        x: root.picture-x + root.image-x * root.zoom * 1px;
+        y: root.picture-y + root.image-y * root.zoom * 1px;
+        width: root.image-width * root.zoom * 1px;
+        height: root.image-height * root.zoom * 1px;
+        source: root.primary-image;
+        image-fit: fill;
+        accessible-role: none;
+    }
+    if root.comparing: Rectangle {
+        width: root.width * root.split;
+        height: root.height;
+        clip: true;
+        Image {
+            x: root.picture-x;
+            y: root.picture-y;
+            width: root.frame-width * root.zoom * 1px;
+            height: root.frame-height * root.zoom * 1px;
+            source: root.comparison-image;
+            image-fit: fill;
+            accessible-role: none;
+        }
+    }
+    if root.comparing: Rectangle {
+        x: root.width * root.split;
+        y: 0;
+        width: 2px;
+        height: root.height;
+        background: #e6ebf0;
+    }
+    if !root.has-image: Text {
+        width: parent.width;
+        y: (parent.height - self.height) / 2;
+        text: "No image to preview";
+        color: #b2b8c1;
+        horizontal-alignment: center;
+    }
+
+    viewer-keys := FocusScope {
+        key-pressed(event) => {
+            if !root.has-image { return reject; }
+            if event.text == Key.RightArrow {
+                root.next-source(1);
+                return accept;
+            }
+            if event.text == Key.LeftArrow {
+                root.next-source(-1);
+                return accept;
+            }
+            if event.text == "+" || event.text == "=" {
+                root.set-zoom(root.zoom * 1.35);
+                return accept;
+            }
+            if event.text == "-" {
+                root.set-zoom(root.zoom / 1.35);
+                return accept;
+            }
+            reject
+        }
+    }
+
+    gestures := TouchArea {
+        enabled: root.has-image;
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                root.initial-x = root.center-x;
+                root.initial-y = root.center-y;
+                root.focus-viewer();
+            }
+        }
+        moved => {
+            if root.comparing {
+                root.split = min(0.98, max(0.02, self.mouse-x / root.width));
+            } else if !root.fit-mode {
+                root.manual-x = max(0, min(root.frame-width, root.initial-x + (self.pressed-x - self.mouse-x) / (root.zoom * 1px)));
+                root.manual-y = max(0, min(root.frame-height, root.initial-y + (self.pressed-y - self.mouse-y) / (root.zoom * 1px)));
+            }
+        }
+        scroll-event(event) => {
+            if event.delta-y == 0px { return reject; }
+            root.set-zoom(event.delta-y > 0px ? root.zoom * 1.2 : root.zoom / 1.2);
+            accept
+        }
+    }
+}
+
+export component Workspace inherits Window {
+    title: "Pancake";
+    min-width: 850px;
+    min-height: 600px;
+    preferred-width: 1170px;
+    preferred-height: 730px;
+    background: Palette.background;
+
+    in property <string> app-version;
+    in property <bool> native-menu-bar: true;
+    in-out property <int> theme-index: 0;
+    in-out property <int> device-index: 0;
+    in-out property <int> method-index: 1;
+    in-out property <int> alignment-index: 0;
+    in-out property <bool> crop-enabled: false;
+    in-out property <string> kernel-size: "3";
+    in-out property <string> pyramid-levels: "4";
+    in-out property <string> scale-factor: "6";
+    in-out property <string> error-message;
+
+    // These models hold actual files and finished results provided by the host.
+    in property <[string]> frames;
+    in property <[string]> results;
+    in property <[string]> recent-folders;
+    in property <bool> result-can-crop;
+    in property <bool> result-cropped;
+    in property <string> prompt;
+    in-out property <bool> file-open: false;
+    in-out property <int> context-index: -1;
+    in property <bool> running;
+    in property <bool> can-pause;
+    in property <bool> can-resume;
+    in property <bool> can-cancel;
+    in property <string> stack-status: "Idle";
+    in property <string> stack-details: "{}";
+    in property <image> preview;
+
+    in property <int> preview-width;
+    in property <int> preview-height;
+    in property <int> preview-x;
+    in property <int> preview-y;
+    in property <int> base-width: preview-width;
+    in property <int> base-height: preview-height;
+    in property <image> comparison-preview;
+    in property <int> selected-source: -1;
+    in property <string> selected-result-method;
+    in property <int> selected-result: -1;
+    property <bool> has-preview: root.preview-width > 0 && root.preview-height > 0;
+
+    callback save-preferences(string, string);
+    callback select-source(int);
+    callback select-result(int);
+    callback import-files();
+    callback file-menu();
+    callback open-recent(int);
+    callback clear-recent();
+    callback source-menu(int);
+    callback reveal-source(int);
+    callback import-folder();
+    callback remove-sources(int);
+    callback pause();
+    callback resume();
+    callback cancel();
+    callback close-request();
+    callback new-request();
+    callback confirm-transition();
+    callback cancel-transition();
+    callback compare-preview();
+    callback crop-result();
+    callback export-batch();
+    callback export-viewport(float, float, float, float);
+    callback stack();
+    callback export-save(int, int);
+
+    property <[string]> themes: ["Light", "Dark"];
+    property <[string]> devices: ["Automatic", "CPU", "GPU"];
+    property <[string]> methods: ["Laplacian", "Hybrid", "Weighted average", "Depth map", "Exposure fusion"];
+    property <[string]> method-ids: ["method.laplacian", "method.hybrid", "method.weighted_average", "method.depth_map", "method.exposure_fusion"];
+    property <string> page: "workspace";
+    property <bool> sidebar-visible: true;
+    property <bool> inspector-visible: true;
+    property <bool> advanced-visible: false;
+    in-out property <bool> compare: false;
+    property <bool> all-selected: false;
+    property <int> export-format-index: 2;
+    property <int> export-depth-index: 1;
+
+    changed theme-index => {
+        root.update-theme();
+    }
+
+    function update-theme() {
+        Palette.color-scheme = root.theme-index == 1 ? ColorScheme.dark : ColorScheme.light;
+    }
+
+    init => {
+        root.update-theme();
+    }
+
+    function select-frame(index: int) {
+        root.all-selected = false;
+        root.compare = false;
+        root.select-source(index);
+    }
+
+    function change-source(step: int) {
+        if root.frames.length > 0 {
+            root.select-source(max(0, min(root.frames.length - 1, root.selected-source + step)));
+        }
+    }
+
+    MenuBar {
+        visible: root.native-menu-bar;
+        Menu {
+            title: "File";
+            MenuItem {
+                title: "Close window";
+                shortcut: @keys(Control + W);
+                activated => { root.close-request(); }
+            }
+        }
+    }
+
+    VerticalLayout {
+        Rectangle {
+            height: 54px;
+            background: Palette.alternate-background;
+            HorizontalLayout {
+                padding: 10px;
+                spacing: 8px;
+                SectionLabel {
+                    text: "Pancake";
+                    font-size: 18px;
+                    height: 34px;
+                }
+                Button {
+                    text: "File";
+                    accessible-id: "file.menu";
+                    enabled: !root.running;
+                    clicked => { root.file-menu(); }
+                }
+                Button {
+                    text: "New";
+                    accessible-id: "workspace.new";
+                    enabled: !root.running;
+                    clicked => { root.new-request(); }
+                }
+                Button {
+                    text: "Open files…";
+                    accessible-id: "import.files";
+                    enabled: !root.running;
+                    clicked => { root.import-files(); }
+                }
+                Button {
+                    text: "Open folder…";
+                    accessible-id: "import.folder";
+                    enabled: !root.running;
+                    clicked => { root.import-folder(); }
+                }
+                Rectangle { horizontal-stretch: 1; }
+                Button {
+                    text: "View";
+                    accessible-id: "mode.view";
+                    enabled: root.has-preview;
+                    checkable: true;
+                    checked: !root.compare;
+                    clicked => { root.compare = false; }
+                }
+                Button {
+                    text: "Compare";
+                    accessible-id: "mode.compare";
+                    enabled: root.selected-result >= 0 && root.frames.length > 0;
+                    checkable: true;
+                    checked: root.compare;
+                    clicked => { root.compare-preview(); }
+                }
+                Button {
+                    text: "Sources";
+                    accessible-id: "layout.sidebar";
+                    checkable: true;
+                    checked <=> root.sidebar-visible;
+                }
+                Button {
+                    text: "Inspector";
+                    accessible-id: "layout.inspector";
+                    checkable: true;
+                    checked <=> root.inspector-visible;
+                }
+                Button {
+                    text: "Preferences";
+                    accessible-id: "settings.open";
+                    clicked => { root.page = "preferences"; }
+                }
+                Button {
+                    text: "About";
+                    accessible-id: "about.open";
+                    clicked => { root.page = "about"; }
+                }
+            }
+        }
+        if root.prompt != "": Rectangle {
+            background: Palette.alternate-background;
+            VerticalLayout {
+                padding: 14px;
+                spacing: 8px;
+                SectionLabel {
+                    text: root.prompt == "replace"
+                        ? "Replace the current source frames?"
+                        : "Save your result before closing this workspace?";
+                }
+                HorizontalLayout {
+                    alignment: start;
+                    spacing: 6px;
+                    Button {
+                        text: "Keep working";
+                        accessible-id: "dialog.cancel";
+                        clicked => { root.cancel-transition(); }
+                    }
+                    if root.prompt != "replace" && root.selected-result >= 0: Button {
+                        text: "Export…";
+                        clicked => {
+                            root.page = "export";
+                            root.cancel-transition();
+                        }
+                    }
+                    Button {
+                        text: root.prompt == "replace" ? "Replace" : "Discard";
+                        accessible-id: root.prompt == "replace"
+                            ? "dialog.replace"
+                            : root.prompt == "close" ? "dialog.discard_close" : "dialog.discard";
+                        clicked => { root.confirm-transition(); }
+                    }
+                }
+            }
+        }
+        if root.file-open: VerticalLayout {
+            alignment: start;
+            padding: 8px;
+            spacing: 5px;
+            Button { text: "Open files…"; clicked => { root.file-open = false; root.import-files(); } }
+            Button { text: "Open folder…"; clicked => { root.file-open = false; root.import-folder(); } }
+            SectionLabel { text: "Recent folders"; accessible-id: "recent.open"; }
+            if root.recent-folders.length == 0: Button { text: "No recent folders"; accessible-id: "recent.empty"; enabled: false; }
+            for title[index] in root.recent-folders: Button {
+                text: title;
+                clicked => { root.file-open = false; root.open-recent(index); }
+            }
+            if root.recent-folders.length > 0: Button {
+                text: "Clear menu";
+                accessible-id: "recent.clear";
+                clicked => { root.file-open = false; root.clear-recent(); }
+            }
+            Button { text: "Close menu"; clicked => { root.file-open = false; } }
+        }
+        if root.context-index >= 0: HorizontalLayout {
+            alignment: start;
+            padding: 8px;
+            spacing: 5px;
+            Button {
+                text: "Reveal source";
+                accessible-id: "frames.reveal";
+                clicked => { root.reveal-source(root.context-index); root.context-index = -1; }
+            }
+            Button {
+                text: "Remove source";
+                accessible-id: "frames.remove_one";
+                clicked => { root.remove-sources(root.context-index); root.context-index = -1; }
+            }
+        }
+        if root.page == "workspace": HorizontalLayout {
+            spacing: 1px;
+            if root.sidebar-visible: Rectangle {
+                width: 207px;
+                background: Palette.alternate-background;
+                accessible-id: "frames";
+                accessible-role: groupbox;
+                accessible-label: "Source frames";
+                VerticalLayout {
+                    spacing: 10px;
+                    padding: 14px;
+                    SectionLabel { text: "Sources"; }
+                    Text {
+                        text: root.frames.length == 1 ? "1 frame" : "\{root.frames.length} frames";
+                        accessible-id: "frames.count";
+                        color: Palette.foreground;
+                    }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        Button {
+                            text: "Select all";
+                            accessible-id: "frames.select_all";
+                            enabled: root.frames.length > 0 && !root.running;
+                            checkable: true;
+                            checked <=> root.all-selected;
+                        }
+                        Button {
+                            text: "Remove";
+                            accessible-id: "frames.remove_selected";
+                            enabled: root.frames.length > 0 && (root.all-selected || root.selected-source >= 0) && !root.running;
+                            clicked => {
+                                root.remove-sources(root.all-selected ? -1 : root.selected-source);
+                                root.all-selected = false;
+                            }
+                        }
+                    }
+                    ScrollView {
+                        VerticalLayout {
+                            spacing: 4px;
+                            alignment: start;
+                            for name[index] in root.frames: Rectangle {
+                                height: 33px;
+                                border-radius: 4px;
+                                property <bool> chosen: root.all-selected || root.selected-source == index;
+                                background: self.chosen ? Palette.accent-background : Palette.control-background;
+                                accessible-id: "frame.\{index}";
+                                accessible-role: button;
+                                accessible-label: name;
+                                accessible-action-default => { root.select-frame(index); }
+                                Text {
+                                    x: 8px;
+                                    width: parent.width - 16px;
+                                    height: parent.height;
+                                    color: parent.chosen ? Palette.accent-foreground : Palette.foreground;
+                                    vertical-alignment: center;
+                                    text: name;
+                                    overflow: elide;
+                                    accessible-role: none;
+                                }
+                                TouchArea {
+                                    clicked => { root.select-frame(index); }
+                                    pointer-event(event) => {
+                                        if event.kind == PointerEventKind.down && event.button == PointerEventButton.right {
+                                            root.source-menu(index);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if root.results.length > 0: Rectangle {
+                        accessible-id: "results";
+                        accessible-role: groupbox;
+                        accessible-label: "Retained results";
+                        VerticalLayout {
+                            spacing: 4px;
+                            SectionLabel { text: "Results"; }
+                            Text { text: "\{root.results.length}"; accessible-id: "results.count"; color: Palette.foreground; }
+                            for label[index] in root.results: Button {
+                                text: label;
+                                primary: root.selected-result == index;
+                                accessible-id: "result.\{index}";
+                                clicked => { root.select-result(index); }
+                            }
+                        }
+                    }
+                }
+            }
+            VerticalLayout {
+                        horizontal-stretch: 1;
+                canvas := ViewCanvas {
+                    vertical-stretch: 1;
+                    primary-image: root.preview;
+                    image-width: root.preview-width;
+                    image-height: root.preview-height;
+                    image-x: root.preview-x;
+                    image-y: root.preview-y;
+                    frame-width: root.base-width;
+                    frame-height: root.base-height;
+                    comparison-image: root.comparison-preview;
+                    comparing: root.compare;
+                    cropped: root.result-cropped;
+                    selected-source: root.selected-source;
+                    result-method: root.selected-result-method;
+                    next-source(step) => { root.change-source(step); }
+                }
+                Rectangle {
+                    height: 48px;
+                    background: Palette.alternate-background;
+                    HorizontalLayout {
+                        padding-left: 10px;
+                        padding-right: 10px;
+                        spacing: 8px;
+                        Button { text: "Fit"; accessible-id: "viewer.fit"; enabled: root.has-preview; clicked => { canvas.fit-image(); } }
+                        Button { text: "1:1"; accessible-id: "viewer.actual"; enabled: root.has-preview; clicked => { canvas.set-zoom(1); } }
+                        Button { text: "−"; accessible-id: "viewer.zoom_out"; accessible-label: "Zoom out"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom / 1.35); } }
+                        Button { text: "+"; accessible-id: "viewer.zoom_in"; accessible-label: "Zoom in"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom * 1.35); } }
+                        Button { text: "‹"; accessible-id: "viewer.previous"; accessible-label: "Previous source"; enabled: root.frames.length > 0; clicked => { root.change-source(-1); } }
+                        Button { text: "›"; accessible-id: "viewer.next"; accessible-label: "Next source"; enabled: root.frames.length > 0; clicked => { root.change-source(1); } }
+                        Rectangle { horizontal-stretch: 1; }
+                        Button {
+                            text: "Crop";
+                            accessible-id: "result.crop";
+                            enabled: root.result-can-crop && !root.running;
+                            clicked => { root.crop-result(); }
+                        }
+                        Button {
+                            text: "Export";
+                            accessible-id: "export.start";
+                            enabled: root.selected-result >= 0 && !root.running;
+                            clicked => { root.page = "export"; }
+                        }
+                    }
+                }
+                HorizontalLayout {
+                    padding: 8px;
+                    spacing: 6px;
+                    Button {
+                        text: "Save view…";
+                        accessible-id: "export.viewport";
+                        enabled: root.has-preview && !root.running;
+                        clicked => {
+                            root.export-viewport(
+                                canvas.absolute-position.x / 1px,
+                                canvas.absolute-position.y / 1px,
+                                canvas.width / 1px, canvas.height / 1px
+                            );
+                        }
+                    }
+                    Button {
+                        text: "Batch export…";
+                        accessible-id: "export.batch";
+                        enabled: root.selected-result >= 0 && !root.running;
+                        clicked => { root.export-batch(); }
+                    }
+                    if root.result-cropped: Text {
+                        accessible-id: "result.crop.state";
+                        text: "Cropped";
+                        vertical-alignment: center;
+                        color: Palette.foreground;
+                    }
+                }
+                if root.error-message != "": Rectangle {
+                    background: Palette.alternate-background;
+                    accessible-id: "dialog.error";
+                    accessible-role: groupbox;
+                    accessible-label: "Pancake error";
+                    HorizontalLayout {
+                        padding: 10px;
+                        spacing: 8px;
+                        Text { text: root.error-message; wrap: word-wrap; color: Palette.foreground; }
+                        Button { text: "Dismiss"; accessible-id: "dialog.accept"; clicked => { root.error-message = ""; } }
+                    }
+                }
+            }
+            if root.inspector-visible: Rectangle {
+                width: 239px;
+                background: Palette.alternate-background;
+                VerticalLayout {
+                    padding: 14px;
+                    spacing: 8px;
+                    SectionLabel { text: "Stack method"; }
+                    for method[index] in root.methods: Button {
+                        text: method;
+                        accessible-id: root.method-ids[index];
+                        primary: root.method-index == index;
+                        accessible-role: radio-button;
+                        accessible-checkable: true;
+                        accessible-checked: root.method-index == index;
+                        enabled: !root.running;
+                        clicked => { root.method-index = index; }
+                    }
+                    SectionLabel { text: "Alignment"; }
+                    ComboBox {
+                        accessible-id: "alignment";
+                        accessible-label: self.current-value;
+                        model: ["Off", "Translation", "Euclidean", "Similarity", "Affine", "Breathing"];
+                        current-index <=> root.alignment-index;
+                        enabled: !root.running;
+                    }
+                    CheckBox {
+                        text: "Crop aligned margins";
+                        accessible-id: "autocrop";
+                        checked <=> root.crop-enabled;
+                        enabled: !root.running;
+                    }
+                    CheckBox {
+                        text: "Advanced settings";
+                        accessible-id: "advanced";
+                        checked <=> root.advanced-visible;
+                    }
+                    if root.advanced-visible && root.method-index != 4: Parameter {
+                        label: "Kernel size";
+                        identifier: "kernel-size";
+                        value <=> root.kernel-size;
+                    }
+                    if root.advanced-visible && (root.method-index < 2 || root.method-index == 4): Parameter {
+                        label: "Pyramid levels";
+                        identifier: "pyramid-levels";
+                        value <=> root.pyramid-levels;
+                    }
+                    if root.advanced-visible && root.method-index < 2: Parameter {
+                        label: "Scale factor";
+                        identifier: "scale-factor";
+                        value <=> root.scale-factor;
+                    }
+                    Rectangle { vertical-stretch: 1; }
+                    Text {
+                        text: root.stack-status;
+                        color: Palette.foreground;
+                        accessible-id: "stack.status";
+                        accessible-label: root.stack-status;
+                        accessible-description: root.stack-details;
+                    }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        Button { text: "Pause"; accessible-id: "stack.pause"; enabled: root.can-pause; clicked => { root.pause(); } }
+                        Button { text: "Resume"; accessible-id: "stack.resume"; enabled: root.can-resume; clicked => { root.resume(); } }
+                        Button { text: "Stop"; accessible-id: "stack.stop"; enabled: root.can-cancel; clicked => { root.cancel(); } }
+                    }
+                    Button {
+                        text: "Start stack";
+                        primary: true;
+                        accessible-id: "stack.start";
+                        enabled: root.frames.length > 1 && !root.running;
+                        clicked => { root.stack(); }
+                    }
+                }
+            }
+        }
+        if root.page == "export": VerticalLayout {
+            padding: 22px;
+            spacing: 12px;
+            alignment: start;
+            SectionLabel { text: "Export result"; }
+            HorizontalLayout {
+                spacing: 12px;
+                alignment: start;
+                Text { text: "Format"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
+                ComboBox {
+                    width: 205px;
+                    accessible-id: "export.format";
+                    accessible-label: self.current-value;
+                    model: ["PNG", "JPEG", "TIFF", "OpenEXR"];
+                    current-index <=> root.export-format-index;
+                }
+            }
+            HorizontalLayout {
+                spacing: 12px;
+                alignment: start;
+                Text { text: "Bit depth"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
+                ComboBox {
+                    width: 205px;
+                    accessible-id: "export.depth";
+                    accessible-label: self.current-value;
+                    model: ["8-bit", "16-bit"];
+                    current-index <=> root.export-depth-index;
+                    enabled: root.export-format-index == 0 || root.export-format-index == 2;
+                }
+            }
+            HorizontalLayout {
+                spacing: 8px;
+                alignment: start;
+                Button { text: "Cancel"; accessible-id: "dialog.cancel"; clicked => { root.page = "workspace"; } }
+                Button {
+                    text: "Continue…";
+                    accessible-id: "export.confirm";
+                    primary: true;
+                    clicked => {
+                        root.page = "workspace";
+                        root.export-save(root.export-format-index, root.export-depth-index);
+                    }
+                }
+            }
+        }
+        if root.page == "preferences": VerticalLayout {
+            padding: 22px;
+            alignment: start;
+            spacing: 12px;
+            SectionLabel { text: "Preferences"; }
+            HorizontalLayout {
+                spacing: 12px;
+                alignment: start;
+                Text { text: "Theme"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
+                ComboBox {
+                    width: 205px;
+                    accessible-id: "settings.theme";
+                    accessible-label: self.current-value;
+                    model: root.themes;
+                    current-index <=> root.theme-index;
+                    selected(_) => { root.save-preferences(root.themes[root.theme-index], root.devices[root.device-index]); }
+                }
+            }
+            HorizontalLayout {
+                spacing: 12px;
+                alignment: start;
+                Text { text: "Processing device"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
+                ComboBox {
+                    width: 205px;
+                    accessible-id: "settings.device";
+                    accessible-label: self.current-value;
+                    model: root.devices;
+                    current-index <=> root.device-index;
+                    selected(_) => { root.save-preferences(root.themes[root.theme-index], root.devices[root.device-index]); }
+                }
+            }
+            SectionLabel { text: "Lightroom Classic"; }
+            Text {
+                text: "Lightroom Classic integration is unavailable in this build.";
+                color: Palette.foreground;
+                accessible-id: "settings.lightroom.status";
+            }
+            Button {
+                text: "Configure Lightroom integration";
+                accessible-id: "settings.lightroom.action";
+                enabled: false;
+                horizontal-stretch: 0;
+            }
+            Button {
+                text: "Done";
+                accessible-id: "dialog.close";
+                horizontal-stretch: 0;
+                clicked => { root.page = "workspace"; }
+            }
+            if root.error-message != "": Text {
+                text: root.error-message;
+                wrap: word-wrap;
+                color: Palette.foreground;
+            }
+        }
+        if root.page == "about": VerticalLayout {
+            padding: 22px;
+            alignment: start;
+            spacing: 12px;
+            SectionLabel { text: "About Pancake"; accessible-id: "about.window"; }
+            Text { text: root.app-version; accessible-id: "about.version"; color: Palette.foreground; }
+            Text { text: "Focus stacking and exposure fusion"; color: Palette.foreground; }
+            Button {
+                text: "Done";
+                accessible-id: "dialog.close";
+                horizontal-stretch: 0;
+                clicked => { root.page = "workspace"; }
+            }
+        }
+    }
+}

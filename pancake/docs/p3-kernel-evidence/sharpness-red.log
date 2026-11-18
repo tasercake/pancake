@@ -1,0 +1,9 @@
+   Compiling pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p3-fusion/pancake)
+error[E0432]: unresolved import `pancake::fusion::sharpness`
+ --> tests/common/fusion_cases.rs:3:62
+  |
+3 | use pancake::fusion::{FocusAccumulator, FocusMethod, resize, sharpness};
+  |                                                              ^^^^^^^^^ no `sharpness` in `fusion`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `pancake` (test "cpu_fusion_contract") due to 1 previous error

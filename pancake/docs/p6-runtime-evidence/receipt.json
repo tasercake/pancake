@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "source_revision": "ef07af2e09748e57be6e0fec53483d417313f85c",
+  "cargo_lock_sha256": "52095cb40f098ea2c59e54c36a6bcf634db233759e1aff7d57f28ecc2ff02a7c",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "os": "Linux 6.8.0-147-generic x86_64 GNU/Linux",
+  "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "gpu": "NVIDIA GeForce RTX 3090, 580.178.04, 00000000:01:00.0, 24576 MiB",
+  "cuda_toolkit": "12.5 at /usr/local/cuda-12.5, CUDARC_CUDA_VERSION=12050",
+  "benchmark_performance_run": false,
+  "input": {
+    "qualification_row": [
+      1,
+      9
+    ],
+    "expected_variance": 16,
+    "default_blur": [
+      0,
+      8,
+      16
+    ],
+    "expected_default_blur": [
+      2,
+      8,
+      14
+    ],
+    "shared_setup_blur": [
+      16,
+      0,
+      12
+    ],
+    "expected_shared_setup_blur": [
+      12,
+      7,
+      9
+    ]
+  },
+  "verified_executables": {
+    "target/debug/build/pancake/597505d00b7236eb/out/cpu_runtime_contract-597505d00b7236eb": {
+      "size_bytes": 517083128,
+      "sha256": "c6b349cea49bb98d56b1dc6b499a48350c548b2797f84ff774fb59acc920b660"
+    },
+    "target/debug/build/pancake/baa4d5a09bc92f99/out/gpu_runtime_contract-baa4d5a09bc92f99": {
+      "size_bytes": 517163432,
+      "sha256": "198fe2fa8bb8eeb0dd35c2a793971cf6555b2514d1a4108b2faf4efc74f80d4a"
+    },
+    "target/debug/build/pancake/08bf905c3a6157ed/out/gpu_runtime_contract-08bf905c3a6157ed": {
+      "size_bytes": 579611552,
+      "sha256": "6ad17c0da0acf64e0403ab4c3a0d64a6b002754df00dd594994680342e685b77"
+    }
+  },
+  "retained_reports": {
+    "clippy-pass.log.gz": "5fb55e72375eab71f156c82c6702badd7be03a512576378f040406c11b277094",
+    "default.log.gz": "38e8159396479e4266b932b515889ad9484575f9f12b55b5ed0db798a84ef5e3",
+    "native-cuda.log.gz": "bb9ab04ecf00024d4145727b77968e9dc7fe7e9cc63294738ee8473ab0559ecb",
+    "native-cuda.txt": "72de7e4e9a855fc0c9834761b881fcded74fd9582540184dd7c7f04664553006",
+    "red-runtime.log.gz": "5616dd8491d1f272591e701246b30ef481660ee182dd63573779f475d5d47a4a",
+    "software-auto.log.gz": "c29a43295b70fde7730dab0a8f88cf7956f664bfb63ffeefa32f2b86b6a2b95b",
+    "software-auto.txt": "07634b70d67f54f5999add46c139b6bb8ba660f98638512401260cf1d02df91f",
+    "software-strict.log.gz": "e081dddba4eb683f4b2b5d4a24b3a25ceda0fb0e72f6d2929b6703919b6f98dd",
+    "vulkan.txt": "ec4a1aeb9fc31104d001aad506ec16cfc4a0568925f6fb8f6759690b6598704c"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "app": "/tmp/p9-release-source-boundary-0b_mgvj4/app/usr/bin/pancake-gui",
+  "binary_sha256": "57053ae2b7e15e4e5f21559149b0e8dc17d43dec7f218169c799ce194e5b3598",
+  "xvfb": "/tmp/pancake-worktrees.t3paqgWM/p7-ui/artifacts/p7/system/root/usr/bin/Xvfb",
+  "settings": {
+    "SLINT_BACKEND": "winit-software"
+  },
+  "shadow_source": "export component P9AuditMarker inherits Rectangle {}\n",
+  "runs": [
+    {
+      "variant": "empty-cwd",
+      "command": [
+        "dbus-run-session",
+        "--",
+        "strace",
+        "-f",
+        "-e",
+        "trace=openat",
+        "-o",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-package-smoke/slint-5216ba4/empty-cwd.strace",
+        "/tmp/p9-release-source-boundary-0b_mgvj4/app/usr/bin/pancake-gui"
+      ],
+      "display": ":2",
+      "exit_when_observed": null,
+      "window_observed": true,
+      "log": "empty-cwd.log",
+      "std_widget_openat_calls": []
+    },
+    {
+      "variant": "local-widget-shadow",
+      "command": [
+        "dbus-run-session",
+        "--",
+        "strace",
+        "-f",
+        "-e",
+        "trace=openat",
+        "-o",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-package-smoke/slint-5216ba4/local-widget-shadow.strace",
+        "/tmp/p9-release-source-boundary-0b_mgvj4/app/usr/bin/pancake-gui"
+      ],
+      "display": ":2",
+      "exit_when_observed": null,
+      "window_observed": true,
+      "log": "local-widget-shadow.log",
+      "std_widget_openat_calls": []
+    }
+  ]
+}

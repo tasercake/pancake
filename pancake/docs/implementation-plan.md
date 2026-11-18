@@ -1,5 +1,20 @@
 # Pancake implementation plan
 
+| Roadmap phase | Passed | Host evidence |
+|---|---:|---|
+| P5 motion, crop and registration | 64/64 | [P5 replay](p5-registration.md) |
+
+The isolated release replay passed all 20 P7 and 14 P8 interface IDs. It
+verified native panels, retained results, GUI and CLI export parity, and
+the actual 64-frame pause, resume, cancel, and worker reuse workflow.
+[Interface evidence](p7-ui-evidence/5216ba4/README.md) and
+[Linux package evidence](p9-linux-package-evidence/README.md).
+
+Apple execution, retained platform builds, mutation/sanitizer assurance,
+full owned-source coverage, end-to-end CUDA qualification, genuine driver
+fault recovery, and the frozen P10 measurements remain separate exit gates.
+[Sealed Linux branch coverage](p9-cpu-assurance-evidence/5216ba4-nightly/README.md).
+
 [Consolidated P0 work log, including earlier work](p0-work-log.md) is the evidence
 entry point. Historical reports retain their original outcomes; this plan owns
 current scope and exit requirements.

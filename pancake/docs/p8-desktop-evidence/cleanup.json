@@ -1,0 +1,16 @@
+{
+  "evidence_commit": "ff67e75f2fac8956ad530ec8637bc1d3c0224b7e",
+  "removed": [
+    {
+      "temporary_directory": "artifacts/p8-native",
+      "files_removed": 1292,
+      "logical_bytes_removed": 494025446
+    },
+    {
+      "temporary_directory": "artifacts/n8",
+      "files_removed": 17,
+      "logical_bytes_removed": 233614
+    }
+  ],
+  "scope": "Only standalone GTK probe builds, isolated profiles and generated test inputs and outputs in this worktree."
+}

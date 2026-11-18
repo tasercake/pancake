@@ -1,0 +1,10 @@
+runtime=cuda
+backend=gpu
+device=NVIDIA GeForce RTX 3090
+fingerprint=ptx_sm86
+device_pci_address=Some("0000:01:00.0")
+physical_gpu=true
+maximum_allocation_bytes=6324011008
+capacity_bytes=Some(25296044032)
+fallback_reason=None
+wgpu_adapter=None

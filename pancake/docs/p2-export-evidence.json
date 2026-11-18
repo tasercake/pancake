@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-18",
+  "scope": "P2 codec and atomic publication component proof",
+  "status": "focused_tests_passed",
+  "application_commit": "422ae41add00105e61880dc7c7faf6d4a449b139",
+  "red_commit": "4674086",
+  "cargo_lock_sha256": "3ddbc2bdae9eff3e8a5284e09d614684a1145fb384a46c59ad307acf17ea34bf",
+  "export_source_sha256": "1104274e242452cc7586b2cf5bba38985333b83f5688cdec8bdf00a6722ad0c5",
+  "tests_source_sha256": "28a33551f64b905dfbf3efad177118b3f3755e99ec11286cd06bdab4f69199de",
+  "host": {
+    "os": "Ubuntu 24.04.5 LTS",
+    "kernel": "6.8.0-147-generic",
+    "architecture": "x86_64",
+    "cpu": "AMD Ryzen 9 7950X3D",
+    "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+    "gpu_required": false
+  },
+  "command": "cd pancake && cargo test --locked --offline --test cpu_image_export",
+  "red": {
+    "exit_code": 101,
+    "diagnostic": "Unresolved public ExportFormat, export, and prepare_export; the codec inputs, Pancake core, and export test compiled to the missing API boundary."
+  },
+  "green": {
+    "exit_code": 0,
+    "passed": 6,
+    "failed": 0,
+    "contracts": [
+      "PNG and TIFF preserve all u16 codes with matched RGB8 quantization",
+      "JPEG16 request reports eight-bit reduction and publishes RGB8",
+      "EXR preserves signed f32 samples above and below the normalized interval",
+      "dropping a staged export retains the previous file and removes staging",
+      "unsupported format, missing directory, invalid quality, and destination directory failures retain data",
+      "the input file and existing or newly introduced hardlink aliases are protected"
+    ]
+  },
+  "independent_oracle": {
+    "input_rgb16": [
+      0,
+      257,
+      256,
+      32768,
+      580,
+      62211,
+      65025,
+      65535,
+      130,
+      35533,
+      17,
+      1
+    ],
+    "input_rgb16_geometry": [
+      2,
+      2,
+      3
+    ],
+    "input_rgb_f32": [
+      -0.125,
+      0.12345679,
+      7.25,
+      0.0,
+      0.75,
+      1.0
+    ],
+    "input_rgb_f32_geometry": [
+      1,
+      2,
+      3
+    ],
+    "driver": "Temporary Cargo example called the production export function with normalized u16 codes and JPEG quality 95, then exported raw finite f32 values as EXR.",
+    "outputs": {
+      "uint16.png": {
+        "dtype": "uint16",
+        "shape": [
+          2,
+          2,
+          3
+        ],
+        "bytes": 110,
+        "sha256": "6c8ce2274c85ee7305d6b72281a36ddcb88eb49fbc9728e1d539d69fae7d8e7e",
+        "exact_input_codes": true
+      },
+      "uint16.tiff": {
+        "dtype": "uint16",
+        "shape": [
+          2,
+          2,
+          3
+        ],
+        "bytes": 234,
+        "sha256": "1df90f62f3b28e194eafb93fbc103f5eba7c3e58d4083c1b8937f85e2b7313c9",
+        "exact_input_codes": true
+      },
+      "uint16.jpg": {
+        "dtype": "uint8",
+        "shape": [
+          2,
+          2,
+          3
+        ],
+        "bytes": 724,
+        "sha256": "8b7eb2af5ce121c4babac4bcd4865c6bf7e822a01fd5b4606688c57e8e4a431c"
+      },
+      "float.exr": {
+        "dtype": "float32",
+        "shape": [
+          1,
+          2,
+          3
+        ],
+        "bytes": 442,
+        "sha256": "06fa3730d5926147ffe72578cbe54ec277294dfacc578e53c24c647a0bab5bf4",
+        "exact_float_samples": true
+      }
+    },
+    "cleanup": "Removed all four temporary output images after successful validation."
+  },
+  "unresolved": [
+    "Full native assurance and audited image/raw dependency inventory are pending on the integrated source.",
+    "Apple and Windows builds for this change were not run on this Linux host."
+  ],
+  "integration": {
+    "base_commit": "e1bac3a",
+    "tested_commit": "8c1d650f9a7f9e3e68c52badfdea54687621c425",
+    "cargo_lock_sha256": "3ddbc2bdae9eff3e8a5284e09d614684a1145fb384a46c59ad307acf17ea34bf",
+    "export_source_sha256": "1104274e242452cc7586b2cf5bba38985333b83f5688cdec8bdf00a6722ad0c5",
+    "export_tests_sha256": "d4e3c64280dd421e5cfd22291dfa43c662dcc417ded73d737606e5f663561764",
+    "commands_from_pancake_directory": [
+      "bash scripts/check.sh fast",
+      "cargo test --locked --offline --workspace --test cpu_image_export --test cpu_image_io --test cpu_cli --test cpu_config",
+      "bash scripts/check.sh deps"
+    ],
+    "results": {
+      "fast": "Passed 40 checker tests, reviewed source/dependency inventory, strict Clippy, and rustdoc.",
+      "tests": {
+        "passed": 18,
+        "failed": 0,
+        "targets": {
+          "cpu_image_export": 6,
+          "cpu_image_io": 3,
+          "cpu_cli": 5,
+          "cpu_config": 4
+        }
+      },
+      "dependencies": "Passed 19 policy tests and 7 patch/macro contract tests. Advisory, ban, source and unused-dependency checks passed. The export change added four direct edges and no package versions.",
+      "independent_oracle": "All four outputs repeat the exact hashes and decoded values recorded in independent_oracle.outputs.",
+      "cleanup": "Removed four generated oracle output files. After checking no build was active in the export worktree, cargo clean removed 7,469 local build files totaling 3.1 GiB."
+    },
+    "artifacts": {
+      "check-oracle.py.txt": "57d52d5c0b2a410847d5aa85c662fdbc4f3635d426876f7ce3eb481a9fe73bce",
+      "deps.log.gz": "6f80b585bb4005c24b9de64a2ef8bf24715767d99167f0798e22b367e490c707",
+      "driver.rs.txt": "2db48c042760e06642d2d6ca75e63fa4ca1384b2cf876bbc6c67009a88a87065",
+      "fast.log.gz": "f5118d8a51eb65bc27790fe2e1f956b739e727c0f38f268e213cb1ea0413df35",
+      "tests.log.gz": "fe091326777e60b8ce507c66c2ed2ce06a068fedd82c66b14f8fbde0108cfb5b"
+    }
+  }
+}

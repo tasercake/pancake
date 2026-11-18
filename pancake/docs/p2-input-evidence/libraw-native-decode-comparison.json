@@ -1,0 +1,26 @@
+{
+  "libraw_commit": "0b56545a4f828743f28a4345cdfdd4c49f9f9a2a",
+  "tool": "dcraw_emu",
+  "argv": [
+    "-w",
+    "-W",
+    "-6",
+    "-q",
+    "3",
+    "-T",
+    "-Z",
+    "-"
+  ],
+  "out_shape": [
+    3412,
+    5118,
+    3
+  ],
+  "dtype": "uint16",
+  "mean": 1.0324107606023443,
+  "p99": 2.0,
+  "max": 2,
+  "exactly_equal": false,
+  "capture_sha": "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca",
+  "pixel_sha": "7b98694521ef6e7b472e99dfc033372f5853c53576fafaeba90d5487a3e20be7"
+}

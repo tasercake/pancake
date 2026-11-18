@@ -1,0 +1,5 @@
+   Compiling x11 v2.21.0
+   Compiling gdkx11-sys v0.19.0
+   Compiling gdkx11 v0.19.0
+   Compiling pancake-gui v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/crates/pancake-gui)
+    Finished `dev` profile [unoptimized] target(s) in 9.11s

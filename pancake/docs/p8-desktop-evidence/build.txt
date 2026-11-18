@@ -1,0 +1,2 @@
+   Compiling pancake-native-probe v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p8-desktop/artifacts/p8-native/harness)
+    Finished `dev` profile [unoptimized] target(s) in 0.51s

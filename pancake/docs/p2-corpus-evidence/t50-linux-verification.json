@@ -1,0 +1,54 @@
+{
+  "cleanup_receipt_sha256": "fe106b9ccdbee12faa30d9292baf3b90a6a9bffd36c130ce82e0730738fcce5b",
+  "commands": [
+    "artifacts/t50-venv/bin/python qualification/t50-generated/t50_generated.py --materialize-from qualification/t50-generated/evidence/native-t50-receipt.json --output artifacts/p2-t50-benchmark-inputs --receipt artifacts/p2-t50-materialization.json",
+    "artifacts/t50-venv/bin/python qualification/t50-generated/t50_generated.py --cleanup-from artifacts/p2-t50-materialization.json --output artifacts/p2-t50-benchmark-inputs --receipt artifacts/p2-t50-cleanup.json"
+  ],
+  "cpu": "AMD Ryzen 9 7950X3D",
+  "dataset_kind": "GENERATED_SYNTHETIC_FOCAL_SCALE",
+  "date": "2026-11-18",
+  "deleted_bytes": 2775174405,
+  "deleted_files": 52,
+  "file_records_equal_frozen_receipt": true,
+  "focus_frames": 50,
+  "free_disk_before_bytes": 119994179584,
+  "free_reserve_bytes": 16106127360,
+  "frozen_performance_targets_sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc",
+  "frozen_receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+  "full_set_preflight_bytes": 3067213930,
+  "gpu": {
+    "driver": "580.178.04",
+    "name": "NVIDIA GeForce RTX 3090",
+    "used_for_this_run": false
+  },
+  "materialization_archive_sha256": "9c449b925ed69e18065650eb322dc1f6a563299258137686f71d9c3e6941020e",
+  "materialization_receipt_sha256": "e5872fa4a6b019c850d6de02a47457de63f4824ac0f107aaec9fb70357b256d6",
+  "maximum_simultaneous_image_files": 52,
+  "ordered_sha256_of_decoded_pixel_digests": "af415f3eb12c3d0d4da685ddcd1d5e6a5ff142e813fe03cb37e7cd1067ea2a0f",
+  "ordered_sha256_of_file_digests": "ea3338e982324b09fbcdb6fb2a243977dede491b16068fc158e4f45e242190f1",
+  "peak_retained_tiff_bytes": 2775174405,
+  "recipe": {
+    "frames": 50,
+    "height": 4000,
+    "seed": 20261117,
+    "tile": 256,
+    "width": 6000
+  },
+  "remaining_tiff_count": 0,
+  "scope": "Native generated T50 corpus preparation only; no product cases or timing target measured",
+  "source_git_commit": "9057cff6662b4dccd985169388e4550837ec975b",
+  "source_sha256": {
+    "t50_generated.py": "aea85c1322e5e736d13fa5b945e4e3bdae68acbda9ded5e798d5d3486b57303e",
+    "t50_oracle.py": "02ef3f567e84e2e11459e3af0d642f867740de24125a29145c8500ed7b36a116",
+    "test_t50_generated.py": "68ebc34ae3ff539b50fb888ed00f98b82bcecb23ae1d4c4f31e19075f74f7798"
+  },
+  "truth_frames": 2,
+  "versions": {
+    "imagecodecs": "2026.11.11",
+    "numpy": "2.5.4",
+    "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+    "python": "3.12.12",
+    "tifffile": "2026.11.12",
+    "zlib": "1.3.1"
+  }
+}
