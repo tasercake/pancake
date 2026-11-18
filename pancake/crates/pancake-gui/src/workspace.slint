@@ -189,6 +189,7 @@ export component Workspace inherits Window {
     background: Palette.background;
 
     in property <string> app-version;
+    in property <bool> native-menu-bar: true;
     in-out property <int> theme-index: 0;
     in-out property <int> device-index: 0;
     in-out property <int> method-index: 1;
@@ -290,6 +291,7 @@ export component Workspace inherits Window {
     }
 
     MenuBar {
+        visible: root.native-menu-bar;
         Menu {
             title: "File";
             MenuItem {
@@ -337,6 +339,22 @@ export component Workspace inherits Window {
                     clicked => { root.import-folder(); }
                 }
                 Rectangle { horizontal-stretch: 1; }
+                Button {
+                    text: "View";
+                    accessible-id: "mode.view";
+                    enabled: root.has-preview;
+                    checkable: true;
+                    checked: !root.compare;
+                    clicked => { root.compare = false; }
+                }
+                Button {
+                    text: "Compare";
+                    accessible-id: "mode.compare";
+                    enabled: root.selected-result >= 0 && root.frames.length > 0;
+                    checkable: true;
+                    checked: root.compare;
+                    clicked => { root.compare-preview(); }
+                }
                 Button {
                     text: "Sources";
                     accessible-id: "layout.sidebar";
@@ -543,22 +561,6 @@ export component Workspace inherits Window {
                         padding-left: 10px;
                         padding-right: 10px;
                         spacing: 8px;
-                        Button {
-                            text: "View";
-                            accessible-id: "mode.view";
-                            enabled: root.has-preview;
-                            checkable: true;
-                            checked: !root.compare;
-                            clicked => { root.compare = false; }
-                        }
-                        Button {
-                            text: "Compare";
-                            accessible-id: "mode.compare";
-                            enabled: root.selected-result >= 0 && root.frames.length > 0;
-                            checkable: true;
-                            checked: root.compare;
-                            clicked => { root.compare-preview(); }
-                        }
                         Button { text: "Fit"; accessible-id: "viewer.fit"; enabled: root.has-preview; clicked => { canvas.fit-image(); } }
                         Button { text: "1:1"; accessible-id: "viewer.actual"; enabled: root.has-preview; clicked => { canvas.set-zoom(1); } }
                         Button { text: "−"; accessible-id: "viewer.zoom_out"; accessible-label: "Zoom out"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom / 1.35); } }

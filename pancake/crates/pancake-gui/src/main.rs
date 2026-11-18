@@ -83,6 +83,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut options = pancake::job::Options::from_env()?;
     configure_backend(&mut options)?;
     let window = compile_workspace()?.create()?;
+    window.set_property("native-menu-bar", cfg!(not(target_os = "linux")).into())?;
     window.set_property(
         "app-version",
         SharedString::from(env!("CARGO_PKG_VERSION")).into(),
