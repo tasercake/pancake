@@ -708,11 +708,11 @@ fn malformed_optional_tiff_profile_preserves_valid_samples() -> TestResult {
     let directory = tempfile::tempdir()?;
     let path = directory.path().join("wrong-profile-type.tiff");
     let mut encoder = TiffEncoder::new(File::create(&path)?)?;
-    let mut encoded = encoder.new_image::<colortype::RGB16>(1, 1)?;
-    encoded
+    let mut raster = encoder.new_image::<colortype::RGB16>(1, 1)?;
+    raster
         .encoder()
         .write_tag(Tag::IccProfile, &[7_u16, 13, 251][..])?;
-    encoded.write_data(&[1, 17, 4097])?;
+    raster.write_data(&[1, 17, 4097])?;
     let frame = decode(&path)?;
     require(
         frame.icc_profile().is_none() && frame.sample_encoding() == SampleEncoding::U16,
