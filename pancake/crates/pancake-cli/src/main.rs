@@ -9,6 +9,7 @@ use clap::Parser;
 use pancake::config::{
     AlignmentMode, AlignmentReference, BitDepth, DevicePreference, JobConfig, JobSettings, Method,
 };
+use pancake::image_io::decode;
 
 /// Process a focal stack or exposure bracket.
 #[derive(Debug, Parser)]
@@ -165,7 +166,7 @@ fn main() -> ExitCode {
             );
         }
     };
-    let _job = match arguments.into_job() {
+    let job = match arguments.into_job() {
         Ok(job) => job,
         Err(error) => {
             return report(
@@ -175,6 +176,15 @@ fn main() -> ExitCode {
             );
         }
     };
+    for input in job.inputs() {
+        if let Err(error) = decode(input) {
+            return report(
+                &mut io::stderr().lock(),
+                format_args!("error: {error}\n"),
+                ExitCode::FAILURE,
+            );
+        }
+    }
     report(
         &mut io::stderr().lock(),
         format_args!("error: stack processing is not available in this build\n"),
