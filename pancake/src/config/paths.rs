@@ -45,7 +45,7 @@ pub(super) fn resolve(arguments: &[PathBuf]) -> Result<Vec<PathBuf>, String> {
 ///
 /// # Errors
 /// Returns an error when the scan budget is exhausted.
-fn consume_entry(entries: &mut impl Iterator<Item = ()>) -> Result<(), String> {
+fn consume_entry(entries: &mut std::iter::RepeatN<()>) -> Result<(), String> {
     entries
         .next()
         .ok_or_else(|| "too many input path entries".into())
@@ -66,7 +66,7 @@ fn is_pattern(text: &str) -> bool {
 fn expand(
     argument: &Path,
     files: &mut BTreeSet<PathBuf>,
-    entries: &mut impl Iterator<Item = ()>,
+    entries: &mut std::iter::RepeatN<()>,
 ) -> Result<(), String> {
     let pattern = argument
         .to_str()
@@ -109,7 +109,7 @@ fn expand(
 fn expand_component(
     paths: &[PathBuf],
     matcher: &glob::Pattern,
-    entries: &mut impl Iterator<Item = ()>,
+    entries: &mut std::iter::RepeatN<()>,
 ) -> Result<Vec<PathBuf>, String> {
     let mut next_paths = Vec::new();
     for prefix in paths {
@@ -123,8 +123,8 @@ fn expand_component(
             Err(error) if missing_component(&error) => continue,
             Err(error) => return Err(path_error(directory, &error)),
         };
-        let listing = listing.map(|entry| entry.map(|entry| (entry.file_name(), entry.path())));
-        scan_entries(listing, directory, matcher, entries, &mut next_paths)?;
+        let mut listing = listing.map(|entry| entry.map(|entry| (entry.file_name(), entry.path())));
+        scan_entries(&mut listing, directory, matcher, entries, &mut next_paths)?;
     }
     Ok(next_paths)
 }
@@ -133,11 +133,11 @@ fn expand_component(
 ///
 /// # Errors
 /// Returns entry read or scan budget errors.
-fn scan_entries(
-    listing: impl Iterator<Item = std::io::Result<(OsString, PathBuf)>>,
+pub(super) fn scan_entries(
+    listing: &mut dyn Iterator<Item = std::io::Result<(OsString, PathBuf)>>,
     directory: &Path,
     matcher: &glob::Pattern,
-    entries: &mut impl Iterator<Item = ()>,
+    entries: &mut std::iter::RepeatN<()>,
     next_paths: &mut Vec<PathBuf>,
 ) -> Result<(), String> {
     let options = glob::MatchOptions {
@@ -182,29 +182,4 @@ fn insert(files: &mut BTreeSet<PathBuf>, file: PathBuf) -> Result<(), String> {
 /// Report which path was inaccessible.
 fn path_error(path: &Path, error: &std::io::Error) -> String {
     format!("cannot access input {}: {error}", path.display())
-}
-
-/// An interrupted directory stream must identify the directory and return an error.
-///
-/// # Errors
-/// Returns a parser or missing diagnostic error.
-#[cfg(test)]
-#[test]
-fn failed_directory_read_keeps_its_path() -> Result<(), String> {
-    let directory = Path::new("failed-directory");
-    let matcher = glob::Pattern::new("*.png").map_err(|error| error.to_string())?;
-    let error = std::io::Error::other("directory read interrupted");
-    let mut output = Vec::new();
-    let outcome = scan_entries(
-        std::iter::once(Err(error)),
-        directory,
-        &matcher,
-        &mut std::iter::once(()),
-        &mut output,
-    );
-    let expected = Err("cannot access input failed-directory: directory read interrupted".into());
-    if outcome != expected || !output.is_empty() {
-        return Err(format!("directory iterator error was lost: {outcome:?}"));
-    }
-    Ok(())
 }
