@@ -1,0 +1,13 @@
+[package]
+name = "pancake-cr3-probe"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+rawler = { version = "=0.8.0", default-features = false }
+rayon = "1"
+
+[profile.dev]
+opt-level = 2
+debug = false

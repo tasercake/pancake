@@ -1,0 +1,122 @@
+//! Isolated Rust probe for Rawler CR3 geometry and render options.
+#![forbid(unsafe_code)]
+
+use std::env;
+use std::fs::{self, File};
+use std::io::{self, BufWriter, Write};
+use std::path::Path;
+use std::sync::Arc;
+
+use rawler::decoders::{RawDecodeParams, WhiteLevel};
+use rawler::formats::bmff::Bmff;
+use rawler::imgop::develop::{Intermediate, ProcessingStep, RawDevelop};
+use rawler::imgop::{Dim2, Point, Rect};
+use rawler::rawimage::RawImageData;
+use rawler::rawsource::RawSource;
+
+/// Decode one real file and export a test raster under the requested controls.
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<_> = env::args().skip(1).collect();
+    let [input, mode, output, oracle] = args.as_slice() else {
+        return Err(io::Error::other("expected INPUT MODE OUTPUT ORACLE-RECT").into());
+    };
+    let path = Path::new(input);
+    let source = RawSource::new_from_shared_vec(Arc::new(fs::read(path)?)).with_path(path);
+    let container = Bmff::new_buf(source.buf())?;
+
+    let pool = rayon::ThreadPoolBuilder::new().num_threads(2).build()?;
+    let (frame, geometry) = pool.install(|| -> Result<_, String> {
+        let mut raw = rawler::decode(&source, &RawDecodeParams::default()).map_err(|error| error.to_string())?;
+        let track = container.filebox.moov.traks.iter().filter_map(|track| {
+            let raw_track = track.mdia.minf.stbl.stsd.craw.as_ref()?;
+            let cmp1 = raw_track.cmp1.as_ref()?;
+            if usize::try_from(cmp1.f_width).ok()? == raw.width
+                && usize::try_from(cmp1.f_height).ok()? == raw.height {
+                Some(raw_track)
+            } else {
+                None
+            }
+        }).next().ok_or("no matching CMP1 track")?;
+        let bits = track.cmp1.as_ref().ok_or("missing CMP1 sensor precision")?.n_bits;
+        let nominal_white = 1_u32.checked_shl(u32::from(bits)).and_then(|one| one.checked_sub(1))
+            .ok_or("invalid nominal sensor precision")?;
+        let iad1 = &track.cdi1.as_ref().ok_or("missing IAD1")?.iad1.iad1_type;
+        eprintln!("encoded IAD1: {iad1:?}");
+        eprintln!(
+            "sensor={}x{} format={:?} active={:?} default={:?} WB={:?} black={:?} white={:?} bits={bits}",
+            raw.width, raw.height, raw.photometric, raw.active_area, raw.crop_area, raw.wb_coeffs,
+            raw.blacklevel.as_vec(), raw.whitelevel.as_vec()
+        );
+
+        let mut developer = RawDevelop::default();
+        let (x, y, width, height) = match mode.as_str() {
+            "default" => rect(raw.crop_area.ok_or("missing CR3 default crop")?),
+            "active" => {
+                developer.steps.retain(|step| *step != ProcessingStep::CropDefault);
+                rect(raw.active_area.ok_or("missing CR3 active crop")?)
+            }
+            "sensor" => {
+                developer.steps.retain(|step| !matches!(step, ProcessingStep::CropActiveArea | ProcessingStep::CropDefault));
+                (0, 0, raw.width, raw.height)
+            }
+            "nominal" | "measured" => {
+                let coords: Vec<usize> = oracle.split(',').map(str::parse).collect::<Result<_, _>>()
+                    .map_err(|err| format!("invalid oracle rectangle: {err}"))?;
+                let [x, y, width, height] = coords.as_slice() else {
+                    return Err("expected oracle rectangle x,y,w,h".into());
+                };
+                let right = x.checked_add(*width).ok_or("oracle crop overflow")?;
+                let bottom = y.checked_add(*height).ok_or("oracle crop overflow")?;
+                if right > raw.width || bottom > raw.height || *width == 0 || *height == 0 {
+                    return Err("oracle crop lies outside real sensor data".into());
+                }
+                let RawImageData::Integer(samples) = &raw.data else {
+                    return Err("CR3 is not an integer mosaic".into());
+                };
+                let observed = samples.chunks_exact(raw.width).skip(*y).take(*height)
+                    .filter_map(|row| row.get(*x..right)).flatten().copied().max()
+                    .ok_or("cannot measure mosaic range")?;
+                let peak = u32::from(observed);
+                let black_levels = raw.blacklevel.as_vec();
+                let black = black_levels.first().copied().ok_or("missing black level")?;
+                if black_levels.iter().any(|other| *other != black)
+                    || raw.wb_coeffs.iter().take(3).any(|wb| !wb.is_finite() || *wb <= 0.0) {
+                    return Err("probe requires a uniform black level and valid camera WB".into());
+                }
+                let max_adjusted = peak < nominal_white
+                    && (f64::from(peak) - f64::from(black))
+                    > 0.75 * (f64::from(nominal_white) - f64::from(black));
+                let chosen_white = if mode == "measured" && max_adjusted { peak } else { nominal_white };
+                raw.whitelevel = WhiteLevel(vec![chosen_white]);
+                eprintln!("controlled oracle-only crop max={peak}, nominal={nominal_white}, adjusted={chosen_white}");
+                raw.active_area = Some(Rect::new(Point::new(*x, *y), Dim2::new(*width, *height)));
+                developer.steps.retain(|step| !matches!(step, ProcessingStep::CropDefault | ProcessingStep::SRgb));
+                (*x, *y, *width, *height)
+            }
+            _ => return Err("unknown comparison mode".into()),
+        };
+        let intermediate = developer.develop_intermediate(&raw).map_err(|error| error.to_string())?;
+        let Intermediate::ThreeColor(rgb) = intermediate else {
+            return Err("RAW did not develop to RGB".into());
+        };
+        if (rgb.width, rgb.height) != (width, height) {
+            return Err("unexpected Rawler output geometry".into());
+        }
+        Ok((rgb, (x, y, width, height)))
+    })?;
+    let mut file = BufWriter::new(File::create(output)?);
+    let (x, y, width, height) = geometry;
+    writeln!(file, "{x} {y} {width} {height}")?;
+    for pixel in frame.data {
+        for channel in pixel {
+            file.write_all(&channel.to_le_bytes())?;
+        }
+    }
+    file.flush()?;
+    Ok(())
+}
+
+/// Extract exclusive width and height with the sensor origin.
+fn rect(value: Rect) -> (usize, usize, usize, usize) {
+    (value.x(), value.y(), value.width(), value.height())
+}

@@ -1,0 +1,29 @@
+======== artifacts/resume-cr3/frame_000.CR3
+[Canon]         SensorWidth                     : 5376
+[Canon]         SensorHeight                    : 3574
+[Canon]         SensorLeftBorder                : 272
+[Canon]         SensorTopBorder                 : 172
+[Canon]         SensorRightBorder               : 5359
+[Canon]         SensorBottomBorder              : 3563
+[Canon]         CroppedImageWidth               : 5088
+[Canon]         CroppedImageHeight              : 3392
+[Canon]         CroppedImageLeft                : 0
+[Canon]         CroppedImageTop                 : 0
+[Canon]         AspectRatio                     : 3:2 (APS-C crop)
+[ExifIFD]       ExifImageWidth                  : 5088
+[ExifIFD]       ExifImageHeight                 : 3392
+======== artifacts/resume-cr3/frame_049.CR3
+[Canon]         SensorWidth                     : 5376
+[Canon]         SensorHeight                    : 3574
+[Canon]         SensorLeftBorder                : 272
+[Canon]         SensorTopBorder                 : 172
+[Canon]         SensorRightBorder               : 5359
+[Canon]         SensorBottomBorder              : 3563
+[Canon]         CroppedImageWidth               : 5088
+[Canon]         CroppedImageHeight              : 3392
+[Canon]         CroppedImageLeft                : 0
+[Canon]         CroppedImageTop                 : 0
+[Canon]         AspectRatio                     : 3:2 (APS-C crop)
+[ExifIFD]       ExifImageWidth                  : 5088
+[ExifIFD]       ExifImageHeight                 : 3392
+    2 image files read
