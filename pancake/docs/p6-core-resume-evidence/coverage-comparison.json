@@ -1,0 +1,497 @@
+{
+  "baseline": {
+    "raw_json_sha256": "a17aba39b8fd75c889fb08781c329aca8d94a645ea6795a522330404ed3b46ca",
+    "report": "../p9-cpu-assurance-evidence/5216ba4-nightly/branches-cpu.json.gz",
+    "revision": "5216ba4227e14033483a21bb5eca1c6c168ef840"
+  },
+  "candidate": {
+    "gate_exit": 1,
+    "raw_json_sha256": "a6f4f15f3a9846eab537edf8d504a22ae1c6d27338a68c19beeda22291a5ae6b",
+    "report": "branches-cpu.json.gz",
+    "revision": "2375efabd2699e4db993b02061cc90ed5ecd37d3",
+    "test_target_results": 20,
+    "tests_passed": 106
+  },
+  "shared_files": {
+    "after": {
+      "crates/pancake-cli/src/main.rs": {
+        "branches": {
+          "count": 16,
+          "covered": 15
+        },
+        "functions": {
+          "count": 9,
+          "covered": 6
+        },
+        "lines": {
+          "count": 99,
+          "covered": 95
+        },
+        "regions": {
+          "count": 103,
+          "covered": 96
+        }
+      },
+      "src/job/events.rs": {
+        "branches": {
+          "count": 8,
+          "covered": 6
+        },
+        "functions": {
+          "count": 9,
+          "covered": 6
+        },
+        "lines": {
+          "count": 73,
+          "covered": 64
+        },
+        "regions": {
+          "count": 74,
+          "covered": 63
+        }
+      },
+      "src/job/lifecycle.rs": {
+        "branches": {
+          "count": 42,
+          "covered": 41
+        },
+        "functions": {
+          "count": 18,
+          "covered": 17
+        },
+        "lines": {
+          "count": 171,
+          "covered": 165
+        },
+        "regions": {
+          "count": 174,
+          "covered": 159
+        }
+      },
+      "src/job/mod.rs": {
+        "branches": {
+          "count": 22,
+          "covered": 13
+        },
+        "functions": {
+          "count": 28,
+          "covered": 25
+        },
+        "lines": {
+          "count": 176,
+          "covered": 161
+        },
+        "regions": {
+          "count": 177,
+          "covered": 146
+        }
+      },
+      "src/job/registration.rs": {
+        "branches": {
+          "count": 32,
+          "covered": 28
+        },
+        "functions": {
+          "count": 6,
+          "covered": 6
+        },
+        "lines": {
+          "count": 157,
+          "covered": 156
+        },
+        "regions": {
+          "count": 156,
+          "covered": 133
+        }
+      },
+      "src/job/stream.rs": {
+        "branches": {
+          "count": 32,
+          "covered": 28
+        },
+        "functions": {
+          "count": 23,
+          "covered": 18
+        },
+        "lines": {
+          "count": 262,
+          "covered": 251
+        },
+        "regions": {
+          "count": 305,
+          "covered": 241
+        }
+      },
+      "src/job/worker.rs": {
+        "branches": {
+          "count": 24,
+          "covered": 19
+        },
+        "functions": {
+          "count": 17,
+          "covered": 14
+        },
+        "lines": {
+          "count": 115,
+          "covered": 101
+        },
+        "regions": {
+          "count": 112,
+          "covered": 91
+        }
+      },
+      "src/runtime/mod.rs": {
+        "branches": {
+          "count": 32,
+          "covered": 24
+        },
+        "functions": {
+          "count": 43,
+          "covered": 30
+        },
+        "lines": {
+          "count": 229,
+          "covered": 187
+        },
+        "regions": {
+          "count": 241,
+          "covered": 186
+        }
+      },
+      "src/runtime/portable.rs": {
+        "branches": {
+          "count": 6,
+          "covered": 2
+        },
+        "functions": {
+          "count": 12,
+          "covered": 5
+        },
+        "lines": {
+          "count": 88,
+          "covered": 36
+        },
+        "regions": {
+          "count": 89,
+          "covered": 32
+        }
+      }
+    },
+    "before": {
+      "crates/pancake-cli/src/main.rs": {
+        "branches": {
+          "count": 16,
+          "covered": 15
+        },
+        "functions": {
+          "count": 9,
+          "covered": 6
+        },
+        "lines": {
+          "count": 99,
+          "covered": 95
+        },
+        "regions": {
+          "count": 103,
+          "covered": 96
+        }
+      },
+      "src/job/events.rs": {
+        "branches": {
+          "count": 8,
+          "covered": 6
+        },
+        "functions": {
+          "count": 9,
+          "covered": 6
+        },
+        "lines": {
+          "count": 73,
+          "covered": 63
+        },
+        "regions": {
+          "count": 74,
+          "covered": 62
+        }
+      },
+      "src/job/lifecycle.rs": {
+        "branches": {
+          "count": 42,
+          "covered": 37
+        },
+        "functions": {
+          "count": 18,
+          "covered": 16
+        },
+        "lines": {
+          "count": 171,
+          "covered": 160
+        },
+        "regions": {
+          "count": 174,
+          "covered": 153
+        }
+      },
+      "src/job/mod.rs": {
+        "branches": {
+          "count": 22,
+          "covered": 6
+        },
+        "functions": {
+          "count": 28,
+          "covered": 22
+        },
+        "lines": {
+          "count": 175,
+          "covered": 151
+        },
+        "regions": {
+          "count": 175,
+          "covered": 130
+        }
+      },
+      "src/job/registration.rs": {
+        "branches": {
+          "count": 32,
+          "covered": 28
+        },
+        "functions": {
+          "count": 6,
+          "covered": 6
+        },
+        "lines": {
+          "count": 157,
+          "covered": 156
+        },
+        "regions": {
+          "count": 156,
+          "covered": 133
+        }
+      },
+      "src/job/stream.rs": {
+        "branches": {
+          "count": 32,
+          "covered": 28
+        },
+        "functions": {
+          "count": 23,
+          "covered": 18
+        },
+        "lines": {
+          "count": 262,
+          "covered": 251
+        },
+        "regions": {
+          "count": 305,
+          "covered": 241
+        }
+      },
+      "src/job/worker.rs": {
+        "branches": {
+          "count": 24,
+          "covered": 19
+        },
+        "functions": {
+          "count": 17,
+          "covered": 14
+        },
+        "lines": {
+          "count": 115,
+          "covered": 101
+        },
+        "regions": {
+          "count": 112,
+          "covered": 91
+        }
+      },
+      "src/runtime/mod.rs": {
+        "branches": {
+          "count": 32,
+          "covered": 14
+        },
+        "functions": {
+          "count": 43,
+          "covered": 22
+        },
+        "lines": {
+          "count": 228,
+          "covered": 134
+        },
+        "regions": {
+          "count": 238,
+          "covered": 124
+        }
+      },
+      "src/runtime/portable.rs": {
+        "branches": {
+          "count": 6,
+          "covered": 0
+        },
+        "functions": {
+          "count": 12,
+          "covered": 0
+        },
+        "lines": {
+          "count": 88,
+          "covered": 0
+        },
+        "regions": {
+          "count": 89,
+          "covered": 0
+        }
+      }
+    }
+  },
+  "shared_groups": {
+    "after": {
+      "cli": {
+        "branches": {
+          "count": 16,
+          "covered": 15
+        },
+        "functions": {
+          "count": 9,
+          "covered": 6
+        },
+        "lines": {
+          "count": 99,
+          "covered": 95
+        },
+        "regions": {
+          "count": 103,
+          "covered": 96
+        }
+      },
+      "job": {
+        "branches": {
+          "count": 160,
+          "covered": 135
+        },
+        "functions": {
+          "count": 101,
+          "covered": 86
+        },
+        "lines": {
+          "count": 954,
+          "covered": 898
+        },
+        "regions": {
+          "count": 998,
+          "covered": 833
+        }
+      },
+      "runtime": {
+        "branches": {
+          "count": 38,
+          "covered": 26
+        },
+        "functions": {
+          "count": 55,
+          "covered": 35
+        },
+        "lines": {
+          "count": 317,
+          "covered": 223
+        },
+        "regions": {
+          "count": 330,
+          "covered": 218
+        }
+      }
+    },
+    "before": {
+      "cli": {
+        "branches": {
+          "count": 16,
+          "covered": 15
+        },
+        "functions": {
+          "count": 9,
+          "covered": 6
+        },
+        "lines": {
+          "count": 99,
+          "covered": 95
+        },
+        "regions": {
+          "count": 103,
+          "covered": 96
+        }
+      },
+      "job": {
+        "branches": {
+          "count": 160,
+          "covered": 124
+        },
+        "functions": {
+          "count": 101,
+          "covered": 82
+        },
+        "lines": {
+          "count": 953,
+          "covered": 882
+        },
+        "regions": {
+          "count": 996,
+          "covered": 810
+        }
+      },
+      "runtime": {
+        "branches": {
+          "count": 38,
+          "covered": 14
+        },
+        "functions": {
+          "count": 55,
+          "covered": 22
+        },
+        "lines": {
+          "count": 316,
+          "covered": 134
+        },
+        "regions": {
+          "count": 327,
+          "covered": 124
+        }
+      }
+    }
+  },
+  "whole": {
+    "after": {
+      "branches": {
+        "count": 612,
+        "covered": 489
+      },
+      "functions": {
+        "count": 670,
+        "covered": 402
+      },
+      "lines": {
+        "count": 5775,
+        "covered": 4018
+      },
+      "regions": {
+        "count": 6554,
+        "covered": 4105
+      }
+    },
+    "before": {
+      "branches": {
+        "count": 612,
+        "covered": 466
+      },
+      "functions": {
+        "count": 670,
+        "covered": 385
+      },
+      "lines": {
+        "count": 5773,
+        "covered": 3913
+      },
+      "regions": {
+        "count": 6549,
+        "covered": 3988
+      }
+    }
+  }
+}

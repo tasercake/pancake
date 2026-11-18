@@ -81,6 +81,15 @@ fn cancellation_followed_by_cleanup() -> Result<(), String> {
 fn cancellation_wakes_paused_worker() -> Result<(), String> {
     let control = JobControl::new(Generation(7), 2)?;
     require(control.pause()?, "initial work refused a pause")?;
+    require(
+        !control.pause()? && !control.resume()?,
+        "pause was acknowledged before the worker boundary",
+    )?;
+    control.complete_frame()?;
+    require(
+        control.snapshot()?.completed == 1,
+        "an already submitted frame was discarded during its drain",
+    )?;
     let worker_control = control.clone();
     let worker = thread::spawn(move || worker_control.checkpoint(Stage::Fuse));
     let paused = wait_for_pause(&control)?;
@@ -117,8 +126,22 @@ fn completed_stage_freezes_progress() -> Result<(), String> {
     )?;
     control.commit().map_err(|error| error.to_string())?;
     require(
-        !control.cancel()?,
-        "publication accepted a competing cancellation",
+        !control.cancel()? && !control.pause()? && !control.resume()?,
+        "publication accepted a competing control",
+    )?;
+    let closed = control
+        .checkpoint(Stage::Fuse)
+        .err()
+        .ok_or("publication admitted another calculation")?;
+    let progress_error = control
+        .complete_frame()
+        .err()
+        .ok_or("publication admitted more progress")?;
+    require(
+        closed == Stop::Closed
+            && closed.to_string().contains("cannot admit")
+            && progress_error.contains("current state"),
+        "closed checkpoint lost its public diagnostic or changed progress",
     )?;
     control.finish(true)?;
     let completed = control.snapshot()?;

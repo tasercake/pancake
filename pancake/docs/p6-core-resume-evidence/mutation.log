@@ -1,0 +1,4 @@
+Found 18 mutants to test
+ok       Unmutated baseline in 46s build + 20s test
+TIMEOUT  src/job/lifecycle.rs:226:9: replace JobControl::resume -> Result<bool, String> with Ok(true) in 5s build + 60s test
+18 mutants tested in 4m: 17 caught, 1 timeouts

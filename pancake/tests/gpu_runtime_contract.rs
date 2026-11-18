@@ -178,3 +178,89 @@ wgpu_adapter={adapter:#?}
     }
     Ok(())
 }
+
+/// Renderer reuse observes the same job budget before admitting new GPU work.
+///
+/// # Errors
+/// Returns fixture, hardware qualification, export or job admission errors.
+#[test]
+fn prepared_wgpu_respects_each_jobs_budget() -> Result<(), String> {
+    use pancake::config::{BitDepth, JobConfig, JobSettings, Method};
+    use pancake::image_io::{RgbImage, decode, export};
+    use pancake::job::{Options, run};
+
+    let prepared = prepare_wgpu_runtime(None, 1024)?;
+    require(
+        prepared.physical_gpu(),
+        "renderer fixture lacks physical compute",
+    )?;
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let source = RgbImage::new(7, 5, [0.0_f32, 0.5, 1.0].repeat(35))?;
+    let originals = [
+        directory.path().join("a.png"),
+        directory.path().join("b.png"),
+    ];
+    for path in &originals {
+        export(path, &source, BitDepth::Sixteen, 95, &[])?;
+    }
+    let destination = directory.path().join("result.png");
+    let events = directory.path().join("events.jsonl");
+    let prior = b"prior export";
+    std::fs::write(&destination, prior).map_err(|error| error.to_string())?;
+    let request = || {
+        JobConfig::new(
+            &originals,
+            Some(destination.clone()),
+            JobSettings {
+                method: Method::WeightedAverage,
+                device: DevicePreference::Gpu,
+                bit_depth: BitDepth::Sixteen,
+                ..JobSettings::default()
+            },
+        )
+    };
+    let rejected = |prepared_wgpu| {
+        let options = Options {
+            working_bytes: 1,
+            runtime: Some(RuntimeOverride::Wgpu),
+            prepared_wgpu,
+            events_path: Some(events.clone()),
+        };
+        run(request()?, &options, |_| {})
+            .err()
+            .map(|error| error.to_string())
+            .ok_or_else(|| "impossible GPU working budget was accepted".to_owned())
+    };
+    let fresh = rejected(None)?;
+    let reused = rejected(Some(prepared.clone()))?;
+    require(
+        reused == fresh
+            && reused.contains("runtime probe")
+            && !events.exists()
+            && std::fs::read(&destination).map_err(|error| error.to_string())? == prior,
+        &format!(
+            "a prepared renderer bypassed admission for the actual job: {reused}; fresh: {fresh}"
+        ),
+    )?;
+
+    let result = run(
+        request()?,
+        &Options {
+            working_bytes: 1_048_576,
+            prepared_wgpu: Some(prepared),
+            runtime: Some(RuntimeOverride::Wgpu),
+            events_path: Some(events.clone()),
+        },
+        |_| {},
+    )
+    .map_err(|error| error.to_string())?;
+    require(
+        result.backend() == Backend::Gpu
+            && decode(&destination)?.samples()
+                == decode(originals.first().ok_or("source missing")?)?.samples()
+            && std::fs::read_to_string(events)
+                .map_err(|error| error.to_string())?
+                .contains(r#""physical_gpu":true"#),
+        "eligible prepared GPU did not publish independently decoded pixels and its actual backend",
+    )
+}

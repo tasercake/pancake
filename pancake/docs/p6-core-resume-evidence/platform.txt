@@ -1,0 +1,12 @@
+2375efabd2699e4db993b02061cc90ed5ecd37d3
+639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd  Cargo.lock
+rustc 1.102.0-nightly (5f4effd57 2026-11-13)
+binary: rustc
+commit-hash: 5f4effd579500175af844241eb179e756190f1e7
+commit-date: 2026-11-13
+host: x86_64-unknown-linux-gnu
+release: 1.102.0-nightly
+LLVM version: 23.1.5
+cargo-llvm-cov 0.9.1
+Linux 6.8.0-147-generic x86_64
+NVIDIA GeForce RTX 3090, 00000000:01:00.0, 580.178.04

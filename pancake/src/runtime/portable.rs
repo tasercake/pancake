@@ -97,7 +97,7 @@ fn acquire(selector: &WgpuDevice, budget_bytes: usize) -> Result<SelectedRuntime
         runtime
     };
     drop(setups);
-    runtime.check_capacity(budget_bytes)?;
+    runtime.check_job_budget(budget_bytes)?;
     Ok(runtime)
 }
 
