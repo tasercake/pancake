@@ -1,5 +1,9 @@
 //! Independent oracles for the shared CPU and physical-GPU fusion kernels.
 
+use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+use cubecl::logging::{LaunchObservation, LaunchObserver};
 use pancake::fusion::advanced::{AdvancedAccumulator, AdvancedMethod};
 
 /// Width of the odd-sized fusion test scene.
@@ -176,6 +180,16 @@ pub fn check_constant(device: &cubecl::Device) -> Result<(), String> {
     Ok(())
 }
 
+/// Count submitted kernels during one numerical job without adding synchronization.
+#[derive(Default)]
+struct LaunchCount(AtomicUsize);
+
+impl LaunchObserver for LaunchCount {
+    fn launched(&self, _kernel: &'static str) {
+        let _previous = self.0.fetch_add(1, Ordering::Relaxed);
+    }
+}
+
 /// A change of raster size alone should reuse the same compiled exposure kernels.
 ///
 /// # Errors
@@ -185,6 +199,8 @@ pub fn check_exposure_specialization(device: &cubecl::Device) -> Result<(), Stri
 
     let run = |width: usize, height: usize| {
         let collection = LaunchedKernels::new();
+        let launches = Arc::new(LaunchCount::default());
+        let observing = LaunchObservation::new(launches.clone());
         let mut accumulator = AdvancedAccumulator::new(
             device,
             width,
@@ -203,6 +219,13 @@ pub fn check_exposure_specialization(device: &cubecl::Device) -> Result<(), Stri
         let image = accumulator.finish()?;
         if image.len() != samples || image.iter().any(|sample| (sample - 0.45_f32).abs() > 1e-6) {
             return Err("the specialization test did not complete exposure fusion".to_owned());
+        }
+        drop(observing);
+        let issued = launches.0.load(Ordering::Relaxed);
+        if issued > 39 {
+            return Err(format!(
+                "two four-reduction exposures should need at most 39 launches, issued {issued}"
+            ));
         }
         Ok(collection.finish())
     };
