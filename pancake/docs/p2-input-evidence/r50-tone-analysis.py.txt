@@ -1,0 +1,57 @@
+import json
+from pathlib import Path
+import sys
+import numpy as np
+import rawpy
+
+case, capture, output = map(Path, sys.argv[1:])
+with capture.open('rb') as data:
+    width, height, precision = data.readline().decode().split()
+    candidate = np.fromfile(data, dtype='<f4').reshape(int(height), int(width), 3)[::8,::8].astype(np.float64)
+
+def stats(cand, reference):
+    delta = cand-reference
+    return {
+        'mae': float(np.mean(np.abs(delta))),
+        'p99': float(np.quantile(np.abs(delta), .99)),
+        'max': float(np.max(np.abs(delta))),
+        'channel_mean_candidate': cand.mean((0,1)).tolist(),
+        'channel_mean_reference': reference.mean((0,1)).tolist(),
+        'channel_signed_mean_error': delta.mean((0,1)).tolist(),
+        'clip_fraction_candidate': (cand>=1).mean((0,1)).tolist(),
+        'clip_fraction_reference': (reference>=1).mean((0,1)).tolist(),
+    }
+
+variant_stats = {}
+variants = {
+    "frozen": {},
+    "srgb_gamma": {"gamma": (2.4,12.92)},
+    "srgb_gamma_ppg": {"gamma": (2.4,12.92), "demosaic_algorithm": rawpy.DemosaicAlgorithm.PPG},
+    "linear_gamma": {"gamma": (1.0,1.0)},
+    "linear_gamma_ppg": {"gamma": (1.0,1.0), "demosaic_algorithm": rawpy.DemosaicAlgorithm.PPG},
+    "linear_gamma_ppg_no_adjust_maximum": {"gamma": (1.0,1.0), "demosaic_algorithm": rawpy.DemosaicAlgorithm.PPG, "adjust_maximum_thr": 0},
+    "linear_gamma_ppg_daylight_wb": {"gamma": (1.0,1.0), "demosaic_algorithm": rawpy.DemosaicAlgorithm.PPG, "use_camera_wb": False},
+    "linear_gamma_ppg_camera_space": {"gamma": (1.0,1.0), "demosaic_algorithm": rawpy.DemosaicAlgorithm.PPG, "output_color":rawpy.ColorSpace.raw},
+}
+linear_candidate = np.where(candidate <= 12.92*0.00304, candidate/12.92, ((candidate+0.055)/1.055)**2.4)
+for label, change in variants.items():
+    options = dict(use_camera_wb=True, no_auto_bright=True, output_bps=16) | change
+    with rawpy.imread(str(case)) as raw:
+        s=raw.sizes
+        match = raw.postprocess(**options)
+        starting_y = s.crop_top_margin-s.top_margin
+        starting_x = s.crop_left_margin-s.left_margin
+        ref = match[starting_y:starting_y+s.crop_height:8, starting_x:starting_x+s.crop_width:8].astype(np.float64)/65535
+    if label.startswith("linear"):
+        actual = linear_candidate
+    else:
+        actual = candidate
+    baseline = stats(actual, ref)
+    inlier = (ref>.01)&(ref<.8)&(actual>.01)&(actual<.8)
+    gain = [np.median(ref[:,:,i][inlier[:,:,i]]/actual[:,:,i][inlier[:,:,i]]) for i in range(3)]
+    baseline['diagnostic_per_channel_gain'] = gain
+    if label.startswith("linear"):
+        baseline['diagnostic_mae_after_gain'] = stats(np.minimum(actual*np.asarray(gain),1.0),ref)['mae']
+    variant_stats[label] = baseline
+print(json.dumps(variant_stats,indent=2))
+output.write_text(json.dumps(variant_stats,indent=2)+'\n')

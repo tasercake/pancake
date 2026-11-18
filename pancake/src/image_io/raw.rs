@@ -33,6 +33,10 @@ static RAW_POOL: LazyLock<Result<rayon::ThreadPool, String>> = LazyLock::new(|| 
 ///
 /// Returns file-read, size-limit, worker-pool, or camera decode errors.
 pub(super) fn decode(file: File, path: &Path) -> Result<RgbImage, String> {
+    let encoded_size = file.metadata().map_err(|error| error.to_string())?.len();
+    if encoded_size > MAX_RAW_BYTES {
+        return Err("compressed RAW source exceeds the byte limit".to_owned());
+    }
     let mut bytes = Vec::new();
     let count = file
         .take(MAX_RAW_BYTES.saturating_add(1))

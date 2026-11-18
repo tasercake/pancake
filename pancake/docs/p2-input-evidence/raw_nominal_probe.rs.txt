@@ -1,0 +1,43 @@
+//! Test-only Rawler compatibility experiment using stored sensor precision.
+
+use std::{env, fs, io::{self, Write}, path::Path, sync::Arc};
+use rawler::decoders::{RawDecodeParams, WhiteLevel};
+use rawler::formats::bmff::Bmff;
+use rawler::imgop::develop::{Intermediate, ProcessingStep, RawDevelop};
+use rawler::rawsource::RawSource;
+
+/// Replace only camera-tagged saturation with nominal sensor maximum and use linear output.
+///
+/// # Errors
+///
+/// The probe reports all input, metadata, RAW processing and output failures.
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let arg = env::args_os().nth(1).ok_or_else(|| io::Error::other("missing path"))?;
+    let path = Path::new(&arg);
+    let source = RawSource::new_from_shared_vec(Arc::new(fs::read(path)?)).with_path(path);
+    let data = Bmff::new_buf(source.buf())?;
+    let bits = data.filebox.moov.traks.iter().find_map(|track| {
+        track.mdia.minf.stbl.stsd.craw.as_ref()?.cmp1.as_ref().map(|raster| raster.n_bits)
+    }).ok_or_else(|| io::Error::other("missing sensor precision"))?;
+    let nominal_white = 1_u32.checked_shl(u32::from(bits)).and_then(|value| value.checked_sub(1))
+        .ok_or_else(|| io::Error::other("bad nominal sensor precision"))?;
+    let pool = rayon::ThreadPoolBuilder::new().num_threads(2).build()?;
+    let (width, height, pixels) = pool.install(|| -> Result<_, String> {
+        let mut raw = rawler::decode(&source, &RawDecodeParams::default()).map_err(|error| error.to_string())?;
+        raw.whitelevel = WhiteLevel(vec![nominal_white]);
+        let mut developer = RawDevelop::default();
+        developer.steps.retain(|step| !matches!(step, ProcessingStep::SRgb));
+        let frame = developer.develop_intermediate(&raw).map_err(|error| error.to_string())?;
+        let Intermediate::ThreeColor(rgb) = frame else { return Err("not full RGB".to_owned()); };
+        Ok((rgb.width, rgb.height, rgb.data))
+    })?;
+    let mut output = io::BufWriter::new(io::stdout().lock());
+    writeln!(output, "{width} {height} {nominal_white}")?;
+    for pixel in pixels {
+        for sample in pixel {
+            output.write_all(&sample.to_le_bytes())?;
+        }
+    }
+    output.flush()?;
+    Ok(())
+}
