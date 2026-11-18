@@ -190,6 +190,7 @@ def measure(argv, *, cwd, env, directory, timeout, gpu):
         "elapsed_ns": elapsed,
         "peak_rss_bytes": peak_rss if adequate_sampling and peak_rss else None,
         "peak_gpu_bytes": peak_gpu if adequate_sampling and peak_gpu else None,
+        "observed_peak_gpu_bytes": peak_gpu,
         "maximum_sample_gap_ns": largest_gap,
         "resource_errors": sample_failures,
         "sample_count": samples,
