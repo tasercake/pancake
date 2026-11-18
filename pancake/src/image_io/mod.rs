@@ -186,26 +186,38 @@ fn decode_raster(input: File) -> Result<RgbImage, String> {
         .set_limits(limits)
         .map_err(|error| error.to_string())?;
     let orientation = decoder.orientation().map_err(|error| error.to_string())?;
-    let profile = decoder.icc_profile().map_err(|error| error.to_string())?;
+    let is_tiff = format == Some(ImageFormat::Tiff);
+    let profile = if is_tiff {
+        None
+    } else {
+        decoder.icc_profile().map_err(|error| error.to_string())?
+    };
     let mut image = DynamicImage::from_decoder(decoder).map_err(|error| error.to_string())?;
     image.apply_orientation(orientation);
-    let profile = match (format, profile) {
-        (Some(ImageFormat::Tiff), None) => read_tiff_profile(&mut stream)?,
-        (_, profile) => profile,
+    let profile = if is_tiff {
+        read_tiff_profile(&mut stream)?
+    } else {
+        profile
     };
     raster_to_rgb(image, format, profile)
 }
 
 /// Read optional TIFF ICC metadata using the native directory's bounded byte API.
 ///
-/// The raster decoder can omit TIFF profiles even when the raw tag is valid.
-/// Keep the original bytes and never infer a different transfer curve.
+/// This uses the native TIFF IFD value budget, without relying on image
+/// decoder profile handling. Keep the original bytes without applying a
+/// color transformation.
 ///
 /// # Errors
 /// Returns a stream seek or directory read error.
 fn read_tiff_profile(stream: &mut BufReader<File>) -> Result<Option<Vec<u8>>, String> {
     stream.rewind().map_err(|error| error.to_string())?;
-    let mut decoder = tiff::decoder::Decoder::new(stream).map_err(|error| error.to_string())?;
+    let mut limits = tiff::decoder::Limits::default();
+    // The pinned byte-buffer reader charges tag storage against the decoder's data cap.
+    limits.decoding_buffer_size = limits.ifd_value_size;
+    let mut decoder = tiff::decoder::Decoder::new(stream)
+        .map_err(|error| error.to_string())?
+        .with_limits(limits);
     let mut payload = ValueBuffer::empty(Type::UNDEFINED);
     let found = decoder
         .image_ifd()

@@ -720,3 +720,36 @@ fn malformed_optional_tiff_profile_preserves_valid_samples() -> TestResult {
     )?;
     require_codes(&frame, [1, 17, 4097], 65_535.0)
 }
+
+/// Enforce the native TIFF metadata budget while retaining a valid small raster.
+///
+/// # Errors
+/// Returns fixture creation, incorrect metadata acceptance, or decoded sample errors.
+#[test]
+fn oversized_optional_tiff_profile_preserves_valid_samples() -> TestResult {
+    use tiff::encoder::{TiffEncoder, colortype};
+    use tiff::tags::Tag;
+
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("bounded-profile.tiff");
+    let original = include_bytes!("data/srgb.png.icc");
+    let limit = tiff::decoder::Limits::default().ifd_value_size;
+    for expected_profile in [true, false] {
+        let mut profile = original.to_vec();
+        profile.resize(limit.saturating_add(usize::from(!expected_profile)), 0);
+        let mut encoder = TiffEncoder::new(File::create(&path)?)?;
+        let mut raster = encoder.new_image::<colortype::RGB16>(1, 1)?;
+        raster
+            .encoder()
+            .write_tag(Tag::IccProfile, profile.as_slice())?;
+        raster.write_data(&[1, 17, 4097])?;
+        let frame = decode(&path)?;
+        require(
+            frame.icc_profile() == expected_profile.then_some(profile.as_slice())
+                && frame.sample_encoding() == SampleEncoding::U16,
+            "TIFF ICC field handling or raster precision differs at the metadata limit",
+        )?;
+        require_codes(&frame, [1, 17, 4097], 65_535.0)?;
+    }
+    Ok(())
+}
