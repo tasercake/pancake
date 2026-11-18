@@ -1,6 +1,7 @@
 //! Bounded conversion of path arguments to a deterministic stack input list.
 
 use std::collections::BTreeSet;
+use std::ffi::OsString;
 use std::fs;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
@@ -88,7 +89,7 @@ fn expand(
     for candidate in candidates {
         match candidate.canonicalize() {
             Ok(path) => insert(files, path)?,
-            Err(error) if error.kind() == ErrorKind::NotFound && !candidate.is_symlink() => {
+            Err(error) if missing_component(&error) && !candidate.is_symlink() => {
                 continue;
             }
             Err(error) => return Err(path_error(&candidate, &error)),
@@ -111,10 +112,6 @@ fn expand_component(
     entries: &mut impl Iterator<Item = ()>,
 ) -> Result<Vec<PathBuf>, String> {
     let mut next_paths = Vec::new();
-    let options = glob::MatchOptions {
-        require_literal_leading_dot: true,
-        ..glob::MatchOptions::new()
-    };
     for prefix in paths {
         let directory = if prefix.as_os_str().is_empty() {
             Path::new(".")
@@ -126,15 +123,35 @@ fn expand_component(
             Err(error) if missing_component(&error) => continue,
             Err(error) => return Err(path_error(directory, &error)),
         };
-        for entry in listing {
-            consume_entry(entries)?;
-            let entry = entry.map_err(|error| path_error(directory, &error))?;
-            if matcher.matches_path_with(Path::new(&entry.file_name()), options) {
-                next_paths.push(entry.path());
-            }
-        }
+        let listing = listing.map(|entry| entry.map(|entry| (entry.file_name(), entry.path())));
+        scan_entries(listing, directory, matcher, entries, &mut next_paths)?;
     }
     Ok(next_paths)
+}
+
+/// Inspect each streaming directory entry once and preserve directory read errors.
+///
+/// # Errors
+/// Returns entry read or scan budget errors.
+fn scan_entries(
+    listing: impl Iterator<Item = std::io::Result<(OsString, PathBuf)>>,
+    directory: &Path,
+    matcher: &glob::Pattern,
+    entries: &mut impl Iterator<Item = ()>,
+    next_paths: &mut Vec<PathBuf>,
+) -> Result<(), String> {
+    let options = glob::MatchOptions {
+        require_literal_leading_dot: true,
+        ..glob::MatchOptions::new()
+    };
+    for entry in listing {
+        consume_entry(entries)?;
+        let (name, path) = entry.map_err(|error| path_error(directory, &error))?;
+        if matcher.matches_path_with(Path::new(&name), options) {
+            next_paths.push(path);
+        }
+    }
+    Ok(())
 }
 
 /// Missing components simply remove that wildcard prefix from consideration.
