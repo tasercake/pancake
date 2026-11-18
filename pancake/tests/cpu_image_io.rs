@@ -753,3 +753,215 @@ fn oversized_optional_tiff_profile_preserves_valid_samples() -> TestResult {
     }
     Ok(())
 }
+
+/// Read the inline value or external word-array offset from a known DNG field.
+/// # Errors
+/// Returns an invalid fixture directory or missing-tag error.
+fn dng_field_value(bytes: &mut [u8], tag: u16) -> Result<u32, Box<dyn Error>> {
+    let field = tiff_fields(bytes)?
+        .iter()
+        .find(|field| tiff_tag(field) == tag)
+        .ok_or_else(|| io::Error::other(format!("DNG fixture omitted tag {tag}")))?;
+    let [.., a, b, c, d] = *field;
+    Ok(u32::from_le_bytes([a, b, c, d]))
+}
+
+/// Replace the fixture's existing external LONG or RATIONAL payload words.
+/// # Errors
+/// Returns invalid tag storage, count, or fixture bounds errors.
+fn replace_dng_words(bytes: &mut [u8], tag: u16, words: &[u32]) -> TestResult {
+    let field = tiff_fields(bytes)?
+        .iter()
+        .find(|field| tiff_tag(field) == tag)
+        .ok_or_else(|| io::Error::other(format!("DNG fixture omitted tag {tag}")))?;
+    let [
+        _,
+        _,
+        type_low,
+        type_high,
+        count_a,
+        count_b,
+        count_c,
+        count_d,
+        ..,
+    ] = *field;
+    let word_count = match u16::from_le_bytes([type_low, type_high]) {
+        4 => 1,
+        5 => 2,
+        _ => return Err(io::Error::other("unexpected DNG word payload type").into()),
+    };
+    let count = usize::try_from(u32::from_le_bytes([count_a, count_b, count_c, count_d]))?;
+    require(
+        count.saturating_mul(word_count) == words.len(),
+        "DNG word count changed",
+    )?;
+    let offset = usize::try_from(dng_field_value(bytes, tag)?)?;
+    let length = words.len().saturating_mul(size_of::<u32>());
+    require(length > 4, "DNG field uses inline storage")?;
+    let payload = bytes
+        .get_mut(offset..offset.saturating_add(length))
+        .ok_or_else(|| io::Error::other("truncated DNG word payload"))?;
+    for (field, word) in payload.as_chunks_mut::<4>().0.iter_mut().zip(words) {
+        *field = word.to_le_bytes();
+    }
+    Ok(())
+}
+
+/// Verify that the default DNG crop selects the specified sensor rectangle.
+/// # Errors
+/// Returns fixture construction, camera decode or exact crop mismatch errors.
+#[test]
+fn developed_dng_uses_the_asymmetric_metadata_crop() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let original = directory.path().join("full.dng");
+    let cropped = directory.path().join("lens-crop.DNG");
+    let mut bytes = include_bytes!("data/bayer-pattern.dng").to_vec();
+    fs::write(&original, &bytes)?;
+    let full = decode(&original)?;
+    replace_dng_words(&mut bytes, 50_719, &[11, 7])?;
+    replace_dng_words(&mut bytes, 50_720, &[73, 53])?;
+    fs::write(&cropped, &bytes)?;
+
+    let frame = decode(&cropped)?;
+    require(
+        (frame.width(), frame.height(), frame.sample_encoding()) == (73, 53, SampleEncoding::U16),
+        "DNG metadata crop or source precision was lost",
+    )?;
+    let expected = full
+        .samples()
+        .chunks_exact(full.width().saturating_mul(3))
+        .skip(7)
+        .take(53)
+        .flat_map(|row| row.iter().copied().skip(11 * 3).take(73 * 3));
+    require(
+        frame
+            .samples()
+            .iter()
+            .copied()
+            .map(f32::to_bits)
+            .eq(expected.map(f32::to_bits)),
+        "DNG default crop selected different sensor pixels",
+    )?;
+    require(fs::read(cropped)? == bytes, "DNG crop changed its source")
+}
+
+/// Make four known Bayer exposures with an intentionally non-neutral camera response.
+/// # Errors
+/// Returns fixture metadata, storage bounds, or malformed pattern errors.
+fn dng_exposure_chart(bytes: &mut [u8]) -> TestResult {
+    set_dng_scalar(bytes, 50_714, 512)?;
+    set_dng_scalar(bytes, 50_717, 16_896)?;
+    replace_dng_words(bytes, 50_728, &[1, 2, 1, 1, 1, 4])?;
+    let start = usize::try_from(dng_field_value(bytes, 273)?)?;
+    let length = usize::try_from(dng_field_value(bytes, 279)?)?;
+    require(
+        length == 160 * 112 * 2,
+        "DNG fixture no longer has one unpacked RGGB strip",
+    )?;
+    let raster = bytes
+        .get_mut(start..start.saturating_add(length))
+        .ok_or_else(|| io::Error::other("DNG fixture strip extends beyond the file"))?;
+    for (index, code) in raster.as_chunks_mut::<2>().0.iter_mut().enumerate() {
+        let x = index % 160;
+        let y = index / 160;
+        let distance: u16 = match (x < 80, y < 56) {
+            (true, true) => 0,
+            (false, true) => 32,
+            (true, false) => 4_096,
+            (false, false) => 16_384,
+        };
+        let response = match (x % 2, y % 2) {
+            (0, 0) => 2,
+            (1, 1) => 4,
+            _ => 1,
+        };
+        *code = 512_u16.saturating_add(distance / response).to_le_bytes();
+    }
+    Ok(())
+}
+
+/// Exercise camera white balance, black/white scaling and gamma through public decode.
+/// # Errors
+/// Returns fixture failure, color mismatch, or changed source data.
+#[test]
+fn developed_bayer_chart_matches_independent_srgb_levels() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("camera-exposures.dng");
+    let mut bytes = include_bytes!("data/bayer-pattern.dng").to_vec();
+    dng_exposure_chart(&mut bytes)?;
+    fs::write(&path, &bytes)?;
+    let frame = decode(&path)?;
+    require(
+        (frame.width(), frame.height(), frame.sample_encoding()) == (160, 112, SampleEncoding::U16),
+        "DNG chart geometry or precision changed",
+    )?;
+
+    // Standard sRGB for linear levels 0, 1/512, 1/4 and 1. Read well inside
+    // each uniform CFA patch so no border interpolation enters the oracle.
+    for (x, y, expected) in [
+        (40_usize, 28_usize, 0.0_f32),
+        (120, 28, 0.025_234_375),
+        (40, 84, 0.537_098_7),
+        (120, 84, 1.0),
+    ] {
+        let start = y.saturating_mul(160).saturating_add(x).saturating_mul(3);
+        let channels = frame
+            .samples()
+            .get(start..start.saturating_add(3))
+            .ok_or_else(|| io::Error::other("DNG chart pixel missing"))?;
+        for channel in channels {
+            require(
+                channel.mul_add(1.0, -expected).abs() <= 2.0 / 65_535.0,
+                &format!("DNG chart ({x}, {y}) expected neutral {expected}, got {channels:?}"),
+            )?;
+        }
+    }
+    require(
+        fs::read(path)? == bytes,
+        "developing the chart changed its source",
+    )
+}
+
+/// Reject missing DNG sensor fields and a zero-sized sensor before unpacking its strip.
+/// # Errors
+/// Returns missing fixture metadata, inappropriate acceptance or wrong diagnostic.
+#[test]
+fn dng_preflight_requires_real_sensor_metadata() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("missing-sensor-field.dng");
+    for (tag, field_name) in [
+        (256_u16, "ImageWidth"),
+        (257, "ImageLength"),
+        (277, "SamplesPerPixel"),
+    ] {
+        let mut bytes = include_bytes!("data/bayer-pattern.dng").to_vec();
+        let fields = tiff_fields(&mut bytes)?;
+        let [tag_low, tag_high, ..] = fields
+            .iter_mut()
+            .find(|field| tiff_tag(field) == tag)
+            .ok_or_else(|| io::Error::other("expected a sensor field"))?;
+        [*tag_low, *tag_high] = 65_000_u16.to_le_bytes();
+        fields.sort_unstable_by_key(tiff_tag);
+        fs::write(&path, &bytes)?;
+        let error = decode(&path)
+            .err()
+            .ok_or_else(|| io::Error::other("missing sensor metadata accepted"))?;
+        require(
+            error.contains(&format!("DNG has no valid {field_name}"))
+                && error.contains("missing-sensor-field.dng"),
+            &format!("wrong missing-field diagnostic: {error}"),
+        )?;
+        require(
+            fs::read(&path)? == bytes,
+            "failed RAW preflight changed the encoded source",
+        )?;
+    }
+
+    let mut bytes = include_bytes!("data/bayer-pattern.dng").to_vec();
+    set_dng_scalar(&mut bytes, 256, 0)?;
+    fs::write(&path, &bytes)?;
+    let error = decode(&path)
+        .err()
+        .ok_or_else(|| io::Error::other("zero-width DNG accepted"))?;
+    require(error.contains("image dimensions must be nonzero"), &error)
+}
