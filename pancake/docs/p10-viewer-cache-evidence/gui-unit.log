@@ -1,0 +1,18 @@
+89c6a22775cd8877fc094dc4842108232f2d7183
+   Compiling pancake-gui v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/resume-viewer/pancake/crates/pancake-gui)
+    Finished `release` profile [optimized] target(s) in 1m 03s
+     Running unittests src/main.rs (target/release/build/pancake-gui/e6fc0257e2e49f9c/out/pancake_gui-e6fc0257e2e49f9c)
+running 12 tests
+test preferences::tests::reports_malformed_preferences ... ok
+test preview::tests::retains_no_more_than_four_display_images ... ok
+test sources::tests::retains_sources_after_unreadable_selection ... ok
+test sources::tests::imports_nested_source_files_once ... ok
+test history::tests::malformed_and_unbounded_lists_fail_without_editing_the_profile ... ok
+test history::tests::write_failure_preserves_the_current_history ... ok
+test preferences::tests::saves_preferences_to_only_the_active_profile ... ok
+test delivery::tests::failed_batch_keeps_previous_files ... ok
+test history::tests::remember_and_clear_across_launches ... ok
+test history::tests::retains_only_the_newest_folders ... ok
+test embedded_workspace_compiles ... ok
+test tests::comparison_clips_source_to_left_of_split ... ok
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
