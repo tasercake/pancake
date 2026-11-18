@@ -1,6 +1,7 @@
 //! Bounded conversion of path arguments to a deterministic stack input list.
 
 use std::collections::BTreeSet;
+use std::ffi::OsString;
 use std::fs;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
@@ -44,7 +45,7 @@ pub(super) fn resolve(arguments: &[PathBuf]) -> Result<Vec<PathBuf>, String> {
 ///
 /// # Errors
 /// Returns an error when the scan budget is exhausted.
-fn consume_entry(entries: &mut impl Iterator<Item = ()>) -> Result<(), String> {
+fn consume_entry(entries: &mut std::iter::RepeatN<()>) -> Result<(), String> {
     entries
         .next()
         .ok_or_else(|| "too many input path entries".into())
@@ -65,7 +66,7 @@ fn is_pattern(text: &str) -> bool {
 fn expand(
     argument: &Path,
     files: &mut BTreeSet<PathBuf>,
-    entries: &mut impl Iterator<Item = ()>,
+    entries: &mut std::iter::RepeatN<()>,
 ) -> Result<(), String> {
     let pattern = argument
         .to_str()
@@ -88,7 +89,7 @@ fn expand(
     for candidate in candidates {
         match candidate.canonicalize() {
             Ok(path) => insert(files, path)?,
-            Err(error) if error.kind() == ErrorKind::NotFound && !candidate.is_symlink() => {
+            Err(error) if missing_component(&error) && !candidate.is_symlink() => {
                 continue;
             }
             Err(error) => return Err(path_error(&candidate, &error)),
@@ -108,33 +109,57 @@ fn expand(
 fn expand_component(
     paths: &[PathBuf],
     matcher: &glob::Pattern,
-    entries: &mut impl Iterator<Item = ()>,
+    entries: &mut std::iter::RepeatN<()>,
 ) -> Result<Vec<PathBuf>, String> {
     let mut next_paths = Vec::new();
-    let options = glob::MatchOptions {
-        require_literal_leading_dot: true,
-        ..glob::MatchOptions::new()
-    };
     for prefix in paths {
         let directory = if prefix.as_os_str().is_empty() {
             Path::new(".")
         } else {
             prefix.as_path()
         };
-        let listing = match fs::read_dir(directory) {
-            Ok(listing) => listing,
+        let (listing, failure) = match fs::read_dir(directory) {
+            Ok(listing) => (Some(listing), None),
             Err(error) if missing_component(&error) => continue,
-            Err(error) => return Err(path_error(directory, &error)),
+            Err(error) => (None, Some(Err(error))),
         };
-        for entry in listing {
-            consume_entry(entries)?;
-            let entry = entry.map_err(|error| path_error(directory, &error))?;
-            if matcher.matches_path_with(Path::new(&entry.file_name()), options) {
-                next_paths.push(entry.path());
-            }
-        }
+        // Apply the same path diagnostic to failures opening or reading the directory.
+        let children = listing
+            .into_iter()
+            .flatten()
+            .map(|entry| entry.map(|entry| (entry.file_name(), entry.path())));
+        let mut listing = failure.into_iter().chain(children);
+        scan_entries(&mut listing, directory, matcher, entries, &mut next_paths)?;
     }
     Ok(next_paths)
+}
+
+/// Inspect each streaming directory entry once and preserve directory read errors.
+///
+/// # Errors
+/// Returns entry read or scan budget errors.
+pub(super) fn scan_entries(
+    listing: &mut dyn Iterator<Item = std::io::Result<(OsString, PathBuf)>>,
+    directory: &Path,
+    matcher: &glob::Pattern,
+    entries: &mut std::iter::RepeatN<()>,
+    next_paths: &mut Vec<PathBuf>,
+) -> Result<(), String> {
+    let options = glob::MatchOptions {
+        require_literal_leading_dot: true,
+        ..glob::MatchOptions::new()
+    };
+    for entry in listing {
+        consume_entry(entries)?;
+        let (name, path) = match entry {
+            Ok(entry) => entry,
+            Err(error) => return Err(path_error(directory, &error)),
+        };
+        if matcher.matches_path_with(Path::new(&name), options) {
+            next_paths.push(path);
+        }
+    }
+    Ok(())
 }
 
 /// Missing components simply remove that wildcard prefix from consideration.
