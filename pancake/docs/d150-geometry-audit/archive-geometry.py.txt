@@ -1,0 +1,58 @@
+"""Audit only the already-committed D150 candidate maps, using the frozen frame order."""
+import gzip
+import json
+import math
+from pathlib import Path
+import statistics
+
+sealed = Path("qualification/p10-performance/evidence/scale-functional")
+with gzip.open(sealed / "d150-cpu-events.jsonl.gz", "rt") as stream:
+    event = json.load(stream)
+with gzip.open(sealed / "d150-cpu-receipt.json.gz", "rt") as stream:
+    receipt = json.load(stream)
+argv = receipt["argv"]
+order = [Path(arg).name for arg in argv[argv.index("--input")+1:argv.index("--output")]]
+maps = {Path(path).name: matrix for path, matrix in event["alignment_transforms"].items()}
+assert len(order) == len(set(order)) == len(maps) == 150 and set(order) == set(maps)
+width, height = 2304, 1728
+points = [(0,0), (width-1,0), (0,height-1), (width-1,height-1), ((width-1)/2,(height-1)/2)]
+identity = [[1,0,0], [0,1,0]]
+
+
+def apply(matrix, point):
+    x,y = point
+    return tuple(a*x+b*y+c for a,b,c in matrix)
+
+
+flags = [maps[name] == identity for name in order]
+dets = [a*d-b*c for ((a,b,_),(c,d,_)) in maps.values()]
+steps = [(max(math.dist(apply(maps[before], point), apply(maps[after], point))
+              for point in points), index, before, after)
+         for index, (before, after) in enumerate(zip(order, order[1:]), 1)]
+assert all(((b,c) == (0,0) and a > 0 and d > 0)
+           for ((a,b,_),(c,d,_)) in maps.values())
+print("archived revision", receipt["revision"])
+print("native shape", width, height, "decoded crop", receipt["output"]["shape"])
+print("determinant min/max", min(dets), max(dets))
+print("identity count", sum(flags), "first nonidentity index", flags.index(False))
+print("identity/nonidentity transitions", sum(a != b for a,b in zip(flags, flags[1:])))
+print("adjacent median maximum displacement delta", statistics.median(row[0] for row in steps))
+print("adjacent deltas >5px", sum(row[0] > 5 for row in steps))
+print("adjacent deltas >20px", sum(row[0] > 20 for row in steps))
+for gap, index, before, after in sorted(steps, reverse=True)[:6]:
+    print("neighbor difference", gap, index, before, after)
+    print("  matrices", maps[before], maps[after])
+for axis, upper in enumerate((width-1, height-1)):
+    corner_delta, frame, point = max(
+        (abs(apply(matrix, point)[axis]-point[axis]), name, point)
+        for name, matrix in maps.items() for point in points[:4])
+    valid_lo, lower_frame = max((-matrix[axis][2]/matrix[axis][axis], name)
+                               for name,matrix in maps.items())
+    valid_hi, upper_frame = min(((upper-matrix[axis][2])/matrix[axis][axis], name)
+                               for name,matrix in maps.items())
+    symmetric_inset = max(0, math.ceil(valid_lo), math.ceil(upper-valid_hi))
+    print("axis", axis, "corner max", corner_delta, frame, point,
+          "required inset by current symmetric formula", math.ceil(corner_delta)+1)
+    print("  exact inverse-map validity intersection", valid_lo, valid_hi,
+          "limiting frames", lower_frame, upper_frame,
+          "integer symmetric inset excluding interpolation margin", symmetric_inset)
