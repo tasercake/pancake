@@ -25,11 +25,25 @@ pub enum Picker<'a> {
 /// Returns a desktop setup error before registering the completion.
 #[cfg(target_os = "linux")]
 pub fn open(
-    _window: &ComponentInstance,
+    window: &ComponentInstance,
     kind: Picker<'_>,
     completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
 ) -> Result<(), String> {
-    linux::open(kind, completion)
+    linux::open(x11_owner(window), kind, completion)
+}
+
+/// Obtain the actual managed workspace's X11 owner for native transience.
+#[cfg(target_os = "linux")]
+fn x11_owner(window: &ComponentInstance) -> Option<std::ffi::c_ulong> {
+    use slint::ComponentHandle as _;
+    use slint::winit_030::winit::raw_window_handle::{HasWindowHandle as _, RawWindowHandle};
+
+    let workspace = window.window().window_handle();
+    match workspace.window_handle().ok()?.as_raw() {
+        RawWindowHandle::Xlib(raw) => Some(raw.window).filter(|&id| id != 0),
+        RawWindowHandle::Xcb(raw) => Some(raw.window.get().into()),
+        _ => None,
+    }
 }
 
 /// Return focus from a native GTK popup to its actual Slint owner.
