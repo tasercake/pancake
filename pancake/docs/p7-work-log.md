@@ -47,3 +47,27 @@ The follow-up uses a private GDK display round-trip and restores focus to
 the Slint owner after native panel closure. It also loads repository-owned
 Slint source under a builtin URI, so source resolution stays in the pinned
 widget bundle, and introduces a four-entry display-only preview cache.
+
+### X11 pointer handoff
+
+After the asynchronous GTK conversion, actual Openbox focus returned to the
+Slint workspace before an immediate second click. The root X11 observer
+recorded both physical clicks at the Open button. The Winit event observer
+recorded the second press and release after a final coordinate at the
+dismissed GTK dialog, with the motion back to Open absent from the Winit
+stream. The
+[X11 trace](p7-ui-evidence/native-pointer-x11.jsonl.gz),
+[Winit trace](p7-ui-evidence/native-pointer-winit-events.log), and
+[failed case](p7-ui-evidence/native-pointer-red.json) preserve that sequence.
+
+On the first delivered press following native GTK dismissal, the Linux
+application compares the Winit coordinates with a safe X11 pointer query
+relative to the actual workspace window. A stale pair is delivered once to
+Slint with the queried position and its original button and event order.
+Other events follow their normal Winit path. GTK file windows also name
+the actual Slint owner as their native X11 transient parent. The observer
+build was used only to localize the fault and its logging code was removed.
+
+The private Xvfb launcher adds `-noreset` to preserve its display socket
+across accessibility service activation before Openbox starts. The
+unchanged runner still owns startup, teardown, and physical input.

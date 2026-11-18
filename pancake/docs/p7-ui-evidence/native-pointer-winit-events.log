@@ -1,0 +1,17 @@
+native event Focused(false)
+native event CursorEntered { device_id: DeviceId(X(DeviceId(2))) }
+native event CursorMoved { device_id: DeviceId(X(DeviceId(2))), position: PhysicalPosition { x: 585.0, y: 357.0 } }
+native event Focused(true)
+native event CursorMoved { device_id: DeviceId(X(DeviceId(2))), position: PhysicalPosition { x: 585.0, y: 357.0 } }
+native event CursorMoved { device_id: DeviceId(X(DeviceId(2))), position: PhysicalPosition { x: 249.0, y: 27.0 } }
+native event MouseInput { device_id: DeviceId(X(DeviceId(2))), state: Pressed, button: Left }
+native event MouseInput { device_id: DeviceId(X(DeviceId(2))), state: Released, button: Left }
+import callback
+native event Focused(false)
+native event CursorLeft { device_id: DeviceId(X(DeviceId(2))) }
+native event CursorEntered { device_id: DeviceId(X(DeviceId(2))) }
+native event CursorMoved { device_id: DeviceId(X(DeviceId(2))), position: PhysicalPosition { x: 817.0, y: 591.0 } }
+native event Focused(true)
+native event CursorMoved { device_id: DeviceId(X(DeviceId(2))), position: PhysicalPosition { x: 817.0, y: 591.0 } }
+native event MouseInput { device_id: DeviceId(X(DeviceId(2))), state: Pressed, button: Left }
+native event MouseInput { device_id: DeviceId(X(DeviceId(2))), state: Released, button: Left }

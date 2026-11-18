@@ -50,6 +50,9 @@ struct Session {
     /// Real GTK popup awaiting dismissal or a selected command.
     #[cfg(target_os = "linux")]
     menu: Option<Rc<RefCell<Option<MenuOutcome>>>>,
+    /// Position handoff between Winit and native GTK on Linux.
+    #[cfg(target_os = "linux")]
+    pointer: panel::PointerHandoff,
     /// Active result ordinal when the viewer displays a result.
     selected: Option<usize>,
     /// Sum of retained full-precision RGB bytes.
@@ -143,6 +146,8 @@ enum MenuOutcome {
     File(Option<desktop_menu::FileAction>),
     /// Task selected for one real source row.
     Source(usize, Option<desktop_menu::SourceAction>),
+    /// Native toolkit failed to create the requested popup.
+    Failed(String),
 }
 
 impl Session {
@@ -324,8 +329,9 @@ impl Session {
             return Ok(());
         };
         self.menu = None;
-        panel::restore_focus(window);
+        self.pointer.restore_focus(window);
         match outcome {
+            MenuOutcome::Failed(error) => Err(error.into()),
             MenuOutcome::File(action) => dispatch_file_menu(self, window, action),
             MenuOutcome::Source(index, action) => {
                 let arguments = [i32::try_from(index)?.into()];
@@ -350,7 +356,7 @@ impl Session {
     fn open_file_panel(
         &mut self,
         window: &ComponentInstance,
-        picker: Picker<'_>,
+        picker: Picker<'static>,
         request: FileRequest,
     ) -> UiResult {
         if self.file_panel.is_some() {
@@ -358,9 +364,17 @@ impl Session {
         }
         let selected = Rc::new(RefCell::new(None));
         let ready = Rc::clone(&selected);
-        panel::open(window, picker, move |paths| {
-            *ready.borrow_mut() = Some(paths);
-        })?;
+        let owner = window.as_weak();
+        Timer::single_shot(Duration::ZERO, move || {
+            if let Some(window) = owner.upgrade() {
+                let completion = Rc::clone(&ready);
+                if let Err(error) = panel::open(&window, picker, move |paths| {
+                    *completion.borrow_mut() = Some(paths);
+                }) {
+                    *ready.borrow_mut() = Some(Err(error));
+                }
+            }
+        });
         self.file_panel = Some(FilePanel { request, selected });
         Ok(())
     }
@@ -383,7 +397,7 @@ impl Session {
             .take()
             .ok_or("File selection lost its request.")?;
         #[cfg(target_os = "linux")]
-        panel::restore_focus(window);
+        self.pointer.restore_focus(window);
         let paths = outcome?;
         let Some(first) = paths.first() else {
             self.pending = None;
@@ -437,11 +451,29 @@ fn configure_image(window: &ComponentInstance, preview: &Preview) -> UiResult {
 /// Returns dynamic status/button binding errors.
 fn render_status(window: &ComponentInstance, snapshot: JobSnapshot) -> UiResult {
     let state = snapshot.state;
+    let suffix = if snapshot.cancel_acknowledged.is_some() {
+        " · Cancellation acknowledged"
+    } else {
+        ""
+    };
     let message = format!(
-        "{state:?} · {:?} · {} of {}",
+        "{state:?} · {:?} · {} of {}{suffix}",
         snapshot.stage, snapshot.completed, snapshot.total
     );
+    let observed = serde_json::json!({
+        "generation": format!("{:?}", snapshot.generation),
+        "state": format!("{state:?}"),
+        "stage": format!("{:?}", snapshot.stage),
+        "completed": snapshot.completed,
+        "total": snapshot.total,
+        "pause_acknowledged": snapshot.pause_acknowledged.is_some(),
+        "cancel_acknowledged": snapshot.cancel_acknowledged.is_some(),
+    });
     window.set_property("stack-status", SharedString::from(message).into())?;
+    window.set_property(
+        "stack-details",
+        SharedString::from(observed.to_string()).into(),
+    )?;
     window.set_property("can-pause", (state == JobState::Running).into())?;
     window.set_property("can-resume", (state == JobState::Paused).into())?;
     window.set_property(
@@ -477,6 +509,8 @@ pub fn configure(
         file_panel: None,
         #[cfg(target_os = "linux")]
         menu: None,
+        #[cfg(target_os = "linux")]
+        pointer: panel::PointerHandoff::install(window),
         selected: None,
         retained_bytes: 0,
     };
@@ -743,6 +777,9 @@ fn ordinal(argument: Option<&Value>) -> UiResult<usize> {
 fn start(session: &mut Session, window: &ComponentInstance, _: &[Value]) -> UiResult {
     let config = JobConfig::new(session.sources.paths(), None, settings(window)?)?;
     session.generation = Some(session.worker.start(config)?);
+    if let Some(snapshot) = session.worker.snapshot()? {
+        render_status(window, snapshot)?;
+    }
     show_error(window, "");
     window.set_property("running", true.into())?;
     Ok(())
@@ -793,6 +830,7 @@ fn save(session: &mut Session, window: &ComponentInstance, args: &[Value]) -> Ui
     let formats = ["pancake.png", "pancake.jpg", "pancake.tif", "pancake.exr"];
     let name = formats
         .get(ordinal(args.first())?)
+        .copied()
         .ok_or("Invalid export format.")?;
     let depth = if ordinal(args.get(1))? == 0 {
         BitDepth::Eight
@@ -1125,9 +1163,15 @@ fn file_menu(session: &mut Session, _: &ComponentInstance, _: &[Value]) -> UiRes
     }
     let selection = Rc::new(RefCell::new(None));
     let ready = Rc::clone(&selection);
-    desktop_menu::open_file(session.history.entries(), move |action| {
-        *ready.borrow_mut() = Some(MenuOutcome::File(action));
-    })?;
+    let recent = session.history.entries().to_vec();
+    Timer::single_shot(Duration::ZERO, move || {
+        let completion = Rc::clone(&ready);
+        if let Err(error) = desktop_menu::open_file(&recent, move |action| {
+            *completion.borrow_mut() = Some(MenuOutcome::File(action));
+        }) {
+            *ready.borrow_mut() = Some(MenuOutcome::Failed(error));
+        }
+    });
     session.menu = Some(selection);
     Ok(())
 }
@@ -1205,9 +1249,14 @@ fn source_menu(session: &mut Session, _: &ComponentInstance, args: &[Value]) -> 
     let index = ordinal(args.first())?;
     let selection = Rc::new(RefCell::new(None));
     let ready = Rc::clone(&selection);
-    desktop_menu::open_source(move |action| {
-        *ready.borrow_mut() = Some(MenuOutcome::Source(index, action));
-    })?;
+    Timer::single_shot(Duration::ZERO, move || {
+        let completion = Rc::clone(&ready);
+        if let Err(error) = desktop_menu::open_source(move |action| {
+            *completion.borrow_mut() = Some(MenuOutcome::Source(index, action));
+        }) {
+            *ready.borrow_mut() = Some(MenuOutcome::Failed(error));
+        }
+    });
     session.menu = Some(selection);
     Ok(())
 }

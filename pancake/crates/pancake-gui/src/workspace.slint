@@ -214,6 +214,7 @@ export component Workspace inherits Window {
     in property <bool> can-resume;
     in property <bool> can-cancel;
     in property <string> stack-status: "Idle";
+    in property <string> stack-details: "{}";
     in property <image> preview;
 
     in property <int> preview-width;
@@ -680,6 +681,7 @@ export component Workspace inherits Window {
                         color: Palette.foreground;
                         accessible-id: "stack.status";
                         accessible-label: root.stack-status;
+                        accessible-description: root.stack-details;
                     }
                     HorizontalLayout {
                         spacing: 5px;

@@ -1,0 +1,8 @@
+drwxrwxr-x root/root         0 2026-11-18 10:48 ./
+drwxrwxr-x root/root         0 2026-11-18 10:48 ./usr/
+drwxrwxr-x root/root         0 2026-11-18 10:48 ./usr/bin/
+-rwxr-xr-x root/root 122104504 2026-11-18 10:48 ./usr/bin/pancake-cli
+-rwxr-xr-x root/root 156088608 2026-11-18 10:48 ./usr/bin/pancake-gui
+drwxrwxr-x root/root         0 2026-11-18 10:48 ./usr/share/
+drwxrwxr-x root/root         0 2026-11-18 10:48 ./usr/share/applications/
+-rw-rw-r-- root/root        99 2026-11-18 10:48 ./usr/share/applications/pancake.desktop

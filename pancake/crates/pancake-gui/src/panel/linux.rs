@@ -1,10 +1,13 @@
 //! Local Linux file dialogs with native GTK widgets and native editable paths.
 
 use std::cell::RefCell;
+use std::ffi::c_ulong;
 use std::path::PathBuf;
 use std::rc::Rc;
 
+use gdkx11::{X11Display, X11Window};
 use gtk::atk::prelude::AtkObjectExt as _;
+use gtk::glib::object::Cast as _;
 use gtk::prelude::{
     BoxExt as _, DialogExt as _, EntryExt as _, FileChooserExt as _, GtkWindowExt as _,
     WidgetExt as _,
@@ -22,10 +25,12 @@ use super::Picker;
 ///
 /// Returns an unavailable desktop or lost path-entry error during setup.
 pub(super) fn open(
+    owner: Option<c_ulong>,
     kind: Picker<'_>,
     completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
 ) -> Result<(), String> {
     let (dialog, chooser, entry) = build(kind)?;
+    set_native_owner(&dialog, owner);
     let saving = matches!(kind, Picker::Save(_));
     let pending = Rc::new(RefCell::new(Some(completion)));
     let response = Rc::clone(&pending);
@@ -38,11 +43,7 @@ pub(super) fn open(
         } else {
             Ok(Vec::new())
         };
-        if choice == ResponseType::DeleteEvent {
-            dialog.hide();
-        } else {
-            close(dialog);
-        }
+        close(dialog, choice == ResponseType::DeleteEvent);
         complete(outcome);
     });
     let _destroy = dialog.connect_destroy(move |_| {
@@ -112,10 +113,27 @@ fn build(kind: Picker<'_>) -> Result<(Dialog, FileChooserWidget, Entry), String>
     Ok((dialog, chooser, entry))
 }
 
-/// Unmap the actual dialog before requesting the toolkit's native close.
-fn close(dialog: &Dialog) {
+/// Bind the real GTK surface to the Slint workspace on native X11.
+fn set_native_owner(dialog: &Dialog, owner: Option<c_ulong>) {
+    if let Some(xid) = owner
+        && let Some(display) = gtk::gdk::Display::default()
+        && let Ok(display) = display.downcast::<X11Display>()
+    {
+        dialog.realize();
+        if let Some(child) = dialog.window() {
+            let parent = X11Window::foreign_new_for_display(&display, xid);
+            child.set_transient_for(parent.upcast_ref());
+        }
+    }
+}
+
+/// Release the toolkit's modal input grab before unmapping and closing.
+fn close(dialog: &Dialog, deleting: bool) {
+    dialog.set_modal(false);
     dialog.hide();
-    dialog.close();
+    if !deleting {
+        dialog.close();
+    }
     if let Some(display) = gtk::gdk::Display::default() {
         display.sync();
     }

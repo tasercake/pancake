@@ -1,0 +1,10 @@
+rowan v0.17.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/vendor/rowan-0.17.0)
+└── i-slint-compiler v1.19.0
+    └── slint-macros v1.19.0 (proc-macro)
+        └── slint v1.19.0
+            └── pancake-gui v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/crates/pancake-gui)
+
+rowan v0.17.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/vendor/rowan-0.17.0)
+└── i-slint-compiler v1.19.0
+    └── slint-interpreter v1.19.0
+        └── pancake-gui v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/crates/pancake-gui)
