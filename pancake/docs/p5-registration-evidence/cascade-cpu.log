@@ -1,0 +1,1 @@
+Estimate { transform: Affine { rows: [[1.0000001, -1.1620273e-7, 2.0036254], [1.1623358e-7, 1.0, -0.0010052411]] }, confidence: 0.9974219 } gives 0.0041098595px max interior-corner error

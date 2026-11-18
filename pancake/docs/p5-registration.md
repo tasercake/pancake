@@ -51,3 +51,16 @@ root with these commands. Remove the generated artifacts after inspection.
 
 Native CUDA, Apple, complete job recovery, end-to-end case accounting and
 workspace-wide assurance remain pending on the integrated revision.
+
+## Elongated-canvas regression
+
+Commit `395917324fd1855ad23b581c253f8eb16801a893` retains short-axis detail on
+elongated images under the same 589,824-pixel limit. The same two lossless
+`wide-*.png` inputs from the frozen cascade fixture, decoded to packed f32 with
+the independent reader, yielded 0.004110px and 0.004358px worst interior-corner
+error on CPU high precision and RTX 3090 Vulkan ordinary precision respectively.
+[CPU trace](p5-registration-evidence/cascade-cpu.log) and
+[GPU trace](p5-registration-evidence/cascade-vulkan.log). The probe takes
+little-endian float data from those fixture PNGs, normalized by dividing
+decoded channel values by 255, in `artifacts/p5/cascade-probe/wide-{0,1}.f32`.
+[Probe source](p5-registration-evidence/cascade-probe.rs.txt).
