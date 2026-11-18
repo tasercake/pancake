@@ -1,0 +1,12 @@
+LLD linker
+LLD 23.1.5 (/checkout/src/llvm-project/llvm 0a5579eb649d3634a9c30ac873300cc2944fa070)
+LLVM configuration
+23.1.0
+x86_64-unknown-linux-gnu
+/home/krishna/.local/share/tracel/tracel-llvm-23.1.0-4/lib
+-lrt -ldl -lm
+Extracted member: AbstractCallSite.cpp.o
+/tmp/pancake-worktrees.t3paqgWM/windows-cross/pancake/target/windows-retained-build/tracel-llvm-host-object.o: ELF 64-bit LSB relocatable, x86-64, version 1 (SYSV), not stripped
+60468bdeff545db107756235de34b72775a80413528dd4126c903b7b71db9ce2  /tmp/pancake-worktrees.t3paqgWM/windows-cross/pancake/target/windows-retained-build/tracel-llvm-host-object.o
+COFF linker result
+rust-lld: error: /tmp/pancake-worktrees.t3paqgWM/windows-cross/pancake/target/windows-retained-build/tracel-llvm-host-object.o: unknown file type
