@@ -163,6 +163,16 @@ maintenance reviews retain their original expiry. The Chrono review binds
 both the retained Rawler and reactivated Slint paths to their original
 reviewed versions.
 
+The Linux-only dialog handoff adds exact GDK X11 bindings 0.19.0,
+their matching sys crate, and X11 2.21.0. The GUI also declares x11rb 0.13.2
+directly, using the version already resolved for winit. GDK X11 associates
+the GTK panel with its actual X11 owner window. x11rb reads the current
+window-relative pointer position when a real button event arrives after a
+panel closes. The development package already supplies the native GDK X11
+and X11 edges. The graph regression and Linux pkg-config probe check both
+explicitly. The configured Cargo-deny audit adds no duplicate or advisory
+exception for these packages.
+
 Canonical Miri still runs every first-party library test on Darwin. GTK,
 rfd and Slint are isolated in the GUI binary, whose native checks stay in
 the workspace CPU, coverage, layout and sanitizer selectors. The reviewed
