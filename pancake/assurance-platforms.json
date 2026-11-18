@@ -46,7 +46,7 @@
     "src/image_io/npy.rs": "e8697e8d90d26ff24c7d17c0ab605f3b0cc8ebc08a7f0bd023759830e76f2b05",
     "src/image_io/raw.rs": "6335a39835eedb6f6f6dd372d4b41471549f3e6fd258994de6acd0e1d43b17a0",
     "src/job/events.rs": "9d4d8bcdd531d3d3a6d50911f63081bbe72bb6afde9d51a35df49dd2ba547312",
-    "src/job/lifecycle/tests.rs": "de319a3df2e9f9ba025f1686dba210bd6132108aaa86f81ac153f46eba34cafd",
+    "src/job/lifecycle/tests.rs": "1ab4529d8af19f23402bc1ce64622f384cc7ed765f9f31cb2cee4d7ecd58279a",
     "src/job/lifecycle.rs": "4d6492a9303ce03a260597658615dda5f809f28cca8d5d1273aaabad9e4b15ca",
     "src/job/mod.rs": "4c1f348633c4993d665fefd809c3640b1fe88b4ee4b4e6d4daca61ee80b7fbbd",
     "src/job/registration.rs": "ea58a3b45232ad2f790d2505413b2f43cbd4cc7af68873451daa759c523c2944",

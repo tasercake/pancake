@@ -511,8 +511,12 @@ fn paused_stack_resumes_and_publishes_only_its_completed_generation() -> Result<
             std::thread::yield_now();
         }
         require(
-            control.resume()?,
-            "the acknowledged pause refused to resume",
+            control.resume()?
+                && !matches!(
+                    control.snapshot()?.state,
+                    JobState::Pausing | JobState::Paused
+                ),
+            "resume returned without releasing the real stack",
         )
     })();
     if verification.is_err() {
