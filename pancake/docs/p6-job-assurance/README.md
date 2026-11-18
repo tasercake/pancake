@@ -28,3 +28,15 @@ constant color with mixed input dimensions, both aligned and unaligned.
 Host Linux x86-64, kernel `6.8.0-147-generic`, Rust 1.100.0 and CPU LLVM.
 The tests used their own temporary encoded RGB16 source files. The earlier
 341-case host ledger retains its exact release identity.
+
+## CPU coverage observation
+
+At `c645a70`, `bash scripts/check.sh coverage-cpu` ran 65 passing tests and
+returned exit 1 on uncovered source. The stable LLVM report covers 3,404 of
+3,961 lines, 320 of 454 functions and 3,445 of 4,312 regions across the CPU
+scope. The production job modules cover 817 of 909 lines, 75 of 93 functions
+and 742 of 936 regions. The preceding headless job observation was 626 of 895
+lines, 58 of 92 functions and 559 of 920 regions. The admission fix added
+reviewed source, so the totals differ. Branch coverage is a separate nightly
+check. [Coverage report](stack-plan-coverage-cpu.json.gz) and
+[command log](stack-plan-coverage-cpu.log.gz).
