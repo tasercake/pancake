@@ -73,3 +73,35 @@ fn reports_malformed_preferences() -> Result<(), Box<dyn Error>> {
         "unknown device accepted",
     )
 }
+
+/// The profile accepts valid bytes up to its bound and diagnoses oversize data.
+///
+/// # Errors
+/// Returns a fixture, storage, or comparison failure.
+#[test]
+fn rejects_an_oversized_preferences_document_without_truncating_it() -> Result<(), Box<dyn Error>> {
+    let work = tempfile::tempdir()?;
+    let store = Store::new(work.path().to_path_buf());
+    let choices = Preferences::from_choices("Dark", "CPU")?;
+    let mut raw = serde_json::to_vec(&choices)?;
+    raw.resize(65_536, b' ');
+    std::fs::write(store.path(), &raw)?;
+    let observed = store.read()?;
+    verify(
+        observed == choices && observed.device.index() == 1,
+        "exactly 64 KiB should retain the explicit CPU selector",
+    )?;
+
+    raw.push(b' ');
+    std::fs::write(store.path(), &raw)?;
+    verify(
+        store
+            .read()
+            .is_err_and(|error| error.to_string() == "Preferences exceed 64 KiB."),
+        "valid JSON above the storage limit must fail rather than parse a truncated prefix",
+    )?;
+    verify(
+        std::fs::read(store.path())? == raw,
+        "oversize input was altered during a read",
+    )
+}

@@ -1,6 +1,7 @@
 //! Render the embedded workspace through Slint's pinned software renderer.
 
 use std::error::Error;
+use std::fs;
 use std::rc::{Rc, Weak};
 
 use num_traits::ToPrimitive as _;
@@ -9,7 +10,9 @@ use slint::platform::{Platform, PlatformError, PointerEventButton, WindowAdapter
 use slint::{
     ComponentHandle as _, Image, LogicalPosition, PhysicalSize, Rgb8Pixel, SharedPixelBuffer,
 };
-use slint_interpreter::ComponentInstance;
+use slint_interpreter::{ComponentInstance, Value};
+
+use super::preferences::{Preferences, Store};
 
 /// An offscreen window using the same renderer as the software desktop backend.
 struct Offscreen(Weak<MinimalSoftwareWindow>);
@@ -223,5 +226,75 @@ fn observe_comparison(
         RESULT,
         "the result beyond the dragged split must stay visible",
     )?;
+    Ok(())
+}
+
+/// Read the actual status displayed by the application's preference controls.
+///
+/// # Errors
+/// Returns the binding error if the workspace has no string status.
+fn preference_error(workspace: &ComponentInstance) -> Result<slint::SharedString, Box<dyn Error>> {
+    let Value::String(message) = workspace.get_property("error-message")? else {
+        return Err("The workspace preference status was not a string.".into());
+    };
+    Ok(message)
+}
+
+/// Report invalid profile data and allow the same window to save after repair.
+///
+/// # Errors
+/// Returns a fixture, binding, persistence, or observed state error.
+#[test]
+fn preference_callback_reports_storage_errors_and_recovers() -> Result<(), Box<dyn Error>> {
+    let sandbox = tempfile::tempdir()?;
+    let profile = sandbox.path().to_path_buf();
+    let destination = profile.join("preferences.json");
+    let malformed = b"{broken";
+    fs::write(&destination, malformed)?;
+
+    let adapter = MinimalSoftwareWindow::new(RepaintBufferType::NewBuffer);
+    let platform_window = Rc::downgrade(&adapter);
+    slint::platform::set_platform(Box::new(Offscreen(platform_window.clone())))?;
+    let workspace = super::compile_workspace()?.create()?;
+    super::configure_preferences(&workspace, Store::new(profile.clone()))?;
+    if !preference_error(&workspace)?.starts_with("Could not read preferences:")
+        || workspace.get_property("theme-index")? != Value::from(0_i32)
+        || workspace.get_property("device-index")? != Value::from(0_i32)
+        || fs::read(&destination)? != malformed
+    {
+        return Err("An invalid profile must keep its bytes and display default choices.".into());
+    }
+
+    fs::remove_file(&destination)?;
+    fs::create_dir(&destination)?;
+    let protected = destination.join("other data");
+    fs::write(&protected, b"preserved")?;
+    let choices = [Value::String("Dark".into()), Value::String("CPU".into())];
+    let _failed_save = workspace.invoke("save-preferences", &choices)?;
+    if !preference_error(&workspace)?.starts_with("Could not save preferences:")
+        || fs::read(&protected)? != b"preserved"
+    {
+        return Err("The failed save must report its error and preserve existing data.".into());
+    }
+
+    fs::remove_file(protected)?;
+    fs::remove_dir(destination)?;
+    let _saved = workspace.invoke("save-preferences", &choices)?;
+    if !preference_error(&workspace)?.is_empty()
+        || Store::new(profile).read()? != Preferences::from_choices("Dark", "CPU")?
+    {
+        return Err(
+            "A successful retry must save the choices and clear the previous error.".into(),
+        );
+    }
+
+    let component = workspace.as_weak();
+    drop(workspace);
+    drop(adapter);
+    if component.upgrade().is_some() || platform_window.upgrade().is_some() {
+        return Err(
+            "The repaired profile window retained its callback or platform adapter.".into(),
+        );
+    }
     Ok(())
 }

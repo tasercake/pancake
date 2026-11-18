@@ -137,7 +137,7 @@ fn read(profile: &Path) -> io::Result<Vec<PathBuf>> {
 /// Contracts for persistence across application launches.
 #[cfg(test)]
 mod tests {
-    use super::RecentFolders;
+    use super::{HISTORY, RecentFolders};
     use std::{fs, io};
 
     /// A successful folder visit moves that canonical directory to the front.
@@ -252,6 +252,48 @@ mod tests {
             history.entries() == expected,
             "the MRU list has twelve entries",
         )
+    }
+
+    /// Only a directory can replace the latest folder, even when a file exists.
+    ///
+    /// # Errors
+    /// Returns a fixture failure or an unexpected history update.
+    #[test]
+    fn rejects_nonfolders_without_mutating_committed_history() -> io::Result<()> {
+        let sandbox = tempfile::tempdir()?;
+        let profile = sandbox.path().join("profile");
+        let first = sandbox.path().join("first");
+        let image = first.join("image.tif");
+        fs::create_dir(&first)?;
+        fs::write(&image, b"existing source file")?;
+        let mut history = RecentFolders::open(&profile)?;
+        history.remember(&first)?;
+        let expected = [first.canonicalize()?];
+        let committed = fs::read(profile.join(HISTORY))?;
+
+        for (candidate, expected_error) in [
+            (image, io::ErrorKind::NotADirectory),
+            (
+                sandbox.path().join("removed folder"),
+                io::ErrorKind::NotFound,
+            ),
+        ] {
+            let rejected = history.remember(&candidate);
+            check(
+                rejected.is_err_and(|error| error.kind() == expected_error),
+                "an invalid folder visit must report the applicable storage error",
+            )?;
+            check(
+                history.entries() == expected,
+                "invalid folder changed the active MRU",
+            )?;
+            check(
+                fs::read(profile.join(HISTORY))? == committed
+                    && RecentFolders::open(&profile)?.entries() == expected,
+                "invalid folder changed the committed MRU",
+            )?;
+        }
+        Ok(())
     }
 
     /// Report a failed contract without a panic-only path in a fallible test.
