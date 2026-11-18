@@ -1,0 +1,96 @@
+"""Replay one authenticated native D150 pair using the sealed candidate launch flags."""
+
+import json
+from pathlib import Path
+import subprocess
+import sys
+from importlib.machinery import SourceFileLoader
+from importlib.util import module_from_spec, spec_from_loader
+
+
+def load_helpers():
+    """Load frozen comparator helpers from the archived Python source."""
+    path = Path(__file__).with_name("run_fixed_d150.py.txt")
+    loader = SourceFileLoader("d150_fixed", str(path))
+    spec = spec_from_loader(loader.name, loader)
+    helpers = module_from_spec(spec)
+    loader.exec_module(helpers)
+    return helpers
+
+
+def main():
+    """Run both exact executables once, within matching CPU and address bounds."""
+    fixed = load_helpers()
+    stock, candidate, input_root, sealed_launch, destination = [
+        Path(item).resolve() for item in sys.argv[1:]
+    ]
+    if fixed.sha(stock) != fixed.STOCK_SHA or fixed.sha(candidate) != fixed.PROTOTYPE_SHA:
+        raise ValueError("sealed and prototype executables must match the recorded pair")
+    images = fixed.authenticated_inputs(input_root)
+    original = json.loads(sealed_launch.read_bytes())
+    args = original["argv"]
+    split = args.index("--output")
+    if args[1] != "--input" or [Path(item).name for item in args[2:split]] != [
+        item.name for item in images
+    ]:
+        raise ValueError("sealed launch order does not match all native originals")
+    original_base = original["environment"]["HOME"].removesuffix("/home")
+    destination.mkdir(exist_ok=False)
+    results = {}
+    for label, binary in [("stock", stock), ("prototype", candidate)]:
+        target = destination / label
+        target.mkdir()
+        for folder in ("home", "cache", "config", "tmp", "cuda", "nvidia", "numba", "mesa"):
+            (target / "cache" / folder).mkdir(parents=True)
+        output = target / "complete.tif"
+        observer = target / "events.jsonl"
+        argv = [
+            "/usr/bin/time", "-v", "-o", str(target / "resources.txt"),
+            "taskset", "-c", "0-15", "prlimit", "--as=34359738368",
+            str(binary), "--input", *map(str, images), "--output", str(output), *args[split + 2 :],
+        ]
+        env = {
+            key: value.replace(original_base, str(target / "cache"))
+            for key, value in original["environment"].items()
+        }
+        env["CONFORMANCE_EVENTS_PATH"] = str(observer)
+        cwd = str(fixed.ROOT / "pancake")
+        (target / "launch.json").write_text(json.dumps({
+            "argv": argv, "environment": env, "cwd": cwd, "binary_sha256": fixed.sha(binary),
+            "sealed_launch_sha256": fixed.sha(sealed_launch),
+        }, indent=2) + "\n")
+        print(label, "started", flush=True)
+        with (target / "stdout.txt").open("x") as stdout, (target / "stderr.txt").open("x") as stderr:
+            subprocess.run(
+                argv, env=env, cwd=cwd, stdout=stdout, stderr=stderr, check=True, timeout=300,
+            )
+        (event,) = [json.loads(line) for line in observer.read_text().splitlines()]
+        if (
+            not event["completed"]
+            or event["actual_backend"] != "cpu"
+            or event["runtime"] != "cpu"
+            or event["physical_gpu"]
+            or event["fallback_reason"] is not None
+            or list(event["alignment_transforms"]) != list(map(str, images))
+            or len(event["sequential_transforms"]) != 150
+        ):
+            raise ValueError(f"{label} failed the exact ordered native CPU contract")
+        results[label] = {
+            "encoded_sha256": fixed.sha(output), "event_sha256": fixed.sha(observer),
+            "resources_sha256": fixed.sha(target / "resources.txt"),
+        }
+        print(label, "completed", flush=True)
+    if results["stock"]["event_sha256"] != results["prototype"]["event_sha256"]:
+        raise ValueError("CPU runtime or transform event bytes differ between products")
+    if fixed.authenticated_inputs(input_root) != images:
+        raise ValueError("D150 originals changed during the comparison")
+    (destination / "run.json").write_text(json.dumps({
+        "scope": "one diagnostic CPU pair, not a frozen timing or resource campaign",
+        "all_originals_unchanged": True, "all_transforms_exactly_equal": True,
+        "source_manifest_sha256": fixed.MANIFEST_SHA,
+        "stock": results["stock"], "prototype": results["prototype"],
+    }, indent=2) + "\n")
+
+
+if __name__ == "__main__":
+    main()

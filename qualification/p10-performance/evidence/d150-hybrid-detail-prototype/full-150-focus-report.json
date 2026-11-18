@@ -1,0 +1,142 @@
+{
+  "scope": "full identical originals and transforms, one native CPU diagnostic per target",
+  "stock_reproduces_frozen_warm_pixels": true,
+  "first_canvas_ltrb": [
+    87,
+    99,
+    2217,
+    1629
+  ],
+  "outputs": {
+    "stock": {
+      "shape": [
+        1530,
+        2130,
+        3
+      ],
+      "pixel_sha256": "7e1ba2a85156b3ca872972c95cd0cb51a09ce61b58a3ba6a9d5eec627b6695ab",
+      "kernel_child_maxrss_kib": 819068,
+      "encoded_sha256": "fee2530932c54dc6ab1468a1a1c0f65c0c88d90b4f4574c35c79072395406ab0"
+    },
+    "prototype": {
+      "shape": [
+        1530,
+        2130,
+        3
+      ],
+      "pixel_sha256": "3e1a55da13c69ab4e0937a8b8cf4fe191d54a1f7be5d08fbf5f661794a235c3d",
+      "kernel_child_maxrss_kib": 867280,
+      "encoded_sha256": "41faa7fa458ae8649668e75e6d9e3a754db3cb55f429f7ff15524db1905b8926"
+    }
+  },
+  "regions": [
+    {
+      "first_canvas_xywh": [
+        1271,
+        131,
+        192,
+        192
+      ],
+      "phase_source": {
+        "rank_index": 16,
+        "name": "P9160532_d2.jpg",
+        "patch_p90": 0.0355615686274511
+      },
+      "historical_pinned_reference_laplace_p90": 0.09694561135271212,
+      "stock": {
+        "luma_laplacian_absolute_p90": 0.06840959182116468,
+        "signed_projection_on_source": 0.2806827884466004,
+        "signed_phase_correlation": 0.15933594490947445
+      },
+      "prototype": {
+        "luma_laplacian_absolute_p90": 0.07431125078202463,
+        "signed_projection_on_source": 0.30477549650271085,
+        "signed_phase_correlation": 0.1600968059220353
+      },
+      "stock_to_pinned_reference_detail": 0.7056491868649284,
+      "prototype_to_pinned_reference_detail": 0.76652516545243,
+      "stock_to_prototype_mae_u16": 2316.113868995949
+    },
+    {
+      "first_canvas_xywh": [
+        1079,
+        515,
+        192,
+        192
+      ],
+      "phase_source": {
+        "rank_index": 22,
+        "name": "P9160538_d2.jpg",
+        "patch_p90": 0.03499529411764746
+      },
+      "historical_pinned_reference_laplace_p90": 0.08835201342793912,
+      "stock": {
+        "luma_laplacian_absolute_p90": 0.061018019684138135,
+        "signed_projection_on_source": 0.18663930945739918,
+        "signed_phase_correlation": 0.10581266031505128
+      },
+      "prototype": {
+        "luma_laplacian_absolute_p90": 0.0662649182879376,
+        "signed_projection_on_source": 0.20834182483329988,
+        "signed_phase_correlation": 0.1090380133421548
+      },
+      "stock_to_pinned_reference_detail": 0.6906239859933142,
+      "prototype_to_pinned_reference_detail": 0.750010279527857,
+      "stock_to_prototype_mae_u16": 751.5801956741898
+    },
+    {
+      "first_canvas_xywh": [
+        1271,
+        515,
+        192,
+        192
+      ],
+      "phase_source": {
+        "rank_index": 17,
+        "name": "P9160533_d2.jpg",
+        "patch_p90": 0.029972549019607886
+      },
+      "historical_pinned_reference_laplace_p90": 0.08149466453040333,
+      "stock": {
+        "luma_laplacian_absolute_p90": 0.0558936662851914,
+        "signed_projection_on_source": 0.28001425140785313,
+        "signed_phase_correlation": 0.14761654648175365
+      },
+      "prototype": {
+        "luma_laplacian_absolute_p90": 0.060363854734111745,
+        "signed_projection_on_source": 0.313005538746102,
+        "signed_phase_correlation": 0.15255577764126516
+      },
+      "stock_to_pinned_reference_detail": 0.6858567564793039,
+      "prototype_to_pinned_reference_detail": 0.7407092854722007,
+      "stock_to_prototype_mae_u16": 654.2920554832176
+    },
+    {
+      "first_canvas_xywh": [
+        1079,
+        899,
+        192,
+        192
+      ],
+      "phase_source": {
+        "rank_index": 45,
+        "name": "P9160561_d2.jpg",
+        "patch_p90": 0.02914352941176459
+      },
+      "historical_pinned_reference_laplace_p90": 0.08113568291752489,
+      "stock": {
+        "luma_laplacian_absolute_p90": 0.056304029907682615,
+        "signed_projection_on_source": 0.19189572964821017,
+        "signed_phase_correlation": 0.10395622849577564
+      },
+      "prototype": {
+        "luma_laplacian_absolute_p90": 0.06108343236438566,
+        "signed_projection_on_source": 0.2162417103186119,
+        "signed_phase_correlation": 0.10839176714622499
+      },
+      "stock_to_pinned_reference_detail": 0.6939490478550127,
+      "prototype_to_pinned_reference_detail": 0.752855342654569,
+      "stock_to_prototype_mae_u16": 623.9377893518518
+    }
+  ]
+}

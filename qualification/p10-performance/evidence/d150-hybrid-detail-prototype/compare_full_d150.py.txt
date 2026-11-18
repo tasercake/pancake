@@ -1,0 +1,128 @@
+"""Measure a complete D150 CPU pair against fixed historical focus coordinates."""
+
+import hashlib
+import json
+from pathlib import Path
+import sys
+from importlib.machinery import SourceFileLoader
+from importlib.util import module_from_spec, spec_from_loader
+
+import cv2
+import numpy as np
+import tifffile
+
+
+def load_helpers():
+    """Read the archived comparison's existing fixed phase implementation."""
+    path = Path(__file__).with_name("run_fixed_d150.py.txt")
+    loader = SourceFileLoader("d150_fixed", str(path))
+    spec = spec_from_loader(loader.name, loader)
+    helpers = module_from_spec(spec)
+    loader.exec_module(helpers)
+    return helpers
+
+
+def find_phase_sources(fixed, originals, coords):
+    """Identify the optically sharpest registered input at each fixed region."""
+    maps = fixed.pinned_maps(originals)
+    picked = [None for _ in coords]
+    for index, path in enumerate(originals):
+        decoded = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+        if decoded is None or decoded.dtype != np.uint8 or decoded.shape != (
+            fixed.HEIGHT, fixed.WIDTH, 3,
+        ):
+            raise ValueError(f"native {path.name} is no longer the calibrated RGB8 raster")
+        bgr = decoded.astype(np.float32)
+        matrix = np.asarray(maps[index] if maps[index] is not None else fixed.IDENTITY, dtype=np.float64)
+        if matrix.shape != (2, 3) or not np.isfinite(matrix).all():
+            raise ValueError(f"invalid previously captured affine for {path.name}")
+        for rank, (x, y, width, height) in enumerate(coords):
+            patch_map = matrix.copy()
+            patch_map[:, 2] += matrix[:, :2] @ [x, y]
+            warped = cv2.warpAffine(
+                bgr, patch_map, (width, height),
+                flags=cv2.INTER_LANCZOS4 | cv2.WARP_INVERSE_MAP,
+                borderMode=cv2.BORDER_REPLICATE,
+            )
+            patch = np.around(np.clip(warped[..., ::-1], 0, 255) * 257).astype(np.uint16)
+            score, phase = fixed.features(patch)
+            if picked[rank] is None or score > picked[rank][0]:
+                picked[rank] = (score, index, path.name, phase, patch)
+    return picked
+
+
+def main():
+    """Preserve exact geometry, bounded image statistics and optical phase."""
+    fixed = load_helpers()
+    input_root, destination = [Path(item).resolve() for item in sys.argv[1:]]
+    cv2.setNumThreads(2)
+    source_paths = fixed.authenticated_inputs(input_root)
+    run = json.loads((destination / "run.json").read_bytes())
+    if not run["all_transforms_exactly_equal"] or not run["all_originals_unchanged"]:
+        raise ValueError("input or transform comparability was not established")
+    before = json.loads((fixed.SEALED / "focus-comparison.json").read_bytes())
+    historical = json.loads((fixed.SEALED / "staging-transfer.json").read_bytes())
+    expected_crop = before["published_first_frame_canvas_ltrb"]["candidate"]
+    output = {}
+    pixels = {}
+    for label in ("stock", "prototype"):
+        path = destination / label / "complete.tif"
+        with tifffile.TiffFile(path) as encoded:
+            if len(encoded.pages) != 1 or encoded.pages[0].photometric != tifffile.PHOTOMETRIC.RGB:
+                raise ValueError("full D150 output is not one RGB TIFF")
+            image = encoded.asarray()
+        h, w = image.shape[:2]
+        if image.shape != (
+            expected_crop[3] - expected_crop[1], expected_crop[2] - expected_crop[0], 3,
+        ) or image.dtype != np.uint16:
+            raise ValueError("full D150 output did not retain the same RGB16 crop")
+        raw = hashlib.sha256(image.astype("<u2", copy=False)).hexdigest()
+        if label == "stock" and raw != historical["first_warm_exports"]["candidate"]["pixel_sha256"]:
+            raise ValueError("fresh sealed stock output differs from preserved warm pixels")
+        usage = (destination / label / "resources.txt").read_text().splitlines()
+        peak = next(row.rsplit(":", 1)[-1].strip() for row in usage if "Maximum resident set size" in row)
+        output[label] = {
+            "shape": list(image.shape), "pixel_sha256": raw,
+            "kernel_child_maxrss_kib": int(peak), "encoded_sha256": fixed.sha(path),
+        }
+        pixels[label] = image
+
+    coords = [item["source_xywh"] for item in before["focus_regions"]]
+    anchors = find_phase_sources(fixed, source_paths, coords)
+    reports, panels = [], []
+    for (x, y, width, height), anchor, historical_region in zip(
+        coords, anchors, before["focus_regions"], strict=True,
+    ):
+        roi = [x - expected_crop[0], y - expected_crop[1], width, height]
+        stock = fixed.cropped(pixels["stock"], roi)
+        prototype = fixed.cropped(pixels["prototype"], roi)
+        stock_metric = fixed.phase_comparison(stock, anchor)
+        candidate_metric = fixed.phase_comparison(prototype, anchor)
+        reference = historical_region["reference_luma_laplacian_absolute_p90"]
+        reports.append({
+            "first_canvas_xywh": [x, y, width, height],
+            "phase_source": {"rank_index": anchor[1], "name": anchor[2], "patch_p90": anchor[0]},
+            "historical_pinned_reference_laplace_p90": reference,
+            "stock": stock_metric,
+            "prototype": candidate_metric,
+            "stock_to_pinned_reference_detail": stock_metric["luma_laplacian_absolute_p90"] / reference,
+            "prototype_to_pinned_reference_detail": candidate_metric["luma_laplacian_absolute_p90"] / reference,
+            "stock_to_prototype_mae_u16": float(np.abs(
+                stock.astype(np.int32) - prototype.astype(np.int32)
+            ).mean()),
+        })
+        panels.append(np.hstack([anchor[4], stock, prototype]))
+    panel = (np.vstack(panels) // 257).astype(np.uint8)
+    if not cv2.imwrite(str(destination / "focus-phase-panel.png"), cv2.cvtColor(panel, cv2.COLOR_RGB2BGR)):
+        raise ValueError("could not retain actual full comparison patches")
+    report = {
+        "scope": "full identical originals and transforms, one native CPU diagnostic per target",
+        "stock_reproduces_frozen_warm_pixels": True, "first_canvas_ltrb": expected_crop,
+        "outputs": output, "regions": reports,
+    }
+    (destination / "focus-report.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
+    print(json.dumps(report, indent=2))
+
+
+if __name__ == "__main__":
+    main()
