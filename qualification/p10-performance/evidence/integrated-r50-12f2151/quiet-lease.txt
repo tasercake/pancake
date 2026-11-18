@@ -1,0 +1,2 @@
+2026-11-18T15:03:28+08:00
+Exclusive CPU quiet window authorized by integration owner after P4 focused checks and P3 bulk cleanup completed.

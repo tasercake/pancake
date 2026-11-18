@@ -1,0 +1,47 @@
+{
+  "removed_local_original_count": 50,
+  "removed_local_original_bytes": 442098996,
+  "verified_unchanged_before_removal": true,
+  "transferred_exact_original_count": 2,
+  "remaining_originals_owner": "/root/assurance",
+  "remaining_originals_receipt": "staging-transfer.json",
+  "retained_review_exports_removed": [
+    {
+      "path": "paired/warm-01/candidate/complete.tif",
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    },
+    {
+      "path": "paired/warm-01/reference/complete.tif",
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "6bceffbd485796996da6afaa7e1a13e29b941d9a02ddcee793b0e9729b776498",
+      "pixel_sha256": "2067f6550fcd34bf1149b76e26dd0290f89acfa1a75c08b5d51d8a9ae3de0e91",
+      "bytes": 92419730,
+      "minimum": 0,
+      "maximum": 65535
+    }
+  ],
+  "other_export_paths_removed_by_runner": [],
+  "paired_runtime_cache_absent": true,
+  "review_previews_removed": [
+    "paired/focus-review.png",
+    "paired/subject-review.png"
+  ],
+  "scratch_path_removed": "/tmp/pancake-worktrees.t3paqgWM/r50-hybrid-cpu/artifacts/r50-quality",
+  "sealed_execution_worktree_removed": "/tmp/pancake-worktrees.t3paqgWM/r50-paired-sealed",
+  "sealed_execution_branch": "codex/pancake-r50-paired-sealed"
+}

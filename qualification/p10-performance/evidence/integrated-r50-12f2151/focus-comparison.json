@@ -1,0 +1,269 @@
+{
+  "purpose": "Descriptive comparison of genuine RGB16 first warm pair. No fitted transform, resampling, or new acceptance threshold.",
+  "warm_outputs": {
+    "reference": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "6bceffbd485796996da6afaa7e1a13e29b941d9a02ddcee793b0e9729b776498",
+      "pixel_sha256": "2067f6550fcd34bf1149b76e26dd0290f89acfa1a75c08b5d51d8a9ae3de0e91",
+      "bytes": 92419730,
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "candidate": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    }
+  },
+  "diagnostic_alignment": {
+    "reference": {
+      "events_sha256": "15543efaebd9a9ca007518df8e3a4e92c45c1a11ee09ab2d13815443b01c7e36",
+      "alignment_count": 50,
+      "identity_transform_count": 50,
+      "diagnostic_matches_warm_pixels": true
+    },
+    "candidate": {
+      "events_sha256": "9bdfe75f36fb8d40c0f5a0deadb130da18518c30378567a2e235f41cfa7f2d8f",
+      "alignment_count": 50,
+      "identity_transform_count": 50,
+      "diagnostic_matches_warm_pixels": true
+    }
+  },
+  "reference_canvas_ltrb": [
+    1,
+    1,
+    5087,
+    3391
+  ],
+  "reference_geometry_source": "reference crop_complete bounds [top,bottom,left,right] insets",
+  "candidate_canvas_ltrb": [
+    1,
+    1,
+    5087,
+    3391
+  ],
+  "candidate_geometry_source": "full source extent and width/height of production symmetric crop",
+  "shared_source_canvas_ltrb": [
+    1,
+    1,
+    5087,
+    3391
+  ],
+  "exact_output_geometry_matches": true,
+  "compare_transform_note": "Both registered into first-frame coordinates. Different per-input transform estimates can contribute to pixel and sharpness differences.",
+  "shared_canvas_rgb": {
+    "rgb_samples": 51724620,
+    "mae_u16": 506.42141972236817,
+    "rms_u16": 669.3871171965342,
+    "max_u16": 52299,
+    "changed_fraction": 0.9993327935516975,
+    "signed_channel_mean_u16": [
+      -254.69962468549792,
+      -260.78395212956616,
+      -226.66805064976793
+    ]
+  },
+  "focus_region_selection": "Highest reference Laplacian-variance 256px tile in each of four quadrants with 64px outer/quadrant guard; no refitting or resampling.",
+  "focus_regions_quadrant_order_ul_ur_ll_lr": [
+    {
+      "source_canvas_xywh": [
+        1857,
+        321,
+        256,
+        256
+      ],
+      "rgb": {
+        "rgb_samples": 196608,
+        "mae_u16": 456.315434773763,
+        "rms_u16": 630.7058509135514,
+        "max_u16": 52299,
+        "changed_fraction": 0.9992218017578125,
+        "signed_channel_mean_u16": [
+          -216.1175079345703,
+          -205.09141540527344,
+          -222.07276916503906
+        ]
+      },
+      "reference_luma_laplacian_variance": 8.571921138215327e-05,
+      "candidate_luma_laplacian_variance": 0.0005393751335173812,
+      "candidate_reference_variance_ratio": 6.292348294161734
+    },
+    {
+      "source_canvas_xywh": [
+        3120,
+        321,
+        256,
+        256
+      ],
+      "rgb": {
+        "rgb_samples": 196608,
+        "mae_u16": 491.67230733235675,
+        "rms_u16": 685.4764214710088,
+        "max_u16": 31945,
+        "changed_fraction": 0.9992624918619791,
+        "signed_channel_mean_u16": [
+          -304.0825958251953,
+          -286.45948791503906,
+          -220.4988250732422
+        ]
+      },
+      "reference_luma_laplacian_variance": 0.00017403548064785378,
+      "candidate_luma_laplacian_variance": 0.00041947168428960825,
+      "candidate_reference_variance_ratio": 2.4102653247953163
+    },
+    {
+      "source_canvas_xywh": [
+        577,
+        2016,
+        256,
+        256
+      ],
+      "rgb": {
+        "rgb_samples": 196608,
+        "mae_u16": 532.6945343017578,
+        "rms_u16": 678.0429143349332,
+        "max_u16": 5423,
+        "changed_fraction": 0.9993845621744791,
+        "signed_channel_mean_u16": [
+          -386.2520446777344,
+          -390.8636169433594,
+          -354.0669403076172
+        ]
+      },
+      "reference_luma_laplacian_variance": 5.506085237634544e-05,
+      "candidate_luma_laplacian_variance": 0.0003267347341400166,
+      "candidate_reference_variance_ratio": 5.934066038548729
+    },
+    {
+      "source_canvas_xywh": [
+        4656,
+        3040,
+        256,
+        256
+      ],
+      "rgb": {
+        "rgb_samples": 196608,
+        "mae_u16": 728.7175750732422,
+        "rms_u16": 1061.8478918802443,
+        "max_u16": 16462,
+        "changed_fraction": 0.9994659423828125,
+        "signed_channel_mean_u16": [
+          -27.168746948242188,
+          -98.51310729980469,
+          -77.10475158691406
+        ]
+      },
+      "reference_luma_laplacian_variance": 0.0010581115754443138,
+      "candidate_luma_laplacian_variance": 0.0007863055066156054,
+      "candidate_reference_variance_ratio": 0.7431215430049769
+    }
+  ],
+  "sustained_texture_selection": "Four non-overlapping 256px tiles ranked by independent reference absolute-luma-Laplacian 90th percentile on a 256px grid, with 64px border guards",
+  "sustained_texture_regions": [
+    {
+      "source_canvas_xywh": [
+        4161,
+        2881,
+        256,
+        256
+      ],
+      "rgb": {
+        "rgb_samples": 196608,
+        "mae_u16": 635.1510213216146,
+        "rms_u16": 881.8046074745506,
+        "max_u16": 11503,
+        "changed_fraction": 0.9993743896484375,
+        "signed_channel_mean_u16": [
+          27.128311157226562,
+          23.7591552734375,
+          -29.150619506835938
+        ]
+      },
+      "reference_luma_laplacian_absolute_p90": 0.032269831387807923,
+      "candidate_luma_laplacian_absolute_p90": 0.038202458228427605,
+      "candidate_reference_luma_laplacian_absolute_p90_ratio": 1.183844370592563
+    },
+    {
+      "source_canvas_xywh": [
+        4673,
+        2881,
+        256,
+        256
+      ],
+      "rgb": {
+        "rgb_samples": 196608,
+        "mae_u16": 570.1818339029948,
+        "rms_u16": 812.5340785559073,
+        "max_u16": 10053,
+        "changed_fraction": 0.9993896484375,
+        "signed_channel_mean_u16": [
+          14.80322265625,
+          -50.05046081542969,
+          -20.887252807617188
+        ]
+      },
+      "reference_luma_laplacian_absolute_p90": 0.029788787670709915,
+      "candidate_luma_laplacian_absolute_p90": 0.03442968642709965,
+      "candidate_reference_luma_laplacian_absolute_p90_ratio": 1.155793475306581
+    },
+    {
+      "source_canvas_xywh": [
+        4417,
+        2881,
+        256,
+        256
+      ],
+      "rgb": {
+        "rgb_samples": 196608,
+        "mae_u16": 627.6171569824219,
+        "rms_u16": 895.2958220262068,
+        "max_u16": 21255,
+        "changed_fraction": 0.9993438720703125,
+        "signed_channel_mean_u16": [
+          -2.49798583984375,
+          -29.595565795898438,
+          -69.50358581542969
+        ]
+      },
+      "reference_luma_laplacian_absolute_p90": 0.027992867933165466,
+      "candidate_luma_laplacian_absolute_p90": 0.0360624185549705,
+      "candidate_reference_luma_laplacian_absolute_p90_ratio": 1.2882716640921372
+    },
+    {
+      "source_canvas_xywh": [
+        3905,
+        2881,
+        256,
+        256
+      ],
+      "rgb": {
+        "rgb_samples": 196608,
+        "mae_u16": 634.9649098714193,
+        "rms_u16": 875.8268975086444,
+        "max_u16": 14368,
+        "changed_fraction": 0.9993387858072916,
+        "signed_channel_mean_u16": [
+          50.40174865722656,
+          15.391769409179688,
+          -16.206954956054688
+        ]
+      },
+      "reference_luma_laplacian_absolute_p90": 0.026940283817807165,
+      "candidate_luma_laplacian_absolute_p90": 0.03784653696498047,
+      "candidate_reference_luma_laplacian_absolute_p90_ratio": 1.4048306699710573
+    }
+  ]
+}
