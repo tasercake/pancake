@@ -1,0 +1,350 @@
+import { Button, CheckBox, ComboBox, LineEdit, Palette, ScrollView } from "std-widgets.slint";
+
+// A label for the settings panels and inspector.
+component SectionLabel inherits Text {
+    color: Palette.foreground;
+    font-size: 16px;
+    font-weight: 600;
+    vertical-alignment: center;
+    height: 28px;
+}
+
+// A labelled numerical entry, committed when the user leaves the field.
+component Parameter inherits HorizontalLayout {
+    in property <string> label;
+    in property <string> identifier;
+    in-out property <string> value;
+    height: 32px;
+    spacing: 6px;
+    Text {
+        text: root.label;
+        color: Palette.foreground;
+        vertical-alignment: center;
+        horizontal-stretch: 1;
+    }
+    LineEdit {
+        text <=> root.value;
+        width: 84px;
+        accessible-id: root.identifier;
+        accessible-label: root.label;
+    }
+}
+
+export component Workspace inherits Window {
+    title: "Pancake";
+    min-width: 850px;
+    min-height: 600px;
+    preferred-width: 1170px;
+    preferred-height: 730px;
+    background: Palette.background;
+
+    in property <string> app-version;
+    in-out property <int> theme-index: 0;
+    in-out property <int> device-index: 0;
+    in-out property <int> method-index: 1;
+    in-out property <int> alignment-index: 0;
+    in-out property <bool> crop-enabled: false;
+    in-out property <string> kernel-size: "3";
+    in-out property <string> pyramid-levels: "4";
+    in-out property <string> scale-factor: "6";
+    in property <string> error-message;
+
+    // These models hold actual files and finished results provided by the host.
+    in property <[string]> frames;
+    in property <[string]> results;
+    in property <bool> running;
+    in property <image> preview;
+    in property <bool> has-preview;
+
+    callback save-preferences(string, string);
+    callback stack();
+    callback export-result();
+
+    property <[string]> themes: ["Light", "Dark"];
+    property <[string]> devices: ["Automatic", "CPU", "GPU"];
+    property <[string]> methods: ["Laplacian", "Hybrid", "Weighted average", "Depth map", "Exposure fusion"];
+    property <[string]> method-ids: ["method.laplacian", "method.hybrid", "method.weighted_average", "method.depth_map", "method.exposure_fusion"];
+    property <string> page: "workspace";
+    property <bool> sidebar-visible: true;
+    property <bool> inspector-visible: true;
+    property <bool> advanced-visible: false;
+    property <bool> compare: false;
+
+    changed theme-index => {
+        root.update-theme();
+    }
+
+    function update-theme() {
+        Palette.color-scheme = root.theme-index == 1 ? ColorScheme.dark : ColorScheme.light;
+    }
+
+    init => {
+        root.update-theme();
+    }
+
+    VerticalLayout {
+        Rectangle {
+            height: 58px;
+            background: Palette.alternate-background;
+            HorizontalLayout {
+                padding-left: 14px;
+                padding-right: 14px;
+                spacing: 8px;
+                alignment: center;
+                SectionLabel {
+                    text: "Pancake";
+                    font-size: 18px;
+                    horizontal-stretch: 1;
+                }
+                Button {
+                    text: "Sources";
+                    accessible-id: "layout.sidebar";
+                    checkable: true;
+                    checked <=> root.sidebar-visible;
+                }
+                Button {
+                    text: "Inspector";
+                    accessible-id: "layout.inspector";
+                    checkable: true;
+                    checked <=> root.inspector-visible;
+                }
+                Button {
+                    text: "Preferences";
+                    accessible-id: "settings.open";
+                    clicked => { root.page = "preferences"; }
+                }
+                Button {
+                    text: "About";
+                    accessible-id: "about.open";
+                    clicked => { root.page = "about"; }
+                }
+            }
+        }
+        if root.page == "workspace": HorizontalLayout {
+            spacing: 1px;
+            if root.sidebar-visible: Rectangle {
+                width: 207px;
+                background: Palette.alternate-background;
+                accessible-id: "frames";
+                accessible-role: groupbox;
+                accessible-label: "Source frames";
+                VerticalLayout {
+                    spacing: 10px;
+                    padding: 14px;
+                    SectionLabel { text: "Sources"; }
+                    Text {
+                        text: root.frames.length == 1 ? "1 frame" : "\{root.frames.length} frames";
+                        accessible-id: "frames.count";
+                        color: Palette.foreground;
+                    }
+                    ScrollView {
+                        VerticalLayout {
+                            spacing: 4px;
+                            alignment: start;
+                            for name in root.frames: Text {
+                                text: name;
+                                color: Palette.foreground;
+                                height: 28px;
+                                overflow: elide;
+                            }
+                        }
+                    }
+                }
+            }
+            VerticalLayout {
+                        horizontal-stretch: 1;
+                Rectangle {
+                    vertical-stretch: 1;
+                    background: #141619;
+                    accessible-role: image;
+                    accessible-id: "viewer";
+                    accessible-label: "Image viewer";
+                    accessible-description: "{\"has_image\":\{root.has-preview ? "true" : "false"},\"zoom\":1,\"center\":[0,0],\"compare\":\{root.compare ? "true" : "false"},\"split\":0.5,\"fit\":true}";
+                    if root.has-preview: Image {
+                        width: parent.width;
+                        height: parent.height;
+                        source: root.preview;
+                        image-fit: contain;
+                        accessible-role: none;
+                    }
+                    if !root.has-preview: Text {
+                        x: 0px;
+                        width: parent.width;
+                        y: (parent.height - self.height) / 2;
+                        text: "No image to preview";
+                        color: #b2b8c1;
+                        horizontal-alignment: center;
+                    }
+                }
+                Rectangle {
+                    height: 48px;
+                    background: Palette.alternate-background;
+                    HorizontalLayout {
+                        padding-left: 10px;
+                        padding-right: 10px;
+                        spacing: 8px;
+                        Button {
+                            text: "View";
+                            accessible-id: "mode.view";
+                            enabled: root.has-preview;
+                            checkable: true;
+                            checked: !root.compare;
+                            clicked => { root.compare = false; }
+                        }
+                        Button {
+                            text: "Compare";
+                            accessible-id: "mode.compare";
+                            enabled: root.results.length > 0 && root.frames.length > 0;
+                            checkable: true;
+                            checked: root.compare;
+                            clicked => { root.compare = true; }
+                        }
+                        Rectangle { horizontal-stretch: 1; }
+                        Button {
+                            text: "Export";
+                            accessible-id: "export.start";
+                            enabled: root.results.length > 0;
+                            clicked => { root.export-result(); }
+                        }
+                    }
+                }
+                if root.error-message != "": Text {
+                    text: root.error-message;
+                    wrap: word-wrap;
+                    color: Palette.foreground;
+                    accessible-id: "workflow.error";
+                }
+            }
+            if root.inspector-visible: Rectangle {
+                width: 239px;
+                background: Palette.alternate-background;
+                VerticalLayout {
+                    padding: 14px;
+                    spacing: 8px;
+                    SectionLabel { text: "Stack method"; }
+                    for method[index] in root.methods: Button {
+                        text: method;
+                        accessible-id: root.method-ids[index];
+                        primary: root.method-index == index;
+                        accessible-role: radio-button;
+                        accessible-checkable: true;
+                        accessible-checked: root.method-index == index;
+                        enabled: !root.running;
+                        clicked => { root.method-index = index; }
+                    }
+                    SectionLabel { text: "Alignment"; }
+                    ComboBox {
+                        accessible-id: "alignment";
+                        accessible-label: self.current-value;
+                        model: ["Off", "Translation", "Euclidean", "Similarity", "Affine", "Breathing"];
+                        current-index <=> root.alignment-index;
+                        enabled: !root.running;
+                    }
+                    CheckBox {
+                        text: "Crop aligned margins";
+                        accessible-id: "autocrop";
+                        checked <=> root.crop-enabled;
+                        enabled: !root.running;
+                    }
+                    CheckBox {
+                        text: "Advanced settings";
+                        accessible-id: "advanced";
+                        checked <=> root.advanced-visible;
+                    }
+                    if root.advanced-visible && root.method-index != 4: Parameter {
+                        label: "Kernel size";
+                        identifier: "kernel-size";
+                        value <=> root.kernel-size;
+                    }
+                    if root.advanced-visible && (root.method-index < 2 || root.method-index == 4): Parameter {
+                        label: "Pyramid levels";
+                        identifier: "pyramid-levels";
+                        value <=> root.pyramid-levels;
+                    }
+                    if root.advanced-visible && root.method-index < 2: Parameter {
+                        label: "Scale factor";
+                        identifier: "scale-factor";
+                        value <=> root.scale-factor;
+                    }
+                    Rectangle { vertical-stretch: 1; }
+                    Button {
+                        text: "Start stack";
+                        primary: true;
+                        accessible-id: "stack.start";
+                        enabled: root.frames.length > 1 && !root.running;
+                        clicked => { root.stack(); }
+                    }
+                }
+            }
+        }
+        if root.page == "preferences": VerticalLayout {
+            padding: 22px;
+            alignment: start;
+            spacing: 12px;
+            SectionLabel { text: "Preferences"; }
+            HorizontalLayout {
+                spacing: 12px;
+                alignment: start;
+                Text { text: "Theme"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
+                ComboBox {
+                    width: 205px;
+                    accessible-id: "settings.theme";
+                    accessible-label: self.current-value;
+                    model: root.themes;
+                    current-index <=> root.theme-index;
+                    selected(_) => { root.save-preferences(root.themes[root.theme-index], root.devices[root.device-index]); }
+                }
+            }
+            HorizontalLayout {
+                spacing: 12px;
+                alignment: start;
+                Text { text: "Processing device"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
+                ComboBox {
+                    width: 205px;
+                    accessible-id: "settings.device";
+                    accessible-label: self.current-value;
+                    model: root.devices;
+                    current-index <=> root.device-index;
+                    selected(_) => { root.save-preferences(root.themes[root.theme-index], root.devices[root.device-index]); }
+                }
+            }
+            SectionLabel { text: "Lightroom Classic"; }
+            Text {
+                text: "Lightroom Classic integration is unavailable in this build.";
+                color: Palette.foreground;
+                accessible-id: "settings.lightroom.status";
+            }
+            Button {
+                text: "Configure Lightroom integration";
+                accessible-id: "settings.lightroom.action";
+                enabled: false;
+                horizontal-stretch: 0;
+            }
+            Button {
+                text: "Done";
+                accessible-id: "dialog.close";
+                horizontal-stretch: 0;
+                clicked => { root.page = "workspace"; }
+            }
+            if root.error-message != "": Text {
+                text: root.error-message;
+                wrap: word-wrap;
+                color: Palette.foreground;
+            }
+        }
+        if root.page == "about": VerticalLayout {
+            padding: 22px;
+            alignment: start;
+            spacing: 12px;
+            SectionLabel { text: "About Pancake"; accessible-id: "about.window"; }
+            Text { text: root.app-version; accessible-id: "about.version"; color: Palette.foreground; }
+            Text { text: "Focus stacking and exposure fusion"; color: Palette.foreground; }
+            Button {
+                text: "Done";
+                accessible-id: "dialog.close";
+                horizontal-stretch: 0;
+                clicked => { root.page = "workspace"; }
+            }
+        }
+    }
+}

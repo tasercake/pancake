@@ -13,7 +13,7 @@ categories = ["multimedia::images"]
 publish = false
 
 [workspace]
-members = ["."]
+members = [".", "crates/pancake-gui"]
 exclude = ["vendor/*"]
 resolver = "3"
 

@@ -1262,7 +1262,7 @@
     {
       "name": "hashbrown",
       "version": "0.16.1",
-      "reason": "Compiler, UI and runtime parents require distinct collection APIs; maps stay private to their parent and shared GPU/window handles remain single-version.",
+      "reason": "Compiler, UI and runtime parents require distinct collection APIs; maps stay private to their parent and shared GPU/window handles remain single-version. UI profile: Pinned interpreter uses its own internal map generation; no hashbrown type crosses GPU/window resource boundaries.",
       "parents": [
         {
           "name": "clru",
@@ -1273,6 +1273,11 @@
           "name": "gpu-allocator",
           "version": "0.28.0",
           "requirement": "^0.16.0"
+        },
+        {
+          "name": "slint-interpreter",
+          "version": "1.19.0",
+          "requirement": "^0.16"
         }
       ],
       "reviewed_on": "2026-11-17",
@@ -3060,10 +3065,15 @@
     {
       "name": "smol_str",
       "version": "0.3.7",
-      "reason": "Winit and newer UI/tooling parents require different compact-string APIs; application boundaries use ordinary Rust strings.",
+      "reason": "Winit and newer UI/tooling parents require different compact-string APIs; application boundaries use ordinary Rust strings. UI profile: Pinned interpreter stores internal property and identifier strings; this private generation does not cross typed GPU resource boundaries.",
       "parents": [
         {
           "name": "i-slint-compiler",
+          "version": "1.19.0",
+          "requirement": "^0.3.1"
+        },
+        {
+          "name": "slint-interpreter",
           "version": "1.19.0",
           "requirement": "^0.3.1"
         }
@@ -3326,7 +3336,7 @@
     {
       "name": "syn",
       "version": "3.0.10",
-      "reason": "Independent procedural macros require different Rust syntax-tree generations; host-side ASTs do not form a shared runtime ABI.",
+      "reason": "Independent procedural macros require different Rust syntax-tree generations; host-side ASTs do not form a shared runtime ABI. UI profile: Existing bindgen accepts syn2 or syn3; this locked host-code-generation resolution selects the already reviewed syn3 version.",
       "parents": [
         {
           "name": "async-recursion",
@@ -3467,6 +3477,11 @@
           "name": "zvariant_utils",
           "version": "4.2.0",
           "requirement": "^3.0"
+        },
+        {
+          "name": "bindgen",
+          "version": "0.73.2",
+          "requirement": ">=2, <4"
         }
       ],
       "reviewed_on": "2026-11-17",

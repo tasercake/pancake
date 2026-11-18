@@ -1,0 +1,23 @@
+[package]
+name = "pancake-gui"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.100"
+license = "GPL-3.0-or-later"
+description = "Native Slint frontend for the Pancake focus-stacking application"
+repository = "https://github.com/tasercake/focus-stacking"
+keywords = ["photography", "focus-stacking", "image-processing"]
+categories = ["multimedia::images"]
+publish = false
+
+[dependencies]
+slint = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "unstable-wgpu-30", "compat-1-18", "accessibility"] }
+slint-interpreter = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "compat-1-18", "accessibility"] }
+spin_on = "=0.1.1"
+dirs = "=6.0.0"
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+tempfile = "=3.27.0"
+
+[lints]
+workspace = true
