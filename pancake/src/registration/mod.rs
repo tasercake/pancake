@@ -3,6 +3,7 @@
 mod estimate;
 mod geometry;
 mod kernels;
+mod spectral;
 
 pub use estimate::{Estimate, Model, Thumbnail, estimate_pair, thumbnail, thumbnail_with_scale};
 pub use geometry::{Affine, Bounds, Frame, symmetric_crop};

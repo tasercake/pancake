@@ -91,7 +91,11 @@ fn upload(client: &Client, data: &[f32]) -> TensorHandle {
 /// # Errors
 ///
 /// Returns a device error or malformed readback error.
-fn read(client: &Client, handle: TensorHandle, count: usize) -> Result<Vec<f32>, String> {
+pub(super) fn read(
+    client: &Client,
+    handle: TensorHandle,
+    count: usize,
+) -> Result<Vec<f32>, String> {
     let buffers = client
         .read_tensor(vec![handle.into_copy_descriptor()])
         .map_err(|error| error.to_string())?;
@@ -168,6 +172,15 @@ impl Pair {
             extent,
             client,
         }
+    }
+
+    /// Find a coarse spectral translation on the same prepared device pair.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error for failed FFT readback or a malformed correlation surface.
+    pub(super) fn spectral_seed(&self) -> Result<Option<[f32; 2]>, String> {
+        super::spectral::phase_peak(&self.client, &self.reference, &self.source, self.extent)
     }
 
     /// Evaluate correlation for a small batch of candidate maps.
@@ -268,7 +281,7 @@ fn pearson(moments: &[f32], samples: u32) -> f32 {
 
 /// Checked bilinear sampling in a clamped image, including single-pixel axes.
 #[cube(expand_only)]
-fn bilinear(
+pub(super) fn bilinear(
     input: &Tensor<f32>,
     x: f32,
     y: f32,

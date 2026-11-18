@@ -1,6 +1,7 @@
 //! Per-level selection and weighted accumulation for multiscale fusion.
 
 use cubecl::prelude::*;
+use cubecl::server::Handle;
 use cubecl::std::tensor::TensorHandle;
 
 use super::super::buffers::{ImageShape, elementwise, empty};
@@ -42,6 +43,17 @@ impl Level {
             scores: empty(client, grid.area),
             hybrid,
         }
+    }
+
+    /// Return every live output handle that the current frame may have changed.
+    pub(super) fn outputs(&self) -> impl Iterator<Item = &Handle> {
+        [&self.primary.handle, &self.scores.handle]
+            .into_iter()
+            .chain(
+                self.hybrid
+                    .iter()
+                    .flat_map(|hybrid| [&hybrid.coefficients.handle, &hybrid.scores.handle]),
+            )
     }
 
     /// Accumulate new coefficients beginning with a completely defined first frame.
@@ -261,12 +273,16 @@ fn normalize_hybrid(
 
 /// Add a reconstructed exposure batch at equal weight to earlier batches.
 #[cube(launch, expand_only)]
-pub(super) fn accumulate_batch(image: &Tensor<f32>, sum: &mut Tensor<f32>) {
+pub(super) fn accumulate_batch(image: &Tensor<f32>, sum: &mut Tensor<f32>, first: u32) {
     let sample = ABSOLUTE_POS;
     if sample >= sum.len() {
         terminate!();
     }
-    sum[sample] += image[sample];
+    if first != 0 {
+        sum[sample] = image[sample];
+    } else {
+        sum[sample] += image[sample];
+    }
 }
 
 /// Scale the sum of equal-weight exposure batches to their mean.

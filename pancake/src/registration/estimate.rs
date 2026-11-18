@@ -152,7 +152,7 @@ fn prepare_thumbnail(
 
 /// Estimate the reference-to-source map from one independent pair of proxies.
 ///
-/// Wide integer matching seeds subpixel correlation refinement. Scoring
+/// Coarse spectral and integer matching seed subpixel correlation refinement. Scoring
 /// normalizes gain and bias and compares a fixed interior region. A proposed
 /// transform must be plausible and explain enough detail error to beat identity.
 /// Large unsupported scale or rotation, repeated peaks and focus-only changes
@@ -283,7 +283,7 @@ impl Coordinates {
     }
 }
 
-/// Find a bounded integer seed and reject widely separated near-equal peaks.
+/// Compare spectral and spatial seeds, rejecting widely separated near-equal peaks.
 ///
 /// # Errors
 ///
@@ -302,6 +302,9 @@ fn seed(pair: &Pair, coords: Coordinates) -> Result<(Parameters, bool), String> 
                 0.0,
             ]));
         }
+    }
+    if let Some([dx, dy]) = pair.spectral_seed()? {
+        trials.push(Parameters([dx, dy, 0.0, 0.0, 0.0, 0.0]));
     }
     let maps = trials
         .iter()

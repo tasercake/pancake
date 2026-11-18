@@ -10,9 +10,12 @@ mod plan;
 mod pyramid;
 mod weights;
 
+#[cfg(test)]
+mod tests;
+
 pub use plan::{AutomaticParameters, automatic_parameters, slab_ranges};
 
-use super::buffers::{ImageShape, elementwise, read_image, upload};
+use super::buffers::{ImageShape, elementwise, empty, read_image, upload};
 use levels::Level;
 use pyramid::{grids, reconstruct, reduce};
 
@@ -55,6 +58,8 @@ pub struct AdvancedAccumulator {
     batch_sum: Option<TensorHandle>,
     /// Number of exposure batches represented in the sum.
     batches: u32,
+    /// A failed submission leaves the stream's retained output unusable.
+    failure: Option<String>,
 }
 
 impl fmt::Debug for AdvancedAccumulator {
@@ -101,6 +106,7 @@ impl AdvancedAccumulator {
         let grids = grids(grid, pyramid_levels)?;
         validate_budget(&grids, grid, method, max_working_bytes)?;
         let client = device.client();
+        validate_buffer_limit(grid, client.properties().memory.max_page_size)?;
         let levels = grids
             .into_iter()
             .map(|level| Level::new(&client, level, method))
@@ -114,6 +120,7 @@ impl AdvancedAccumulator {
             frames: 0,
             batch_sum: None,
             batches: 0,
+            failure: None,
         })
     }
 
@@ -122,7 +129,22 @@ impl AdvancedAccumulator {
     /// # Errors
     /// Returns a shape, nonfinite-sample, arithmetic or runtime completion error.
     pub fn add_frame(&mut self, rgb: &[f32]) -> Result<(), String> {
+        if let Some(error) = &self.failure {
+            return Err(error.clone());
+        }
         self.grid.validate(rgb)?;
+        let result = self.submit_frame(rgb);
+        if let Err(error) = &result {
+            self.failure = Some(error.clone());
+        }
+        result
+    }
+
+    /// Queue the shared pipeline, then check all mutated output buffers.
+    ///
+    /// # Errors
+    /// Returns resource, submission or completed-kernel errors.
+    fn submit_frame(&mut self, rgb: &[f32]) -> Result<(), String> {
         let first = self.frames == 0;
         let mut image = upload(&self.client, rgb);
         let mut weights = weights::weights(
@@ -158,7 +180,13 @@ impl AdvancedAccumulator {
         if self.method == AdvancedMethod::Exposure && self.frames == EXPOSURE_BATCH_SIZE {
             self.finish_exposure_batch()?;
         }
-        cubecl::future::block_on(self.client.sync()).map_err(|error| error.to_string())
+        let outputs = self
+            .levels
+            .iter()
+            .flat_map(Level::outputs)
+            .chain(self.batch_sum.iter().map(|sum| &sum.handle));
+        cubecl::future::block_on(self.client.sync_buffers(outputs))
+            .map_err(|error| error.to_string())
     }
 
     /// Reconstruct and read back an output on the original (possibly odd) grid.
@@ -166,6 +194,9 @@ impl AdvancedAccumulator {
     /// # Errors
     /// Returns a runtime or numerical error, or an error for an empty stream.
     pub fn finish(mut self) -> Result<Vec<f32>, String> {
+        if let Some(error) = self.failure.take() {
+            return Err(error);
+        }
         let output = if self.method == AdvancedMethod::Exposure {
             if self.frames > 0 {
                 self.finish_exposure_batch()?;
@@ -197,18 +228,19 @@ impl AdvancedAccumulator {
     /// Returns an error if reconstruction fails or the batch count overflows.
     fn finish_exposure_batch(&mut self) -> Result<(), String> {
         let output = self.reconstruct()?;
-        if let Some(sum) = &self.batch_sum {
-            let (blocks, threads) = elementwise(&self.client, self.grid.samples);
-            levels::accumulate_batch::launch(
-                &self.client,
-                blocks,
-                threads,
-                output.into_arg(),
-                sum.clone().into_arg(),
-            );
-        } else {
-            self.batch_sum = Some(output);
-        }
+        let first = self.batch_sum.is_none();
+        let sum = self
+            .batch_sum
+            .get_or_insert_with(|| empty(&self.client, self.grid.samples));
+        let (blocks, threads) = elementwise(&self.client, self.grid.samples);
+        levels::accumulate_batch::launch(
+            &self.client,
+            blocks,
+            threads,
+            output.into_arg(),
+            sum.clone().into_arg(),
+            u32::from(first),
+        );
         self.frames = 0;
         self.batches = self
             .batches
@@ -266,6 +298,24 @@ fn validate_budget(
     if required > available {
         return Err(format!(
             "fusion working-data budget exceeded: needs {required} bytes, have {available}"
+        ));
+    }
+    Ok(())
+}
+
+/// Require the largest packed source or coefficient allocation to fit a page.
+///
+/// # Errors
+/// Returns an error for an unaddressable or oversized allocation.
+fn validate_buffer_limit(grid: ImageShape, limit: u64) -> Result<(), String> {
+    let required = grid
+        .samples
+        .checked_mul(size_of::<f32>())
+        .and_then(|bytes| u64::try_from(bytes).ok())
+        .ok_or("fusion buffer bytes overflow")?;
+    if required > limit {
+        return Err(format!(
+            "fusion device buffer needs {required} bytes, limit is {limit}"
         ));
     }
     Ok(())
