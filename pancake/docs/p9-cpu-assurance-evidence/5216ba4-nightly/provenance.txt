@@ -1,0 +1,17 @@
+5216ba4227e14033483a21bb5eca1c6c168ef840
+639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd  Cargo.lock
+7f67bd0651e9dd0de9e653dd0da78ed9a4517a1d77486159200c6f5819d84c14  scripts/check.sh
+rustc 1.102.0-nightly (5f4effd57 2026-11-13)
+binary: rustc
+commit-hash: 5f4effd579500175af844241eb179e756190f1e7
+commit-date: 2026-11-13
+host: x86_64-unknown-linux-gnu
+release: 1.102.0-nightly
+LLVM version: 23.1.5
+cargo-llvm-cov 0.9.1
+CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_TARGET_DIR=target/nightly-cpu-5216ba4 nice -n 10 taskset --cpu-list 14,15 bash scripts/check.sh branches-cpu
+CPU CORE SOCKET NODE ONLINE
+ 14   14      0    0    yes
+ 15   15      0    0    yes
+2026-11-18T03:28:29Z
+2026-11-18T03:33:47Z

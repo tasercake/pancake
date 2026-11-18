@@ -1,0 +1,6 @@
+Linux 6.8.0-147-generic x86_64
+Ubuntu 24.04.5 LTS
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+NVIDIA GeForce RTX 3090, 580.178.04
+3.24.41
+2.52.0
