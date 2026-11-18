@@ -1,0 +1,12 @@
+aac05e4cd80097c986c545d90ed02ec9284546e0
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+LLVM (http://llvm.org/):
+  LLVM version 23.1.5-rust-1.100.0-stable
+  Optimized build.
