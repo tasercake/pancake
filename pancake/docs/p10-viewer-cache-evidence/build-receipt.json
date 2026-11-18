@@ -1,0 +1,30 @@
+{
+  "commit": "89c6a22775cd8877fc094dc4842108232f2d7183",
+  "lock_sha256": "639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "component": "gui",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/resume-viewer/pancake/target/release/pancake-gui",
+  "binary_sha256": "fee0bd832c5a4a452e184d35aa05faa5036bdd1e1440edb07d92888469e75a91",
+  "producer_build_command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--release",
+    "-p",
+    "pancake-gui"
+  ],
+  "producer_build_environment": {
+    "CARGO_BUILD_JOBS": "4",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+  },
+  "producer_log_sha256": "6fb7f0bc80a182646173cb03a27a6ec27081374d8d028f024b3877d6cfdfd1d4",
+  "campaign_tool_sha256": {
+    "framebuffer.py": "4c1d3c836153a97795909599de34bcfd2fc61eb4f1eefb711f715da4a918d61e",
+    "linux_latency.py": "eb121716568526bd72b9bfe07589c4ffdaa5b1bbfecf9e5d3409de280d880af8",
+    "native_campaign.py": "cebbaa9961ab5c1ff4e60d20f30fabb0d4331a388302c858dacc4e864407acff",
+    "native_witness.py": "8b58d01242c1f947bae0626ef63827f152ef2c641551e861ddfdc8455c2a4e10",
+    "p10.py": "e098b47d0147a6ce1a9bb7d586ae07d05ade6714c067eebd0f8d59aba1bbbaa0",
+    "protocol.py": "e4868f65418eaf6604d3b0d2c0f5a259566939ff2a5f2bfcb2a8bce23dcfdbac"
+  }
+}

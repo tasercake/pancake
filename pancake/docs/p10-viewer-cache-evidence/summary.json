@@ -1,0 +1,289 @@
+{
+  "baseline": {
+    "commit": "74dfaa359ea9e285baac16a16f485977f6c10b6c",
+    "lock_sha256": "639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd",
+    "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+    "component": "gui",
+    "executable": "/tmp/pancake-worktrees.t3paqgWM/p10-native-view-74dfaa/pancake/target/release/pancake-gui",
+    "binary_sha256": "983735af5db3b00885678a1b6cf1e2160949463b3eb54ce98e307c1e4e1aabbb",
+    "producer_build_command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--release",
+      "--jobs",
+      "4",
+      "-p",
+      "pancake-gui",
+      "-p",
+      "pancake-cli"
+    ],
+    "producer_build_environment": {
+      "CARGO_INCREMENTAL": "0"
+    },
+    "producer_log_sha256": "3465518e75a7dded52b7cebb1b1824bbd24531096795c5891d123fe8ad6d57c2",
+    "harness_commit": "61ff3a93c701fb39e25bcb9593062a1f137c6c70",
+    "harness_files": {
+      "qualification/p10-performance/framebuffer.py": "4c1d3c836153a97795909599de34bcfd2fc61eb4f1eefb711f715da4a918d61e",
+      "qualification/p10-performance/linux_latency.py": "eb121716568526bd72b9bfe07589c4ffdaa5b1bbfecf9e5d3409de280d880af8",
+      "qualification/p10-performance/native_campaign.py": "cebbaa9961ab5c1ff4e60d20f30fabb0d4331a388302c858dacc4e864407acff",
+      "qualification/p10-performance/native_witness.py": "8b58d01242c1f947bae0626ef63827f152ef2c641551e861ddfdc8455c2a4e10",
+      "qualification/p10-performance/p10.py": "e098b47d0147a6ce1a9bb7d586ae07d05ade6714c067eebd0f8d59aba1bbbaa0",
+      "qualification/p10-performance/physical.py": "b55db52361af0b6effdb48293a36e7d04dc2930aedac8c76e950b837074adb32",
+      "qualification/p10-performance/protocol.py": "e4868f65418eaf6604d3b0d2c0f5a259566939ff2a5f2bfcb2a8bce23dcfdbac",
+      "qualification/p10-performance/resources.py": "f5d70194b1daf24c084344f4353a889d8d9bbf56107e0220dd6fa1c02fdab17e",
+      "qualification/p10-performance/smoke_x11.py": "a1aa6acc4e9872a80f5cef08d36cc5f639fd443cb532db84fbe8e41ac0350dc9",
+      "qualification/p10-performance/test_launch.py": "0e963bd58e7210f23614100fcf77b333301342705e35aff23cba48678a187e04",
+      "qualification/p10-performance/test_native_campaign.py": "66bb8d3f28e4247d6ca39b8c07fce14219c87c26a791c3b68e75a3c741f257ce",
+      "qualification/p10-performance/test_native_latency.py": "7387b921ce3f88d0311b52f08ad5d64444ff860c05b6fbfa1c9ab094b2a0f1ca",
+      "qualification/p10-performance/test_native_witness.py": "6c4efc229c4d0f3613a7a84d0510e2b0ada2b74026f2ea975a5515fa4f59b633",
+      "qualification/p10-performance/test_protocol.py": "7eb9f40ff3c0cd5c27a04d3d0670fcd8d1b0158051d94d50d9c6eabb22e5840a"
+    }
+  },
+  "candidate": {
+    "commit": "89c6a22775cd8877fc094dc4842108232f2d7183",
+    "lock_sha256": "639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd",
+    "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+    "component": "gui",
+    "executable": "/tmp/pancake-worktrees.t3paqgWM/resume-viewer/pancake/target/release/pancake-gui",
+    "binary_sha256": "fee0bd832c5a4a452e184d35aa05faa5036bdd1e1440edb07d92888469e75a91",
+    "producer_build_command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--release",
+      "-p",
+      "pancake-gui"
+    ],
+    "producer_build_environment": {
+      "CARGO_BUILD_JOBS": "4",
+      "CARGO_INCREMENTAL": "0",
+      "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+    },
+    "producer_log_sha256": "6fb7f0bc80a182646173cb03a27a6ec27081374d8d028f024b3877d6cfdfd1d4",
+    "campaign_tool_sha256": {
+      "framebuffer.py": "4c1d3c836153a97795909599de34bcfd2fc61eb4f1eefb711f715da4a918d61e",
+      "linux_latency.py": "eb121716568526bd72b9bfe07589c4ffdaa5b1bbfecf9e5d3409de280d880af8",
+      "native_campaign.py": "cebbaa9961ab5c1ff4e60d20f30fabb0d4331a388302c858dacc4e864407acff",
+      "native_witness.py": "8b58d01242c1f947bae0626ef63827f152ef2c641551e861ddfdc8455c2a4e10",
+      "p10.py": "e098b47d0147a6ce1a9bb7d586ae07d05ade6714c067eebd0f8d59aba1bbbaa0",
+      "protocol.py": "e4868f65418eaf6604d3b0d2c0f5a259566939ff2a5f2bfcb2a8bce23dcfdbac"
+    }
+  },
+  "all_motion_and_witnesses_match": true,
+  "original_inputs_match": true,
+  "condition_stage_samples": {
+    "idle": {
+      "Publish": 200
+    },
+    "loaded": {
+      "Decode": 137,
+      "Fuse": 63
+    }
+  },
+  "record_sha256": "cbb45b40d19e783134d74a6be8542b2294fa33ce4d65a06d7c6c529ffa00a4b0",
+  "quiet_window": [
+    "2026-11-18T12:42:50+08:00",
+    "2026-11-18T12:47:30+08:00"
+  ],
+  "by_condition_and_action": {
+    "idle": {
+      "all": {
+        "baseline": {
+          "count": 200,
+          "min_ns": 21569238,
+          "p50_ns": 35649224.5,
+          "p95_ns": 42310351,
+          "max_ns": 657913684
+        },
+        "resident_textures": {
+          "count": 200,
+          "min_ns": 21589562,
+          "p50_ns": 32492662.0,
+          "p95_ns": 43273674,
+          "max_ns": 672899019
+        }
+      },
+      "comparison": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 21569238,
+          "p50_ns": 22673437.5,
+          "p95_ns": 37569830,
+          "max_ns": 39872145
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 21589562,
+          "p50_ns": 22637095.5,
+          "p95_ns": 23741283,
+          "max_ns": 24754169
+        }
+      },
+      "pan": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 22734187,
+          "p50_ns": 26638776.0,
+          "p95_ns": 42152084,
+          "max_ns": 44595484
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 22869386,
+          "p50_ns": 38936365.5,
+          "p95_ns": 42519963,
+          "max_ns": 43693935
+        }
+      },
+      "result": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 32404383,
+          "p50_ns": 35798674.5,
+          "p95_ns": 40804837,
+          "max_ns": 46742984
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 22675164,
+          "p50_ns": 26512754.0,
+          "p95_ns": 43640568,
+          "max_ns": 43844587
+        }
+      },
+      "source": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 33505180,
+          "p50_ns": 40006061.5,
+          "p95_ns": 52285259,
+          "max_ns": 657913684
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 23885885,
+          "p50_ns": 38884008.5,
+          "p95_ns": 44605908,
+          "max_ns": 672899019
+        }
+      },
+      "zoom": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 26066704,
+          "p50_ns": 35187251.0,
+          "p95_ns": 39962054,
+          "max_ns": 42177135
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 29134437,
+          "p50_ns": 33513470.0,
+          "p95_ns": 40413641,
+          "max_ns": 42441921
+        }
+      }
+    },
+    "loaded": {
+      "all": {
+        "baseline": {
+          "count": 200,
+          "min_ns": 19299584,
+          "p50_ns": 34670142.5,
+          "p95_ns": 54054336,
+          "max_ns": 71557968
+        },
+        "resident_textures": {
+          "count": 200,
+          "min_ns": 19435678,
+          "p50_ns": 32492568.0,
+          "p95_ns": 43355020,
+          "max_ns": 49508649
+        }
+      },
+      "comparison": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 19299584,
+          "p50_ns": 22638768.0,
+          "p95_ns": 35422905,
+          "max_ns": 38744611
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 19435678,
+          "p50_ns": 22534617.0,
+          "p95_ns": 39016126,
+          "max_ns": 43102512
+        }
+      },
+      "pan": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 22722831,
+          "p50_ns": 31807536.5,
+          "p95_ns": 40522539,
+          "max_ns": 41302076
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 21705085,
+          "p50_ns": 30999713.5,
+          "p95_ns": 39945775,
+          "max_ns": 40071916
+        }
+      },
+      "result": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 26036303,
+          "p50_ns": 43462354.0,
+          "p95_ns": 64098558,
+          "max_ns": 71557968
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 24968796,
+          "p50_ns": 36741951.5,
+          "p95_ns": 44334420,
+          "max_ns": 48797684
+        }
+      },
+      "source": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 27124877,
+          "p50_ns": 38465980.0,
+          "p95_ns": 55280430,
+          "max_ns": 58327823
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 23795382,
+          "p50_ns": 33664345.0,
+          "p95_ns": 44340482,
+          "max_ns": 49508649
+        }
+      },
+      "zoom": {
+        "baseline": {
+          "count": 40,
+          "min_ns": 24851157,
+          "p50_ns": 35856850.0,
+          "p95_ns": 43163939,
+          "max_ns": 45804517
+        },
+        "resident_textures": {
+          "count": 40,
+          "min_ns": 26052840,
+          "p50_ns": 35176003.0,
+          "p95_ns": 46514495,
+          "max_ns": 46837234
+        }
+      }
+    }
+  },
+  "collector_exit": 0,
+  "reducer_exit": 1
+}
