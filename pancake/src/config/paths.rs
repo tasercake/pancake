@@ -58,7 +58,7 @@ fn is_pattern(text: &str) -> bool {
 /// Resolve a missing literal as a shell-style wildcard when applicable.
 ///
 /// Expand each component separately. A wildcard selects entries within one
-/// directory level; traversal never recursively follows directories or links.
+/// directory level; there is no unbounded recursive descent.
 ///
 /// # Errors
 /// Returns unresolvable or invalid patterns, invalid files, or exceeded limits.

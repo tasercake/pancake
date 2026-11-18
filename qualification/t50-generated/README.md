@@ -36,12 +36,12 @@ low-bit data are checked. File-byte and pixel-byte SHA-256 digests are retained
 for every image; no conversion occurs, so the converted-pixel digest equals the
 decoded digest.
 
-Only one new image exists at a time. The generator verifies its hash and
-ownership marker, deletes that exact image, then writes the next. It requires
-a new output directory, rejects symlinks/path escapes or changed files, and
-checks every candidate before cleanup deletes any file. It never recursively
-removes an arbitrary directory. The output ownership marker remains as evidence.
-The receipt is stored outside the image directory.
+In the default sequential mode, only one new image exists at a time. The
+generator verifies its hash and ownership marker, deletes that exact image, then
+writes the next. It requires a new output directory, rejects symlinks, path
+escapes and changed files, and checks every candidate before cleanup deletes
+any file. The output ownership marker remains as evidence. Store the receipt
+outside the image directory.
 
 The default 15 GiB free-space guard runs before each image and each generated
 tile. A separate 1,490,980,001-byte cap bounds **retained temporary image bytes**,
@@ -51,10 +51,14 @@ source bytes. Decode concurrency is one worker with an 8 MiB input buffer;
 rendering and predictor reversal use tile buffers. No full-frame buffer or
 50-frame RAM stack is allocated.
 
-This command always deletes verified images. Future completed-job benchmarks
-must materialize the same recipe under a separately reviewed lifecycle that
-preflights the full retained dataset plus the disk reserve. This qualification
-does not time either application or satisfy speed/memory targets.
+The materialization mode holds all 52 images concurrently for completed-job
+benchmarks. It preflights the largest possible retained byte count plus the
+15 GiB reserve before creating the output directory. The bound includes the
+exact bytes of already verified images and a conservative allowance for the
+image being written. Every encoded file and fully decoded pixel stream must
+match the frozen qualification receipt. A mismatch removes this run's generated
+TIFFs and fails before publishing a materialization receipt. Corpus preparation
+does not time either application or satisfy speed or memory targets.
 
 ## Reproduce
 
@@ -73,5 +77,22 @@ The frozen qualification used the already installed
 `artifacts/p0-close-io/fixture-venv/bin/python`; it made no package installs or
 image downloads. Unit tests use a zero reserve only inside disposable tiny
 fixtures; the native run keeps the default 15 GiB reserve.
+
+For benchmark preparation, pass the frozen sequential receipt and keep exactly
+the 50 files whose receipt role is `focus_frame` in receipt order. Truth images
+remain separate. Run cleanup after both applications have finished using the
+set. Cleanup binds to the materialization receipt and rechecks every TIFF's
+SHA-256 before deleting any of them.
+
+```sh
+artifacts/t50-venv/bin/python qualification/t50-generated/t50_generated.py \
+  --materialize-from qualification/t50-generated/evidence/native-t50-receipt.json \
+  --output artifacts/t50-benchmark-inputs \
+  --receipt artifacts/t50-materialization.json
+artifacts/t50-venv/bin/python qualification/t50-generated/t50_generated.py \
+  --cleanup-from artifacts/t50-materialization.json \
+  --output artifacts/t50-benchmark-inputs \
+  --receipt artifacts/t50-cleanup.json
+```
 
 Evidence and final native results are recorded in [evidence/](evidence/).
