@@ -1,0 +1,14 @@
+74dfaa359ea9e285baac16a16f485977f6c10b6c
+639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd  Cargo.lock
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+   Compiling pancake-gui v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/crates/pancake-gui)
+    Finished `release` profile [optimized] target(s) in 1m 02s
+d0554ce43411b39da66bd04ea5de82b2cc74384e8bb576b5ec74408aa5c6da12  target/release/pancake-cli
+983735af5db3b00885678a1b6cf1e2160949463b3eb54ce98e307c1e4e1aabbb  target/release/pancake-gui

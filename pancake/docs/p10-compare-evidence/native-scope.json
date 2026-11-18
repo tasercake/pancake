@@ -1,0 +1,35 @@
+{
+  "target_commit": "74dfaa359ea9e285baac16a16f485977f6c10b6c",
+  "executables_sha256": {
+    "pancake-cli": "d0554ce43411b39da66bd04ea5de82b2cc74384e8bb576b5ec74408aa5c6da12",
+    "pancake-gui": "983735af5db3b00885678a1b6cf1e2160949463b3eb54ce98e307c1e4e1aabbb"
+  },
+  "reports_sha256": {
+    "report.json": "3028379db49dc52bac4cd751d49e9cb8baefff3f4af66f0c8a38d78c418d3fdf",
+    "provenance.json": "25e2dfdafeb3345e833b17da5622c02a3b3f403f92d5f6cb29cb80eca5f32ddd",
+    "junit.xml": "d869aaf996d654d879946525c0806c384cbfb65a20da49405d0cb56c33da43d5"
+  },
+  "cases": [
+    {
+      "status": "passed",
+      "output_files": {}
+    },
+    {
+      "status": "passed",
+      "output_files": {
+        "uncropped": "before.tif",
+        "cropped": "cropped.tif",
+        "cropped-again": "cropped-again.tif",
+        "output-02.tif": "output-02.tif"
+      }
+    },
+    {
+      "status": "passed",
+      "output_files": {}
+    },
+    {
+      "status": "passed",
+      "output_files": {}
+    }
+  ]
+}
