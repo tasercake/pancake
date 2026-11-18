@@ -1,0 +1,59 @@
+
+/// Decode the verified original R50 frame and exercise real CMP1 sensor bounds.
+/// # Errors
+/// Returns missing native source, incorrect geometry or preflight failure.
+#[test]
+fn real_cr3_sensor_bounds_and_development() -> TestResult {
+    let source = std::env::var_os("PANCAKE_R50_ORIGINAL")
+        .map(std::path::PathBuf::from)
+        .ok_or_else(|| io::Error::other("set PANCAKE_R50_ORIGINAL to the verified frame_000.CR3"))?;
+    let original = fs::read(&source)?;
+    let (width, height, encoding) = {
+        let frame = decode(&source)?;
+        (frame.width(), frame.height(), frame.sample_encoding())
+    };
+    require(
+        (width, height, encoding) == (5088, 3392, SampleEncoding::U16),
+        "native CR3 diverged from the independently read recommended crop or developed precision",
+    )?;
+    require(fs::read(&source)? == original, "native decoding modified the original")?;
+    let cmp1: Vec<_> = original.windows(4).enumerate()
+        .filter(|(_, marker)| *marker == b"CMP1")
+        .map(|(index, _)| index)
+        .collect();
+    let [smaller, sensor] = cmp1.as_slice() else {
+        return Err(io::Error::other("unexpected native CR3 sensor track count").into());
+    };
+    require(
+        [*smaller, *sensor] == [47_835, 48_435],
+        "recorded native track offsets changed",
+    )?;
+    let directory = tempfile::tempdir()?;
+    let edited = directory.path().join("bounded-original.CR3");
+    for (offset, number, diagnostic) in [
+        (sensor.saturating_add(12), 32_769_u32, "dimensions 32769×3574 exceed the image limit"),
+        (sensor.saturating_add(16), 0_u32, "image dimensions must be nonzero"),
+    ] {
+        let mut bytes = original.clone();
+        let field = bytes.get_mut(offset..offset.saturating_add(4))
+            .ok_or_else(|| io::Error::other("native CMP1 dimension field is absent"))?;
+        field.copy_from_slice(&number.to_be_bytes());
+        fs::write(&edited, &bytes)?;
+        let error = decode(&edited).err()
+            .ok_or_else(|| io::Error::other("invalid CR3 sensor geometry was accepted"))?;
+        require(error.contains(diagnostic), &format!("incorrect preflight diagnostic: {error}"))?;
+        require(fs::read(&edited)? == bytes, "failed CR3 preflight modified the source")?;
+    }
+
+    let mut no_sensor = original.clone();
+    for offset in cmp1 {
+        no_sensor.get_mut(offset..offset.saturating_add(4))
+            .ok_or_else(|| io::Error::other("native CMP1 marker is absent"))?
+            .copy_from_slice(b"free");
+    }
+    fs::write(&edited, &no_sensor)?;
+    let error = decode(&edited).err()
+        .ok_or_else(|| io::Error::other("CR3 without a sensor track was accepted"))?;
+    require(error.contains("CR3 has no sensor raster"), &format!("incorrect missing-sensor diagnostic: {error}"))?;
+    require(fs::read(edited)? == no_sensor, "missing-sensor preflight modified the source")
+}
