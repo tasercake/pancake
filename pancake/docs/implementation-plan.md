@@ -61,6 +61,9 @@ while warping and fusion completed on the GPU. The diagnostic carries no
 frozen warm or cold timing credit. Resource and equal-quality gates remain open.
 [Generated T50 diagnostic and cleanup](../../qualification/p10-performance/evidence/t50-12f2151-preflight/pair-001/README.md).
 
+The final GitHub push of `main` and required CI run remain pending while
+the frozen release gates are unmet.
+
 The isolated release replay passed all 20 P7 and 14 P8 interface IDs. It
 verified native panels, retained results, GUI and CLI export parity, and
 the actual 64-frame pause, resume, cancel, and worker reuse workflow.
