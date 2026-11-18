@@ -3,12 +3,17 @@
   "canonical_miri_host": "Darwin",
   "required_ci_job": "nightly",
   "nightly": "nightly-2026-11-15",
-  "scope": "Five current pure-host library tests; OS-neutral checked shapes, budgets and readback validation. Not UI, JIT, GPU or transitive unsafe certification.",
+  "scope": "Pure host library validation: shapes, budgets, readback validation and shared job settings. The CLI process and filesystem input contracts use CPU integration tests; UI, JIT, GPU and transitive unsafe lie outside Miri.",
   "reviewed_files": {
-    "src/lib.rs": "b792d6de1209063495d2b91e2e914fff45606d57a309835dd93e51f1c29acf0d",
-    "src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f",
-    "Cargo.toml": "e1eebd03924e1bf26f33da7199df2602175b573304a96aaa8c1a578a8a7f54d9",
-    "Cargo.lock": "f2603e6cb6e669617a5ef4098cfa9a27f042edd3e380be2e6c3e57820a32700f"
+    "Cargo.lock": "52095cb40f098ea2c59e54c36a6bcf634db233759e1aff7d57f28ecc2ff02a7c",
+    "Cargo.toml": "b2da4836118f817880cc2eb1469a39ff7f09e2f8592e6927d67bb5aa9462dfe9",
+    "crates/pancake-cli/Cargo.toml": "b161e3bf5f8a1bd2f8ef41cc0e447665c9ac521034230f2771d15fb766a8dffd",
+    "crates/pancake-cli/src/main.rs": "3806bce42143e848888bd2c213682cc6e28b49ee25cc54c6027903c12da13a28",
+    "src/config/paths.rs": "6ce75fd5f6f19e4f87176cd1c6f24f8ba5d2d3303bfe40813322281d800a592f",
+    "src/config/tests.rs": "394cadf71ba06be5cdd351861a68018da295253596c7daa0bb2dfa3741501436",
+    "src/config.rs": "d650b110722a19339b0aa7c9d987ae61e3e4ec1b582480fbfab5f1f36cd9f24f",
+    "src/lib.rs": "25e388f87d1e75fd4cf8b7f5e3a964f5315471a8affcd3be29ce79d32cc5e4d5",
+    "src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f"
   },
   "linux_limit": "The P0 Slint/tiny-xlib eager constructor was removed from the headless core dependency graph. Canonical Darwin Miri remains required; no new Linux Miri qualification is assumed from the graph change.",
   "reopen": "Any changed or new production source or dependency resolution requires review. New OS-specific authored code invalidates cross-host coverage unless separately qualified. Required CI must execute canonical macOS Miri; a Linux local all result cannot substitute."

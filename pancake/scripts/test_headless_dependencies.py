@@ -16,7 +16,7 @@ class HeadlessDependenciesTests(unittest.TestCase):
     """Resolve the actual enabled Cargo dependencies of every headless package."""
 
     def test_release_graphs_are_window_system_independent(self):
-        for package in ("pancake",):
+        for package in ("pancake", "pancake-cli"):
             with self.subTest(package=package):
                 graph = subprocess.run(
                     ["cargo", "tree", "--locked", "--target", "all", "--all-features",
