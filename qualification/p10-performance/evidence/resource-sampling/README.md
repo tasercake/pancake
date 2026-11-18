@@ -70,3 +70,11 @@ alongside their actual wall intervals. Temporary exports and caches were
 removed and all nine original inputs rehashed unchanged. The retained
 sampler files, launch commands, input acquisition receipt, and both counters’
 raw timestamps identify the exact runs independently of the branch name.
+
+The installed NVIDIA 580.178.04 kernel interfaces under
+`/usr/src/nvidia-580.178.04/{nvidia-drm,nvidia,nvidia-uvm}` contain no registered
+`show_fdinfo` callback or DRM resident-memory export. Linux makes those DRM
+counters optional. NVIDIA documents the combined NVML process-detail API for
+Hopper or newer devices, outside this RTX 3090 validation lane.
+[Linux DRM accounting](https://docs.kernel.org/gpu/drm-usage-stats.html) ·
+[NVIDIA process-detail API](https://docs.nvidia.com/deploy/nvml-api/latest/api/group__nvmlDeviceQueries.html)
