@@ -1,0 +1,126 @@
+"""Describe the corrected D150 geometry and compare unchanged held-out pixels."""
+
+import argparse
+import gzip
+import json
+import math
+from pathlib import Path
+
+import cv2
+import numpy as np
+
+
+def event(path, target_event):
+    records = [row for line in path.read_text().splitlines()
+               if (row := json.loads(line)).get("event") == target_event]
+    assert len(records) == 1
+    return records[0]
+
+
+def maps(record):
+    transforms = {Path(path).name: np.vstack((np.asarray(matrix, dtype=np.float64), [0.0, 0.0, 1.0]))
+                  for path, matrix in record["alignment_transforms"].items()}
+    assert len(transforms) == 150
+    assert all(matrix.shape == (3, 3) and np.all(np.isfinite(matrix)) for matrix in transforms.values())
+    return transforms
+
+
+def output(path):
+    pixels = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+    assert pixels is not None and pixels.dtype == np.uint16
+    h, w, channels = pixels.shape
+    assert channels == 3 and w <= 2304 and h <= 1728
+    x_margin, x_remainder = divmod(2304 - w, 2)
+    y_margin, y_remainder = divmod(1728 - h, 2)
+    assert x_remainder == 0 and y_remainder == 0
+    return pixels, (x_margin, y_margin, x_margin + w, y_margin + h)
+
+
+def project(image, rect, target_rect):
+    left, top, right, bottom = target_rect
+    x, y, max_x, max_y = rect
+    assert x <= left < right <= max_x and y <= top < bottom <= max_y
+    return image[top-y:bottom-y, left-x:right-x]
+
+
+def compare(reference, candidate):
+    assert reference.shape == candidate.shape
+    absolute_sum, squares_sum, peak = 0, 0, 0
+    for y in range(0, reference.shape[0], 64):
+        diff = np.abs(np.subtract(reference[y:y+64], candidate[y:y+64], dtype=np.int32))
+        absolute_sum += int(diff.sum(dtype=np.int64))
+        squares_sum += int(np.square(diff, dtype=np.int64).sum(dtype=np.int64))
+        peak = max(peak, int(diff.max()))
+    count = reference.size
+    return {"samples": count, "mean_absolute_u16": absolute_sum / count,
+            "rms_u16": math.sqrt(squares_sum / count), "max_abs_u16": peak}
+
+
+def detail_score(values):
+    b, g, r = (values[..., channel] for channel in range(3))
+    luma = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 65535
+    detail = luma[:-2, 1:-1] + luma[2:, 1:-1] + luma[1:-1, :-2] + luma[1:-1, 2:] - 4 * luma[1:-1, 1:-1]
+    return float(np.quantile(np.abs(detail), 0.9))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--repaired", type=Path, required=True, help="Directory with new complete.tif and events.jsonl")
+    parser.add_argument("--leased", type=Path, required=True, help="Directory with baseline warm-01 pair")
+    parser.add_argument("--focus-review", type=Path, required=True, help="Sealed baseline focus review JSON")
+    parser.add_argument("--held-out", type=Path, nargs="+", required=True, help="Compressed independent landmark results")
+    args = parser.parse_args()
+    cv2.ocl.setUseOpenCL(False)
+    cv2.setNumThreads(1)
+    repaired = event(args.repaired / "events.jsonl", "stack_complete")
+    assert repaired["completed"] and repaired["actual_backend"] == "cpu" and repaired["fallback_reason"] is None
+    transforms = maps(repaired)
+    ordered = sorted(transforms)
+    sample_points = np.asarray([[0, 0, 1], [2303, 0, 1], [0, 1727, 1], [2303, 1727, 1], [1151.5, 863.5, 1]])
+    steps = [float(np.max(np.linalg.norm((sample_points @ (transforms[b] - transforms[a]).T)[:, :2], axis=1)))
+             for a, b in zip(ordered, ordered[1:])]
+    checked = []
+    for path in args.held_out:
+        with gzip.open(path, "rt") as stream:
+            witness = json.load(stream)
+        for pair in witness["pairs"]:
+            points = pair["matches"]
+            if len(points) < 3:
+                continue
+            delta = transforms[pair["after"]] @ np.linalg.inv(transforms[pair["before"]])
+            errors = [float(np.linalg.norm((delta @ [*point["before"], 1])[:2] - point["after"])) for point in points]
+            checked.append({"before": pair["before"], "after": pair["after"], "count": len(errors),
+                            "median_residual_px": float(np.median(errors)), "min_residual_px": min(errors),
+                            "max_residual_px": max(errors)})
+
+    paths = {label: args.leased / "warm-01" / label / "complete.tif" for label in ("reference", "candidate")}
+    paths["repaired"] = args.repaired / "complete.tif"
+    images = {label: output(path) for label, path in paths.items()}
+    rects = {label: rect for label, (_image, rect) in images.items()}
+    overlap = tuple((max if i < 2 else min)(rect[i] for rect in rects.values()) for i in range(4))
+    old_focus = json.loads(args.focus_review.read_bytes())
+    quality = []
+    for region in old_focus["focus_regions"]:
+        x, y, w, h = region["source_xywh"]
+        fixed = {label: project(image, rect, (x, y, x+w, y+h)) for label, (image, rect) in images.items()}
+        reference_score = detail_score(fixed["reference"])
+        old_ratio = detail_score(fixed["candidate"]) / reference_score
+        assert abs(old_ratio - region["candidate_reference_ratio"]) < 1e-12
+        quality.append({"source_xywh": [x, y, w, h], "baseline_focus_detail_ratio": old_ratio,
+                        "repaired_focus_detail_ratio": detail_score(fixed["repaired"]) / reference_score,
+                        "baseline_pixels": compare(fixed["reference"], fixed["candidate"]),
+                        "repaired_pixels": compare(fixed["reference"], fixed["repaired"])})
+    common = {label: project(image, rect, overlap) for label, (image, rect) in images.items()}
+    result = {"scope": "one traced D150 CPU job and decoded comparison; no timing or frozen acceptance claim",
+              "runtime": repaired["runtime"], "matrix_count": len(transforms),
+              "identity_count": sum(np.array_equal(matrix, np.eye(3)) for matrix in transforms.values()),
+              "maximum_adjacent_corner_or_center_change_px": max(steps),
+              "median_adjacent_corner_or_center_change_px": float(np.median(steps)), "held_out_pairs": checked,
+              "native_crops": rects, "common_native_extent": overlap,
+              "common_baseline_pixels": compare(common["reference"], common["candidate"]),
+              "common_repaired_pixels": compare(common["reference"], common["repaired"]), "focus_regions": quality}
+    print(json.dumps(result, indent=2, allow_nan=False))
+
+
+if __name__ == "__main__":
+    main()
