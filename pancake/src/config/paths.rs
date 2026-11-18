@@ -166,3 +166,28 @@ fn insert(files: &mut BTreeSet<PathBuf>, file: PathBuf) -> Result<(), String> {
 fn path_error(path: &Path, error: &std::io::Error) -> String {
     format!("cannot access input {}: {error}", path.display())
 }
+
+/// An interrupted directory stream must identify the directory and return an error.
+///
+/// # Errors
+/// Returns a parser or missing diagnostic error.
+#[cfg(test)]
+#[test]
+fn failed_directory_read_keeps_its_path() -> Result<(), String> {
+    let directory = Path::new("failed-directory");
+    let matcher = glob::Pattern::new("*.png").map_err(|error| error.to_string())?;
+    let error = std::io::Error::other("directory read interrupted");
+    let mut output = Vec::new();
+    let outcome = scan_entries(
+        std::iter::once(Err(error)),
+        directory,
+        &matcher,
+        &mut std::iter::once(()),
+        &mut output,
+    );
+    let expected = Err("cannot access input failed-directory: directory read interrupted".into());
+    if outcome != expected || !output.is_empty() {
+        return Err(format!("directory iterator error was lost: {outcome:?}"));
+    }
+    Ok(())
+}
