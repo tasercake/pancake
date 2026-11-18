@@ -14,6 +14,11 @@
       "passed": 1,
       "failed": 0,
       "unsupported": 0
+    },
+    "isolated-gui": {
+      "passed": 34,
+      "failed": 0,
+      "unsupported": 0
     }
   },
   "physical_device": {
@@ -24,5 +29,8 @@
     "device_fingerprint": "spirv_4318_8708",
     "physical_gpu": true,
     "runtime": "wgpu-vulkan"
-  }
+  },
+  "total_passed": 376,
+  "aggregate_ledger_sha256": "16bf063d0b8f3052027bd1a025c7941112ba59fcfc2f01d4771445a8d1400873",
+  "raw_ledger_path": "artifacts/p9-5216ba4/linux-ledger.json"
 }
