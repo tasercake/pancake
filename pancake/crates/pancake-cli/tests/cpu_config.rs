@@ -7,6 +7,9 @@ use clap as _;
 use pancake::config::{JobConfig, JobSettings};
 
 /// Literal and pattern inputs resolve to a single canonical, sorted sequence.
+///
+/// # Errors
+/// Returns errors creating fixture files or unexpected job configuration.
 #[test]
 fn canonical_input_order_preserves_distinct_paths() -> Result<(), Box<dyn Error>> {
     let directory = tempfile::tempdir()?;
@@ -32,6 +35,9 @@ fn canonical_input_order_preserves_distinct_paths() -> Result<(), Box<dyn Error>
 }
 
 /// Rejecting a destination that resolves to an input leaves the source intact.
+///
+/// # Errors
+/// Returns fixture setup errors or source/output aliasing failures.
 #[test]
 fn source_cannot_be_its_own_export_destination() -> Result<(), Box<dyn Error>> {
     let directory = tempfile::tempdir()?;

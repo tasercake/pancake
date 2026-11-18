@@ -1,5 +1,6 @@
 //! Headless Pancake argument parsing and job execution.
 
+use std::fmt;
 use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -90,6 +91,9 @@ struct Arguments {
 
 impl Arguments {
     /// Normalize command-line switches to the shared job settings.
+    ///
+    /// # Errors
+    /// Returns invalid settings or inaccessible input paths.
     fn into_job(self) -> Result<JobConfig, String> {
         let defaults = JobSettings::default();
         let alignment = self.alignment_mode.unwrap_or({
@@ -133,9 +137,9 @@ impl Arguments {
     }
 }
 
-/// Write an error without unwinding on a disconnected output stream.
-fn fail(error: &str, status: ExitCode) -> ExitCode {
-    if writeln!(io::stderr().lock(), "error: {error}").is_err() {
+/// Write a status message without unwinding on a disconnected stream.
+fn report(stream: &mut impl Write, args: fmt::Arguments<'_>, status: ExitCode) -> ExitCode {
+    if stream.write_fmt(args).is_err() {
         return ExitCode::FAILURE;
     }
     status
@@ -146,23 +150,37 @@ fn main() -> ExitCode {
     let bad_arguments = ExitCode::from(2);
     let arguments = match Arguments::try_parse() {
         Ok(arguments) => arguments,
-        Err(error) => {
-            if error.print().is_err() {
-                return ExitCode::FAILURE;
-            }
-            return if error.use_stderr() {
-                bad_arguments
-            } else {
-                ExitCode::SUCCESS
-            };
+        Err(error) if error.use_stderr() => {
+            return report(
+                &mut io::stderr().lock(),
+                format_args!("{error}"),
+                bad_arguments,
+            );
+        }
+        Err(help_or_version) => {
+            return report(
+                &mut io::stdout().lock(),
+                format_args!("{help_or_version}"),
+                ExitCode::SUCCESS,
+            );
         }
     };
     let _job = match arguments.into_job() {
         Ok(job) => job,
-        Err(error) => return fail(&error, bad_arguments),
+        Err(error) => {
+            return report(
+                &mut io::stderr().lock(),
+                format_args!("error: {error}\n"),
+                bad_arguments,
+            );
+        }
     };
-    fail(
-        "stack processing is not available in this build",
+    report(
+        &mut io::stderr().lock(),
+        format_args!("error: stack processing is not available in this build\n"),
         ExitCode::FAILURE,
     )
 }
+
+#[cfg(test)]
+mod tests;

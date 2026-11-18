@@ -5,6 +5,9 @@ use std::str::FromStr;
 use super::{AlignmentMode, AlignmentReference, BitDepth, DevicePreference, JobSettings, Method};
 
 /// Assert both directions of the documented spelling checks.
+///
+/// # Errors
+/// Returns a mismatch or an unexpected successful parse.
 fn names<T>(values: &[(&str, T)]) -> Result<(), String>
 where
     T: Copy + std::fmt::Debug + PartialEq + FromStr<Err = &'static str>,
@@ -24,6 +27,9 @@ where
 }
 
 /// Public flags expand to specific program settings.
+///
+/// # Errors
+/// Returns a mismatch in a documented flag spelling.
 #[test]
 fn configuration_names() -> Result<(), String> {
     names(&[
@@ -55,6 +61,9 @@ fn configuration_names() -> Result<(), String> {
 }
 
 /// Check valid and invalid ranges before filesystem access.
+///
+/// # Errors
+/// Returns an incorrect acceptance or a missing diagnostic.
 #[test]
 fn settings_reject_invalid_values() -> Result<(), String> {
     let defaults = JobSettings::default();
@@ -77,6 +86,14 @@ fn settings_reject_invalid_values() -> Result<(), String> {
         ..defaults
     }
     .validate()?;
+    invalid_settings(defaults)
+}
+
+/// Test all invalid bounds in isolation.
+///
+/// # Errors
+/// Returns the invalid setting that reached execution.
+fn invalid_settings(defaults: JobSettings) -> Result<(), String> {
     for (settings, flag) in [
         (
             JobSettings {
