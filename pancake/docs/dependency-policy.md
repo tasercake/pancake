@@ -125,6 +125,13 @@ and parent edges. The previous Chrono review remains in the P0 ledger at
 `34dd609`; reuse requires an active target graph with unchanged reviewed
 versions and relationships before the original expiry.
 
+Bounded image diagnostics activate a new Chrono consumer in Rawler. The exact
+maintenance review records Rawler 0.8.0's date and metadata calls and retains the
+original expiry. This does not restore the Slint paths to the headless graph.
+The codec graph also adds reviewed container, parser and compression generations
+to the exact duplicate ledger. The pinned Cargo-deny target union finishes with
+advisories, bans and sources checked with warnings denied.
+
 Clap 4.6.8 adds a reviewed compile-time parent to the existing `syn` 3.0.10
 duplicate entry. Clap's derive proc macro parses Rust input and generates the
 CLI parser. All `syn` ASTs stay within their own proc-macro expansions. The

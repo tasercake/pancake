@@ -269,3 +269,5 @@ fn centered_variance(input: &Tensor<u32>, output: &mut Tensor<f32>, width: usize
 
 /// Validated settings and input discovery shared by both frontends.
 pub mod config;
+
+pub mod image_io;
