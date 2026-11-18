@@ -57,8 +57,11 @@ just the two selected archives and 50 RAW files. Original archives and images
 stay in ignored task storage and must be removed after use. This run moved
 verified data to `artifacts/pancake-corpus/p2-real-inputs`, with an ownership
 marker listing the temporary archive, dataset and source metadata directories.
-Resolve the adapter manifests' `path` entries relative to this root. A final
-cleanup receipt is due after the last corpus consumer.
+Resolve the adapter manifests' `path` entries relative to a newly acquired
+root. After the P10 consumers finished, the owned staging directory was
+removed after rechecking all 209 inputs, both archives, and four metadata
+files. A future machine can reconstruct it using the commands below.
+[Verified cleanup receipt](../../../qualification/p10-performance/evidence/real-corpus-cleanup.json)
 
 From a clean worktree root with a **new** `artifacts/p2-real-inputs` directory,
 the preserved acquisition command uses versioned manifest URLs, bounded

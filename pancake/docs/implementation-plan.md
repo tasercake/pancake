@@ -21,17 +21,24 @@ pauses and 60 cancels across the original 64-path fixture and real D150.
 Maximum observed acknowledgement was 155.640 ms for pause and 221.802 ms
 for cancellation. The independent 24 MP physical viewport calibration
 matched source and retained-result RGB regions. The full viewer sample
-requirements are still pending.
+requirements are still pending. On the sealed GUI, the visible comparison
+clip shifts its source pixels with the divider instead of staying anchored
+at the left edge.
 [Lifecycle measurements](../../qualification/p10-performance/evidence/native-lifecycle-measured/README.md)
-and [viewport calibration](../../qualification/p10-performance/evidence/native-physical-pair-calibration/README.md).
+and [physical comparison evidence](../../qualification/p10-performance/evidence/native-physical-pair-calibration/comparison.md).
 
 The registration-fixed `5e10244` diagnostic matched all 17 E9 CPU launches
 per application. Warm median was 1.086 s versus 0.899 s (ratio 1.208, limit
 0.50). Cold median was 1.075 s versus 6.535 s (ratio 0.164, limit 1.00).
-Process-tree RSS exceeded the sampling-gap specification, and equal output
-quality remains unresolved. The remaining completed-job profiles and all
-required end-to-end speed, memory and quality acceptance remain open.
-[Paired E9 receipt](../../qualification/p10-performance/evidence/e9-measured-diagnostic/README.md)
+The sealed `5216ba4` E9 Vulkan/OpenCL diagnostic used the same RTX 3090 for
+all 17 completed runs per application. Warm median was 0.733 s versus 0.770 s
+(ratio 0.952, limit 0.50). Cold median was 0.931 s versus 7.037 s (ratio 0.132,
+limit 1.00). CPU and GPU memory observations exceeded the sampling-gap
+specification, and equal output quality remains unresolved. The remaining
+completed-job profiles and end-to-end speed, memory and quality acceptance
+remain open.
+[CPU E9 receipt](../../qualification/p10-performance/evidence/e9-measured-diagnostic/README.md),
+[NVIDIA E9 receipt](../../qualification/p10-performance/evidence/e9-vulkan-diagnostic/README.md),
 and [real-scale T50/R50/D150 functional evidence](../../qualification/p10-performance/evidence/scale-functional/README.md).
 
 [Consolidated P0 work log, including earlier work](p0-work-log.md) is the evidence

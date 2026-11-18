@@ -1,0 +1,1524 @@
+{
+  "root": "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs",
+  "ownership_sha256": "3e409cd2537efeb5f469d4549d9aa5f37bef667d9b09bc233b947eb4c005fc28",
+  "acquisition_receipt_sha256": "03159526e7cd6d5104739d35f0f10f62a68d61677df899c9093904f018c709e1",
+  "verification_receipt_sha256": "4a6c1633da9fc80ada85b20750b73abb6b13c204004c7b9ed04d873a86c56d1b",
+  "preflight_file_counts": {
+    "R50": 50,
+    "D150": 150,
+    "E9": 9,
+    "archives": 2,
+    "source-metadata": 4
+  },
+  "preflight_verified_files": [
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_000.CR3",
+      "sha256": "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca",
+      "bytes": 8869034
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_001.CR3",
+      "sha256": "ee3ae1e3611500e68dd37a51e9939f5d0527dfa39b262d5880ffdc1c8bac4a1c",
+      "bytes": 8873130
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_002.CR3",
+      "sha256": "2bda10f70bce16cf189bbfdee39b7e9f5695607345ea841180765a274e32fdc7",
+      "bytes": 8877738
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_003.CR3",
+      "sha256": "6885fce345e8be17869348341683fa789559e676d36b4a697fa83d7c95c2b370",
+      "bytes": 8883882
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_004.CR3",
+      "sha256": "a43405da7e75faf9c7593a9392430d5ac9c13cf2bd5465118a21d5ebfe20cc48",
+      "bytes": 8866474
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_005.CR3",
+      "sha256": "9b6720cb6286a00aeb23fed80bf21f97b24d2b1e08c981698581a860b1455a5b",
+      "bytes": 8840874
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_006.CR3",
+      "sha256": "f0c70819d4f520096936ecd1a775cd7044512154dd2ed1ce224e1ad60b36402f",
+      "bytes": 8837290
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_007.CR3",
+      "sha256": "ac7ab7f88ac1261882e156b023f9becc8d057f4cdf23e74ddcdf6d709c02a97c",
+      "bytes": 8842922
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_008.CR3",
+      "sha256": "74cec8c7a4c0999c27a5a2faeae2baf742381ddaa1e970d95dfec71d62d3f571",
+      "bytes": 8848042
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_009.CR3",
+      "sha256": "c78ebb44efccebe7903163968fdba2411ebe7247749a675f7d90d41ddcc80ed3",
+      "bytes": 8848042
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_010.CR3",
+      "sha256": "359a6b77c0b5cb07c91f93f475f47b9ef79ba785ae00da8b9ed662cc82123187",
+      "bytes": 8850602
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_011.CR3",
+      "sha256": "1405f1d463f7954817a8587b912efd1493b7b535e80c636bcbf79d1d98774f8d",
+      "bytes": 8886954
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_012.CR3",
+      "sha256": "da7d4e05a1e753debe06f789793f1b9d534a0a281e514981a7a0e3bfb98cd843",
+      "bytes": 8939178
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_013.CR3",
+      "sha256": "149998b05112268d67952e8fe6abebf651b87c7db726627e5e8f543b605e6d7c",
+      "bytes": 8934058
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_014.CR3",
+      "sha256": "d293ab05515a60f3e68716492c481be0ed62c6fdc162ce53e0cc7a802ee24fcf",
+      "bytes": 8942762
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_015.CR3",
+      "sha256": "d8cc83be46113d98b99852dec75c127249bdb4c895da2e494de26fc7a1af04b6",
+      "bytes": 8903850
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_016.CR3",
+      "sha256": "9ca6a390ca39f3edfd0e7d6a96f891d24adbd91452f2f4ee99a16db2c8f0a98b",
+      "bytes": 8831146
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_017.CR3",
+      "sha256": "e5f0df5ce9ee053a25aabf7959ace48c76bcf61cd0fadea9b7316b1cfe1d9966",
+      "bytes": 8824490
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_018.CR3",
+      "sha256": "d6e53c5d8d38c9ab68322cf32e5764830c562553c4729b888b49392ee1d61911",
+      "bytes": 8825002
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_019.CR3",
+      "sha256": "1d7f68fc525b64cbab6b43afc13991073fd97e0c321f35f160810b7d12ebd787",
+      "bytes": 8830634
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_020.CR3",
+      "sha256": "33433869f87e1430d61a8644073dd29139f359a12a453b6f8a5924475f25483e",
+      "bytes": 8833706
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_021.CR3",
+      "sha256": "43c0928f9b7490ee2858355339b5decb1fb10f033b2975d52182f038de62cdf4",
+      "bytes": 8831146
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_022.CR3",
+      "sha256": "79fc212cbd5e7b6a804978a8e0b8fdd266f6c6a209887f01d74a0e526b5fa656",
+      "bytes": 8832170
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_023.CR3",
+      "sha256": "d8f6616575872f59dcf0cd37bf6f4248b4468b424ddecb635f6d1b8c1dd532b2",
+      "bytes": 8832170
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_024.CR3",
+      "sha256": "d3445d174fc099ad5e01ac650da3edf164ee22a6f8095a4d5d0eecddd544a663",
+      "bytes": 8833194
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_025.CR3",
+      "sha256": "7cc350322be52a168f716ccc1424e6ec8d053098f8d084644ed2a4a29ec73d91",
+      "bytes": 8831146
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_026.CR3",
+      "sha256": "a53d24b2118715e6d4aefdc770aa14dd96c787c3086c7eee0e43c9d1981df510",
+      "bytes": 8831658
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_027.CR3",
+      "sha256": "8b4ff51a3e2603968fcee245bbe3dc9ecadffe139f3b93e890d2dc53d52201a4",
+      "bytes": 8829610
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_028.CR3",
+      "sha256": "64a96f12d7476585e1c657f2caa1d7d4264448f0e8f38ce8eb38aa8146ef5bf9",
+      "bytes": 8828074
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_029.CR3",
+      "sha256": "f79dd7eeeeb0b88c1eb1d43aadd77efbb82093505a6e0a0eaf4905bf70173b3d",
+      "bytes": 8825514
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_030.CR3",
+      "sha256": "b7728d6fc420a31ee61a36aaa9ddb144b36dcd4c759cf95e3c972e30d53b802a",
+      "bytes": 8823466
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_031.CR3",
+      "sha256": "6ab24934e4df6fbc2d329855de62b860266c4f76fa7a0a63863e5dcb0bc67ae2",
+      "bytes": 8823466
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_032.CR3",
+      "sha256": "0921f655e8eb4bcbaf328635943e6b91d7f4f16c8cd43f339a7f7cf46c8da653",
+      "bytes": 8822442
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_033.CR3",
+      "sha256": "2706c62dc50a28ce13d7b0cd991171a35069f0d350bb8d179c9a2f84726a0aa1",
+      "bytes": 8821418
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_034.CR3",
+      "sha256": "e8d71e13796c13117239fac0a1cd718a1a02c11472828ad6c89473a8c908f05f",
+      "bytes": 8821930
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_035.CR3",
+      "sha256": "d318d63eb2efd1be37945092898ab79aac7ea3cfcb2cb4fb820a5e166cff6288",
+      "bytes": 8820906
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_036.CR3",
+      "sha256": "d561bedb2691d31c7e8fc6230bb90b9931a66eb3fd15a3861b2af443c497f60e",
+      "bytes": 8819370
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_037.CR3",
+      "sha256": "7d6fcb69b5edcbb66d98937cf822497a184886e9fea068029fae5768c1aa3334",
+      "bytes": 8821418
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_038.CR3",
+      "sha256": "fc99e96f0812eeeded7c26ea6b4595e6739a754e05813c0619bdb48b2c0b1782",
+      "bytes": 8820906
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_039.CR3",
+      "sha256": "71b57798266ad1e98eaea02baf9b3a1bd2f8b0bcaafa9531b6abb0a28b501d30",
+      "bytes": 8824490
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_040.CR3",
+      "sha256": "c2f55edc0b8bccd621b29f74e04ad19f6b60ee3bc9b0535216db48394cda2f01",
+      "bytes": 8822442
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_041.CR3",
+      "sha256": "a77ec8ca7a265f99255de003d8f8d8e807c3ef03ee510850bb1ae23c779f9ca4",
+      "bytes": 8825514
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_042.CR3",
+      "sha256": "42c78ad0609673bc3ffd59bf57ff189557d4625db9c680bd07a9ccb7665482e7",
+      "bytes": 8823978
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_043.CR3",
+      "sha256": "f6b178e86ba1535cb1066de4afeee625d87bd0157e7a93d62919b61c1c0882f3",
+      "bytes": 8826026
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_044.CR3",
+      "sha256": "16d0b75f9fe2f1f7f6b3874d26428b754f51543612da8e2d4062de1cffcf752c",
+      "bytes": 8825514
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_045.CR3",
+      "sha256": "48ffe0c8720c5359891b16a8a919aa36a83d045cf62aecd456cadf61dc79635a",
+      "bytes": 8821930
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_046.CR3",
+      "sha256": "276c72772a383286a898cfaf58b548422b011b46f36395a47534d723f79f0cf8",
+      "bytes": 8820394
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_047.CR3",
+      "sha256": "723112175317985fd9788d5c14af94f875b3142cefc57682542edcb25321a384",
+      "bytes": 8819882
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_048.CR3",
+      "sha256": "155c9f17b0f4acc6a12bea46a24aea469f285a7002863c13e7e8246affe0abf3",
+      "bytes": 8815274
+    },
+    {
+      "role": "R50",
+      "path": "datasets/p0-d02/raw/frame_049.CR3",
+      "sha256": "98fe6e370fc2ab58ba7b45d242a8c2f2a1942404ee0e0524c5cb33048969dc36",
+      "bytes": 8813738
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160516_d2.jpg",
+      "sha256": "8ef1cc7c1bda23b9e19950e95decceaed563997315d56a11523c2ac37ba24fb3",
+      "bytes": 288578
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160517_d2.jpg",
+      "sha256": "d861c75af96cd2eaf516b40ac9c6845b3ab543a17ee22735dd3ed76d1ed0fd24",
+      "bytes": 293365
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160518_d2.jpg",
+      "sha256": "31da708beb68661abd4fd65b91f12816772f2f7ee2a565c24be177b63497260b",
+      "bytes": 300386
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160519_d2.jpg",
+      "sha256": "f9f2eae499157d9f6f2a0223998042d0dfd6d7bf7337d8ea860237d7973228eb",
+      "bytes": 304148
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160520_d2.jpg",
+      "sha256": "460dd7929b303a7a7c92c4688fe405408ed87be2e0e543970d4a7e09a444c115",
+      "bytes": 307165
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160521_d2.jpg",
+      "sha256": "d6c62c258526122a0c1ebeca00f7a41ec9542c8c8f475d71a5f6c10b4a284042",
+      "bytes": 309914
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160522_d2.jpg",
+      "sha256": "b35d57a5f8d4a109aed5865df4eb0d6c5cc332cc0070ff1a02feb9a9f65df435",
+      "bytes": 313063
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160523_d2.jpg",
+      "sha256": "b58c59335adbc1d645364d0015715dc78047898357e6167792c3998d9342b722",
+      "bytes": 316012
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160524_d2.jpg",
+      "sha256": "69995853bf34c4aa30ff44e807ce0c23adcbb417515ddc9c7a8652a84ae490de",
+      "bytes": 318401
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160525_d2.jpg",
+      "sha256": "4e5ec98272e0acde7f489353ce924d997c312b16c847ea3d282dabe83a4f71af",
+      "bytes": 321562
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160526_d2.jpg",
+      "sha256": "0b07d655c4c1cf8f679dc4968fc825769f7ae4b7a45a02fbbd81930598ce5c33",
+      "bytes": 323743
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160527_d2.jpg",
+      "sha256": "abfdf3882854ddde21ba6448314ffeb5ac00bd16400bf2cfce18270f5f197258",
+      "bytes": 327123
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160528_d2.jpg",
+      "sha256": "4388b334e8fc80a7cf29df0672b7ab9b0533a994571a25f397655907f86b60d6",
+      "bytes": 329099
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160529_d2.jpg",
+      "sha256": "267dfddf0dec4b48ae737ea5f445da7c22291d9c707b0fef47ab40ea290ad8a3",
+      "bytes": 331375
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160530_d2.jpg",
+      "sha256": "e870fa1626a4f5d24939dd8507b4c031e20b8d05433ba4b0882931b1bae0556a",
+      "bytes": 333500
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160531_d2.jpg",
+      "sha256": "238e3d61ab150d0e789884471091a6c192f746b30d18f37cb631abb34dd3af79",
+      "bytes": 336004
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160532_d2.jpg",
+      "sha256": "217b18776f13e7ea9b412d10ab51b792dd597a64fd2e2dc64b4cc13f44199434",
+      "bytes": 337859
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160533_d2.jpg",
+      "sha256": "1a3c341f512996d8849832d309f152ad77b60441521959ed4f63b9b0345c2151",
+      "bytes": 339972
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160534_d2.jpg",
+      "sha256": "4c066122e95e401ac3bb7c2ef4b35b4ef5e6a66908cd0afbedd4f17efd49f34e",
+      "bytes": 342016
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160535_d2.jpg",
+      "sha256": "cf3aeb01a32a907ceeaf89986d1a976d70827d9baa71073e783575e15c572f69",
+      "bytes": 343871
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160536_d2.jpg",
+      "sha256": "5b12066797a75722eaca76aca7f580c75ebf62066bc4716d5d0a8872a561da95",
+      "bytes": 345799
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160537_d2.jpg",
+      "sha256": "b0576bafcb6d1a0696d42e3f39ee171bbbe99fc38ae71903c77cb426e221b10a",
+      "bytes": 347081
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160538_d2.jpg",
+      "sha256": "249ebf70ac72aee251e33045a444e97ee631ecac575b7d7b9a9e79d969a0e695",
+      "bytes": 349170
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160539_d2.jpg",
+      "sha256": "3c0a5f30bbd647ffa35e538801a367d366dcc94854dcda7a075a3de50db4d1fd",
+      "bytes": 351859
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160540_d2.jpg",
+      "sha256": "4dca557fc4c554d9f34738aeaaa6d0624a32b05360f03d758e528ddf41704562",
+      "bytes": 354145
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160541_d2.jpg",
+      "sha256": "522f8a1495ba9cca4bebf27ed33d84579c314aa46084eeb79c1060fb14dda269",
+      "bytes": 356993
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160542_d2.jpg",
+      "sha256": "9edf6eb60e45cde517681cbbc8d4a48383e9d3575740fa664cd24d3fecca3aaa",
+      "bytes": 358527
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160543_d2.jpg",
+      "sha256": "6c441d33329a4be460b0bb315e6a99e22c823f3c2a4a1d6aa5673c3ea139c28f",
+      "bytes": 360297
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160544_d2.jpg",
+      "sha256": "5b66ffff280e27da1ce89c27c763b23e93934131b95b8975cd89fe8b270c6318",
+      "bytes": 362260
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160545_d2.jpg",
+      "sha256": "856153c7570ac955856fe4b38d1a14198e7e465a97def1b6418fc44586e88568",
+      "bytes": 364523
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160546_d2.jpg",
+      "sha256": "cfd5d9c4c6a6e9759111b739c55fc7ba04453ffe1e73a01f0a67fff79c6f9d0c",
+      "bytes": 365591
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160547_d2.jpg",
+      "sha256": "2eb69b8c174e8b7e838992641d88e7a0ab5d1d2051a3c4766e2e9ebee1a50377",
+      "bytes": 367828
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160548_d2.jpg",
+      "sha256": "4eda93b35f0a2bc64969b5e801aa130bf0f8daba0258ae56d4bfc7753353d66c",
+      "bytes": 368758
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160549_d2.jpg",
+      "sha256": "d33da685be8e28d2a87538e7afe1bfbf47f326cd6c12f4ed606e694dd07c2556",
+      "bytes": 370651
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160550_d2.jpg",
+      "sha256": "5fa0aecad0ff9efc0befc63875d42d0541164d6011d4a0a61bf1aba7f01f7642",
+      "bytes": 372149
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160551_d2.jpg",
+      "sha256": "8239bcb18fcde3e99fb0de55e3ac48387af220abaa764dd5c845572a31093507",
+      "bytes": 373451
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160552_d2.jpg",
+      "sha256": "6aeb6753ba9a262fd8b7df22f59d1a88d89f3287ce0cb569752ec2a117da7f6f",
+      "bytes": 375004
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160553_d2.jpg",
+      "sha256": "3baa190b8fe56abe3c6870a3066a00cfa85ff69cf21fd21a673fb0ad9706f77f",
+      "bytes": 376410
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160554_d2.jpg",
+      "sha256": "52d24711706f200c965965618ef835e740d0893b991a584fb6d5e2ecb087c1fb",
+      "bytes": 377997
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160555_d2.jpg",
+      "sha256": "78ba3f42a300efce3726674bf51451c1814519a63d4a5620474a10a0114619f4",
+      "bytes": 379140
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160556_d2.jpg",
+      "sha256": "b8fdd9a170bd4d3d4fb289e5260d9e9bce49e589ab45f4335553a8cf5048a176",
+      "bytes": 379666
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160557_d2.jpg",
+      "sha256": "cd6f6918a7c204cc295a6c8cee5406b0c209e28579a9d56188f66694bb07fae8",
+      "bytes": 380621
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160558_d2.jpg",
+      "sha256": "62fb7f124b5d0bd78fba78f3579e896271d8bdd06b6e55a1a8a2fc59408cdc09",
+      "bytes": 381480
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160559_d2.jpg",
+      "sha256": "2b8b7d4f931ae5d57b7888eaa34c610edb0fae87230b81f366c670b3433011b9",
+      "bytes": 382607
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160560_d2.jpg",
+      "sha256": "c29d4cc61dd4887a6c7ce4715505d12a70eff29330b6c182c472d75904c98908",
+      "bytes": 383322
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160561_d2.jpg",
+      "sha256": "26acf4526b51983ebb740758f050611650b79b9b5671f315decba36ab41fc3fd",
+      "bytes": 384299
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160562_d2.jpg",
+      "sha256": "8a3bcb4dae2e6dd46eaf529433fa935b80d0561f1b678b4d05cd513c5f7f19d0",
+      "bytes": 384541
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160563_d2.jpg",
+      "sha256": "137c3612f3a6ac8bc70de902d74609a05bdc66b7796ae0fb53db8e58f9d5cdc4",
+      "bytes": 385495
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160564_d2.jpg",
+      "sha256": "78596a154fb8a0c0259602a696d88ecb36205aef0a43a94a298887c10391ea1c",
+      "bytes": 385986
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160565_d2.jpg",
+      "sha256": "32ea1d226d78e937d43579e87dd43501d19a506d8972d89463fdc95cb0c595a8",
+      "bytes": 386294
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160566_d2.jpg",
+      "sha256": "f8e461c7bee263fd1a5defe07358c750351a2e0f2ae8b419af3e6ddb164ffb75",
+      "bytes": 386150
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160567_d2.jpg",
+      "sha256": "77d38d2d1e59f95e06ef2b4098edcf9eea1d3b28cab3da4ca3ec2cee8a5634e5",
+      "bytes": 386404
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160568_d2.jpg",
+      "sha256": "94d44a0f6e43534cf42313ada4f9edf899e57a5306eb0b31a94822305f36ea35",
+      "bytes": 386696
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160569_d2.jpg",
+      "sha256": "e60562f7b140f6e9cf2155dc03745ca53d3f238d4cd868f86b31ec508ff74559",
+      "bytes": 386723
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160570_d2.jpg",
+      "sha256": "7eca0ab0dd5c716efabdfd5696b80f9c151701a25bd697c8817b8d80ad2e9657",
+      "bytes": 386149
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160571_d2.jpg",
+      "sha256": "71c3a3782b7c742802a5e96c6b4237e3a7be22a133e9df66d1175f4222586bec",
+      "bytes": 386872
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160572_d2.jpg",
+      "sha256": "402c62182ff26107a30dd6ad5c088b0451a1ce9284ed71fc80ca413dc786ad72",
+      "bytes": 386773
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160573_d2.jpg",
+      "sha256": "cc6939027761ce652bd9cce844e6cec1b300a2fe4d10153f723195d8f93107a1",
+      "bytes": 387109
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160574_d2.jpg",
+      "sha256": "4562faf13e37f2f098f5b8bd8e82f62c21db41f921dd6cdf7b26d5a78ef91977",
+      "bytes": 387704
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160575_d2.jpg",
+      "sha256": "21ac6d7ac8aa986e95709688261bbaa1d12c180373aa1d591928d74b5cfa95e1",
+      "bytes": 388479
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160576_d2.jpg",
+      "sha256": "aba7dbb848222941e2f4f29fce2c0c151b1778fedc5bac0ce6f77e4d1d6595af",
+      "bytes": 389018
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160577_d2.jpg",
+      "sha256": "52aac2c29d4ad066b027a1a0db60942cb3b8c5c775688ec69d3ef1356ac921d4",
+      "bytes": 389469
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160578_d2.jpg",
+      "sha256": "c7cd0d714ead26eef7189728bcde4aa68960f3261399fe1f8210a4e213009f2a",
+      "bytes": 389572
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160579_d2.jpg",
+      "sha256": "7f13161b5e0d8b4bc1639fc5addb189fe7445f14454762a6873b35c6079cb998",
+      "bytes": 390311
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160580_d2.jpg",
+      "sha256": "c7bf1931c5138961fdcc0bb5973a8eadf38a6b14d5f671930c2b8ec9d94e58d7",
+      "bytes": 391289
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160581_d2.jpg",
+      "sha256": "69438cf33d6b0455bb388b83cf9edca2c1f286ee6fb6212b9a1df8c3e959efcd",
+      "bytes": 392173
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160582_d2.jpg",
+      "sha256": "f24f62583b249dcc335eb80d74faf23f6457998321d5fb54112dcef4c50d354a",
+      "bytes": 392504
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160583_d2.jpg",
+      "sha256": "58a86c64c2c4576c384abbf6db535616e2f162a8b3536a4c6598e0c90f0fdb23",
+      "bytes": 393001
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160584_d2.jpg",
+      "sha256": "bd76fa9cea24e732b62afc4840149670be004a0d48d4fb3e75ec480e84643060",
+      "bytes": 393746
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160585_d2.jpg",
+      "sha256": "15eb4558cfbb88550c7f1e928e110177a023b112d391104ff91e2a8e2875aebc",
+      "bytes": 394458
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160586_d2.jpg",
+      "sha256": "7244a61272309bb65a6b7bc586b3ec01aae3b86f6d933e3fb89ce83fcfca9e7c",
+      "bytes": 394771
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160587_d2.jpg",
+      "sha256": "c4551b3cbce4d2dbff5a43a57e55a270073af5daa8d2fefe85b2e9da307abbcd",
+      "bytes": 395125
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160588_d2.jpg",
+      "sha256": "d75113a33c94abb7280698544866191f71bb733ac4cfdeb0962333a942a2db1d",
+      "bytes": 396133
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160589_d2.jpg",
+      "sha256": "4444eec89cec4a4f0a898c22dee56ca00748f0236eb435f866790d841c537def",
+      "bytes": 395745
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160590_d2.jpg",
+      "sha256": "074bd2ce955e989ca2926afcdf780ee6f8675269fde39d6832b9df78f1977ecc",
+      "bytes": 395744
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160591_d2.jpg",
+      "sha256": "30191435b5ca546a7ed2b425e610538bfb6b4942e34f42e9adc88819548bf6f7",
+      "bytes": 395958
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160592_d2.jpg",
+      "sha256": "ef6f661154e5b599d7c286f805be9ceaafc5f3487c54a276e009a105d51cc263",
+      "bytes": 396177
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160593_d2.jpg",
+      "sha256": "9ade6f8c165cebc59757df9b054b2d0ee64c33cee8dc36e3b7ab07b9ffd886c1",
+      "bytes": 396457
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160594_d2.jpg",
+      "sha256": "937865c6e16a29e36f6dc71cefd764471f3224ea7caa6a46333ce4499fa60428",
+      "bytes": 397144
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160595_d2.jpg",
+      "sha256": "1b2dc00936889b2068d3b59616072d70904a01d4478a3d751e79476dae41b994",
+      "bytes": 397817
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160596_d2.jpg",
+      "sha256": "96e1bd41ef583d8d7e2a88c8570a0c17521b591da2203c4fefce40c6a021a6ae",
+      "bytes": 397706
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160597_d2.jpg",
+      "sha256": "ef87d20853ee057143851bc338711551defc1d6ed6f778053d96b7221ec14fec",
+      "bytes": 397802
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160598_d2.jpg",
+      "sha256": "ab514c1a05e16e424e53b6044ff80f70987f1ca881350bd41cfc8057169e5beb",
+      "bytes": 397675
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160599_d2.jpg",
+      "sha256": "351fdea0a344ccae35ed7bd7cb96c8a9ce0186d0a2be5d44341fd58700f357f0",
+      "bytes": 397928
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160600_d2.jpg",
+      "sha256": "19ac97cc7e30da39f4240cfa38a00512f1baa169d3bc3f8e69fad1d7205787e3",
+      "bytes": 397808
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160601_d2.jpg",
+      "sha256": "7f7fb9e55ca1839baebfeec811403c34a99fbbae3d57ff113e122a20ff73c705",
+      "bytes": 397571
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160602_d2.jpg",
+      "sha256": "e6143d937775eb73bf0a12900cd40ca2c2de2d3bf1f1d2051eafca7cbedb3820",
+      "bytes": 398110
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160603_d2.jpg",
+      "sha256": "e26aa0d0b6eef785a04196f696cf73ecc55340f7414818c22e7a46d6f7bc20e2",
+      "bytes": 396913
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160604_d2.jpg",
+      "sha256": "924fd5a270fb23c757bf70edac2c1be23b60ea1738a5d1fce4633acbf3dff8d2",
+      "bytes": 396503
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160605_d2.jpg",
+      "sha256": "91ffd5fa01ec410923c57c4dd7ba781e73a1d4111cc3864f31582ca918e37499",
+      "bytes": 395827
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160606_d2.jpg",
+      "sha256": "09c48d01aa7470e286fb5b4c5aa116b032dbcdeac2b55a69f4104104a8275a28",
+      "bytes": 394838
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160607_d2.jpg",
+      "sha256": "7d41aaf6c86cffd804928528b553f10e6b6d7480d05ed24a185ca5e04939da8d",
+      "bytes": 393684
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160608_d2.jpg",
+      "sha256": "43304a81a8f67146419bea70738ee891cedab468b8a870fcc4d565d468723d9f",
+      "bytes": 392461
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160609_d2.jpg",
+      "sha256": "7931f2573af4b175a358d0459161fbb0a9a78adc309935294b3039d09ceafb08",
+      "bytes": 390729
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160610_d2.jpg",
+      "sha256": "8217dd90af196993fd994e21c1b414c45aafa23176f2fcd74b51878cd1462e95",
+      "bytes": 388958
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160611_d2.jpg",
+      "sha256": "33e9ff1a14c4f808aa6cc1df3e14a05d46f200f28118163a888888da49f8046a",
+      "bytes": 388027
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160612_d2.jpg",
+      "sha256": "43e79633c314780d8fdaa69131307f00ac6c6c75de8b674dd0bb9c2569425b08",
+      "bytes": 386365
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160613_d2.jpg",
+      "sha256": "b8f49930ffabf94c31bd059c56edb6831dc910b616d6db96003af893794f7aa7",
+      "bytes": 384302
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160614_d2.jpg",
+      "sha256": "60a125d4e0267be15a9f9a8e53ea3b9960f962eafe8bfad00e0950c1035b711a",
+      "bytes": 381837
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160615_d2.jpg",
+      "sha256": "4616420972cb9019a675bad31c37b9c39225247186274ac4abe71145345d0a32",
+      "bytes": 380318
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160616_d2.jpg",
+      "sha256": "a04cba8615d98c6cf0b71b4e232f49e248d6608eaeee661952cc1322edbe30a3",
+      "bytes": 378399
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160617_d2.jpg",
+      "sha256": "35e4f53158655fb14a916d548fa2199cee29acc58e30f429cf1815d194a71201",
+      "bytes": 375269
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160618_d2.jpg",
+      "sha256": "3a76f2358d364f6ef118632eec3a52ff1ef2a90b6c25ec4a887b42db71fe6361",
+      "bytes": 373809
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160619_d2.jpg",
+      "sha256": "ec19925b8e0ee2e4c5c94454e184854ab1498a152ad0d8a453ba4bb5b111ee66",
+      "bytes": 370528
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160620_d2.jpg",
+      "sha256": "951192fd1b22a1e70244670bbf4efb2605860f406053350baffa784142b5d1ca",
+      "bytes": 367751
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160621_d2.jpg",
+      "sha256": "06394ec859e6061467fe046ba2590310ef40576555b2c498dd5f753493b39193",
+      "bytes": 364881
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160622_d2.jpg",
+      "sha256": "65dc7a400011155fbccd0616b04a10aa0e1325d331a71eb4322deb7d3a858611",
+      "bytes": 361990
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160623_d2.jpg",
+      "sha256": "e871a61fd57fc31f06fd47fc4cae2e7dba226837ee5fe97ca56c55733e7d8fc0",
+      "bytes": 359911
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160624_d2.jpg",
+      "sha256": "ee48a8b9079091503199aa4b821ee526ed17c75d2c8d93cff9210d357cfdbff2",
+      "bytes": 355203
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160625_d2.jpg",
+      "sha256": "083c9cd0bea4d7714f5dc2b710d5375f012ff293aa9ba91bf60975458ea1c0df",
+      "bytes": 352827
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160626_d2.jpg",
+      "sha256": "614a99b4508ff45f30c3b28f3e9d8e2289f172ceca12bf557f937b21cb89b818",
+      "bytes": 348965
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160627_d2.jpg",
+      "sha256": "cedfe12ab852568b8c2de3dff524d2dd55e356a10177272bc9779a1f1a66f0c9",
+      "bytes": 345829
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160628_d2.jpg",
+      "sha256": "0412383eba52191067c6f0f164ec6436eea1facaabcf61c1e3c04e67d7364fd0",
+      "bytes": 342566
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160629_d2.jpg",
+      "sha256": "bf15566ac9a33e0e40eac53272327fdb99f82f22d71ca68f3f67e6b3f1a2609c",
+      "bytes": 338580
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160630_d2.jpg",
+      "sha256": "a3206904808007073735d4424276014cd107185783534c53243831b419c5bdcb",
+      "bytes": 336214
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160631_d2.jpg",
+      "sha256": "b34c6571a8f231bbb4f345285bab413e0752c328344657628f8a93d40af47dd8",
+      "bytes": 334167
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160632_d2.jpg",
+      "sha256": "8e0216fe89f2a336c67a9fe405c7cd90bb65e127fcc283b54a530a55cb658291",
+      "bytes": 331531
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160633_d2.jpg",
+      "sha256": "4072566eb6273215c9c139a57de56a37db79bd8d677d2057c1c8564b185b2445",
+      "bytes": 328618
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160634_d2.jpg",
+      "sha256": "74a42abef8690f1d429ce41341ba1e4e1b08587379c471177496cc143210f731",
+      "bytes": 327209
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160635_d2.jpg",
+      "sha256": "c6347af88958e38c304ed55bdc7ae91a7c1987e1c062d7825b1785d489695a43",
+      "bytes": 324849
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160636_d2.jpg",
+      "sha256": "956c5fea9dc7e7f5d795b072b709334dddc2dc247c055ae450c26a0b731d176d",
+      "bytes": 322546
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160637_d2.jpg",
+      "sha256": "333c067bf539d010db3acdc9f1e06d83c7a6dbf0ee42f6538c61b6bd50e556e4",
+      "bytes": 320307
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160638_d2.jpg",
+      "sha256": "b575bed5403a07eccccc649e0d9b8ccd309477c49670c63f09d9167dc7efaed2",
+      "bytes": 318692
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160639_d2.jpg",
+      "sha256": "1232eda770d80c4790e4ab071789eb6093a41a404257071685bc681fa8fd7ce9",
+      "bytes": 316780
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160640_d2.jpg",
+      "sha256": "9089e78a45d0457e2925f399d76ec374dcf34e42e04cf54567f937ae5afb6d50",
+      "bytes": 313977
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160641_d2.jpg",
+      "sha256": "f8449c8102844ce1ddb35ffc350ed1802d9b24756ff8542989aa3bd55d9f5172",
+      "bytes": 312260
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160642_d2.jpg",
+      "sha256": "9cb3dee038af667450023986deb0431f255e1b88292fd9590e4848a5cf623360",
+      "bytes": 309511
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160643_d2.jpg",
+      "sha256": "36043209d7c3de5a917390d07b2792d1fa8d3eb642c34639e91cdba1be490dd9",
+      "bytes": 307794
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160644_d2.jpg",
+      "sha256": "f0e0c011724370204bc953eab4918903667a6be1873eafde5e2e842c4b4b3d00",
+      "bytes": 305888
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160645_d2.jpg",
+      "sha256": "b051d0cdbd49d86fd585eec539b5ced8d050229d70fe418865d89319df47f33b",
+      "bytes": 303369
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160646_d2.jpg",
+      "sha256": "3f08b3912fcee40dc7a05da0e3acecc447059f2620df48ce07eaf074f75a9bf6",
+      "bytes": 301935
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160647_d2.jpg",
+      "sha256": "c27eb90a40cc70c396e6e53156f6894a7571664e813c0d57a09653e8859bf09d",
+      "bytes": 299061
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160648_d2.jpg",
+      "sha256": "cf6ceec6ec1ae82146683ee5d6877e036b0f1ec2de1bcea58384a17942ca8939",
+      "bytes": 297218
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160649_d2.jpg",
+      "sha256": "abc67d9ade7f132c7a691f4c401690c9b18617effa5e04c6bde1198be716fc0a",
+      "bytes": 294855
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160650_d2.jpg",
+      "sha256": "d6c569ffa675b0ff570360141548d4b6f3a7b9dbb57c2e56e286b196f14e0d75",
+      "bytes": 292181
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160651_d2.jpg",
+      "sha256": "76048448b7ab6a8d76b3aada995fc7c75a61b1cda2ae67ac83bb6f33e57082e6",
+      "bytes": 290017
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160652_d2.jpg",
+      "sha256": "fa3cef550066d3aae7d7cc860762c62f139b3732bdd72f7c025f76276ec07d1c",
+      "bytes": 288722
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160653_d2.jpg",
+      "sha256": "87f53c2c86589fa343dd5620affcc0db9b22fa5c8ddd8b779ccce9d1961f2fb3",
+      "bytes": 286373
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160654_d2.jpg",
+      "sha256": "555061eb4be42e928b365dc883daa73137a950bbd9faa994cba6b97a7f17b5fd",
+      "bytes": 284774
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160655_d2.jpg",
+      "sha256": "6117cb6e01e3b2e9c5ecccd651a839035fb7e851f37ec9eaa91235147e95fd97",
+      "bytes": 282411
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160656_d2.jpg",
+      "sha256": "5b5dfaec21e2956715a64bfdf1e61e4ec05d05a9fdbd135a4ce22e74e9f77b6e",
+      "bytes": 280654
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160657_d2.jpg",
+      "sha256": "8c5350fa12ec89f69569f1f11fe31c8d2d5a68a362d85a58cef40a0f0832f667",
+      "bytes": 278167
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160658_d2.jpg",
+      "sha256": "be0eb14375eb4f5819e145e04fdee9d73b84e56591f54139a53b537c4f5f5cef",
+      "bytes": 276347
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160659_d2.jpg",
+      "sha256": "ed5d522631252c59cd1e3767900fbd2123f8857938df2fda77ee781587207577",
+      "bytes": 274182
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160660_d2.jpg",
+      "sha256": "6ced07c726d451ac02a231d7d31ab8397d0e05311bf8af5fbd169e55ca5d7267",
+      "bytes": 272108
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160661_d2.jpg",
+      "sha256": "11c93537e2235cc53e16201962309ef9aeb978365aafaee5a596eb690d640e4d",
+      "bytes": 269581
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160662_d2.jpg",
+      "sha256": "e6b423b46729824da50a012510448acbbe545bb329541e5c314eb66b9739904b",
+      "bytes": 267984
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160663_d2.jpg",
+      "sha256": "d23d0cf080102e05e476f33ce59bfbfb3d1ed1e05fe73fd5c3907149c4a28a1d",
+      "bytes": 266198
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160664_d2.jpg",
+      "sha256": "d0a56830ff7803f1a468fb61b3380515edb657d5a51701295ffed48838e61c98",
+      "bytes": 264690
+    },
+    {
+      "role": "D150",
+      "path": "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160665_d2.jpg",
+      "sha256": "4de97098a7f7da74f76897fe914b182a1b11adc9ace88567c39db0fe3ac1c488",
+      "bytes": 263337
+    },
+    {
+      "role": "E9",
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0163.png",
+      "sha256": "65bef59ae2cffaac5a0401780c884fc1f0cb87c3fb6ba7057213bbb03b775f9d",
+      "bytes": 112938
+    },
+    {
+      "role": "E9",
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0164.png",
+      "sha256": "37094f4247a7e5cac3af1876137f42c88263ace0d075d99daec7b1e796e33ad0",
+      "bytes": 133941
+    },
+    {
+      "role": "E9",
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0165.png",
+      "sha256": "8582dc34b2035c4daafc5784a9f7191a6aff3161a7fd54b4d493c45145d6a8e6",
+      "bytes": 154601
+    },
+    {
+      "role": "E9",
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0166.png",
+      "sha256": "5fc9ade7715c0110ec5b4d18777ce2718c2f70946fa23833222b98b425b2ca7c",
+      "bytes": 175787
+    },
+    {
+      "role": "E9",
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0167.png",
+      "sha256": "530a91ac82e4406acc23913088efb0ab0d056e686345088e41f60e4fc6176f60",
+      "bytes": 191648
+    },
+    {
+      "role": "E9",
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0168.png",
+      "sha256": "5c7ed4b5bba42b52c93eeaaf462b1531717d1abd43938445a1e6bea9c19c1ae3",
+      "bytes": 211350
+    },
+    {
+      "role": "E9",
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0169.png",
+      "sha256": "4f26850b1aee4fe40ab0f060fc24568f54e637d9b5158b74c4a99a865c991e35",
+      "bytes": 228010
+    },
+    {
+      "role": "E9",
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0170.png",
+      "sha256": "e20b37e52a492042647c15edb5e9f45990e5bd585f38d1fc14282e95752597da",
+      "bytes": 214462
+    },
+    {
+      "role": "E9",
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0171.png",
+      "sha256": "029ae94dfcc2d105a2ee2f91e5d535820c00e9e73c6b4bdf7b0ba690df670c32",
+      "bytes": 202755
+    },
+    {
+      "role": "archives",
+      "path": "archives/26E_dorsal_60x.zip",
+      "sha256": "311ca6aab7d3bff03c714fd2d81c741f3847de1d4d3f2f9cfa767b6eb62cf56a",
+      "bytes": 53459291
+    },
+    {
+      "role": "archives",
+      "path": "archives/MEFDatabase.rar",
+      "sha256": "02939e5eb63d0536793e467848c9381e41c71ca1642b9f0291e2fc0843744242",
+      "bytes": 69869523
+    },
+    {
+      "role": "source-metadata",
+      "path": "source-metadata/D02-LICENSE",
+      "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+      "bytes": 18657
+    },
+    {
+      "role": "source-metadata",
+      "path": "source-metadata/D02-README.md",
+      "sha256": "c54f3060ac7c655eef98b594154f301437a43c138c997b5e731cd45c3ebf62a3",
+      "bytes": 4147
+    },
+    {
+      "role": "source-metadata",
+      "path": "source-metadata/D03.json",
+      "sha256": "a0ffbdf7039850bbf5a166a972fec3f2bd6c85ec2d85568f5245d59e3e845192",
+      "bytes": 10087
+    },
+    {
+      "role": "source-metadata",
+      "path": "source-metadata/D28.html",
+      "sha256": "cb7197b53835fc5d0f002e74e22548a36f275d60188ae874591aed678558be1f",
+      "bytes": 5185
+    }
+  ],
+  "removed": [
+    "datasets/p0-d02/raw/frame_000.CR3",
+    "datasets/p0-d02/raw/frame_001.CR3",
+    "datasets/p0-d02/raw/frame_002.CR3",
+    "datasets/p0-d02/raw/frame_003.CR3",
+    "datasets/p0-d02/raw/frame_004.CR3",
+    "datasets/p0-d02/raw/frame_005.CR3",
+    "datasets/p0-d02/raw/frame_006.CR3",
+    "datasets/p0-d02/raw/frame_007.CR3",
+    "datasets/p0-d02/raw/frame_008.CR3",
+    "datasets/p0-d02/raw/frame_009.CR3",
+    "datasets/p0-d02/raw/frame_010.CR3",
+    "datasets/p0-d02/raw/frame_011.CR3",
+    "datasets/p0-d02/raw/frame_012.CR3",
+    "datasets/p0-d02/raw/frame_013.CR3",
+    "datasets/p0-d02/raw/frame_014.CR3",
+    "datasets/p0-d02/raw/frame_015.CR3",
+    "datasets/p0-d02/raw/frame_016.CR3",
+    "datasets/p0-d02/raw/frame_017.CR3",
+    "datasets/p0-d02/raw/frame_018.CR3",
+    "datasets/p0-d02/raw/frame_019.CR3",
+    "datasets/p0-d02/raw/frame_020.CR3",
+    "datasets/p0-d02/raw/frame_021.CR3",
+    "datasets/p0-d02/raw/frame_022.CR3",
+    "datasets/p0-d02/raw/frame_023.CR3",
+    "datasets/p0-d02/raw/frame_024.CR3",
+    "datasets/p0-d02/raw/frame_025.CR3",
+    "datasets/p0-d02/raw/frame_026.CR3",
+    "datasets/p0-d02/raw/frame_027.CR3",
+    "datasets/p0-d02/raw/frame_028.CR3",
+    "datasets/p0-d02/raw/frame_029.CR3",
+    "datasets/p0-d02/raw/frame_030.CR3",
+    "datasets/p0-d02/raw/frame_031.CR3",
+    "datasets/p0-d02/raw/frame_032.CR3",
+    "datasets/p0-d02/raw/frame_033.CR3",
+    "datasets/p0-d02/raw/frame_034.CR3",
+    "datasets/p0-d02/raw/frame_035.CR3",
+    "datasets/p0-d02/raw/frame_036.CR3",
+    "datasets/p0-d02/raw/frame_037.CR3",
+    "datasets/p0-d02/raw/frame_038.CR3",
+    "datasets/p0-d02/raw/frame_039.CR3",
+    "datasets/p0-d02/raw/frame_040.CR3",
+    "datasets/p0-d02/raw/frame_041.CR3",
+    "datasets/p0-d02/raw/frame_042.CR3",
+    "datasets/p0-d02/raw/frame_043.CR3",
+    "datasets/p0-d02/raw/frame_044.CR3",
+    "datasets/p0-d02/raw/frame_045.CR3",
+    "datasets/p0-d02/raw/frame_046.CR3",
+    "datasets/p0-d02/raw/frame_047.CR3",
+    "datasets/p0-d02/raw/frame_048.CR3",
+    "datasets/p0-d02/raw/frame_049.CR3",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160516_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160517_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160518_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160519_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160520_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160521_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160522_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160523_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160524_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160525_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160526_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160527_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160528_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160529_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160530_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160531_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160532_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160533_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160534_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160535_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160536_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160537_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160538_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160539_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160540_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160541_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160542_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160543_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160544_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160545_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160546_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160547_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160548_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160549_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160550_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160551_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160552_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160553_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160554_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160555_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160556_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160557_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160558_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160559_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160560_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160561_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160562_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160563_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160564_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160565_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160566_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160567_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160568_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160569_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160570_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160571_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160572_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160573_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160574_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160575_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160576_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160577_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160578_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160579_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160580_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160581_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160582_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160583_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160584_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160585_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160586_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160587_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160588_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160589_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160590_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160591_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160592_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160593_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160594_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160595_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160596_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160597_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160598_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160599_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160600_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160601_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160602_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160603_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160604_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160605_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160606_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160607_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160608_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160609_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160610_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160611_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160612_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160613_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160614_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160615_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160616_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160617_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160618_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160619_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160620_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160621_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160622_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160623_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160624_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160625_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160626_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160627_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160628_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160629_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160630_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160631_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160632_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160633_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160634_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160635_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160636_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160637_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160638_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160639_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160640_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160641_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160642_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160643_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160644_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160645_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160646_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160647_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160648_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160649_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160650_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160651_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160652_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160653_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160654_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160655_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160656_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160657_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160658_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160659_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160660_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160661_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160662_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160663_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160664_d2.jpg",
+    "datasets/.bokehforge/work/D03/26E_dorsal_60x-311ca6aab7d3/26E_dorsal_60x/P9160665_d2.jpg",
+    "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0163.png",
+    "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0164.png",
+    "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0165.png",
+    "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0166.png",
+    "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0167.png",
+    "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0168.png",
+    "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0169.png",
+    "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0170.png",
+    "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0171.png",
+    "archives/26E_dorsal_60x.zip",
+    "archives/MEFDatabase.rar",
+    "source-metadata/D02-LICENSE",
+    "source-metadata/D02-README.md",
+    "source-metadata/D03.json",
+    "source-metadata/D28.html"
+  ],
+  "owned_root_removed": true,
+  "removed_input_bytes": 620002526
+}
