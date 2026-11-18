@@ -2,7 +2,6 @@
 
 include!("common/kernel_cases.rs");
 
-
 /// GPU availability is a qualification requirement, so failures are not skipped.
 ///
 /// # Errors

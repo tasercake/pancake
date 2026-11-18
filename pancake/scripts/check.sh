@@ -53,7 +53,7 @@ assurance_profile() {
     python3 scripts/assurance_targets.py target/assurance/metadata.json "$family" \
         > target/assurance/selected-targets.txt
     assurance_args=()
-    if [[ $family == cpu ]]; then assurance_args=(--lib); fi
+    if [[ $family == cpu ]]; then assurance_args=(--lib --bins); fi
     while IFS= read -r target; do
         assurance_args+=(--test "$target")
     done < target/assurance/selected-targets.txt

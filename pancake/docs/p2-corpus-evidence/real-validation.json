@@ -1,0 +1,65 @@
+{
+  "manifests": {
+    "performance-corpus.json": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+    "performance-raw-corpus.json": "dd7a7e8a396d16e952d3d24d258afc1e05b77bb1664b179d3a43a7f66e413fab"
+  },
+  "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+  "verification": {
+    "D150": {
+      "decoded_shape_hwc": [
+        1728,
+        2304,
+        3
+      ],
+      "exif_exposure_time_frame_count": 0,
+      "files": 150,
+      "frame_bytes": 52911148,
+      "native_sample_precision_bits": 8,
+      "ordered_sha256_of_input_digests": "c6cbceaecf2a1a1faf82097409799f5778f49cff5a2e32f4124c8ffe09fee520",
+      "ordered_sha256_of_output_digests": "5a904fbe15d492642a4b807810630172874c4d9652c2ececf1816bb5b859c92b"
+    },
+    "E9": {
+      "decoded_shape_hwc": [
+        339,
+        512,
+        3
+      ],
+      "exif_exposure_time_frame_count": 0,
+      "files": 9,
+      "frame_bytes": 1625492,
+      "native_sample_precision_bits": 8,
+      "ordered_sha256_of_input_digests": "554c481377329275247ffed880f4bb34ab0f12c62b1d48b030ac2cc0de69b969",
+      "ordered_sha256_of_output_digests": "ceaf70b03894c8c5a6d0d9400ab602060c7e6266611ada3d109e609d90144e2d"
+    },
+    "R50": {
+      "decoded_dtype": "uint16",
+      "decoded_shape_hwc": [
+        3412,
+        5118,
+        3
+      ],
+      "files": 50,
+      "frame_bytes": 442098996,
+      "full_development": {
+        "no_auto_bright": true,
+        "output_bps": 16,
+        "use_camera_wb": true
+      },
+      "ordered_sha256_of_input_digests": "068f853268e865760f5ac81dcc370908f68b35b6b4e03a3b93b656c67acc5942",
+      "ordered_sha256_of_output_digests": "4397b6e3df41ff6e80fbca4848ceea785e62694d859009c960a1b75fd67ad34b",
+      "visible_low_bit_frame_count": 50,
+      "white_level": 16383
+    }
+  },
+  "versions": {
+    "libraw": [
+      0,
+      22,
+      0
+    ],
+    "numpy": "2.5.4",
+    "pillow": "13.0.0",
+    "python": "3.12.12",
+    "rawpy": "0.26.1"
+  }
+}
