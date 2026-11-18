@@ -55,3 +55,17 @@ slot at this source started no real processing job with valid inputs.
 Required canonical Darwin Miri and retained platform builds remain separate
 obligations. The Linux Miri result covers the reported pure host tests. The raw
 logs retain first-attempt failures and exact tested source paths.
+
+## First-stage integrated CPU coverage
+
+The unmodified `bash scripts/check.sh coverage-cpu` gate ran on clean source
+`98e945f27874c2c8b162ca124d33df23b0fb71a0`, with the same lock hash and pinned
+Linux toolchain. It exited 1 after all instrumented CPU tests passed. The LLVM
+report recorded 380/404 lines, 33/39 functions and 365/404 regions. The stable
+coverage profile did not instrument branches. The core kernels and configuration
+types had full line, function and region coverage. The CLI main and input path
+resolution still had uncovered paths, including a valid job reaching its
+processing diagnostic and file discovery error or limit handling.
+
+[Gate log](p1-first-stage-coverage-cpu.log.gz) and
+[raw LLVM report](p1-first-stage-coverage-cpu.json.gz) retain this result.
