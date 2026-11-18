@@ -1,0 +1,9 @@
+running 1 test
+test identity_crop_applies_only_to_aligned_jobs ... FAILED
+failures:
+---- identity_crop_applies_only_to_aligned_jobs stdout ----
+Error: "identity crop geometry disagrees with aligned export"
+failures:
+    identity_crop_applies_only_to_aligned_jobs
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.21s
+error: test failed, to rerun pass `--test cpu_job`
