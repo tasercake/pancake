@@ -1,9 +1,12 @@
 """Regression contracts for Linux sampling cadence and attribution."""
 
+import json
 import os
 import subprocess
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -11,6 +14,94 @@ import resources
 
 
 class ResourceCadence(unittest.TestCase):
+    @unittest.skipUnless(sys.platform == "linux", "Linux per-thread affinity")
+    def test_rss_sampler_uses_its_own_cpu_and_the_job_inherits_the_original_mask(self):
+        original = os.sched_getaffinity(0)
+        if len(original) < 2:
+            self.skipTest("two allowed logical CPUs are needed")
+        application_cpu, collector_cpu = sorted(original)[:2]
+        job = (
+            "import os, time\nprint(sorted(os.sched_getaffinity(0)))\ntime.sleep(0.08)"
+        )
+        with tempfile.TemporaryDirectory() as scratch:
+            directory = Path(scratch)
+            sampler_masks = set()
+
+            def sample(session):
+                sampler_masks.add(tuple(sorted(os.sched_getaffinity(0))))
+                return snapshot(session)
+
+            snapshot = resources._session_memory
+            os.sched_setaffinity(0, {application_cpu})
+            try:
+                with patch("resources._session_memory", side_effect=sample):
+                    result = resources.measure(
+                        [sys.executable, "-c", job],
+                        cwd=directory,
+                        env=os.environ.copy(),
+                        directory=directory,
+                        timeout=3,
+                        gpu=None,
+                        rss_sampler_cpu=collector_cpu,
+                    )
+                self.assertEqual(os.sched_getaffinity(0), {application_cpu})
+            finally:
+                os.sched_setaffinity(0, original)
+
+            self.assertEqual(result["returncode"], 0)
+            self.assertEqual(
+                json.loads((directory / "stdout.txt").read_text()), [application_cpu]
+            )
+            self.assertEqual(result["rss_sampler_affinity"], [collector_cpu])
+            self.assertEqual(sampler_masks, {(application_cpu,), (collector_cpu,)})
+            rows = [
+                json.loads(line)
+                for line in (directory / "resources.jsonl").read_text().splitlines()
+            ]
+            self.assertGreater(len(rows), 1)
+            self.assertEqual(rows[0]["scheduled_ns"], 0)
+            self.assertTrue(all(row["snapshot_thread_cpu_ns"] > 0 for row in rows))
+            self.assertTrue(all(row["scheduled_ns"] % 8_000_000 == 0 for row in rows))
+
+    @unittest.skipUnless(sys.platform == "linux", "Linux per-thread affinity")
+    def test_refuses_an_rss_sampler_cpu_shared_with_the_job(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            directory = Path(scratch)
+            with self.assertRaisesRegex(ValueError, "outside the common job affinity"):
+                resources.measure(
+                    [sys.executable, "-c", "raise AssertionError('must not launch')"],
+                    cwd=directory,
+                    env=os.environ.copy(),
+                    directory=directory,
+                    timeout=3,
+                    gpu=None,
+                    rss_sampler_cpu=min(os.sched_getaffinity(0)),
+                )
+            self.assertFalse((directory / "stdout.txt").exists())
+
+    @unittest.skipUnless(sys.platform == "linux", "Linux per-thread affinity")
+    def test_unavailable_rss_sampler_cpu_aborts_before_job_launch(self):
+        with (
+            tempfile.TemporaryDirectory() as scratch,
+            patch(
+                "resources.os.sched_setaffinity", side_effect=OSError("cpuset blocked")
+            ),
+            patch("resources.subprocess.Popen") as launch,
+        ):
+            directory = Path(scratch)
+            outside = max(os.sched_getaffinity(0)) + 1
+            with self.assertRaisesRegex(ValueError, "cpuset blocked"):
+                resources.measure(
+                    [sys.executable, "-c", "raise AssertionError('must not launch')"],
+                    cwd=directory,
+                    env=os.environ.copy(),
+                    directory=directory,
+                    timeout=3,
+                    gpu=None,
+                    rss_sampler_cpu=outside,
+                )
+            launch.assert_not_called()
+
     def test_each_trace_keeps_its_own_metric_and_launch_to_exit_cadence(self):
         rows = [
             {"rss_elapsed_ns": 5_000_000, "rss_bytes": 25},

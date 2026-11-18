@@ -1,0 +1,48 @@
+{
+  "archive_sha256": "863291e4671914c7a6261a02d3e9fbe93c541b5a29bcfff01209a66020a514a1",
+  "candidate": {
+    "gap_over_limit_counts": {
+      "before_snapshot_over_20ms": 1,
+      "during_snapshot_larger": 18,
+      "exit": 0,
+      "internal": 22,
+      "launch": 0,
+      "snapshot_wall_over_20ms": 0,
+      "snapshot_wall_over_8ms": 20
+    },
+    "jobs": 17,
+    "jobs_with_gap_over_limit": 9,
+    "maximum_gap_ns": 23834260,
+    "observations_inside_job": 86996,
+    "sampler_thread_mean_cpu_ns_per_sample_by_job_min_max": [
+      1915233,
+      2257573
+    ],
+    "snapshot_wall_max_ns": 16589875,
+    "snapshot_wall_median_ns": 1867879.0
+  },
+  "limit_ns": 20000000,
+  "nominal_interval_ns": 8000000,
+  "reference": {
+    "gap_over_limit_counts": {
+      "before_snapshot_over_20ms": 0,
+      "during_snapshot_larger": 364,
+      "exit": 0,
+      "internal": 431,
+      "launch": 0,
+      "snapshot_wall_over_20ms": 9,
+      "snapshot_wall_over_8ms": 420
+    },
+    "jobs": 17,
+    "jobs_with_gap_over_limit": 17,
+    "maximum_gap_ns": 33924843,
+    "observations_inside_job": 185248,
+    "sampler_thread_mean_cpu_ns_per_sample_by_job_min_max": [
+      2073622,
+      3097154
+    ],
+    "snapshot_wall_max_ns": 26257797,
+    "snapshot_wall_median_ns": 1508914.0
+  },
+  "report_sha256": "850301affcba2367fbd9094c708e8ecb4558316b91e4916a37175a4e27e141ed"
+}

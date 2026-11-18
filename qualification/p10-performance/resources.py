@@ -173,10 +173,14 @@ def _summarize_samples(rows, elapsed, *, gpu, errors):
     return result
 
 
-def measure(argv, *, cwd, env, directory, timeout, gpu):
+def measure(argv, *, cwd, env, directory, timeout, gpu, rss_sampler_cpu=None):
     """Measure direct spawn-to-exit, record sampled process-tree and GPU peaks."""
     if timeout <= 0 or not Path("/proc/self/stat").is_file():
         raise ValueError("positive timeout and Linux procfs required")
+    if rss_sampler_cpu is not None and (
+        rss_sampler_cpu < 0 or rss_sampler_cpu in os.sched_getaffinity(0)
+    ):
+        raise ValueError("RSS sampler CPU must be outside the common job affinity")
     traces = {"rss": (directory / "resources.jsonl", _session_memory)}
     if gpu is not None:
         traces["gpu"] = (directory / "gpu-resources.jsonl", gpu.sample_session)
@@ -185,6 +189,7 @@ def measure(argv, *, cwd, env, directory, timeout, gpu):
     launched = threading.Event()
     sample_failures = []
     sampler_cpu_ns = {}
+    rss_sampler_affinity = None
     child = None
     start = 0
 
@@ -200,9 +205,14 @@ def measure(argv, *, cwd, env, directory, timeout, gpu):
                 _signal_group(child.pid, signal.SIGKILL)
 
     def collect(metric, path, snapshot, ready):
+        nonlocal rss_sampler_affinity
         cpu_start = time.thread_time_ns()
         try:
             with path.open("x") as raw:
+                if metric == "rss":
+                    if rss_sampler_cpu is not None:
+                        os.sched_setaffinity(0, {rss_sampler_cpu})
+                    rss_sampler_affinity = sorted(os.sched_getaffinity(0))
                 ready.set()
                 launched.wait()
                 if child is None:
@@ -210,13 +220,17 @@ def measure(argv, *, cwd, env, directory, timeout, gpu):
                 due = start
                 while not stop.is_set():
                     sample_start = time.monotonic_ns()
+                    snapshot_cpu_start = time.thread_time_ns()
                     pids, value = snapshot(child.pid)
+                    snapshot_cpu = time.thread_time_ns() - snapshot_cpu_start
                     elapsed_ns = time.monotonic_ns() - start
                     raw.write(
                         json.dumps(
                             {
                                 "elapsed_ns": elapsed_ns,
+                                "scheduled_ns": due - start,
                                 "started_ns": sample_start - start,
+                                "snapshot_thread_cpu_ns": snapshot_cpu,
                                 f"{metric}_elapsed_ns": elapsed_ns,
                                 "processes": sorted(pids),
                                 f"{metric}_bytes": value,
@@ -254,6 +268,13 @@ def measure(argv, *, cwd, env, directory, timeout, gpu):
             timer.start()
             for _, ready in samplers:
                 ready.wait()
+            if rss_sampler_cpu is not None and rss_sampler_affinity != [
+                rss_sampler_cpu
+            ]:
+                raise ValueError(
+                    f"RSS sampler could not use CPU {rss_sampler_cpu} "
+                    f"(effective mask {rss_sampler_affinity}, errors {sample_failures})"
+                )
             start = time.monotonic_ns()
             child = subprocess.Popen(
                 argv,
@@ -308,6 +329,7 @@ def measure(argv, *, cwd, env, directory, timeout, gpu):
         "kernel_process_system_cpu_seconds": usage.ru_stime,
         "resource_errors": sample_failures,
         "sample_interval_ns": _SAMPLE_NS,
+        "rss_sampler_affinity": rss_sampler_affinity,
         "sampler_thread_cpu_ns": sum(sampler_cpu_ns.values()),
         "sampler_threads_cpu_ns": sampler_cpu_ns,
     }
