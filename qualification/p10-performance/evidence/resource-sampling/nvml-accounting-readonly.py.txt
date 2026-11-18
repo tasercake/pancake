@@ -1,0 +1,78 @@
+"""Read NVML per-process accounting capability without changing device state."""
+
+import ctypes as c
+import json
+import os
+import sys
+
+uuid = b"GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac"
+lib = c.CDLL("libnvidia-ml.so.1")
+lib.nvmlErrorString.restype = c.c_char_p
+
+
+class AccountingStats(c.Structure):
+    _fields_ = [
+        ("gpu_utilization", c.c_uint),
+        ("memory_utilization", c.c_uint),
+        ("max_memory_usage", c.c_ulonglong),
+        ("time", c.c_ulonglong),
+        ("start_time", c.c_ulonglong),
+        ("is_running", c.c_uint),
+        ("reserved", c.c_uint * 5),
+    ]
+
+
+def status(value):
+    return {"code": value, "name": lib.nvmlErrorString(value).decode()}
+
+
+def check(value):
+    if value:
+        raise RuntimeError(status(value))
+
+
+device = c.c_void_p()
+driver = c.create_string_buffer(128)
+check(lib.nvmlInit_v2())
+try:
+    check(lib.nvmlSystemGetDriverVersion(driver, c.c_uint(len(driver))))
+    check(lib.nvmlDeviceGetHandleByUUID(uuid, c.byref(device)))
+    mode, capacity, count = c.c_uint(), c.c_uint(), c.c_uint()
+    probes = {
+        "get_mode": (lib.nvmlDeviceGetAccountingMode(device, c.byref(mode)), mode),
+        "get_buffer_size": (
+            lib.nvmlDeviceGetAccountingBufferSize(device, c.byref(capacity)),
+            capacity,
+        ),
+        "get_pid_count": (
+            lib.nvmlDeviceGetAccountingPids(device, c.byref(count), None),
+            count,
+        ),
+    }
+    result = {
+        "device_uuid": uuid.decode(),
+        "driver": driver.value.decode(),
+        "scope": "read-only NVML capability inquiry",
+        "probes": {
+            name: status(code) | {"value": item.value if code in (0, 7) else None}
+            for name, (code, item) in probes.items()
+        },
+        "prior_benchmark_pids": {},
+    }
+    for pid in map(int, sys.argv[1:]):
+        try:
+            os.getsid(pid)
+        except ProcessLookupError:
+            pass
+        else:
+            raise ValueError(f"benchmark PID {pid} is currently in use")
+        data = AccountingStats()
+        code = lib.nvmlDeviceGetAccountingStats(device, c.c_uint(pid), c.byref(data))
+        result["prior_benchmark_pids"][pid] = status(code) | {
+            "max_memory_usage": data.max_memory_usage if code == 0 else None,
+            "is_running": data.is_running if code == 0 else None,
+            "start_time": data.start_time if code == 0 else None,
+        }
+    print(json.dumps(result, indent=2))
+finally:
+    check(lib.nvmlShutdown())
