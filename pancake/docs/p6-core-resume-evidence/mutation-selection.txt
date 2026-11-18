@@ -1,0 +1,18 @@
+src/job/lifecycle.rs:183:9: replace JobControl::claim -> Result<(), String> with Ok(())
+src/job/lifecycle.rs:187:33: replace != with == in JobControl::claim
+src/job/lifecycle.rs:210:9: replace JobControl::pause -> Result<bool, String> with Ok(true)
+src/job/lifecycle.rs:210:9: replace JobControl::pause -> Result<bool, String> with Ok(false)
+src/job/lifecycle.rs:211:34: replace || with && in JobControl::pause
+src/job/lifecycle.rs:211:12: delete ! in JobControl::pause
+src/job/lifecycle.rs:211:58: replace != with == in JobControl::pause
+src/job/lifecycle.rs:226:9: replace JobControl::resume -> Result<bool, String> with Ok(true)
+src/job/lifecycle.rs:226:9: replace JobControl::resume -> Result<bool, String> with Ok(false)
+src/job/lifecycle.rs:227:34: replace || with && in JobControl::resume
+src/job/lifecycle.rs:227:12: delete ! in JobControl::resume
+src/job/lifecycle.rs:227:58: replace != with == in JobControl::resume
+src/job/lifecycle.rs:273:9: replace JobControl::complete_frame -> Result<(), String> with Ok(())
+src/job/lifecycle.rs:274:83: replace || with && in JobControl::complete_frame
+src/job/lifecycle.rs:274:12: delete ! in JobControl::complete_frame
+src/job/lifecycle.rs:282:44: replace <= with > in JobControl::complete_frame
+src/job/lifecycle.rs:298:9: replace JobControl::commit -> Result<(), Stop> with Ok(())
+src/job/lifecycle.rs:299:37: replace != with == in JobControl::commit
