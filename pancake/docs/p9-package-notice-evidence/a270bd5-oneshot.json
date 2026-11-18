@@ -1,0 +1,56 @@
+{
+  "receipt": {
+    "file": "usr/share/doc/pancake/dependency-notices/inventory.json",
+    "sha256": "f8c83daeca08bb5fabd2b0e8d86fd676a7eacc51c87d6682444354b62cc2e3a3",
+    "packages": 583,
+    "status_counts": {
+      "present": 556,
+      "no_notice_in_source": 27
+    },
+    "files": 1036
+  },
+  "oneshot": {
+    "name": "oneshot",
+    "version": "0.2.1",
+    "source": null,
+    "declared_license": "MIT OR Apache-2.0",
+    "declared_license_file": null,
+    "status": "present",
+    "provenance": {
+      "commit": "a270bd532474c50328c299d0a8384a48024cb0bc",
+      "directory": "pancake/vendor/oneshot-0.2.1",
+      "upstream_patch": {
+        "name": "oneshot",
+        "version": "0.2.1",
+        "directory": "oneshot-0.2.1",
+        "archive_url": "https://static.crates.io/crates/oneshot/oneshot-0.2.1.crate",
+        "archive_sha256": "cfe21416a02c693fb9f980befcb230ecc70b0b3d1cc4abf88b9675c4c1457f0c",
+        "modified_files": [
+          {
+            "path": "src/receiver.rs",
+            "original_sha256": "5beb04d077c4cfd29747739f80ef9a3a58135c08db573bd9c269044f8e579188",
+            "patched_sha256": "065a10346822ee15a039a68565ff22c8d14df56b1513060edf54dc4117ad6ce5"
+          }
+        ],
+        "upstream_repository": {
+          "git": {
+            "sha1": "83fd0864be7289067ce96cc79cd96c0928742979"
+          },
+          "path_in_vcs": ""
+        }
+      }
+    },
+    "notices": [
+      {
+        "file": "oneshot-0.2.1/LICENSE-APACHE",
+        "bytes": 9723,
+        "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+      },
+      {
+        "file": "oneshot-0.2.1/LICENSE-MIT",
+        "bytes": 1023,
+        "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      }
+    ]
+  }
+}
