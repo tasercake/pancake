@@ -22,3 +22,22 @@ before a job began. The unchanged semantic adapter maps this name.
 The application timestamps were excluded from this check. Both generated
 fixture directories were removed after use. The physical GPU remained idle
 from these software-presented CPU tasks.
+
+## Durable acknowledgement recheck
+
+The locked release GUI
+`bc192616ecebad47fef0ced154ca4361c2f0b994`, actual binary SHA-256
+`57053ae2b7e15e4e5f21559149b0e8dc17d43dec7f218169c799ce194e5b3598`,
+passed the same untimed private 64-frame route after native metadata gained
+the actual worker acknowledgement. Before Stop, native Generation(1)
+reported Running in Register with one input complete and
+`cancel_acknowledged=false`. The first acknowledgement observation came
+through native Idle in Decode with three inputs complete,
+`cancel_acknowledged=true`, and the same Generation(1). Start was enabled.
+The first native acknowledgement and settled Idle were visible together,
+while the worker's actual acknowledgement marker retained their distinct
+semantics.
+
+The metadata was derived from the live worker snapshot. The test introduced
+no worker dwell or timing hook. Temporary inputs were removed. No latency
+interval was retained or counted toward the frozen target.
