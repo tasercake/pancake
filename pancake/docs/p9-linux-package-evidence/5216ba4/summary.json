@@ -1,0 +1,28 @@
+{
+  "tested_revision": "5216ba4227e14033483a21bb5eca1c6c168ef840",
+  "platform": "Ubuntu 24.04 x86-64",
+  "cpu": "AMD Ryzen 9 7950X3D",
+  "package": "artifacts/pancake-packages/linux-5216ba4/pancake_0.1.0_amd64.deb",
+  "local_raw_capture_root": "artifacts/p9-5216ba4",
+  "passes": {
+    "host": {
+      "passed": 341,
+      "failed": 0,
+      "unsupported": 0
+    },
+    "physical-gpu": {
+      "passed": 1,
+      "failed": 0,
+      "unsupported": 0
+    }
+  },
+  "physical_device": {
+    "actual_backend": "gpu",
+    "completed": true,
+    "device": "NVIDIA GeForce RTX 3090",
+    "device_pci_address": "0000:01:00.0",
+    "device_fingerprint": "spirv_4318_8708",
+    "physical_gpu": true,
+    "runtime": "wgpu-vulkan"
+  }
+}
