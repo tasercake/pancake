@@ -10,6 +10,7 @@ use slint_interpreter::{Compiler, ComponentInstance, Value};
 use preferences::{Preferences, Store};
 
 pub mod preferences;
+pub mod sources;
 
 /// Repository-owned declarative presentation.
 const WINDOW: &str = include_str!("workspace.slint");
