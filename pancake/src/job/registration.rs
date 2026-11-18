@@ -123,7 +123,7 @@ impl Alignment {
             if index != self.transforms.len() {
                 return Err("registration inputs were not presented in order".into());
             }
-            let new = self.estimate(device, index, &image, budget)?;
+            let new = self.estimate(device, index, &image, budget, control)?;
             self.transforms.push(new);
             new
         };
@@ -159,7 +159,8 @@ impl Alignment {
         index: usize,
         image: &RgbImage,
         budget: usize,
-    ) -> Result<SourceMap, String> {
+        control: &JobControl,
+    ) -> Result<SourceMap, JobError> {
         let mut sequential = Affine::IDENTITY;
         let mut common = Affine::IDENTITY;
         if let Some(model) = self.model {
@@ -177,6 +178,7 @@ impl Alignment {
                     .proxy
                     .as_ref()
                     .ok_or("registration reference missing")?;
+                control.checkpoint(Stage::Register)?;
                 let relative = estimate_pair(
                     device,
                     reference,

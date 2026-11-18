@@ -94,7 +94,7 @@ enum Accumulator {
     /// Per-pixel focus weights or the strongest focus source.
     Focus(Box<FocusAccumulator>),
     /// Multiscale Laplacian, Hybrid, or four-frame exposure batches.
-    Advanced(AdvancedAccumulator),
+    Advanced(Box<AdvancedAccumulator>),
 }
 
 impl Accumulator {
@@ -114,7 +114,7 @@ impl Accumulator {
                 plan.pyramid_levels,
                 plan.accumulator_bytes,
             )
-            .map(Self::Advanced)
+            .map(|advanced| Self::Advanced(Box::new(advanced)))
         };
         let focus = match method {
             Method::Laplacian => return constructor(AdvancedMethod::Laplacian),
@@ -154,7 +154,7 @@ impl Accumulator {
     fn finish(self) -> Result<Vec<f32>, String> {
         match self {
             Self::Focus(accumulator) => (*accumulator).finish(),
-            Self::Advanced(accumulator) => accumulator.finish(),
+            Self::Advanced(accumulator) => (*accumulator).finish(),
         }
     }
 }
@@ -207,6 +207,7 @@ pub(super) fn process(
         None
     };
     let mut unused_first = Some(first);
+    let mut grayscale_array = true;
     let mut single_slab_result = None;
     for slab in &plan.slabs {
         control.checkpoint(Stage::Fuse)?;
@@ -223,6 +224,7 @@ pub(super) fn process(
                         .ok_or("stack input index out of range")?,
                 )?
             };
+            grayscale_array &= image.is_grayscale_array();
             let pixels =
                 alignment.normalize(device, index, image, plan.registration_bytes, control)?;
             control.checkpoint(Stage::Fuse)?;
@@ -248,13 +250,18 @@ pub(super) fn process(
     } else {
         single_slab_result.ok_or("stack produced no fusion result")?
     };
-    finish(
+    let mut product = finish(
         device,
         &plan,
         alignment.into_transforms(),
         samples,
         settings,
-    )
+        control,
+    )?;
+    if grayscale_array {
+        product.image.mark_grayscale_array();
+    }
+    Ok(product)
 }
 
 /// Retain geometry and crop the actual full-precision readback if requested.
@@ -268,6 +275,7 @@ fn finish(
     transforms: Vec<SourceMap>,
     mut samples: Vec<f32>,
     settings: &JobSettings,
+    control: &JobControl,
 ) -> Result<Product, JobError> {
     let canvas = plan.canvas;
     let common = transforms.iter().map(|map| map.common).collect::<Vec<_>>();
@@ -283,6 +291,7 @@ fn finish(
     };
     let image = RgbImage::new(crop.width(), crop.height(), samples)?;
     let quality = if settings.quality_report {
+        control.checkpoint(Stage::Fuse)?;
         Some(sharpness(
             device,
             image.width(),
