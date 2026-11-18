@@ -3,7 +3,6 @@
 #[path = "common/numerical_cases.rs"]
 pub mod numerical_cases;
 
-use slint as _;
 use wgpu as _;
 
 /// CPU uses the same authored kernels as the GPU.
