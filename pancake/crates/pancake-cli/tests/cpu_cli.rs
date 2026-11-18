@@ -109,7 +109,7 @@ fn parser_diagnostics_identify_the_invalid_request() -> Result<(), Box<dyn Error
         let output = run(args)?;
         let stderr = String::from_utf8(output.stderr)?;
         require(
-            output.status.code() == Some(2),
+            output.status.code() == Some(2_i32),
             format!("{args:?}: exit status"),
         )?;
         require(stderr.contains(expected), format!("{args:?}: {stderr}"))?;
@@ -134,7 +134,7 @@ fn validation_diagnostics_identify_the_invalid_value() -> Result<(), Box<dyn Err
         ])?;
         let stderr = String::from_utf8(output.stderr)?;
         require(
-            output.status.code() == Some(2),
+            output.status.code() == Some(2_i32),
             format!("{option} {value}: exit status"),
         )?;
         require(
