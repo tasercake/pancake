@@ -86,6 +86,17 @@ impl SampleType {
     }
 }
 
+/// Source layout before converting array samples to interleaved RGB.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ArrayLayout {
+    /// A two-dimensional grayscale raster.
+    GrayscaleArray,
+    /// A three-dimensional array with a singleton channel axis.
+    SingleChannel,
+    /// A three-dimensional array with three RGB channels.
+    Rgb,
+}
+
 /// Read and validate array metadata before reading row-major grayscale or RGB.
 ///
 /// # Errors
@@ -93,13 +104,13 @@ impl SampleType {
 /// Returns metadata, shape, raster read, and sample validity errors.
 pub(super) fn decode(mut input: impl Read) -> Result<RgbImage, String> {
     let header = read_header(&mut input)?;
-    let (width, height, channels) = parse_shape(&header)?;
+    let (width, height, layout) = parse_shape(&header)?;
     let pixel_count = checked_pixel_count(width, height)?;
     let mut samples = Vec::with_capacity(pixel_count.saturating_mul(3));
     let dtype = SampleType::from_header(&header)?;
     for _ in 0..pixel_count {
         let first = dtype.read(&mut input).map_err(|error| error.to_string())?;
-        if channels == 1 {
+        if layout != ArrayLayout::Rgb {
             samples.extend([first; 3]);
         } else {
             let second = dtype.read(&mut input).map_err(|error| error.to_string())?;
@@ -112,6 +123,9 @@ pub(super) fn decode(mut input: impl Read) -> Result<RgbImage, String> {
     }
     let mut image = RgbImage::new(width, height, samples)?;
     image.sample_encoding = dtype.encoding();
+    if layout == ArrayLayout::GrayscaleArray {
+        image.mark_grayscale_array();
+    }
     if image.sample_encoding == SampleEncoding::Float {
         normalize_float_codes(&mut image.samples);
     }
@@ -178,7 +192,7 @@ fn field<'a>(header: &'a str, key: &str) -> Result<&'a str, String> {
 /// # Errors
 ///
 /// Returns malformed, unsupported order, or unsupported channel errors.
-fn parse_shape(header: &str) -> Result<(usize, usize, usize), String> {
+fn parse_shape(header: &str) -> Result<(usize, usize, ArrayLayout), String> {
     let fortran = field(header, "fortran_order")?
         .split_once(',')
         .ok_or_else(|| "NumPy order has no delimiter".to_owned())?
@@ -199,8 +213,9 @@ fn parse_shape(header: &str) -> Result<(usize, usize, usize), String> {
         .collect::<Result<Vec<_>, _>>()
         .map_err(|error| error.to_string())?;
     match dimensions.as_slice() {
-        [height, width] | [height, width, 1] => Ok((*width, *height, 1)),
-        [height, width, 3] => Ok((*width, *height, 3)),
+        [height, width] => Ok((*width, *height, ArrayLayout::GrayscaleArray)),
+        [height, width, 1] => Ok((*width, *height, ArrayLayout::SingleChannel)),
+        [height, width, 3] => Ok((*width, *height, ArrayLayout::Rgb)),
         _ => Err("NumPy image must be H×W, H×W×1, or H×W×3".to_owned()),
     }
 }
