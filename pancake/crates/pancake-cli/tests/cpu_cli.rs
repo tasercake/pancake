@@ -4,7 +4,7 @@ use std::error::Error;
 use std::process::{Command, Output};
 
 use clap as _;
-use pancake as _;
+use pancake::image_io::decode;
 
 /// Invoke the current test build with all display variables removed.
 ///
@@ -219,12 +219,12 @@ fn malformed_inputs_are_rejected_by_the_decoder() -> Result<(), Box<dyn Error>> 
     Ok(())
 }
 
-/// Valid PNG inputs must finish source validation even before the stacking engine ships.
+/// A relative glob selects valid visible sources and publishes a completed stack.
 ///
 /// # Errors
 /// Returns fixture creation, process launch, or an unexpected exit/publication.
 #[test]
-fn valid_relative_glob_paths_reach_the_processing_boundary() -> Result<(), Box<dyn Error>> {
+fn relative_glob_processes_the_selected_sources() -> Result<(), Box<dyn Error>> {
     // Two pixels of RGB8 with a standard PNG signature and checksummed chunks.
     let png = [
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44,
@@ -243,17 +243,31 @@ fn valid_relative_glob_paths_reach_the_processing_boundary() -> Result<(), Box<d
     let output = directory.path().join("out.tif");
     let result = Command::new(env!("CARGO_BIN_EXE_pancake-cli"))
         .current_dir(directory.path())
-        .args(["--input", "*.png", "--output", "out.tif", "--cpu"])
+        .args([
+            "--input",
+            "*.png",
+            "--output",
+            "out.tif",
+            "--cpu",
+            "--method",
+            "weighted_average",
+        ])
         .output()?;
     let diagnostic = String::from_utf8(result.stderr)?;
     require(
-        diagnostic.contains("stack processing is not available in this build")
-            && !result.status.success(),
-        format!("valid frames did not reach the processing boundary: {diagnostic}"),
+        result.status.success(),
+        format!("real stack failed: {diagnostic}"),
     )?;
+    let observation = String::from_utf8(result.stdout)?;
     require(
-        !output.exists(),
-        "incomplete processing must not write an export",
+        observation.contains("progress 2/2"),
+        "real frames did not finish",
+    )?;
+    let result = decode(&output)?;
+    let first = decode(&directory.path().join("first.png"))?;
+    require(
+        result.samples() == first.samples(),
+        "published stack changed the expected identity image",
     )
 }
 
