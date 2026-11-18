@@ -84,7 +84,7 @@ fn reveal_native(path: &std::path::Path) -> Result<(), String> {
 }
 
 #[cfg(target_os = "linux")]
-pub use linux::{FileAction, SourceAction, show_file, show_source};
+pub use linux::{FileAction, SourceAction, open_file, open_source, show_file, show_source};
 
 /// Same-process GTK menu implementation for Linux.
 #[cfg(target_os = "linux")]
@@ -98,7 +98,7 @@ mod linux {
         self,
         prelude::{DeviceExt as _, SeatExt as _},
     };
-    use gtk::glib::MainLoop;
+    use gtk::glib::{MainLoop, idle_add_local_once};
     use gtk::prelude::{GtkMenuExt as _, GtkMenuItemExt as _, MenuShellExt as _, WidgetExt as _};
     use gtk::{Menu, MenuItem, SeparatorMenuItem};
 
@@ -153,6 +153,40 @@ mod linux {
         }))
     }
 
+    /// Open the file menu and dispatch one native action when it closes.
+    ///
+    /// # Errors
+    ///
+    /// Returns an unavailable GTK desktop or pointer.
+    pub fn open_file(
+        recent: &[PathBuf],
+        completion: impl FnOnce(Option<FileAction>) + 'static,
+    ) -> Result<(), String> {
+        let initial = build_file_popup(None)?;
+        let expanded = build_file_popup(Some(recent))?;
+        let anchor = Anchor::pointer()?;
+        initial.present(&anchor, {
+            let anchor = anchor.clone();
+            move |choice| match choice {
+                Some(FileChoice::ShowRecent) => {
+                    expanded.present(&anchor, move |expanded_choice| {
+                        completion(expanded_choice.and_then(workspace_action));
+                    });
+                }
+                other => completion(other.and_then(workspace_action)),
+            }
+        });
+        Ok(())
+    }
+
+    /// Convert a completed native menu action to a workspace operation.
+    fn workspace_action(choice: FileChoice) -> Option<FileAction> {
+        match choice {
+            FileChoice::Dispatch(action) => Some(action),
+            FileChoice::ShowRecent => None,
+        }
+    }
+
     /// Open a native File popup, with or without the expanded recent entries.
     ///
     /// GTK classifies attached submenu owners as menu containers. An action
@@ -162,6 +196,15 @@ mod linux {
     ///
     /// Returns GTK or display errors.
     fn file_popup(recent: Option<&[PathBuf]>) -> Result<Option<FileChoice>, String> {
+        build_file_popup(recent)?.show()
+    }
+
+    /// Build actual GTK items for the desired level of the File menu.
+    ///
+    /// # Errors
+    ///
+    /// Returns a GTK initialization error.
+    fn build_file_popup(recent: Option<&[PathBuf]>) -> Result<Popup<FileChoice>, String> {
         let popup = Popup::new()?;
         popup.action(
             "Open Images…",
@@ -203,7 +246,7 @@ mod linux {
             "window.close",
             FileChoice::Dispatch(FileAction::Close),
         );
-        popup.show()
+        Ok(popup)
     }
 
     /// Use a full path when two recent folders share the same leaf name.
@@ -228,6 +271,28 @@ mod linux {
     ///
     /// Returns GTK or display errors.
     pub fn show_source() -> Result<Option<SourceAction>, String> {
+        build_source_popup()?.show()
+    }
+
+    /// Open the source context menu and deliver one selected action.
+    ///
+    /// # Errors
+    ///
+    /// Returns an unavailable GTK desktop or pointer.
+    pub fn open_source(
+        completion: impl FnOnce(Option<SourceAction>) + 'static,
+    ) -> Result<(), String> {
+        let popup = build_source_popup()?;
+        popup.present(&Anchor::pointer()?, completion);
+        Ok(())
+    }
+
+    /// Build the actual action rows for one selected source.
+    ///
+    /// # Errors
+    ///
+    /// Returns a GTK initialization error.
+    fn build_source_popup() -> Result<Popup<SourceAction>, String> {
         let popup = Popup::new()?;
         popup.action(
             "Show in File Manager",
@@ -235,7 +300,56 @@ mod linux {
             SourceAction::Reveal,
         );
         popup.action("Remove Source", "frames.remove_one", SourceAction::Remove);
-        popup.show()
+        Ok(popup)
+    }
+
+    /// The native pointer location and GDK context used to place a menu.
+    #[derive(Clone)]
+    struct Anchor {
+        /// Root native window whose screen coordinates the rectangle uses.
+        root: gdk::Window,
+        /// Pointer position in native screen coordinates.
+        rect: gdk::Rectangle,
+        /// GDK device context for the native popup grab.
+        context: gdk::Event,
+    }
+
+    impl Anchor {
+        /// Find the pointer on the current GTK desktop.
+        ///
+        /// # Errors
+        ///
+        /// Returns an unavailable native display or pointer.
+        fn pointer() -> Result<Self, String> {
+            let pointer = gdk::Display::default()
+                .and_then(|display| display.default_seat())
+                .and_then(|seat| seat.pointer())
+                .ok_or("Could not locate the desktop pointer.")?;
+            let (screen, x, y) = pointer.position();
+            let root = screen
+                .root_window()
+                .ok_or("Could not locate the desktop window.")?;
+            let mut context = gdk::Event::new(gdk::EventType::ButtonRelease);
+            context.set_device(Some(&pointer));
+            context.set_screen(Some(&screen));
+            Ok(Self {
+                root,
+                rect: gdk::Rectangle::new(x, y, 1, 1),
+                context,
+            })
+        }
+
+        /// Present a real native menu at the pointer through GTK.
+        fn popup(&self, menu: &Menu) {
+            menu.show_all();
+            menu.popup_at_rect(
+                &self.root,
+                &self.rect,
+                gdk::Gravity::SouthWest,
+                gdk::Gravity::NorthWest,
+                Some(&self.context),
+            );
+        }
     }
 
     /// A native GTK menu and the single action selected in its local event loop.
@@ -276,34 +390,41 @@ mod linux {
         ///
         /// Returns an unavailable display or pointer.
         fn show(self) -> Result<Option<Action>, String> {
-            let pointer = gdk::Display::default()
-                .and_then(|display| display.default_seat())
-                .and_then(|seat| seat.pointer())
-                .ok_or("Could not locate the desktop pointer.")?;
-            let (screen, x, y) = pointer.position();
-            let root = screen
-                .root_window()
-                .ok_or("Could not locate the desktop window.")?;
-            let mut context = gdk::Event::new(gdk::EventType::ButtonRelease);
-            context.set_device(Some(&pointer));
-            context.set_screen(Some(&screen));
-
+            let anchor = Anchor::pointer()?;
             let main_loop = MainLoop::new(None, false);
             let end = main_loop.clone();
             let _deactivated = self.menu.connect_deactivate(move |_| end.quit());
-            self.menu.show_all();
-            self.menu.popup_at_rect(
-                &root,
-                &gdk::Rectangle::new(x, y, 1, 1),
-                gdk::Gravity::SouthWest,
-                gdk::Gravity::NorthWest,
-                Some(&context),
-            );
+            anchor.popup(&self.menu);
             if self.menu.is_mapped() {
                 main_loop.run();
             }
             let chosen = self.action.borrow_mut().take();
             Ok(chosen)
+        }
+
+        /// Present the popup without entering a nested GTK main loop.
+        fn present(self, anchor: &Anchor, completion: impl FnOnce(Option<Action>) + 'static) {
+            // Keep the native widget alive through deactivation, then release
+            // the reference once after the final activation event has finished.
+            let pending = Rc::new(RefCell::new(Some((self.menu.clone(), completion))));
+            let release = Rc::clone(&pending);
+            let selected = Rc::clone(&self.action);
+            let _handler = self.menu.connect_deactivate(move |_| {
+                if let Some((menu, complete)) = release.borrow_mut().take() {
+                    let selection = Rc::clone(&selected);
+                    let _source = idle_add_local_once(move || {
+                        let chosen = selection.borrow_mut().take();
+                        drop(menu);
+                        complete(chosen);
+                    });
+                }
+            });
+            anchor.popup(&self.menu);
+            if !self.menu.is_mapped()
+                && let Some((_, complete)) = pending.borrow_mut().take()
+            {
+                let _source = idle_add_local_once(move || complete(None));
+            }
         }
     }
 

@@ -1,6 +1,8 @@
 //! Local Linux file dialogs with native GTK widgets and native editable paths.
 
+use std::cell::RefCell;
 use std::path::PathBuf;
+use std::rc::Rc;
 
 use gtk::atk::prelude::AtkObjectExt as _;
 use gtk::prelude::{
@@ -17,6 +19,66 @@ use super::Picker;
 ///
 /// Returns unavailable desktop, lost path entry, or working-directory errors.
 pub(super) fn choose(kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
+    let (dialog, chooser, entry) = build(kind)?;
+    dialog.show_all();
+    let response = dialog.run();
+    let outcome = if response == ResponseType::Accept {
+        selected(matches!(kind, Picker::Save(_)), &chooser, &entry)
+    } else {
+        Ok(Vec::new())
+    };
+    close(&dialog);
+    outcome
+}
+
+/// Present a desktop panel and deliver one accepted path set or cancellation.
+///
+/// Slint continues dispatching its own input while the host services GTK's
+/// main context. No nested modal GTK loop consumes the workspace's turn.
+///
+/// # Errors
+///
+/// Returns an unavailable desktop or lost path-entry error during setup.
+pub(super) fn open(
+    kind: Picker<'_>,
+    completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
+) -> Result<(), String> {
+    let (dialog, chooser, entry) = build(kind)?;
+    let saving = matches!(kind, Picker::Save(_));
+    let pending = Rc::new(RefCell::new(Some(completion)));
+    let response = Rc::clone(&pending);
+    let _response = dialog.connect_response(move |dialog, choice| {
+        let Some(complete) = response.borrow_mut().take() else {
+            return;
+        };
+        let outcome = if choice == ResponseType::Accept {
+            selected(saving, &chooser, &entry)
+        } else {
+            Ok(Vec::new())
+        };
+        if choice == ResponseType::DeleteEvent {
+            dialog.hide();
+        } else {
+            close(dialog);
+        }
+        complete(outcome);
+    });
+    let _destroy = dialog.connect_destroy(move |_| {
+        if let Some(complete) = pending.borrow_mut().take() {
+            complete(Ok(Vec::new()));
+        }
+    });
+    dialog.show_all();
+    dialog.present();
+    Ok(())
+}
+
+/// Create the native dialog, its file-browser region and its editable path.
+///
+/// # Errors
+///
+/// Returns an unavailable desktop or lost path-entry error.
+fn build(kind: Picker<'_>) -> Result<(Dialog, FileChooserWidget, Entry), String> {
     gtk::init()
         .map_err(|error| format!("Could not initialize the desktop file dialog: {error}"))?;
     let (title, label, accept, action) = match kind {
@@ -65,18 +127,16 @@ pub(super) fn choose(kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
     content.pack_start(&chooser, true, true, 0);
     content.pack_start(&row, false, false, 6);
 
-    dialog.show_all();
-    let response = dialog.run();
-    let outcome = if response == ResponseType::Accept {
-        selected(kind, &chooser, &entry)
-    } else {
-        Ok(Vec::new())
-    };
-    // Hide accessibility state now. A Slint host does not continuously run
-    // GTK's main loop to process the window-close event after Dialog::run.
+    Ok((dialog, chooser, entry))
+}
+
+/// Unmap the actual dialog before requesting the toolkit's native close.
+fn close(dialog: &Dialog) {
     dialog.hide();
     dialog.close();
-    outcome
+    if let Some(display) = gtk::gdk::Display::default() {
+        display.sync();
+    }
 }
 
 /// Read only a user-accepted native selection.
@@ -85,7 +145,7 @@ pub(super) fn choose(kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
 ///
 /// Returns an error if no base directory is available for a relative path.
 fn selected(
-    kind: Picker<'_>,
+    saving: bool,
     chooser: &FileChooserWidget,
     entry: &Entry,
 ) -> Result<Vec<PathBuf>, String> {
@@ -97,7 +157,7 @@ fn selected(
     if path.is_absolute() {
         return Ok(vec![path]);
     }
-    let directory = if matches!(kind, Picker::Save(_)) {
+    let directory = if saving {
         chooser.filename().or_else(|| chooser.current_folder())
     } else {
         chooser.current_folder()

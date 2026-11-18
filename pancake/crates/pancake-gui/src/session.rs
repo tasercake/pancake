@@ -45,6 +45,11 @@ struct Session {
     previews: Cache,
     /// User transition awaiting an explicit confirmation.
     pending: Option<Transition>,
+    /// One native file panel and state captured by its invoking action.
+    file_panel: Option<FilePanel>,
+    /// Real GTK popup awaiting dismissal or a selected command.
+    #[cfg(target_os = "linux")]
+    menu: Option<Rc<RefCell<Option<MenuOutcome>>>>,
     /// Active result ordinal when the viewer displays a result.
     selected: Option<usize>,
     /// Sum of retained full-precision RGB bytes.
@@ -96,6 +101,48 @@ enum Transition {
     Close,
     /// Replace the workspace with one actual recent folder.
     Replace(PathBuf),
+}
+
+/// Value delivered by the actual native file dialog.
+type FileSelection = Result<Vec<PathBuf>, String>;
+
+/// A native picker in flight; a delivered response remains ready until consumed.
+#[derive(Debug)]
+struct FilePanel {
+    /// Business operation originally selected from the Slint workspace.
+    request: FileRequest,
+    /// A response from GTK's main context or the system's modal panel.
+    selected: Rc<RefCell<Option<FileSelection>>>,
+}
+
+/// Continuation for a real file selection before any workspace mutation.
+#[derive(Debug)]
+enum FileRequest {
+    /// Import accepted source images.
+    OpenFiles,
+    /// Import accepted folder contents.
+    OpenFolder,
+    /// Publish this specific retained result at the chosen precision.
+    Save {
+        /// Retained result captured when the panel opened.
+        index: usize,
+        /// Integer sample precision used by the shared encoder.
+        depth: BitDepth,
+    },
+    /// Publish these three formats to a chosen directory.
+    Batch(usize),
+    /// Publish the viewport pixels captured before opening the native dialog.
+    Viewport(Box<RgbImage>),
+}
+
+/// A native popup result associated with the actual selection context.
+#[cfg(target_os = "linux")]
+#[derive(Debug)]
+enum MenuOutcome {
+    /// Task selected from the File menu.
+    File(Option<desktop_menu::FileAction>),
+    /// Task selected for one real source row.
+    Source(usize, Option<desktop_menu::SourceAction>),
 }
 
 impl Session {
@@ -217,6 +264,7 @@ impl Session {
     ///
     /// Returns a worker failure or an inability to present its result.
     fn poll(&mut self, window: &ComponentInstance) -> UiResult {
+        self.consume_desktop_actions(window)?;
         let Some(generation) = self.generation else {
             return Ok(());
         };
@@ -248,6 +296,125 @@ impl Session {
         window.set_property("can-resume", false.into())?;
         window.set_property("can-cancel", false.into())?;
         Ok(())
+    }
+
+    /// Consume any real dialog selection or menu action from the platform.
+    ///
+    /// # Errors
+    ///
+    /// Returns the actual command or view failure.
+    fn consume_desktop_actions(&mut self, window: &ComponentInstance) -> UiResult {
+        #[cfg(target_os = "linux")]
+        self.finish_menu(window)?;
+        self.finish_file_panel(window)
+    }
+
+    /// Consume a single GTK menu dismissal outside the native event dispatch.
+    ///
+    /// # Errors
+    ///
+    /// Returns errors from the selected command.
+    #[cfg(target_os = "linux")]
+    fn finish_menu(&mut self, window: &ComponentInstance) -> UiResult {
+        let outcome = self
+            .menu
+            .as_ref()
+            .and_then(|ready| ready.borrow_mut().take());
+        let Some(outcome) = outcome else {
+            return Ok(());
+        };
+        self.menu = None;
+        panel::restore_focus(window);
+        match outcome {
+            MenuOutcome::File(action) => dispatch_file_menu(self, window, action),
+            MenuOutcome::Source(index, action) => {
+                let arguments = [i32::try_from(index)?.into()];
+                match action {
+                    Some(desktop_menu::SourceAction::Remove) => {
+                        remove_sources(self, window, &arguments)
+                    }
+                    Some(desktop_menu::SourceAction::Reveal) => {
+                        reveal_source(self, window, &arguments)
+                    }
+                    None => Ok(()),
+                }
+            }
+        }
+    }
+
+    /// Open a real native file panel without holding a Slint input dispatch.
+    ///
+    /// # Errors
+    ///
+    /// Returns a panel already in use or toolkit initialization error.
+    fn open_file_panel(
+        &mut self,
+        window: &ComponentInstance,
+        picker: Picker<'_>,
+        request: FileRequest,
+    ) -> UiResult {
+        if self.file_panel.is_some() {
+            return Err("A file dialog is already open.".into());
+        }
+        let selected = Rc::new(RefCell::new(None));
+        let ready = Rc::clone(&selected);
+        panel::open(window, picker, move |paths| {
+            *ready.borrow_mut() = Some(paths);
+        })?;
+        self.file_panel = Some(FilePanel { request, selected });
+        Ok(())
+    }
+
+    /// Consume a native selection exactly once and apply the pending workflow.
+    ///
+    /// # Errors
+    ///
+    /// Returns the actual selection, import, or export error.
+    fn finish_file_panel(&mut self, window: &ComponentInstance) -> UiResult {
+        let outcome = self
+            .file_panel
+            .as_ref()
+            .and_then(|dialog| dialog.selected.borrow_mut().take());
+        let Some(outcome) = outcome else {
+            return Ok(());
+        };
+        let dialog = self
+            .file_panel
+            .take()
+            .ok_or("File selection lost its request.")?;
+        #[cfg(target_os = "linux")]
+        panel::restore_focus(window);
+        let paths = outcome?;
+        let Some(first) = paths.first() else {
+            self.pending = None;
+            return Ok(());
+        };
+        match dialog.request {
+            FileRequest::OpenFiles => {
+                add_sources(self, window, &paths)?;
+                remember_inputs(self, window, &paths)
+            }
+            FileRequest::OpenFolder => import_chosen_folder(self, window, first),
+            FileRequest::Save { index, depth } => publish_result(self, index, depth, first),
+            FileRequest::Batch(index) => {
+                let result = self
+                    .results
+                    .get_mut(index)
+                    .ok_or("The selected result was removed.")?;
+                delivery::batch(
+                    first,
+                    result.image(),
+                    result.stack.sources(),
+                    result.stack.settings().quality,
+                )?;
+                result.saved = true;
+                Ok(())
+            }
+            FileRequest::Viewport(image) => {
+                export(first, &image, BitDepth::Eight, 95, self.sources.paths())?;
+                Ok(())
+            }
+        }
     }
 }
 
@@ -307,6 +474,9 @@ pub fn configure(
         history: RecentFolders::open(profile)?,
         previews: Cache::default(),
         pending: None,
+        file_panel: None,
+        #[cfg(target_os = "linux")]
+        menu: None,
         selected: None,
         retained_bytes: 0,
     };
@@ -390,10 +560,14 @@ fn register(
     let weak = window.as_weak();
     let session = Rc::clone(session);
     window.set_callback(name, move |arguments| {
-        if let Some(window) = weak.upgrade()
-            && let Err(error) = action(&mut session.borrow_mut(), &window, arguments)
-        {
-            show_error(&window, &error.to_string());
+        if let Some(window) = weak.upgrade() {
+            let mut session = session.borrow_mut();
+            let result = session
+                .consume_desktop_actions(&window)
+                .and_then(|()| action(&mut session, &window, arguments));
+            if let Err(error) = result {
+                show_error(&window, &error.to_string());
+            }
         }
         Value::Void
     })?;
@@ -424,24 +598,33 @@ fn select_result(session: &mut Session, window: &ComponentInstance, args: &[Valu
 ///
 /// Returns native panel, source validation, or decode errors.
 fn import_files(session: &mut Session, window: &ComponentInstance, _: &[Value]) -> UiResult {
-    let files = panel::select(window, Picker::Files)?;
-    add_sources(session, window, &files)?;
-    remember_inputs(session, window, &files)
+    session.open_file_panel(window, Picker::Files, FileRequest::OpenFiles)
 }
 
-/// Import supported paths below a selected native directory.
+/// Open a native directory picker for source imports.
 ///
 /// # Errors
 ///
-/// Returns native panel, folder walk, or source errors.
+/// Returns native chooser errors.
 fn import_folder(session: &mut Session, window: &ComponentInstance, _: &[Value]) -> UiResult {
-    if let Some(folder) = panel::select(window, Picker::Folder)?.first() {
-        let files = folder_files(folder)?;
-        if !files.is_empty() {
-            add_sources(session, window, &files)?;
-            session.history.remember(folder)?;
-            render_recent(window, &session.history)?;
-        }
+    session.open_file_panel(window, Picker::Folder, FileRequest::OpenFolder)
+}
+
+/// Import the supported files after the user confirms a real directory.
+///
+/// # Errors
+///
+/// Returns a folder walk, source import, or history error.
+fn import_chosen_folder(
+    session: &mut Session,
+    window: &ComponentInstance,
+    folder: &Path,
+) -> UiResult {
+    let files = folder_files(folder)?;
+    if !files.is_empty() {
+        add_sources(session, window, &files)?;
+        session.history.remember(folder)?;
+        render_recent(window, &session.history)?;
     }
     Ok(())
 }
@@ -616,20 +799,31 @@ fn save(session: &mut Session, window: &ComponentInstance, args: &[Value]) -> Ui
     } else {
         BitDepth::Sixteen
     };
-    let Some(destination) = panel::select(window, Picker::Save(name))?
-        .into_iter()
-        .next()
-    else {
-        session.pending = None;
-        return Ok(());
-    };
     let index = session.selected.ok_or("No computed result is selected.")?;
+    session.open_file_panel(
+        window,
+        Picker::Save(name),
+        FileRequest::Save { index, depth },
+    )
+}
+
+/// Complete a former export request after a path is actually confirmed.
+///
+/// # Errors
+///
+/// Returns a missing retained result, encode, or publication error.
+fn publish_result(
+    session: &mut Session,
+    index: usize,
+    depth: BitDepth,
+    destination: &Path,
+) -> UiResult {
     let result = session
         .results
         .get_mut(index)
         .ok_or("The selected result was removed.")?;
     export(
-        &destination,
+        destination,
         result.image(),
         depth,
         result.stack.settings().quality,
@@ -645,40 +839,28 @@ fn save(session: &mut Session, window: &ComponentInstance, args: &[Value]) -> Ui
     Ok(())
 }
 
-/// Save all supported batch integer formats using the same result pixels.
+/// Request a destination for all batch integer formats.
 ///
 /// # Errors
 ///
-/// Returns native selection or image persistence errors.
+/// Returns native chooser or result selection errors.
 fn save_batch(session: &mut Session, window: &ComponentInstance, _: &[Value]) -> UiResult {
     let index = session.selected.ok_or("No computed result is selected.")?;
-    let result = session
-        .results
-        .get_mut(index)
-        .ok_or("The selected result was removed.")?;
-    if let Some(folder) = panel::select(window, Picker::Folder)?.first() {
-        delivery::batch(
-            folder,
-            result.image(),
-            result.stack.sources(),
-            result.stack.settings().quality,
-        )?;
-        result.saved = true;
-    }
-    Ok(())
+    session.open_file_panel(window, Picker::Folder, FileRequest::Batch(index))
 }
 
-/// Export the renderer's current viewport, independent of the result raster.
+/// Capture the live viewport before a native panel covers the canvas.
 ///
 /// # Errors
 ///
-/// Returns native selection, snapshot geometry or image persistence errors.
+/// Returns native selection or renderer snapshot errors.
 fn save_viewport(session: &mut Session, window: &ComponentInstance, args: &[Value]) -> UiResult {
-    let visible = delivery::viewport(window, args)?;
-    if let Some(path) = panel::select(window, Picker::Save("Viewport.png"))?.first() {
-        export(path, &visible, BitDepth::Eight, 95, session.sources.paths())?;
-    }
-    Ok(())
+    let visible = Box::new(delivery::viewport(window, args)?);
+    session.open_file_panel(
+        window,
+        Picker::Save("Viewport.png"),
+        FileRequest::Viewport(visible),
+    )
 }
 
 /// Retain an exact cropped subset without discarding the original result.
@@ -937,11 +1119,32 @@ fn remember_inputs(
 ///
 /// Returns native menu, transition, or import errors.
 #[cfg(target_os = "linux")]
-fn file_menu(session: &mut Session, window: &ComponentInstance, _: &[Value]) -> UiResult {
+fn file_menu(session: &mut Session, _: &ComponentInstance, _: &[Value]) -> UiResult {
+    if session.menu.is_some() {
+        return Err("A native menu is already open.".into());
+    }
+    let selection = Rc::new(RefCell::new(None));
+    let ready = Rc::clone(&selection);
+    desktop_menu::open_file(session.history.entries(), move |action| {
+        *ready.borrow_mut() = Some(MenuOutcome::File(action));
+    })?;
+    session.menu = Some(selection);
+    Ok(())
+}
+
+/// Execute the confirmed desktop File command.
+///
+/// # Errors
+///
+/// Returns transition or import preparation errors.
+#[cfg(target_os = "linux")]
+fn dispatch_file_menu(
+    session: &mut Session,
+    window: &ComponentInstance,
+    choice: Option<desktop_menu::FileAction>,
+) -> UiResult {
     use desktop_menu::FileAction;
-    let choice = desktop_menu::show_file(session.history.entries());
-    panel::restore_focus(window);
-    match choice? {
+    match choice {
         Some(FileAction::OpenFiles) => import_files(session, window, &[]),
         Some(FileAction::OpenFolder) => import_folder(session, window, &[]),
         Some(FileAction::OpenRecent(path)) => {
@@ -995,15 +1198,18 @@ fn clear_recent(session: &mut Session, window: &ComponentInstance, _: &[Value]) 
 ///
 /// Returns GTK, file operation or selection errors.
 #[cfg(target_os = "linux")]
-fn source_menu(session: &mut Session, window: &ComponentInstance, args: &[Value]) -> UiResult {
-    use desktop_menu::SourceAction;
-    let choice = desktop_menu::show_source();
-    panel::restore_focus(window);
-    match choice? {
-        Some(SourceAction::Remove) => remove_sources(session, window, args),
-        Some(SourceAction::Reveal) => reveal_source(session, window, args),
-        None => Ok(()),
+fn source_menu(session: &mut Session, _: &ComponentInstance, args: &[Value]) -> UiResult {
+    if session.menu.is_some() {
+        return Err("A native menu is already open.".into());
     }
+    let index = ordinal(args.first())?;
+    let selection = Rc::new(RefCell::new(None));
+    let ready = Rc::clone(&selection);
+    desktop_menu::open_source(move |action| {
+        *ready.borrow_mut() = Some(MenuOutcome::Source(index, action));
+    })?;
+    session.menu = Some(selection);
+    Ok(())
 }
 
 /// Present the selected row's native context actions.

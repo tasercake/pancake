@@ -30,6 +30,36 @@ pub fn select(window: &ComponentInstance, kind: Picker<'_>) -> Result<Vec<PathBu
     selected
 }
 
+/// Present the native Linux file panel without blocking the Slint event loop.
+///
+/// # Errors
+///
+/// Returns a desktop setup error before registering the completion.
+#[cfg(target_os = "linux")]
+pub fn open(
+    _window: &ComponentInstance,
+    kind: Picker<'_>,
+    completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
+) -> Result<(), String> {
+    linux::open(kind, completion)
+}
+
+/// Present a system file panel and deliver its native result.
+///
+/// # Errors
+///
+/// Returns a native panel error through the completion callback. An empty
+/// selection is cancellation.
+#[cfg(any(target_os = "macos", target_os = "windows"))]
+pub fn open(
+    window: &ComponentInstance,
+    kind: Picker<'_>,
+    completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
+) -> Result<(), String> {
+    completion(select(window, kind));
+    Ok(())
+}
+
 /// Return focus from a native GTK popup to its actual Slint owner.
 #[cfg(target_os = "linux")]
 pub fn restore_focus(window: &ComponentInstance) {
