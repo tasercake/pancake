@@ -1,0 +1,36 @@
+{
+  "build_commit": "bc192616ecebad47fef0ced154ca4361c2f0b994",
+  "test_commit": "5216ba4227e14033483a21bb5eca1c6c168ef840",
+  "unchanged_build_inputs": [
+    "pancake/Cargo.toml",
+    "pancake/Cargo.lock",
+    "pancake/src",
+    "pancake/crates",
+    "pancake/vendor",
+    "pancake/.cargo",
+    "pancake/build.rs",
+    "pancake/rust-toolchain.toml"
+  ],
+  "changed_paths_since_build": [
+    "pancake/assurance-platforms.json",
+    "pancake/docs/dependency-policy.md",
+    "pancake/docs/p7-ui-evidence/dependency-graph-combined-logs.tar.gz",
+    "pancake/docs/p7-ui-evidence/dependency-graph.json",
+    "pancake/scripts/ci-linux-native-deps.sh",
+    "pancake/scripts/test_headless_dependencies.py"
+  ],
+  "copy_of_producer_log_sha256": "250146cfc5a7c85f9caec76ca8bc6db126953f48eea10d3711c9ba8feb043d13",
+  "cargo_lock_sha256": "639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "binaries": {
+    "pancake-cli": "d0554ce43411b39da66bd04ea5de82b2cc74384e8bb576b5ec74408aa5c6da12",
+    "pancake-gui": "57053ae2b7e15e4e5f21559149b0e8dc17d43dec7f218169c799ce194e5b3598"
+  },
+  "tested_source": "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-package-smoke/source-5216ba4",
+  "package": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "f3caa23753ff1a670d895b33bff58d26ab6d48aa58f961e5bab731d985371ed1",
+    "bytes": 69262768
+  },
+  "headless_and_gui_executables": "extracted and byte-verified against producer outputs"
+}

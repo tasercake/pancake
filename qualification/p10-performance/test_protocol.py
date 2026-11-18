@@ -199,6 +199,7 @@ class MeasurementContracts(unittest.TestCase):
             self.assertEqual(result["returncode"], 0)
             self.assertFalse(result["timed_out"])
             self.assertGreaterEqual(result["elapsed_ns"], 80_000_000)
+            self.assertGreaterEqual(result["kernel_process_peak_rss_bytes"], 4 << 20)
             raw = [
                 json.loads(line)
                 for line in (root / "resources.jsonl").read_text().splitlines()
