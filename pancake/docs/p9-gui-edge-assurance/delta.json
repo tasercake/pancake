@@ -1,0 +1,750 @@
+{
+  "compared_gui_test_sha256": "b68976482d969474b7ca0a29420499b65864a2ae4c77a49d2912ed11f613d1e5",
+  "historic_combined_report_sha256": "76de483a57138b7c3e3e3ddc90f22a1c897f6f6bdc2be83f6b240d5613cc1849",
+  "before_llvm_json_sha256": "248d69251223b82a0e27331aedd148fb053f7c2658ea1558b94d39e6c6d1af7c",
+  "after_llvm_json_sha256": "297926d2800def4a4aedcc8d41b644285fbee4a58a71c2c3bb748e1996976327",
+  "files": [
+    {
+      "file": "history.rs",
+      "production_code_regions": 112,
+      "covered_before": 87,
+      "covered_after": 90,
+      "gained_with_zero_count_in_historic_report": 3,
+      "newly_covered_regions": [
+        {
+          "start": [
+            49,
+            46
+          ],
+          "end": [
+            49,
+            47
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "let canonical = folder.canonicalize()?;"
+        },
+        {
+          "start": [
+            51,
+            13
+          ],
+          "end": [
+            54,
+            15
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "return Err(io::Error::new("
+        },
+        {
+          "start": [
+            51,
+            24
+          ],
+          "end": [
+            51,
+            38
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "return Err(io::Error::new("
+        }
+      ]
+    },
+    {
+      "file": "main.rs",
+      "production_code_regions": 117,
+      "covered_before": 11,
+      "covered_after": 51,
+      "gained_with_zero_count_in_historic_report": 7,
+      "newly_covered_regions": [
+        {
+          "start": [
+            28,
+            1
+          ],
+          "end": [
+            28,
+            68
+          ],
+          "count": 3,
+          "historic_combined_span_count": 35,
+          "source": "pub(crate) fn show_error(window: &ComponentInstance, message: &str) {"
+        },
+        {
+          "start": [
+            29,
+            8
+          ],
+          "end": [
+            29,
+            97
+          ],
+          "count": 3,
+          "historic_combined_span_count": 35,
+          "source": "if let Err(error) = window.set_property(\"error-message\", SharedString::from(message).into()) {"
+        },
+        {
+          "start": [
+            29,
+            25
+          ],
+          "end": [
+            29,
+            31
+          ],
+          "count": 3,
+          "historic_combined_span_count": 35,
+          "source": "if let Err(error) = window.set_property(\"error-message\", SharedString::from(message).into()) {"
+        },
+        {
+          "start": [
+            29,
+            45
+          ],
+          "end": [
+            29,
+            60
+          ],
+          "count": 3,
+          "historic_combined_span_count": 35,
+          "source": "if let Err(error) = window.set_property(\"error-message\", SharedString::from(message).into()) {"
+        },
+        {
+          "start": [
+            31,
+            5
+          ],
+          "end": [
+            31,
+            6
+          ],
+          "count": 3,
+          "historic_combined_span_count": 35,
+          "source": "}"
+        },
+        {
+          "start": [
+            32,
+            1
+          ],
+          "end": [
+            32,
+            2
+          ],
+          "count": 3,
+          "historic_combined_span_count": 35,
+          "source": "}"
+        },
+        {
+          "start": [
+            39,
+            1
+          ],
+          "end": [
+            39,
+            81
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "fn save_preferences(store: &Store, args: &[Value]) -> Result<(), Box<dyn Error>> {"
+        },
+        {
+          "start": [
+            40,
+            57
+          ],
+          "end": [
+            40,
+            61
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "let [Value::String(theme), Value::String(device)] = args else {"
+        },
+        {
+          "start": [
+            43,
+            5
+          ],
+          "end": [
+            43,
+            10
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "store.save(Preferences::from_choices(theme.as_str(), device.as_str())?)"
+        },
+        {
+          "start": [
+            43,
+            16
+          ],
+          "end": [
+            43,
+            41
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "store.save(Preferences::from_choices(theme.as_str(), device.as_str())?)"
+        },
+        {
+          "start": [
+            43,
+            16
+          ],
+          "end": [
+            43,
+            74
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "store.save(Preferences::from_choices(theme.as_str(), device.as_str())?)"
+        },
+        {
+          "start": [
+            44,
+            1
+          ],
+          "end": [
+            44,
+            2
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "}"
+        },
+        {
+          "start": [
+            51,
+            1
+          ],
+          "end": [
+            51,
+            97
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "fn configure_preferences(window: &ComponentInstance, store: Store) -> Result<(), Box<dyn Error>> {"
+        },
+        {
+          "start": [
+            52,
+            29
+          ],
+          "end": [
+            52,
+            41
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "let preferences = match store.read() {"
+        },
+        {
+          "start": [
+            55,
+            13
+          ],
+          "end": [
+            55,
+            23
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "show_error(window, &format!(\"Could not read preferences: {error}\"));"
+        },
+        {
+          "start": [
+            55,
+            13
+          ],
+          "end": [
+            55,
+            80
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "show_error(window, &format!(\"Could not read preferences: {error}\"));"
+        },
+        {
+          "start": [
+            55,
+            24
+          ],
+          "end": [
+            55,
+            30
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "show_error(window, &format!(\"Could not read preferences: {error}\"));"
+        },
+        {
+          "start": [
+            56,
+            13
+          ],
+          "end": [
+            56,
+            35
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "Preferences::default()"
+        },
+        {
+          "start": [
+            59,
+            5
+          ],
+          "end": [
+            59,
+            11
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "window.set_property("
+        },
+        {
+          "start": [
+            59,
+            5
+          ],
+          "end": [
+            62,
+            6
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "window.set_property("
+        },
+        {
+          "start": [
+            60,
+            9
+          ],
+          "end": [
+            60,
+            22
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "\"theme-index\","
+        },
+        {
+          "start": [
+            63,
+            5
+          ],
+          "end": [
+            63,
+            11
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "window.set_property("
+        },
+        {
+          "start": [
+            63,
+            5
+          ],
+          "end": [
+            66,
+            6
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "window.set_property("
+        },
+        {
+          "start": [
+            64,
+            9
+          ],
+          "end": [
+            64,
+            23
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "\"device-index\","
+        },
+        {
+          "start": [
+            67,
+            16
+          ],
+          "end": [
+            67,
+            32
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "let weak = window.as_weak();"
+        },
+        {
+          "start": [
+            68,
+            5
+          ],
+          "end": [
+            68,
+            11
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "window.set_callback(\"save-preferences\", move |args| {"
+        },
+        {
+          "start": [
+            68,
+            25
+          ],
+          "end": [
+            68,
+            43
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "window.set_callback(\"save-preferences\", move |args| {"
+        },
+        {
+          "start": [
+            68,
+            57
+          ],
+          "end": [
+            68,
+            58
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "window.set_callback(\"save-preferences\", move |args| {"
+        },
+        {
+          "start": [
+            69,
+            12
+          ],
+          "end": [
+            69,
+            45
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "if let Some(window) = weak.upgrade() {"
+        },
+        {
+          "start": [
+            70,
+            19
+          ],
+          "end": [
+            70,
+            35
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "match save_preferences(&store, args) {"
+        },
+        {
+          "start": [
+            70,
+            19
+          ],
+          "end": [
+            70,
+            49
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "match save_preferences(&store, args) {"
+        },
+        {
+          "start": [
+            71,
+            27
+          ],
+          "end": [
+            71,
+            37
+          ],
+          "count": 1,
+          "historic_combined_span_count": 3,
+          "source": "Ok(()) => show_error(&window, \"\"),"
+        },
+        {
+          "start": [
+            71,
+            27
+          ],
+          "end": [
+            71,
+            50
+          ],
+          "count": 1,
+          "historic_combined_span_count": 3,
+          "source": "Ok(()) => show_error(&window, \"\"),"
+        },
+        {
+          "start": [
+            72,
+            31
+          ],
+          "end": [
+            72,
+            41
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "Err(error) => show_error(&window, &format!(\"Could not save preferences: {error}\")),"
+        },
+        {
+          "start": [
+            72,
+            31
+          ],
+          "end": [
+            72,
+            99
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "Err(error) => show_error(&window, &format!(\"Could not save preferences: {error}\")),"
+        },
+        {
+          "start": [
+            72,
+            42
+          ],
+          "end": [
+            72,
+            49
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "Err(error) => show_error(&window, &format!(\"Could not save preferences: {error}\")),"
+        },
+        {
+          "start": [
+            75,
+            9
+          ],
+          "end": [
+            75,
+            20
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "Value::Void"
+        },
+        {
+          "start": [
+            76,
+            5
+          ],
+          "end": [
+            76,
+            6
+          ],
+          "count": 2,
+          "historic_combined_span_count": 3,
+          "source": "})?;"
+        },
+        {
+          "start": [
+            77,
+            5
+          ],
+          "end": [
+            77,
+            11
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "Ok(())"
+        },
+        {
+          "start": [
+            78,
+            1
+          ],
+          "end": [
+            78,
+            2
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "}"
+        }
+      ]
+    },
+    {
+      "file": "preferences/mod.rs",
+      "production_code_regions": 73,
+      "covered_before": 37,
+      "covered_after": 49,
+      "gained_with_zero_count_in_historic_report": 3,
+      "newly_covered_regions": [
+        {
+          "start": [
+            27,
+            5
+          ],
+          "end": [
+            27,
+            35
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "pub const fn index(self) -> u8 {"
+        },
+        {
+          "start": [
+            28,
+            15
+          ],
+          "end": [
+            28,
+            19
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "match self {"
+        },
+        {
+          "start": [
+            29,
+            28
+          ],
+          "end": [
+            29,
+            29
+          ],
+          "count": 1,
+          "historic_combined_span_count": 35,
+          "source": "Self::Light => 0,"
+        },
+        {
+          "start": [
+            32,
+            5
+          ],
+          "end": [
+            32,
+            6
+          ],
+          "count": 1,
+          "historic_combined_span_count": 36,
+          "source": "}"
+        },
+        {
+          "start": [
+            51,
+            5
+          ],
+          "end": [
+            51,
+            35
+          ],
+          "count": 2,
+          "historic_combined_span_count": 36,
+          "source": "pub const fn index(self) -> u8 {"
+        },
+        {
+          "start": [
+            52,
+            15
+          ],
+          "end": [
+            52,
+            19
+          ],
+          "count": 2,
+          "historic_combined_span_count": 36,
+          "source": "match self {"
+        },
+        {
+          "start": [
+            53,
+            32
+          ],
+          "end": [
+            53,
+            33
+          ],
+          "count": 1,
+          "historic_combined_span_count": 35,
+          "source": "Self::Automatic => 0,"
+        },
+        {
+          "start": [
+            54,
+            26
+          ],
+          "end": [
+            54,
+            27
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "Self::Cpu => 1,"
+        },
+        {
+          "start": [
+            57,
+            5
+          ],
+          "end": [
+            57,
+            6
+          ],
+          "count": 2,
+          "historic_combined_span_count": 36,
+          "source": "}"
+        },
+        {
+          "start": [
+            83,
+            22
+          ],
+          "end": [
+            83,
+            33
+          ],
+          "count": 4,
+          "historic_combined_span_count": 1,
+          "source": "\"CPU\" => Device::Cpu,"
+        },
+        {
+          "start": [
+            146,
+            13
+          ],
+          "end": [
+            146,
+            60
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "return Err(\"Preferences exceed 64 KiB.\".into());"
+        },
+        {
+          "start": [
+            161,
+            59
+          ],
+          "end": [
+            161,
+            60
+          ],
+          "count": 1,
+          "historic_combined_span_count": 0,
+          "source": "let _published_file = pending.persist(self.path())?;"
+        }
+      ]
+    }
+  ]
+}

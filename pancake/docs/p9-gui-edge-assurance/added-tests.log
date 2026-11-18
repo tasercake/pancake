@@ -1,0 +1,17 @@
+running 15 tests
+test delivery::tests::failed_batch_keeps_previous_files ... ok
+test history::tests::malformed_and_unbounded_lists_fail_without_editing_the_profile ... ok
+test history::tests::rejects_nonfolders_without_mutating_committed_history ... ok
+test history::tests::remember_and_clear_across_launches ... ok
+test history::tests::retains_only_the_newest_folders ... ok
+test history::tests::write_failure_preserves_the_current_history ... ok
+test preferences::tests::rejects_an_oversized_preferences_document_without_truncating_it ... ok
+test preferences::tests::reports_malformed_preferences ... ok
+test preferences::tests::saves_preferences_to_only_the_active_profile ... ok
+test preview::tests::retains_no_more_than_four_display_images ... ok
+test sources::tests::imports_nested_source_files_once ... ok
+test sources::tests::retains_sources_after_unreadable_selection ... ok
+test embedded_workspace_compiles ... ok
+test tests::comparison_clips_source_to_left_of_split ... ok
+test tests::preference_callback_reports_storage_errors_and_recovers ... ok
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.89s

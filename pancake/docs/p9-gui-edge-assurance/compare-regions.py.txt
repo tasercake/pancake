@@ -1,0 +1,74 @@
+"""Reduce matched profiles to production code regions in the three target files."""
+from collections import defaultdict
+from gzip import open as open_gzip
+from hashlib import sha256
+from json import dumps, loads
+from pathlib import Path
+from subprocess import check_output
+import sys
+
+output = Path(sys.argv[1])
+src = Path("pancake/crates/pancake-gui/src")
+limit = {
+    "history.rs": "/// Contracts for persistence across application launches.",
+    "main.rs": "/// Smoke-check the same declarative component compiled on application startup.",
+    "preferences/mod.rs": None,
+}
+source_lines = {name: (src/name).read_text().splitlines() for name in limit}
+production_end = {name: lines.index(limit[name]) + 1 if limit[name] else len(lines) + 1
+                  for name, lines in source_lines.items()}
+archive = Path("pancake/docs/p9-cpu-assurance-evidence/native-gui-continuous/5443cdf/combined.json.gz")
+for name, end in production_end.items():
+    current = source_lines[name][:end-1]
+    original = check_output(["git", "show", f"5443cdf:{src/name}"], text=True).splitlines()
+    assert original[:end-1] == current, name
+
+def production_regions(document):
+    files = defaultdict(dict)
+    for function in document["data"][0]["functions"]:
+        for line0, col0, line1, col1, count, file_id, expanded_id, kind in function["regions"]:
+            if kind != 0:
+                continue
+            sourcefile = function["filenames"][file_id]
+            relative = sourcefile.partition("/crates/pancake-gui/src/")[2]
+            if relative not in production_end or line0 >= production_end[relative]:
+                continue
+            location = (function["name"], line0, col0, line1, col1, expanded_id)
+            files[relative][location] = files[relative].get(location, 0) + count
+    return files
+
+before_path = output/"baseline/coverage.json"
+after_path = output/"added/coverage.json"
+baseline = production_regions(loads(before_path.read_text()))
+added = production_regions(loads(after_path.read_text()))
+with open_gzip(archive, "rt") as stream:
+    historic = production_regions(loads(stream.read()))
+measurements = []
+for name in limit:
+    before, after = baseline[name], added[name]
+    assert before.keys() == after.keys(), name
+    historic_spans = {}
+    for key, count in historic[name].items():
+        span = key[1:5]
+        historic_spans[span] = historic_spans.get(span, 0) + count
+    gained = []
+    for key, count in sorted(after.items(), key=lambda item: (item[0][1:], item[0][0])):
+        if before[key] == 0 and count > 0:
+            _, x, col_x, y, col_y, _ = key
+            gained.append({"start": [x, col_x], "end": [y, col_y], "count": count,
+                           "historic_combined_span_count": historic_spans.get(key[1:5]),
+                           "source": source_lines[name][x-1].strip()})
+    measurements.append({"file": name, "production_code_regions": len(before),
+                         "covered_before": sum(count>0 for count in before.values()),
+                         "covered_after": sum(count>0 for count in after.values()),
+                         "gained_with_zero_count_in_historic_report":sum(
+                             region["historic_combined_span_count"]==0 for region in gained),
+                         "newly_covered_regions": gained})
+receipt = {
+    "compared_gui_test_sha256": (output/"test-object.sha256").read_text().split()[0],
+    "historic_combined_report_sha256": sha256(archive.read_bytes()).hexdigest(),
+    "before_llvm_json_sha256": sha256(before_path.read_bytes()).hexdigest(),
+    "after_llvm_json_sha256": sha256(after_path.read_bytes()).hexdigest(),
+    "files": measurements,
+}
+print(dumps(receipt, indent=2))

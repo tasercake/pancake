@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
+cd "$root/pancake"
+scratch="$root/artifacts/gui-edge"
+export PATH=/tmp/pancake-tools/bin:$PATH
+unset DISPLAY WAYLAND_DISPLAY DBUS_SESSION_BUS_ADDRESS
+obj=$(python3 - "$scratch/compiler.jsonl" <<'PY'
+import json
+import sys
+from pathlib import Path
+source=Path(sys.argv[1])
+records=[json.loads(line) for line in source.read_text().splitlines()]
+tests={row["executable"] for row in records
+       if row.get("reason")=="compiler-artifact" and row["target"]["name"]=="pancake-gui"
+       and row["profile"]["test"] and row["executable"]}
+assert len(tests)==1, tests
+print(tests.pop())
+PY
+)
+test -x "$obj"
+target=$(rustc -vV | awk '/^host: / {print $2}')
+llvm="$(rustc --print sysroot)/lib/rustlib/$target/bin"
+test -x "$llvm/llvm-cov"
+test -x "$llvm/llvm-profdata"
+sha256sum "$obj" > "$scratch/test-object.sha256"
+{
+  git rev-parse HEAD
+  sha256sum Cargo.lock
+  rustc -vV
+  "$llvm/llvm-cov" --version
+} > "$scratch/toolchain.txt"
+for condition in baseline added; do
+    profile="$scratch/$condition"
+    mkdir "$profile"
+    selectors=()
+    if [[ "$condition" == baseline ]]; then
+        selectors=(
+            --skip history::tests::rejects_nonfolders_without_mutating_committed_history
+            --skip preferences::tests::rejects_an_oversized_preferences_document_without_truncating_it
+            --skip tests::preference_callback_reports_storage_errors_and_recovers
+        )
+    fi
+    LLVM_PROFILE_FILE="$profile/%p-%m.profraw" "$obj" --test-threads=2 "${selectors[@]}"         > "$profile/test.log" 2>&1
+    "$llvm/llvm-profdata" merge -sparse "$profile"/*.profraw -o "$profile/merged.profdata"
+    "$llvm/llvm-cov" export "$obj" -instr-profile "$profile/merged.profdata"         crates/pancake-gui/src/history.rs crates/pancake-gui/src/preferences/mod.rs crates/pancake-gui/src/main.rs         > "$profile/coverage.json"
+done
+sha256sum --check "$scratch/test-object.sha256"
