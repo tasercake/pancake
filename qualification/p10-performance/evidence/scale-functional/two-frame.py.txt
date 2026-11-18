@@ -1,0 +1,56 @@
+"""Generate or remove exactly two frozen native T50 reproduction inputs."""
+
+import argparse
+import hashlib
+import json
+import secrets
+from pathlib import Path
+
+from t50_generated import Recipe, cleanup_owned, image_specs, read_receipt, require_free, write_and_verify
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("mode", choices=("materialize", "cleanup"))
+    parser.add_argument("frozen", type=Path)
+    parser.add_argument("output", type=Path)
+    parser.add_argument("pair_receipt", type=Path)
+    args = parser.parse_args()
+    frozen, digest = read_receipt(args.frozen)
+    if digest != "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c":
+        raise ValueError("unexpected frozen T50 receipt bytes")
+    recipe = Recipe(**frozen["recipe"])
+    root = args.output.resolve()
+    if args.mode == "cleanup":
+        pair = json.loads(args.pair_receipt.read_text())
+        if pair["owned_output"] != str(root) or pair["frozen_sha256"] != digest:
+            raise ValueError("pair receipt does not own this path")
+        deleted = cleanup_owned(root, pair["ownership_token"], pair["files"])
+        print(json.dumps({
+            "deleted": deleted, "remaining_tiffs": len(list(root.glob("*.tif"))),
+            "pair_receipt_sha256": hashlib.sha256(args.pair_receipt.read_bytes()).hexdigest(),
+        }))
+        return
+    selected = [spec for spec in image_specs(recipe) if spec[0] in (0, 6)]
+    root.mkdir(parents=True, exist_ok=False)
+    reserve = 15 << 30
+    require_free(root, reserve, sum(item[3] for item in selected))
+    token = secrets.token_hex(16)
+    (root / "ownership.json").write_text(json.dumps({"token": token}) + "\n")
+    files = []
+    for focus, role, name, _ in selected:
+        record = write_and_verify(root / name, recipe, focus, role, reserve)
+        if record != frozen["files"][focus]:
+            raise ValueError("exact file/pixel/independent scalar receipt mismatch")
+        files.append(record)
+    with args.pair_receipt.open("x") as receipt:
+        json.dump({
+            "frozen_sha256": digest, "recipe": frozen["recipe"], "reserve_bytes": reserve,
+            "owned_output": str(root), "ownership_token": token, "files": files,
+        }, receipt, indent=2)
+        receipt.write("\n")
+    print(json.dumps([(item["name"], item["file_sha256"]) for item in files]))
+
+
+if __name__ == "__main__":
+    main()
