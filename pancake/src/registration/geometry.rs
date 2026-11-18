@@ -249,8 +249,9 @@ impl Bounds {
 /// Compute a symmetric crop that removes the largest corner displacement per axis.
 ///
 /// The operation expects reference-to-source matrices on the common, untrimmed
-/// canvas. A moving axis is trimmed by the rounded-up displacement and one extra
-/// pixel for interpolation. An unchanged axis retains its original size.
+/// canvas. For an aligned sequence each axis is trimmed by the rounded-up
+/// displacement and one extra pixel for interpolation. An empty map list
+/// represents an unregistered sequence and retains the original canvas.
 ///
 /// # Errors
 ///
@@ -258,6 +259,9 @@ impl Bounds {
 /// nonempty symmetric crop.
 pub fn symmetric_crop(width: usize, height: usize, maps: &[Affine]) -> Result<Bounds, String> {
     let extent = Extent::new(width, height)?;
+    if maps.is_empty() {
+        return Bounds::new(0, 0, width, height);
+    }
     let right = f32::from(extent.width) - 1.0;
     let bottom = f32::from(extent.height) - 1.0;
     let points = [[0.0, 0.0], [right, 0.0], [0.0, bottom], [right, bottom]];
@@ -292,9 +296,6 @@ pub fn symmetric_crop(width: usize, height: usize, maps: &[Affine]) -> Result<Bo
     reason = "absolute displacement with interpolation margin is positive"
 )]
 fn trimmed_axis(full: u16, displacement: f32) -> Result<(usize, usize), String> {
-    if displacement <= f32::EPSILON {
-        return Ok((0, usize::from(full)));
-    }
     let margin = displacement.ceil().mul_add(1.0, 1.0);
     if !margin.is_finite() || margin >= f32::from(full) {
         return Err("registration leaves no valid crop".to_owned());

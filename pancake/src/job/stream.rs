@@ -2,7 +2,7 @@
 
 use std::ops::Range;
 
-use crate::config::{JobConfig, JobSettings, Method};
+use crate::config::{AlignmentMode, JobConfig, JobSettings, Method};
 use crate::fusion::advanced::{
     AdvancedAccumulator, AdvancedMethod, automatic_parameters, slab_ranges,
 };
@@ -278,10 +278,14 @@ fn finish(
     control: &JobControl,
 ) -> Result<Product, JobError> {
     let canvas = plan.canvas;
-    let common = transforms.iter().map(|map| map.common).collect::<Vec<_>>();
-    let valid = symmetric_crop(canvas.width(), canvas.height(), &common);
+    let valid = if settings.alignment == AlignmentMode::Off {
+        Some(canvas)
+    } else {
+        let common = transforms.iter().map(|map| map.common).collect::<Vec<_>>();
+        symmetric_crop(canvas.width(), canvas.height(), &common).ok()
+    };
     let crop = if settings.auto_crop {
-        let bounds = *valid.as_ref().map_err(String::clone)?;
+        let bounds = valid.unwrap_or(canvas);
         if bounds != canvas {
             crop_samples(&mut samples, canvas, bounds)?;
         }
@@ -306,7 +310,7 @@ fn finish(
         image,
         canvas,
         crop,
-        safe_crop: valid.ok(),
+        safe_crop: valid,
         transforms,
         sharpness: quality,
     })

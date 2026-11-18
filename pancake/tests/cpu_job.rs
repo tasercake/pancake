@@ -3,7 +3,7 @@
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use pancake::config::{BitDepth, DevicePreference, JobConfig, JobSettings, Method};
+use pancake::config::{AlignmentMode, BitDepth, DevicePreference, JobConfig, JobSettings, Method};
 use pancake::image_io::{RgbImage, decode, export};
 use pancake::job::{
     Generation, JobControl, JobError, JobState, Options, StackResult, StackWorker, run,
@@ -58,6 +58,40 @@ fn stack_completion_follows_atomic_export() -> Result<(), String> {
                 == Some(false),
         "event does not describe the completed CPU job",
     )
+}
+
+/// Crop aligned identity stacks exactly once and preserve unregistered canvases.
+///
+/// # Errors
+///
+/// Returns encoding, job or output geometry errors.
+#[test]
+fn identity_crop_applies_only_to_aligned_jobs() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let inputs = sources(directory.path())?;
+    for (alignment, width, height) in [(AlignmentMode::Off, 9, 8), (AlignmentMode::Euclidean, 7, 6)]
+    {
+        let output = directory.path().join(format!("{alignment:?}.png"));
+        let config = JobConfig::new(
+            &inputs,
+            Some(output.clone()),
+            JobSettings {
+                alignment,
+                auto_crop: true,
+                device: DevicePreference::Cpu,
+                method: Method::WeightedAverage,
+                ..JobSettings::default()
+            },
+        )?;
+        let result = run(config, &Options::default(), |_| {}).map_err(|error| error.to_string())?;
+        let decoded = decode(&output)?;
+        require(
+            [result.crop().width(), result.crop().height()] == [width, height]
+                && [decoded.width(), decoded.height()] == [width, height],
+            "identity crop geometry disagrees with aligned export",
+        )?;
+    }
+    Ok(())
 }
 
 /// Corruption and mid-job cancellation must preserve existing output bytes.
