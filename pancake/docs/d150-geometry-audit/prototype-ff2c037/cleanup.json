@@ -1,0 +1,62 @@
+{
+  "lease": {
+    "task": "D150 original and first-warm witness lease",
+    "authority": "Parent explicitly requested retention for registration follow-up after the paired timings.",
+    "receiving_owner": "P5 registration task",
+    "lease_root": "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/d150-12f2151-review",
+    "purpose": "Independent held-out registration and full corrected D150 comparison; scope-limited temporary data",
+    "input_root": "inputs",
+    "input_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+    "original_count": 150,
+    "original_bytes": 52911148,
+    "original_hashes_before_after_transfer_match": true,
+    "original_ordered_sha256_of_frozen_hashes": "c6cbceaecf2a1a1faf82097409799f5778f49cff5a2e32f4124c8ffe09fee520",
+    "first_warm_exports": {
+      "candidate": {
+        "shape": [
+          1530,
+          2130,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "fee2530932c54dc6ab1468a1a1c0f65c0c88d90b4f4574c35c79072395406ab0",
+        "pixel_sha256": "7e1ba2a85156b3ca872972c95cd0cb51a09ce61b58a3ba6a9d5eec627b6695ab",
+        "bytes": 19553770,
+        "minimum": 0,
+        "maximum": 61198,
+        "relative_to_lease": "warm-01/candidate/complete.tif"
+      },
+      "reference": {
+        "shape": [
+          1696,
+          2288,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "bc16c22bbf59699f91a826733da0a24cd9f70c81482a022605650068434a0c7b",
+        "pixel_sha256": "f6bfe0d45221e03ee6971648cefcc743e78363415f2b31c145c93a30e77dfa6a",
+        "bytes": 25721288,
+        "minimum": 0,
+        "maximum": 65535,
+        "relative_to_lease": "warm-01/reference/complete.tif"
+      }
+    },
+    "input_ownership_marker_sha256": "26df67dcdf4f7339a404f320fd4d8b1894af1e3ad2f352f0033b9c8522fd6dda",
+    "retention": "Remove originals and both witness TIFF exports after the bounded registration comparison and record counts and verified hashes."
+  },
+  "ownership": {
+    "task": "D150 Hybrid CPU paired run",
+    "frozen_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+    "archive_sha256": "311ca6aab7d3bff03c714fd2d81c741f3847de1d4d3f2f9cfa767b6eb62cf56a"
+  },
+  "checked_at_utc": "2026-11-18T06:54:13.066558+00:00",
+  "verified_original_sha256_digest": "c6cbceaecf2a1a1faf82097409799f5778f49cff5a2e32f4124c8ffe09fee520",
+  "verified_owned_originals": 150,
+  "verified_transferred_warm_exports": 2,
+  "verified_prototype_export_sha256": "4cdea6049540272dbb9083794829bad7e17572bd0a9e7a8c8cbb692113255ef8",
+  "retained_prototype_cli": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/d150-adjacent-ff2c037/pancake-cli",
+  "retained_prototype_cli_sha256": "83335816e3a644cef89d3ca7485f16cab2e6f7ceee8a1e0a65fd50cedb395dbd",
+  "retained_prototype_events_sha256": "af70870625ff5a702a988e21a5981619701b2a78c8e2f4eb3d709afa661a872d",
+  "removed_total_bytes": 122026120,
+  "remaining_owned_images": 0
+}
