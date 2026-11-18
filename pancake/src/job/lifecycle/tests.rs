@@ -27,8 +27,12 @@ fn pause_acknowledgement_and_resume() -> Result<(), String> {
         paused.state == JobState::Paused && paused.stage == Stage::Decode,
         "worker must pause before starting the next stage",
     )?;
-    require(control.resume()?, "paused work must resume")?;
+    let acknowledged = control.resume()? && control.snapshot()?.state == JobState::Running;
+    if !acknowledged {
+        drop(control.cancel());
+    }
     let resumed = worker.join().map_err(|_| "boundary worker panicked")?;
+    require(acknowledged, "resume returned without releasing the pause")?;
     resumed.map_err(|error| error.to_string())?;
     require(
         control.snapshot()?.stage == Stage::Fuse,
