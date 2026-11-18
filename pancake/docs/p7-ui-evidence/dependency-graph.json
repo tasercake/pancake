@@ -91,5 +91,16 @@
         "sha256": "fd1e7754d6782fb5a51ac5f3d4cc5c6449927685bb64ba49a5466af16aa2899d"
       }
     }
+  },
+  "supplemental_linux_miri": {
+    "executed_revision": "1fdbcaa74f0fdad69911b16fc9a7f938fdeb8807",
+    "command": "CARGO_TARGET_DIR=$PWD/target/host-pin-miri MIRIFLAGS='-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check' cargo +nightly-2026-11-15 miri test --locked --workspace --all-features --lib -- --include-ignored",
+    "exit_status": 0,
+    "passed": 15,
+    "skipped": 0,
+    "scope": "Headless library tests on Linux. Canonical Darwin execution remains required.",
+    "archive": "graph-linux-miri.log.gz",
+    "archive_sha256": "b5c87751be604601e5a03f8eb2cd94ebf1d4236bfaff2770bdaeeecafcb2063c",
+    "raw_sha256": "178b88b89f1294fdb6a4a0724dcf855bc3dbd0d79ea324909c1a64d1d3b84cdc"
   }
 }
