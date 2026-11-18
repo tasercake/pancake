@@ -1,0 +1,11 @@
+   Compiling pancake-native-probe v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p8-desktop/artifacts/p8-native/harness)
+    Finished `test` profile [unoptimized] target(s) in 0.48s
+     Running unittests src/lib.rs (artifacts/p8-native/harness/target/debug/build/pancake-native-probe/e6ce89f3c0693077/out/pancake_native_probe-e6ce89f3c0693077)
+
+running 4 tests
+test history::tests::malformed_and_unbounded_lists_fail_without_editing_the_profile ... ok
+test history::tests::write_failure_preserves_the_current_history ... ok
+test history::tests::remember_and_clear_across_launches ... ok
+test history::tests::retains_only_the_newest_folders ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
