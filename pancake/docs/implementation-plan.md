@@ -15,18 +15,6 @@ full owned-source coverage, end-to-end CUDA qualification, genuine driver
 fault recovery, and the frozen P10 measurements remain separate exit gates.
 [Sealed Linux branch coverage](p9-cpu-assurance-evidence/5216ba4-nightly/README.md).
 
-**P10 Linux lifecycle passes. P10 release acceptance remains open.** The
-`5216ba4` physical RTX 3090 GUI met the frozen 250 ms deadline on all 60
-pauses and 60 cancels across the original 64-path fixture and real D150.
-Maximum observed acknowledgement was 155.640 ms for pause and 221.802 ms
-for cancellation. The independent 24 MP physical viewport calibration
-matched source and retained-result RGB regions. The full viewer sample
-requirements are still pending. On the sealed GUI, the visible comparison
-clip shifts its source pixels with the divider instead of staying anchored
-at the left edge.
-[Lifecycle measurements](../../qualification/p10-performance/evidence/native-lifecycle-measured/README.md)
-and [physical comparison evidence](../../qualification/p10-performance/evidence/native-physical-pair-calibration/comparison.md).
-
 The registration-fixed `5e10244` diagnostic matched all 17 E9 CPU launches
 per application. Warm median was 1.086 s versus 0.899 s (ratio 1.208, limit
 0.50). Cold median was 1.075 s versus 6.535 s (ratio 0.164, limit 1.00).

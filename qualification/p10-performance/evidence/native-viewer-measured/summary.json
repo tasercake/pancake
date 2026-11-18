@@ -1,0 +1,165 @@
+{
+  "corrected_build": {
+    "commit": "74dfaa359ea9e285baac16a16f485977f6c10b6c",
+    "lock_sha256": "639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd",
+    "binary_sha256": "983735af5db3b00885678a1b6cf1e2160949463b3eb54ce98e307c1e4e1aabbb",
+    "harness_commit": "61ff3a93c701fb39e25bcb9593062a1f137c6c70"
+  },
+  "capture_sha256": "93c290b0390f4351766ef421585056ead7efdc7bd20e68159a02f598be5ff54e",
+  "calibration_sha256": "e9ab3fd034e69a174db133149da7d9ddf8eca55744f17a458d4a4209170157ef",
+  "calibration": {
+    "retained_tiff": {
+      "sha256": "e77f22ddbc7b4d809bf82ed3deae7f99738b6d194dfee2e5731d43065c33006b",
+      "bytes": 144001354,
+      "native": [
+        6000,
+        4000
+      ]
+    },
+    "inputs_unchanged": true,
+    "temporary_tiff_removed": true,
+    "channel_max_error": {
+      "source0": 1,
+      "source6": 1,
+      "result": 1,
+      "zoom": 1,
+      "pan": 1,
+      "compare_before": 1,
+      "compare_after": 1
+    }
+  },
+  "initial_setup": {
+    "capture_sha256": "f4913afd49308884600c1fd2b11e358f46a1baf757a27b7993c5d0ba1188a71a",
+    "status": "fail",
+    "error": "preparation pixels never matched the independent witnesses",
+    "observed_samples": 0,
+    "confirmed_visible_preparation_maximum_channel_errors": [
+      1,
+      1,
+      1
+    ],
+    "generator_used_wrong_tolerance_field": true
+  },
+  "corrected_capture_status": "captured",
+  "corrected_capture_error": null,
+  "capture_inputs_unchanged": true,
+  "capture_workload": "T50",
+  "actual_operator_samples": 400,
+  "observations": {
+    "idle": {
+      "count": 200,
+      "input_to_present_ns": {
+        "count": 200,
+        "min": 21569238,
+        "p50": 35649224.5,
+        "p95": 42310351,
+        "max": 657913684
+      },
+      "observation_gaps_ns": {
+        "count": 200,
+        "min": 1075659,
+        "p50": 1116236.0,
+        "p95": 1263713,
+        "max": 2146901
+      },
+      "by_action": {
+        "comparison": {
+          "count": 40,
+          "min": 21569238,
+          "p50": 22673437.5,
+          "p95": 37569830,
+          "max": 39872145
+        },
+        "pan": {
+          "count": 40,
+          "min": 22734187,
+          "p50": 26638776.0,
+          "p95": 42152084,
+          "max": 44595484
+        },
+        "result": {
+          "count": 40,
+          "min": 32404383,
+          "p50": 35798674.5,
+          "p95": 40804837,
+          "max": 46742984
+        },
+        "source": {
+          "count": 40,
+          "min": 33505180,
+          "p50": 40006061.5,
+          "p95": 52285259,
+          "max": 657913684
+        },
+        "zoom": {
+          "count": 40,
+          "min": 26066704,
+          "p50": 35187251.0,
+          "p95": 39962054,
+          "max": 42177135
+        }
+      },
+      "worker_stage_at_dispatch": {
+        "Publish": 200
+      }
+    },
+    "loaded": {
+      "count": 200,
+      "input_to_present_ns": {
+        "count": 200,
+        "min": 19299584,
+        "p50": 34670142.5,
+        "p95": 54054336,
+        "max": 71557968
+      },
+      "observation_gaps_ns": {
+        "count": 200,
+        "min": 1076451,
+        "p50": 1113320.0,
+        "p95": 1157754,
+        "max": 1242623
+      },
+      "by_action": {
+        "comparison": {
+          "count": 40,
+          "min": 19299584,
+          "p50": 22638768.0,
+          "p95": 35422905,
+          "max": 38744611
+        },
+        "pan": {
+          "count": 40,
+          "min": 22722831,
+          "p50": 31807536.5,
+          "p95": 40522539,
+          "max": 41302076
+        },
+        "result": {
+          "count": 40,
+          "min": 26036303,
+          "p50": 43462354.0,
+          "p95": 64098558,
+          "max": 71557968
+        },
+        "source": {
+          "count": 40,
+          "min": 27124877,
+          "p50": 38465980.0,
+          "p95": 55280430,
+          "max": 58327823
+        },
+        "zoom": {
+          "count": 40,
+          "min": 24851157,
+          "p50": 35856850.0,
+          "p95": 43163939,
+          "max": 45804517
+        }
+      },
+      "worker_stage_at_dispatch": {
+        "Decode": 134,
+        "Fuse": 66
+      }
+    }
+  }
+}
