@@ -118,12 +118,17 @@ fn expand_component(
         } else {
             prefix.as_path()
         };
-        let listing = match fs::read_dir(directory) {
-            Ok(listing) => listing,
+        let (listing, failure) = match fs::read_dir(directory) {
+            Ok(listing) => (Some(listing), None),
             Err(error) if missing_component(&error) => continue,
-            Err(error) => return Err(path_error(directory, &error)),
+            Err(error) => (None, Some(Err(error))),
         };
-        let mut listing = listing.map(|entry| entry.map(|entry| (entry.file_name(), entry.path())));
+        // Apply the same path diagnostic to failures opening or reading the directory.
+        let children = listing
+            .into_iter()
+            .flatten()
+            .map(|entry| entry.map(|entry| (entry.file_name(), entry.path())));
+        let mut listing = failure.into_iter().chain(children);
         scan_entries(&mut listing, directory, matcher, entries, &mut next_paths)?;
     }
     Ok(next_paths)
