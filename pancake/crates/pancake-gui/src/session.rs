@@ -437,11 +437,29 @@ fn configure_image(window: &ComponentInstance, preview: &Preview) -> UiResult {
 /// Returns dynamic status/button binding errors.
 fn render_status(window: &ComponentInstance, snapshot: JobSnapshot) -> UiResult {
     let state = snapshot.state;
+    let suffix = if snapshot.cancel_acknowledged.is_some() {
+        " · Cancellation acknowledged"
+    } else {
+        ""
+    };
     let message = format!(
-        "{state:?} · {:?} · {} of {}",
+        "{state:?} · {:?} · {} of {}{suffix}",
         snapshot.stage, snapshot.completed, snapshot.total
     );
+    let observed = serde_json::json!({
+        "generation": format!("{:?}", snapshot.generation),
+        "state": format!("{state:?}"),
+        "stage": format!("{:?}", snapshot.stage),
+        "completed": snapshot.completed,
+        "total": snapshot.total,
+        "pause_acknowledged": snapshot.pause_acknowledged.is_some(),
+        "cancel_acknowledged": snapshot.cancel_acknowledged.is_some(),
+    });
     window.set_property("stack-status", SharedString::from(message).into())?;
+    window.set_property(
+        "stack-details",
+        SharedString::from(observed.to_string()).into(),
+    )?;
     window.set_property("can-pause", (state == JobState::Running).into())?;
     window.set_property("can-resume", (state == JobState::Paused).into())?;
     window.set_property(
@@ -743,6 +761,9 @@ fn ordinal(argument: Option<&Value>) -> UiResult<usize> {
 fn start(session: &mut Session, window: &ComponentInstance, _: &[Value]) -> UiResult {
     let config = JobConfig::new(session.sources.paths(), None, settings(window)?)?;
     session.generation = Some(session.worker.start(config)?);
+    if let Some(snapshot) = session.worker.snapshot()? {
+        render_status(window, snapshot)?;
+    }
     show_error(window, "");
     window.set_property("running", true.into())?;
     Ok(())
