@@ -1,0 +1,354 @@
+{
+  "source_revision": "fcf395b280f9cbdd4b4ee8c7ea41d40523c1c722",
+  "source_tree": "07caea1af3222c96dc232eefad5a05c7e7dd1b5a",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "toolchain": "nightly-2026-11-15",
+  "rustc": "rustc 1.102.0-nightly (5f4effd57 2026-11-13)",
+  "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "compile_jobs": 3,
+  "host": "Linux krishna-desktop 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+  "gpu": "NVIDIA GeForce RTX 3090, GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac, 00000000:01:00.0, 580.178.04",
+  "loader_package": "libvulkan1:amd64\t1.3.275.0-1build1",
+  "runtime_options": {
+    "asan": null,
+    "lsan": null,
+    "suppressions": []
+  },
+  "inputs": "Repository test fixtures and archived C and Rust startup controls",
+  "run_started": "2026-11-18T14:29:19+08:00",
+  "run_finished": "2026-11-18T14:29:31+08:00",
+  "results": {
+    "app-witness": {
+      "process_status": 1,
+      "observed_marker": "Parent device is lost",
+      "leaked_allocations": 8,
+      "leaked_bytes": 4868,
+      "allocation_sizes": [
+        88,
+        104,
+        144,
+        160,
+        184,
+        184,
+        2002,
+        2002
+      ],
+      "log": "app-witness.log",
+      "failed_test": "explicit_gpu_override_completes_on_named_runtime",
+      "completed_hardware_receipt": false
+    },
+    "rust-minimal-wgpu": {
+      "process_status": 1,
+      "observed_marker": "minimal_wgpu_device=ok",
+      "leaked_allocations": 5,
+      "leaked_bytes": 2522,
+      "allocation_sizes": [
+        88,
+        104,
+        144,
+        184,
+        2002
+      ],
+      "log": "rust-minimal-wgpu.log"
+    },
+    "rust-cubecl": {
+      "process_status": 1,
+      "observed_marker": "Parent device is lost",
+      "leaked_allocations": 8,
+      "leaked_bytes": 4868,
+      "allocation_sizes": [
+        88,
+        104,
+        144,
+        160,
+        184,
+        184,
+        2002,
+        2002
+      ],
+      "log": "rust-cubecl.log"
+    },
+    "c-native": {
+      "process_status": 0,
+      "observed_marker": "vkCreateDevice=0",
+      "leaked_allocations": 0,
+      "leaked_bytes": 0,
+      "allocation_sizes": [],
+      "log": "c-native.log"
+    },
+    "c-address": {
+      "process_status": 1,
+      "observed_marker": "vkCreateDevice=0",
+      "leaked_allocations": 5,
+      "leaked_bytes": 2522,
+      "allocation_sizes": [
+        88,
+        104,
+        144,
+        184,
+        2002
+      ],
+      "log": "c-address.log"
+    },
+    "gate": {
+      "process_status": 1,
+      "observed_marker": "Parent device is lost",
+      "leaked_allocations": 8,
+      "leaked_bytes": 4868,
+      "allocation_sizes": [
+        88,
+        104,
+        144,
+        160,
+        184,
+        184,
+        2002,
+        2002
+      ],
+      "log": "gate.log",
+      "selected_targets": [
+        "gpu_advanced_fusion",
+        "gpu_fusion_contract",
+        "gpu_kernel_contract",
+        "gpu_numerical_contract",
+        "gpu_registration_contract",
+        "gpu_runtime_contract"
+      ],
+      "reached_targets": [
+        "gpu_advanced_fusion"
+      ],
+      "unrun_targets": [
+        "gpu_fusion_contract",
+        "gpu_kernel_contract",
+        "gpu_numerical_contract",
+        "gpu_registration_contract",
+        "gpu_runtime_contract"
+      ],
+      "failing_executable_elf_build_id": "861508ded35429ae496cc6529ff9c2086c441bb0"
+    }
+  },
+  "raw_archive": {
+    "file": "raw-records.tar.gz",
+    "sha256": "672a3a126046d826eb3decf0163a179e996eb1ad10d5e90327bbd49ac6f96227",
+    "files": {
+      "app-build.jsonl": {
+        "bytes": 501146,
+        "sha256": "b2cfbd78ef1c551ce226d7c0eb8acad28171fe7bb75793a64d10987c2ab2a552"
+      },
+      "app-build.log": {
+        "bytes": 13225,
+        "sha256": "f8aa4f3f2cec92b32c1d9c6b1d036ae97da1f5cbacaa56ea14804abd75625f8e"
+      },
+      "app-witness-stream.json": {
+        "bytes": 171,
+        "sha256": "be51d7b0c4036fb24aac388bfcfa66f364eb9aabf9bb7bf7ccdcc58676f4ad10"
+      },
+      "app-witness.command": {
+        "bytes": 1599,
+        "sha256": "dcbe3fb666fee4d6357a87f53c13baecf23c2f9335e31d991035404e4cbffff1"
+      },
+      "app-witness.log": {
+        "bytes": 12569,
+        "sha256": "e0b438346c4c9231d8a9404177408d3954c96a579f0d3191ebf23f6b8df9cf70"
+      },
+      "app-witness.path": {
+        "bytes": 194,
+        "sha256": "07e47acd3f9c7f70979e517dd7858c52372660aa2ac488adfa1823e6b666b055"
+      },
+      "app-witness.status": {
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "build-ids.txt": {
+        "bytes": 2635,
+        "sha256": "325edf80049be3e65af234e216727dc42e44f4b3b4a8fe272b9444d2ced63e51"
+      },
+      "c-address-build.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "c-address-stream.json": {
+        "bytes": 169,
+        "sha256": "a42d4721d57ac0e30f30e561b8c0b3f11e6d67276fa1fcf8b5b3478292a513c1"
+      },
+      "c-address.command": {
+        "bytes": 1236,
+        "sha256": "bfee433155d687ffd95bbd19c623b22ff9dc413395fcca598e6f6db180a8291e"
+      },
+      "c-address.log": {
+        "bytes": 6600,
+        "sha256": "0b451ab4026652b41bc50e603c811c7a3e0352df01ab58bade974dfea92a74f3"
+      },
+      "c-address.status": {
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "c-native-build.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "c-native-stream.json": {
+        "bytes": 165,
+        "sha256": "28be8e85234a1e5c4b7cc764253dcf56ee6079c246c111407b0a3da75a1be82e"
+      },
+      "c-native.command": {
+        "bytes": 1233,
+        "sha256": "12f17b5027955af8c282146d91db3a35ba1363263f325800f61352213a02fcb3"
+      },
+      "c-native.log": {
+        "bytes": 82,
+        "sha256": "212522263bdaec6179f02c204f02872399a585d0d3cfdd529b40bfaffef02396"
+      },
+      "c-native.status": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "capture-log.py": {
+        "bytes": 696,
+        "sha256": "4b86bb1878ce80c00f53b6fa48d587c0f75880b8bdfe2a53c1098d77b63fd130"
+      },
+      "collect.py": {
+        "bytes": 5821,
+        "sha256": "6dab19185963788a96d576f62cdcf9b7357873f801ce89e71dfa7c0772bdd362"
+      },
+      "cpu-topology.csv": {
+        "bytes": 405,
+        "sha256": "85b6a88f02bfb00e0a6f2d650af8fb1fa530c8f24288ffd8bd477594cb8b5146"
+      },
+      "executable-check.log": {
+        "bytes": 545,
+        "sha256": "c3c60a4c30af59d16e034df873387bc7f63a0c8f73c4f98b6525643fe2dd3891"
+      },
+      "executables.sha256": {
+        "bytes": 793,
+        "sha256": "22578a5c2c07b3077e3c3bb957d851cfc7fdb0e67787086f0eb52967a43ee390"
+      },
+      "gate-stream.json": {
+        "bytes": 171,
+        "sha256": "04933e80acda145a13712649170a5b895455209557d5a2f51c3a5a11ff5e88e3"
+      },
+      "gate.command": {
+        "bytes": 1178,
+        "sha256": "75b255331442996f301e8e44660a4d0792d2eb7982074f882f9c269bfec32b89"
+      },
+      "gate.log": {
+        "bytes": 13167,
+        "sha256": "cfde4fbefbd8b48b735c08c1e2bb5a2d934a71290ee196f5fbdf340a7f4b29d1"
+      },
+      "gate.status": {
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "gcc.txt": {
+        "bytes": 246,
+        "sha256": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048"
+      },
+      "gpu-targets.txt": {
+        "bytes": 130,
+        "sha256": "9ad81b83e81ca439df52ea57431b303d3e0134cf7d1f393ed5b8fef1b3051d5a"
+      },
+      "loader-package.txt": {
+        "bytes": 35,
+        "sha256": "f3fff7c0fd6bf6e15eb285e4f04b3f564c8d59d4fb3885ef84fc968901eeaadd"
+      },
+      "nvidia.txt": {
+        "bytes": 96,
+        "sha256": "12a544d5125c9ab9ec53e147073fdb423b11978c050055823be1eb79bb0954fc"
+      },
+      "os.txt": {
+        "bytes": 132,
+        "sha256": "62b2233ccf7ed82d068411dc66526b072d3a2418151f90862abd55c2f7772cc2"
+      },
+      "preflight.md": {
+        "bytes": 3663,
+        "sha256": "5911e976c14828d472784735f6e7d173304bd8f55a1ff7c601ed1f55f4bb61ee"
+      },
+      "replay.sh": {
+        "bytes": 8284,
+        "sha256": "bcf2d76a8e726749c2db495554e1af82c0dec6e7064944402a68723a14f6c507"
+      },
+      "run-finished.txt": {
+        "bytes": 26,
+        "sha256": "290d68c19d8524e3fa34192a29ccec5527ad8efa2de8917400279760f31cbbbd"
+      },
+      "run-started.txt": {
+        "bytes": 26,
+        "sha256": "95b0d300d5c7ed6e7f7bc935e0f644075bbd9012823d11d32765cf06a4c651a4"
+      },
+      "rust-build.log": {
+        "bytes": 8246,
+        "sha256": "7504d78a00fa8686b2ab0d30a8440a316235f3301a77c9569d6298954756c545"
+      },
+      "rust-control-source.sha256": {
+        "bytes": 202,
+        "sha256": "0f141f957b3f3167cfb73fdcaf2cee6235517960c97dba782efcb9b97f403737"
+      },
+      "rust-cubecl-stream.json": {
+        "bytes": 171,
+        "sha256": "b84a425adbf6f27097d3a73d988b7e0bade768b1f2101efd461cf4312f48411a"
+      },
+      "rust-cubecl.command": {
+        "bytes": 1304,
+        "sha256": "4da8ccefc3a178a7cc1114ab1c79bfca007be5db2f661e39319d3973c7c1ea93"
+      },
+      "rust-cubecl.log": {
+        "bytes": 12560,
+        "sha256": "c362a39f1d1c0603dd1bbebedaf19a698b46e3fbd51977cb5a1ad940fc075bba"
+      },
+      "rust-cubecl.status": {
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "rust-minimal-wgpu-stream.json": {
+        "bytes": 169,
+        "sha256": "b08e71e0366338f0f77905572dfdc811a695dcd94e98e8176dbdf6e99e91b308"
+      },
+      "rust-minimal-wgpu.command": {
+        "bytes": 1314,
+        "sha256": "7ba51dc500bf2cfb4dc1fc50fa783b66d3526095c49a8e7bd06463a78fc41b93"
+      },
+      "rust-minimal-wgpu.log": {
+        "bytes": 7190,
+        "sha256": "78b7027cf15fbaebb16b67a11893f0637865bc9e9396ec1f45b777d090760e44"
+      },
+      "rust-minimal-wgpu.status": {
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "rustc.txt": {
+        "bytes": 214,
+        "sha256": "072391379b408a5c6c30ef78ad74e86d15c0eebf2c02c1e70ba1992bdae7752b"
+      },
+      "source-revision.txt": {
+        "bytes": 41,
+        "sha256": "b1ad7440b72ff3ebaa6fbb0b2c12ed41b45b3b5d79eccaa4f5369c0361f54086"
+      },
+      "source-tree.txt": {
+        "bytes": 41,
+        "sha256": "d978b309302728650174d22b26656c2514ed3698b7acf3c575f7c499be5f83da"
+      },
+      "source.sha256": {
+        "bytes": 1049,
+        "sha256": "293313483062d839058a7cf5f750282520cc347042a3050a8ec97e112d5e69f9"
+      },
+      "target-metadata.json": {
+        "bytes": 15422,
+        "sha256": "8eefa1b8e7f11a6724159b792869d912fecb86d4a96fa1771cf2779241667f71"
+      },
+      "test-executables.json": {
+        "bytes": 1349,
+        "sha256": "e1aa28796fac948c32a1cd15b52884f7403684e60d619a4d9522e82e6cf8b2eb"
+      },
+      "vulkan.sha256": {
+        "bytes": 219,
+        "sha256": "85ed7064bc0cef0406b379e9e8da11a0eceff308cabc901796feed02cda57623"
+      }
+    }
+  }
+}

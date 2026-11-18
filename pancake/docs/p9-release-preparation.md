@@ -94,13 +94,15 @@ five allocations. Disabling implicit layers in that diagnostic yielded the same
 2,522 bytes across five allocations. The native setup works and the sanitizer
 leaks reproduce outside Rust, including with implicit layers disabled.
 
-Keep this result distinct from the unresolved CubeCL device acquisition failure
-under Rust ASan in P0. On the integrated build, repeat the minimal wgpu versus
-CubeCL setup control, holding driver and build constant. Vary one device
-descriptor condition at a time (features, limits, memory hints, experimental
-features) and identify both actual device completion and ASan verdicts. Keep
-CPU ASan/TSan and physical GPU execution gates. No sanitizer suppression was
-introduced. [Current traces and provenance](p9-gpu-asan-evidence/receipt.json).
+The integrated replay at `fcf395b` reproduced both outcomes. Minimal wgpu and
+standalone C created the RTX 3090 Vulkan device under ASan and each reported
+2,522 leaked bytes across five allocations, with matching D-Bus allocation
+frames. The direct CubeCL request in the same Rust executable and the unchanged
+application witness returned `Parent device is lost`. The full GPU ASan gate
+failed at its first test. Isolating the failing descriptor field remains open.
+CPU ASan/TSan and physical GPU execution retain their separate gates.
+[Integrated replay](p9-gpu-asan-evidence/fcf395b/README.md).
+[Earlier C control](p9-gpu-asan-evidence/receipt.json).
 [P0 Rust diagnostic](p0-sanitizer-investigation.md).
 
 ## Preparation tests
