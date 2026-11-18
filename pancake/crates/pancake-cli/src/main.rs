@@ -23,7 +23,7 @@ struct Arguments {
     /// Export destination; the extension selects the image format.
     #[arg(long, value_name = "PATH")]
     output: PathBuf,
-    /// Combine with laplacian, hybrid, weighted_average, depth_map, or exposure_fusion.
+    /// Combine with laplacian, hybrid, `weighted_average`, `depth_map`, or `exposure_fusion`.
     #[arg(long, value_name = "METHOD")]
     method: Option<Method>,
     /// Align inputs with a translation model unless a model is supplied.
@@ -92,7 +92,7 @@ impl Arguments {
     /// Normalize command-line switches to the shared job settings.
     fn into_job(self) -> Result<JobConfig, String> {
         let defaults = JobSettings::default();
-        let alignment = self.alignment_mode.unwrap_or_else(|| {
+        let alignment = self.alignment_mode.unwrap_or({
             if self.rotation_scale {
                 AlignmentMode::Similarity
             } else if self.align {
@@ -143,7 +143,7 @@ fn fail(error: &str, status: ExitCode) -> ExitCode {
 
 /// Parse arguments and reject incomplete jobs without publishing output.
 fn main() -> ExitCode {
-    const BAD_ARGUMENTS: ExitCode = ExitCode::from(2);
+    let bad_arguments = ExitCode::from(2);
     let arguments = match Arguments::try_parse() {
         Ok(arguments) => arguments,
         Err(error) => {
@@ -151,7 +151,7 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
             return if error.use_stderr() {
-                BAD_ARGUMENTS
+                bad_arguments
             } else {
                 ExitCode::SUCCESS
             };
@@ -159,7 +159,7 @@ fn main() -> ExitCode {
     };
     let _job = match arguments.into_job() {
         Ok(job) => job,
-        Err(error) => return fail(&error, BAD_ARGUMENTS),
+        Err(error) => return fail(&error, bad_arguments),
     };
     fail(
         "stack processing is not available in this build",
