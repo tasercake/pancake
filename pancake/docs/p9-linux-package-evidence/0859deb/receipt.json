@@ -1,0 +1,67 @@
+{
+  "source_commit": "0859deb124ed9c9dc4a8dd12a16d309b9af321fc",
+  "cargo_lock_sha256": "b2fa570aaa2dbc0265d938f9cb4567c78fe6ca2a0b8c6acba7c98fc381ec7cf4",
+  "expected_binaries": {
+    "pancake-cli": "1954cf0f5039013b98d18459f52972438b445837babbf8f5536577b51e2c6d1a",
+    "pancake-gui": "3326812d97511cedf8ae7aee011f66816fae274f84ae1a1157c5df806d879001"
+  },
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "build_command": "cd pancake && CARGO_INCREMENTAL=0 cargo build --locked --release --jobs 4 -p pancake-gui -p pancake-cli",
+  "build_log_sha256": "c020b686136cb3d246507455988a78692b69d68b69ed5edb3472ae51977394ba",
+  "package": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "d5cfb3d07f0452b56d690e633cb77af47841b8326ed4b4ea4eccec595b1d7df4",
+    "bytes": 69265760
+  },
+  "cases": [],
+  "command": [
+    "uv",
+    "run",
+    "--project",
+    "--frozen",
+    "--no-sync",
+    "run",
+    "--target",
+    "--no-coverage",
+    "--output",
+    "/tmp/p9-extract-hkyq0h_o/artifacts/run",
+    "--cli-command",
+    "[\"/tmp/p9-extract-hkyq0h_o/package/usr/bin/pancake-cli\"]",
+    "--gui-command",
+    "[\"/tmp/p9-extract-hkyq0h_o/package/usr/bin/pancake-gui\"]",
+    "--case",
+    "--case",
+    "--case",
+    "--case",
+    "--case"
+  ],
+  "returncode": 0,
+  "outputs": {},
+  "report_counts": {
+    "passed": 5,
+    "failed": 0,
+    "unsupported": 0
+  },
+  "report_complete": true,
+  "report_sha256": "9cb87255c1eabf8f99e2a19f30d28752fc17a10d49f559f06864de19c6daf554",
+  "package_receipt_sha256": "3beba56c049a36712f5ee57737e128c1f21a4fc30a492ccaa8b0c3042aef33c3",
+  "retained_package": "artifacts/pancake-packages/linux-0859deb/pancake_0.1.0_amd64.deb",
+  "hardware": {
+    "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "platform": "Ubuntu 24.04 x86_64 / Linux 6.8.0-147-generic",
+    "gui_renderer": "Slint winit software on private Xvfb"
+  },
+  "artifact_files": {
+    "apt-simulation.txt": "cfca8e98330bd1ac292b2ba3eb199d8725b61e6eb745ec80c24976182d763fdd",
+    "cargo-release.log.gz": "f878deeb6211ad94715bbf03e687cf188752e32c145596ffce8d719fbaa6efd8",
+    "dpkg-contents.txt": "f888bdc25fddb9cf322cb04a9c8cb435944eaba68b4bb05dad1879449830e728",
+    "dpkg-info.txt": "dc0fd53e77042f5b850aee8f867aad7ca78bf3ca134ccfe531a015997d4dd0e3",
+    "junit.xml": "7be72368aef0361313c7fadbc15673a5d27fdc4f67b35ff3596aa8abe20cf4c0",
+    "package-receipt.json.gz": "7d2c9c53f120da285abfe6394fef125886e1078a2731e6bacee7a1c9ad5b8559",
+    "pancake-cli.ldd.txt": "4814540d733d06dfe639eeb9deeea6214c2f99fa8b28b6563967e8cc73fe90db",
+    "pancake-gui.ldd.txt": "602c77b9155795643b9b91930bb36249d00e4fc928afda51b48ba28bb3bbb7c8",
+    "provenance.json.gz": "bf1de963bbe8e9cdd2b9d97501be2f0c6dac00c949dd04f6c1e4473a466be429",
+    "report.json.gz": "8ab4957977b5f9f687cb9ad87b849e30e58c49c137e4e67ee5a7f9df26c03603"
+  }
+}

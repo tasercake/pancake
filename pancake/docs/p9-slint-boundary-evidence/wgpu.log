@@ -1,0 +1,22 @@
+wgpu v30.0.2
+├── cubecl-wgpu v0.11.4
+│   └── cubecl v0.11.4
+│       └── pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake)
+├── femtovg v0.28.0
+│   └── i-slint-renderer-femtovg v1.19.0
+│       ├── i-slint-backend-selector v1.19.0
+│       ├── i-slint-backend-winit v1.19.0
+│       └── slint v1.19.0
+├── i-slint-core v1.19.0
+│   ├── i-slint-backend-selector v1.19.0 (*)
+│   ├── i-slint-backend-winit v1.19.0 (*)
+│   ├── i-slint-renderer-femtovg v1.19.0 (*)
+│   ├── i-slint-renderer-software v1.19.0
+│   │   ├── i-slint-backend-winit v1.19.0 (*)
+│   │   └── slint v1.19.0 (*)
+│   ├── slint v1.19.0 (*)
+│   └── slint-interpreter v1.19.0
+│       └── pancake-gui v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/crates/pancake-gui)
+├── i-slint-renderer-femtovg v1.19.0 (*)
+├── pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake) (*)
+└── slint v1.19.0 (*)

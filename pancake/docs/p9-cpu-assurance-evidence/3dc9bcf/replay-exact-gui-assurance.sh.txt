@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+revision=${1:?Enter the exact integrated candidate revision.}
+root=$(git rev-parse --show-toplevel)
+if [[ $(git rev-parse HEAD) != "$revision" || -n $(git status --porcelain) ]]; then
+    printf 'A clean checkout of the exact tested revision is required.\n' >&2
+    exit 2
+fi
+result="$root/artifacts/pancake-assurance/gui-source-${revision:0:12}"
+mkdir -p "$result"
+cd "$root/pancake"
+
+export PATH="/tmp/pancake-tools/bin:$PATH" CARGO_BUILD_JOBS=4
+export VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.json
+export XDG_RUNTIME_DIR="$PWD/target/assurance-private-xdg"
+export XDG_CACHE_HOME="$PWD/target/assurance-private-cache"
+install -d -m 700 "$XDG_RUNTIME_DIR" "$XDG_CACHE_HOME"
+unset DISPLAY WAYLAND_DISPLAY DBUS_SESSION_BUS_ADDRESS RUSTC_WRAPPER
+unset ASAN_OPTIONS LSAN_OPTIONS TSAN_OPTIONS
+{
+    git rev-parse HEAD
+    sha256sum Cargo.lock Cargo.toml assurance-platforms.json
+    rustc --version --verbose
+    cargo --version
+    uname -srm
+    pkg-config --modversion gtk+-3.0 atk
+    nvidia-smi --query-gpu=name,driver_version --format=csv,noheader
+} > "$result/platform.txt"
+
+printf 'gate\texit\n' > "$result/exits.tsv"
+record() {
+    local name=$1 exit_code=0
+    shift
+    "$@" > "$result/$name.log" 2>&1 || exit_code=$?
+    printf '%s\t%d\n' "$name" "$exit_code" | tee -a "$result/exits.tsv"
+}
+for gate in fast deps coverage-cpu; do
+    record "$gate" bash scripts/check.sh "$gate"
+done
+if [[ -f target/assurance/coverage-cpu.json ]]; then
+    cp target/assurance/coverage-cpu.json "$result/coverage-cpu.json"
+fi
+for kind in address thread; do
+    record "sanitizer-$kind" env CARGO_TARGET_DIR="$PWD/target/host-sanitizer-$kind" bash scripts/check.sh sanitizer "$kind"
+done
+if [[ $(git rev-parse HEAD) != "$revision" || -n $(git status --porcelain) ]]; then
+    printf 'Source changed during verification.\n' >&2
+    exit 3
+fi
