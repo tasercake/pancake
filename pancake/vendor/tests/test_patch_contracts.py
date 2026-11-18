@@ -30,7 +30,9 @@ class DependencyPatchContracts(unittest.TestCase):
 
     def test_vendor_records_exact_original_crate_identities(self):
         provenance = json.loads((VENDOR / "upstream-sources.json").read_text())
-        expected = {f"cubecl-{part}" for part in CUBECL_PACKAGES} | {"spin_on", "cubecl-macros", "rowan"}
+        expected = {f"cubecl-{part}" for part in CUBECL_PACKAGES} | {
+            "spin_on", "cubecl-macros", "rowan", "oneshot",
+        }
         self.assertEqual({p["name"] for p in provenance["packages"]}, expected)
         for package in provenance["packages"]:
             with self.subTest(package=package["name"]):
@@ -40,6 +42,17 @@ class DependencyPatchContracts(unittest.TestCase):
                 self.assertEqual(manifest["package"]["name"], package["name"])
                 self.assertEqual(manifest["package"]["version"], package["version"])
                 self.assertRegex(package["archive_sha256"], r"^[0-9a-f]{64}$")
+
+    def test_oneshot_workspace_resolves_the_reviewed_checkout(self):
+        root = VENDOR.parent
+        manifest = tomllib.loads((root / "Cargo.toml").read_text())
+        self.assertEqual(
+            manifest["patch"]["crates-io"].get("oneshot"),
+            {"path": "vendor/oneshot-0.2.1"},
+        )
+        lock = tomllib.loads((root / "Cargo.lock").read_text())
+        entries = [package for package in lock["package"] if package["name"] == "oneshot"]
+        self.assertEqual(entries, [{"name": "oneshot", "version": "0.2.1"}])
 
     def test_modified_files_match_reviewed_hashes(self):
         provenance = json.loads((VENDOR / "upstream-sources.json").read_text())
