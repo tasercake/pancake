@@ -30,7 +30,7 @@
     "src/job/events.rs": "9d4d8bcdd531d3d3a6d50911f63081bbe72bb6afde9d51a35df49dd2ba547312",
     "src/job/lifecycle/tests.rs": "95edc94553cf2ea311ff074fb92920f8dced4214f2b38bad0f6f0b1f347d5166",
     "src/job/lifecycle.rs": "4d6492a9303ce03a260597658615dda5f809f28cca8d5d1273aaabad9e4b15ca",
-    "src/job/mod.rs": "78958c02e1645fcd42244068df98e1354b8736d28082c697c0760bccafce64d2",
+    "src/job/mod.rs": "af3ae3b3eba7940f22da0d266ea2d729de29dba1d53327449b2043113acc028b",
     "src/job/registration.rs": "ea58a3b45232ad2f790d2505413b2f43cbd4cc7af68873451daa759c523c2944",
     "src/job/stream.rs": "f4f94502ac0932f76570d193401e9e709eac93485156ae3511f87b5e121963ca",
     "src/job/worker.rs": "a2772be63942b532391894ee8d036d72009122d8c932f069cd255b5fb67ecf5d",
