@@ -50,6 +50,9 @@ struct Session {
     /// Real GTK popup awaiting dismissal or a selected command.
     #[cfg(target_os = "linux")]
     menu: Option<Rc<RefCell<Option<MenuOutcome>>>>,
+    /// Position handoff between Winit and native GTK on Linux.
+    #[cfg(target_os = "linux")]
+    pointer: panel::PointerHandoff,
     /// Active result ordinal when the viewer displays a result.
     selected: Option<usize>,
     /// Sum of retained full-precision RGB bytes.
@@ -326,7 +329,7 @@ impl Session {
             return Ok(());
         };
         self.menu = None;
-        panel::restore_focus(window);
+        self.pointer.restore_focus(window);
         match outcome {
             MenuOutcome::Failed(error) => Err(error.into()),
             MenuOutcome::File(action) => dispatch_file_menu(self, window, action),
@@ -394,7 +397,7 @@ impl Session {
             .take()
             .ok_or("File selection lost its request.")?;
         #[cfg(target_os = "linux")]
-        panel::restore_focus(window);
+        self.pointer.restore_focus(window);
         let paths = outcome?;
         let Some(first) = paths.first() else {
             self.pending = None;
@@ -506,6 +509,8 @@ pub fn configure(
         file_panel: None,
         #[cfg(target_os = "linux")]
         menu: None,
+        #[cfg(target_os = "linux")]
+        pointer: panel::PointerHandoff::install(window),
         selected: None,
         retained_bytes: 0,
     };

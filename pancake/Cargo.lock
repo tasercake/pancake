@@ -5581,6 +5581,7 @@ dependencies = [
  "slint-interpreter",
  "spin_on",
  "tempfile",
+ "x11rb",
 ]
 
 [[package]]

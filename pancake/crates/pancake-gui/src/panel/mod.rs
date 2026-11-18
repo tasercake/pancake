@@ -6,6 +6,10 @@ use slint_interpreter::ComponentInstance;
 
 #[cfg(target_os = "linux")]
 mod linux;
+#[cfg(target_os = "linux")]
+mod pointer;
+#[cfg(target_os = "linux")]
+pub use pointer::PointerHandoff;
 
 /// File selection purpose.
 #[derive(Clone, Copy, Debug)]
@@ -29,35 +33,21 @@ pub fn open(
     kind: Picker<'_>,
     completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
 ) -> Result<(), String> {
-    linux::open(x11_owner(window), kind, completion)
+    use slint::ComponentHandle as _;
+    linux::open(x11_owner(window.window()), kind, completion)
 }
 
 /// Obtain the actual managed workspace's X11 owner for native transience.
 #[cfg(target_os = "linux")]
-fn x11_owner(window: &ComponentInstance) -> Option<std::ffi::c_ulong> {
-    use slint::ComponentHandle as _;
+fn x11_owner(window: &slint::Window) -> Option<std::ffi::c_ulong> {
     use slint::winit_030::winit::raw_window_handle::{HasWindowHandle as _, RawWindowHandle};
 
-    let workspace = window.window().window_handle();
+    let workspace = window.window_handle();
     match workspace.window_handle().ok()?.as_raw() {
         RawWindowHandle::Xlib(raw) => Some(raw.window).filter(|&id| id != 0),
         RawWindowHandle::Xcb(raw) => Some(raw.window.get().into()),
         _ => None,
     }
-}
-
-/// Return focus from a native GTK popup to its actual Slint owner.
-#[cfg(target_os = "linux")]
-pub fn restore_focus(window: &ComponentInstance) {
-    use slint::ComponentHandle as _;
-    use slint::winit_030::WinitWindowAccessor as _;
-
-    if let Some(display) = gtk::gdk::Display::default() {
-        display.sync();
-    }
-    let _focused = window
-        .window()
-        .with_winit_window(slint::winit_030::winit::window::Window::focus_window);
 }
 
 /// Present the platform dialog with native window parenting.
