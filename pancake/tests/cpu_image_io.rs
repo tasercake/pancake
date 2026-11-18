@@ -870,12 +870,12 @@ fn dng_exposure_chart(bytes: &mut [u8]) -> TestResult {
             (true, false) => 4_096,
             (false, false) => 16_384,
         };
-        let response = match (x % 2, y % 2) {
-            (0, 0) => 2,
-            (1, 1) => 4,
-            _ => 1,
+        let encoded = match (x % 2, y % 2) {
+            (0, 0) => distance / 2,
+            (1, 1) => distance / 4,
+            _ => distance,
         };
-        *code = 512_u16.saturating_add(distance / response).to_le_bytes();
+        *code = 512_u16.saturating_add(encoded).to_le_bytes();
     }
     Ok(())
 }
