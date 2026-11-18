@@ -67,7 +67,11 @@ impl Level {
         method: AdvancedMethod,
         first: bool,
     ) {
-        let band = self.band(client, fine, coarse);
+        let band = if method == AdvancedMethod::Exposure {
+            fine.clone()
+        } else {
+            self.band(client, fine, coarse)
+        };
         let (blocks, threads) = elementwise(client, self.grid.area);
         if method == AdvancedMethod::Laplacian {
             select::launch(
@@ -83,15 +87,28 @@ impl Level {
             return;
         }
 
+        // Exposure has no coefficient-selection consumer. Its weighted kernel
+        // can compute the band directly, avoiding an intermediate RGB buffer.
+        let (lower, lower_width, lower_height) = if method == AdvancedMethod::Exposure {
+            coarse.map_or((&band, 0, 0), |(lower, grid)| {
+                (lower, grid.width, grid.height)
+            })
+        } else {
+            (&band, 0, 0)
+        };
         add_weighted::launch(
             client,
             blocks.clone(),
             threads,
             band.clone().into_arg(),
+            lower.clone().into_arg(),
             weights.clone().into_arg(),
             self.primary.clone().into_arg(),
             self.scores.clone().into_arg(),
             u32::from(first),
+            self.grid.width,
+            lower_width,
+            lower_height,
         );
         if let Some(hybrid) = &self.hybrid {
             select::launch(
@@ -211,14 +228,21 @@ fn select(
     }
 }
 
-/// Accumulate one RGB coefficient and its scalar weight for each pixel.
+/// Accumulate weighted coefficients, deriving an exposure band when requested.
+///
+/// A zero lower width identifies a supplied coefficient or the top Gaussian
+/// level. Otherwise the lower level is expanded at the original pixel grid.
 #[cube(launch, expand_only)]
 fn add_weighted(
-    band: &Tensor<f32>,
+    fine: &Tensor<f32>,
+    lower: &Tensor<f32>,
     weight: &Tensor<f32>,
     primary: &mut Tensor<f32>,
     scores: &mut Tensor<f32>,
     first: u32,
+    width: usize,
+    lower_width: usize,
+    lower_height: usize,
 ) {
     let pixel = ABSOLUTE_POS;
     if pixel >= scores.len() {
@@ -228,13 +252,23 @@ fn add_weighted(
     let score = weight[pixel];
     if first != 0 {
         scores[pixel] = score;
-        for channel in 0..3 {
-            primary[address + channel] = score * band[address + channel];
-        }
     } else {
         scores[pixel] += score;
-        for channel in 0..3 {
-            primary[address + channel] += score * band[address + channel];
+    }
+
+    for channel in 0..3 {
+        let sample = address + channel;
+        let mut coefficient = fine[sample];
+        if lower_width != 0 {
+            let x = pixel % width;
+            let y = pixel / width;
+            coefficient -= expanded(lower, x, y, channel, lower_width, lower_height);
+        }
+        let scaled = score * coefficient;
+        if first != 0 {
+            primary[sample] = scaled;
+        } else {
+            primary[sample] += scaled;
         }
     }
 }

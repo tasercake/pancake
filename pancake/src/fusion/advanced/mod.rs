@@ -160,7 +160,8 @@ impl AdvancedAccumulator {
                 level.accumulate(&self.client, &image, None, &weights, self.method, first);
                 break;
             };
-            let coarse = reduce(&self.client, &image, level.grid, next.grid, 3)?;
+            let (coarse, reduced_weights) =
+                reduce(&self.client, &image, &weights, level.grid, next.grid)?;
             level.accumulate(
                 &self.client,
                 &image,
@@ -169,7 +170,7 @@ impl AdvancedAccumulator {
                 self.method,
                 first,
             );
-            weights = reduce(&self.client, &weights, level.grid, next.grid, 1)?;
+            weights = reduced_weights;
             image = coarse;
         }
 
