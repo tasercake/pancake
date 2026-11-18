@@ -5,23 +5,27 @@ use std::str::FromStr;
 use super::{AlignmentMode, AlignmentReference, BitDepth, DevicePreference, JobSettings, Method};
 
 /// Assert both directions of the documented spelling checks.
-fn names<T>(values: &[(&str, T)]) -> Result<(), T::Err>
+fn names<T>(values: &[(&str, T)]) -> Result<(), String>
 where
-    T: Copy + std::fmt::Debug + PartialEq + FromStr,
+    T: Copy + std::fmt::Debug + PartialEq + FromStr<Err = &'static str>,
 {
     for &(name, expected) in values {
-        assert_eq!(T::from_str(name)?, expected, "{name}");
+        let actual = T::from_str(name)?;
+        if actual != expected {
+            return Err(format!(
+                "{name}: expected {expected:?}, received {actual:?}"
+            ));
+        }
     }
-    assert!(
-        T::from_str("unsupported").is_err(),
-        "unknown spelling must fail"
-    );
+    if T::from_str("unsupported").is_ok() {
+        return Err("unknown spelling must fail".into());
+    }
     Ok(())
 }
 
 /// Public flags expand to specific program settings.
 #[test]
-fn configuration_names() -> Result<(), &'static str> {
+fn configuration_names() -> Result<(), String> {
     names(&[
         ("laplacian", Method::Laplacian),
         ("hybrid", Method::Hybrid),
@@ -154,13 +158,13 @@ fn settings_reject_invalid_values() -> Result<(), String> {
             "--gpu-id",
         ),
     ] {
-        assert!(
-            settings
-                .validate()
-                .err()
-                .is_some_and(|error| error.contains(flag)),
-            "expected diagnostic for {flag} in {settings:?}"
-        );
+        if !settings
+            .validate()
+            .err()
+            .is_some_and(|error| error.contains(flag))
+        {
+            return Err(format!("expected diagnostic for {flag} in {settings:?}"));
+        }
     }
     Ok(())
 }
