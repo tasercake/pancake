@@ -1,14 +1,62 @@
 """Linux package integration tests with temporary native program fixtures."""
 
+import io
 import json
 import subprocess
+import tarfile
 import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from subprocess import CompletedProcess
 from unittest.mock import patch
 
 from package_linux import _dependency_report, build_package, file_sha256
+from package_notices import _registry_notices, verify_notices
+
+
+def _workspace(root):
+    """Create a locked Git fixture with selected and dev-only local crates."""
+    source = root / "source"
+    source.mkdir()
+    (source / "Cargo.toml").write_text(
+        '[workspace]\nresolver = "3"\nmembers = ["crates/cli", "crates/gui"]\n'
+        'exclude = ["vendor/*"]\n'
+    )
+    for name in ("fixture-dep", "fixture-dev"):
+        directory = source / "vendor" / f"{name}-1.0.0"
+        library = directory / "src"
+        library.mkdir(parents=True)
+        (library / "lib.rs").touch()
+        (directory / "Cargo.toml").write_text(
+            f'[package]\nname = "{name}"\nversion = "1.0.0"\n'
+            'edition = "2024"\nlicense-file = "legal/terms.txt"\n'
+        )
+        (directory / "legal").mkdir()
+        (directory / "legal/terms.txt").write_text(f"Original {name} license.\n")
+        (directory / "NOTICE").write_text(f"Original {name} notice.\n")
+        (directory / "LICENSES").mkdir()
+        (directory / "LICENSES/additional.txt").write_text(f"Original {name} additional license.\n")
+    (source / "vendor/upstream-sources.json").write_text(json.dumps({"packages": [{
+        "name": "fixture-dep", "version": "1.0.0", "directory": "fixture-dep-1.0.0",
+        "archive_sha256": "a" * 64,
+    }]}))
+    for component in ("cli", "gui"):
+        directory = source / "crates" / component
+        (directory / "src").mkdir(parents=True)
+        (directory / "src/main.rs").write_text("fn main() {}\n")
+        manifest = (f'[package]\nname = "pancake-{component}"\nversion = "0.1.0"\n'
+                    'edition = "2024"\nlicense = "MIT"\n')
+        if component == "cli":
+            manifest += ('[dependencies]\nfixture-dep = { path = "../../vendor/fixture-dep-1.0.0" }\n'
+                         '[dev-dependencies]\nfixture-dev = { path = "../../vendor/fixture-dev-1.0.0" }\n')
+        (directory / "Cargo.toml").write_text(manifest)
+    subprocess.run(["cargo", "generate-lockfile", "--offline", "--quiet"], cwd=source, check=True)
+    subprocess.run(["git", "init", "--quiet"], cwd=source, check=True)
+    subprocess.run(["git", "add", "."], cwd=source, check=True)
+    subprocess.run(["git", "-c", "user.name=Fixture", "-c", "user.email=test@localhost",
+                    "commit", "--quiet", "-m", "Pin fixture source"], cwd=source, check=True)
+    revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=source, text=True).strip()
+    return source, revision
 
 
 class LinuxPackageTests(unittest.TestCase):
@@ -24,8 +72,10 @@ class LinuxPackageTests(unittest.TestCase):
             for name in ("pancake-cli", "pancake-gui"):
                 subprocess.run(["cc", "-o", release / name, source], check=True)
             output = root / "package"
-            revision = "a" * 40
-            build_package(release, output, "0.1.0", "Pancake fixture <test@localhost>", revision, "b" * 64)
+            source_root, revision = _workspace(root)
+            lock_digest = file_sha256(source_root / "Cargo.lock")
+            build_package(release, output, "0.1.0", "Pancake fixture <test@localhost>", revision, lock_digest,
+                          source_root=source_root)
             receipt = json.loads((output / "package-receipt.json").read_text())
             self.assertEqual(receipt["source_commit"], revision)
             artifact = output / receipt["archive"]["file"]
@@ -35,6 +85,24 @@ class LinuxPackageTests(unittest.TestCase):
                 self.assertEqual(file_sha256(release / name), file_sha256(root / "unpack/usr/bin" / name))
             self.assertIn("libc6", receipt["depends"])
             self.assertIn("libvulkan1", receipt["depends"])
+            inventory = root / "unpack/usr/share/doc/pancake/dependency-notices/inventory.json"
+            self.assertTrue(inventory.is_file(), "Debian archive dropped the dependency notice inventory")
+            self.assertEqual(receipt["dependency_notices"]["sha256"], file_sha256(inventory))
+            manifest = json.loads(inventory.read_text())
+            self.assertEqual(manifest["source_commit"], revision)
+            self.assertEqual(manifest["cargo_lock_sha256"], lock_digest)
+            items = {package["name"]: package for package in manifest["packages"]}
+            self.assertEqual(set(items), {"pancake-cli", "pancake-gui", "fixture-dep"})
+            self.assertEqual(items["pancake-gui"]["status"], "no_notice_in_source")
+            self.assertEqual(items["fixture-dep"]["provenance"]["commit"], revision)
+            self.assertEqual(items["fixture-dep"]["provenance"]["upstream_patch"]["archive_sha256"], "a" * 64)
+            for name in ("NOTICE", "legal/terms.txt", "LICENSES/additional.txt"):
+                relative = Path("fixture-dep-1.0.0") / name
+                self.assertEqual((inventory.parent / relative).read_bytes(),
+                                 (source_root / "vendor" / relative).read_bytes())
+            (inventory.parent / "fixture-dep-1.0.0/NOTICE").write_text("tampered")
+            with self.assertRaisesRegex(ValueError, "Packaged dependency notice changed"):
+                verify_notices(root / "unpack", receipt["dependency_notices"])
             launcher = root / "unpack/usr/share/applications/pancake.desktop"
             self.assertIn("Exec=pancake-gui %F", launcher.read_text())
             self.assertIn("Shared library: [libc.so.6]", receipt["binaries"]["pancake-cli"]["dynamic"])
@@ -51,6 +119,37 @@ class LinuxPackageTests(unittest.TestCase):
             self.assertIn(versioned, requirements)
             self.assertNotIn("libfontconfig1", requirements)
 
+    def test_registry_notices_use_the_locked_archive(self):
+        with tempfile.TemporaryDirectory() as directory:
+            registry = Path(directory) / "registry"
+            index = "index-fixture"
+            source = registry / "src" / index / "fixture-registry-1.2.3"
+            source.mkdir(parents=True)
+            archive = registry / "cache" / index / "fixture-registry-1.2.3.crate"
+            archive.parent.mkdir(parents=True)
+            entries = {
+                "LICENSES/LicenseRef-Fictional.txt": b"upstream declared notice",
+                "source-license/terms.txt": b"Cargo license-file",
+                "../NOTICE": b"out of crate scope",
+                "src/lib.rs": b"not notice text",
+            }
+            with tarfile.open(archive, "w:gz") as output:
+                for name, content in entries.items():
+                    member = tarfile.TarInfo(f"fixture-registry-1.2.3/{name}")
+                    member.size = len(content)
+                    output.addfile(member, io.BytesIO(content))
+            package = {"name": "fixture-registry", "version": "1.2.3",
+                       "manifest_path": str(source / "Cargo.toml"), "license_file": "source-license/terms.txt"}
+            checksum = file_sha256(archive)
+            provenance, status, notices = _registry_notices(package, {"checksum": checksum})
+            self.assertEqual(status, "present")
+            self.assertEqual(provenance["locked_archive_sha256"], checksum)
+            self.assertEqual(notices, {PurePosixPath(name): entries[name] for name in
+                                       ("LICENSES/LicenseRef-Fictional.txt", "source-license/terms.txt")})
+            _, status, notices = _registry_notices(package, {"checksum": "a" * 64})
+            self.assertEqual(status, "archive_checksum_mismatch")
+            self.assertEqual(notices, {})
+
     def test_a_shell_script_cannot_be_packaged_as_a_native_release_binary(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -62,7 +161,8 @@ class LinuxPackageTests(unittest.TestCase):
                 script.chmod(0o755)
             output = root / "package"
             with self.assertRaisesRegex(ValueError, "native Linux executable"):
-                build_package(release, output, "0.1.0", "Pancake fixture <test@localhost>", "a" * 40, "b" * 64)
+                build_package(release, output, "0.1.0", "Pancake fixture <test@localhost>", "a" * 40, "b" * 64,
+                              source_root=root)
             self.assertFalse(output.exists())
 
 

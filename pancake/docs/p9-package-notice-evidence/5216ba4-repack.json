@@ -1,0 +1,193 @@
+{
+  "source_commit": "5216ba4227e14033483a21bb5eca1c6c168ef840",
+  "cargo_lock_sha256": "639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd",
+  "original_tested_package": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "f3caa23753ff1a670d895b33bff58d26ab6d48aa58f961e5bab731d985371ed1",
+    "bytes": 69262768
+  },
+  "notice_package": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "b645bcba77d0d408d80245d78fde6a41a74a169bf412e9a07dba438a227f736d",
+    "bytes": 69398682
+  },
+  "package_fields": [
+    "Package: pancake",
+    "Version: 0.1.0",
+    "Architecture: amd64",
+    "Maintainer: Pancake <local@localhost>",
+    "Depends: libatk1.0-0t64 (>= 2.33.1), libc6 (>= 2.39), libfontconfig1 (>= 2.12.6), libgcc-s1 (>= 4.2), libglib2.0-0t64 (>= 2.54.0), libgtk-3-0t64 (>= 3.21.5), libstdc++6 (>= 12), at-spi2-core, libvulkan1, libwayland-client0, libxcursor1, libxi6, libx11-6, libx11-xcb1, libxcb1, libxkbcommon0, libxkbcommon-x11-0, xdg-utils"
+  ],
+  "binaries": {
+    "pancake-cli": "d0554ce43411b39da66bd04ea5de82b2cc74384e8bb576b5ec74408aa5c6da12",
+    "pancake-gui": "57053ae2b7e15e4e5f21559149b0e8dc17d43dec7f218169c799ce194e5b3598"
+  },
+  "notice_inventory": {
+    "file": "usr/share/doc/pancake/dependency-notices/inventory.json",
+    "sha256": "b41894dde71f0476159d6f6b3677bcd5ce994470c4ecd566cfd129fec6c9f8b0",
+    "packages": 583,
+    "status_counts": {
+      "present": 556,
+      "no_notice_in_source": 27
+    },
+    "files": 1036
+  },
+  "extraction": "rootless dpkg-deb -x, verified notice and binary bytes",
+  "cli_help": "extracted executable exit 0",
+  "reproduced_notice_inventory": "b41894dde71f0476159d6f6b3677bcd5ce994470c4ecd566cfd129fec6c9f8b0",
+  "package_path": "artifacts/pancake-packages/linux-5216ba4-notices/pancake_0.1.0_amd64.deb",
+  "missing_notice_names": [
+    {
+      "package": "accesskit",
+      "version": "0.25.2",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "accesskit_atspi_common",
+      "version": "0.21.1",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "accesskit_consumer",
+      "version": "0.39.2",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "accesskit_unix",
+      "version": "0.24.1",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "accesskit_winit",
+      "version": "0.34.2",
+      "declared_license": "Apache-2.0"
+    },
+    {
+      "package": "alloc-stdlib",
+      "version": "0.2.4",
+      "declared_license": "BSD-3-Clause"
+    },
+    {
+      "package": "buildid",
+      "version": "1.1.0",
+      "declared_license": "MPL-2.0"
+    },
+    {
+      "package": "cubecl-environment",
+      "version": "0.11.4",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "cubecl-monitoring",
+      "version": "0.11.4",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "cubecl-opt",
+      "version": "0.11.4",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "cubecl-std",
+      "version": "0.11.4",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "cubecl-zspace",
+      "version": "0.11.4",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "embassy-futures",
+      "version": "0.1.2",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "lyon_algorithms",
+      "version": "1.0.22",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "lyon_extra",
+      "version": "1.1.0",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "lyon_geom",
+      "version": "1.0.20",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "lyon_path",
+      "version": "1.0.19",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "mutants",
+      "version": "0.0.3",
+      "declared_license": "MIT"
+    },
+    {
+      "package": "pancake",
+      "version": "0.1.0",
+      "declared_license": "GPL-3.0-or-later"
+    },
+    {
+      "package": "pancake-cli",
+      "version": "0.1.0",
+      "declared_license": "GPL-3.0-or-later"
+    },
+    {
+      "package": "pancake-gui",
+      "version": "0.1.0",
+      "declared_license": "GPL-3.0-or-later"
+    },
+    {
+      "package": "profiling",
+      "version": "1.0.18",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "spirv",
+      "version": "0.4.0+sdk-1.4.341.0",
+      "declared_license": "Apache-2.0"
+    },
+    {
+      "package": "taffy",
+      "version": "0.15.1",
+      "declared_license": "MIT"
+    },
+    {
+      "package": "tracel-llvm-bundler",
+      "version": "23.1.0-4",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "utf8-chars",
+      "version": "3.0.7",
+      "declared_license": "MIT OR Apache-2.0"
+    },
+    {
+      "package": "zune-inflate",
+      "version": "0.2.54",
+      "declared_license": "MIT OR Apache-2.0 OR Zlib"
+    }
+  ],
+  "checks": [
+    "original Debian archive SHA verified before extraction",
+    "binary hashes and selected Debian control fields match",
+    "rootless extraction verified original notice bytes and CLI help",
+    "final notice collector replay matches the packaged inventory exactly",
+    "patched oneshot notice bytes match the two registry notice bytes"
+  ],
+  "toolchain": {
+    "dpkg_deb": "Debian 'dpkg-deb' package archive backend version 1.22.6 (amd64).",
+    "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)"
+  },
+  "separate_native_artifact": {
+    "archive": "tracel-llvm-23.1.0-4-linux-x64.tar.xz",
+    "cached_archive_sha256": "c394bb1b10ac785f16d3d92d688a9343ba869f720e9cf9ca3f1abf2f401f165f",
+    "discovered_notice_path": "tracel-llvm-23.1.0-4/include/llvm/Support/LICENSE.TXT",
+    "scope": "locally observed cache asset; no exact build-consumption receipt or complete native notice set"
+  }
+}

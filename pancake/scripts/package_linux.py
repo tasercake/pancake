@@ -1,7 +1,6 @@
 """Build a local amd64 Debian package from already-built Pancake release binaries."""
 
 import argparse
-import hashlib
 import json
 import os
 import platform
@@ -12,6 +11,8 @@ import sys
 import tempfile
 import tomllib
 from pathlib import Path
+
+from package_notices import file_sha256, stage_notices, verify_notices
 
 BINARIES = ("pancake-cli", "pancake-gui")
 # Slint/winit and Vulkan can load these at runtime without an ELF NEEDED entry.
@@ -29,12 +30,6 @@ SESSION_DEPENDS = (
     "libxkbcommon-x11-0",
     "xdg-utils",
 )
-
-
-def file_sha256(path):
-    """Hash the artifact without reading a whole release binary into memory."""
-    with path.open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def _run(*args, cwd=None):
@@ -74,7 +69,7 @@ def _dependency_report(staging, binaries, control):
     return ", ".join(dependencies), result.stderr
 
 
-def build_package(release, output, version, maintainer, revision, lock_digest):
+def build_package(release, output, version, maintainer, revision, lock_digest, *, source_root):
     """Stage, extract and verify the package before publishing local artifacts."""
     if sys.platform != "linux" or platform.machine() != "x86_64":
         raise ValueError("Build the Debian package on a Linux x86-64 package host")
@@ -116,6 +111,7 @@ def build_package(release, output, version, maintainer, revision, lock_digest):
         (applications / "pancake.desktop").write_text(
             "[Desktop Entry]\nType=Application\nName=Pancake\n"
             "Exec=pancake-gui %F\nCategories=Graphics;Photography;\n", encoding="utf-8")
+        notices = stage_notices(payload, source_root, revision, lock_digest)
         metadata = payload / "DEBIAN"
         metadata.mkdir()
         (metadata / "control").write_text(f"{control}Depends: {dependencies}\n", encoding="utf-8")
@@ -124,6 +120,7 @@ def build_package(release, output, version, maintainer, revision, lock_digest):
         _run("dpkg-deb", "--root-owner-group", "--build", payload, archive)
         extracted = staging / "verify"
         _run("dpkg-deb", "--extract", archive, extracted)
+        verify_notices(extracted, notices)
         for name, expected in audit.items():
             binary = extracted / "usr" / "bin" / name
             if not os.access(binary, os.X_OK) or file_sha256(binary) != expected["sha256"]:
@@ -131,6 +128,7 @@ def build_package(release, output, version, maintainer, revision, lock_digest):
         receipt = {"schema_version": 1, "source_commit": revision, "cargo_lock_sha256": lock_digest,
                    "platform": platform.platform(), "dpkg_deb": _run("dpkg-deb", "--version").stdout.splitlines()[0],
                    "depends": dependencies, "shlibdeps_diagnostics": diagnostics, "binaries": audit,
+                   "dependency_notices": notices,
                    "archive": {"file": archive_name, "sha256": file_sha256(archive), "bytes": archive.stat().st_size}}
         output.mkdir()
         archive.rename(output / archive_name)
@@ -152,7 +150,7 @@ def main(argv=None):
             raise ValueError(f"Commit Pancake source changes before packaging:\n{dirty}")
         revision = _run("git", "-C", pancake, "rev-parse", "HEAD").stdout.strip()
         build_package(args.release_dir, args.output, manifest["package"]["version"], args.maintainer,
-                      revision, file_sha256(pancake / "Cargo.lock"))
+                      revision, file_sha256(pancake / "Cargo.lock"), source_root=pancake)
         print(args.output / "package-receipt.json")
         return 0
     except subprocess.CalledProcessError as error:
