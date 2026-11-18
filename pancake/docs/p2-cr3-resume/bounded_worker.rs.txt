@@ -1,0 +1,173 @@
+//! Standalone Linux proof of the bounded native RAW process transport.
+#![forbid(unsafe_code)]
+
+use std::env;
+use std::fs;
+use std::io::{self, Read, Write};
+use std::path::Path;
+use std::process::{Child, Command, Stdio};
+use std::sync::mpsc::{self, Receiver, TryRecvError};
+use std::thread;
+use std::time::{Duration, Instant};
+
+/// Bound source intake to the same cap used by Pancake camera RAW.
+const INPUT_CAP: u64 = 256 * 1024 * 1024;
+/// Bound worker diagnostic data separately from TIFF data.
+const STDERR_CAP: u64 = 64 * 1024;
+/// Poll only the native child and pipe ownership before the deadline.
+const POLL_INTERVAL: Duration = Duration::from_millis(2);
+
+/// Check the worker's stdin-free, bounded filesystem-to-stdout protocol.
+fn main() -> Result<(), String> {
+    let args: Vec<_> = env::args_os().skip(1).collect();
+    let [tool, library, source, ceiling, delay, memory, orientation] = args.as_slice() else {
+        return Err(
+            "expected TOOL LIBRARY INPUT MAX-OUTPUT MS-DEADLINE MAX-ADDRESS-SPACE ORIENTATION"
+                .into(),
+        );
+    };
+    let ceiling = positive_limit(ceiling)?;
+    let timeout = Duration::from_millis(positive_limit(delay)?);
+    let memory = positive_limit(memory)?;
+    let tool = fs::canonicalize(tool).map_err(|error| error.to_string())?;
+    let library = fs::canonicalize(library).map_err(|error| error.to_string())?;
+    let source = fs::canonicalize(source).map_err(|error| error.to_string())?;
+    let metadata = source.metadata().map_err(|error| error.to_string())?;
+    if !metadata.is_file() || metadata.len() == 0 || metadata.len() > INPUT_CAP {
+        return Err("native decoder input is not a bounded regular file".into());
+    }
+
+    let mut command = Command::new("/usr/bin/prlimit");
+    command
+        .env_clear()
+        .env("LANG", "C")
+        .env("OMP_NUM_THREADS", "2")
+        .env("OMP_THREAD_LIMIT", "2")
+        .env("LD_LIBRARY_PATH", &library)
+        .arg(format!("--as={memory}"))
+        .arg("--")
+        .arg(tool)
+        .args([
+            "-w", "-W", "-6", "-q", "3", "-g", "2.222", "4.5", "-T", "-Z", "-",
+        ]);
+    match orientation.to_str() {
+        Some("native") => {}
+        Some("rotate90") => {
+            let _command = command.args(["-t", "6"]);
+        }
+        _ => return Err("unsupported probe orientation".into()),
+    }
+    command
+        .arg(Path::new(&source))
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+
+    let deadline = Instant::now()
+        .checked_add(timeout)
+        .ok_or("native worker deadline overflow")?;
+    let mut child = command.spawn().map_err(|error| error.to_string())?;
+    let (Some(stdout), Some(stderr)) = (child.stdout.take(), child.stderr.take()) else {
+        kill_and_reap(&mut child);
+        return Err("native worker pipe was not created".into());
+    };
+    let rgb_tiff = thread::scope(|scope| {
+        let (out_tx, out_rx) = mpsc::sync_channel(1);
+        let (err_tx, err_rx) = mpsc::sync_channel(1);
+        let _stdout_reader = scope.spawn(move || {
+            let _finished = out_tx.send(read_with_limit(stdout, ceiling, "output"));
+        });
+        let _stderr_reader = scope.spawn(move || {
+            let _finished = err_tx.send(read_with_limit(stderr, STDERR_CAP, "diagnostic"));
+        });
+        let result = wait_for_tiff(&mut child, out_rx, err_rx, deadline);
+        if result.is_err() {
+            kill_and_reap(&mut child);
+        }
+        result
+    })?;
+
+    let mut output = io::stdout().lock();
+    output
+        .write_all(&rgb_tiff)
+        .and_then(|()| output.flush())
+        .map_err(|error| error.to_string())
+}
+
+/// Interpret a decimal resource limit and reject zero.
+fn positive_limit(limit: &std::ffi::OsStr) -> Result<u64, String> {
+    limit
+        .to_str()
+        .and_then(|text| text.parse().ok())
+        .filter(|value| *value > 0)
+        .ok_or_else(|| "expected positive worker limit".to_owned())
+}
+
+/// Capture up to one byte beyond the requested stream limit to detect overflow.
+fn read_with_limit(reader: impl Read, limit: u64, stream: &str) -> Result<Vec<u8>, String> {
+    let cap = limit
+        .checked_add(1)
+        .ok_or("worker pipe byte limit overflow")?;
+    let mut bytes = Vec::new();
+    let count = reader
+        .take(cap)
+        .read_to_end(&mut bytes)
+        .map_err(|error| error.to_string())?;
+    if u64::try_from(count).map_err(|error| error.to_string())? > limit {
+        return Err(format!("native decoder {stream} byte limit exceeded"));
+    }
+    Ok(bytes)
+}
+
+/// Poll a native worker pipe until its single bounded capture is complete.
+fn receive(
+    receiver: &Receiver<Result<Vec<u8>, String>>,
+    captured: &mut Option<Vec<u8>>,
+) -> Result<(), String> {
+    if captured.is_some() {
+        return Ok(());
+    }
+    match receiver.try_recv() {
+        Ok(result) => *captured = Some(result?),
+        Err(TryRecvError::Empty) => {}
+        Err(TryRecvError::Disconnected) => return Err("native decoder pipe disconnected".into()),
+    }
+    Ok(())
+}
+
+/// Release TIFF bytes only after both pipes close and the real child exits.
+fn wait_for_tiff(
+    child: &mut Child,
+    out_rx: Receiver<Result<Vec<u8>, String>>,
+    err_rx: Receiver<Result<Vec<u8>, String>>,
+    deadline: Instant,
+) -> Result<Vec<u8>, String> {
+    let (mut stdout, mut stderr) = (None, None);
+    while Instant::now() < deadline {
+        receive(&out_rx, &mut stdout)?;
+        receive(&err_rx, &mut stderr)?;
+        if stdout.is_some()
+            && stderr.is_some()
+            && let Some(status) = child.try_wait().map_err(|error| error.to_string())?
+        {
+            let output = stdout.take().ok_or("worker output pipe missing")?;
+            let diagnostic = stderr.take().ok_or("worker diagnostic pipe missing")?;
+            if !status.success() || !(output.starts_with(b"II*\0") || output.starts_with(b"MM\0*"))
+            {
+                return Err(format!(
+                    "native decoder exited ({status}) without a valid TIFF: {}",
+                    String::from_utf8_lossy(&diagnostic).trim(),
+                ));
+            }
+            return Ok(output);
+        }
+        thread::sleep(POLL_INTERVAL);
+    }
+    Err("native decoder deadline exceeded".into())
+}
+
+/// Terminate the direct worker and reap its process on failure.
+fn kill_and_reap(child: &mut Child) {
+    let _kill = child.kill();
+    let _exit = child.wait();
+}

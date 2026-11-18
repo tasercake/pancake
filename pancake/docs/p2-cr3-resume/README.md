@@ -29,8 +29,9 @@ The comparison uses the same absolute sensor coordinates with no resampling.
 Errors are normalized to 0–1 RGB values. The nominal and measured probes use
 the reference rectangle as an explicit diagnostic input. The reference's
 piecewise power transform was reconstructed from its toe slope and exponent
-and verified separately on linear LibRaw output. That reconstruction differed
-from the reference by at most about two u16 codes.
+and verified separately on linear LibRaw output. The analytical probe used
+LibRaw's 0.45 exponent and differed from the reference by about two u16 codes
+at most. The worker experiment below matched RawPy's exact gamma arguments.
 
 | Probe | Frame 000 mean absolute error | Frame 049 mean absolute error |
 | --- | ---: | ---: |
@@ -51,6 +52,29 @@ differences are 0.724498 and 0.742702. LibRaw's own PPG override moves about
 remaining difference can include interpolation, white-balance operation order,
 clamping and rounding. [LibRaw postprocessing](https://github.com/LibRaw/LibRaw/blob/0b56545a4f828743f28a4345cdfdd4c49f9f9a2a/src/postprocessing/dcraw_process.cpp)
 [LibRaw output transform](https://github.com/LibRaw/LibRaw/blob/0b56545a4f828743f28a4345cdfdd4c49f9f9a2a/src/postprocessing/mem_image.cpp#L194)
+
+## Source-pinned isolated worker
+
+A separate Linux diagnostic compiled LibRaw 0.22.0 at
+`0b56545a4f828743f28a4345cdfdd4c49f9f9a2a` and used its compiled
+`dcraw_emu` executable. An authored safe-Rust launcher controlled its
+environment, pipes and deadline. With RawPy's exact `-g 2.222 4.5` arguments,
+both originals delivered 5118×3412 RGB16 with **all samples bit-exact** to
+RawPy. A forced 90° rotation control on frame 000 delivered 3412×5118,
+also bit-exact, with an identity TIFF orientation tag after rotation. The
+same test failed first by two codes with stock LibRaw gamma because
+RawPy's 0.26.1 defaults use exponent `1 / 2.222`.
+[RawPy defaults](https://github.com/letmaik/rawpy/blob/a411daac7d5bf1ab07f6285164e41596a205393e/rawpy/_rawpy.pyx#L1270)
+[Exact worker receipt](native-worker-receipt.json)
+[Stock gamma diagnostic](native-worker-default-gamma.json)
+
+The launcher bounded source bytes, stderr and stdout, set two OpenMP threads,
+and used Linux `prlimit --as` for the child address space. Under a 1 MiB TIFF
+output cap, 1 ms deadline, 64 MiB address-space cap or a truncated CR3 header,
+the process returned a diagnostic and published zero bytes. The capture
+cases completed under a 1 GiB address-space cap and 112 MiB TIFF cap. The
+launcher checked the header and the test independently decoded the full TIFF.
+Both original hashes were rechecked. [Build, binary and failure provenance](native-worker-provenance.json)
 
 ## Reproduce
 
@@ -79,3 +103,29 @@ Isolated lock after resolution SHA-256 `5ae51d437cb2dca00d58d7de3e62deb6b1de1471
 Uncompressed machine receipt SHA-256 `bc0e11b5326bcde942c13dec3abf40f404374580755cf767de2d15f2162ee8f2`.
 The probe removes each intermediate f32 raster after comparison. Delete the
 two temporary CR3 inputs after the final diagnostic.
+
+The Linux worker replay uses the same two sources and separate comparison
+environment. Use the actual ELF from the source build; the build directory's
+Libtool shell wrapper is outside the tested transport.
+
+```sh
+git clone --depth 1 --branch 0.22.0 https://github.com/LibRaw/LibRaw.git \
+  "$scratch/reference-source/libraw"
+test "$(git -C "$scratch/reference-source/libraw" rev-parse HEAD)" = \
+  0b56545a4f828743f28a4345cdfdd4c49f9f9a2a
+(
+  cd "$scratch/reference-source/libraw"
+  autoreconf --install
+  ./configure --disable-static --enable-openmp
+  make -j2
+)
+uv pip install --python "$scratch/venv/bin/python" \
+  tifffile==2026.11.12 imagecodecs==2026.11.11
+rustc +1.100.0 --edition 2024 -D warnings -O --crate-name bounded_worker \
+  "$evidence/bounded_worker.rs.txt" -o "$scratch/bounded-worker"
+OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=1 "$scratch/venv/bin/python" \
+  "$evidence/worker_contract.py.txt" "$scratch"
+```
+
+The temporary CR3s, generated rasters, diagnostic native build and local
+virtual environment were removed after preserving evidence.

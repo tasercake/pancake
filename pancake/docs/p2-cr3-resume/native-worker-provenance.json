@@ -1,0 +1,85 @@
+{
+  "analysis_git_revision": "1a10f4a",
+  "cleanup": {
+    "deleted_original_bytes": 17682772,
+    "deleted_original_count": 2,
+    "owned_scratch_path": "artifacts/resume-cr3",
+    "remaining_original_count": 0,
+    "removed_task_owned_build_and_venv": true
+  },
+  "date": "2026-11-18",
+  "exact_parity_green_frames": 2,
+  "exact_parity_green_rotation_control": true,
+  "exact_parity_red": "AssertionError: expected exact RGB16 parity, max difference 2 u16 codes",
+  "failed_closed_limit_cases": [
+    "output_cap",
+    "deadline",
+    "address_space_cap",
+    "truncated_header"
+  ],
+  "libraw_git_commit": "0b56545a4f828743f28a4345cdfdd4c49f9f9a2a",
+  "native_decoder_argv": [
+    "-w",
+    "-W",
+    "-6",
+    "-q",
+    "3",
+    "-g",
+    "2.222",
+    "4.5",
+    "-T",
+    "-Z",
+    "-"
+  ],
+  "native_rotate90_control_extra_argv": [
+    "-t",
+    "6"
+  ],
+  "owned_sample_inventory": [
+    {
+      "bytes": 8869034,
+      "name": "frame_000.CR3",
+      "sha256": "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca"
+    },
+    {
+      "bytes": 8813738,
+      "name": "frame_049.CR3",
+      "sha256": "98fe6e370fc2ab58ba7b45d242a8c2f2a1942404ee0e0524c5cb33048969dc36"
+    }
+  ],
+  "positive_and_negative_receipt_sha256": "df67b6fdc088d751a5242626453817b9f9099acd877521f84f2dacb55c00a90d",
+  "previous_worktree_base_git_revision": "bbb4767a7ef5857c38a2f12661dcfbc06d0e36ce",
+  "products_sha256": {
+    "external_oracle_source": "2e0e6adfec6f3ada66cd054e82e10ee2fd49871dd2a8f6586cb20780a3d60dda",
+    "native_decoder_executable": "a0325b2ecf314e0634f2b1806a9476424a5d2e48e9a7ec103e6ece18170903a4",
+    "native_decoder_library": "f40e8d61b02671bf5dd4a379259ea6cd7309467416fd9b9dd3acdf167609f4b3",
+    "native_default_gamma_receipt": "5c398bb261f9bbb6ac2ec42e97f3cd1df14397714fc9de49e17c30c80ced53a8",
+    "native_worker_executable": "e7411f8bd0d3b30f2e793658754c2d4046e043be01e04885adc8a0641c18bd2c",
+    "native_worker_rust_source": "fc3fe98efaf8539025f84bfca0b44dcacd8a9e8d9c5aa82956063e782d7f587f",
+    "rawpy_cython_source": "44c4dd43cfb5413dad6317d54d5cb9557d06d5e124e44bb4c6374db3f1afe6f5"
+  },
+  "rawpy_git_tag_commit": "a411daac7d5bf1ab07f6285164e41596a205393e",
+  "rawpy_runtime": "0.26.1 with LibRaw 0.22.0",
+  "resource_options": {
+    "diagnostic_limit_bytes": 65536,
+    "native_openmp_threads": 2,
+    "source_limit_bytes": 268435456,
+    "success_address_space_bytes": 1073741824,
+    "success_output_limit_bytes": 117440512,
+    "success_wall_deadline_ms": 10000
+  },
+  "source_build_commands": [
+    "autoreconf --install",
+    "./configure --disable-static --enable-openmp",
+    "make -j2"
+  ],
+  "tests_before_transport": "failed because the bounded-worker executable did not exist",
+  "toolchain": {
+    "gcc": "13.3.0",
+    "prlimit": "util-linux 2.39.3",
+    "python": "3.12.12",
+    "rustc": "1.100.0 0ef1bc386",
+    "tifffile": "2026.11.12"
+  },
+  "working_scope": "isolated diagnostic only, Linux x86-64"
+}

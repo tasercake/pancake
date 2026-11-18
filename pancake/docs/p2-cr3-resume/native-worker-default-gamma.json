@@ -1,0 +1,85 @@
+{
+  "native": {
+    "frame_000.CR3": {
+      "shape_hwc": [
+        3412,
+        5118,
+        3
+      ],
+      "dtype": "uint16",
+      "native_profile": "native",
+      "orientation_tiff_tag": 1,
+      "tiff_bytes": 104777568,
+      "tiff_sha256": "cfd4721c1c752e14b17ae8ff4413d46817bd145ad5c793f78dde9afa1e362cea",
+      "rgb_le_u16_sha256": "7b98694521ef6e7b472e99dfc033372f5853c53576fafaeba90d5487a3e20be7",
+      "reference_rgb_le_u16_sha256": "382cfe53a519ce10c0ad1a8ed083af46a83c216985c2ca4a7828ec09c3827040",
+      "max_abs_u16": 2,
+      "mean_abs_u16": 1.0324107606023443,
+      "mean_signed_u16": 1.0324107606023443
+    },
+    "frame_049.CR3": {
+      "shape_hwc": [
+        3412,
+        5118,
+        3
+      ],
+      "dtype": "uint16",
+      "native_profile": "native",
+      "orientation_tiff_tag": 1,
+      "tiff_bytes": 104777568,
+      "tiff_sha256": "75a19154baa7ba918536479694a4a4cc193f45a4f9ad559e246546623d28e0e6",
+      "rgb_le_u16_sha256": "6f72ef6515397a90a2caf665dd611c9c2e68b318d8319ba34205b549ef543ced",
+      "reference_rgb_le_u16_sha256": "5dbbcb603cc4021f2c57afefaf74af97d5f17585b47041cd1fdb8a2141500da1",
+      "max_abs_u16": 2,
+      "mean_abs_u16": 1.0666954481504947,
+      "mean_signed_u16": 1.0666954481504947
+    }
+  },
+  "rotation_control": {
+    "shape_hwc": [
+      5118,
+      3412,
+      3
+    ],
+    "dtype": "uint16",
+    "native_profile": "rotate90",
+    "orientation_tiff_tag": 1,
+    "tiff_bytes": 104777568,
+    "tiff_sha256": "b77e48ed454115e2504b0199fa70c215d5d4c8ecce6fad4d5876eea685f87653",
+    "rgb_le_u16_sha256": "72e40e2899dff5d6ff307c5010fade72a4e8c901b7c7c29a2bf98c98df0ef534",
+    "reference_rgb_le_u16_sha256": "954912eeb31c2b3023699ca64b286dc0bd294be3920847ed0541c1718e159c90",
+    "max_abs_u16": 2,
+    "mean_abs_u16": 1.0324107606023443,
+    "mean_signed_u16": 1.0324107606023443
+  },
+  "limits": {
+    "output_cap": {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "diagnostic": "Error: \"native decoder output byte limit exceeded\"",
+      "elapsed_seconds": 1.017808179021813
+    },
+    "deadline": {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "diagnostic": "Error: \"native decoder deadline exceeded\"",
+      "elapsed_seconds": 0.0037683339905925095
+    },
+    "address_space_cap": {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "diagnostic": "Error: \"native decoder exited (exit status: 2) without a valid TIFF: Cannot do postprocessing on /tmp/pancake-worktrees.t3paqgWM/resume-cr3/artifacts/resume-cr3/frame_000.CR3: Libraw internal mempool overflowed\"",
+      "elapsed_seconds": 0.14526621100958437
+    },
+    "truncated_header": {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "diagnostic": "Error: \"native decoder exited (exit status: 2) without a valid TIFF: Cannot open /tmp/pancake-worktrees.t3paqgWM/resume-cr3/artifacts/resume-cr3/truncated.CR3: Unsupported file format or not RAW file\"",
+      "elapsed_seconds": 0.006107562978286296
+    }
+  },
+  "source_hashes_before_after": {
+    "frame_000.CR3": "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca",
+    "frame_049.CR3": "98fe6e370fc2ab58ba7b45d242a8c2f2a1942404ee0e0524c5cb33048969dc36"
+  }
+}

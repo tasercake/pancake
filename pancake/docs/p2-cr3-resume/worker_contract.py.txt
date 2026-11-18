@@ -1,0 +1,141 @@
+"""Exercise the real isolated LibRaw sample decoder and transport limits."""
+
+import hashlib
+import io
+import json
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+import numpy as np
+import rawpy
+import tifffile
+
+
+def run_worker(
+    root,
+    source,
+    *,
+    timeout=10000,
+    output=112 * 1024**2,
+    memory=1024**3,
+    orientation="native",
+):
+    """Start the worker with explicit local tool, path and resource settings."""
+    libraw = root / "reference-source/libraw"
+    arguments = [
+        str(root / "bounded-worker"),
+        str(libraw / "bin/.libs/dcraw_emu"),
+        str(libraw / "lib/.libs"),
+        str(source),
+        str(output),
+        str(timeout),
+        str(memory),
+        orientation,
+    ]
+    start = time.monotonic()
+    process = subprocess.run(arguments, check=False, capture_output=True, timeout=20)
+    return process, time.monotonic() - start
+
+
+def check_native(root, source, orientation):
+    """Compare the real TIFF transport with RawPy full develop at same orientation."""
+    process, _ = run_worker(root, source, orientation=orientation)
+    assert process.returncode == 0, process.stderr.decode(errors="replace")
+    with tifffile.TiffFile(io.BytesIO(process.stdout)) as candidate:
+        tags = candidate.pages[0].tags
+        orientation_field = tags["Orientation"].value if "Orientation" in tags else 1
+        rgb = candidate.asarray()
+    options = {"use_camera_wb": True, "no_auto_bright": True, "output_bps": 16}
+    if orientation == "rotate90":
+        options["user_flip"] = 6
+    with rawpy.imread(str(source)) as raw:
+        oracle = raw.postprocess(**options)
+    assert rgb.dtype == oracle.dtype == np.dtype("uint16")
+    assert rgb.shape == oracle.shape
+    assert orientation_field == 1
+    delta = np.subtract(rgb, oracle, dtype=np.int32)
+    absolute = np.abs(delta)
+    maximum = int(absolute.max())
+    assert maximum == 0, (
+        f"expected exact RGB16 parity, max difference {maximum} u16 codes"
+    )
+    return {
+        "shape_hwc": list(rgb.shape),
+        "dtype": rgb.dtype.name,
+        "native_profile": orientation,
+        "orientation_tiff_tag": int(orientation_field),
+        "tiff_bytes": len(process.stdout),
+        "tiff_sha256": hashlib.sha256(process.stdout).hexdigest(),
+        "rgb_le_u16_sha256": hashlib.sha256(
+            rgb.astype("<u2", copy=False).tobytes()
+        ).hexdigest(),
+        "reference_rgb_le_u16_sha256": hashlib.sha256(
+            oracle.astype("<u2", copy=False).tobytes()
+        ).hexdigest(),
+        "max_abs_u16": maximum,
+        "mean_abs_u16": float(absolute.mean(dtype=np.float64)),
+        "mean_signed_u16": float(delta.mean(dtype=np.float64)),
+    }
+
+
+def failure(root, source, expected, **limits):
+    """Verify fail-closed transport using a real decoder input."""
+    process, elapsed = run_worker(root, source, **limits)
+    diagnostic = process.stderr.decode(errors="replace")
+    assert process.returncode != 0, f"unexpected successful output {expected}"
+    assert not process.stdout, "failure published partial output"
+    assert expected in diagnostic, diagnostic
+    return {
+        "exit": process.returncode,
+        "stdout_bytes": len(process.stdout),
+        "diagnostic": diagnostic.strip(),
+        "elapsed_seconds": elapsed,
+    }
+
+
+def main(root):
+    """Run success and negative cases serially with frozen originals."""
+    paths = [root / "frame_000.CR3", root / "frame_049.CR3"]
+    expected = {
+        "frame_000.CR3": "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca",
+        "frame_049.CR3": "98fe6e370fc2ab58ba7b45d242a8c2f2a1942404ee0e0524c5cb33048969dc36",
+    }
+    for source in paths:
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == expected[source.name]
+    results = {
+        "native": {
+            source.name: check_native(root, source, "native") for source in paths
+        },
+        "rotation_control": check_native(root, paths[0], "rotate90"),
+        "limits": {
+            "output_cap": failure(root, paths[0], "output byte limit", output=1024**2),
+            "deadline": failure(root, paths[0], "deadline", timeout=1),
+            "address_space_cap": failure(
+                root, paths[0], "native decoder exited", memory=64 * 1024**2
+            ),
+        },
+    }
+
+    truncated = root / "truncated.CR3"
+    try:
+        with paths[0].open("rb") as source:
+            prefix = source.read(128)
+        with truncated.open("xb") as target:
+            target.write(prefix)
+        results["limits"]["truncated_header"] = failure(
+            root, truncated, "native decoder exited"
+        )
+    finally:
+        truncated.unlink(missing_ok=True)
+    for source in paths:
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == expected[source.name]
+    results["source_hashes_before_after"] = expected
+    (root / "native-worker-receipt.json").write_text(
+        json.dumps(results, indent=2) + "\n"
+    )
+
+
+if __name__ == "__main__":
+    main(Path(sys.argv[1]).resolve(strict=True))
