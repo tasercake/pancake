@@ -55,6 +55,9 @@ impl PointerHandoff {
                     if let Some((held, pressed_at)) = forwarded.take() {
                         let position =
                             current_position(window, &mut connection).unwrap_or(pressed_at);
+                        // The native adapter still needs a real motion event to
+                        // update its cache, even after this repaired click.
+                        synchronize.set(true);
                         let _delivered =
                             window.dispatch_event_with_result(WindowEvent::PointerReleased {
                                 position,
