@@ -1,0 +1,168 @@
+{
+  "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+  "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "strace": "strace -- version 6.8",
+  "source_fixture_sha256": "4857e9bc29af558c81a207d575980397490b6f47f9e27f006873a2dc713e3567",
+  "variants": {
+    "before": {
+      "app": "/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/target/debug/pancake-gui",
+      "binary_sha256": "93eb2527fefbbdec46f92778220abb7bbf5cacc1762864235c9dada342cbccfd",
+      "xvfb": "/tmp/pancake-worktrees.t3paqgWM/p7-ui/artifacts/p7/system/root/usr/bin/Xvfb",
+      "settings": {
+        "SLINT_BACKEND": "winit-software"
+      },
+      "shadow_source": "export component P9AuditMarker inherits Rectangle {}\n",
+      "runs": [
+        {
+          "variant": "empty-cwd",
+          "command": [
+            "dbus-run-session",
+            "--",
+            "strace",
+            "-f",
+            "-e",
+            "trace=openat",
+            "-o",
+            "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-slint-shadow-before/empty-cwd.strace",
+            "/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/target/debug/pancake-gui"
+          ],
+          "display": ":2",
+          "exit_when_observed": null,
+          "window_observed": true,
+          "std_widget_openat_calls": [],
+          "diagnostics": [],
+          "raw_trace_sha256": "47e88e9f11e58de2e2313e34e863720fa1e1416b21b47545440998bb02edcd63"
+        },
+        {
+          "variant": "local-widget-shadow",
+          "command": [
+            "dbus-run-session",
+            "--",
+            "strace",
+            "-f",
+            "-e",
+            "trace=openat",
+            "-o",
+            "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-slint-shadow-before/local-widget-shadow.strace",
+            "/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/target/debug/pancake-gui"
+          ],
+          "display": ":2",
+          "exit_when_observed": 1,
+          "window_observed": false,
+          "std_widget_openat_calls": [
+            "17530 openat(AT_FDCWD, \"/tmp/pancake-p9-slint-efmwgq66/std-widgets.slint\", O_RDONLY|O_CLOEXEC) = 9"
+          ],
+          "diagnostics": [
+            "Error: \":1: No exported type called 'Button' found in \\\"std-widgets.slint\\\"\\n:1: No exported type called 'CheckBox' found in \\\"std-widgets.slint\\\"\\n:1: No exported type called 'ComboBox' found in \\\"std-widgets.slint\\\"\\n:1: No exported type called 'LineEdit' found in \\\"std-widgets.slint\\\"\\n:1: No exported type called 'Palette' found in \\\"std-widgets.slint\\\"\\n:1: No exported type called 'ScrollView' found in \\\"std-widgets.slint\\\"\""
+          ],
+          "raw_trace_sha256": "3f64a2f042cf9d056da0fa4967015e0a92e41bcd1d9585fa84745e30ba0339d7"
+        }
+      ],
+      "source_commit": "8f1da27b65c2138768d2b118ee7701501368c2ca",
+      "lock_sha256": "4e705dc47a6fcc2ff46a9c0ace4307605463a9d57d3e1e4a916caf8b72c8da18",
+      "gui_source_sha256": "66dcaab786291d0b5b47e39b741cf8ff0f93478bcc666da486d00529d3eadfb8",
+      "artifact_note": "Debug GUI supplied by the P7 build owner. Each run owns a distinct Xvfb process and D-Bus session."
+    },
+    "after": {
+      "app": "/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/target/debug/pancake-gui",
+      "binary_sha256": "debb8ec804b76ae8f683527a2364ec2d693ca7862945ecab0c371ada86483597",
+      "xvfb": "/tmp/pancake-worktrees.t3paqgWM/p7-ui/artifacts/p7/system/root/usr/bin/Xvfb",
+      "settings": {
+        "SLINT_BACKEND": "winit-software"
+      },
+      "shadow_source": "export component P9AuditMarker inherits Rectangle {}\n",
+      "runs": [
+        {
+          "variant": "empty-cwd",
+          "command": [
+            "dbus-run-session",
+            "--",
+            "strace",
+            "-f",
+            "-e",
+            "trace=openat",
+            "-o",
+            "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-slint-shadow-after/empty-cwd.strace",
+            "/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/target/debug/pancake-gui"
+          ],
+          "display": ":2",
+          "exit_when_observed": null,
+          "window_observed": true,
+          "std_widget_openat_calls": [],
+          "diagnostics": [],
+          "raw_trace_sha256": "e754770aad8a62994a0c21025c273becd23dba2fb976164102ac07ed9b9484a6"
+        },
+        {
+          "variant": "local-widget-shadow",
+          "command": [
+            "dbus-run-session",
+            "--",
+            "strace",
+            "-f",
+            "-e",
+            "trace=openat",
+            "-o",
+            "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-slint-shadow-after/local-widget-shadow.strace",
+            "/tmp/pancake-worktrees.t3paqgWM/p7-ui/pancake/target/debug/pancake-gui"
+          ],
+          "display": ":2",
+          "exit_when_observed": null,
+          "window_observed": true,
+          "std_widget_openat_calls": [],
+          "diagnostics": [],
+          "raw_trace_sha256": "1c374ee6b53613b91012437f31002600e790855fe9c30c36e4f7600ad202d264"
+        }
+      ],
+      "source_commit": "fa885f1662b15ba76125480b0c1e220efce0d1ff",
+      "lock_sha256": "b2fa570aaa2dbc0265d938f9cb4567c78fe6ca2a0b8c6acba7c98fc381ec7cf4",
+      "gui_source_sha256": "dc91b6eb2cf51ca1b7eaa5a9bc6cb06849c15c658e60d9331a8d90517620b4b9",
+      "artifact_note": "Debug GUI supplied by the P7 build owner. Each run owns a distinct Xvfb process and D-Bus session."
+    }
+  },
+  "cargo_graphs": {
+    "rowan": {
+      "command": [
+        "cargo",
+        "tree",
+        "--locked",
+        "--offline",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "pancake-gui",
+        "-i",
+        "rowan"
+      ],
+      "log": "rowan.log",
+      "sha256": "594703135e198b0de2d027b96e65ec2dbfd2b07bbe80dfd592e1295282039da1"
+    },
+    "wgpu": {
+      "command": [
+        "cargo",
+        "tree",
+        "--locked",
+        "--offline",
+        "--target",
+        "x86_64-unknown-linux-gnu",
+        "-p",
+        "pancake-gui",
+        "-i",
+        "wgpu",
+        "--depth",
+        "3"
+      ],
+      "log": "wgpu.log",
+      "sha256": "0d9055f9d71affa93c10dee9056419ef18b703924f2f8eb0d9dc6a2bcdb53203"
+    }
+  },
+  "headless_absent_dependencies": [
+    "slint",
+    "rowan ",
+    "winit ",
+    "accesskit",
+    "gtk ",
+    "atk ",
+    "x11-dl",
+    "wayland-client"
+  ]
+}

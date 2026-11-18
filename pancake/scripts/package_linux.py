@@ -61,15 +61,17 @@ def _elf_header(path):
 def _dependency_report(staging, binaries, control):
     """Resolve actual ELF dependencies in the package build distribution."""
     debian = staging / "debian"
-    debian.mkdir()
+    debian.mkdir(exist_ok=True)
     (debian / "control").write_text(f"Source: pancake\nSection: graphics\nPriority: optional\n\n{control}",
                                     encoding="utf-8")
     result = _run("dpkg-shlibdeps", "-O", *(f"-e{path}" for path in binaries), cwd=staging)
     linked = result.stdout.strip().removeprefix("shlibs:Depends=")
     if not linked or linked == result.stdout.strip():
         raise ValueError("dpkg-shlibdeps did not resolve native dependencies")
-    dependencies = (*linked.split(", "), *SESSION_DEPENDS)
-    return ", ".join(dict.fromkeys(dependencies)), result.stderr
+    dependencies = linked.split(", ")
+    provided = {dependency.partition(" ")[0] for dependency in dependencies if "|" not in dependency}
+    dependencies.extend(dependency for dependency in SESSION_DEPENDS if dependency not in provided)
+    return ", ".join(dependencies), result.stderr
 
 
 def build_package(release, output, version, maintainer, revision, lock_digest):
@@ -94,7 +96,7 @@ def build_package(release, output, version, maintainer, revision, lock_digest):
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".pancake-package-", dir=output.parent) as scratch:
         staging = Path(scratch)
-        payload = staging / "payload"
+        payload = staging / "debian" / "pancake"
         bindir = payload / "usr" / "bin"
         bindir.mkdir(parents=True)
         audit = {}

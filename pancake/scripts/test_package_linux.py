@@ -5,8 +5,10 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from subprocess import CompletedProcess
+from unittest.mock import patch
 
-from package_linux import build_package, file_sha256
+from package_linux import _dependency_report, build_package, file_sha256
 
 
 class LinuxPackageTests(unittest.TestCase):
@@ -36,6 +38,18 @@ class LinuxPackageTests(unittest.TestCase):
             launcher = root / "unpack/usr/share/applications/pancake.desktop"
             self.assertIn("Exec=pancake-gui %F", launcher.read_text())
             self.assertIn("Shared library: [libc.so.6]", receipt["binaries"]["pancake-cli"]["dynamic"])
+
+    def test_direct_version_constraint_replaces_duplicate_runtime_dependency(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            versioned = "libfontconfig1 (>= 2.12.6)"
+            with patch("package_linux._run", return_value=CompletedProcess(
+                args=[], returncode=0, stdout=f"shlibs:Depends=libc6 (>= 2.39), {versioned}\n", stderr=""
+            )):
+                dependencies, _ = _dependency_report(root, (), "Package: pancake\n")
+            requirements = dependencies.split(", ")
+            self.assertIn(versioned, requirements)
+            self.assertNotIn("libfontconfig1", requirements)
 
     def test_a_shell_script_cannot_be_packaged_as_a_native_release_binary(self):
         with tempfile.TemporaryDirectory() as directory:
