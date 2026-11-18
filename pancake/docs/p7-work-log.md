@@ -71,3 +71,12 @@ build was used only to localize the fault and its logging code was removed.
 The private Xvfb launcher adds `-noreset` to preserve its display socket
 across accessibility service activation before Openbox starts. The
 unchanged runner still owns startup, teardown, and physical input.
+
+### Matched Linux release
+
+The sealed `5216ba4` release passed all 34 isolated native GUI cases and
+the separate physical RTX 3090 GUI case. The unchanged file panel case
+passed the immediate Cancel and reopen sequence, and the original native
+64-frame workload passed pause, resume, cancel, and worker reuse. The
+joint package verifier matched these 35 cases with all 341 host cases.
+[Release and native input receipts](p7-ui-evidence/5216ba4/README.md).
