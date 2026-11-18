@@ -939,7 +939,9 @@ fn remember_inputs(
 #[cfg(target_os = "linux")]
 fn file_menu(session: &mut Session, window: &ComponentInstance, _: &[Value]) -> UiResult {
     use desktop_menu::FileAction;
-    match desktop_menu::show_file(session.history.entries())? {
+    let choice = desktop_menu::show_file(session.history.entries());
+    panel::restore_focus(window);
+    match choice? {
         Some(FileAction::OpenFiles) => import_files(session, window, &[]),
         Some(FileAction::OpenFolder) => import_folder(session, window, &[]),
         Some(FileAction::OpenRecent(path)) => {
@@ -995,7 +997,9 @@ fn clear_recent(session: &mut Session, window: &ComponentInstance, _: &[Value]) 
 #[cfg(target_os = "linux")]
 fn source_menu(session: &mut Session, window: &ComponentInstance, args: &[Value]) -> UiResult {
     use desktop_menu::SourceAction;
-    match desktop_menu::show_source()? {
+    let choice = desktop_menu::show_source();
+    panel::restore_focus(window);
+    match choice? {
         Some(SourceAction::Remove) => remove_sources(session, window, args),
         Some(SourceAction::Reveal) => reveal_source(session, window, args),
         None => Ok(()),

@@ -25,15 +25,24 @@ pub enum Picker<'a> {
 /// Returns a platform dialog or path-resolution error.
 #[cfg(target_os = "linux")]
 pub fn select(window: &ComponentInstance, kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
+    let selected = linux::choose(kind);
+    restore_focus(window);
+    selected
+}
+
+/// Return focus from a native GTK popup to its actual Slint owner.
+#[cfg(target_os = "linux")]
+pub fn restore_focus(window: &ComponentInstance) {
     use slint::ComponentHandle as _;
     use slint::winit_030::WinitWindowAccessor as _;
 
-    let selected = linux::choose(kind);
     service_events();
+    if let Some(display) = gtk::gdk::Display::default() {
+        display.sync();
+    }
     let _focused = window
         .window()
         .with_winit_window(slint::winit_030::winit::window::Window::focus_window);
-    selected
 }
 
 /// Use the platform dialog with native window parenting.
