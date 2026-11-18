@@ -118,5 +118,40 @@
   "unresolved": [
     "Full native assurance and audited image/raw dependency inventory are pending on the integrated source.",
     "Apple and Windows builds for this change were not run on this Linux host."
-  ]
+  ],
+  "integration": {
+    "base_commit": "e1bac3a",
+    "tested_commit": "8c1d650f9a7f9e3e68c52badfdea54687621c425",
+    "cargo_lock_sha256": "3ddbc2bdae9eff3e8a5284e09d614684a1145fb384a46c59ad307acf17ea34bf",
+    "export_source_sha256": "1104274e242452cc7586b2cf5bba38985333b83f5688cdec8bdf00a6722ad0c5",
+    "export_tests_sha256": "d4e3c64280dd421e5cfd22291dfa43c662dcc417ded73d737606e5f663561764",
+    "commands_from_pancake_directory": [
+      "bash scripts/check.sh fast",
+      "cargo test --locked --offline --workspace --test cpu_image_export --test cpu_image_io --test cpu_cli --test cpu_config",
+      "bash scripts/check.sh deps"
+    ],
+    "results": {
+      "fast": "Passed 40 checker tests, reviewed source/dependency inventory, strict Clippy, and rustdoc.",
+      "tests": {
+        "passed": 18,
+        "failed": 0,
+        "targets": {
+          "cpu_image_export": 6,
+          "cpu_image_io": 3,
+          "cpu_cli": 5,
+          "cpu_config": 4
+        }
+      },
+      "dependencies": "Passed 19 policy tests and 7 patch/macro contract tests. Advisory, ban, source and unused-dependency checks passed. The export change added four direct edges and no package versions.",
+      "independent_oracle": "All four outputs repeat the exact hashes and decoded values recorded in independent_oracle.outputs.",
+      "cleanup": "Removed four generated oracle output files. After checking no build was active in the export worktree, cargo clean removed 7,469 local build files totaling 3.1 GiB."
+    },
+    "artifacts": {
+      "check-oracle.py.txt": "57d52d5c0b2a410847d5aa85c662fdbc4f3635d426876f7ce3eb481a9fe73bce",
+      "deps.log.gz": "6f80b585bb4005c24b9de64a2ef8bf24715767d99167f0798e22b367e490c707",
+      "driver.rs.txt": "2db48c042760e06642d2d6ca75e63fa4ca1384b2cf876bbc6c67009a88a87065",
+      "fast.log.gz": "f5118d8a51eb65bc27790fe2e1f956b739e727c0f38f268e213cb1ea0413df35",
+      "tests.log.gz": "fe091326777e60b8ce507c66c2ed2ce06a068fedd82c66b14f8fbde0108cfb5b"
+    }
+  }
 }
