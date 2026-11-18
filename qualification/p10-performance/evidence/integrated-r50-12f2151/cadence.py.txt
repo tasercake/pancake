@@ -1,0 +1,45 @@
+"""Explain recorded RSS gaps using actual trace times, independently of gates."""
+
+import gzip
+import json
+import sys
+from pathlib import Path
+
+paired = Path(sys.argv[1]).resolve(strict=True)
+report = json.loads((paired / "report.json").read_bytes())
+if not report.get("finished_at_unix_ns"):
+    raise ValueError("report must be terminal")
+
+measured = []
+for job in report["samples"] + report["diagnostics"]:
+    if not job["valid"]:
+        continue
+    name = f"{job['kind']}-{job['number']:02d}/{job['target']}"
+    trace = paired / name / "resources.jsonl.gz"
+    elapsed = job["elapsed_ns"]
+    previous, largest = 0, {"duration_ns": 0}
+    with gzip.open(trace, "rt") as stream:
+        for line in stream:
+            sample = json.loads(line)
+            actual = sample["rss_elapsed_ns"]
+            if actual > elapsed:
+                break
+            gap = actual - previous
+            if gap > largest["duration_ns"]:
+                largest = {
+                    "duration_ns": gap,
+                    "when": "initial" if previous == 0 else "interior",
+                    "sample_end_ns": actual,
+                    "wake_after_absolute_slot_ns": sample["started_ns"] - sample["scheduled_ns"],
+                    "snapshot_wall_ns": actual - sample["started_ns"],
+                    "snapshot_thread_cpu_ns": sample["snapshot_thread_cpu_ns"],
+                }
+            previous = actual
+    if elapsed - previous > largest["duration_ns"]:
+        largest = {"duration_ns": elapsed - previous, "when": "terminal"}
+    if largest["duration_ns"] != job["maximum_rss_sample_gap_ns"]:
+        raise ValueError(f"recomputed cadence disagrees for {name}")
+    measured.append({"case": name, "target": job["target"], "worst_gap": largest})
+
+out = {"algorithm": "Initial and terminal elapsed interval bounds plus consecutive procfs RSS sample timestamps; each gap is preserved regardless of peak size.", "samples": measured}
+print(json.dumps(out, indent=2))

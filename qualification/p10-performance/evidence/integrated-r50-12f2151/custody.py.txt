@@ -1,0 +1,108 @@
+"""Verify, transfer two read-only witnesses, and clean the owned originals."""
+
+import hashlib
+import json
+import shutil
+import sys
+from pathlib import Path
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+scratch, evidence, lease = (Path(p).absolute() for p in sys.argv[1:])
+acquisition = json.loads((scratch / "acquisition.json").read_bytes())
+runs = json.loads((scratch / "paired/report.json").read_bytes())
+if not (runs.get("finished_at_unix_ns") and (evidence / "raw-paired-runs.sha256").is_file()):
+    raise ValueError("retain terminal receipts before cleanup")
+inputs = scratch / "inputs"
+owner_path = inputs / "ownership.json"
+owner = json.loads(owner_path.read_bytes())
+frames = acquisition["ordered_files"]
+if (
+    len(frames) != 50
+    or owner["expected_files"] != 50
+    or owner["manifest_sha256"] != acquisition["manifest_sha256"]
+):
+    raise ValueError("expected the task-owned frozen 50 originals")
+expected = {inputs / item["path"] for item in frames} | {owner_path}
+actual = {entry for entry in inputs.rglob("*") if not entry.is_dir()}
+if actual != expected or any(entry.is_symlink() for entry in inputs.rglob("*")):
+    raise ValueError("input stage contains paths outside its verified ownership")
+
+
+def verify(path, item):
+    if (
+        path.is_symlink()
+        or not path.is_file()
+        or path.stat().st_size != item["bytes"]
+    ):
+        raise ValueError(f"ownership path or size changed for {path}")
+    with path.open("rb") as stream:
+        if hashlib.file_digest(stream, "sha256").hexdigest() != item["sha256"]:
+            raise ValueError(f"ownership hash changed for {path}")
+
+
+for item in frames:
+    verify(inputs / item["path"], item)
+exports = sorted((scratch / "paired").glob("*/*/complete.tif"))
+warm = {
+    item["target"]: item["output"]
+    for item in runs["samples"]
+    if item["kind"] == "warm" and item["number"] == 1 and item["valid"]
+}
+if exports and (
+    len(exports) != 2
+    or not runs["cleanup"]["retained_review_pair"]
+    or not (evidence / "focus-comparison.json").is_file()
+):
+    raise ValueError("the retained warm witness pair needs reviewed evidence before deletion")
+for output in exports:
+    if output.parent.parent.name != "warm-01":
+        raise ValueError(f"unexpected owned export {output}")
+    verify(output, warm[output.parent.name])
+
+selected = [frames[0], frames[-1]]
+lease.mkdir(parents=False, exist_ok=False)
+leased = []
+for item in selected:
+    original = inputs / item["path"]
+    destination = lease / original.name
+    with original.open("rb") as reader, destination.open("xb") as writer:
+        shutil.copyfileobj(reader, writer)
+    verify(destination, item)
+    leased.append({**item, "leased_name": destination.name})
+transfer = {
+    "owner": "/root/assurance",
+    "previous_owner": "/root/p2_corpus",
+    "purpose": "Two exact CR3 inputs for separate bounded RAW intermediate-copy bitwise parity, after official Hybrid CPU timing. The receiving agent owns deletion after its proof.",
+    "transferred_at": datetime.now(ZoneInfo("Asia/Singapore")).isoformat(timespec="seconds"),
+    "path": str(lease),
+    "native_manifest_sha256": acquisition["manifest_sha256"],
+    "files": leased,
+}
+transfer_json = json.dumps(transfer, indent=2) + "\n"
+(lease / "ownership.json").write_text(transfer_json)
+(evidence / "staging-transfer.json").write_text(transfer_json)
+
+removed_exports = []
+for output in exports:
+    removed_exports.append({
+        "path": str(output.relative_to(scratch)),
+        **warm[output.parent.name],
+    })
+    output.unlink()
+shutil.rmtree(inputs)
+if inputs.exists() or list((scratch / "paired").glob("*/*/complete.tif")):
+    raise ValueError("owned originals or tracked review exports still present")
+
+cleanup = {
+    "removed_local_original_count": len(frames),
+    "removed_local_original_bytes": sum(item["bytes"] for item in frames),
+    "verified_unchanged_before_removal": True,
+    "transferred_exact_original_count": len(leased),
+    "remaining_originals_owner": transfer["owner"],
+    "remaining_originals_receipt": "staging-transfer.json",
+    "retained_review_exports_removed": removed_exports,
+    "other_export_paths_removed_by_runner": runs["cleanup"]["removed_partial_or_diagnostic_outputs"],
+    "paired_runtime_cache_absent": not (scratch / "paired/cache").exists(),
+}
+(evidence / "cleanup.json").write_text(json.dumps(cleanup, indent=2) + "\n")

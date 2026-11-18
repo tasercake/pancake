@@ -1,0 +1,5 @@
+2026-11-18T15:45:15+08:00
+MemAvailable:   44747028 kB
+SwapFree:         152132 kB
+NVIDIA GeForce RTX 3090, 580.178.04, P2, 2 %, 654 MiB, 66
+paired_runner_exit=1
