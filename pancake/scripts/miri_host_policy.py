@@ -22,7 +22,8 @@ def validate(root):
     crate_roots = [root, *(path.parent for path in root.glob('crates/*/Cargo.toml'))]
     production = {'Cargo.lock'}
     for crate in crate_roots:
-        files = [crate / 'Cargo.toml', *(crate / 'src').rglob('*.rs')]
+        source = crate / 'src'
+        files = [crate / 'Cargo.toml', *source.rglob('*.rs'), *source.rglob('*.slint')]
         if (crate / 'build.rs').exists():
             files.append(crate / 'build.rs')
         production.update(path.relative_to(root).as_posix() for path in files)

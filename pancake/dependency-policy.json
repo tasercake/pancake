@@ -178,6 +178,11 @@
           "requirement": "^2.2.1"
         },
         {
+          "name": "cairo-rs",
+          "version": "0.22.11",
+          "requirement": "^2.10"
+        },
+        {
           "name": "calloop",
           "version": "0.13.0",
           "requirement": "^2.4"
@@ -221,6 +226,11 @@
           "name": "gbm",
           "version": "0.18.0",
           "requirement": "^2"
+        },
+        {
+          "name": "glib",
+          "version": "0.22.11",
+          "requirement": "^2.10"
         },
         {
           "name": "glutin",
@@ -610,6 +620,11 @@
           "requirement": "^0.6.2"
         },
         {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
           "name": "objc2-core-foundation",
           "version": "0.3.2",
           "requirement": ">=0.6.1, <0.8.0"
@@ -633,6 +648,11 @@
           "name": "objc2-ui-kit",
           "version": "0.3.2",
           "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
+          "requirement": "^0.6.0"
         },
         {
           "name": "wgpu-hal",
@@ -2034,8 +2054,18 @@
           "requirement": ">=0.6.2, <0.8.0"
         },
         {
+          "name": "objc2-uniform-type-identifiers",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
           "name": "raw-window-metal",
           "version": "1.1.0",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.6.0"
         },
         {
@@ -2118,6 +2148,11 @@
         {
           "name": "muda",
           "version": "0.21.2",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.3.0"
         },
         {
@@ -2293,8 +2328,18 @@
           "requirement": "^0.3.2"
         },
         {
+          "name": "objc2-uniform-type-identifiers",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
           "name": "raw-window-metal",
           "version": "1.1.0",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.3.0"
         },
         {
@@ -2478,6 +2523,43 @@
       "expires_on": "2027-02-15",
       "clippy_allow": true,
       "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-uniform-type-identifiers",
+      "version": "0.2.2",
+      "reason": "UIKit needs its matching Uniform Type Identifiers binding generation in dormant iOS metadata. AppKit and rfd use the other generation to build native macOS panel filters. Platform panel types stay inside their own toolkit.",
+      "parents": [
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
+    },
+    {
+      "name": "objc2-uniform-type-identifiers",
+      "version": "0.3.2",
+      "reason": "UIKit needs its matching Uniform Type Identifiers binding generation in dormant iOS metadata. AppKit and rfd use the other generation to build native macOS panel filters. Platform panel types stay inside their own toolkit.",
+      "parents": [
+        {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
+          "requirement": "^0.3.0"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
     },
     {
       "name": "prettyplease",
@@ -3477,6 +3559,16 @@
           "requirement": "^3.0"
         },
         {
+          "name": "glib-macros",
+          "version": "0.22.11",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "gtk3-macros",
+          "version": "0.19.0",
+          "requirement": "^3.0"
+        },
+        {
           "name": "i-slint-compiler",
           "version": "1.19.0",
           "requirement": "^3.0"
@@ -3885,6 +3977,11 @@
           "name": "skia-bindings",
           "version": "0.157.0",
           "requirement": "^1.0.3"
+        },
+        {
+          "name": "system-deps",
+          "version": "9.0.1",
+          "requirement": "^1"
         }
       ],
       "reviewed_on": "2026-11-18",
@@ -4402,6 +4499,11 @@
           "requirement": "^0.61.2"
         },
         {
+          "name": "gio-sys",
+          "version": "0.22.11",
+          "requirement": ">=0.52, <=0.61"
+        },
+        {
           "name": "home",
           "version": "0.5.12",
           "requirement": "^0.61"
@@ -4419,6 +4521,11 @@
         {
           "name": "polling",
           "version": "3.11.0",
+          "requirement": "^0.61"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.61"
         },
         {
@@ -4744,85 +4851,6 @@
       "id": "RUSTSEC-2026-0372",
       "exposure_review": "Host proc macro generates variant serialization/deserialization implementations used by runtime D-Bus accessibility/settings. The macro itself handles Rust syntax, while generated code handles session-bus input.",
       "removal_condition": "Migrate with zvariant and zbus 6; validate generated wire contracts and native accessibility/settings."
-    },
-    {
-      "name": "chrono",
-      "version": "0.4.45",
-      "reason": "Temporary maintenance-only exception for Slint 1.19 date/calendar APIs and exact dormant Turso metadata paths; replacement must preserve date/text/calendar/local-time and SQL timestamp behavior.",
-      "parents": [
-        {
-          "name": "i-slint-core",
-          "version": "1.19.0",
-          "requirement": "^0.4"
-        },
-        {
-          "name": "turso_core",
-          "version": "0.8.3",
-          "requirement": "^0.4.42"
-        },
-        {
-          "name": "turso_ext",
-          "version": "0.8.3",
-          "requirement": "^0.4.42"
-        }
-      ],
-      "reviewed_on": "2026-11-17",
-      "expires_on": "2026-12-17",
-      "id": "RUSTSEC-2026-0543",
-      "exposure_review": "Active i-slint-core date_time.rs parses UI date/format strings, computes calendar month/weekday values, formats dates and reads Local::now plus system clock/timezone. Full metadata also includes dormant Turso_core/ext paths: SQL timestamp/date/RFC3339 parsing and arithmetic, timezone conversion, clock/pragma date values and VFS current-time formatting. Runtime text/database/OS-time inputs are reviewed; these uses are not compile-only or image/RAW decoding. Current normal cargo tree reaches Chrono through Slint only.",
-      "removal_condition": "Adopt maintained date/time implementations through compatible upstream releases or a separately reviewed migration; validate parsing/formatting, invalid inputs, calendar/local-time boundaries and any activated SQL timestamp paths before removing this review.",
-      "advisory_review": {
-        "date": "2026-09-14",
-        "informational": "unmaintained",
-        "patched_versions": [],
-        "url": "https://github.com/chronotope/chrono/issues/1768",
-        "advisory_sha256": "18424c6a155f754151a55ce9fb73376bf66f3709d81750d921f5293da91ccc59",
-        "classification": "Maintenance notice; no security vulnerability classification is downgraded."
-      },
-      "source_review": [
-        {
-          "package": "i-slint-core",
-          "version": "1.19.0",
-          "file": "date_time.rs",
-          "sha256": "8f19a965b75f2e27ff217d4493195547a220a060a57ac9f5bca499d03e6e2f55"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "functions/datetime.rs",
-          "sha256": "756f802dea07e41a6484a5a7b574e31df03070cdedbbbfb715824722b8a0140e"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "time/mod.rs",
-          "sha256": "898d7fa8b6afa949062ecc441f3e8944f1dfa870127b02fc176b320f5f44e81b"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "time/internal.rs",
-          "sha256": "91c21503e4bffd8da8a4b47e5c109a77340a34b7f0a739bb7382bc566dbfddee"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "io/clock.rs",
-          "sha256": "9eb5070e2f158f18f750e41c1b3fca6a9e7b33742fc77f3cc4afa9fa1a3e7cf7"
-        },
-        {
-          "package": "turso_core",
-          "version": "0.8.3",
-          "file": "translate/pragma.rs",
-          "sha256": "314657dd79a531dc20ffcee79f5a2114848885872d5e6d8276fdef30b91a87e7"
-        },
-        {
-          "package": "turso_ext",
-          "version": "0.8.3",
-          "file": "src/vfs_modules.rs",
-          "sha256": "56e633b8bc6678f4b1e1163f2235b9e46070199621229ea93d3482907930e425"
-        }
-      ]
     }
   ]
 }

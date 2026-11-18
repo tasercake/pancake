@@ -143,6 +143,8 @@ enum MenuOutcome {
     File(Option<desktop_menu::FileAction>),
     /// Task selected for one real source row.
     Source(usize, Option<desktop_menu::SourceAction>),
+    /// Native toolkit failed to create the requested popup.
+    Failed(String),
 }
 
 impl Session {
@@ -326,6 +328,7 @@ impl Session {
         self.menu = None;
         panel::restore_focus(window);
         match outcome {
+            MenuOutcome::Failed(error) => Err(error.into()),
             MenuOutcome::File(action) => dispatch_file_menu(self, window, action),
             MenuOutcome::Source(index, action) => {
                 let arguments = [i32::try_from(index)?.into()];
@@ -350,7 +353,7 @@ impl Session {
     fn open_file_panel(
         &mut self,
         window: &ComponentInstance,
-        picker: Picker<'_>,
+        picker: Picker<'static>,
         request: FileRequest,
     ) -> UiResult {
         if self.file_panel.is_some() {
@@ -358,9 +361,17 @@ impl Session {
         }
         let selected = Rc::new(RefCell::new(None));
         let ready = Rc::clone(&selected);
-        panel::open(window, picker, move |paths| {
-            *ready.borrow_mut() = Some(paths);
-        })?;
+        let owner = window.as_weak();
+        Timer::single_shot(Duration::ZERO, move || {
+            if let Some(window) = owner.upgrade() {
+                let completion = Rc::clone(&ready);
+                if let Err(error) = panel::open(&window, picker, move |paths| {
+                    *completion.borrow_mut() = Some(paths);
+                }) {
+                    *ready.borrow_mut() = Some(Err(error));
+                }
+            }
+        });
         self.file_panel = Some(FilePanel { request, selected });
         Ok(())
     }
@@ -814,6 +825,7 @@ fn save(session: &mut Session, window: &ComponentInstance, args: &[Value]) -> Ui
     let formats = ["pancake.png", "pancake.jpg", "pancake.tif", "pancake.exr"];
     let name = formats
         .get(ordinal(args.first())?)
+        .copied()
         .ok_or("Invalid export format.")?;
     let depth = if ordinal(args.get(1))? == 0 {
         BitDepth::Eight
@@ -1146,9 +1158,15 @@ fn file_menu(session: &mut Session, _: &ComponentInstance, _: &[Value]) -> UiRes
     }
     let selection = Rc::new(RefCell::new(None));
     let ready = Rc::clone(&selection);
-    desktop_menu::open_file(session.history.entries(), move |action| {
-        *ready.borrow_mut() = Some(MenuOutcome::File(action));
-    })?;
+    let recent = session.history.entries().to_vec();
+    Timer::single_shot(Duration::ZERO, move || {
+        let completion = Rc::clone(&ready);
+        if let Err(error) = desktop_menu::open_file(&recent, move |action| {
+            *completion.borrow_mut() = Some(MenuOutcome::File(action));
+        }) {
+            *ready.borrow_mut() = Some(MenuOutcome::Failed(error));
+        }
+    });
     session.menu = Some(selection);
     Ok(())
 }
@@ -1226,9 +1244,14 @@ fn source_menu(session: &mut Session, _: &ComponentInstance, args: &[Value]) -> 
     let index = ordinal(args.first())?;
     let selection = Rc::new(RefCell::new(None));
     let ready = Rc::clone(&selection);
-    desktop_menu::open_source(move |action| {
-        *ready.borrow_mut() = Some(MenuOutcome::Source(index, action));
-    })?;
+    Timer::single_shot(Duration::ZERO, move || {
+        let completion = Rc::clone(&ready);
+        if let Err(error) = desktop_menu::open_source(move |action| {
+            *completion.borrow_mut() = Some(MenuOutcome::Source(index, action));
+        }) {
+            *ready.borrow_mut() = Some(MenuOutcome::Failed(error));
+        }
+    });
     session.menu = Some(selection);
     Ok(())
 }

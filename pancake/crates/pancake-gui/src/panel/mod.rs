@@ -38,7 +38,6 @@ pub fn restore_focus(window: &ComponentInstance) {
     use slint::ComponentHandle as _;
     use slint::winit_030::WinitWindowAccessor as _;
 
-    service_events();
     if let Some(display) = gtk::gdk::Display::default() {
         display.sync();
     }
