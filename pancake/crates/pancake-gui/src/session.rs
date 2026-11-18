@@ -498,13 +498,14 @@ pub fn configure(
     profile: &Path,
     options: Options,
 ) -> UiResult<Timer> {
+    let previews = Cache::for_runtime(options.prepared_wgpu.as_ref());
     let mut session = Session {
         sources: Sources::default(),
         worker: StackWorker::new(options)?,
         generation: None,
         results: Vec::new(),
         history: RecentFolders::open(profile)?,
-        previews: Cache::default(),
+        previews,
         pending: None,
         file_panel: None,
         #[cfg(target_os = "linux")]
@@ -1076,6 +1077,7 @@ fn apply_transition(
 /// Returns dynamic view binding errors.
 fn clear_image(window: &ComponentInstance) -> UiResult {
     window.set_property("preview", Image::default().into())?;
+    window.set_property("comparison-preview", Image::default().into())?;
     window.set_property("preview-width", 0_i32.into())?;
     window.set_property("preview-height", 0_i32.into())?;
     window.set_property("selected-source", (-1_i32).into())?;

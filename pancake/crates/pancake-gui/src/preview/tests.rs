@@ -11,7 +11,7 @@ use super::{Cache, ImageKey, Preview};
 /// Returns an invalid preview or a violated cache boundary.
 #[test]
 fn retains_no_more_than_four_display_images() -> Result<(), String> {
-    let mut cache = Cache::default();
+    let mut cache = Cache::for_runtime(None);
     let raster = RgbImage::new(1, 1, vec![0.2, 0.4, 0.6])?;
     for index in 0_usize..4 {
         let _preview = cache.get(ImageKey::Result(index, false), || Preview::new(&raster))?;

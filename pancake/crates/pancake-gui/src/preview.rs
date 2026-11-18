@@ -6,6 +6,8 @@ use std::time::SystemTime;
 
 use num_traits::ToPrimitive as _;
 use pancake::image_io::RgbImage;
+use pancake::runtime::SelectedRuntime;
+use slint::wgpu_30::wgpu;
 use slint::{Image, Rgba8Pixel, SharedPixelBuffer};
 
 /// A decoded display raster is bounded separately from authoritative pixels.
@@ -105,13 +107,33 @@ impl ImageKey {
 }
 
 /// Four display-only images at at most 16 MiB apiece.
+///
+/// The viewer can additionally reference its two displayed images and stage
+/// one new raster. These lifetimes are independent of full-precision results.
 #[derive(Debug, Default)]
 pub struct Cache {
     /// Least recently accessed previews first.
     entries: VecDeque<(ImageKey, Preview)>,
+    /// Shared renderer handles for the lifetime of this workspace.
+    device: Option<PreviewDevice>,
 }
 
 impl Cache {
+    /// Cache textures on the active Slint device, or rasters on software.
+    #[must_use]
+    pub fn for_runtime(runtime: Option<&SelectedRuntime>) -> Self {
+        let device = runtime
+            .and_then(SelectedRuntime::wgpu_setup)
+            .map(|setup| PreviewDevice {
+                device: setup.device.clone(),
+                queue: setup.queue.clone(),
+            });
+        Self {
+            device,
+            ..Self::default()
+        }
+    }
+
     /// Retrieve a prior preview or render exactly one current frame.
     ///
     /// # Errors
@@ -135,7 +157,10 @@ impl Cache {
             self.entries.push_back(entry);
             return Ok(picture);
         }
-        let picture = build()?;
+        let mut picture = build()?;
+        if let Some(device) = &self.device {
+            picture.picture = device.retain(&picture.picture)?;
+        }
         if self.entries.len() == 4 {
             let _evicted = self.entries.pop_front();
         }
@@ -146,6 +171,58 @@ impl Cache {
     /// Remove previews from the replaced source and result collections.
     pub fn clear(&mut self) {
         self.entries.clear();
+    }
+}
+
+/// Device-local resources never outlive their owning viewer session.
+#[derive(Debug)]
+struct PreviewDevice {
+    /// The exact device Slint uses for its presentation surfaces.
+    device: wgpu::Device,
+    /// The matching queue, so resource creation precedes any frame that samples it.
+    queue: wgpu::Queue,
+}
+
+impl PreviewDevice {
+    /// Retain the same bounded display samples as one native Slint texture.
+    ///
+    /// # Errors
+    ///
+    /// Returns an invalid raster or a texture import error.
+    fn retain(&self, image: &Image) -> Result<Image, String> {
+        let raster = image.to_rgba8().ok_or("Preview raster is unavailable.")?;
+        let row_bytes = raster
+            .width()
+            .checked_mul(4_u32)
+            .ok_or("Preview upload row is too large.")?;
+        let size = wgpu::Extent3d {
+            width: raster.width(),
+            height: raster.height(),
+            depth_or_array_layers: 1,
+        };
+        let texture = self.device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("Pancake viewer preview"),
+            size,
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8Unorm,
+            usage: wgpu::TextureUsages::COPY_DST
+                | wgpu::TextureUsages::TEXTURE_BINDING
+                | wgpu::TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[],
+        });
+        self.queue.write_texture(
+            texture.as_image_copy(),
+            raster.as_bytes(),
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(row_bytes),
+                rows_per_image: None,
+            },
+            size,
+        );
+        Image::try_from(texture).map_err(|error| error.to_string())
     }
 }
 
