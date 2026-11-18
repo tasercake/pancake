@@ -165,8 +165,11 @@ def measure(argv, *, cwd, env, directory, timeout, gpu):
         try:
             sampler.start()
             timer.start()
-            status = child.wait()
+            _, wait_status, usage = os.wait4(child.pid, 0)
             elapsed = time.monotonic_ns() - start
+            # Popen shares the actual reaped exit status with cleanup.
+            status = os.waitstatus_to_exitcode(wait_status)
+            child.returncode = status
         finally:
             stop.set()
             if child.poll() is None:
@@ -191,6 +194,9 @@ def measure(argv, *, cwd, env, directory, timeout, gpu):
         "peak_rss_bytes": peak_rss if adequate_sampling and peak_rss else None,
         "peak_gpu_bytes": peak_gpu if adequate_sampling and peak_gpu else None,
         "observed_peak_gpu_bytes": peak_gpu,
+        "kernel_process_peak_rss_bytes": usage.ru_maxrss * 1024,
+        "kernel_process_user_cpu_seconds": usage.ru_utime,
+        "kernel_process_system_cpu_seconds": usage.ru_stime,
         "maximum_sample_gap_ns": largest_gap,
         "resource_errors": sample_failures,
         "sample_count": samples,
