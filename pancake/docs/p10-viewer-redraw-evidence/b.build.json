@@ -1,0 +1,25 @@
+{
+  "build": [
+    "cargo",
+    "build",
+    "--locked",
+    "--release",
+    "--workspace",
+    "--bins"
+  ],
+  "component": "gui",
+  "commit": "1a0ec8ccf2eea215cfeb57f47ffd85d3e6779464",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-latency-audit/pancake/target/release/pancake-gui",
+  "binary_sha256": "f0e2f354fc561f6479b2e0930c691bd2fd6dd74013618c8918f8dc07c192cdad",
+  "binary_size": 156235584,
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
+  "build_environment": {
+    "CARGO_BUILD_JOBS": "2",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+  },
+  "release_log_sha256": "d7771a783174eae17bf90e70173ee1511792808d6e85fe5ae49d1cb23259ab2a"
+}

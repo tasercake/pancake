@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+main=/home/krishna/Documents/focus-stacking
+workspace=/tmp/pancake-worktrees.t3paqgWM/viewer-latency-audit
+baseline=/tmp/pancake-worktrees.t3paqgWM/viewer-sealed-base
+t50=/tmp/pancake-worktrees.t3paqgWM/t50-sealed-12f2151/artifacts/t50-stage-001
+output="$workspace/artifacts/viewer-redraw"
+exec bash "$output/run-pair-existing-inputs.sh" \
+    "$main" "$baseline" "$workspace" "$main/artifacts/p10-vcache/calibration" \
+    "$t50/inputs" "$t50/materialization.json" \
+    "$output/sealed-a.build.json" "$output/candidate.build.json"

@@ -1,0 +1,38 @@
+{
+  "viewer": {
+    "idle": {
+      "status": "fail",
+      "input_to_present_ns": {
+        "count": 200,
+        "min": 21501476,
+        "p50": 29348236.5,
+        "p95": 41120514,
+        "max": 653029253
+      }
+    },
+    "loaded": {
+      "status": "fail",
+      "input_to_present_ns": {
+        "count": 200,
+        "min": 19329764,
+        "p50": 30458142.5,
+        "p95": 41362980,
+        "max": 46932516
+      }
+    }
+  },
+  "lifecycle": {
+    "pause": {
+      "status": "pending",
+      "count": 0
+    },
+    "cancel": {
+      "status": "pending",
+      "count": 0
+    }
+  },
+  "native_lifecycle_workloads": {
+    "status": "pending",
+    "workloads": []
+  }
+}

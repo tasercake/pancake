@@ -1,0 +1,40 @@
+{
+  "historical_archive": "qualification/p10-performance/evidence/native-viewer-measured/raw-viewer-captures.tar.gz",
+  "calibration": "/home/krishna/Documents/focus-stacking/artifacts/p10-vcache/calibration",
+  "scenario_sha256": "57435714e073366e62f1c926ad1c078663fc98541475b6fd9c0288e87f181358",
+  "physical_gpu_uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+  "all_ordered_steps_identical": true,
+  "scored_samples_by_action": {
+    "idle/source": 40,
+    "idle/result": 40,
+    "idle/pan": 40,
+    "idle/zoom": 40,
+    "idle/comparison": 40,
+    "loaded/source": 40,
+    "loaded/result": 40,
+    "loaded/pan": 40,
+    "loaded/zoom": 40,
+    "loaded/comparison": 40
+  },
+  "witness_sha256": {
+    "compare_after-00-witness.png": "f0442a6b5bc50b2000dd2b3ffe7ec09bfa8df692e549ad21cc950c76a5268ab2",
+    "compare_after-01-witness.png": "ecc578739beb4b7579dba84a4a3c06871405b09a4a38bc0761c2d7100f228739",
+    "compare_before-00-witness.png": "b671ed563e98c07e11546e06830c1b45b707df5d8d96ab5cb666c7cc8f59ba0e",
+    "compare_before-01-witness.png": "20a2f25c4d879f7acbfa27fbf848e88099d71ff7ff98cb39a69f2d3970d3f7a0",
+    "pan-00-witness.png": "bfad8259b47990abe7cf9babd579e9df2a69c5d136545ccba575ce5e83ec32bb",
+    "pan-01-witness.png": "885928dc62c7a44850d1e983af90e4394c676bbed4d1bc9430e0118ade39bd9e",
+    "pan-02-witness.png": "e595f3a9bb173ae729e25b01d063749bc030247e75f4c60bcc62a682a721f2de",
+    "result-00-witness.png": "795e3328834c2a6380f1e95bd682e7ea14159bddcd39d31d09e7f82410214e84",
+    "result-01-witness.png": "940b6e70fe600abf56ddb13e42311e48d699092e7f0064945a757c0e46ded803",
+    "result-02-witness.png": "9ef2315f2c403957f7be0e70c637042f0dc85665bbd8b7cb151ceb7ac475a306",
+    "source0-00-witness.png": "7e0ceecaa2ff5f37a3c245b2661d46f20e732d0ecc2700a3583fa70dc419ed70",
+    "source0-01-witness.png": "5c4be168b0bf3eecfd80c6c1fe7f3a6af3b982e3b3007b956476cc90ba0889f0",
+    "source0-02-witness.png": "a441d8f912ecc4fe98eb7d3ecf59e0f224eab6321220220f2b6bac386215b4c9",
+    "source6-00-witness.png": "ef2cfde4b2f5218b4b65f8d064b5933228232b05258ec6419abafdc68b6fc91f",
+    "source6-01-witness.png": "07fb96995b92256f77abfdc50b4162fc68e50b7c1e6e4bcf9e4589d7e8b00ef6",
+    "source6-02-witness.png": "b14a42e671194c3c747b0ab94d0f79a5698ed3593e1078b2c0d109e8dc39d560",
+    "zoom-00-witness.png": "7538c1e32e4464d7cadfc7ff0169b3d346908ac831048b6fa40266ec47b9b012",
+    "zoom-01-witness.png": "fb65663d1c96f27eae29261cd4a83751f61eaa99d8e9c8fd3f0808337dd81564",
+    "zoom-02-witness.png": "3809b24ad61e4c416e8b45fff0c90f427abc923c4cfac25e350bdc6527853499"
+  }
+}
