@@ -1,8 +1,9 @@
 # T50 Hybrid matched-job preflight
 
-This preparation inspected retained results, frozen inputs, and source only.
-No T50 files were generated and no application or hardware workload was
-started during the D150 campaign.
+The initial preparation reviewed retained evidence and wrote a quiet launch
+plan during the D150 campaign. After D150 ended, the sealed candidate and
+reference were staged and all 52 TIFFs were generated for read-only reuse
+by the viewer A/B and this benchmark. The diagnostic pair is queued.
 
 ## Exact inputs and prior closure
 
