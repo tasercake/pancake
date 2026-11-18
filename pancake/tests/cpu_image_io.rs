@@ -421,12 +421,12 @@ fn png_input_retains_embedded_icc_without_altering_rgb() -> TestResult {
     require_codes(&frame, [11, 49, 137], 255.0)
 }
 
-/// Update one classic TIFF scalar tag value, leaving the raster payload untouched.
+/// Return the first classic little-endian TIFF directory's tag fields.
 ///
 /// # Errors
 ///
-/// Returns invalid fixture header/directory or missing-tag errors.
-fn set_dng_scalar(bytes: &mut [u8], tag: u16, value: u32) -> TestResult {
+/// Returns malformed or truncated fixture directory errors.
+fn tiff_fields(bytes: &mut [u8]) -> Result<&mut [[u8; 12]], Box<dyn Error>> {
     let offset = bytes
         .get(4..8)
         .ok_or_else(|| io::Error::other("no TIFF header"))?;
@@ -438,15 +438,32 @@ fn set_dng_scalar(bytes: &mut [u8], tag: u16, value: u32) -> TestResult {
         .split_first_chunk_mut::<2>()
         .ok_or_else(|| io::Error::other("truncated TIFF directory"))?;
     let count = usize::from(u16::from_le_bytes([*count_low, *count_high]));
-    for [id_low, id_high, .., output_a, output_b, output_c, output_d] in
-        fields.as_chunks_mut::<12>().0.iter_mut().take(count)
-    {
-        if u16::from_le_bytes([*id_low, *id_high]) == tag {
-            [*output_a, *output_b, *output_c, *output_d] = value.to_le_bytes();
-            return Ok(());
-        }
-    }
-    Err(io::Error::other(format!("TIFF fixture omitted tag {tag}")).into())
+    fields
+        .as_chunks_mut::<12>()
+        .0
+        .get_mut(..count)
+        .ok_or_else(|| io::Error::other("truncated TIFF directory fields").into())
+}
+
+/// Identify a classic TIFF field by its unsigned tag number.
+const fn tiff_tag(field: &[u8; 12]) -> u16 {
+    let [identifier_low, identifier_high, ..] = *field;
+    u16::from_le_bytes([identifier_low, identifier_high])
+}
+
+/// Update one classic TIFF scalar tag value, leaving the raster payload untouched.
+///
+/// # Errors
+///
+/// Returns invalid fixture header/directory or missing-tag errors.
+fn set_dng_scalar(bytes: &mut [u8], tag: u16, value: u32) -> TestResult {
+    let field = tiff_fields(bytes)?
+        .iter_mut()
+        .find(|field| tiff_tag(field) == tag)
+        .ok_or_else(|| io::Error::other(format!("TIFF fixture omitted tag {tag}")))?;
+    let [.., output_a, output_b, output_c, output_d] = field;
+    [*output_a, *output_b, *output_c, *output_d] = value.to_le_bytes();
+    Ok(())
 }
 
 /// Reject impossible camera sensor dimensions and extra channels before decompression.
@@ -493,4 +510,213 @@ fn encoded_raw_size_is_limited() -> TestResult {
         error.contains("compressed RAW source exceeds the byte limit"),
         &format!("expected encoded size diagnostic, got {error}"),
     )
+}
+
+/// Reject missing sources and PNG files with a valid header but truncated raster.
+///
+/// # Errors
+/// Returns a setup error or an incorrect input diagnosis.
+#[test]
+fn missing_and_truncated_rasters_report_the_offending_path() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("recoverable.png");
+    let error = decode(&path)
+        .err()
+        .ok_or_else(|| io::Error::other("a missing raster was decoded"))?;
+    require(
+        error.contains("recoverable.png"),
+        &format!("missing path diagnostic: {error}"),
+    )?;
+    let source = GrayImage::from_raw(2, 2, vec![7, 19, 47, 193])
+        .ok_or_else(|| io::Error::other("bad PNG fixture dimensions"))?;
+    source.save_with_format(&path, ImageFormat::Png)?;
+    let mut bytes = fs::read(&path)?;
+    let data_start = bytes
+        .windows(4)
+        .position(|marker| marker == b"IDAT")
+        .ok_or_else(|| io::Error::other("PNG fixture has no IDAT"))?;
+    bytes.truncate(data_start.saturating_add(5));
+    fs::write(&path, &bytes)?;
+    let error = decode(&path)
+        .err()
+        .ok_or_else(|| io::Error::other("a truncated PNG raster was decoded"))?;
+    require(
+        error.contains("recoverable.png"),
+        &format!("corrupt path diagnostic: {error}"),
+    )?;
+    require(
+        fs::read(&path)? == bytes,
+        "decoder modified truncated source",
+    )
+}
+
+/// Treat unknown positive HDR TIFF levels above 255 as working float data.
+///
+/// # Errors
+/// Returns changed precision, an invalid sample, or fixture construction failure.
+#[test]
+fn positive_hdr_tiff_does_not_use_ordinary_integer_code_scale() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("positive-hdr.tif");
+    let original = [0.25_f32, 256.0, 65504.0];
+    let source = ImageBuffer::from_raw(1, 1, original.to_vec())
+        .ok_or_else(|| io::Error::other("bad positive HDR fixture dimensions"))?;
+    DynamicImage::ImageRgb32F(source).save_with_format(&path, ImageFormat::Tiff)?;
+    let frame = decode(&path)?;
+    require(
+        frame
+            .into_samples()
+            .into_iter()
+            .map(f32::to_bits)
+            .eq(original.map(f32::to_bits)),
+        "positive HDR TIFF was rescaled as an eight-bit raster",
+    )
+}
+
+/// Huge raster area is rejected even when the two axes are within limits.
+///
+/// # Errors
+/// Returns an invalid constructor result or a misleading geometry diagnostic.
+#[test]
+fn shape_caps_precede_sample_validation() -> TestResult {
+    for (width, height) in [(32769, 2), (2, 32769), (8192, 8192)] {
+        let error = RgbImage::new(width, height, Vec::new())
+            .err()
+            .ok_or_else(|| io::Error::other("oversized working raster shape was accepted"))?;
+        require(
+            error.contains("image limit"),
+            &format!("expected shape cap before sample length checking: {error}"),
+        )?;
+    }
+    Ok(())
+}
+
+/// Rotate a developed Bayer DNG according to its own raw metadata.
+///
+/// # Errors
+/// Returns missing fixture metadata or a mismatch in decoded pixels or shape.
+#[test]
+fn developed_bayer_dng_obeys_camera_orientation() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("original.dng");
+    let mut bytes = include_bytes!("data/bayer-pattern.dng").to_vec();
+    fs::write(&path, &bytes)?;
+    let base = decode(&path)?;
+
+    let entries = tiff_fields(&mut bytes)?;
+    let resolution = entries
+        .iter_mut()
+        .find(|entry| tiff_tag(entry) == 282)
+        .ok_or_else(|| {
+            io::Error::other("DNG fixture has no replaceable optional resolution tag")
+        })?;
+    // The optional XResolution is replaced by Orientation = 6 (90° clockwise).
+    *resolution = [0x12, 0x01, 3, 0, 1, 0, 0, 0, 6, 0, 0, 0];
+    entries.sort_unstable_by_key(tiff_tag);
+    let rotated_path = directory.path().join("rotated.dng");
+    fs::write(&rotated_path, &bytes)?;
+    let actual = decode(&rotated_path)?;
+    require(
+        (actual.width(), actual.height()) == (base.height(), base.width()),
+        "camera orientation did not transpose output dimensions",
+    )?;
+    let rows = base.samples().as_chunks::<3>().0.chunks_exact(base.width());
+    let expected = (0..base.width()).flat_map(|x| {
+        rows.clone()
+            .rev()
+            .filter_map(move |row| row.get(x))
+            .copied()
+            .flatten()
+    });
+    require(
+        actual
+            .samples()
+            .iter()
+            .copied()
+            .map(f32::to_bits)
+            .eq(expected.map(f32::to_bits)),
+        "camera orientation changed pixels or used the wrong rotation",
+    )
+}
+
+/// Reject an existing TIFF whose orientation tag points outside the file.
+///
+/// # Errors
+/// Returns a fixture or unexpected decode result.
+#[test]
+fn invalid_tiff_orientation_storage_reports_decode_failure() -> TestResult {
+    use tiff::encoder::{TiffEncoder, colortype};
+    use tiff::tags::Tag;
+
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("invalid-orientation.tif");
+    let mut encoder = TiffEncoder::new(File::create(&path)?)?;
+    let mut image = encoder.new_image::<colortype::RGB8>(1, 1)?;
+    image
+        .encoder()
+        .write_tag(Tag::Orientation, &[1_u16, 1, 1][..])?;
+    image.write_data(&[7, 11, 23])?;
+    let mut bytes = fs::read(&path)?;
+    set_dng_scalar(&mut bytes, 274, u32::MAX)?;
+    fs::write(&path, &bytes)?;
+    let error = decode(&path)
+        .err()
+        .ok_or_else(|| io::Error::other("invalid TIFF orientation storage was accepted"))?;
+    require(
+        error.contains("invalid-orientation.tif"),
+        &format!("missing TIFF path: {error}"),
+    )?;
+    require(
+        fs::read(&path)? == bytes,
+        "metadata failure changed the source file",
+    )
+}
+
+/// Reject Bayer DNG containers when dimensions survive but the strip is incomplete.
+///
+/// # Errors
+/// Returns a fixture error or incorrect source diagnostic.
+#[test]
+fn corrupt_bayer_payload_is_not_developed() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("incomplete.dng");
+    let mut bytes = include_bytes!("data/bayer-pattern.dng").to_vec();
+    set_dng_scalar(&mut bytes, 273, u32::MAX)?;
+    fs::write(&path, &bytes)?;
+    let error = decode(&path)
+        .err()
+        .ok_or_else(|| io::Error::other("incomplete RAW strip produced a raster"))?;
+    require(
+        error.contains("incomplete.dng"),
+        &format!("missing RAW source path: {error}"),
+    )?;
+    require(
+        fs::read(&path)? == bytes,
+        "RAW failure changed the source file",
+    )
+}
+
+/// An incorrectly typed optional ICC tag must not change a valid TIFF raster.
+///
+/// # Errors
+/// Returns a fixture, decode, or metadata/raster integrity failure.
+#[test]
+fn malformed_optional_tiff_profile_preserves_valid_samples() -> TestResult {
+    use tiff::encoder::{TiffEncoder, colortype};
+    use tiff::tags::Tag;
+
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("wrong-profile-type.tiff");
+    let mut encoder = TiffEncoder::new(File::create(&path)?)?;
+    let mut raster = encoder.new_image::<colortype::RGB16>(1, 1)?;
+    raster
+        .encoder()
+        .write_tag(Tag::IccProfile, &[7_u16, 13, 251][..])?;
+    raster.write_data(&[1, 17, 4097])?;
+    let frame = decode(&path)?;
+    require(
+        frame.icc_profile().is_none() && frame.sample_encoding() == SampleEncoding::U16,
+        "incorrectly typed ICC metadata changed source precision or was returned as a byte profile",
+    )?;
+    require_codes(&frame, [1, 17, 4097], 65_535.0)
 }

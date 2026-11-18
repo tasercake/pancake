@@ -160,6 +160,18 @@ fn invalid_metadata_reports_the_failing_field_or_shape() -> TestResult {
             "header dictionary",
         ),
         (
+            "'descr': '|u1', 'fortran_order': False, 'shape': (1, 2)}\n",
+            "header dictionary",
+        ),
+        (
+            "{'descr': '|u1', 'fortran_order': False, 'shape': (1, 2)\n",
+            "header dictionary",
+        ),
+        (
+            "{'descr': '|u1', 'fortran_order': False, 'shape': (0, 2)}\n",
+            "nonzero",
+        ),
+        (
             "{'descr': '|u1', 'fortran_order': False, 'shape': (32769, 2)}\n",
             "limit",
         ),
