@@ -1,0 +1,184 @@
+{
+  "native_row_position": [
+    149,
+    395
+  ],
+  "native_row_size": [
+    179,
+    33
+  ],
+  "before_viewer": {
+    "has_image": true,
+    "zoom": 0.12033334,
+    "center": [
+      3000,
+      2000
+    ],
+    "compare": false,
+    "split": 0.5,
+    "fit": true,
+    "source_index": 1,
+    "result_method": "",
+    "cropped": false
+  },
+  "after_viewer": {
+    "has_image": true,
+    "zoom": 0.12033334,
+    "center": [
+      3000,
+      2000
+    ],
+    "compare": false,
+    "split": 0.5,
+    "fit": true,
+    "source_index": 2,
+    "result_method": "",
+    "cropped": false
+  },
+  "before_frame_geometry": [
+    343,
+    237,
+    722,
+    540
+  ],
+  "after_frame_geometry": [
+    343,
+    237,
+    722,
+    540
+  ],
+  "witnesses": [
+    {
+      "xy": [
+        424,
+        279
+      ],
+      "before_expected": [
+        116,
+        102,
+        121
+      ],
+      "after_expected": [
+        125,
+        98,
+        91
+      ],
+      "after_observed": [
+        120,
+        132,
+        153
+      ],
+      "after_max_channel_error": 62
+    },
+    {
+      "xy": [
+        415,
+        508
+      ],
+      "before_expected": [
+        115,
+        109,
+        145
+      ],
+      "after_expected": [
+        85,
+        122,
+        167
+      ],
+      "after_observed": [
+        110,
+        101,
+        147
+      ],
+      "after_max_channel_error": 25
+    },
+    {
+      "xy": [
+        458,
+        302
+      ],
+      "before_expected": [
+        141,
+        120,
+        143
+      ],
+      "after_expected": [
+        109,
+        85,
+        124
+      ],
+      "after_observed": [
+        153,
+        116,
+        155
+      ],
+      "after_max_channel_error": 44
+    },
+    {
+      "xy": [
+        485,
+        326
+      ],
+      "before_expected": [
+        113,
+        109,
+        145
+      ],
+      "after_expected": [
+        115,
+        75,
+        127
+      ],
+      "after_observed": [
+        106,
+        111,
+        143
+      ],
+      "after_max_channel_error": 36
+    },
+    {
+      "xy": [
+        480,
+        427
+      ],
+      "before_expected": [
+        125,
+        128,
+        152
+      ],
+      "after_expected": [
+        123,
+        106,
+        135
+      ],
+      "after_observed": [
+        114,
+        128,
+        150
+      ],
+      "after_max_channel_error": 22
+    },
+    {
+      "xy": [
+        451,
+        449
+      ],
+      "before_expected": [
+        115,
+        117,
+        151
+      ],
+      "after_expected": [
+        137,
+        92,
+        129
+      ],
+      "after_observed": [
+        145,
+        160,
+        152
+      ],
+      "after_max_channel_error": 68
+    }
+  ]
+}
