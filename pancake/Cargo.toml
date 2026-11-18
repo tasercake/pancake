@@ -22,6 +22,13 @@ cubecl = { version = "=0.11.4", default-features = false, features = ["std", "st
 slint = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "unstable-wgpu-30", "compat-1-18", "accessibility"] }
 wgpu = { version = "=30.0.2", default-features = false, features = ["std", "wgsl", "metal", "vulkan", "dx12"] }
 
+image = { version = "=0.25.10", default-features = false, features = ["png", "tiff", "exr", "jpeg"] }
+rawler = { version = "=0.8.0", default-features = false }
+rayon = "=1.12.0"
+
+[dev-dependencies]
+tempfile = "=3.27.0"
+
 [patch.crates-io]
 cubecl-core = { path = "vendor/cubecl-core-0.11.4" }
 cubecl-macros = { path = "vendor/cubecl-macros-0.11.4" }
