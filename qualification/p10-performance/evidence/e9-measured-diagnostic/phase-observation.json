@@ -1,0 +1,115 @@
+{
+  "scope": "one diagnostic with dynamic loader counters; excluded from all performance statistics",
+  "source": {
+    "commit": "5e102447ad95c641eb773d9fdf94f2bc3757b81d",
+    "lock_sha256": "012cda6d161124eef8ecc3c5c6a4fed8db881e5f7606f4b9d7aee5f766f1a879",
+    "descriptor_sha256": "f774e9e080fb49e2f82f11923668db6212ccea83f2924b370dbba1d508c2bfc8",
+    "component": "cli",
+    "executable": "/tmp/pancake-worktrees.t3paqgWM/p10-e9-campaign/pancake/target/release/pancake-cli",
+    "binary_sha256": "3ac6abaecc1bbd5743efd2abc6879a43d4b17294514b7bc209a05227d613ccbb",
+    "scope": "adopted locked release from P5 registration proof, single E9 diagnostic",
+    "build_evidence_commit": "7c8bbcb",
+    "runner_files": {
+      "p10.py": "e098b47d0147a6ce1a9bb7d586ae07d05ade6714c067eebd0f8d59aba1bbbaa0",
+      "physical.py": "b55db52361af0b6effdb48293a36e7d04dc2930aedac8c76e950b837074adb32",
+      "protocol.py": "fbb908a9b3a8f6b1255b1df066375a22217a5ae5ffbb194ba05a45b168335349",
+      "resources.py": "1ad4c59f938ae2768e4af0a64a4cf74904ccb3b6ebd01df6a200b8b25326ca60"
+    }
+  },
+  "argv": [
+    "/tmp/pancake-worktrees.t3paqgWM/p10-e9-campaign/pancake/target/release/pancake-cli",
+    "--input",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0163.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0164.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0165.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0166.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0167.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0168.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0169.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0170.png",
+    "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/p2-real-inputs/datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0171.png",
+    "--output",
+    "/tmp/pancake-worktrees.t3paqgWM/p10-e9-campaign/artifacts/e9-registration-profile/phase-observation/image.tif",
+    "--cpu",
+    "--method",
+    "exposure_fusion",
+    "--align",
+    "--alignment-mode",
+    "euclidean",
+    "--alignment-ref",
+    "first",
+    "--kernel-size",
+    "6",
+    "--pyramid-levels",
+    "8",
+    "--scale-factor",
+    "6",
+    "--slab-size",
+    "0",
+    "--slab-overlap",
+    "0",
+    "--bit-depth",
+    "16",
+    "--auto-crop"
+  ],
+  "exit": 0,
+  "observed_work_progress": [
+    {
+      "line": "progress 1/9",
+      "observed_since_spawn_ns": 226049127
+    },
+    {
+      "line": "progress 2/9",
+      "observed_since_spawn_ns": 336786222
+    },
+    {
+      "line": "progress 3/9",
+      "observed_since_spawn_ns": 376993309
+    },
+    {
+      "line": "progress 4/9",
+      "observed_since_spawn_ns": 471572982
+    },
+    {
+      "line": "progress 5/9",
+      "observed_since_spawn_ns": 489996738
+    },
+    {
+      "line": "progress 6/9",
+      "observed_since_spawn_ns": 509100112
+    },
+    {
+      "line": "progress 7/9",
+      "observed_since_spawn_ns": 528101507
+    },
+    {
+      "line": "progress 8/9",
+      "observed_since_spawn_ns": 557962908
+    },
+    {
+      "line": "progress 9/9",
+      "observed_since_spawn_ns": 575912036
+    }
+  ],
+  "process_exit_seen_ns": 607356213,
+  "kernel_process_peak_rss_bytes": 121647104,
+  "kernel_process_user_cpu_seconds": 4.487083,
+  "kernel_process_system_cpu_seconds": 0.507593,
+  "competing_work": "P7 compilation permitted this diagnostic; this was not a benchmark quiet window",
+  "phase_scope": "first marker includes launch and first complete input. Last marker precedes final fusion, export, and exit.",
+  "output": {
+    "shape": [
+      337,
+      510,
+      3
+    ],
+    "dtype": "uint16",
+    "sha256": "9990c8f8ecd1c0ce49ef56df124f0ac87b4d233fb35a72320fa71b66d603421d",
+    "pixel_sha256": "657ba90289bf36037b4c64f266bca4696c82120f3fc1f697bf12addfc2671349",
+    "bytes": 1031446,
+    "minimum": 0,
+    "maximum": 65535
+  },
+  "unchanged_inputs_and_output_pixels_verified": true,
+  "temporary_image_removed": true
+}
