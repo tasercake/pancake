@@ -1,0 +1,5 @@
+2026-11-18T11:07:11+08:00
+Allowed CPU IDs selected from separate physical cores: 0,1,2,3
+8816d3c7f36ea1ce245348bd89e80f8496be92cfd4eed33ec41c567738dfee0d  /tmp/pancake-worktrees.t3paqgWM/assurance/pancake/target/host-sanitizer-thread/x86_64-unknown-linux-gnu/debug/build/pancake/68a815e7aaac3576/out/cpu_advanced_fusion-68a815e7aaac3576
+timeout --signal=TERM --kill-after=5s 90s taskset --cpu-list 0,1,2,3 /tmp/pancake-worktrees.t3paqgWM/assurance/pancake/target/host-sanitizer-thread/x86_64-unknown-linux-gnu/debug/build/pancake/68a815e7aaac3576/out/cpu_advanced_fusion-68a815e7aaac3576 --exact cpu_advanced_fusion --nocapture
+exit=0

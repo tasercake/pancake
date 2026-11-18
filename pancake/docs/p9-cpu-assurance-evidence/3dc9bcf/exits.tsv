@@ -1,0 +1,7 @@
+gate	exit
+fast	0
+deps	0
+coverage-cpu	1
+sanitizer-address	0
+sanitizer-thread	101
+sanitizer-thread-affinity	101

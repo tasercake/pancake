@@ -1,0 +1,16 @@
+3dc9bcf3c30605badea2f7b2ee2840075507b6c3
+b2fa570aaa2dbc0265d938f9cb4567c78fe6ca2a0b8c6acba7c98fc381ec7cf4  Cargo.lock
+57e5fb6c6e32064a6fc15b0d604c356f6a13cbf6238f4750b1f5b959447da17a  Cargo.toml
+831af4923e6996ce627e587ab55681b016a64fffa6b640cb7cf927a8b2a6d8a4  assurance-platforms.json
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+Linux 6.8.0-147-generic x86_64
+3.24.41
+2.52.0
+NVIDIA GeForce RTX 3090, 580.178.04
