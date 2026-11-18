@@ -1,0 +1,27 @@
+runtime=wgpu-vulkan
+backend=gpu
+device=NVIDIA GeForce RTX 3090
+fingerprint=spirv_4318_8708
+device_pci_address=Some("0000:01:00.0")
+physical_gpu=true
+maximum_allocation_bytes=2147483644
+capacity_bytes=None
+fallback_reason=None
+wgpu_adapter=Some(
+    AdapterInfo {
+        name: "NVIDIA GeForce RTX 3090",
+        vendor: 4318,
+        device: 8708,
+        device_type: DiscreteGpu,
+        device_pci_bus_id: "0000:01:00.0",
+        driver: "NVIDIA",
+        driver_info: "580.178.04",
+        backend: Vulkan,
+        subgroup_min_size: 32,
+        subgroup_max_size: 32,
+        transient_saves_memory: Some(
+            false,
+        ),
+        limit_bucket: None,
+    },
+)

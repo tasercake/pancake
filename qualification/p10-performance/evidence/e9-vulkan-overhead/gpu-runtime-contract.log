@@ -1,0 +1,8 @@
+
+running 4 tests
+test auto_reports_the_qualified_device ... ok
+test explicit_gpu_override_completes_on_named_runtime ... ok
+test prepared_wgpu_respects_each_jobs_budget ... ok
+test wgpu_runtime_qualifies_hardware_and_reuses_setup ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
