@@ -3,7 +3,10 @@
 The initial preparation reviewed retained evidence and wrote a quiet launch
 plan during the D150 campaign. After D150 ended, the sealed candidate and
 reference were staged and all 52 TIFFs were generated for read-only reuse
-by the viewer A/B and this benchmark. The diagnostic pair is queued.
+by the viewer A/B and this benchmark. One complete diagnostic pair
+established matching stationary RGB16 geometry. The candidate took 3.084×
+the reference time and produced different measured detail transfer.
+The full timing schedule was closed. [Diagnostic evidence](pair-001/README.md)
 
 ## Exact inputs and prior closure
 
