@@ -146,7 +146,10 @@ pub(super) fn scan_entries(
     };
     for entry in listing {
         consume_entry(entries)?;
-        let (name, path) = entry.map_err(|error| path_error(directory, &error))?;
+        let (name, path) = match entry {
+            Ok(entry) => entry,
+            Err(error) => return Err(path_error(directory, &error)),
+        };
         if matcher.matches_path_with(Path::new(&name), options) {
             next_paths.push(path);
         }
