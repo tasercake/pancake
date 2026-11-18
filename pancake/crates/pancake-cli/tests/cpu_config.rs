@@ -205,3 +205,20 @@ fn rejection(arguments: &[std::path::PathBuf], diagnostic: &str) -> Result<(), B
         other => Err(format!("expected {diagnostic}, actual {other:?}").into()),
     }
 }
+
+/// Glob expansion reports a matched link whose source disappeared.
+///
+/// # Errors
+/// Returns fixture setup or a missing broken-link diagnostic.
+#[cfg(unix)]
+#[test]
+fn dangling_wildcard_input_is_reported() -> Result<(), Box<dyn Error>> {
+    let directory = tempfile::tempdir()?;
+    let present = directory.path().join("present.png");
+    fs::write(&present, b"present")?;
+    std::os::unix::fs::symlink(
+        directory.path().join("absent"),
+        directory.path().join("stale.png"),
+    )?;
+    rejection(&[directory.path().join("*.png")], "cannot access input")
+}

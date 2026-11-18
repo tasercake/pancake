@@ -256,3 +256,31 @@ fn valid_relative_glob_paths_reach_the_processing_boundary() -> Result<(), Box<d
         "incomplete processing must not write an export",
     )
 }
+
+/// An actual closed diagnostic pipe gives a recoverable process error.
+///
+/// # Errors
+/// Returns pipe creation, process launch or incorrect exit status.
+#[test]
+fn closed_console_pipe_fails_cleanly() -> Result<(), Box<dyn Error>> {
+    let (reader, writer) = std::io::pipe()?;
+    drop(reader);
+    let help = Command::new(env!("CARGO_BIN_EXE_pancake-cli"))
+        .arg("--help")
+        .stdout(writer)
+        .status()?;
+    require(
+        help.code() == Some(1_i32),
+        "closed help stream must exit with a recoverable error",
+    )?;
+
+    let (reader, writer) = std::io::pipe()?;
+    drop(reader);
+    let error = Command::new(env!("CARGO_BIN_EXE_pancake-cli"))
+        .stderr(writer)
+        .status()?;
+    require(
+        error.code() == Some(1_i32),
+        "closed diagnostic stream must exit with a recoverable error",
+    )
+}
