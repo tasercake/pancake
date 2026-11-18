@@ -26,7 +26,7 @@
     "crates/pancake-gui/src/session.rs": "7515e70636dffe8948d410b915d99a3e363708e11591764cba43e40bd316fe15",
     "crates/pancake-gui/src/sources/mod.rs": "c01336b0adf32cf6d230e54f909518bad93c1473984a10408b2ed3c9ddac3907",
     "crates/pancake-gui/src/sources/tests.rs": "96d3a89abdf397ab504a3b66b3f8b15858d6e4550b6c08b6faeaeefe306d339e",
-    "crates/pancake-gui/src/tests.rs": "66ed180423a5e7047973699ab8bb62af9ef7993da4815b801ca24d92163c1f51",
+    "crates/pancake-gui/src/tests.rs": "3aaa7fb16b0a9e104aded80e4792dabd4c24b11a6de425e7be6df32d6033472f",
     "crates/pancake-gui/src/workspace.slint": "0c17f3ada5daa2b7941aa9c401ed5c6165653c8de518c45c0225af53439aac86",
     "src/config/paths.rs": "f38808b8399c489a5a1f252628dff540b28bcacabb3a8b4d8311412b05ca5660",
     "src/config/tests.rs": "64f34d3e1b4f87a8d6a5d59a17a326b978d8736c95016560eff909cb48035079",

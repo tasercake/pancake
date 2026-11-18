@@ -9,6 +9,7 @@ use slint::platform::{Platform, PlatformError, PointerEventButton, WindowAdapter
 use slint::{
     ComponentHandle as _, Image, LogicalPosition, PhysicalSize, Rgb8Pixel, SharedPixelBuffer,
 };
+use slint_interpreter::ComponentInstance;
 
 /// An offscreen window using the same renderer as the software desktop backend.
 struct Offscreen(Rc<MinimalSoftwareWindow>);
@@ -103,9 +104,30 @@ fn comparison_clips_source_to_left_of_split() -> Result<(), Box<dyn Error>> {
     workspace.set_property("comparison-preview", solid(SOURCE).into())?;
     workspace.set_property("preview-width", 320_i32.into())?;
     workspace.set_property("preview-height", 40_i32.into())?;
-    workspace.show()?;
+    let component = workspace.as_weak();
+    let observed = workspace
+        .show()
+        .map_err(Box::<dyn Error>::from)
+        .and_then(|()| observe_comparison(&workspace, &adapter));
+    // The offscreen fixture owns the window lifecycle. Slint retains a strong
+    // component reference while the window is visible.
+    let hidden = workspace.hide().map_err(Box::<dyn Error>::from);
+    drop(workspace);
+    observed.and(hidden)?;
+    if component.upgrade().is_some() {
+        return Err("The closed comparison workspace is still retained.".into());
+    }
+    Ok(())
+}
 
-    let before = render(&adapter)?;
+/// Observe the initial split and its response to native pointer events.
+/// # Errors
+/// Returns an input dispatch or framebuffer observation error.
+fn observe_comparison(
+    workspace: &ComponentInstance,
+    adapter: &MinimalSoftwareWindow,
+) -> Result<(), Box<dyn Error>> {
+    let before = render(adapter)?;
     let rows = before.as_chunks::<WIDTH>().0;
     let (top, row) = rows
         .iter()
@@ -130,7 +152,7 @@ fn comparison_clips_source_to_left_of_split() -> Result<(), Box<dyn Error>> {
     let right_probe = right.saturating_sub(span / 10);
 
     workspace.set_property("compare", true.into())?;
-    let centered = render(&adapter)?;
+    let centered = render(adapter)?;
     check_pixel(
         &centered,
         left_probe,
@@ -170,7 +192,7 @@ fn comparison_clips_source_to_left_of_split() -> Result<(), Box<dyn Error>> {
     ] {
         let _delivered = window.dispatch_event_with_result(event)?;
     }
-    let dragged = render(&adapter)?;
+    let dragged = render(adapter)?;
     check_pixel(
         &dragged,
         left_probe,
