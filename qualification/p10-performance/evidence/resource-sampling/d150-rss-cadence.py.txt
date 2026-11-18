@@ -1,0 +1,91 @@
+"""Reconcile the archived D150 RSS traces with their original run receipts."""
+
+import gzip
+import hashlib
+import json
+import statistics
+import sys
+import tarfile
+from collections import Counter, defaultdict
+from pathlib import Path
+
+
+LIMIT_NS = 20_000_000
+STEP_NS = 8_000_000
+
+
+def summarize(trace, run):
+    previous = 0
+    maximum_gap = 0
+    durations = []
+    gaps = Counter(launch=0, internal=0, exit=0)
+    for row in map(json.loads, trace):
+        finished = row["rss_elapsed_ns"]
+        if finished > run["elapsed_ns"]:
+            break
+        started = row["started_ns"]
+        acquisition = finished - started
+        between = started - previous
+        gap = finished - previous
+        durations.append(acquisition)
+        maximum_gap = max(maximum_gap, gap)
+        if gap > LIMIT_NS:
+            gaps["launch" if not previous else "internal"] += 1
+            gaps["during_snapshot_larger"] += acquisition > between
+            gaps["snapshot_wall_over_8ms"] += acquisition > STEP_NS
+            gaps["snapshot_wall_over_20ms"] += acquisition > LIMIT_NS
+            gaps["before_snapshot_over_20ms"] += between > LIMIT_NS
+        previous = finished
+    tail = run["elapsed_ns"] - previous
+    gaps["exit"] += tail > LIMIT_NS
+    maximum_gap = max(maximum_gap, tail)
+    assert run["sample_interval_ns"] == STEP_NS
+    assert run["maximum_rss_sample_gap_ns"] == maximum_gap
+    assert run["rss_sample_count"] == len(durations)
+    return durations, maximum_gap, gaps
+
+
+def main():
+    path = Path(sys.argv[1])
+    per_target = defaultdict(list)
+    with tarfile.open(path) as archive:
+        report_bytes = archive.extractfile("paired/report.json").read()
+        for run in json.loads(report_bytes)["samples"]:
+            name = run["target"]
+            relative = (
+                f"paired/{run['kind']}-{run['number']:02d}/{name}/resources.jsonl.gz"
+            )
+            with gzip.GzipFile(fileobj=archive.extractfile(relative)) as trace:
+                durations, maximum_gap, gaps = summarize(trace, run)
+            mean_cpu = run["sampler_threads_cpu_ns"]["rss"] / len(durations)
+            per_target[name].append((durations, maximum_gap, gaps, mean_cpu))
+
+    result = {
+        "archive_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "report_sha256": hashlib.sha256(report_bytes).hexdigest(),
+        "limit_ns": LIMIT_NS,
+        "nominal_interval_ns": STEP_NS,
+    }
+    for name, runs in sorted(per_target.items()):
+        durations = [duration for run, _, _, _ in runs for duration in run]
+        gaps = Counter()
+        for _, _, counts, _ in runs:
+            gaps.update(counts)
+        result[name] = {
+            "jobs": len(runs),
+            "observations_inside_job": len(durations),
+            "jobs_with_gap_over_limit": sum(gap > LIMIT_NS for _, gap, _, _ in runs),
+            "maximum_gap_ns": max(gap for _, gap, _, _ in runs),
+            "gap_over_limit_counts": gaps,
+            "snapshot_wall_median_ns": statistics.median(durations),
+            "snapshot_wall_max_ns": max(durations),
+            "sampler_thread_mean_cpu_ns_per_sample_by_job_min_max": [
+                round(min(mean for _, _, _, mean in runs)),
+                round(max(mean for _, _, _, mean in runs)),
+            ],
+        }
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
