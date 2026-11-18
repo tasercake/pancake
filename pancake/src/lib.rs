@@ -270,3 +270,6 @@ fn centered_variance(input: &Tensor<u32>, output: &mut Tensor<f32>, width: usize
 pub mod config;
 pub mod image_io;
 pub mod job;
+pub mod fusion;
+pub mod registration;
+pub mod runtime;
