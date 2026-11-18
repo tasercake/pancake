@@ -19,10 +19,14 @@ def validate(root):
     if [line.partition('=')[2] for line in pins if line.startswith('PANCAKE_NIGHTLY=')] != [policy['nightly']]:
         raise ValueError('nightly tool pin changed; review cross-host Miri boundary')
     reviewed = policy['reviewed_files']
-    production = {str(path.relative_to(root)) for path in (root / 'src').rglob('*.rs')}
-    if (root / 'build.rs').exists():
-        production.add('build.rs')
-    if set(reviewed) != production | {'Cargo.toml', 'Cargo.lock'}:
+    crate_roots = [root, *(path.parent for path in root.glob('crates/*/Cargo.toml'))]
+    production = {'Cargo.lock'}
+    for crate in crate_roots:
+        files = [crate / 'Cargo.toml', *(crate / 'src').rglob('*.rs')]
+        if (crate / 'build.rs').exists():
+            files.append(crate / 'build.rs')
+        production.update(path.relative_to(root).as_posix() for path in files)
+    if set(reviewed) != production:
         raise ValueError('production source inventory changed; review cross-host Miri boundary')
     for name, expected in reviewed.items():
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != expected:

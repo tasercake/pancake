@@ -2,7 +2,6 @@
 
 include!("common/kernel_cases.rs");
 
-use slint as _;
 
 /// CPU must execute the same kernel used by the GPU.
 ///
