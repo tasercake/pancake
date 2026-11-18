@@ -200,12 +200,14 @@ case ${1:-all} in
         ;;
     mutants | mutants-cpu)
         require_tool cargo-mutants
+        # Members have behavior and downstream tests of the shared core.
+        mutation_scope=(--workspace --test-workspace true)
         if [[ $1 == mutants-cpu ]]; then
             assurance_profile cpu
-            cargo mutants --cap-lints true --all-features --in-place --timeout 60 \
+            cargo mutants "${mutation_scope[@]}" --cap-lints true --all-features --in-place --timeout 60 \
                 --build-timeout 180 -- --locked "${assurance_args[@]}" -- --include-ignored
         else
-            cargo mutants --cap-lints true --all-features --in-place --timeout 60 \
+            cargo mutants "${mutation_scope[@]}" --cap-lints true --all-features --in-place --timeout 60 \
                 --build-timeout 180 -- --locked -- --include-ignored
         fi
         ;;

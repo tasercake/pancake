@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "observed_on": "2026-11-18",
+  "tested_revision": "1fdbcaa74f0fdad69911b16fc9a7f938fdeb8807",
+  "gui_behavior_revision": "5a0c0ae49004e046bf1297da3029d43b5dc4a725",
+  "input_sha256": {
+    "Cargo.toml": "57e5fb6c6e32064a6fc15b0d604c356f6a13cbf6238f4750b1f5b959447da17a",
+    "Cargo.lock": "2868b482b0f83698a7b52563bb518b5acce2176c01c277cfbd27ec889852aacc",
+    "crates/pancake-gui/Cargo.toml": "188c6c781c7dbd0d07bbfbb12f41de1552e1394b83c5da7794734ba1651bfb4e",
+    "dependency-policy.json": "91d090dba5002cca17eb9e46f2c4d7967018f9c36a86a05dfa9f6e4cb16d48c4",
+    "assurance-platforms.json": "e18476d413ede6752880acf9518d747362a38ebaf40e12c6a6f1658e50af3a85"
+  },
+  "host": {
+    "os": "Ubuntu 24.04.5 LTS",
+    "kernel": "Linux 6.8.0-147-generic x86_64",
+    "cpu": "AMD Ryzen 9 7950X3D",
+    "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo": "1.100.0 (3acc79c0c 2026-11-05)",
+    "gtk+-3.0": "3.24.41",
+    "atk": "2.52.0",
+    "glib-2.0": "2.80.0"
+  },
+  "tools": {
+    "cargo-deny": "0.20.2",
+    "cargo-mutants": "27.1.0"
+  },
+  "commands": [
+    {
+      "command": "cargo metadata --locked --format-version 1 --all-features",
+      "result": "868 resolved packages including optional, target and build edges"
+    },
+    {
+      "command": "cargo deny --format json --locked --workspace --all-features --config deny.toml check advisories bans sources --deny warnings",
+      "result": "35 duplicate target groups and five previously reviewed maintenance IDs before ledger application. No GTK3 advisory.",
+      "log": "deny-unreviewed.jsonl"
+    },
+    {
+      "command": "bash scripts/check.sh deps",
+      "result": "PASS. 19 policy checks, seven vendor contracts, strict advisories/bans/sources and all three first-party manifests checked by cargo-machete.",
+      "log": "check-deps.log"
+    },
+    {
+      "command": "python3 -m unittest scripts/test_assurance_targets.py scripts/test_assurance_coverage.py scripts/test_miri_host_policy.py scripts/test_headless_dependencies.py",
+      "result": "PASS. 18 regression tests. Declarative source receipt test first failed before .slint inventory support.",
+      "test_first_log": "slint-source-red.log"
+    },
+    {
+      "command": "cargo mutants --list --workspace --test-workspace true",
+      "result": "2,261 listed, including six CLI and 135 GUI mutations. Root-only default listed 2,120. No mutation outcome claim."
+    },
+    {
+      "command": "cargo clippy --locked --package pancake-gui --all-targets --all-features -- -Dwarnings",
+      "result": "FAIL. Five first-party session.rs lint diagnostics after successful native dependency checks.",
+      "log": "clippy-gui.log"
+    }
+  ],
+  "review": {
+    "cargo_deny_exact_skips": 38,
+    "cargo_deny_existing_maintenance_ids": 5,
+    "clippy_reviewed_duplicate_names": 64,
+    "gtk3_advisory": "https://rustsec.org/advisories/RUSTSEC-2024-0415.html",
+    "pending": [
+      "Full native GUI coverage, layout and sanitizer receipts for the integrated release.",
+      "Canonical Darwin Miri run and native macOS build and workflow evidence.",
+      "Retained Windows MSVC build and link for the integrated release.",
+      "Linux mutation listing includes rfd implementation conditionally compiled on macOS and Windows. Platform-specific mutation outcomes require the matching executable source path."
+    ]
+  },
+  "archive": {
+    "path": "dependency-graph-logs.tar.gz",
+    "sha256": "7b4d7b37e32608e974947e38818dbf856a56400004d768e52dc10489854f84c7",
+    "logs": {
+      "deny-unreviewed.jsonl": {
+        "exit_status": 3,
+        "sha256": "8e70e09293a16e81e5f59fc0c2e6979df6a32fb61147dbb21285a9680a906380"
+      },
+      "deny-reviewed.log": {
+        "exit_status": 0,
+        "sha256": "9c97eff057dde47e35c90012f8ded8880f95791a27f0fe144f66200f66000342"
+      },
+      "slint-source-red.log": {
+        "exit_status": 1,
+        "sha256": "b4fdd5b49c32034cc30bf9304c771c6bc66ac203fc172b5185eb8f130e03081a"
+      },
+      "check-deps.log": {
+        "exit_status": 0,
+        "sha256": "5a6594fb51f3e9967d8f2a74bd51650039b728ba4e9c9318135055029d06602b"
+      },
+      "clippy-gui.log": {
+        "exit_status": 101,
+        "sha256": "fd1e7754d6782fb5a51ac5f3d4cc5c6449927685bb64ba49a5466af16aa2899d"
+      }
+    }
+  },
+  "supplemental_linux_miri": {
+    "executed_revision": "1fdbcaa74f0fdad69911b16fc9a7f938fdeb8807",
+    "command": "CARGO_TARGET_DIR=$PWD/target/host-pin-miri MIRIFLAGS='-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check' cargo +nightly-2026-11-15 miri test --locked --workspace --all-features --lib -- --include-ignored",
+    "exit_status": 0,
+    "passed": 15,
+    "skipped": 0,
+    "scope": "Headless library tests on Linux. Canonical Darwin execution remains required.",
+    "archive": "graph-linux-miri.log.gz",
+    "archive_sha256": "b5c87751be604601e5a03f8eb2cd94ebf1d4236bfaff2770bdaeeecafcb2063c",
+    "raw_sha256": "178b88b89f1294fdb6a4a0724dcf855bc3dbd0d79ea324909c1a64d1d3b84cdc"
+  }
+}
