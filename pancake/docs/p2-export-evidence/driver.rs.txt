@@ -1,0 +1,19 @@
+//! Temporary driver for validating the actual encoder with independent readers.
+
+use pancake::config::BitDepth;
+use pancake::image_io::{RgbImage, export};
+use std::error::Error;
+use std::path::PathBuf;
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let directory = PathBuf::from(std::env::args_os().nth(1).ok_or("output directory required")?);
+    let codes = [0_u16, 257, 256, 32768, 580, 62211, 65025, 65535, 130, 35533, 17, 1];
+    let frame = RgbImage::new(2, 2, codes.map(|v| f32::from(v) / f32::from(u16::MAX)).to_vec())?;
+    for extension in ["png", "tiff", "jpg"] {
+        let path = directory.join(format!("uint16.{extension}"));
+        export(&path, &frame, BitDepth::Sixteen, 95, &[])?;
+    }
+    let hdr = RgbImage::new(2, 1, vec![-0.125, 0.123_456_79, 7.25, 0.0, 0.75, 1.0])?;
+    export(&directory.join("float.exr"), &hdr, BitDepth::Eight, 95, &[])?;
+    Ok(())
+}
