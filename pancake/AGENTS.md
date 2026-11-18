@@ -16,7 +16,10 @@
 
 ## Verification
 
-Run `bash scripts/check.sh all` here before completing changes. All local gates must pass.
+Run `bash scripts/check.sh all` before pushing runtime changes or preparing a
+release. Pre-push and CI retain the full gates. For hook/documentation-only
+changes, run focused hook regressions and static checks; do not compile the
+application merely to commit. Pre-commit is whitespace and formatting only.
 CI also checks native Linux/macOS/Windows builds and Linux address/thread
 sanitizers. Report remote/platform checks that were not run locally.
 

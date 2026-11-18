@@ -56,8 +56,11 @@ Install hooks from the repository root:
 git config --local core.hooksPath pancake/.githooks
 ```
 
-Pre-commit checks staged Pancake changes and rejects partially staged project
-changes. Pre-push runs the complete local suite for pushes that change Pancake,
+Pre-commit checks staged whitespace and, for Rust/manifest/formatter changes,
+Rust formatting. It never runs Clippy, documentation builds, compilation or tests.
+Documentation-only commits do not invoke Cargo. Partially staged project changes
+are rejected so checks cannot validate different content from the commit.
+Pre-push runs the complete local suite for pushes that change Pancake,
 and requires the checkout to match the pushed code. Git hooks are bypassable;
 server enforcement requires making **Pancake required** a required repository
 status check. No repository ruleset is changed by this scaffold.
