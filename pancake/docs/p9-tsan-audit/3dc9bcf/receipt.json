@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "tested_application_revision": "3dc9bcf3c30605badea2f7b2ee2840075507b6c3",
+  "target": "x86_64-unknown-linux-gnu",
+  "os": "Linux 6.8.0-147-generic x86_64 GNU/Linux",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "rustc": [
+    "rustc 1.102.0-nightly (5f4effd57 2026-11-13)",
+    "binary: rustc",
+    "commit-hash: 5f4effd579500175af844241eb179e756190f1e7",
+    "commit-date: 2026-11-13",
+    "host: x86_64-unknown-linux-gnu",
+    "release: 1.102.0-nightly",
+    "LLVM version: 23.1.5"
+  ],
+  "oneshot": {
+    "version": "0.2.1",
+    "vcs_revision": "83fd0864be7289067ce96cc79cd96c0928742979",
+    "registry_archive_sha256": "cfe21416a02c693fb9f980befcb230ecc70b0b3d1cc4abf88b9675c4c1457f0c",
+    "stock_file_hashes": {
+      "/home/krishna/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oneshot-0.2.1/src/receiver.rs": "5beb04d077c4cfd29747739f80ef9a3a58135c08db573bd9c269044f8e579188",
+      "/home/krishna/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/oneshot-0.2.1/src/sender.rs": "b3af6605922a2f8c2a83d235e6d0a1e5ca08147f6fd3ea937e40288d8e957ad8"
+    },
+    "candidate_file_hashes": {
+      "/tmp/pancake-worktrees.t3paqgWM/p6-runtime/artifacts/oneshot-tsan/vendor/oneshot/src/receiver.rs": "065a10346822ee15a039a68565ff22c8d14df56b1513060edf54dc4117ad6ce5",
+      "/tmp/pancake-worktrees.t3paqgWM/p6-runtime/artifacts/oneshot-tsan/vendor/oneshot/src/sender.rs": "b3af6605922a2f8c2a83d235e6d0a1e5ca08147f6fd3ea937e40288d8e957ad8"
+    },
+    "unified_patch_sha256": "c28a7c7cb66a91cd810a884c58c2ff699b376600b78fa60b6c71ad61da4279f5"
+  },
+  "original_application": {
+    "status": "failed",
+    "tests": {
+      "passed": 74,
+      "failed": 1,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "tsan_warnings": 1,
+      "unrun": 22
+    },
+    "cli_sha256": "9d6b45248e3c6acbc59c00bcad30a4961eca624e68d25b6ce4b9bfc94a38c5a0",
+    "cli_elf_build_id": "34ce657fd044e5792bc53be2aca70c2e8ab1e47e",
+    "manifests": {
+      "pancake/Cargo.toml": "57e5fb6c6e32064a6fc15b0d604c356f6a13cbf6238f4750b1f5b959447da17a",
+      "pancake/Cargo.lock": "b2fa570aaa2dbc0265d938f9cb4567c78fe6ca2a0b8c6acba7c98fc381ec7cf4"
+    }
+  },
+  "experimental_application": {
+    "status": "passed",
+    "focused_original_cli_case": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 6,
+      "tsan_warnings": 0
+    },
+    "full_cpu_tsan": {
+      "passed": 97,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "tsan_warnings": 0
+    },
+    "cli_sha256": "68abe945c6836fe3e79c48d70e49ed20981b010d75519c7035e616b01702658a",
+    "cli_elf_build_id": "bbf0c85ac484fd1152929cfc4fe210652653cad4",
+    "manifests": {
+      "Cargo.toml": "ba7e7a160344b2e5f1672ae5314f658c24fdbe951c7bf580ed3e8a56025f4594",
+      "Cargo.lock": "198c0a9b8110e42ec551391203ba5b62a887b1e608c96575a6eb0fb71d505971"
+    },
+    "manifest_and_lock_patch_sha256": "b242007f9ce86e219d11b1e23add757e7f6fff752d6d714f5e0a6b76033c94d2"
+  },
+  "independent_probe": {
+    "original_tsan_exit": 66,
+    "candidate_tsan_exit": 0,
+    "original_executable_sha256": "72e9c8932b46ea4ffcbdf537de95938a4ecb80b0c34814f2ade4efd59d33e972",
+    "candidate_executable_sha256": "13540f91b821ffd37854658148aa26afa1c6a6b3e7b162d425be069b2768804d"
+  },
+  "integration": "isolated_experimental_graph_only",
+  "archive_sha256": "16f20b1c75ddec46982aa3d773ce1b51c417fb4c73b0a48ef08139e4ea810b36",
+  "raw_archive_members": {
+    "Cargo.lock": "392882bb2218048bde77dccb80fe5ad57adf9d2fa3cba01b5643d6fae86e98f5",
+    "Cargo.toml": "d445e22f55cc194dc2c8fb316ad743b4318784284871e091106787264d8d5903",
+    "app-cli-build-id.txt": "32eb997a571d10687df2292ce9a307be0076db9d41093d2aa0fdc0c559f92d3a",
+    "app-cli.sha256": "ece0f0637db478a3c0e6788e0efcd07b4985c275729486a6b27962dec1b5ec8f",
+    "app-focused.log": "237402de2284e222339ceb03a9973fd8652fd9ca17446b472c047f1c5fde8674",
+    "app-focused.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "app-lock-update.log": "cc20a1f87e06bf5b9a003811737737a169069a1db226e2eac07fe6bb9ad59d94",
+    "app-thread.log": "b2a0b7858189436e4a2f4881977ecd669d77651277d260041516e730a38d4313",
+    "app-thread.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "blocking-receive-acquire.patch": "c28a7c7cb66a91cd810a884c58c2ff699b376600b78fa60b6c71ad61da4279f5",
+    "candidate-app-manifests.sha256": "d6dcfa2a71d7c2b32af6301fcbf074bbad2435bd16e4bbd1e8a9312807495ffb",
+    "candidate-binary.sha256": "b13b791edce7115e2ac3acdbccc59ab4b84041b01252e4ddc629dcbce73e9cc0",
+    "candidate-build.log": "f5700c6252e0a3e131a2cffe9608e4c86efa6b3fe99c08161601f5cac3173966",
+    "candidate-build.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "candidate-dependency-sources.sha256": "2600ae4c768e4749e595b5bc77610b12d230ad48c3c3d51b876271064c38a6ed",
+    "candidate-lock-generation.log": "7fc6a8ed0cb365c57e10981e59e26e10e7d0b03e286e4a09088d4ad156c7aa89",
+    "candidate-run.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "candidate-run.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "candidate.Cargo.lock": "392882bb2218048bde77dccb80fe5ad57adf9d2fa3cba01b5643d6fae86e98f5",
+    "candidate.Cargo.toml": "d445e22f55cc194dc2c8fb316ad743b4318784284871e091106787264d8d5903",
+    "experimental-app-graph.patch": "b242007f9ce86e219d11b1e23add757e7f6fff752d6d714f5e0a6b76033c94d2",
+    "lock-generation.log": "7fc6a8ed0cb365c57e10981e59e26e10e7d0b03e286e4a09088d4ad156c7aa89",
+    "original-binary.sha256": "d46e5d9cbb92c92a9b927c28aff2e475ff796c858fb037b23150743a70e9a7a8",
+    "original-build.log": "d9adbaf436b80bbcc0fe50adecdf07e43f3dada9997a7f2eb2318897a0aae978",
+    "original-build.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "original-run.log": "3ee667ee7b02d6c911397b4b1a2c9cffad5a4cd45d24a1d9d2380cfdefa86b1b",
+    "original-run.status": "8e37bed9dff3949ffd23ae638260dff869f5cc26e551f2a9e5e289a8888949fa",
+    "original.Cargo.lock": "1ec5c31ab8f7dfbdc1160693fe7cc2e5e6d9aeb6b48e404f71aab7334e5044c1",
+    "original.Cargo.toml": "21062180839b5ae375433a8a1f22acb83b05f9b1dc15df9b318287d98570345b",
+    "os.txt": "249d55b9060f51dce07187d99cbde8eb73aa3be8d893dddd371dd457d350c1ab",
+    "replay-app.sh": "8e65df37db5d49cca63aa4f1facff6604575078a023a1a979c9240c85dd8377b",
+    "rustc-version.txt": "072391379b408a5c6c30ef78ad74e86d15c0eebf2c02c1e70ba1992bdae7752b",
+    "sanitizer-thread-affinity.log": "e97b48d409494908d9ab653b1ec3dda4e1ed64c0813cf1964fefc3d082457dbc",
+    "sanitizer-thread.log": "ed2ae44eece01fba9daba9277ebd826ab96515dc3d8c15c914e6d1f1f5f814ff",
+    "source-logs.sha256": "d10324ecff987ba217aff41e210ab50fab5a6da748ae84fea2d647b1c292eda0",
+    "source-revision.txt": "7c663deb3f27774b98fbeea5bd09f376a5d60fe46788399b2ce714d5d73ab375",
+    "src/main.rs": "3e18e8f03e8f518bb4eb0d789b640b352684952e6cedf929c421a0cee1aabf7e",
+    "stock-app-manifests.sha256": "8ebacfa30abc489a3b451b7d9e8babd2d5d6cf9e65166a1b82fcb42975458921",
+    "stock-dependency-sources.sha256": "b7284c92c13812fc51a64ebabe20191472cad3238b0294a185588e381f79a618",
+    "thread-affinity.log": "23e2288dc60379cdcb259b3105691d306592cae000bee1830d3270fe76156309",
+    "thread-affinity.txt": "95cd830c0b0c57bde71c3dfe55ee79186278d938293eaa417db1942de3522758",
+    "upstream-crate.sha256": "18d7b7437b805e5272099a6ab61c52cc89aa3505e38d3342497084b624459a33",
+    "upstream-vcs.json": "2eba72150ec00c626bebcfb3894a3f4189b8da8fe7b3b5277e4c44a3942d0b5e"
+  }
+}
