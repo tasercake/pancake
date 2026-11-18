@@ -110,7 +110,7 @@ fn expand_component(
     matcher: &glob::Pattern,
     entries: &mut impl Iterator<Item = ()>,
 ) -> Result<Vec<PathBuf>, String> {
-    let mut matches = Vec::new();
+    let mut next_paths = Vec::new();
     let options = glob::MatchOptions {
         require_literal_leading_dot: true,
         ..glob::MatchOptions::new()
@@ -130,11 +130,11 @@ fn expand_component(
             consume_entry(entries)?;
             let entry = entry.map_err(|error| path_error(directory, &error))?;
             if matcher.matches_path_with(Path::new(&entry.file_name()), options) {
-                matches.push(entry.path());
+                next_paths.push(entry.path());
             }
         }
     }
-    Ok(matches)
+    Ok(next_paths)
 }
 
 /// Missing components simply remove that wildcard prefix from consideration.
