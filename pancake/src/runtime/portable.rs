@@ -32,6 +32,22 @@ pub fn prepare_wgpu_runtime(
 ) -> Result<SelectedRuntime, String> {
     check_request(gpu_index, budget_bytes)?;
     let api = primary_api();
+    // The leading discrete Vulkan selector is the first entry of the full
+    // inventory. Its setup already discovers and verifies the physical adapter.
+    // Most indexed and automatic jobs can finish that single acquisition.
+    let preferred_failure = if api == WgpuBackend::Vulkan && gpu_index.unwrap_or(0) == 0 {
+        let selector = WgpuDevice::new(WgpuDeviceKind::DiscreteGpu(0)).on(api);
+        match acquire(&selector, budget_bytes) {
+            Ok(runtime) => return Ok(runtime),
+            Err(error) => Some((selector, error)),
+        }
+    } else {
+        None
+    };
+    let acquire_selected = |selector: &WgpuDevice| match &preferred_failure {
+        Some((failed, error)) if failed == selector => Err(error.clone()),
+        _ => acquire(selector, budget_bytes),
+    };
     let adapters = physical_adapters(api).collect::<Vec<_>>();
     if let Some(index) = gpu_index {
         let selector = adapters.get(index).ok_or_else(|| {
@@ -40,12 +56,12 @@ pub fn prepare_wgpu_runtime(
                 adapters.len()
             )
         })?;
-        return acquire(selector, budget_bytes);
+        return acquire_selected(selector);
     }
 
     let mut last_failure = format!("wgpu {api:?} found no physical GPU");
     for selector in &adapters {
-        match acquire(selector, budget_bytes) {
+        match acquire_selected(selector) {
             Ok(runtime) => return Ok(runtime),
             Err(error) => last_failure = error,
         }
