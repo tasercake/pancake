@@ -40,3 +40,16 @@ lines, 58 of 92 functions and 559 of 920 regions. The admission fix added
 reviewed source, so the totals differ. Branch coverage is a separate nightly
 check. [Coverage report](stack-plan-coverage-cpu.json.gz) and
 [command log](stack-plan-coverage-cpu.log.gz).
+
+
+## Runtime and reporting integration
+
+The locked public command `cargo +1.100.0 test --locked -p pancake-cli --test cpu_runtime_options`
+first found an unknown-runtime diagnostic that omitted both the setting and
+its value. The test uses real RGB16 source files and a retained export. At
+`7bf07b9`, both native tests pass. Invalid and incompatible overrides fail with
+useful diagnostics and the old bytes intact. A successful stack reports actual
+progress and positive sharpness and independently decodes as 8-bit JPEG
+after the requested 16-bit conversion warning. Workspace `fast` also passes.
+[Red output](runtime-options-red.log.gz), [passing tests](runtime-options-green.log.gz),
+and [fast gate](runtime-options-fast.log.gz).
