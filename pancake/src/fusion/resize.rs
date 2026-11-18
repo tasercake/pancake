@@ -73,8 +73,8 @@ fn axis_pass(
         source.height,
         destination.width,
         destination.height,
-        horizontal,
-        downsample,
+        u32::from(horizontal),
+        u32::from(downsample),
     );
     result
 }
@@ -86,11 +86,9 @@ fn source_index(
     cross: usize,
     channel: usize,
     source_width: usize,
-    #[doc = "Select the horizontal rather than vertical pixel coordinate."]
-    #[comptime]
-    horizontal: bool,
+    horizontal: u32,
 ) -> usize {
-    let pixel = if horizontal {
+    let pixel = if horizontal != 0 {
         cross * source_width + axis
     } else {
         axis * source_width + cross
@@ -107,12 +105,8 @@ fn interpolate(
     source_height: usize,
     destination_width: usize,
     destination_height: usize,
-    #[doc = "Select the horizontal rather than vertical pixel coordinate."]
-    #[comptime]
-    horizontal: bool,
-    #[doc = "Use box decimation instead of linear interpolation."]
-    #[comptime]
-    downsample: bool,
+    horizontal: u32,
+    downsample: u32,
 ) {
     if ABSOLUTE_POS >= output.len() {
         terminate!();
@@ -121,13 +115,13 @@ fn interpolate(
     let channel = ABSOLUTE_POS % 3;
     let x = pixel % destination_width;
     let y = pixel / destination_width;
-    let (axis, cross, source_size, destination_size) = if horizontal {
+    let (axis, cross, source_size, destination_size) = if horizontal != 0 {
         (x, y, source_width, destination_width)
     } else {
         (y, x, source_height, destination_height)
     };
     let scale = f32::cast_from(source_size) / f32::cast_from(destination_size);
-    if downsample {
+    if downsample != 0 {
         let start = f32::cast_from(axis) * scale;
         let end = (f32::cast_from(axis) + 1.0) * scale;
         let start_index = usize::cast_from(start.floor());

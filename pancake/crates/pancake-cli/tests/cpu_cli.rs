@@ -7,6 +7,9 @@ use clap as _;
 use pancake as _;
 
 /// Invoke the current test build with all display variables removed.
+///
+/// # Errors
+/// Returns a failed process launch or output read.
 fn run(args: &[&str]) -> std::io::Result<Output> {
     Command::new(env!("CARGO_BIN_EXE_pancake-cli"))
         .args(args)
@@ -16,6 +19,9 @@ fn run(args: &[&str]) -> std::io::Result<Output> {
 }
 
 /// Preserve an explanation when an external process violates its contract.
+///
+/// # Errors
+/// Returns the diagnostic when the condition fails.
 fn require(condition: bool, diagnostic: impl Into<Box<dyn Error>>) -> Result<(), Box<dyn Error>> {
     if condition {
         Ok(())
@@ -25,6 +31,9 @@ fn require(condition: bool, diagnostic: impl Into<Box<dyn Error>>) -> Result<(),
 }
 
 /// A user can discover the actual option surface without a display.
+///
+/// # Errors
+/// Returns a process launch or malformed help error.
 #[test]
 fn help_is_headless() -> Result<(), Box<dyn Error>> {
     let output = run(&["--help"])?;
@@ -65,6 +74,9 @@ fn help_is_headless() -> Result<(), Box<dyn Error>> {
 }
 
 /// Missing or unsupported options fail before any processing starts.
+///
+/// # Errors
+/// Returns a process launch, acknowledgement, or diagnostic failure.
 #[test]
 fn parser_diagnostics_identify_the_invalid_request() -> Result<(), Box<dyn Error>> {
     let arguments: &[(&[&str], &str)] = &[
@@ -97,7 +109,7 @@ fn parser_diagnostics_identify_the_invalid_request() -> Result<(), Box<dyn Error
         let output = run(args)?;
         let stderr = String::from_utf8(output.stderr)?;
         require(
-            output.status.code() == Some(2),
+            output.status.code() == Some(2_i32),
             format!("{args:?}: exit status"),
         )?;
         require(stderr.contains(expected), format!("{args:?}: {stderr}"))?;
@@ -106,6 +118,9 @@ fn parser_diagnostics_identify_the_invalid_request() -> Result<(), Box<dyn Error
 }
 
 /// Numeric and cross-option constraints reject the actual offending value.
+///
+/// # Errors
+/// Returns a wrong exit status or a missing diagnostic.
 #[test]
 fn validation_diagnostics_identify_the_invalid_value() -> Result<(), Box<dyn Error>> {
     for ([option, value], expected) in [
@@ -119,7 +134,7 @@ fn validation_diagnostics_identify_the_invalid_value() -> Result<(), Box<dyn Err
         ])?;
         let stderr = String::from_utf8(output.stderr)?;
         require(
-            output.status.code() == Some(2),
+            output.status.code() == Some(2_i32),
             format!("{option} {value}: exit status"),
         )?;
         require(
@@ -131,6 +146,9 @@ fn validation_diagnostics_identify_the_invalid_value() -> Result<(), Box<dyn Err
 }
 
 /// File discovery must fail for a missing pattern and for a deduplicated singleton.
+///
+/// # Errors
+/// Returns a fixture creation, process launch, or diagnostic failure.
 #[test]
 fn file_diagnostics_distinguish_no_matches_and_duplicate_paths() -> Result<(), Box<dyn Error>> {
     let directory = tempfile::tempdir()?;
@@ -163,4 +181,40 @@ fn file_diagnostics_distinguish_no_matches_and_duplicate_paths() -> Result<(), B
         "missing pattern should be identified before processing",
     )?;
     require(!output.exists(), "rejection must leave output unpublished")
+}
+
+/// A malformed image reaches the real decoder, fails with its source path, and preserves export.
+///
+/// # Errors
+/// Returns fixture creation, process launch, or an incorrect decode outcome.
+#[test]
+fn malformed_inputs_are_rejected_by_the_decoder() -> Result<(), Box<dyn Error>> {
+    let directory = tempfile::tempdir()?;
+    let output = directory.path().join("out.png");
+    std::fs::write(&output, b"previous export")?;
+    for extension in ["png", "dng", "npy", "unknown"] {
+        let first = directory.path().join(format!("a.{extension}"));
+        let second = directory.path().join(format!("b.{extension}"));
+        std::fs::write(&first, b"not a supported raster")?;
+        std::fs::write(&second, b"not a supported raster")?;
+        let result = Command::new(env!("CARGO_BIN_EXE_pancake-cli"))
+            .arg("--input")
+            .arg(&first)
+            .arg(&second)
+            .arg("--output")
+            .arg(&output)
+            .arg("--cpu")
+            .output()?;
+        let stderr = String::from_utf8(result.stderr)?;
+        require(!result.status.success(), "a real malformed input must fail")?;
+        require(
+            stderr.contains("could not decode input") && stderr.contains(&format!("a.{extension}")),
+            format!("decoder must identify the first bad source: {stderr}"),
+        )?;
+        require(
+            std::fs::read(&output)? == b"previous export",
+            "a failed decode changed the previous export",
+        )?;
+    }
+    Ok(())
 }

@@ -28,7 +28,7 @@ pub struct FocusAccumulator {
     /// Aggregation size selected by the job (normalized to an odd width at use).
     kernel_size: u16,
     /// Device tensors exist only once the first valid frame has arrived.
-    state: Option<FocusState>,
+    state: Result<Option<FocusState>, String>,
 }
 
 /// Allocations reused in every frame. A successful add commits a frame to the
@@ -92,7 +92,7 @@ impl FocusAccumulator {
             shape,
             method,
             kernel_size,
-            state: None,
+            state: Ok(None),
         })
     }
 
@@ -107,13 +107,17 @@ impl FocusAccumulator {
     /// submission invalidates the accumulator.
     pub fn add_frame(&mut self, samples: &[f32]) -> Result<(), String> {
         self.shape.validate(samples)?;
-        let first = self.state.is_none();
-        let state = self.state.take().unwrap_or_else(|| {
+        let previous = self.state.as_mut().map_err(|error| error.clone())?;
+        let first = previous.is_none();
+        let state = previous.get_or_insert_with(|| {
             FocusState::new(self.device.client(), self.shape, self.kernel_size | 1)
         });
         let frame = upload(&state.client, samples);
-        state.process(self.shape, &frame, self.method, self.kernel_size, first)?;
-        self.state = Some(state);
+        if let Err(error) = state.process(self.shape, &frame, self.method, self.kernel_size, first)
+        {
+            self.state = Err(error.clone());
+            return Err(error);
+        }
         Ok(())
     }
 
@@ -122,7 +126,7 @@ impl FocusAccumulator {
     /// # Errors
     /// Returns an error for an empty stack or an invalid runtime readback.
     pub fn finish(self) -> Result<Vec<f32>, String> {
-        let state = self.state.ok_or("focus accumulator has no frames")?;
+        let state = self.state?.ok_or("focus accumulator has no frames")?;
         read_image(&state.client, state.image, self.shape.samples)
     }
 }
@@ -174,8 +178,8 @@ impl FocusState {
             self.weights.clone().into_arg(),
             self.scores.clone().into_arg(),
             self.image.clone().into_arg(),
-            depth,
-            first,
+            u32::from(depth),
+            u32::from(first),
         );
         cubecl::future::block_on(client.sync_buffers([&self.image.handle, &self.scores.handle]))
             .map_err(|error| error.to_string())
@@ -194,9 +198,9 @@ impl FocusState {
             shape.width,
             shape.height,
             radius,
-            true,
-            box_filter,
-            false,
+            1,
+            u32::from(box_filter),
+            0,
         );
         aggregate::launch(
             &self.client,
@@ -208,16 +212,17 @@ impl FocusState {
             shape.width,
             shape.height,
             radius,
-            false,
-            box_filter,
-            accumulate,
+            0,
+            u32::from(box_filter),
+            u32::from(accumulate),
         );
     }
 }
 
-/// Measure mean squared luminance Laplacian using one ordered device sum per
-/// row. Return a normalized squared contrast in the image's sample units.
-/// A flat image yields zero and the original image remains unchanged.
+/// Measure mean squared luminance Laplacian.
+///
+/// Use one ordered device sum per row. Return normalized squared contrast in
+/// the image's sample units. A flat image yields zero.
 ///
 /// # Errors
 /// Returns shape, sample, memory-budget, or runtime readback errors.
@@ -263,7 +268,7 @@ pub fn sharpness(
     clippy::as_conversions,
     reason = "Rust has no From<f64> conversion for the bounded f32 mean."
 )]
-fn clamp_mean(mean: f64) -> f32 {
+const fn clamp_mean(mean: f64) -> f32 {
     mean as f32
 }
 
@@ -292,7 +297,7 @@ fn launch_energy(
         energy.clone().into_arg(),
         shape.width,
         shape.height,
-        depth,
+        u32::from(depth),
     );
 }
 
@@ -368,9 +373,7 @@ fn focus_energy(
     output: &mut Tensor<f32>,
     width: usize,
     height: usize,
-    #[doc = "Select modified Laplacian and maximum-score composition for depth."]
-    #[comptime]
-    depth: bool,
+    depth: u32,
 ) {
     if ABSOLUTE_POS >= output.len() {
         terminate!();
@@ -382,7 +385,7 @@ fn focus_energy(
         + (input[y * width + reflect(x, 2, 1, width)] - center);
     let lap_y = (input[reflect(y, 0, 1, height) * width + x] - center)
         + (input[reflect(y, 2, 1, height) * width + x] - center);
-    output[ABSOLUTE_POS] = if depth {
+    output[ABSOLUTE_POS] = if depth != 0 {
         lap_x.abs() + lap_y.abs()
     } else {
         let total = lap_x + lap_y;
@@ -399,15 +402,9 @@ fn aggregate(
     width: usize,
     height: usize,
     radius: usize,
-    #[doc = "Convolve the horizontal axis when true, vertical when false."]
-    #[comptime]
-    horizontal: bool,
-    #[doc = "Use uniform weights for the depth-map box window."]
-    #[comptime]
-    box_filter: bool,
-    #[doc = "Add this scale to the prior map after convolution."]
-    #[comptime]
-    accumulate: bool,
+    horizontal: u32,
+    box_filter: u32,
+    accumulate: u32,
 ) {
     if ABSOLUTE_POS >= output.len() {
         terminate!();
@@ -417,21 +414,21 @@ fn aggregate(
     let kernel_width = radius * 2 + 1;
     let mut sum = 0.0_f32;
     for tap in 0..kernel_width {
-        let index = if horizontal {
+        let index = if horizontal != 0 {
             y * width + reflect(x, tap, radius, width)
         } else {
             reflect(y, tap, radius, height) * width + x
         };
-        sum += if box_filter {
+        sum += if box_filter != 0 {
             input[index]
         } else {
             input[index] * coefficients[tap]
         };
     }
-    if box_filter {
+    if box_filter != 0 {
         sum /= f32::cast_from(kernel_width);
     }
-    if accumulate {
+    if accumulate != 0 {
         sum += output[ABSOLUTE_POS];
     }
     output[ABSOLUTE_POS] = sum;
@@ -444,24 +441,21 @@ fn combine(
     weights: &Tensor<f32>,
     scores: &mut Tensor<f32>,
     image: &mut Tensor<f32>,
-    #[doc = "Select modified Laplacian and maximum-score composition for depth."]
-    #[comptime]
-    depth: bool,
-    #[doc = "Initialize the running result and weight from this frame."]
-    #[comptime]
-    first: bool,
+    depth: u32,
+    first: u32,
 ) {
+    // A single active-lane bound protects both the score and the RGB tuple.
     if ABSOLUTE_POS >= weights.len() {
         terminate!();
     }
     let sample = ABSOLUTE_POS * 3;
     let weight = weights[ABSOLUTE_POS];
-    if first {
+    if first != 0 {
         scores[ABSOLUTE_POS] = weight;
         image[sample] = frame[sample];
         image[sample + 1] = frame[sample + 1];
         image[sample + 2] = frame[sample + 2];
-    } else if depth {
+    } else if depth != 0 {
         if weight > scores[ABSOLUTE_POS] {
             scores[ABSOLUTE_POS] = weight;
             image[sample] = frame[sample];
