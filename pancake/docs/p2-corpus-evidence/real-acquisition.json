@@ -1,0 +1,30 @@
+{
+  "acquisition_script_sha256": "f4aaf41cca2d57cbdef3ba6cfc65ef4a0ff99bda1a750045945453bdc82839e4",
+  "date": "2026-11-18",
+  "native_acquisition_budget_bytes": 2147483648,
+  "repo_commit": "9057cff6662b4dccd985169388e4550837ec975b",
+  "selected_payload_bytes": 565427810,
+  "sources": {
+    "D150": {
+      "archive_sha256": "311ca6aab7d3bff03c714fd2d81c741f3847de1d4d3f2f9cfa767b6eb62cf56a",
+      "archive_size_bytes": 53459291,
+      "metadata_sha256": "a0ffbdf7039850bbf5a166a972fec3f2bd6c85ec2d85568f5245d59e3e845192",
+      "metadata_url": "https://api.figshare.com/v2/articles/14707077/versions/1",
+      "rights": "CC BY 4.0"
+    },
+    "E9": {
+      "archive_sha256": "02939e5eb63d0536793e467848c9381e41c71ca1642b9f0291e2fc0843744242",
+      "archive_size_bytes": 69869523,
+      "metadata_sha256": "cb7197b53835fc5d0f002e74e22548a36f275d60188ae874591aed678558be1f",
+      "metadata_url": "https://ivc.uwaterloo.ca/database/MEF/MEF-Database.html",
+      "rights": "Waterloo IVC creator reuse and attribution terms; source notice retained beside temporary originals"
+    },
+    "R50": {
+      "pinned_readme_and_license_match": true,
+      "revision": "0f8256edf2d2e3f1f1ea162f78a8bca36eb6915c",
+      "rights": "CC BY 4.0"
+    }
+  },
+  "validation_receipt_sha256": "4a6c1633da9fc80ada85b20750b73abb6b13c204004c7b9ed04d873a86c56d1b",
+  "verification_script_sha256": "1d94ac35807251c760369330dd4f5ce1d4c2d75470268bebf5b405ea0f62bddb"
+}
