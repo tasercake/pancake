@@ -164,6 +164,26 @@
         },
         "path_in_vcs": ""
       }
+    },
+    {
+      "name": "oneshot",
+      "version": "0.2.1",
+      "directory": "oneshot-0.2.1",
+      "archive_url": "https://static.crates.io/crates/oneshot/oneshot-0.2.1.crate",
+      "archive_sha256": "cfe21416a02c693fb9f980befcb230ecc70b0b3d1cc4abf88b9675c4c1457f0c",
+      "modified_files": [
+        {
+          "path": "src/receiver.rs",
+          "original_sha256": "5beb04d077c4cfd29747739f80ef9a3a58135c08db573bd9c269044f8e579188",
+          "patched_sha256": "065a10346822ee15a039a68565ff22c8d14df56b1513060edf54dc4117ad6ce5"
+        }
+      ],
+      "upstream_repository": {
+        "git": {
+          "sha1": "83fd0864be7289067ce96cc79cd96c0928742979"
+        },
+        "path_in_vcs": ""
+      }
     }
   ]
 }

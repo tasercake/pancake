@@ -1,0 +1,629 @@
+{
+  "campaign": "P9 exact Linux CPU address and thread sanitizer scopes",
+  "host": {
+    "architecture": "x86_64",
+    "distribution": "Ubuntu 24.04.5 LTS",
+    "kernel": "6.8.0-147-generic",
+    "cpu": "AMD Ryzen 9 7950X3D",
+    "logical_cpu_affinity": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "physical_cores": 4
+  },
+  "target": "x86_64-unknown-linux-gnu",
+  "rustup_toolchain": "nightly-2026-11-15",
+  "rustc": "5f4effd579500175af844241eb179e756190f1e7",
+  "llvm": "23.1.5",
+  "compile_jobs": 3,
+  "sanitizer_environment_overrides": [],
+  "inputs": "Checked-in synthetic inputs, including uniform solid RGB comparison sources and native pointer-event dispatch",
+  "original_fixture_replays": {
+    "source_revision": "a270bd532474c50328c299d0a8384a48024cb0bc",
+    "elf_build_id": "1cb876580ee0214ca9a92e514676544c5a63406f",
+    "elf_sha256": "ab8c8a7612d72e2be0d12a1c34d6ae482691cf3e5e5f965ccbe35ee83752cc4a",
+    "results": [
+      {
+        "test": "tests::comparison_clips_source_to_left_of_split",
+        "process_status": 1,
+        "raw_log": "address-compare-stock.log",
+        "leaked_bytes": 2876920,
+        "leaked_allocations": 35075
+      },
+      {
+        "test": "embedded_workspace_compiles",
+        "process_status": 0,
+        "raw_log": "address-compile-control.log"
+      }
+    ]
+  },
+  "runs": [
+    {
+      "source_revision": "a270bd532474c50328c299d0a8384a48024cb0bc",
+      "sha256_by_source_file": {
+        "pancake/Cargo.toml": "245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043",
+        "pancake/Cargo.lock": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+        "pancake/assurance-platforms.json": "06627c3274d6413d8aa85f8f8c303a85501bb4d39d67e59ee113b748989408e8",
+        "pancake/scripts/check.sh": "7f67bd0651e9dd0de9e653dd0da78ed9a4517a1d77486159200c6f5819d84c14",
+        "pancake/vendor/upstream-sources.json": "f342a877e1ced3ffa4978f72e85eac6e25f57163e12ac3de02a35d615d5ce347",
+        "pancake/vendor/oneshot-0.2.1/src/receiver.rs": "065a10346822ee15a039a68565ff22c8d14df56b1513060edf54dc4117ad6ce5"
+      },
+      "address": {
+        "process_status": 1,
+        "executables": 19,
+        "assertion_passes": 98,
+        "assertion_failures": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "selected_cpu_integration_targets": [
+          "cpu_advanced_fusion",
+          "cpu_array_layout",
+          "cpu_cli",
+          "cpu_config",
+          "cpu_fusion_contract",
+          "cpu_gray_array_export",
+          "cpu_image_export",
+          "cpu_image_io",
+          "cpu_job",
+          "cpu_kernel_contract",
+          "cpu_npy",
+          "cpu_numerical_contract",
+          "cpu_registration_contract",
+          "cpu_runtime_contract",
+          "cpu_runtime_options",
+          "cpu_stack_plan"
+        ],
+        "built_binaries": [
+          {
+            "name": "pancake-cli",
+            "sha256": "46748aa7d6fc36158710ab1c8881d2a7524321ee5a9e2c99303104131c863cde",
+            "elf_build_id": "5cbf7799288a1e2f8639e3367062139c52672f84"
+          }
+        ],
+        "raw_log": "address.log",
+        "leaked_bytes": 970329,
+        "leaked_allocations": 36595
+      },
+      "thread": {
+        "process_status": 0,
+        "executables": 19,
+        "assertion_passes": 98,
+        "assertion_failures": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "selected_cpu_integration_targets": [
+          "cpu_advanced_fusion",
+          "cpu_array_layout",
+          "cpu_cli",
+          "cpu_config",
+          "cpu_fusion_contract",
+          "cpu_gray_array_export",
+          "cpu_image_export",
+          "cpu_image_io",
+          "cpu_job",
+          "cpu_kernel_contract",
+          "cpu_npy",
+          "cpu_numerical_contract",
+          "cpu_registration_contract",
+          "cpu_runtime_contract",
+          "cpu_runtime_options",
+          "cpu_stack_plan"
+        ],
+        "built_binaries": [
+          {
+            "name": "pancake-cli",
+            "sha256": "9b83628ea41fd6173686d2cca148a17300f40e37ec42ad9fef979e96699b4123",
+            "elf_build_id": "c1c63355fe669779e34b8a5d3b2ffe94f65f862b"
+          }
+        ],
+        "raw_log": "thread.log"
+      }
+    },
+    {
+      "source_revision": "7a953359356883e66c39ad928646a8e6495683b9",
+      "sha256_by_source_file": {
+        "pancake/Cargo.toml": "245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043",
+        "pancake/Cargo.lock": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+        "pancake/assurance-platforms.json": "9ed45400b3a42f916e296a4f101d72c6cb3b6350cdedc716f58322b8f4d7d39d",
+        "pancake/scripts/check.sh": "7f67bd0651e9dd0de9e653dd0da78ed9a4517a1d77486159200c6f5819d84c14",
+        "pancake/crates/pancake-gui/src/tests.rs": "3aaa7fb16b0a9e104aded80e4792dabd4c24b11a6de425e7be6df32d6033472f",
+        "pancake/vendor/upstream-sources.json": "f342a877e1ced3ffa4978f72e85eac6e25f57163e12ac3de02a35d615d5ce347",
+        "pancake/vendor/oneshot-0.2.1/src/receiver.rs": "065a10346822ee15a039a68565ff22c8d14df56b1513060edf54dc4117ad6ce5"
+      },
+      "address": {
+        "process_status": 1,
+        "executables": 19,
+        "assertion_passes": 98,
+        "assertion_failures": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "selected_cpu_integration_targets": [
+          "cpu_advanced_fusion",
+          "cpu_array_layout",
+          "cpu_cli",
+          "cpu_config",
+          "cpu_fusion_contract",
+          "cpu_gray_array_export",
+          "cpu_image_export",
+          "cpu_image_io",
+          "cpu_job",
+          "cpu_kernel_contract",
+          "cpu_npy",
+          "cpu_numerical_contract",
+          "cpu_registration_contract",
+          "cpu_runtime_contract",
+          "cpu_runtime_options",
+          "cpu_stack_plan"
+        ],
+        "built_binaries": [
+          {
+            "name": "pancake-cli",
+            "sha256": "46748aa7d6fc36158710ab1c8881d2a7524321ee5a9e2c99303104131c863cde",
+            "elf_build_id": "5cbf7799288a1e2f8639e3367062139c52672f84"
+          }
+        ],
+        "raw_log": "final/address.log",
+        "leaked_bytes": 529691,
+        "leaked_allocations": 11296
+      },
+      "thread": {
+        "process_status": 0,
+        "executables": 19,
+        "assertion_passes": 98,
+        "assertion_failures": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "selected_cpu_integration_targets": [
+          "cpu_advanced_fusion",
+          "cpu_array_layout",
+          "cpu_cli",
+          "cpu_config",
+          "cpu_fusion_contract",
+          "cpu_gray_array_export",
+          "cpu_image_export",
+          "cpu_image_io",
+          "cpu_job",
+          "cpu_kernel_contract",
+          "cpu_npy",
+          "cpu_numerical_contract",
+          "cpu_registration_contract",
+          "cpu_runtime_contract",
+          "cpu_runtime_options",
+          "cpu_stack_plan"
+        ],
+        "built_binaries": [
+          {
+            "name": "pancake-cli",
+            "sha256": "9b83628ea41fd6173686d2cca148a17300f40e37ec42ad9fef979e96699b4123",
+            "elf_build_id": "c1c63355fe669779e34b8a5d3b2ffe94f65f862b"
+          }
+        ],
+        "raw_log": "final/thread.log"
+      }
+    },
+    {
+      "source_revision": "47cc2a3bfe8272ff7c14228f1b1dca77c2aa5dcd",
+      "sha256_by_source_file": {
+        "pancake/Cargo.toml": "245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043",
+        "pancake/Cargo.lock": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+        "pancake/assurance-platforms.json": "5da6eb818e5f25d2ab0133a1af7ec70d75d94d99bdf89d9e9a78d318a39b7e35",
+        "pancake/scripts/check.sh": "7f67bd0651e9dd0de9e653dd0da78ed9a4517a1d77486159200c6f5819d84c14",
+        "pancake/crates/pancake-gui/src/tests.rs": "cb860a1c3bb7ba5228d430fe92f740caba71a997c53c9fcd952b7dd29d856335",
+        "pancake/vendor/upstream-sources.json": "f342a877e1ced3ffa4978f72e85eac6e25f57163e12ac3de02a35d615d5ce347",
+        "pancake/vendor/oneshot-0.2.1/src/receiver.rs": "065a10346822ee15a039a68565ff22c8d14df56b1513060edf54dc4117ad6ce5"
+      },
+      "address": {
+        "process_status": 0,
+        "executables": 19,
+        "assertion_passes": 98,
+        "assertion_failures": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "selected_cpu_integration_targets": [
+          "cpu_advanced_fusion",
+          "cpu_array_layout",
+          "cpu_cli",
+          "cpu_config",
+          "cpu_fusion_contract",
+          "cpu_gray_array_export",
+          "cpu_image_export",
+          "cpu_image_io",
+          "cpu_job",
+          "cpu_kernel_contract",
+          "cpu_npy",
+          "cpu_numerical_contract",
+          "cpu_registration_contract",
+          "cpu_runtime_contract",
+          "cpu_runtime_options",
+          "cpu_stack_plan"
+        ],
+        "built_binaries": [
+          {
+            "name": "pancake-cli",
+            "sha256": "46748aa7d6fc36158710ab1c8881d2a7524321ee5a9e2c99303104131c863cde",
+            "elf_build_id": "5cbf7799288a1e2f8639e3367062139c52672f84"
+          }
+        ],
+        "raw_log": "ownership/address.log"
+      },
+      "thread": {
+        "process_status": 0,
+        "executables": 19,
+        "assertion_passes": 98,
+        "assertion_failures": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "selected_cpu_integration_targets": [
+          "cpu_advanced_fusion",
+          "cpu_array_layout",
+          "cpu_cli",
+          "cpu_config",
+          "cpu_fusion_contract",
+          "cpu_gray_array_export",
+          "cpu_image_export",
+          "cpu_image_io",
+          "cpu_job",
+          "cpu_kernel_contract",
+          "cpu_npy",
+          "cpu_numerical_contract",
+          "cpu_registration_contract",
+          "cpu_runtime_contract",
+          "cpu_runtime_options",
+          "cpu_stack_plan"
+        ],
+        "built_binaries": [
+          {
+            "name": "pancake-cli",
+            "sha256": "9b83628ea41fd6173686d2cca148a17300f40e37ec42ad9fef979e96699b4123",
+            "elf_build_id": "c1c63355fe669779e34b8a5d3b2ffe94f65f862b"
+          }
+        ],
+        "raw_log": "ownership/thread.log"
+      }
+    }
+  ],
+  "raw_archive": {
+    "file": "raw-records.tar.gz",
+    "sha256": "dbb6f1ccaa51c3ae7c94b009a2d4c688848b7ed490fbea3b58dd9c0c196cee92",
+    "files": {
+      "address-binaries.sha256": {
+        "sha256": "646041ca1076e86408c88cd30b689969e6a44b75d3ff2257a4b68def10c8573b",
+        "bytes": 191
+      },
+      "address-build-ids.txt": {
+        "sha256": "7800725bd2ee797e998716ebfe75cab4ec23b4e8aaf174fb505f707762da1c32",
+        "bytes": 55
+      },
+      "address-cleanup.log": {
+        "sha256": "7fe1926aa73f724f22bc9ac0e3ba41747206c9bc47b81ff8eb66fc3b6b1c7685",
+        "bytes": 39
+      },
+      "address-compare-stock.log": {
+        "sha256": "e46f5ac68513fead1e6889fbd8ac0da5966af923808f34c004df72eb847c5ad9",
+        "bytes": 25916382
+      },
+      "address-compare-stock.status": {
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "bytes": 2
+      },
+      "address-compile-control.log": {
+        "sha256": "d473bee048fcf0a0b6a57aaf0a7dcccd5e1a9fbf1d1ec74c7e5df1fd40f90d00",
+        "bytes": 153
+      },
+      "address-compile-control.status": {
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      "address-direct-sources.txt": {
+        "sha256": "1f3a5a835a828e048f0e489b819611929718853a7643e601deeb2f1ac87b2da4",
+        "bytes": 38146
+      },
+      "address-gui-test-build-id.txt": {
+        "sha256": "c91c86fa7b1e156ca2653a44e76d7e836d3b17b0199160b9c271bbf13e61a4ac",
+        "bytes": 55
+      },
+      "address-gui-test.sha256": {
+        "sha256": "a7d7697d4815b7203668b57487279775edde02a377fbc7af23b8df1c29b773cd",
+        "bytes": 160
+      },
+      "address-selected-targets.txt": {
+        "sha256": "d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e",
+        "bytes": 269
+      },
+      "address.log": {
+        "sha256": "978d025fa354373e7d10c50a899f3320513ddffa2469302f22ed2c0f0dbd4091",
+        "bytes": 40336550
+      },
+      "address.status": {
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "bytes": 2
+      },
+      "advisory-db-revision.txt": {
+        "sha256": "2af556f9efe553b7ab2ef21d93062de49e835ffce690b664f18318000d1939fb",
+        "bytes": 41
+      },
+      "affinity-topology.csv": {
+        "sha256": "8bbf9eee3295172f02a238dc78216c6ea8f3053663056d8db99a45e5dba64fe2",
+        "bytes": 24
+      },
+      "archive-verification.log": {
+        "sha256": "e3bb3367fc6a4f04bf1e71a23c4448857d7753a5abfba375ab031e7605c222ce",
+        "bytes": 93
+      },
+      "blocking-receive-acquire.patch": {
+        "sha256": "c28a7c7cb66a91cd810a884c58c2ff699b376600b78fa60b6c71ad61da4279f5",
+        "bytes": 5002
+      },
+      "cargo-deny-production.log": {
+        "sha256": "9c97eff057dde47e35c90012f8ded8880f95791a27f0fe144f66200f66000342",
+        "bytes": 35
+      },
+      "cargo-deny-stock-oneshot.log": {
+        "sha256": "9c97eff057dde47e35c90012f8ded8880f95791a27f0fe144f66200f66000342",
+        "bytes": 35
+      },
+      "cargo-deny-version.txt": {
+        "sha256": "1758f5ea93d8ad3585079f05c19358b7bb969cce1bf6c7bdab6659a8cd1ef6b8",
+        "bytes": 18
+      },
+      "cargo-metadata.sha256": {
+        "sha256": "616e5c7f5a306bfda35064e8255623f47550de2ea1c72f7934adc765a5e3e4a8",
+        "bytes": 103
+      },
+      "cpu.txt": {
+        "sha256": "799c9c8daebe1c74fd31bca9b973ef459e323c41f95e6d3ae9fb658cb28b63dc",
+        "bytes": 3699
+      },
+      "deps/deny-effective.toml": {
+        "sha256": "63657cc28fcb4e95116264748bf37e4c0260a38c0eaaa805aee26ce4eb6311a6",
+        "bytes": 9171
+      },
+      "deps/licenses.json": {
+        "sha256": "5311d4de4a4f149e6bf8d214902c28aa6c2652052b9d452d5bf4c787c3870d8a",
+        "bytes": 90113
+      },
+      "deps/metadata.json": {
+        "sha256": "34b7d2c38b70a85bc3e23c0a231eeb2591637794880244fca26525ab612596de",
+        "bytes": 4471878
+      },
+      "final/address-binaries.sha256": {
+        "sha256": "646041ca1076e86408c88cd30b689969e6a44b75d3ff2257a4b68def10c8573b",
+        "bytes": 191
+      },
+      "final/address-build-ids.txt": {
+        "sha256": "7800725bd2ee797e998716ebfe75cab4ec23b4e8aaf174fb505f707762da1c32",
+        "bytes": 55
+      },
+      "final/address-cleanup.log": {
+        "sha256": "7fe1926aa73f724f22bc9ac0e3ba41747206c9bc47b81ff8eb66fc3b6b1c7685",
+        "bytes": 39
+      },
+      "final/address-direct-sources.txt": {
+        "sha256": "f43f2fc00300ed708f45d6cef574e8b77168dae98f48ca5ec4c2bc59296c598a",
+        "bytes": 61001
+      },
+      "final/address-gui-test-build-id.txt": {
+        "sha256": "0d0e5982b0b81f3c0a777f2b62844c0087722c2c617986e60064018c92365bd8",
+        "bytes": 55
+      },
+      "final/address-gui-test.sha256": {
+        "sha256": "4eb83111f2f71be3f10ecc5c564d942edb5eb01b8a5f97d38efbb012a304ee3f",
+        "bytes": 131
+      },
+      "final/address-selected-targets.txt": {
+        "sha256": "d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e",
+        "bytes": 269
+      },
+      "final/address.log": {
+        "sha256": "b0e452e0a2baddf9c5123832750ebb906235296e2127f8a7496e284c7a5adb82",
+        "bytes": 2641793
+      },
+      "final/address.status": {
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "bytes": 2
+      },
+      "final/cpu.txt": {
+        "sha256": "f1b1315cc9b62d7334cd1ec27a6ee901d327a823271a14e7e8dee123a3349044",
+        "bytes": 3699
+      },
+      "final/os.txt": {
+        "sha256": "62b2233ccf7ed82d068411dc66526b072d3a2418151f90862abd55c2f7772cc2",
+        "bytes": 132
+      },
+      "final/source-revision.txt": {
+        "sha256": "5533b27d2db337dfbee952d0b0c2a06f11b5d07ba67abd105cd4b797e4005fd7",
+        "bytes": 41
+      },
+      "final/tested-source.sha256": {
+        "sha256": "c815e1395f6b629be5c208097a53d7f8e9bea00bfb5afafda3a4e8b61519444c",
+        "bytes": 680
+      },
+      "final/thread-binaries.sha256": {
+        "sha256": "2dfbaadbbbae57ee22e62d4290ad1ad778e83550336184da08599c61e9b781e4",
+        "bytes": 190
+      },
+      "final/thread-build-ids.txt": {
+        "sha256": "4c781f5e2910b36c1787ef782189011c6e985cecbade4e3d0d55762673501344",
+        "bytes": 55
+      },
+      "final/thread-cleanup.log": {
+        "sha256": "6941bed7c63ad11dc5ea449f87125f3593ffda3ce83f2245e59ccec5c906824a",
+        "bytes": 39
+      },
+      "final/thread-selected-targets.txt": {
+        "sha256": "d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e",
+        "bytes": 269
+      },
+      "final/thread.log": {
+        "sha256": "9b136802a5d9824e29ce833841f1b5cb517d7a4076e7437b65f48404f8610741",
+        "bytes": 32733
+      },
+      "final/thread.status": {
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      "final/toolchain.txt": {
+        "sha256": "072391379b408a5c6c30ef78ad74e86d15c0eebf2c02c1e70ba1992bdae7752b",
+        "bytes": 214
+      },
+      "lock-update.log": {
+        "sha256": "4a3278eec3a0f9c102b87e994d21b9ff50eb78f6b313e451e7c40c4979facaae",
+        "bytes": 131
+      },
+      "miri-policy.log": {
+        "sha256": "22e88bc8b11b052e64c7b4e1949a769853e31e3c521989d95067ff79b8b43b14",
+        "bytes": 81
+      },
+      "os.txt": {
+        "sha256": "62b2233ccf7ed82d068411dc66526b072d3a2418151f90862abd55c2f7772cc2",
+        "bytes": 132
+      },
+      "ownership/address-binaries.sha256": {
+        "sha256": "646041ca1076e86408c88cd30b689969e6a44b75d3ff2257a4b68def10c8573b",
+        "bytes": 191
+      },
+      "ownership/address-build-ids.txt": {
+        "sha256": "7800725bd2ee797e998716ebfe75cab4ec23b4e8aaf174fb505f707762da1c32",
+        "bytes": 55
+      },
+      "ownership/address-cleanup.log": {
+        "sha256": "7fe1926aa73f724f22bc9ac0e3ba41747206c9bc47b81ff8eb66fc3b6b1c7685",
+        "bytes": 39
+      },
+      "ownership/address-selected-targets.txt": {
+        "sha256": "d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e",
+        "bytes": 269
+      },
+      "ownership/address.log": {
+        "sha256": "6e2c7232b13aa12de204e916be6019b8c4f2d3db00c4b6a0103a6012cdd5d170",
+        "bytes": 32752
+      },
+      "ownership/address.status": {
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      "ownership/cpu.txt": {
+        "sha256": "ccfd04cd106f96f90b6373159019b562da865df0f325d9b7c9c29ab769b481a9",
+        "bytes": 3699
+      },
+      "ownership/os.txt": {
+        "sha256": "62b2233ccf7ed82d068411dc66526b072d3a2418151f90862abd55c2f7772cc2",
+        "bytes": 132
+      },
+      "ownership/source-revision.txt": {
+        "sha256": "66df7950493dd9acb23e2057c4caa5d430b2db2766e30238a6bf852fd7ac47e8",
+        "bytes": 41
+      },
+      "ownership/tested-source.sha256": {
+        "sha256": "9d3273105500e18042afcd44e63812c43b036383f6709c830b410191112eee0b",
+        "bytes": 680
+      },
+      "ownership/thread-binaries.sha256": {
+        "sha256": "2dfbaadbbbae57ee22e62d4290ad1ad778e83550336184da08599c61e9b781e4",
+        "bytes": 190
+      },
+      "ownership/thread-build-ids.txt": {
+        "sha256": "4c781f5e2910b36c1787ef782189011c6e985cecbade4e3d0d55762673501344",
+        "bytes": 55
+      },
+      "ownership/thread-cleanup.log": {
+        "sha256": "6941bed7c63ad11dc5ea449f87125f3593ffda3ce83f2245e59ccec5c906824a",
+        "bytes": 39
+      },
+      "ownership/thread-selected-targets.txt": {
+        "sha256": "d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e",
+        "bytes": 269
+      },
+      "ownership/thread.log": {
+        "sha256": "0cdd34f8b2d82aaecba0d1aa299c99ba061acfc37632f3deef7795d66b83a444",
+        "bytes": 32733
+      },
+      "ownership/thread.status": {
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      "ownership/toolchain.txt": {
+        "sha256": "072391379b408a5c6c30ef78ad74e86d15c0eebf2c02c1e70ba1992bdae7752b",
+        "bytes": 214
+      },
+      "patch-application.log": {
+        "sha256": "1fb865117a76de34e28524e2c6cc3cfa693a7ff4cc694372bda368df36adf04b",
+        "bytes": 30
+      },
+      "run-cpu-sanitizers.sh": {
+        "sha256": "e194cfc352a4b65272ee4900e54b16ea586d41683a3bdc3cedf0fbf895a86d99",
+        "bytes": 1877
+      },
+      "run-final-cpu-sanitizers.sh": {
+        "sha256": "11def405aaf1ad53a7c286f4c99ed6cdf215cd72db3684c8aa6575c00ce39a99",
+        "bytes": 2274
+      },
+      "run-ownership-cpu-sanitizers.sh": {
+        "sha256": "48c46a753c334e671cf711779dc366a6633a831c2fbcfca7d11efbfd3ffc2d90",
+        "bytes": 2278
+      },
+      "source-revision.txt": {
+        "sha256": "a86f726a5a2f1e1b9a4ccd2eedca69ba16fab4990578e60a197bf9c7db2f85f6",
+        "bytes": 41
+      },
+      "stock-advisory/Cargo.lock": {
+        "sha256": "1ec5c31ab8f7dfbdc1160693fe7cc2e5e6d9aeb6b48e404f71aab7334e5044c1",
+        "bytes": 392
+      },
+      "stock-advisory/Cargo.toml": {
+        "sha256": "21062180839b5ae375433a8a1f22acb83b05f9b1dc15df9b318287d98570345b",
+        "bytes": 229
+      },
+      "target-policy-regressions.log": {
+        "sha256": "b48a0804f663e53ff72b2aec98c9cf334a94d561463a5aed4ac3e47a87b09bde",
+        "bytes": 110
+      },
+      "tested-source.sha256": {
+        "sha256": "176af5f34f87851d439f90fa4bd7e5c6a65e34edbb98a23268986808f160129b",
+        "bytes": 574
+      },
+      "thread-binaries.sha256": {
+        "sha256": "2dfbaadbbbae57ee22e62d4290ad1ad778e83550336184da08599c61e9b781e4",
+        "bytes": 190
+      },
+      "thread-build-ids.txt": {
+        "sha256": "4c781f5e2910b36c1787ef782189011c6e985cecbade4e3d0d55762673501344",
+        "bytes": 55
+      },
+      "thread-cleanup.log": {
+        "sha256": "6941bed7c63ad11dc5ea449f87125f3593ffda3ce83f2245e59ccec5c906824a",
+        "bytes": 39
+      },
+      "thread-selected-targets.txt": {
+        "sha256": "d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e",
+        "bytes": 269
+      },
+      "thread.log": {
+        "sha256": "d508d915808aeb98143b1ce553fd52b11d0c41984d9a48c5f552933c7444c06f",
+        "bytes": 32733
+      },
+      "thread.status": {
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      "toolchain.txt": {
+        "sha256": "072391379b408a5c6c30ef78ad74e86d15c0eebf2c02c1e70ba1992bdae7752b",
+        "bytes": 214
+      },
+      "vendor-file-audit.txt": {
+        "sha256": "317d11982b2d515751b197133552b354f1ccdd0995ddb3361ce2972a01a3400c",
+        "bytes": 98
+      },
+      "vendor-green.log": {
+        "sha256": "d812634c0228c44e5d2e865275f1a3a61048a87fcac45af5d0f393c4460a5968",
+        "bytes": 895
+      },
+      "vendor-red.log": {
+        "sha256": "b76ce8b41e28beef467c34af4f3d4a82d66ea08290534ec4f4a0b31989762bdc",
+        "bytes": 2144
+      }
+    }
+  }
+}

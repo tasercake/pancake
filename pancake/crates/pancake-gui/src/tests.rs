@@ -1,7 +1,7 @@
 //! Render the embedded workspace through Slint's pinned software renderer.
 
 use std::error::Error;
-use std::rc::Rc;
+use std::rc::{Rc, Weak};
 
 use num_traits::ToPrimitive as _;
 use slint::platform::software_renderer::{MinimalSoftwareWindow, RepaintBufferType};
@@ -9,13 +9,17 @@ use slint::platform::{Platform, PlatformError, PointerEventButton, WindowAdapter
 use slint::{
     ComponentHandle as _, Image, LogicalPosition, PhysicalSize, Rgb8Pixel, SharedPixelBuffer,
 };
+use slint_interpreter::ComponentInstance;
 
 /// An offscreen window using the same renderer as the software desktop backend.
-struct Offscreen(Rc<MinimalSoftwareWindow>);
+struct Offscreen(Weak<MinimalSoftwareWindow>);
 
 impl Platform for Offscreen {
     fn create_window_adapter(&self) -> Result<Rc<dyn WindowAdapter>, PlatformError> {
-        Ok(self.0.clone())
+        let adapter = self.0.upgrade().ok_or_else(|| {
+            PlatformError::Other("The offscreen window is no longer available.".into())
+        })?;
+        Ok(adapter)
     }
 }
 
@@ -92,7 +96,9 @@ fn check_pixel(
 #[test]
 fn comparison_clips_source_to_left_of_split() -> Result<(), Box<dyn Error>> {
     let adapter = MinimalSoftwareWindow::new(RepaintBufferType::NewBuffer);
-    slint::platform::set_platform(Box::new(Offscreen(adapter.clone())))?;
+    // The window holds the Slint context, which owns this platform.
+    let platform_window = Rc::downgrade(&adapter);
+    slint::platform::set_platform(Box::new(Offscreen(platform_window.clone())))?;
     adapter.set_size(PhysicalSize::new(
         u32::try_from(WIDTH)?,
         u32::try_from(HEIGHT)?,
@@ -103,9 +109,34 @@ fn comparison_clips_source_to_left_of_split() -> Result<(), Box<dyn Error>> {
     workspace.set_property("comparison-preview", solid(SOURCE).into())?;
     workspace.set_property("preview-width", 320_i32.into())?;
     workspace.set_property("preview-height", 40_i32.into())?;
-    workspace.show()?;
+    let component = workspace.as_weak();
+    let observed = workspace
+        .show()
+        .map_err(Box::<dyn Error>::from)
+        .and_then(|()| observe_comparison(&workspace, &adapter));
+    // The offscreen fixture owns the window lifecycle. Slint retains a strong
+    // component reference while the window is visible.
+    let hidden = workspace.hide().map_err(Box::<dyn Error>::from);
+    drop(workspace);
+    drop(adapter);
+    observed.and(hidden)?;
+    if component.upgrade().is_some() {
+        return Err("The closed comparison workspace is still retained.".into());
+    }
+    if platform_window.upgrade().is_some() {
+        return Err("The closed offscreen window is still retained.".into());
+    }
+    Ok(())
+}
 
-    let before = render(&adapter)?;
+/// Observe the initial split and its response to native pointer events.
+/// # Errors
+/// Returns an input dispatch or framebuffer observation error.
+fn observe_comparison(
+    workspace: &ComponentInstance,
+    adapter: &MinimalSoftwareWindow,
+) -> Result<(), Box<dyn Error>> {
+    let before = render(adapter)?;
     let rows = before.as_chunks::<WIDTH>().0;
     let (top, row) = rows
         .iter()
@@ -130,7 +161,7 @@ fn comparison_clips_source_to_left_of_split() -> Result<(), Box<dyn Error>> {
     let right_probe = right.saturating_sub(span / 10);
 
     workspace.set_property("compare", true.into())?;
-    let centered = render(&adapter)?;
+    let centered = render(adapter)?;
     check_pixel(
         &centered,
         left_probe,
@@ -170,7 +201,7 @@ fn comparison_clips_source_to_left_of_split() -> Result<(), Box<dyn Error>> {
     ] {
         let _delivered = window.dispatch_event_with_result(event)?;
     }
-    let dragged = render(&adapter)?;
+    let dragged = render(adapter)?;
     check_pixel(
         &dragged,
         left_probe,

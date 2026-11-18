@@ -43,6 +43,7 @@ cubecl-hip = { path = "vendor/cubecl-hip-0.11.4" }
 cubecl-spirv = { path = "vendor/cubecl-spirv-0.11.4" }
 spin_on = { path = "vendor/spin_on-0.1.1" }
 rowan = { path = "vendor/rowan-0.17.0" }
+oneshot = { path = "vendor/oneshot-0.2.1" }
 
 [lints]
 workspace = true
