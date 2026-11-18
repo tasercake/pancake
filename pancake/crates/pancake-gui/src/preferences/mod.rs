@@ -3,7 +3,7 @@
 use std::error::Error;
 use std::fs::{self, File};
 use std::io::{ErrorKind, Read};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
@@ -116,6 +116,12 @@ impl Store {
             )
             .ok_or("Could not locate the application settings folder.")?;
         Ok(Self::new(directory))
+    }
+
+    /// Return the active profile directory shared with other desktop settings.
+    #[must_use]
+    pub fn directory(&self) -> &Path {
+        &self.directory
     }
 
     /// Location of the independently persisted preferences file.

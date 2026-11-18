@@ -53,3 +53,25 @@ pub fn select(window: &ComponentInstance, kind: Picker<'_>) -> Result<Vec<PathBu
     };
     Ok(selected)
 }
+
+/// Dispatch pending native panel events when the Slint event loop owns the UI.
+///
+/// When a modal GTK dialog closes, its native accessibility tree still needs
+/// to process window removal. A bounded main-context drain integrates both
+/// toolkits without keeping a second UI thread or retaining the old dialog.
+#[cfg(target_os = "linux")]
+pub fn service_events() {
+    if gtk::is_initialized_main_thread() {
+        let context = gtk::glib::MainContext::default();
+        for _ in 0..32 {
+            if !context.pending() {
+                break;
+            }
+            let _handled = context.iteration(false);
+        }
+    }
+}
+
+/// Other supported desktops present native file panels through a shared loop.
+#[cfg(any(target_os = "macos", target_os = "windows"))]
+pub const fn service_events() {}

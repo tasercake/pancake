@@ -42,6 +42,7 @@ component ViewCanvas inherits Rectangle {
     in property <int> selected-source: -1;
     in property <image> comparison-image;
     in property <bool> comparing;
+    in property <bool> cropped;
     in property <string> result-method: "";
     callback next-source(int);
 
@@ -73,7 +74,8 @@ component ViewCanvas inherits Rectangle {
         + "\"compare\":\{root.comparing ? "true" : "false"},\"split\":\{root.split},"
         + "\"fit\":\{root.fit-mode ? "true" : "false"},"
         + "\"source_index\":\{root.selected-source < 0 ? "null" : "\{root.selected-source + 1}"},"
-        + "\"result_method\":\"\{root.result-method}\"}";
+        + "\"result_method\":\"\{root.result-method}\","
+        + "\"cropped\":\{root.cropped ? "true" : "false"}}";
 
     public function fit-image() {
         root.fit-mode = true;
@@ -200,6 +202,12 @@ export component Workspace inherits Window {
     // These models hold actual files and finished results provided by the host.
     in property <[string]> frames;
     in property <[string]> results;
+    in property <[string]> recent-folders;
+    in property <bool> result-can-crop;
+    in property <bool> result-cropped;
+    in property <string> prompt;
+    in-out property <bool> file-open: false;
+    in-out property <int> context-index: -1;
     in property <bool> running;
     in property <bool> can-pause;
     in property <bool> can-resume;
@@ -223,12 +231,24 @@ export component Workspace inherits Window {
     callback select-source(int);
     callback select-result(int);
     callback import-files();
+    callback file-menu();
+    callback open-recent(int);
+    callback clear-recent();
+    callback source-menu(int);
+    callback reveal-source(int);
     callback import-folder();
     callback remove-sources(int);
     callback pause();
     callback resume();
     callback cancel();
     callback close-request();
+    callback new-request();
+    callback confirm-transition();
+    callback cancel-transition();
+    callback compare-preview();
+    callback crop-result();
+    callback export-batch();
+    callback export-viewport(float, float, float, float);
     callback stack();
     callback export-save(int, int);
 
@@ -240,7 +260,7 @@ export component Workspace inherits Window {
     property <bool> sidebar-visible: true;
     property <bool> inspector-visible: true;
     property <bool> advanced-visible: false;
-    property <bool> compare: false;
+    in-out property <bool> compare: false;
     property <bool> all-selected: false;
     property <int> export-format-index: 2;
     property <int> export-depth-index: 1;
@@ -255,6 +275,12 @@ export component Workspace inherits Window {
 
     init => {
         root.update-theme();
+    }
+
+    function select-frame(index: int) {
+        root.all-selected = false;
+        root.compare = false;
+        root.select-source(index);
     }
 
     function change-source(step: int) {
@@ -285,6 +311,18 @@ export component Workspace inherits Window {
                     text: "Pancake";
                     font-size: 18px;
                     height: 34px;
+                }
+                Button {
+                    text: "File";
+                    accessible-id: "file.menu";
+                    enabled: !root.running;
+                    clicked => { root.file-menu(); }
+                }
+                Button {
+                    text: "New";
+                    accessible-id: "workspace.new";
+                    enabled: !root.running;
+                    clicked => { root.new-request(); }
                 }
                 Button {
                     text: "Open files…";
@@ -321,6 +359,75 @@ export component Workspace inherits Window {
                     accessible-id: "about.open";
                     clicked => { root.page = "about"; }
                 }
+            }
+        }
+        if root.prompt != "": Rectangle {
+            background: Palette.alternate-background;
+            VerticalLayout {
+                padding: 14px;
+                spacing: 8px;
+                SectionLabel {
+                    text: root.prompt == "replace"
+                        ? "Replace the current source frames?"
+                        : "Save your result before closing this workspace?";
+                }
+                HorizontalLayout {
+                    alignment: start;
+                    spacing: 6px;
+                    Button {
+                        text: "Keep working";
+                        accessible-id: "dialog.cancel";
+                        clicked => { root.cancel-transition(); }
+                    }
+                    if root.prompt != "replace" && root.selected-result >= 0: Button {
+                        text: "Export…";
+                        clicked => {
+                            root.page = "export";
+                            root.cancel-transition();
+                        }
+                    }
+                    Button {
+                        text: root.prompt == "replace" ? "Replace" : "Discard";
+                        accessible-id: root.prompt == "replace"
+                            ? "dialog.replace"
+                            : root.prompt == "close" ? "dialog.discard_close" : "dialog.discard";
+                        clicked => { root.confirm-transition(); }
+                    }
+                }
+            }
+        }
+        if root.file-open: VerticalLayout {
+            alignment: start;
+            padding: 8px;
+            spacing: 5px;
+            Button { text: "Open files…"; clicked => { root.file-open = false; root.import-files(); } }
+            Button { text: "Open folder…"; clicked => { root.file-open = false; root.import-folder(); } }
+            SectionLabel { text: "Recent folders"; accessible-id: "recent.open"; }
+            if root.recent-folders.length == 0: Button { text: "No recent folders"; accessible-id: "recent.empty"; enabled: false; }
+            for title[index] in root.recent-folders: Button {
+                text: title;
+                clicked => { root.file-open = false; root.open-recent(index); }
+            }
+            if root.recent-folders.length > 0: Button {
+                text: "Clear menu";
+                accessible-id: "recent.clear";
+                clicked => { root.file-open = false; root.clear-recent(); }
+            }
+            Button { text: "Close menu"; clicked => { root.file-open = false; } }
+        }
+        if root.context-index >= 0: HorizontalLayout {
+            alignment: start;
+            padding: 8px;
+            spacing: 5px;
+            Button {
+                text: "Reveal source";
+                accessible-id: "frames.reveal";
+                clicked => { root.reveal-source(root.context-index); root.context-index = -1; }
+            }
+            Button {
+                text: "Remove source";
+                accessible-id: "frames.remove_one";
+                clicked => { root.remove-sources(root.context-index); root.context-index = -1; }
             }
         }
         if root.page == "workspace": HorizontalLayout {
@@ -363,14 +470,32 @@ export component Workspace inherits Window {
                         VerticalLayout {
                             spacing: 4px;
                             alignment: start;
-                            for name[index] in root.frames: Button {
-                                text: name;
+                            for name[index] in root.frames: Rectangle {
+                                height: 33px;
+                                border-radius: 4px;
+                                property <bool> chosen: root.all-selected || root.selected-source == index;
+                                background: self.chosen ? Palette.accent-background : Palette.control-background;
                                 accessible-id: "frame.\{index}";
-                                primary: root.all-selected || root.selected-source == index;
-                                clicked => {
-                                    root.all-selected = false;
-                                    root.compare = false;
-                                    root.select-source(index);
+                                accessible-role: button;
+                                accessible-label: name;
+                                accessible-action-default => { root.select-frame(index); }
+                                Text {
+                                    x: 8px;
+                                    width: parent.width - 16px;
+                                    height: parent.height;
+                                    color: parent.chosen ? Palette.accent-foreground : Palette.foreground;
+                                    vertical-alignment: center;
+                                    text: name;
+                                    overflow: elide;
+                                    accessible-role: none;
+                                }
+                                TouchArea {
+                                    clicked => { root.select-frame(index); }
+                                    pointer-event(event) => {
+                                        if event.kind == PointerEventKind.down && event.button == PointerEventButton.right {
+                                            root.source-menu(index);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -406,6 +531,7 @@ export component Workspace inherits Window {
                     frame-height: root.base-height;
                     comparison-image: root.comparison-preview;
                     comparing: root.compare;
+                    cropped: root.result-cropped;
                     selected-source: root.selected-source;
                     result-method: root.selected-result-method;
                     next-source(step) => { root.change-source(step); }
@@ -431,7 +557,7 @@ export component Workspace inherits Window {
                             enabled: root.selected-result >= 0 && root.frames.length > 0;
                             checkable: true;
                             checked: root.compare;
-                            clicked => { root.compare = true; }
+                            clicked => { root.compare-preview(); }
                         }
                         Button { text: "Fit"; accessible-id: "viewer.fit"; enabled: root.has-preview; clicked => { canvas.fit-image(); } }
                         Button { text: "1:1"; accessible-id: "viewer.actual"; enabled: root.has-preview; clicked => { canvas.set-zoom(1); } }
@@ -441,11 +567,45 @@ export component Workspace inherits Window {
                         Button { text: "›"; accessible-id: "viewer.next"; accessible-label: "Next source"; enabled: root.frames.length > 0; clicked => { root.change-source(1); } }
                         Rectangle { horizontal-stretch: 1; }
                         Button {
+                            text: "Crop";
+                            accessible-id: "result.crop";
+                            enabled: root.result-can-crop && !root.running;
+                            clicked => { root.crop-result(); }
+                        }
+                        Button {
                             text: "Export";
                             accessible-id: "export.start";
                             enabled: root.selected-result >= 0 && !root.running;
                             clicked => { root.page = "export"; }
                         }
+                    }
+                }
+                HorizontalLayout {
+                    padding: 8px;
+                    spacing: 6px;
+                    Button {
+                        text: "Save view…";
+                        accessible-id: "export.viewport";
+                        enabled: root.has-preview && !root.running;
+                        clicked => {
+                            root.export-viewport(
+                                canvas.absolute-position.x / 1px,
+                                canvas.absolute-position.y / 1px,
+                                canvas.width / 1px, canvas.height / 1px
+                            );
+                        }
+                    }
+                    Button {
+                        text: "Batch export…";
+                        accessible-id: "export.batch";
+                        enabled: root.selected-result >= 0 && !root.running;
+                        clicked => { root.export-batch(); }
+                    }
+                    if root.result-cropped: Text {
+                        accessible-id: "result.crop.state";
+                        text: "Cropped";
+                        vertical-alignment: center;
+                        color: Palette.foreground;
                     }
                 }
                 if root.error-message != "": Rectangle {

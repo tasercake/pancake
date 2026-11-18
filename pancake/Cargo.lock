@@ -5540,6 +5540,7 @@ dependencies = [
 name = "pancake-gui"
 version = "0.1.0"
 dependencies = [
+ "atk",
  "dirs",
  "gtk",
  "num-traits",

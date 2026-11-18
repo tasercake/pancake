@@ -72,6 +72,8 @@ pub(super) fn choose(kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
     } else {
         Ok(Vec::new())
     };
+    // Hide accessibility state now. A Slint host does not continuously run
+    // GTK's main loop to process the window-close event after Dialog::run.
     dialog.hide();
     dialog.close();
     outcome
