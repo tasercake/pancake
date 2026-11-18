@@ -6,7 +6,7 @@ use image::{ColorType, GrayImage, ImageFormat};
 use pancake::config::BitDepth;
 use pancake::image_io::{decode, export};
 
-/// A real 2D float NumPy image exports integer pixels as one channel.
+/// A real 2D float `NumPy` image exports integer pixels as one channel.
 ///
 /// # Errors
 /// Returns a fixture, codec, source immutability, or pixel representation failure.
