@@ -416,12 +416,19 @@ def merge_latency_samples(receipts):
         ):
             raise ValueError("incomplete native capture or input provenance")
         build = receipt["candidate"]
+        physical = receipt.get("physical_wgpu_run", {})
+        if (receipt["viewer"] or receipt["lifecycle"]) and (
+            not physical.get("stack_completions")
+            or not physical.get("process_gpu_residency_at_visible_launch_bytes")
+        ):
+            raise ValueError("native capture lacks matched physical wgpu provenance")
         current = (
             build["commit"],
             build["binary_sha256"],
             build["descriptor_sha256"],
             build["lock_sha256"],
             receipt["performance_targets_sha256"],
+            physical.get("gpu_uuid"),
         )
         if identity is not None and current != identity:
             raise ValueError("native captures differ in build provenance")
