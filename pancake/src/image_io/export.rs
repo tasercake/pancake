@@ -20,11 +20,11 @@ use crate::config::BitDepth;
 /// Format selected by the destination suffix.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ExportFormat {
-    /// Lossless integer RGB PNG.
+    /// Lossless integer PNG.
     Png,
-    /// Lossy eight-bit RGB JPEG.
+    /// Lossy eight-bit JPEG.
     Jpeg,
-    /// Lossless integer RGB TIFF.
+    /// Lossless integer TIFF.
     Tiff,
     /// Lossless floating-point RGB `OpenEXR`.
     Exr,
@@ -60,15 +60,24 @@ impl ExportFormat {
         depth: BitDepth,
         jpeg_quality: u8,
     ) -> Result<(), String> {
+        if self != Self::Exr && frame.is_grayscale_array() {
+            require_grayscale_samples(frame)?;
+        }
         match self {
             Self::Png => write_png(file, frame, width, height, depth),
             Self::Jpeg => write_jpeg(file, frame, width, height, jpeg_quality),
-            Self::Tiff => match depth {
-                BitDepth::Eight => {
+            Self::Tiff => match (depth, frame.is_grayscale_array()) {
+                (BitDepth::Eight, false) => {
                     write_tiff::<colortype::RGB8>(file, frame, width, height, quantize8)
                 }
-                BitDepth::Sixteen => {
+                (BitDepth::Sixteen, false) => {
                     write_tiff::<colortype::RGB16>(file, frame, width, height, quantize16)
+                }
+                (BitDepth::Eight, true) => {
+                    write_tiff::<colortype::Gray8>(file, frame, width, height, quantize8)
+                }
+                (BitDepth::Sixteen, true) => {
+                    write_tiff::<colortype::Gray16>(file, frame, width, height, quantize16)
                 }
             },
             Self::Exr => OpenExrEncoder::new(file)
@@ -259,7 +268,11 @@ fn write_png(
     depth: BitDepth,
 ) -> Result<(), String> {
     let mut info = png::Info::with_size(width, height);
-    info.color_type = png::ColorType::Rgb;
+    info.color_type = if frame.is_grayscale_array() {
+        png::ColorType::Grayscale
+    } else {
+        png::ColorType::Rgb
+    };
     info.bit_depth = match depth {
         BitDepth::Eight => png::BitDepth::Eight,
         BitDepth::Sixteen => png::BitDepth::Sixteen,
@@ -269,7 +282,9 @@ fn write_png(
     let mut writer = encoder.write_header().map_err(encoding_error)?;
     let mut stream = writer.stream_writer().map_err(encoding_error)?;
     let row_sample_count = frame.width().checked_mul(3).ok_or("PNG row is too wide")?;
+    let stride = integer_sample_stride(frame);
     let row_byte_count = row_sample_count
+        .div_ceil(stride)
         .checked_mul(if depth == BitDepth::Eight { 1 } else { 2 })
         .ok_or("PNG row byte count overflow")?;
     let mut row = Vec::new();
@@ -277,15 +292,11 @@ fn write_png(
         .map_err(encoding_error)?;
     for channels in frame.samples().chunks_exact(row_sample_count) {
         row.clear();
+        let samples = channels.iter().copied().step_by(stride);
         match depth {
-            BitDepth::Eight => row.extend(channels.iter().copied().map(quantize8)),
+            BitDepth::Eight => row.extend(samples.map(quantize8)),
             BitDepth::Sixteen => {
-                row.extend(
-                    channels
-                        .iter()
-                        .copied()
-                        .flat_map(|sample| quantize16(sample).to_be_bytes()),
-                );
+                row.extend(samples.flat_map(|sample| quantize16(sample).to_be_bytes()));
             }
         }
         stream.write_all(&row).map_err(encoding_error)?;
@@ -294,7 +305,7 @@ fn write_png(
     writer.finish().map_err(encoding_error)
 }
 
-/// Encode JPEG from eight-bit RGB values with applied quality and ICC metadata.
+/// Encode eight-bit JPEG with the source layout, quality, and ICC metadata.
 ///
 /// # Errors
 /// Returns an allocation, encoding, or write failure.
@@ -305,11 +316,24 @@ fn write_jpeg(
     height: u32,
     quality: u8,
 ) -> Result<(), String> {
+    let stride = integer_sample_stride(frame);
     let mut samples = Vec::new();
     samples
-        .try_reserve_exact(frame.samples().len())
+        .try_reserve_exact(frame.samples().len().div_ceil(stride))
         .map_err(encoding_error)?;
-    samples.extend(frame.samples().iter().copied().map(quantize8));
+    samples.extend(
+        frame
+            .samples()
+            .iter()
+            .copied()
+            .step_by(stride)
+            .map(quantize8),
+    );
+    let color_type = if frame.is_grayscale_array() {
+        ExtendedColorType::L8
+    } else {
+        ExtendedColorType::Rgb8
+    };
     let mut encoder = JpegEncoder::new_with_quality(file, quality);
     if let Some(profile) = frame.icc_profile() {
         encoder
@@ -317,7 +341,7 @@ fn write_jpeg(
             .map_err(encoding_error)?;
     }
     encoder
-        .write_image(&samples, width, height, ExtendedColorType::Rgb8)
+        .write_image(&samples, width, height, color_type)
         .map_err(encoding_error)
 }
 
@@ -345,7 +369,11 @@ where
             .write_tag(Tag::IccProfile, profile)
             .map_err(encoding_error)?;
     }
-    let mut samples = frame.samples().iter().copied();
+    let mut samples = frame
+        .samples()
+        .iter()
+        .copied()
+        .step_by(integer_sample_stride(frame));
     let mut strip = Vec::new();
     while image.next_strip_sample_count() != 0 {
         let count = usize::try_from(image.next_strip_sample_count()).map_err(encoding_error)?;
@@ -355,6 +383,31 @@ where
         image.write_strip(&strip).map_err(encoding_error)?;
     }
     image.finish().map_err(encoding_error)
+}
+
+/// Select one channel from each validated gray RGB triple, or every RGB sample.
+const fn integer_sample_stride(frame: &RgbImage) -> usize {
+    if frame.is_grayscale_array() { 3 } else { 1 }
+}
+
+/// Verify that writing one sample per source pixel preserves the fused result.
+///
+/// # Errors
+/// Returns an error if any pixel marked grayscale contains unequal channels.
+fn require_grayscale_samples(frame: &RgbImage) -> Result<(), String> {
+    if frame
+        .samples()
+        .as_chunks::<3>()
+        .0
+        .iter()
+        .all(|[red, green, blue]| {
+            red.to_bits() == green.to_bits() && red.to_bits() == blue.to_bits()
+        })
+    {
+        Ok(())
+    } else {
+        Err("grayscale array result contains unequal RGB samples".to_owned())
+    }
 }
 
 /// Round clamped normalized samples to eight-bit codes.

@@ -7,6 +7,10 @@ use super::{
 
 /// Longest side of an estimation thumbnail, independent of camera resolution.
 const THUMBNAIL_LIMIT: u16 = 384;
+/// Preserve enough detail on the narrow axis to estimate small displacements.
+const SHORT_AXIS_DETAIL: u32 = 160;
+/// Native thumbnail budget, including elongated canvases.
+const THUMBNAIL_PIXEL_LIMIT: u32 = 768 * 768;
 /// Minimum independent row/column structure for an identifiable fit.
 const MIN_SIDE: u16 = 12;
 /// Sampled pixel spacing during wide integer translation search.
@@ -96,7 +100,8 @@ pub fn thumbnail(
 /// Prepare a luma proxy using an explicit reduction factor on large inputs.
 ///
 /// Native small images retain their resolution. Larger images allow a
-/// configurable reduction while reserving enough texture for reliable matching.
+/// configurable reduction. Panoramic images can retain a longer proxy within
+/// the same pixel budget to preserve small motions on their narrow axis.
 ///
 /// # Errors
 ///
@@ -126,7 +131,7 @@ pub fn thumbnail_with_scale(
 /// Returns a shape, budget or readback error.
 #[expect(
     clippy::arithmetic_side_effects,
-    reason = "u16 sizes and a <=768 factor bound the u32 rounding calculation"
+    reason = "u16 dimensions bound the area, and the longest side is nonzero"
 )]
 fn prepare_thumbnail(
     device: &cubecl::Device,
@@ -136,7 +141,12 @@ fn prepare_thumbnail(
     budget: usize,
 ) -> Result<Thumbnail, String> {
     let longest = u32::from(canvas.width.max(canvas.height));
-    let factor = limit.min(longest);
+    let shortest = u32::from(canvas.width.min(canvas.height));
+    let detail = shortest.min(SHORT_AXIS_DETAIL);
+    let panoramic = (longest * detail)
+        .div_ceil(shortest)
+        .min(THUMBNAIL_PIXEL_LIMIT / detail);
+    let factor = limit.max(panoramic).min(longest);
     let shrink = |side: u16| -> Result<usize, String> {
         let size = (u32::from(side) * factor + longest / 2) / longest;
         usize::try_from(size.max(1)).map_err(|error| error.to_string())

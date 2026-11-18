@@ -107,3 +107,118 @@ fn nested_glob_matches_each_component() -> Result<(), Box<dyn Error>> {
     }
     Ok(())
 }
+
+/// Unresolvable literals, malformed wildcard syntax and directories report distinct failures.
+///
+/// # Errors
+/// Returns fixture creation failures or an unrecognized path diagnostic.
+#[test]
+fn invalid_sources_keep_their_diagnostic() -> Result<(), Box<dyn Error>> {
+    let directory = tempfile::tempdir()?;
+    fs::create_dir(directory.path().join("folder.png"))?;
+    let patterns = [
+        ("missing.png", "does not exist"),
+        ("unmatched[.png", "invalid input pattern"),
+        ("folder.png", "not an accessible file"),
+        ("fol*.png", "not an accessible file"),
+    ];
+    for (pattern, expected) in patterns {
+        let argument = directory.path().join(pattern);
+        rejection(&[argument], expected)?;
+    }
+    Ok(())
+}
+
+/// Exceeding the explicit and retained file budgets stops path discovery.
+///
+/// # Errors
+/// Returns fixture creation failures or an unexpected limit result.
+#[test]
+fn input_limits_bound_explicit_and_unique_paths() -> Result<(), Box<dyn Error>> {
+    let directory = tempfile::tempdir()?;
+    let first = directory.path().join("0.png");
+    fs::write(&first, b"input")?;
+    rejection(&vec![first.clone(); 16_385], "too many input path entries")?;
+    for index in 1..4096_u16 {
+        fs::hard_link(&first, directory.path().join(format!("{index}.png")))?;
+    }
+    let arguments = [directory.path().join("*.png")];
+    let job = JobConfig::new(&arguments, None, JobSettings::default())?;
+    if job.inputs().len() != 4096 {
+        return Err("the exact file count limit must be admitted".into());
+    }
+    fs::hard_link(&first, directory.path().join("4096.png"))?;
+    rejection(&arguments, "exceeds 4096 distinct")
+}
+
+/// A trailing literal component may be absent under some wildcard-selected directories.
+///
+/// # Errors
+/// Returns fixture creation or input resolution failures.
+#[test]
+fn literal_suffix_can_be_missing_under_some_matches() -> Result<(), Box<dyn Error>> {
+    let directory = tempfile::tempdir()?;
+    let populated = directory.path().join("folder1");
+    fs::create_dir(&populated)?;
+    fs::create_dir(directory.path().join("folder2"))?;
+    let target = populated.join("fixture.png");
+    let unrelated = directory.path().join("unrelated.png");
+    fs::write(&target, b"fixture")?;
+    fs::write(&unrelated, b"unrelated")?;
+    let pattern = directory.path().join("folder?").join("fixture.png");
+    let destination = directory.path().join("out.tif");
+    fs::write(&destination, b"previous export")?;
+    let job = JobConfig::new(
+        &[pattern, unrelated.clone()],
+        Some(destination),
+        JobSettings::default(),
+    )?;
+    if job.inputs() != [target.canonicalize()?, unrelated.canonicalize()?] {
+        return Err("unmatched wildcard branch was treated as a broken input".into());
+    }
+    Ok(())
+}
+
+/// Filesystem access errors identify the offending input at all discovery stages.
+///
+/// # Errors
+/// Returns directory creation failures or a missing filesystem diagnostic.
+#[cfg(unix)]
+#[test]
+fn path_component_too_long_is_a_real_access_error() -> Result<(), Box<dyn Error>> {
+    let directory = tempfile::tempdir()?;
+    fs::create_dir(directory.path().join("folder1"))?;
+    let long = "a".repeat(1024);
+    rejection(&[directory.path().join(&long)], "cannot access input")?;
+    let prefix = directory.path().join("folder?").join(long);
+    rejection(std::slice::from_ref(&prefix), "cannot access input")?;
+    rejection(&[prefix.join("*.png")], "cannot access input")
+}
+
+/// Check the diagnostic of a rejected request without accessing its planned export.
+///
+/// # Errors
+/// Returns an unexpected successful request or missing diagnostic.
+fn rejection(arguments: &[std::path::PathBuf], diagnostic: &str) -> Result<(), Box<dyn Error>> {
+    match JobConfig::new(arguments, None, JobSettings::default()) {
+        Err(error) if error.contains(diagnostic) => Ok(()),
+        other => Err(format!("expected {diagnostic}, actual {other:?}").into()),
+    }
+}
+
+/// Glob expansion reports a matched link whose source disappeared.
+///
+/// # Errors
+/// Returns fixture setup or a missing broken-link diagnostic.
+#[cfg(unix)]
+#[test]
+fn dangling_wildcard_input_is_reported() -> Result<(), Box<dyn Error>> {
+    let directory = tempfile::tempdir()?;
+    let present = directory.path().join("present.png");
+    fs::write(&present, b"present")?;
+    std::os::unix::fs::symlink(
+        directory.path().join("absent"),
+        directory.path().join("stale.png"),
+    )?;
+    rejection(&[directory.path().join("*.png")], "cannot access input")
+}

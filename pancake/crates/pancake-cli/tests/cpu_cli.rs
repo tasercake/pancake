@@ -4,7 +4,7 @@ use std::error::Error;
 use std::process::{Command, Output};
 
 use clap as _;
-use pancake as _;
+use pancake::image_io::decode;
 
 /// Invoke the current test build with all display variables removed.
 ///
@@ -217,4 +217,84 @@ fn malformed_inputs_are_rejected_by_the_decoder() -> Result<(), Box<dyn Error>> 
         )?;
     }
     Ok(())
+}
+
+/// A relative glob selects valid visible sources and publishes a completed stack.
+///
+/// # Errors
+/// Returns fixture creation, process launch, or an unexpected exit/publication.
+#[test]
+fn relative_glob_processes_the_selected_sources() -> Result<(), Box<dyn Error>> {
+    // Two pixels of RGB8 with a standard PNG signature and checksummed chunks.
+    let png = [
+        0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44,
+        0x52, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00, 0x00, 0x7b,
+        0x40, 0xe8, 0xdd, 0x00, 0x00, 0x00, 0x0f, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x60,
+        0xa8, 0xff, 0xff, 0xbf, 0x9e, 0x01, 0x00, 0x0a, 0x79, 0x02, 0xfd, 0xfe, 0x08, 0x7e, 0xbd,
+        0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+    ];
+    let directory = tempfile::tempdir()?;
+    std::fs::write(directory.path().join("first.png"), png)?;
+    std::fs::write(directory.path().join("second.png"), png)?;
+    std::fs::write(
+        directory.path().join(".excluded.png"),
+        b"hidden malformed file",
+    )?;
+    let output = directory.path().join("out.tif");
+    let result = Command::new(env!("CARGO_BIN_EXE_pancake-cli"))
+        .current_dir(directory.path())
+        .args([
+            "--input",
+            "*.png",
+            "--output",
+            "out.tif",
+            "--cpu",
+            "--method",
+            "weighted_average",
+        ])
+        .output()?;
+    let diagnostic = String::from_utf8(result.stderr)?;
+    require(
+        result.status.success(),
+        format!("real stack failed: {diagnostic}"),
+    )?;
+    let observation = String::from_utf8(result.stdout)?;
+    require(
+        observation.contains("progress 2/2"),
+        "real frames did not finish",
+    )?;
+    let result = decode(&output)?;
+    let first = decode(&directory.path().join("first.png"))?;
+    require(
+        result.samples() == first.samples(),
+        "published stack changed the expected identity image",
+    )
+}
+
+/// An actual closed diagnostic pipe gives a recoverable process error.
+///
+/// # Errors
+/// Returns pipe creation, process launch or incorrect exit status.
+#[test]
+fn closed_console_pipe_fails_cleanly() -> Result<(), Box<dyn Error>> {
+    let (reader, writer) = std::io::pipe()?;
+    drop(reader);
+    let help = Command::new(env!("CARGO_BIN_EXE_pancake-cli"))
+        .arg("--help")
+        .stdout(writer)
+        .status()?;
+    require(
+        help.code() == Some(1_i32),
+        "closed help stream must exit with a recoverable error",
+    )?;
+
+    let (reader, writer) = std::io::pipe()?;
+    drop(reader);
+    let error = Command::new(env!("CARGO_BIN_EXE_pancake-cli"))
+        .stderr(writer)
+        .status()?;
+    require(
+        error.code() == Some(1_i32),
+        "closed diagnostic stream must exit with a recoverable error",
+    )
 }

@@ -1,10 +1,14 @@
 //! Real shared numerical stack, filesystem publication, and optional observer.
 
 use std::path::{Path, PathBuf};
+use std::time::{Duration, Instant};
 
 use pancake::config::{BitDepth, DevicePreference, JobConfig, JobSettings, Method};
 use pancake::image_io::{RgbImage, decode, export};
-use pancake::job::{Generation, JobControl, JobError, JobState, Options, run, run_controlled};
+use pancake::job::{
+    Generation, JobControl, JobError, JobState, Options, StackResult, StackWorker, run,
+    run_controlled,
+};
 
 /// A completed weighted stack preserves identity, publishes and then logs.
 ///
@@ -116,7 +120,7 @@ fn interrupted_execution_retains_an_existing_export() -> Result<(), String> {
 fn sources(directory: &Path) -> Result<[PathBuf; 2], String> {
     let inputs = [directory.join("frame-a.png"), directory.join("frame-b.png")];
     let samples = (0_u16..216)
-        .map(|sample| f32::from(sample) / 216.0)
+        .map(|sample| f32::from(sample) * (1.0 / 216.0))
         .collect();
     let original = RgbImage::new(9, 8, samples)?;
     for path in &inputs {
@@ -150,4 +154,63 @@ fn request(inputs: &[PathBuf], output: &Path) -> Result<JobConfig, String> {
 /// Returns a message when the expectation is false.
 fn require(condition: bool, message: &str) -> Result<(), String> {
     condition.then_some(()).ok_or_else(|| message.to_owned())
+}
+
+/// An unread result cannot be replaced and stale controls cannot stop its successor.
+///
+/// # Errors
+///
+/// Returns a failed stack, worker I/O or lifecycle invariant error.
+#[test]
+fn worker_reuses_one_thread_without_replacing_retained_results() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let inputs = sources(directory.path())?;
+    let output = directory.path().join("first.png");
+    let next_output = directory.path().join("second.png");
+    let mut worker = StackWorker::new(Options::default())?;
+    let first = worker.start(request(&inputs, &output)?)?;
+    let duplicate = worker
+        .start(request(&inputs, &next_output)?)
+        .err()
+        .ok_or("worker admitted a new job while one outcome was outstanding")?;
+    require(
+        duplicate.contains("active or unread"),
+        "outstanding job lacked a useful diagnostic",
+    )?;
+    let retained = wait_for_stack(&mut worker, first)?;
+    let second = worker.start(request(&inputs, &next_output)?)?;
+    require(first != second, "worker reused a generation")?;
+    require(
+        !worker.cancel(first)?,
+        "old cancellation reached a new generation",
+    )?;
+    require(
+        worker.take_result(first)?.is_none(),
+        "old generation stole the new result",
+    )?;
+    let result = wait_for_stack(&mut worker, second)?;
+    require(
+        result.image().samples() == retained.image().samples()
+            && worker
+                .snapshot()?
+                .is_some_and(|snapshot| snapshot.state == JobState::Completed),
+        "second stack changed retained pixels or failed to complete",
+    )?;
+    worker.shutdown()
+}
+
+/// Let real work proceed until the current result is available.
+///
+/// # Errors
+///
+/// Returns worker failures or reports a lost completion.
+fn wait_for_stack(worker: &mut StackWorker, generation: Generation) -> Result<StackResult, String> {
+    let started = Instant::now();
+    while started.elapsed() < Duration::from_secs(10) {
+        if let Some(value) = worker.take_result(generation)? {
+            return value;
+        }
+        std::thread::yield_now();
+    }
+    Err("worker did not finish a tiny stack within ten seconds".to_owned())
 }
