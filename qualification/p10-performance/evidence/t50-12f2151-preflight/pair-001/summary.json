@@ -1,0 +1,210 @@
+{
+  "release": "12f2151c8a198b5209c8f4d506dbd17fd9aaa74f",
+  "candidate_binary_sha256": "32caffd65ed785b1883c39ec69cfd726f2a6f836e42c653a6385dacf80267055",
+  "performance_targets_sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc",
+  "profile": "T50.hybrid.gpu",
+  "settings": {
+    "device": "gpu",
+    "method": "hybrid",
+    "align": true,
+    "alignment_mode": "similarity",
+    "alignment_reference": "first",
+    "kernel_size": 6,
+    "pyramid_levels": 8,
+    "scale_factor": 6,
+    "slab_size": 0,
+    "slab_overlap": 0,
+    "bit_depth": 16,
+    "auto": false,
+    "auto_crop": true,
+    "quality_report": false
+  },
+  "scope": "one diagnostic pair before any scheduled measurements",
+  "inputs": {
+    "native_rgb16_sources": 50,
+    "native_width": 6000,
+    "native_height": 4000,
+    "all_52_unchanged": true
+  },
+  "jobs": {
+    "reference": {
+      "elapsed_ns": 26736526595,
+      "maximum_rss_sample_gap_ns": 26019126,
+      "maximum_gpu_sample_gap_ns": 30797023,
+      "observed_peak_rss_bytes": 6551072768,
+      "observed_peak_gpu_bytes": 4502585344,
+      "peak_rss_bytes": null,
+      "peak_gpu_bytes": null,
+      "kernel_process_peak_rss_bytes": 6667108352,
+      "kernel_process_user_cpu_seconds": 122.100125,
+      "kernel_process_system_cpu_seconds": 50.487684,
+      "returncode": 0,
+      "valid": true,
+      "output": {
+        "shape": [
+          3998,
+          5998,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "476c42d7656104f8275f4188aa96cad1643337bc6f49a9913006731edceeba57",
+        "pixel_sha256": "0a47d36947de71c6549a6854be60678d69a83590526a6879ae76b573e60eb4b6",
+        "bytes": 78347120,
+        "minimum": 2891,
+        "maximum": 61523
+      },
+      "native_geometry": {
+        "nonidentity_matrices": [],
+        "matrix_count": 50,
+        "identity_count_at_1e-6": 50,
+        "maximum_translation_norm": 0.0,
+        "determinant_range": [
+          1.0,
+          1.0
+        ]
+      },
+      "resource_errors": [],
+      "gpu_backend": "gpu",
+      "backend_by_stage": {
+        "fusion": "gpu",
+        "alignment_estimation": "cpu",
+        "warping": "gpu"
+      },
+      "effective_reference_settings": {
+        "stacking_method": "hybrid",
+        "fusion_kernel_size": 6,
+        "pyramid_num_levels": 8,
+        "alignment_scale_factor": 6,
+        "use_gpu": true,
+        "gpu_mode": "gpu",
+        "selected_gpu_id": 0,
+        "alignment_reference": "first",
+        "align_rotation_scale": true,
+        "alignment_mode": "similarity",
+        "breathing_max_scale_step": 0.05,
+        "breathing_high_precision": false,
+        "contrast_threshold": 0.0,
+        "feather_radius": 2,
+        "depthmap_smoothing": 5,
+        "slab_size": 0,
+        "slab_overlap": 0
+      },
+      "reference_alignment_warnings": {
+        "(Singular matrix); using the CPU": 3
+      },
+      "generated_truth": {
+        "whole_centered_overlap": {
+          "compared_samples": 71940012,
+          "mean_absolute_error_u16": 979.5945022500135,
+          "rms_error_u16": 1230.168434301035,
+          "maximum_absolute_error_u16": 19154,
+          "changed_sample_fraction": 0.999906936351359
+        },
+        "crop_origin": [
+          1,
+          1
+        ],
+        "sampled_focus_regions": 50,
+        "vertical_second_difference_variance_ratio": {
+          "min": 1.1663986444473267,
+          "median": 1.1663999557495117,
+          "max": 1.1664015054702759
+        }
+      }
+    },
+    "candidate": {
+      "elapsed_ns": 82441012849,
+      "maximum_rss_sample_gap_ns": 10686825,
+      "maximum_gpu_sample_gap_ns": 69969955,
+      "observed_peak_rss_bytes": 1563787264,
+      "observed_peak_gpu_bytes": 2518323200,
+      "peak_rss_bytes": 1563787264,
+      "peak_gpu_bytes": null,
+      "kernel_process_peak_rss_bytes": 1564217344,
+      "kernel_process_user_cpu_seconds": 36.540957,
+      "kernel_process_system_cpu_seconds": 38.704781,
+      "returncode": 0,
+      "valid": true,
+      "output": {
+        "shape": [
+          3998,
+          5998,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302",
+        "pixel_sha256": "f54746784bcc278da2df734e9f034053a3b54105ddb2a30046baf6dab07a80a3",
+        "bytes": 143881378,
+        "minimum": 7663,
+        "maximum": 57895
+      },
+      "native_geometry": {
+        "nonidentity_matrices": [],
+        "matrix_count": 50,
+        "identity_count_at_1e-6": 50,
+        "maximum_translation_norm": 0.0,
+        "determinant_range": [
+          1.0,
+          1.0
+        ]
+      },
+      "resource_errors": [],
+      "gpu_backend": "gpu",
+      "backend_by_stage": null,
+      "effective_reference_settings": null,
+      "reference_alignment_warnings": {},
+      "generated_truth": {
+        "whole_centered_overlap": {
+          "compared_samples": 71940012,
+          "mean_absolute_error_u16": 843.3282649855549,
+          "rms_error_u16": 1093.2079815069662,
+          "maximum_absolute_error_u16": 17902,
+          "changed_sample_fraction": 0.9994509453237234
+        },
+        "crop_origin": [
+          1,
+          1
+        ],
+        "sampled_focus_regions": 50,
+        "vertical_second_difference_variance_ratio": {
+          "min": 0.8667194247245789,
+          "median": 0.8691356778144836,
+          "max": 0.8918330073356628
+        }
+      }
+    }
+  },
+  "resource_guard": {
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/pancake-t50-12f2151-diagnostic-stage001.scope",
+    "memory_max_bytes": 30064771072,
+    "memory_swap_max_bytes": 0,
+    "initial_host_available_bytes": 47750406144,
+    "required_host_available_bytes": 42949672960,
+    "initial_device_free_mib": 23552,
+    "required_device_free_mib": 8192,
+    "per_job_timeout_seconds": 900
+  },
+  "diagnostic_elapsed_candidate_over_reference": 3.0834600955390106,
+  "comparison": {
+    "status": "decoded_pair",
+    "mean_absolute_u16": 1792.1332831025939,
+    "maximum_absolute_u16": 19611,
+    "rms_u16": 2207.6263127691477,
+    "changed_sample_fraction": 0.999754795703954
+  },
+  "assessment": {
+    "geometry": "pass for both diagnostic jobs",
+    "genuine_rgb16_export": "pass for both diagnostic jobs",
+    "whole_job_gpu_fusion": "observed on matching RTX 3090 for both",
+    "equal_quality": "pending; both retain all regions but differ in sharpness and pixel values",
+    "p10_warm_and_cold": "unmeasured: no frozen schedule",
+    "p10_process_tree_rss": "pending: reference diagnostic observation gap exceeds 20 ms",
+    "p10_attributable_gpu_peak": "pending: both diagnostic observation gaps exceed 20 ms"
+  },
+  "sampling": {
+    "candidate_diagnostics": 1,
+    "reference_diagnostics": 1,
+    "frozen_warmup_warm_and_cold_jobs": 0,
+    "full_campaign": "not started after the diagnostic time disparity and different detail transfer"
+  }
+}
