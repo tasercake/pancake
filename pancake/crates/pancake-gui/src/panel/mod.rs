@@ -24,8 +24,16 @@ pub enum Picker<'a> {
 ///
 /// Returns a platform dialog or path-resolution error.
 #[cfg(target_os = "linux")]
-pub fn select(_window: &ComponentInstance, kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
-    linux::choose(kind)
+pub fn select(window: &ComponentInstance, kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
+    use slint::ComponentHandle as _;
+    use slint::winit_030::WinitWindowAccessor as _;
+
+    let selected = linux::choose(kind);
+    service_events();
+    let _focused = window
+        .window()
+        .with_winit_window(slint::winit_030::winit::window::Window::focus_window);
+    selected
 }
 
 /// Use the platform dialog with native window parenting.
@@ -63,7 +71,7 @@ pub fn select(window: &ComponentInstance, kind: Picker<'_>) -> Result<Vec<PathBu
 pub fn service_events() {
     if gtk::is_initialized_main_thread() {
         let context = gtk::glib::MainContext::default();
-        for _ in 0..32 {
+        for _ in 0_u8..32 {
             if !context.pending() {
                 break;
             }

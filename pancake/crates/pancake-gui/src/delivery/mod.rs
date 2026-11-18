@@ -18,7 +18,7 @@ mod tests;
 ///
 /// Returns an encoding or publication error. A failed preparation publishes
 /// no part of the batch, including when an existing output name is a directory.
-pub(super) fn batch(
+pub fn batch(
     directory: &Path,
     image: &RgbImage,
     sources: &[PathBuf],
@@ -46,10 +46,7 @@ pub(super) fn batch(
 /// # Errors
 ///
 /// Returns a renderer, rectangle, shape or allocation error.
-pub(super) fn viewport(
-    window: &ComponentInstance,
-    args: &[Value],
-) -> Result<RgbImage, Box<dyn Error>> {
+pub fn viewport(window: &ComponentInstance, args: &[Value]) -> Result<RgbImage, Box<dyn Error>> {
     let [
         Value::Number(x),
         Value::Number(y),

@@ -76,6 +76,9 @@ pub(super) fn choose(kind: Picker<'_>) -> Result<Vec<PathBuf>, String> {
     // GTK's main loop to process the window-close event after Dialog::run.
     dialog.hide();
     dialog.close();
+    if let Some(display) = gtk::gdk::Display::default() {
+        display.sync();
+    }
     outcome
 }
 

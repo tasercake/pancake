@@ -9,13 +9,13 @@ use slint_interpreter::{Compiler, ComponentDefinition, ComponentInstance, Value}
 
 use preferences::{Preferences, Store};
 
-mod delivery;
+pub mod delivery;
 pub mod desktop_menu;
 pub mod history;
 pub mod panel;
 pub mod preferences;
 pub mod preview;
-mod session;
+pub mod session;
 pub mod sources;
 
 /// Repository-owned declarative presentation.
@@ -141,7 +141,10 @@ fn compile_workspace() -> Result<ComponentDefinition, String> {
     let mut compiler = Compiler::default();
     compiler.set_style("fluent".into());
     compiler.set_edition((1, 19));
-    let built = spin_on::spin_on(compiler.build_from_source(WINDOW.into(), PathBuf::new()));
+    let built = spin_on::spin_on(compiler.build_from_source(
+        WINDOW.into(),
+        PathBuf::from("builtin:/pancake/workspace.slint"),
+    ));
     built.component("Workspace").ok_or_else(|| {
         built
             .diagnostics()

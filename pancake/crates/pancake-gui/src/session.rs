@@ -17,7 +17,7 @@ use slint_interpreter::{ComponentInstance, Value};
 
 use super::history::RecentFolders;
 use super::panel::{self, Picker};
-use super::preview::Preview;
+use super::preview::{Cache, ImageKey, Preview};
 use super::show_error;
 use super::sources::{Sources, folder_files};
 use super::{delivery, desktop_menu};
@@ -41,6 +41,8 @@ struct Session {
     results: Vec<Retained>,
     /// Profile-local recently opened directories.
     history: RecentFolders,
+    /// Short display-only cache separate from computation and export data.
+    previews: Cache,
     /// User transition awaiting an explicit confirmation.
     pending: Option<Transition>,
     /// Active result ordinal when the viewer displays a result.
@@ -135,7 +137,9 @@ impl Session {
             .paths()
             .get(index)
             .ok_or("Source no longer exists.")?;
-        let preview = Preview::new(&decode(path)?)?;
+        let preview = self
+            .previews
+            .get(ImageKey::source(path)?, || Preview::new(&decode(path)?))?;
         configure_image(window, &preview)?;
         window.set_property("base-width", preview.width.into())?;
         window.set_property("base-height", preview.height.into())?;
@@ -158,7 +162,11 @@ impl Session {
     /// Returns missing result, geometry, or dynamic binding errors.
     fn show_result(&mut self, window: &ComponentInstance, index: usize) -> UiResult {
         let result = self.results.get(index).ok_or("Result no longer exists.")?;
-        let preview = Preview::new(result.image())?;
+        let preview = self
+            .previews
+            .get(ImageKey::Result(index, result.manual.is_some()), || {
+                Preview::new(result.image())
+            })?;
         configure_image(window, &preview)?;
         let canvas = result.stack.canvas();
         let crop = result.bounds();
@@ -285,7 +293,7 @@ fn render_status(window: &ComponentInstance, snapshot: JobSnapshot) -> UiResult 
 /// # Errors
 ///
 /// Returns dynamic binding or shared-worker startup errors.
-pub(super) fn configure(
+pub fn configure(
     window: &ComponentInstance,
     paths: &[PathBuf],
     profile: &Path,
@@ -297,6 +305,7 @@ pub(super) fn configure(
         generation: None,
         results: Vec::new(),
         history: RecentFolders::open(profile)?,
+        previews: Cache::default(),
         pending: None,
         selected: None,
         retained_bytes: 0,
@@ -461,17 +470,17 @@ fn add_sources(session: &mut Session, window: &ComponentInstance, files: &[PathB
 fn remove_sources(session: &mut Session, window: &ComponentInstance, args: &[Value]) -> UiResult {
     let argument = args.first().cloned().ok_or("Missing removal selection.")?;
     let ordinal = i32::try_from(argument).map_err(|_| "Removal selection must be an integer.")?;
-    if ordinal == -1 {
+    if ordinal == -1_i32 {
         session.sources.clear();
     } else {
         session.sources.remove(usize::try_from(ordinal)?)?;
     }
     session.refresh_lists(window)?;
-    if !session.sources.paths().is_empty() {
-        session.show_source(window, 0)?;
-    } else {
+    if session.sources.paths().is_empty() {
         session.selected = None;
         clear_image(window)?;
+    } else {
+        session.show_source(window, 0)?;
     }
     Ok(())
 }
@@ -504,11 +513,11 @@ fn settings(window: &ComponentInstance) -> UiResult<JobSettings> {
         .get(ordinal(Some(&window.get_property("alignment-index")?))?)
         .ok_or("Invalid alignment mode.")?;
     let device = match value::<i32>(window, "device-index")? {
-        0 => std::env::var("PANCAKE_DEFAULT_DEVICE")
+        0_i32 => std::env::var("PANCAKE_DEFAULT_DEVICE")
             .ok()
             .map_or(Ok(DevicePreference::Auto), |name| name.parse())?,
-        1 => DevicePreference::Cpu,
-        2 => DevicePreference::Auto,
+        1_i32 => DevicePreference::Cpu,
+        2_i32 => DevicePreference::Auto,
         _ => return Err("Invalid processing device preference.".into()),
     };
     Ok(JobSettings {
@@ -717,7 +726,9 @@ fn compare_preview(session: &mut Session, window: &ComponentInstance, _: &[Value
         .sources()
         .first()
         .ok_or("No comparison source is available.")?;
-    let comparison = Preview::new(&decode(source)?)?;
+    let comparison = session
+        .previews
+        .get(ImageKey::source(source)?, || Preview::new(&decode(source)?))?;
     window.set_property("comparison-preview", comparison.picture.into())?;
     window.set_property("compare", true.into())?;
     Ok(())
@@ -827,6 +838,7 @@ fn apply_transition(
     session.sources = new_sources;
     session.selected = None;
     session.results.clear();
+    session.previews.clear();
     session.retained_bytes = 0;
     clear_image(window)?;
     session.refresh_lists(window)?;
