@@ -153,10 +153,12 @@ def corpus(repo, campaign, workload):
     return records, provenance
 
 
-def verify_frames(root, records, count):
+def verify_frames(root, records, count, *, distinct_content=True):
     """Require a complete exact-byte set under the explicit staging root."""
     root = root.resolve()
-    if len(records) != count or len({record["sha256"] for record in records}) != count:
+    if len(records) != count:
+        raise ValueError(f"expected {count} ordered frames")
+    if distinct_content and len({record["sha256"] for record in records}) != count:
         raise ValueError(f"expected {count} distinct ordered frames")
     ordered = []
     for record in records:
@@ -399,3 +401,41 @@ def evaluate_latency(campaign, viewer, lifecycle):
             "settled_ns": distribution(settled),
         }
     return results
+
+
+def merge_latency_samples(receipts):
+    """Combine actual native captures only when they share an exact app build."""
+    viewed, lifecycle = [], []
+    identity = None
+    event_times = set()
+    workloads = set()
+    for receipt in receipts:
+        if (
+            receipt.get("status") != "captured"
+            or receipt.get("inputs_unchanged") is not True
+        ):
+            raise ValueError("incomplete native capture or input provenance")
+        build = receipt["candidate"]
+        current = (
+            build["commit"],
+            build["binary_sha256"],
+            build["descriptor_sha256"],
+            build["lock_sha256"],
+            receipt["performance_targets_sha256"],
+        )
+        if identity is not None and current != identity:
+            raise ValueError("native captures differ in build provenance")
+        identity = current
+        workload = receipt["workload"]
+        if receipt["viewer"] and workload != "T50":
+            raise ValueError("viewer captures require the frozen verified T50 inputs")
+        for field, entries in (("viewer", viewed), ("lifecycle", lifecycle)):
+            for sample in receipt[field]:
+                dispatch = sample["dispatched_ns"]
+                if sample.get("valid") is not True or dispatch in event_times:
+                    raise ValueError("invalid or duplicate native timestamp sample")
+                event_times.add(dispatch)
+                entries.append(sample)
+        if receipt["lifecycle"]:
+            workloads.add(workload)
+    return viewed, lifecycle, sorted(workloads)
