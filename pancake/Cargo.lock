@@ -3349,6 +3349,7 @@ dependencies = [
  "rawler",
  "rayon",
  "same-file",
+ "serde_json",
  "tempfile",
  "tiff",
  "wgpu",

@@ -9,6 +9,7 @@ use clap::Parser;
 use pancake::config::{
     AlignmentMode, AlignmentReference, BitDepth, DevicePreference, JobConfig, JobSettings, Method,
 };
+use pancake::job::{Options, run};
 
 /// Process a focal stack or exposure bracket.
 #[derive(Debug, Parser)]
@@ -145,7 +146,7 @@ fn report(stream: &mut impl Write, args: fmt::Arguments<'_>, status: ExitCode) -
     status
 }
 
-/// Parse arguments and reject incomplete jobs without publishing output.
+/// Parse public arguments and execute the shared complete stack.
 fn main() -> ExitCode {
     let bad_arguments = ExitCode::from(2);
     let arguments = match Arguments::try_parse() {
@@ -165,7 +166,7 @@ fn main() -> ExitCode {
             );
         }
     };
-    let _job = match arguments.into_job() {
+    let job = match arguments.into_job() {
         Ok(job) => job,
         Err(error) => {
             return report(
@@ -175,11 +176,43 @@ fn main() -> ExitCode {
             );
         }
     };
-    report(
-        &mut io::stderr().lock(),
-        format_args!("error: stack processing is not available in this build\n"),
-        ExitCode::FAILURE,
-    )
+    let outcome = execute(job, &mut io::stdout().lock(), &mut io::stderr().lock());
+    match outcome {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => report(
+            &mut io::stderr().lock(),
+            format_args!("error: {error}\n"),
+            ExitCode::FAILURE,
+        ),
+    }
+}
+
+/// Execute the requested job and report actual completed progress and quality.
+///
+/// # Errors
+///
+/// Returns configuration, processing, export or status output errors.
+fn execute(
+    config: JobConfig,
+    output: &mut impl Write,
+    diagnostics: &mut impl Write,
+) -> Result<(), String> {
+    let options = Options::from_env()?;
+    let mut progress = Ok(());
+    let result = run(config, &options, |snapshot| {
+        if progress.is_ok() {
+            progress = writeln!(output, "progress {}/{}", snapshot.completed, snapshot.total);
+        }
+    })
+    .map_err(|error| error.to_string())?;
+    progress.map_err(|error| error.to_string())?;
+    if let Some(sharpness) = result.sharpness() {
+        writeln!(output, "sharpness {sharpness:.9}").map_err(|error| error.to_string())?;
+    }
+    for message in result.warnings() {
+        writeln!(diagnostics, "warning: {message}").map_err(|error| error.to_string())?;
+    }
+    Ok(())
 }
 
 #[cfg(test)]
