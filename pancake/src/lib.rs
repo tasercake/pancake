@@ -268,3 +268,5 @@ fn centered_variance(input: &Tensor<u32>, output: &mut Tensor<f32>, width: usize
     }
     output[ABSOLUTE_POS] = square_sum / f32::cast_from(width);
 }
+
+pub mod job;
