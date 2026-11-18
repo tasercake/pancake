@@ -9,7 +9,9 @@ use pancake::config::BitDepth;
 use pancake::image_io::{ExportFormat, RgbImage, export, prepare_export};
 
 /// Source codes exercise both bytes of each channel and all RGB positions.
-const RGB16: [u16; 12] = [0, 257, 256, 32768, 580, 62211, 65025, 65535, 130, 35533, 17, 1];
+const RGB16: [u16; 12] = [
+    0, 257, 256, 32768, 580, 62211, 65025, 65535, 130, 35533, 17, 1,
+];
 
 /// Build a complete odd-precision test image through the real RGB API.
 fn rgb16_frame() -> Result<RgbImage, String> {
@@ -55,9 +57,15 @@ fn jpeg_declares_and_writes_eight_bit_samples() -> Result<(), Box<dyn Error>> {
     for suffix in ["jpg", "jpeg"] {
         let path = dir.path().join(format!("encoded.{suffix}"));
         let prepared = prepare_export(&path, &frame, BitDepth::Sixteen, 95, &[])?;
-        assert_eq!(ExportFormat::from_path(&path)?, ExportFormat::Jpeg, "JPEG alias");
+        assert_eq!(
+            ExportFormat::from_path(&path)?,
+            ExportFormat::Jpeg,
+            "JPEG alias"
+        );
         assert!(
-            prepared.warning().is_some_and(|message| message.contains("8-bit")),
+            prepared
+                .warning()
+                .is_some_and(|message| message.contains("8-bit")),
             "requested JPEG16 needs a truthful precision diagnostic"
         );
         prepared.publish()?;
@@ -76,11 +84,24 @@ fn exr_keeps_float_samples() -> Result<(), Box<dyn Error>> {
     let samples = vec![-0.125_f32, 0.123_456_79, 7.25, 0.0, 0.75, 1.0];
     let frame = RgbImage::new(2, 1, samples.clone())?;
     let prepared = prepare_export(&path, &frame, BitDepth::Eight, 95, &[])?;
-    assert_eq!(prepared.warning(), None, "EXR retains higher float precision");
+    assert_eq!(
+        prepared.warning(),
+        None,
+        "EXR retains higher float precision"
+    );
     prepared.publish()?;
     let decoded = image::open(path)?;
-    assert_eq!(decoded.color(), ColorType::Rgb32F, "EXR channel representation");
-    let actual: Vec<_> = decoded.into_rgb32f().into_raw().into_iter().map(f32::to_bits).collect();
+    assert_eq!(
+        decoded.color(),
+        ColorType::Rgb32F,
+        "EXR channel representation"
+    );
+    let actual: Vec<_> = decoded
+        .into_rgb32f()
+        .into_raw()
+        .into_iter()
+        .map(f32::to_bits)
+        .collect();
     let expected: Vec<_> = samples.into_iter().map(f32::to_bits).collect();
     assert_eq!(actual, expected, "lossless EXR values");
     Ok(())
@@ -94,10 +115,22 @@ fn staging_is_invisible_until_commit_and_cleans_on_drop() -> Result<(), Box<dyn 
     let frame = rgb16_frame()?;
     fs::write(&path, b"previous export")?;
     let cancelled = prepare_export(&path, &frame, BitDepth::Sixteen, 95, &[])?;
-    assert_eq!(fs::read(&path)?, b"previous export", "staging touched destination");
+    assert_eq!(
+        fs::read(&path)?,
+        b"previous export",
+        "staging touched destination"
+    );
     drop(cancelled);
-    assert_eq!(fs::read(&path)?, b"previous export", "cancel touched destination");
-    assert_eq!(fs::read_dir(dir.path())?.count(), 1, "cancel leaked staged data");
+    assert_eq!(
+        fs::read(&path)?,
+        b"previous export",
+        "cancel touched destination"
+    );
+    assert_eq!(
+        fs::read_dir(dir.path())?.count(),
+        1,
+        "cancel leaked staged data"
+    );
 
     let prepared = prepare_export(&path, &frame, BitDepth::Sixteen, 95, &[])?;
     prepared.publish()?;
@@ -106,7 +139,11 @@ fn staging_is_invisible_until_commit_and_cleans_on_drop() -> Result<(), Box<dyn 
         RGB16,
         "publishing must replace the previous file with a complete encoded image"
     );
-    assert_eq!(fs::read_dir(dir.path())?.count(), 1, "publish leaked staged data");
+    assert_eq!(
+        fs::read_dir(dir.path())?.count(),
+        1,
+        "publish leaked staged data"
+    );
     Ok(())
 }
 
@@ -121,7 +158,11 @@ fn failures_retain_destinations_and_remove_staging() -> Result<(), Box<dyn Error
         export(&invalid, &frame, BitDepth::Eight, 90, &[]).is_err(),
         "unknown formats must fail"
     );
-    assert_eq!(fs::read(&invalid)?, b"previous", "unknown format modified old file");
+    assert_eq!(
+        fs::read(&invalid)?,
+        b"previous",
+        "unknown format modified old file"
+    );
     let missing = dir.path().join("missing").join("image.png");
     assert!(
         export(&missing, &frame, BitDepth::Eight, 90, &[]).is_err(),
@@ -138,8 +179,16 @@ fn failures_retain_destinations_and_remove_staging() -> Result<(), Box<dyn Error
     fs::create_dir(&changed)?;
     fs::write(changed.join("keep"), b"destination directory")?;
     assert!(staged.publish().is_err(), "rename over directory must fail");
-    assert_eq!(fs::read(changed.join("keep"))?, b"destination directory", "publish damaged destination");
-    assert_eq!(fs::read_dir(dir.path())?.count(), 2, "failed jobs leaked staging");
+    assert_eq!(
+        fs::read(changed.join("keep"))?,
+        b"destination directory",
+        "publish damaged destination"
+    );
+    assert_eq!(
+        fs::read_dir(dir.path())?.count(),
+        2,
+        "failed jobs leaked staging"
+    );
     Ok(())
 }
 
@@ -164,9 +213,20 @@ fn forbids_source_aliases_even_during_commit() -> Result<(), Box<dyn Error>> {
     let prepared = prepare_export(&late_alias, &frame, BitDepth::Sixteen, 90, &sources)?;
     fs::hard_link(&source, &late_alias)?;
     assert!(prepared.publish().is_err(), "recheck destination at commit");
-    assert_eq!(fs::read(&late_alias)?, b"source bytes", "late alias changed");
+    assert_eq!(
+        fs::read(&late_alias)?,
+        b"source bytes",
+        "late alias changed"
+    );
     assert_eq!(fs::read(source)?, b"source bytes", "source changed");
-    assert_eq!(fs::read_dir(dir.path())?.count(), 3, "alias guard leaked staged file");
-    assert!(ExportFormat::from_path(Path::new("no-suffix")).is_err(), "require format suffix");
+    assert_eq!(
+        fs::read_dir(dir.path())?.count(),
+        3,
+        "alias guard leaked staged file"
+    );
+    assert!(
+        ExportFormat::from_path(Path::new("no-suffix")).is_err(),
+        "require format suffix"
+    );
     Ok(())
 }

@@ -3341,12 +3341,16 @@ dependencies = [
 name = "pancake"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
  "cubecl",
  "glob",
  "image",
+ "png",
  "rawler",
  "rayon",
+ "same-file",
  "tempfile",
+ "tiff",
  "wgpu",
 ]
 

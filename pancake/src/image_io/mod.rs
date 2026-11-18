@@ -1,7 +1,10 @@
 //! Bounded image decoding and full-precision RGB frames shared by both front ends.
 
+mod export;
 mod npy;
 mod raw;
+
+pub use export::{ExportFormat, PreparedExport, export, prepare_export};
 
 use std::ffi::OsStr;
 use std::fs::{self, File};
