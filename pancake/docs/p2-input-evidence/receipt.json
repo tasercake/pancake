@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "platform": "Linux 6.8.0-147-generic x86_64",
+  "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "rust": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
+  "source_code_receipts": {
+    "decoder": "a016fd2",
+    "bmp_and_dependency_review": "96cb2e744f829013b964d95d53fc2801f1645d88",
+    "fixture_tests": "53e2f9f21c1de59825588395da48fdfe671b3ba2",
+    "color_and_sensor_header_tests": "177fa50bfc58ed5365888c2211c7896acc2040dd",
+    "cargo_lock_sha256": "8ea88a328b0fca9bceff1c8116460d7471a54163a1ea3fa2c813184085e584d6",
+    "suite_lock_sha256": "30663059d83f2bb9d94bef743e9f74cf1a28c4bdd78073fc0342557fd76eb29b",
+    "suite_fixtures_sha256": "995a0917fa900cd46143ad4a21dca1c3c7101d2c2dc418d2662043fa3ef1cebe",
+    "decoder_source_sha256_before_encoded_size_check": "386df65954cfd5ef5b97e965f1da6d1b525a139ab8d434eb4b8ccc2c41ebb930"
+  },
+  "commands": [
+    "cargo test --locked --test cpu_image_io",
+    "CLIPPY_CONF_DIR=$PWD/target/dependency-policy/clippy cargo clippy --locked --test cpu_image_io -- -D warnings",
+    "cargo deny --locked --all-features --config target/dependency-policy/deny-effective.toml check --deny warnings advisories bans sources",
+    "uv run --no-project --python 3.12 --with rawpy==0.26.1 python <full camera decode overlap comparison>",
+    "OMP_NUM_THREADS=2 bin/dcraw_emu -w -W -6 -q 3 -T -Z - frame_000.CR3 > frame-000.tiff"
+  ],
+  "compressed_raw_limit": {
+    "logical_input_bytes": 268435457,
+    "physical_sample_kind": "sparse file",
+    "tool": "time (GNU Time) UNKNOWN",
+    "before_max_rss_kib": 268800,
+    "after_max_rss_kib": 6912,
+    "before_exit": 1,
+    "after_exit": 1,
+    "diagnostic": "compressed RAW source exceeds the byte limit"
+  },
+  "results": {
+    "fixture_variants": 17,
+    "sample_files": 52,
+    "exact_source_hash_retention": true,
+    "proprietary_raw_geometry_and_render_compatibility": "unresolved",
+    "read_only_native_reference_probe": "full geometry exact, maximum difference two u16 codes",
+    "matched_full_job_performance": "unrun"
+  },
+  "receipts": {
+    "compare-nominal-raw.py.txt": "4325c296f2e0ad00fa36768b98f7b41d650efd17a25f90c01468b4d1c00993a2",
+    "decode_probe.rs.txt": "321ef606f85301f2491ab09d2438cc90e1fc7eb65d5c12cb231be6e2be8346eb",
+    "fixture-results.json": "76320002234039724e91dc26fdf138ed3229593427aa05ef515a6f9b59640f3e",
+    "libraw-native-decode-comparison.json": "01f0968a8a340dc11b878d1960dd3142a28be9a44d196f6dc1fcfe6815e082a8",
+    "r50-nominal-overlap.json": "1213f21132ae776282e549f35d290c452af6f724d1ce8359493f29dd07327eb9",
+    "r50-raw-decode-comparison.json": "ed12a909a03769d1a979bd485c93e72582f0ab25ef28ee797d05ee48d2dbf492",
+    "r50-tone-analysis.json": "08ccdc0576fd9900c32c62d256e58b19d11d1128f23d03603dd191a169eab58c",
+    "r50-tone-analysis.py.txt": "1e631a2f12d792d8fe186f033293021fb5647f58f2eb2e42f30cc23990748b59",
+    "raw_nominal_probe.rs.txt": "2c12c583ca1945c70889044e0d4e334350ef4dffb69b16da3f50ba1f142cc4d1"
+  }
+}
