@@ -6,7 +6,7 @@ use pancake::config::{
     AlignmentMode, AlignmentReference, BitDepth, DevicePreference, JobConfig, JobSettings, Method,
 };
 use pancake::image_io::{RgbImage, decode, export};
-use pancake::job::{Options, run};
+use pancake::job::{Generation, JobControl, Options, run, run_controlled};
 use pancake::runtime::Backend;
 
 /// Exercise real in-memory results, exposure and focus streams, auto and slabs.
@@ -245,4 +245,83 @@ fn close_samples(actual: &[f32], expected: &[f32], tolerance: f32) -> bool {
 /// Returns the supplied diagnostic.
 fn require(condition: bool, diagnostic: &str) -> Result<(), String> {
     condition.then_some(()).ok_or_else(|| diagnostic.to_owned())
+}
+
+/// One real active controller cannot admit a second executor.
+///
+/// # Errors
+///
+/// Returns stack or file errors and detects a second result replacing the first.
+#[test]
+fn shared_ticket_cannot_admit_a_second_stack() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let image = textured(13, 11, 0)?;
+    let inputs = create_sources(directory.path(), [&image, &image])?;
+    let original = directory.path().join("first-result.png");
+    let contender = directory.path().join("second-result.png");
+    let settings = JobSettings {
+        method: Method::WeightedAverage,
+        device: DevicePreference::Cpu,
+        ..JobSettings::default()
+    };
+    let eligible = JobConfig::new(&inputs, Some(original.clone()), settings)?;
+    let mut duplicate = Some(JobConfig::new(&inputs, Some(contender.clone()), settings)?);
+    let control = JobControl::new(Generation::from_counter(1), inputs.len())?;
+    let options = Options::default();
+    let mut second_error = None;
+    let first = run_controlled(eligible, &options, &control, |progress| {
+        if progress.completed == 1
+            && let Some(config) = duplicate.take()
+        {
+            second_error = run_controlled(config, &options, &control, |_| {})
+                .err()
+                .map(|error| error.to_string());
+        }
+    });
+    require(
+        original.is_file() && !contender.exists(),
+        "second executor could supersede the job's sole result publication",
+    )?;
+    let first = first.map_err(|error| error.to_string())?;
+    require(
+        first.image().width() == 13,
+        "admitted executor lost its image",
+    )?;
+    require(
+        second_error.is_some_and(|error| error.contains("already owns an execution")),
+        "duplicate execution was not rejected at admission",
+    )
+}
+
+/// A ticket for a different number of sources cannot claim this request.
+///
+/// # Errors
+///
+/// Returns setup errors or an acknowledgement after the mismatched job starts.
+#[test]
+fn ticket_input_count_must_match_before_processing() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let image = textured(13, 11, 0)?;
+    let inputs = create_sources(directory.path(), [&image, &image])?;
+    let output = directory.path().join("out.png");
+    let request = JobConfig::new(
+        &inputs,
+        Some(output.clone()),
+        JobSettings {
+            method: Method::WeightedAverage,
+            device: DevicePreference::Cpu,
+            ..JobSettings::default()
+        },
+    )?;
+    let control = JobControl::new(Generation::from_counter(2), 1)?;
+    let mut progress = 0;
+    let failure = run_controlled(request, &Options::default(), &control, |snapshot| {
+        progress = snapshot.completed;
+    })
+    .err()
+    .ok_or("mismatched ticket ran to completion")?;
+    require(
+        progress == 0 && !output.exists() && failure.to_string().contains("input count"),
+        "mismatched ticket reached numerical submission",
+    )
 }
