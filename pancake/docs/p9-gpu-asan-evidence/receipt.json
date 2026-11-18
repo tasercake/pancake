@@ -1,0 +1,160 @@
+{
+  "source_commit": "34dd609dda395171284bf2704b4f6b10dfcea040",
+  "source_path": "pancake/docs/p0-sanitizer-evidence/vulkan-device-probe.c",
+  "source_sha256": "04f8f008fa336114d26f11f11aa1490c6bb401f1ada19f315f4f46dfc2b96f4d",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "os": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+  "device": "NVIDIA GeForce RTX 3090, 00000000:01:00.0, 580.178.04",
+  "loader_package": "libvulkan1:amd64\t1.3.275.0-1build1\nlibvulkan1:i386\t1.3.275.0-1build1",
+  "nvidia_icd": {
+    "path": "/usr/share/vulkan/icd.d/nvidia_icd.json",
+    "sha256": "7bdb6f27d35b66fc848df6f94b8773bba30ea3a7f06f114100d14154a235a34b"
+  },
+  "profiles": [
+    {
+      "name": "native",
+      "build": [
+        "gcc",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-g",
+        "pancake/docs/p0-sanitizer-evidence/vulkan-device-probe.c",
+        "-o",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/device-native",
+        "-lvulkan"
+      ],
+      "binary_sha256": "a150dfe40e4390a8adc41525d91dd873422563ecf60673881d1fc10770981b77",
+      "command": [
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/device-native"
+      ],
+      "returncode": 0,
+      "log": "native.log.gz",
+      "log_sha256": "212522263bdaec6179f02c204f02872399a585d0d3cfdd529b40bfaffef02396",
+      "environment": {
+        "XDG_RUNTIME_DIR": "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/xdg-runtime",
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.json",
+        "ASAN_OPTIONS": "fast_unwind_on_malloc=0"
+      },
+      "compressed_log_sha256": "8f7f539e82a20ad023aa7ac2a26e7b0f8552521d67349e5067a77f5447151ba2"
+    },
+    {
+      "name": "address",
+      "build": [
+        "gcc",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-g",
+        "-fsanitize=address",
+        "-fno-omit-frame-pointer",
+        "pancake/docs/p0-sanitizer-evidence/vulkan-device-probe.c",
+        "-o",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/device-address",
+        "-lvulkan"
+      ],
+      "binary_sha256": "4eccc5f0660712e51c0af3481beed234bfd42d60a27e2720f5edb73477d383e9",
+      "command": [
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/device-address"
+      ],
+      "returncode": 1,
+      "log": "address.log.gz",
+      "log_sha256": "1c16b03b44364a42629d35994db32ddde1ed3adf4c36df8e377139f135622c59",
+      "environment": {
+        "XDG_RUNTIME_DIR": "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/xdg-runtime",
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.json",
+        "ASAN_OPTIONS": "fast_unwind_on_malloc=0"
+      },
+      "compressed_log_sha256": "d3942857271702482f0490a4cde8bdf4a73a77d64361d8ea5ea923a10a0d2fa6"
+    },
+    {
+      "name": "address-private-bus",
+      "build": [
+        "gcc",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-g",
+        "-fsanitize=address",
+        "-fno-omit-frame-pointer",
+        "pancake/docs/p0-sanitizer-evidence/vulkan-device-probe.c",
+        "-o",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/device-address",
+        "-lvulkan"
+      ],
+      "binary_sha256": "4eccc5f0660712e51c0af3481beed234bfd42d60a27e2720f5edb73477d383e9",
+      "command": [
+        "dbus-run-session",
+        "--",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/device-address"
+      ],
+      "returncode": 1,
+      "log": "address-private-bus.log.gz",
+      "environment": {
+        "XDG_RUNTIME_DIR": "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/xdg-runtime",
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.json",
+        "ASAN_OPTIONS": "fast_unwind_on_malloc=0",
+        "VK_LOADER_DEBUG": "layer"
+      },
+      "removed_desktop_environment_keys": [
+        "DISPLAY",
+        "WAYLAND_DISPLAY",
+        "XAUTHORITY",
+        "DBUS_SESSION_BUS_ADDRESS",
+        "DBUS_STARTER_ADDRESS",
+        "DBUS_STARTER_BUS_TYPE",
+        "SESSION_MANAGER",
+        "AT_SPI_BUS_ADDRESS"
+      ],
+      "log_sha256": "94a5833dafad19e59e0c4e6d7cbb6d950436788f768410d1943196dbbe9b529f",
+      "compressed_log_sha256": "d11435cfe04d442f2775807586f9b73f56d6eef45a8b6258cbbb9487a0029155"
+    },
+    {
+      "name": "address-private-bus-no-implicit-layers",
+      "build": [
+        "gcc",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-g",
+        "-fsanitize=address",
+        "-fno-omit-frame-pointer",
+        "pancake/docs/p0-sanitizer-evidence/vulkan-device-probe.c",
+        "-o",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/device-address",
+        "-lvulkan"
+      ],
+      "binary_sha256": "4eccc5f0660712e51c0af3481beed234bfd42d60a27e2720f5edb73477d383e9",
+      "command": [
+        "dbus-run-session",
+        "--",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/device-address"
+      ],
+      "returncode": 1,
+      "log": "address-private-bus-no-implicit-layers.log.gz",
+      "environment": {
+        "XDG_RUNTIME_DIR": "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-gpu-asan-control/xdg-runtime",
+        "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.json",
+        "ASAN_OPTIONS": "fast_unwind_on_malloc=0",
+        "VK_LOADER_DEBUG": "layer",
+        "VK_LOADER_LAYERS_DISABLE": "~implicit~"
+      },
+      "removed_desktop_environment_keys": [
+        "DISPLAY",
+        "WAYLAND_DISPLAY",
+        "XAUTHORITY",
+        "DBUS_SESSION_BUS_ADDRESS",
+        "DBUS_STARTER_ADDRESS",
+        "DBUS_STARTER_BUS_TYPE",
+        "SESSION_MANAGER",
+        "AT_SPI_BUS_ADDRESS"
+      ],
+      "log_sha256": "3057ddf5b6bf278b9baf0a9d924785235eaa04c72ba2450eb6e75f92b943a4ad",
+      "compressed_log_sha256": "288245276742f7a321147aeba2cea90b3aa041881f1f47f6b483540e739ae070"
+    }
+  ],
+  "cleanup": {
+    "probe_binaries_present": [],
+    "owned_runtime_dir_present": false
+  }
+}
