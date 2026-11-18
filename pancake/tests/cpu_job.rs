@@ -214,3 +214,219 @@ fn wait_for_stack(worker: &mut StackWorker, generation: Generation) -> Result<St
     }
     Err("worker did not finish a tiny stack within ten seconds".to_owned())
 }
+
+/// Invalid observer paths preserve both the real export and every source.
+/// # Errors
+/// Returns fixture, execution, I/O or observer-diagnostic errors.
+#[test]
+fn observer_failures_leave_completed_exports_and_sources_intact() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let inputs = sources(directory.path())?;
+    let first = inputs.first().ok_or("first input missing")?;
+    let first_bytes = std::fs::read(first).map_err(|error| error.to_string())?;
+    let alias = directory.path().join("source-alias.jsonl");
+    std::fs::hard_link(first, &alias).map_err(|error| error.to_string())?;
+    let output = directory.path().join("export.png");
+    let missing = directory.path().join("missing").join("events.jsonl");
+    let expected = decode(first)?;
+    let observers: [(&Path, &str); 4] = [
+        (&alias, "aliases an input or export"),
+        (&output, "aliases an input or export"),
+        (directory.path(), "must be a regular file"),
+        (&missing, "cannot open completion observer"),
+    ];
+    for (observer, diagnostic) in observers {
+        let options = Options {
+            events_path: Some(observer.to_owned()),
+            ..Options::default()
+        };
+        let result =
+            run(request(&inputs, &output)?, &options, |_| {}).map_err(|error| error.to_string())?;
+        require(
+            result.warnings().len() == 1
+                && result
+                    .warnings()
+                    .iter()
+                    .all(|warning| warning.contains(diagnostic)),
+            &format!(
+                "unexpected observer diagnostic for {observer:?}: {:?}",
+                result.warnings()
+            ),
+        )?;
+        require(
+            decode(&output)?.samples() == expected.samples(),
+            "the exported result changed after an observer failure",
+        )?;
+        require(
+            std::fs::read(first).map_err(|error| error.to_string())? == first_bytes,
+            "observer failure modified source bytes",
+        )?;
+    }
+    Ok(())
+}
+
+/// A memory result can report its real transforms and append to an existing observer.
+/// # Errors
+/// Returns fixture, compute, JSON or provenance errors.
+#[test]
+fn memory_result_appends_complete_geometry_to_an_existing_observer() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let inputs = sources(directory.path())?;
+    let observer = directory.path().join("events.jsonl");
+    let prior = r#"{"event":"previous"}"#;
+    std::fs::write(&observer, format!("{prior}\n")).map_err(|error| error.to_string())?;
+    let config = JobConfig::new(
+        &inputs,
+        None,
+        JobSettings {
+            device: DevicePreference::Cpu,
+            method: Method::WeightedAverage,
+            quality_report: true,
+            ..JobSettings::default()
+        },
+    )?;
+    let options = Options {
+        events_path: Some(observer.clone()),
+        ..Options::default()
+    };
+    let result = run(config, &options, |_| {}).map_err(|error| error.to_string())?;
+    require(
+        result.warnings().is_empty()
+            && result.settings().quality_report
+            && result
+                .sharpness()
+                .is_some_and(|value| value.is_finite() && value >= 0.0),
+        "the in-memory result lost its quality observation",
+    )?;
+    require(
+        result.backend() == pancake::runtime::Backend::Cpu
+            && result.canvas() == result.crop()
+            && result.source_transform(2).is_none(),
+        "the in-memory result lost its backend or first-frame canvas",
+    )?;
+    let log = std::fs::read_to_string(observer).map_err(|error| error.to_string())?;
+    let mut lines = log.lines();
+    require(
+        lines.next() == Some(prior),
+        "the previous observer record changed",
+    )?;
+    let current = lines.next().ok_or("the observer record is missing")?;
+    require(
+        lines.next().is_none(),
+        "the job emitted multiple completion records",
+    )?;
+    let event: serde_json::Value =
+        serde_json::from_str(current).map_err(|error| error.to_string())?;
+    let geometry = event
+        .get("alignment_transforms")
+        .and_then(serde_json::Value::as_object)
+        .ok_or("runtime event omitted original source transforms")?;
+    let sequential = event
+        .get("sequential_transforms")
+        .and_then(serde_json::Value::as_array)
+        .ok_or("runtime event omitted sequential transforms")?;
+    let identity_rows: [[f32; 3]; 2] = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]];
+    let identity = serde_json::json!(identity_rows);
+    require(
+        geometry.len() == inputs.len()
+            && sequential.len() == inputs.len()
+            && sequential.iter().all(|transform| transform == &identity),
+        "unaligned processing reported an invalid transform layout",
+    )?;
+    for path in result.sources() {
+        let source = path.to_str().ok_or("fixture path must be valid UTF-8")?;
+        require(
+            geometry.get(source) == Some(&identity),
+            "completion geometry does not reference the real source in its original canvas",
+        )?;
+    }
+    Ok(())
+}
+
+/// Reject an undersized runtime budget before replacing any previously exported file.
+/// # Errors
+/// Returns fixture, execution or preservation errors.
+#[test]
+fn insufficient_runtime_budget_preserves_previous_output() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let inputs = sources(directory.path())?;
+    let output = directory.path().join("previous.png");
+    let observer = directory.path().join("events.jsonl");
+    let previous = b"previous output sentinel";
+    std::fs::write(&output, previous).map_err(|error| error.to_string())?;
+    let options = Options {
+        working_bytes: 1,
+        events_path: Some(observer.clone()),
+        ..Options::default()
+    };
+    let control = JobControl::new(Generation::from_counter(1), inputs.len())?;
+    let failure = run_controlled(request(&inputs, &output)?, &options, &control, |_| {})
+        .err()
+        .ok_or("undersized runtime budget unexpectedly succeeded")?;
+    require(
+        matches!(failure, JobError::Failed(message) if message.contains("job budget")),
+        "runtime budget failure lacked its real reason",
+    )?;
+    require(
+        control.snapshot()?.state == JobState::Failed
+            && !observer.exists()
+            && std::fs::read(output).map_err(|error| error.to_string())? == previous,
+        "failure changed the output or reported completion",
+    )
+}
+
+/// A failed generation can be consumed once, followed by normal work on the same thread.
+/// # Errors
+/// Returns invalid fixtures, broken worker reuse or output preservation errors.
+#[test]
+fn worker_reports_a_failed_generation_and_accepts_recovery() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let inputs = sources(directory.path())?;
+    let repaired = inputs.last().ok_or("last source missing")?;
+    let original = std::fs::read(repaired).map_err(|error| error.to_string())?;
+    let output = directory.path().join("previous.png");
+    let previous = b"previous output sentinel";
+    std::fs::write(&output, previous).map_err(|error| error.to_string())?;
+    std::fs::write(repaired, b"corrupt raster").map_err(|error| error.to_string())?;
+    let mut worker = StackWorker::new(Options::default())?;
+    require(
+        worker.snapshot()?.is_none() && !worker.cancel(Generation::from_counter(0))?,
+        "an empty worker accepted a stale cancellation",
+    )?;
+    let failed = worker.start(request(&inputs, &output)?)?;
+    let diagnostic = wait_for_stack(&mut worker, failed)
+        .err()
+        .ok_or("worker accepted a corrupt source")?;
+    require(
+        diagnostic.contains("frame-b.png")
+            && worker
+                .snapshot()?
+                .is_some_and(|snapshot| snapshot.state == JobState::Failed)
+            && worker.take_result(failed)?.is_none()
+            && std::fs::read(&output).map_err(|error| error.to_string())? == previous,
+        "failed generation lost diagnostics or changed the previous export",
+    )?;
+
+    std::fs::write(repaired, original).map_err(|error| error.to_string())?;
+    let recovered = worker.start(request(&inputs, &output)?)?;
+    require(
+        failed != recovered && !worker.resume(failed)?,
+        "stale control reached recovery",
+    )?;
+    let complete = wait_for_stack(&mut worker, recovered)?;
+    let expected = decode(inputs.first().ok_or("first input missing")?)?;
+    require(
+        decode(&output)?.samples() == expected.samples()
+            && complete.backend() == pancake::runtime::Backend::Cpu,
+        "recovery did not publish the actual stack",
+    )?;
+    worker.shutdown()?;
+    let closed = worker
+        .start(request(&inputs, &output)?)
+        .err()
+        .ok_or("shut-down worker accepted another request")?;
+    require(
+        closed.contains("shut down"),
+        "closed worker reported the wrong error",
+    )
+}
