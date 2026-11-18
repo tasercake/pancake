@@ -1,0 +1,136 @@
+{
+  "scope": "First warm actual RGB16 pair. Descriptive quality metrics with no fitted transform, resampling or new threshold.",
+  "published_first_frame_canvas_ltrb": {
+    "reference": [
+      8,
+      16,
+      2296,
+      1712
+    ],
+    "candidate": [
+      87,
+      99,
+      2217,
+      1629
+    ]
+  },
+  "geometry_provenance": {
+    "reference": "Reference diagnostic crop event plus matching first warm output geometry",
+    "candidate": "Candidate original canvas and observed width and height; auto-crop uses symmetric borders"
+  },
+  "same_output_geometry": false,
+  "shared_first_frame_extent_ltrb": [
+    87,
+    99,
+    2217,
+    1629
+  ],
+  "shared_extent_coverage_first_source": 0.8185492621527778,
+  "shared_extent_rgb": {
+    "samples": 9776700,
+    "mae_u16": 3220.3432309470477,
+    "rms_u16": 4805.347733576452,
+    "max_u16": 41171,
+    "changed_sample_fraction": 0.9997998302085571,
+    "signed_channel_mean_u16": [
+      -359.94789131301974,
+      -880.8385212801866,
+      -1181.9648126668508
+    ]
+  },
+  "focus_regions_selection": "Four distinct 192px tiles with the highest reference absolute luma Laplacian 90th percentile on a fixed non-overlapping grid; common source coordinates.",
+  "focus_regions": [
+    {
+      "source_xywh": [
+        1271,
+        131,
+        192,
+        192
+      ],
+      "rgb": {
+        "samples": 110592,
+        "mae_u16": 3559.066912615741,
+        "rms_u16": 4601.598852238822,
+        "max_u16": 25825,
+        "changed_sample_fraction": 0.9998824508101852,
+        "signed_channel_mean_u16": [
+          134.63091362847223,
+          -233.75754123263889,
+          -1293.6710611979167
+        ]
+      },
+      "reference_luma_laplacian_absolute_p90": 0.09694561135271212,
+      "candidate_luma_laplacian_absolute_p90": 0.06840959182116468,
+      "candidate_reference_ratio": 0.7056491868649284
+    },
+    {
+      "source_xywh": [
+        1079,
+        515,
+        192,
+        192
+      ],
+      "rgb": {
+        "samples": 110592,
+        "mae_u16": 3683.85265661169,
+        "rms_u16": 4906.889171163387,
+        "max_u16": 23699,
+        "changed_sample_fraction": 0.9999547887731481,
+        "signed_channel_mean_u16": [
+          -1244.9019639756943,
+          -2448.7820638020835,
+          -2076.9373643663193
+        ]
+      },
+      "reference_luma_laplacian_absolute_p90": 0.08835201342793912,
+      "candidate_luma_laplacian_absolute_p90": 0.061018019684138135,
+      "candidate_reference_ratio": 0.6906239859933142
+    },
+    {
+      "source_xywh": [
+        1271,
+        515,
+        192,
+        192
+      ],
+      "rgb": {
+        "samples": 110592,
+        "mae_u16": 3350.728343822338,
+        "rms_u16": 4316.950674729471,
+        "max_u16": 20438,
+        "changed_sample_fraction": 0.9999276620370371,
+        "signed_channel_mean_u16": [
+          -930.3519694010416,
+          -1927.3615180121528,
+          -2150.672661675347
+        ]
+      },
+      "reference_luma_laplacian_absolute_p90": 0.08149466453040333,
+      "candidate_luma_laplacian_absolute_p90": 0.0558936662851914,
+      "candidate_reference_ratio": 0.6858567564793039
+    },
+    {
+      "source_xywh": [
+        1079,
+        899,
+        192,
+        192
+      ],
+      "rgb": {
+        "samples": 110592,
+        "mae_u16": 2884.9220920138887,
+        "rms_u16": 3949.9538880565983,
+        "max_u16": 21725,
+        "changed_sample_fraction": 0.9998281973379629,
+        "signed_channel_mean_u16": [
+          -1558.4361436631943,
+          -2009.8113606770833,
+          -914.5430230034722
+        ]
+      },
+      "reference_luma_laplacian_absolute_p90": 0.08113568291752489,
+      "candidate_luma_laplacian_absolute_p90": 0.056304029907682615,
+      "candidate_reference_ratio": 0.6939490478550127
+    }
+  ]
+}

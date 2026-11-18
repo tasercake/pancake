@@ -1,0 +1,21 @@
+2026-11-18T13:41:43+08:00
+Linux krishna-desktop 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+MemAvailable:   47121472 kB
+SwapFree:         195304 kB
+NVIDIA GeForce RTX 3090, 580.178.04, P2, 2 %, 674 MiB, 67
+Processes at the coordinated CPU timing handoff
+    PID %CPU %MEM COMMAND
+1453161  3.7  0.0 sccache
+   6487  1.8  0.4 kube-apiserver
+   5842  1.1  0.1 kubelet
+   6467  1.0  0.0 etcd
+1285673  0.8  0.6 brave
+   6474  0.7  0.1 kube-controller
+   5547  0.6  0.3 steam
+1547881  0.5  0.4 MainThread
+   4933  0.5  0.0 containerd
+ 104712  0.4  0.6 brave
+   5644  0.4  0.0 bitwarden-app
+1285170  0.4  0.4 brave
+ 104627  0.4  3.5 codex
+ 104104  0.4  0.6 ChatGPT
