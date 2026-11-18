@@ -1,0 +1,80 @@
+//! Read packed RGB produced by the unchanged Python fixture generator.
+
+use std::path::Path;
+use pancake::registration::{Affine, Frame, Model, estimate_pair, symmetric_crop, thumbnail};
+
+/// Read a packed little-endian f32 oracle.
+fn data(path: &Path) -> Result<Vec<f32>, String> {
+    let bytes = std::fs::read(path).map_err(|error| error.to_string())?;
+    let (samples, tail) = bytes.as_chunks::<4>();
+    if !tail.is_empty() {
+        return Err("invalid float oracle".to_owned());
+    }
+    Ok(samples.iter().map(|&value| f32::from_le_bytes(value)).collect())
+}
+
+/// Compare five real fixture families on one physical backend.
+fn run(device: &cubecl::Device, root: &Path) -> Result<(), String> {
+    for (name,model) in [("translation",Model::Translation),("rotation",Model::Euclidean),("similarity",Model::Similarity),("affine",Model::Affine),("breathing",Model::Breathing)] {
+        let path = root.join(name);
+        let expected = data(&path.join("expected.f32"))?;
+        let (maps, _) = expected.as_chunks::<6>();
+        let truth = maps.iter().map(|&[a,b,c,d,e,f]| Affine::from_matrix([[a,b,c],[d,e,f]])).collect::<Result<Vec<_>,_>>()?;
+        let frames = (0_usize..4).map(|index| {
+            let pixels = data(&path.join(format!("{index}.f32")))?;
+            thumbnail(device, Frame::new(321,257,&pixels)?,321,257,16_777_216)
+        }).collect::<Result<Vec<_>,String>>()?;
+        let mut maxima = [0.0_f32;3];
+        let mut first_maps = Vec::new();
+        for (anchor,limit) in [(0,0),(2,1),(0,2)] {
+            let mut acc = Affine::IDENTITY;
+            for (index,source) in frames.iter().enumerate() {
+                let current = if limit == 2 { index.saturating_sub(1) } else {anchor};
+                let estimated = if current == index { Affine::IDENTITY } else {
+                    estimate_pair(device,&frames[current],source,model,0.03,false)?.transform
+                };
+                let estimated = if limit == 2 { estimated.compose(acc)? } else { estimated };
+                acc = estimated;
+                let truth = truth[index].compose(truth[anchor].inverse()?)?;
+                let [[a,b,c],[d,e,f]] = estimated.matrix();
+                let [[g,h,i],[j,k,l]] = truth.matrix();
+                for [x,y] in [[0.0,0.0],[320.0,0.0],[0.0,256.0],[320.0,256.0],[160.0,128.0]] {
+                    maxima[limit]=maxima[limit].max(((a-g)*x+(b-h)*y+c-i).abs()).max(((d-j)*x+(e-k)*y+f-l).abs());
+                }
+                if limit == 0 { first_maps.push(estimated); }
+            }
+        }
+        let crop=symmetric_crop(321,257,&first_maps)?;
+        println!("{name} max_error:first/middle/previous = {maxima:?}, crop = [{},{},{},{}]",crop.x(),crop.y(),crop.width(),crop.height());
+        if maxima.into_iter().any(|error| error > 1.0) || (name=="translation" && (maxima[0]>0.3 || !(4..=5).contains(&crop.x()) || !(2..=4).contains(&crop.y()))) {
+            return Err(format!("geometry mismatch for {name}"));
+        }
+    }
+    for name in ["deep","deep_nonrepeating"]{
+        let dir=root.join(name);
+        let frames=(0_usize..9).map(|index| {
+            let pixels=data(&dir.join(format!("{index}.f32")))?;
+            thumbnail(device,Frame::new(99,65,&pixels)?,99,65,2_097_152)
+        }).collect::<Result<Vec<_>,String>>()?;
+        let mut accepted=0usize;
+        for pair in frames.windows(2) {
+            let result=estimate_pair(device,&pair[0],&pair[1],Model::Breathing,0.03,false)?;
+            accepted+=usize::from(result.transform != Affine::IDENTITY);
+        }
+        println!("{name} non-identity motions: {accepted}");
+        if accepted != 0 { return Err(format!("false motion detected for {name}")) }
+    }
+    Ok(())
+}
+
+/// Dispatch the same fixture oracle to the selected runtime.
+fn main() -> Result<(),String> {
+    let runtime=std::env::args().nth(1).ok_or("specify cpu or vulkan")?;
+    let device=match runtime.as_str() {
+        "cpu"=>cubecl::Device::cpu(),
+        "vulkan"=>cubecl::Device::vulkan(cubecl::device::WgpuDeviceKind::DiscreteGpu(0)),
+        other=>return Err(format!("unknown runtime {other}")),
+    }.map_err(|error| error.to_string())?;
+    println!("Runtime identity: {:?}",device.client().properties().identity);
+    run(&device,Path::new("../artifacts/p5/oracles"))
+}

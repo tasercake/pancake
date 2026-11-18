@@ -1,0 +1,11 @@
+running 1 test
+test cpu_registration_geometry ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+
+     Running tests/gpu_registration_contract.rs (target/debug/build/pancake/4586399206bb4ac8/out/gpu_registration_contract-4586399206bb4ac8)
+
+running 1 test
+test gpu_registration_geometry ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s

@@ -1,0 +1,8 @@
+Runtime identity: DeviceIdentity { name: "NVIDIA GeForce RTX 3090", fingerprint: "spirv_4318_8708", physical: Some(PhysicalDevice { pci_address: Some(PciAddress { domain: 0, bus: 1, device: 0, function: 0 }), luid: None, registry_entry_id: None, vendor: Some(Nvidia) }) }
+translation max_error:first/middle/previous = [0.001991421, 0.0032832623, 0.0020446181], crop = [5,3,311,251]
+rotation max_error:first/middle/previous = [0.014623165, 0.007579446, 0.018668652], crop = [7,6,307,245]
+similarity max_error:first/middle/previous = [0.011012971, 0.014960796, 0.012659669], crop = [6,5,309,247]
+affine max_error:first/middle/previous = [0.06295079, 0.052865416, 0.078270674], crop = [5,4,311,249]
+breathing max_error:first/middle/previous = [0.016734064, 0.013195604, 0.008209169], crop = [6,5,309,247]
+deep non-identity motions: 0
+deep_nonrepeating non-identity motions: 0
