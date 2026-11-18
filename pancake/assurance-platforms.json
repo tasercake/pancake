@@ -16,7 +16,7 @@
     "src/fusion/advanced/levels.rs": "dc8ed6142a69b749fb14f8b15e9307f49d91ab4d221844a3866829fa0e8bd7ca",
     "src/fusion/advanced/mod.rs": "45cf7ff3947b02641dfe0f1ba1cdea26cbd3a2402cd8579c419c1db6eeb56a85",
     "src/fusion/advanced/plan.rs": "8c8654707f5b090f1c529d564ca75cf08002381d2e46320ab61cc1e8b0629c28",
-    "src/fusion/advanced/pyramid.rs": "abb4f0cd5158688f04b7a5343026b2a528c02589d95975a80994cffd8977ec6a",
+    "src/fusion/advanced/pyramid.rs": "8d3edd8635095ca4ac1c2ef387b46aeaf1a37ea577f78de102367ca7c207221a",
     "src/fusion/advanced/tests.rs": "065a7b06b88b22a084f3cf235c7f5c939a1f3ae6eb7fa9b309838281667e4607",
     "src/fusion/advanced/weights.rs": "259feea88ddec7c51ce655f610997dae4ed08f2632c9aedcfdb1a88d12d62709",
     "src/fusion/buffers.rs": "f4e6c9db6f9ef230f4585e6e2b8994be4f4d79c61c5e7861f60d6dfebe5147b4",
