@@ -49,6 +49,8 @@ pub struct RgbImage {
     sample_encoding: SampleEncoding,
     /// Embedded profile, retained as metadata without implicit color conversion.
     icc_profile: Option<Vec<u8>>,
+    /// Whether this raster preserves a truly two-dimensional numeric array.
+    grayscale_array: bool,
 }
 
 impl RgbImage {
@@ -65,6 +67,7 @@ impl RgbImage {
             samples,
             sample_encoding: SampleEncoding::Float,
             icc_profile: None,
+            grayscale_array: false,
         })
     }
 
@@ -96,6 +99,20 @@ impl RgbImage {
     #[must_use]
     pub const fn sample_encoding(&self) -> SampleEncoding {
         self.sample_encoding
+    }
+
+    /// Whether a two-dimensional numeric array supplied the channel layout.
+    #[must_use]
+    pub const fn is_grayscale_array(&self) -> bool {
+        self.grayscale_array
+    }
+
+    /// Preserve a two-dimensional array's one-channel representation.
+    ///
+    /// The original samples or all inputs to the resulting frame must come
+    /// from grayscale arrays. Working pixels remain interleaved RGB.
+    pub(crate) const fn mark_grayscale_array(&mut self) {
+        self.grayscale_array = true;
     }
 
     /// The original embedded ICC profile when the format supplied one.

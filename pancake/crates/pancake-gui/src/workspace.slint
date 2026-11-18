@@ -195,12 +195,16 @@ export component Workspace inherits Window {
     in-out property <string> kernel-size: "3";
     in-out property <string> pyramid-levels: "4";
     in-out property <string> scale-factor: "6";
-    in property <string> error-message;
+    in-out property <string> error-message;
 
     // These models hold actual files and finished results provided by the host.
     in property <[string]> frames;
     in property <[string]> results;
     in property <bool> running;
+    in property <bool> can-pause;
+    in property <bool> can-resume;
+    in property <bool> can-cancel;
+    in property <string> stack-status: "Idle";
     in property <image> preview;
 
     in property <int> preview-width;
@@ -212,13 +216,21 @@ export component Workspace inherits Window {
     in property <image> comparison-preview;
     in property <int> selected-source: -1;
     in property <string> selected-result-method;
+    in property <int> selected-result: -1;
     property <bool> has-preview: root.preview-width > 0 && root.preview-height > 0;
 
     callback save-preferences(string, string);
     callback select-source(int);
+    callback select-result(int);
+    callback import-files();
+    callback import-folder();
+    callback remove-sources(int);
+    callback pause();
+    callback resume();
+    callback cancel();
     callback close-request();
     callback stack();
-    callback export-result();
+    callback export-save(int, int);
 
     property <[string]> themes: ["Light", "Dark"];
     property <[string]> devices: ["Automatic", "CPU", "GPU"];
@@ -229,6 +241,9 @@ export component Workspace inherits Window {
     property <bool> inspector-visible: true;
     property <bool> advanced-visible: false;
     property <bool> compare: false;
+    property <bool> all-selected: false;
+    property <int> export-format-index: 2;
+    property <int> export-depth-index: 1;
 
     changed theme-index => {
         root.update-theme();
@@ -270,6 +285,18 @@ export component Workspace inherits Window {
                     text: "Pancake";
                     font-size: 18px;
                     height: 34px;
+                }
+                Button {
+                    text: "Open files…";
+                    accessible-id: "import.files";
+                    enabled: !root.running;
+                    clicked => { root.import-files(); }
+                }
+                Button {
+                    text: "Open folder…";
+                    accessible-id: "import.folder";
+                    enabled: !root.running;
+                    clicked => { root.import-folder(); }
                 }
                 Rectangle { horizontal-stretch: 1; }
                 Button {
@@ -313,6 +340,25 @@ export component Workspace inherits Window {
                         accessible-id: "frames.count";
                         color: Palette.foreground;
                     }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        Button {
+                            text: "Select all";
+                            accessible-id: "frames.select_all";
+                            enabled: root.frames.length > 0 && !root.running;
+                            checkable: true;
+                            checked <=> root.all-selected;
+                        }
+                        Button {
+                            text: "Remove";
+                            accessible-id: "frames.remove_selected";
+                            enabled: root.frames.length > 0 && (root.all-selected || root.selected-source >= 0) && !root.running;
+                            clicked => {
+                                root.remove-sources(root.all-selected ? -1 : root.selected-source);
+                                root.all-selected = false;
+                            }
+                        }
+                    }
                     ScrollView {
                         VerticalLayout {
                             spacing: 4px;
@@ -320,8 +366,28 @@ export component Workspace inherits Window {
                             for name[index] in root.frames: Button {
                                 text: name;
                                 accessible-id: "frame.\{index}";
-                                primary: root.selected-source == index;
-                                clicked => { root.select-source(index); }
+                                primary: root.all-selected || root.selected-source == index;
+                                clicked => {
+                                    root.all-selected = false;
+                                    root.compare = false;
+                                    root.select-source(index);
+                                }
+                            }
+                        }
+                    }
+                    if root.results.length > 0: Rectangle {
+                        accessible-id: "results";
+                        accessible-role: groupbox;
+                        accessible-label: "Retained results";
+                        VerticalLayout {
+                            spacing: 4px;
+                            SectionLabel { text: "Results"; }
+                            Text { text: "\{root.results.length}"; accessible-id: "results.count"; color: Palette.foreground; }
+                            for label[index] in root.results: Button {
+                                text: label;
+                                primary: root.selected-result == index;
+                                accessible-id: "result.\{index}";
+                                clicked => { root.select-result(index); }
                             }
                         }
                     }
@@ -362,7 +428,7 @@ export component Workspace inherits Window {
                         Button {
                             text: "Compare";
                             accessible-id: "mode.compare";
-                            enabled: root.results.length > 0 && root.frames.length > 0;
+                            enabled: root.selected-result >= 0 && root.frames.length > 0;
                             checkable: true;
                             checked: root.compare;
                             clicked => { root.compare = true; }
@@ -377,16 +443,22 @@ export component Workspace inherits Window {
                         Button {
                             text: "Export";
                             accessible-id: "export.start";
-                            enabled: root.results.length > 0;
-                            clicked => { root.export-result(); }
+                            enabled: root.selected-result >= 0 && !root.running;
+                            clicked => { root.page = "export"; }
                         }
                     }
                 }
-                if root.error-message != "": Text {
-                    text: root.error-message;
-                    wrap: word-wrap;
-                    color: Palette.foreground;
-                    accessible-id: "workflow.error";
+                if root.error-message != "": Rectangle {
+                    background: Palette.alternate-background;
+                    accessible-id: "dialog.error";
+                    accessible-role: groupbox;
+                    accessible-label: "Pancake error";
+                    HorizontalLayout {
+                        padding: 10px;
+                        spacing: 8px;
+                        Text { text: root.error-message; wrap: word-wrap; color: Palette.foreground; }
+                        Button { text: "Dismiss"; accessible-id: "dialog.accept"; clicked => { root.error-message = ""; } }
+                    }
                 }
             }
             if root.inspector-visible: Rectangle {
@@ -441,12 +513,69 @@ export component Workspace inherits Window {
                         value <=> root.scale-factor;
                     }
                     Rectangle { vertical-stretch: 1; }
+                    Text {
+                        text: root.stack-status;
+                        color: Palette.foreground;
+                        accessible-id: "stack.status";
+                        accessible-label: root.stack-status;
+                    }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        Button { text: "Pause"; accessible-id: "stack.pause"; enabled: root.can-pause; clicked => { root.pause(); } }
+                        Button { text: "Resume"; accessible-id: "stack.resume"; enabled: root.can-resume; clicked => { root.resume(); } }
+                        Button { text: "Stop"; accessible-id: "stack.stop"; enabled: root.can-cancel; clicked => { root.cancel(); } }
+                    }
                     Button {
                         text: "Start stack";
                         primary: true;
                         accessible-id: "stack.start";
                         enabled: root.frames.length > 1 && !root.running;
                         clicked => { root.stack(); }
+                    }
+                }
+            }
+        }
+        if root.page == "export": VerticalLayout {
+            padding: 22px;
+            spacing: 12px;
+            alignment: start;
+            SectionLabel { text: "Export result"; }
+            HorizontalLayout {
+                spacing: 12px;
+                alignment: start;
+                Text { text: "Format"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
+                ComboBox {
+                    width: 205px;
+                    accessible-id: "export.format";
+                    accessible-label: self.current-value;
+                    model: ["PNG", "JPEG", "TIFF", "OpenEXR"];
+                    current-index <=> root.export-format-index;
+                }
+            }
+            HorizontalLayout {
+                spacing: 12px;
+                alignment: start;
+                Text { text: "Bit depth"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
+                ComboBox {
+                    width: 205px;
+                    accessible-id: "export.depth";
+                    accessible-label: self.current-value;
+                    model: ["8-bit", "16-bit"];
+                    current-index <=> root.export-depth-index;
+                    enabled: root.export-format-index == 0 || root.export-format-index == 2;
+                }
+            }
+            HorizontalLayout {
+                spacing: 8px;
+                alignment: start;
+                Button { text: "Cancel"; accessible-id: "dialog.cancel"; clicked => { root.page = "workspace"; } }
+                Button {
+                    text: "Continue…";
+                    accessible-id: "export.confirm";
+                    primary: true;
+                    clicked => {
+                        root.page = "workspace";
+                        root.export-save(root.export-format-index, root.export-depth-index);
                     }
                 }
             }

@@ -9,6 +9,7 @@ use slint_interpreter::{Compiler, ComponentDefinition, ComponentInstance, Value}
 
 use preferences::{Preferences, Store};
 
+pub mod panel;
 pub mod preferences;
 pub mod preview;
 mod session;
@@ -87,16 +88,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     )?;
     configure_preferences(&window)?;
     let paths: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
-    session::configure(&window, &paths)?;
-    let weak = window.as_weak();
-    window.set_callback("close-request", move |_| {
-        if let Err(error) = slint::quit_event_loop()
-            && let Some(window) = weak.upgrade()
-        {
-            show_error(&window, &error.to_string());
-        }
-        Value::Void
-    })?;
+    let _worker_poll = session::configure(&window, &paths, pancake::job::Options::from_env()?)?;
     window.run()?;
     Ok(())
 }

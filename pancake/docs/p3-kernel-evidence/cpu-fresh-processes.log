@@ -1,0 +1,95 @@
+CPU fresh process 1
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+
+CPU fresh process 2
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+CPU fresh process 3
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+CPU fresh process 4
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+
+CPU fresh process 5
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+CPU fresh process 6
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+
+CPU fresh process 7
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+
+CPU fresh process 8
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+CPU fresh process 9
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+
+CPU fresh process 10
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+CPU fresh process 11
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+CPU fresh process 12
+
+running 2 tests
+test cpu_fusion_and_resize ... ok
+test invalid_requests_do_not_produce_a_result ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s

@@ -267,7 +267,9 @@ fn centered_variance(input: &Tensor<u32>, output: &mut Tensor<f32>, width: usize
     output[ABSOLUTE_POS] = square_sum / f32::cast_from(width);
 }
 
-/// Validated settings and input discovery shared by both frontends.
 pub mod config;
-
 pub mod image_io;
+pub mod job;
+pub mod fusion;
+pub mod registration;
+pub mod runtime;
