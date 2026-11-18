@@ -254,3 +254,172 @@ fn forbids_source_aliases_even_during_commit() -> TestResult {
         "require format suffix",
     )
 }
+
+/// Retain original ICC bytes through each integer codec that accepts profiles.
+///
+/// # Errors
+/// Returns an encoding, decoding, or metadata preservation failure.
+#[test]
+fn profiled_exports_preserve_original_icc_bytes() -> TestResult {
+    use image::ImageEncoder;
+
+    let directory = tempfile::tempdir()?;
+    let input = directory.path().join("profiled-input.png");
+    let profile = include_bytes!("data/srgb.png.icc");
+    let source = fs::File::create(&input)?;
+    let mut encoder = image::codecs::png::PngEncoder::new(source);
+    encoder.set_icc_profile(profile.to_vec())?;
+    encoder.write_image(&[11, 49, 137], 1, 1, image::ExtendedColorType::Rgb8)?;
+    let frame = pancake::image_io::decode(&input)?;
+    for (name, depth) in [
+        ("metadata.png", BitDepth::Eight),
+        ("metadata.jpg", BitDepth::Eight),
+        ("metadata.tif", BitDepth::Eight),
+        ("metadata.tiff", BitDepth::Sixteen),
+    ] {
+        let path = directory.path().join(name);
+        export(&path, &frame, depth, 90, std::slice::from_ref(&input))?;
+        let restored = pancake::image_io::decode(&path)?;
+        if matches!(name, "metadata.tif" | "metadata.tiff") {
+            let mut independent = tiff::decoder::Decoder::new(fs::File::open(&path)?)?;
+            let read_back = independent.get_tag_u8_vec(tiff::tags::Tag::IccProfile);
+            require(
+                read_back
+                    .as_ref()
+                    .is_ok_and(|value| value == profile.as_slice()),
+                &format!(
+                    "{name} direct TIFF decoder could not read original profile: {read_back:?}"
+                ),
+            )?;
+            require(
+                (restored.width(), restored.height()) == (1, 1)
+                    && restored
+                        .samples()
+                        .iter()
+                        .copied()
+                        .zip(frame.samples())
+                        .all(|(decoded, source)| (decoded - source).abs() <= 1e-6),
+                &format!("{name} changed sample values or geometry when preserving ICC metadata"),
+            )?;
+        }
+        require(
+            restored.icc_profile() == Some(profile.as_slice()),
+            &format!("{name} did not preserve the embedded ICC bytes"),
+        )?;
+    }
+    Ok(())
+}
+
+/// A retained image can overwrite an unrelated export after its source is deleted.
+///
+/// # Errors
+/// Returns fixture errors, a blocked replacement, or a wrong decoded result.
+#[test]
+fn retained_image_can_publish_after_source_disappears() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let source = directory.path().join("old-source.png");
+    let destination = directory.path().join("current-result.png");
+    let frame = rgb16_frame()?;
+    fs::write(&source, b"source identity")?;
+    fs::write(&destination, b"old visible result")?;
+    let staged = prepare_export(
+        &destination,
+        &frame,
+        BitDepth::Sixteen,
+        90,
+        std::slice::from_ref(&source),
+    )?;
+    fs::remove_file(&source)?;
+    staged.publish()?;
+    require(
+        image::open(&destination)?.into_rgb16().into_raw() == RGB16,
+        "missing retained source blocked or changed the export",
+    )?;
+    require(
+        fs::read_dir(directory.path())?.count() == 1,
+        "publish leaked a staging file",
+    )
+}
+
+/// Publication failure at the commit boundary leaves the previous file intact.
+///
+/// # Errors
+/// Returns a staging setup failure or violation of atomic publication.
+#[cfg(unix)]
+#[test]
+fn losing_staging_before_publication_does_not_damage_destination() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let destination = directory.path().join("current-result.png");
+    fs::write(&destination, b"visible previous result")?;
+    let frame = rgb16_frame()?;
+    let staged = prepare_export(&destination, &frame, BitDepth::Sixteen, 90, &[])?;
+    let sibling = fs::read_dir(directory.path())?
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
+        .map(|entry| entry.path())
+        .find(|path| path != &destination)
+        .ok_or_else(|| io::Error::other("missing staged file"))?;
+    fs::remove_file(sibling)?;
+    let error = staged
+        .publish()
+        .err()
+        .ok_or_else(|| io::Error::other("publication succeeded with no staged file"))?;
+    require(
+        error.contains("current-result.png"),
+        &format!("missing destination diagnostic: {error}"),
+    )?;
+    require(
+        fs::read(&destination)? == b"visible previous result",
+        "unsuccessful publication replaced the previous result",
+    )?;
+    require(
+        fs::read_dir(directory.path())?.count() == 1,
+        "publication leaked staging",
+    )
+}
+
+/// Fail safely when a source's parent becomes a file, preserving the old export.
+///
+/// # Errors
+/// Returns a fixture setup or failed source alias inspection contract.
+#[cfg(unix)]
+#[test]
+fn source_inspection_error_preserves_existing_destination() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let parent = directory.path().join("source-parent");
+    let source = parent.join("source.png");
+    let destination = directory.path().join("current-result.png");
+    fs::create_dir(&parent)?;
+    fs::write(&source, b"current source")?;
+    fs::write(&destination, b"visible previous result")?;
+    let frame = rgb16_frame()?;
+    let staged = prepare_export(
+        &destination,
+        &frame,
+        BitDepth::Sixteen,
+        90,
+        std::slice::from_ref(&source),
+    )?;
+    fs::remove_file(&source)?;
+    fs::remove_dir(&parent)?;
+    fs::write(
+        &parent,
+        b"different object at the previous source directory",
+    )?;
+    let error = staged
+        .publish()
+        .err()
+        .ok_or_else(|| io::Error::other("source inspection should fail"))?;
+    require(
+        error.contains("cannot inspect input") && error.contains("source-parent"),
+        &format!("expected input inspection diagnostic: {error}"),
+    )?;
+    require(
+        fs::read(&destination)? == b"visible previous result",
+        "source inspection failure replaced the previous result",
+    )?;
+    require(
+        fs::read_dir(directory.path())?.count() == 2,
+        "alias inspection leaked staging",
+    )
+}

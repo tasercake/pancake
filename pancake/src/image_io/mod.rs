@@ -8,10 +8,11 @@ pub use export::{ExportFormat, PreparedExport, export, prepare_export};
 
 use std::ffi::OsStr;
 use std::fs::{self, File};
-use std::io::BufReader;
+use std::io::{BufReader, Seek};
 use std::path::Path;
 
 use image::{ColorType, DynamicImage, ImageDecoder, ImageFormat, ImageReader, Limits};
+use tiff::tags::{Tag, Type, ValueBuffer};
 
 /// Per-axis limit applied to supported format headers before raster decode.
 const MAX_AXIS: u32 = 32_768;
@@ -162,7 +163,8 @@ fn decode_file(path: &Path) -> Result<RgbImage, String> {
 ///
 /// Returns header-limit, malformed-raster, or conversion errors.
 fn decode_raster(input: File) -> Result<RgbImage, String> {
-    let mut reader = ImageReader::new(BufReader::new(input))
+    let mut stream = BufReader::new(input);
+    let mut reader = ImageReader::new(&mut stream)
         .with_guessed_format()
         .map_err(|error| error.to_string())?;
     let format = reader.format();
@@ -187,7 +189,34 @@ fn decode_raster(input: File) -> Result<RgbImage, String> {
     let profile = decoder.icc_profile().map_err(|error| error.to_string())?;
     let mut image = DynamicImage::from_decoder(decoder).map_err(|error| error.to_string())?;
     image.apply_orientation(orientation);
+    let profile = match (format, profile) {
+        (Some(ImageFormat::Tiff), None) => read_tiff_profile(&mut stream)?,
+        (_, profile) => profile,
+    };
     raster_to_rgb(image, format, profile)
+}
+
+/// Read optional TIFF ICC metadata using the native directory's bounded byte API.
+///
+/// The raster decoder can omit TIFF profiles even when the raw tag is valid.
+/// Keep the original bytes and never infer a different transfer curve.
+///
+/// # Errors
+/// Returns a stream seek or directory read error.
+fn read_tiff_profile(stream: &mut BufReader<File>) -> Result<Option<Vec<u8>>, String> {
+    stream.rewind().map_err(|error| error.to_string())?;
+    let mut decoder = tiff::decoder::Decoder::new(stream).map_err(|error| error.to_string())?;
+    let mut payload = ValueBuffer::empty(Type::UNDEFINED);
+    let found = decoder
+        .image_ifd()
+        .find_tag_buf(Tag::IccProfile, &mut payload)
+        .ok()
+        .flatten()
+        .is_some();
+    Ok(
+        (found && matches!(payload.data_type(), Type::BYTE | Type::UNDEFINED))
+            .then(|| payload.as_bytes().to_vec()),
+    )
 }
 
 /// Return a checked pixel count before allocating a buffer or reading samples.
