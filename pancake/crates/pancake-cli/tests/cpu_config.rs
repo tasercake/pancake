@@ -139,10 +139,16 @@ fn input_limits_bound_explicit_and_unique_paths() -> Result<(), Box<dyn Error>> 
     let first = directory.path().join("0.png");
     fs::write(&first, b"input")?;
     rejection(&vec![first.clone(); 16_385], "too many input path entries")?;
-    for index in 1..=4096_u16 {
+    for index in 1..4096_u16 {
         fs::hard_link(&first, directory.path().join(format!("{index}.png")))?;
     }
-    rejection(&[directory.path().join("*.png")], "exceeds 4096 distinct")
+    let arguments = [directory.path().join("*.png")];
+    let job = JobConfig::new(&arguments, None, JobSettings::default())?;
+    if job.inputs().len() != 4096 {
+        return Err("the exact file count limit must be admitted".into());
+    }
+    fs::hard_link(&first, directory.path().join("4096.png"))?;
+    rejection(&arguments, "exceeds 4096 distinct")
 }
 
 /// A trailing literal component may be absent under some wildcard-selected directories.

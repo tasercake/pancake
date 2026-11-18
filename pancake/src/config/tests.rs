@@ -86,6 +86,16 @@ fn settings_reject_invalid_values() -> Result<(), String> {
         ..defaults
     }
     .validate()?;
+    JobSettings {
+        kernel_size: 63,
+        pyramid_levels: 32,
+        scale_factor: 128,
+        slab_size: 4096,
+        slab_overlap: 4095,
+        quality: 100,
+        ..defaults
+    }
+    .validate()?;
     invalid_settings(defaults)
 }
 
@@ -129,6 +139,13 @@ fn invalid_settings(defaults: JobSettings) -> Result<(), String> {
                 ..defaults
             },
             "--quality",
+        ),
+        (
+            JobSettings {
+                max_scale_step: 0.0,
+                ..defaults
+            },
+            "--max-scale-step",
         ),
         (
             JobSettings {
