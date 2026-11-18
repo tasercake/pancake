@@ -140,11 +140,12 @@ duplicate exception keeps its original expiry.
 ## P7 native desktop graph
 
 The locked GUI crate adds Slint 1.19 with its safe interpreter, GTK 3.24 file
-panels on Linux, and rfd 0.18 native panels on macOS and Windows. The source
+panels and ATK accessibility on Linux, and rfd 0.18 native panels on macOS
+and Windows. The source
 patches for Rowan and spin_on remain active in the GUI graph. Detecting both
 toolkits in the same target or reaching either from the core or CLI fails
 the resolved-graph regression. Linux hosted builds provision `libgtk-3-dev`
-and check the selected GTK pkg-config minimum before compiling.
+and check the GTK 3.24 and ATK 2.34 pkg-config minimums before compiling.
 
 The desktop target union adds exact parent paths for existing duplicate
 versions, including GLib/Cairo bitflags, GTK/GLib proc-macro syntax, and rfd

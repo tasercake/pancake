@@ -39,15 +39,15 @@ class HeadlessDependenciesTests(unittest.TestCase):
 
     def test_gui_resolves_the_native_panel_for_each_release_platform(self):
         panels = {
-            "x86_64-unknown-linux-gnu": "gtk",
-            "aarch64-apple-darwin": "rfd",
-            "x86_64-pc-windows-msvc": "rfd",
+            "x86_64-unknown-linux-gnu": {"atk", "gtk"},
+            "aarch64-apple-darwin": {"rfd"},
+            "x86_64-pc-windows-msvc": {"rfd"},
         }
-        for target, panel in panels.items():
+        for target, native in panels.items():
             with self.subTest(target=target):
                 names = package_names("pancake-gui", target)
                 self.assertTrue({"pancake", "slint", "slint-interpreter"} <= names)
-                self.assertEqual(names & {"gtk", "rfd"}, {panel})
+                self.assertEqual(names & {"atk", "gtk", "rfd"}, native)
 
 
 if __name__ == "__main__":

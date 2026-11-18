@@ -102,5 +102,43 @@
     "archive": "graph-linux-miri.log.gz",
     "archive_sha256": "b5c87751be604601e5a03f8eb2cd94ebf1d4236bfaff2770bdaeeecafcb2063c",
     "raw_sha256": "178b88b89f1294fdb6a4a0724dcf855bc3dbd0d79ea324909c1a64d1d3b84cdc"
+  },
+  "combined_gui_replay": {
+    "product_revision": "f6442a1913288275772731e740c24501d6f08100",
+    "tested_revision": "cde2a9f2c68adc8d22172e73528d3deef2ea82a9",
+    "integrated_graph_revision": "3dc9bcf3c30605badea2f7b2ee2840075507b6c3",
+    "identical_input_paths": [
+      "pancake/Cargo.toml",
+      "pancake/Cargo.lock",
+      "pancake/src",
+      "pancake/crates",
+      "pancake/tests",
+      "pancake/dependency-policy.json"
+    ],
+    "lock_sha256": "b2fa570aaa2dbc0265d938f9cb4567c78fe6ca2a0b8c6acba7c98fc381ec7cf4",
+    "package_count": 868,
+    "exact_duplicate_skips": 38,
+    "existing_maintenance_reviews": 5,
+    "commands": {
+      "bash scripts/check.sh fast": {
+        "exit_status": 0,
+        "graph_and_policy_tests": 42,
+        "result": "PASS. All-feature workspace Clippy, private Rustdoc, formatting, ShellCheck and actionlint."
+      },
+      "bash scripts/check.sh deps": {
+        "exit_status": 0,
+        "dependency_policy_tests": 19,
+        "vendor_contract_tests": 7,
+        "result": "PASS. Advisories, bans and sources are clean with the exact reviews. All three manifests have no unused dependencies."
+      }
+    },
+    "archive": {
+      "path": "dependency-graph-combined-logs.tar.gz",
+      "sha256": "63dbfdf3434876bc30510a8603187b85c203a36052ec8c1853ac5847bc34a291",
+      "logs": {
+        "fast.log": "4ff7104f290de047b77a6816acfdd9b9609f2720ec351fc4a37478f34f5304b2",
+        "deps.log": "4f9763be709ad6ea3b0768d03ea334f369e885443de6ddd43755fcfd0255ccdb"
+      }
+    }
   }
 }
