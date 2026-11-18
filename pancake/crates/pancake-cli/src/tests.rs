@@ -11,7 +11,7 @@ use std::process::ExitCode;
 /// Panics if a failed write continues reporting the requested success code.
 #[test]
 fn inaccessible_diagnostic_stream() {
-    let mut closed = &mut [] as &mut [u8];
+    let mut closed: &mut [u8] = &mut [];
     let result = report(&mut closed, format_args!("actual error"), ExitCode::SUCCESS);
     assert_eq!(
         result,
