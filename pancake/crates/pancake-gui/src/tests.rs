@@ -1,7 +1,7 @@
 //! Render the embedded workspace through Slint's pinned software renderer.
 
 use std::error::Error;
-use std::rc::Rc;
+use std::rc::{Rc, Weak};
 
 use num_traits::ToPrimitive as _;
 use slint::platform::software_renderer::{MinimalSoftwareWindow, RepaintBufferType};
@@ -12,11 +12,14 @@ use slint::{
 use slint_interpreter::ComponentInstance;
 
 /// An offscreen window using the same renderer as the software desktop backend.
-struct Offscreen(Rc<MinimalSoftwareWindow>);
+struct Offscreen(Weak<MinimalSoftwareWindow>);
 
 impl Platform for Offscreen {
     fn create_window_adapter(&self) -> Result<Rc<dyn WindowAdapter>, PlatformError> {
-        Ok(self.0.clone())
+        let adapter = self.0.upgrade().ok_or_else(|| {
+            PlatformError::Other("The offscreen window is no longer available.".into())
+        })?;
+        Ok(adapter)
     }
 }
 
@@ -93,7 +96,9 @@ fn check_pixel(
 #[test]
 fn comparison_clips_source_to_left_of_split() -> Result<(), Box<dyn Error>> {
     let adapter = MinimalSoftwareWindow::new(RepaintBufferType::NewBuffer);
-    slint::platform::set_platform(Box::new(Offscreen(adapter.clone())))?;
+    // The window holds the Slint context, which owns this platform.
+    let platform_window = Rc::downgrade(&adapter);
+    slint::platform::set_platform(Box::new(Offscreen(platform_window.clone())))?;
     adapter.set_size(PhysicalSize::new(
         u32::try_from(WIDTH)?,
         u32::try_from(HEIGHT)?,
@@ -113,9 +118,13 @@ fn comparison_clips_source_to_left_of_split() -> Result<(), Box<dyn Error>> {
     // component reference while the window is visible.
     let hidden = workspace.hide().map_err(Box::<dyn Error>::from);
     drop(workspace);
+    drop(adapter);
     observed.and(hidden)?;
     if component.upgrade().is_some() {
         return Err("The closed comparison workspace is still retained.".into());
+    }
+    if platform_window.upgrade().is_some() {
+        return Err("The closed offscreen window is still retained.".into());
     }
     Ok(())
 }
