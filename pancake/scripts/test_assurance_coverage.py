@@ -61,6 +61,18 @@ class AssuranceCoverageTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("uncovered native branches", result.stderr)
 
+    def test_workspace_binary_regions_are_retained_in_cpu_assurance(self):
+        native = copy.deepcopy(self.report)
+        native["data"][0]["functions"].append({
+            "name": "cli_entry", "filenames": [str(self.root / "crates/pancake-cli/src/main.rs")],
+            "regions": [[1, 1, 2, 1, 1, 0, 0, 0]],
+        })
+        both = self.check(native, native)
+        self.assertEqual(both.returncode, 0, both.stderr)
+        missing = self.check(self.report, native)
+        self.assertNotEqual(missing.returncode, 0)
+        self.assertIn("native host regions absent from CPU coverage: crates/pancake-cli/src/main.rs", missing.stderr)
+
     def test_new_production_source_layout_requires_review(self):
         native = copy.deepcopy(self.report)
         native["data"][0]["functions"][0]["filenames"] = [str(self.root / "host.rs")]

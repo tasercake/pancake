@@ -3,13 +3,23 @@
   "canonical_miri_host": "Darwin",
   "required_ci_job": "nightly",
   "nightly": "nightly-2026-11-15",
-  "scope": "Five current pure-host library tests; OS-neutral checked shapes, budgets and readback validation. Not UI, JIT, GPU or transitive unsafe certification.",
+  "scope": "Pure host library validation: shapes, budgets, readback validation and shared job settings. CLI process, image codec and filesystem contracts use CPU integration tests. Miri does not certify UI, JIT, GPU or transitive native libraries.",
   "reviewed_files": {
-    "src/lib.rs": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
-    "src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f",
-    "Cargo.toml": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649",
-    "Cargo.lock": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b"
+    "Cargo.lock": "3ddbc2bdae9eff3e8a5284e09d614684a1145fb384a46c59ad307acf17ea34bf",
+    "Cargo.toml": "788dcaab9a99c949b20256abc84f80de10ccfdac0bb8ad9ad79e9d0b43b06368",
+    "crates/pancake-cli/Cargo.toml": "b161e3bf5f8a1bd2f8ef41cc0e447665c9ac521034230f2771d15fb766a8dffd",
+    "crates/pancake-cli/src/main.rs": "d49891af73dd8058ca046d8b841f15cce9738b2627afe6bebfb1d8082fd1deb7",
+    "crates/pancake-cli/src/tests.rs": "706708dfe172328478ade337b387aa6e271a23f38a4955913cc972afb601deab",
+    "src/config.rs": "d650b110722a19339b0aa7c9d987ae61e3e4ec1b582480fbfab5f1f36cd9f24f",
+    "src/config/paths.rs": "01611633d0ca1010c19411528e343d35bc6f958ceb35cf13c189c1dfaad22071",
+    "src/config/tests.rs": "8cb54d60ec52db6eef6b9085d22ea4712cf441e08a0ce7fd7dd6ba109ae65a6d",
+    "src/image_io/export.rs": "1104274e242452cc7586b2cf5bba38985333b83f5688cdec8bdf00a6722ad0c5",
+    "src/image_io/mod.rs": "309b671dc192fbed9b99692c79f5513c312988e0b5bd1105e556a78b6021c7e4",
+    "src/image_io/npy.rs": "832d684ef959fe4b887713d8c5eb72b0ddf1416879f12c1ce33497dc1a9ed4d2",
+    "src/image_io/raw.rs": "386df65954cfd5ef5b97e965f1da6d1b525a139ab8d434eb4b8ccc2c41ebb930",
+    "src/lib.rs": "704c42f183cefc7f735c526b4523640d345b7ba88d19c365c460f7ccda98833f",
+    "src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f"
   },
-  "linux_limit": "tiny-xlib 0.2.5 XLIB eager constructor calls Xlib::load and dlopen before test entry; pinned Miri does not support Linux dlopen.",
+  "linux_limit": "The P0 Slint/tiny-xlib eager constructor was removed from the headless core dependency graph. Canonical Darwin Miri remains required; no new Linux Miri qualification is assumed from the graph change.",
   "reopen": "Any changed or new production source or dependency resolution requires review. New OS-specific authored code invalidates cross-host coverage unless separately qualified. Required CI must execute canonical macOS Miri; a Linux local all result cannot substitute."
 }

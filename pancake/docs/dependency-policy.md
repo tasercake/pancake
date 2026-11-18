@@ -58,7 +58,8 @@ shared GPU/window crate; native runtime/interop tests are still required.
 
 ## Temporary maintenance notices
 
-Only the five reviewed **unmaintained** IDs below may receive exceptions. Other
+Only the five reviewed **unmaintained** IDs below may receive exceptions when
+the configured target graph requires them. Other
 advisories, including any new security issue for these crates, remain enforced.
 Cargo-deny ignores advisory IDs globally, so the helper additionally binds each ID
 to exact active package versions and their reviewed immediate parent paths.
@@ -106,6 +107,35 @@ The review expires on 2026-12-17 and remains bound to exact package versions,
 parent versions and declared requirements. No date/time dependency or upstream
 source was replaced here. A maintained replacement still needs compatible
 parsing/formatting, invalid-input, calendar and local-time behavior checks.
+
+### P1 headless dependency graph
+
+The workspace resolves the core and CLI without Slint or its window toolkits.
+The isolated P0 UI qualification preserves exact
+Slint and Slint Interpreter pins for the separate GUI consumer. The core retains the exact CubeCL and wgpu versions and selected backend features,
+including wgpu-hal's dynamic EGL/Wayland loader support. The graph regression
+checks both headless packages across supported targets. It accepts the low-level
+`wayland-sys` loader and rejects the Slint, winit, X11 and Wayland client graphs.
+
+Removing Slint makes the Chrono maintenance ignore and five cargo-deny skips
+unneeded for the headless target union. The affected skips are `getrandom`
+0.3.4, `glow` 0.17.0, `linux-raw-sys` 0.4.15, `rustix` 0.38.44 and
+`windows-sys` 0.52.0. The audit still checks dormant, Clippy-relevant version
+and parent edges. The previous Chrono review remains in the P0 ledger at
+`34dd609`; reuse requires an active target graph with unchanged reviewed
+versions and relationships before the original expiry.
+
+Bounded image diagnostics activate a new Chrono consumer in Rawler. The exact
+maintenance review records Rawler 0.8.0's date and metadata calls and retains the
+original expiry. This does not restore the Slint paths to the headless graph.
+The codec graph also adds reviewed container, parser and compression generations
+to the exact duplicate ledger. The pinned Cargo-deny target union finishes with
+advisories, bans and sources checked with warnings denied.
+
+Clap 4.6.8 adds a reviewed compile-time parent to the existing `syn` 3.0.10
+duplicate entry. Clap's derive proc macro parses Rust input and generates the
+CLI parser. All `syn` ASTs stay within their own proc-macro expansions. The
+duplicate exception keeps its original expiry.
 
 ## Unused dependencies
 

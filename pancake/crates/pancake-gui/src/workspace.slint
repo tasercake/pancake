@@ -30,6 +30,154 @@ component Parameter inherits HorizontalLayout {
     }
 }
 
+// Read-only native state and rendered geometry share the same bindings.
+component ViewCanvas inherits Rectangle {
+    in property <image> primary-image;
+    in property <int> image-width;
+    in property <int> image-height;
+    in property <int> image-x;
+    in property <int> image-y;
+    in property <int> frame-width: image-width;
+    in property <int> frame-height: image-height;
+    in property <int> selected-source: -1;
+    in property <image> comparison-image;
+    in property <bool> comparing;
+    in property <string> result-method: "";
+    callback next-source(int);
+
+    property <bool> has-image: root.image-width > 0 && root.image-height > 0;
+    property <bool> fit-mode: true;
+    property <float> fit-scale: root.has-image
+        ? min(root.width / (root.frame-width * 1px), root.height / (root.frame-height * 1px))
+        : 1;
+    property <float> detail-scale: 1;
+    out property <float> zoom: root.fit-mode ? root.fit-scale : root.detail-scale;
+    property <float> manual-x: 0;
+    property <float> manual-y: 0;
+    property <float> center-x: root.fit-mode ? root.frame-width / 2 : root.manual-x;
+    property <float> center-y: root.fit-mode ? root.frame-height / 2 : root.manual-y;
+    property <float> initial-x;
+    property <float> initial-y;
+    property <float> split: 0.5;
+    property <length> picture-x: root.width / 2 - root.center-x * root.zoom * 1px;
+    property <length> picture-y: root.height / 2 - root.center-y * root.zoom * 1px;
+
+    clip: true;
+    background: #141619;
+    accessible-role: image;
+    accessible-id: "viewer";
+    accessible-label: "Image viewer";
+    accessible-description:
+        "{\"has_image\":\{root.has-image ? "true" : "false"},"
+        + "\"zoom\":\{root.zoom},\"center\":[\{root.center-x},\{root.center-y}],"
+        + "\"compare\":\{root.comparing ? "true" : "false"},\"split\":\{root.split},"
+        + "\"fit\":\{root.fit-mode ? "true" : "false"},"
+        + "\"source_index\":\{root.selected-source < 0 ? "null" : "\{root.selected-source + 1}"},"
+        + "\"result_method\":\"\{root.result-method}\"}";
+
+    public function fit-image() {
+        root.fit-mode = true;
+        root.focus-viewer();
+    }
+
+    function focus-viewer() {
+        viewer-keys.focus();
+    }
+
+    public function set-zoom(scale: float) {
+        root.manual-x = root.center-x;
+        root.manual-y = root.center-y;
+        root.fit-mode = false;
+        root.detail-scale = max(0.01, min(256, scale));
+        root.focus-viewer();
+    }
+
+    Image {
+        x: root.picture-x + root.image-x * root.zoom * 1px;
+        y: root.picture-y + root.image-y * root.zoom * 1px;
+        width: root.image-width * root.zoom * 1px;
+        height: root.image-height * root.zoom * 1px;
+        source: root.primary-image;
+        image-fit: fill;
+        accessible-role: none;
+    }
+    if root.comparing: Rectangle {
+        width: root.width * root.split;
+        height: root.height;
+        clip: true;
+        Image {
+            x: root.picture-x;
+            y: root.picture-y;
+            width: root.frame-width * root.zoom * 1px;
+            height: root.frame-height * root.zoom * 1px;
+            source: root.comparison-image;
+            image-fit: fill;
+            accessible-role: none;
+        }
+    }
+    if root.comparing: Rectangle {
+        x: root.width * root.split;
+        y: 0;
+        width: 2px;
+        height: root.height;
+        background: #e6ebf0;
+    }
+    if !root.has-image: Text {
+        width: parent.width;
+        y: (parent.height - self.height) / 2;
+        text: "No image to preview";
+        color: #b2b8c1;
+        horizontal-alignment: center;
+    }
+
+    viewer-keys := FocusScope {
+        key-pressed(event) => {
+            if !root.has-image { return reject; }
+            if event.text == Key.RightArrow {
+                root.next-source(1);
+                return accept;
+            }
+            if event.text == Key.LeftArrow {
+                root.next-source(-1);
+                return accept;
+            }
+            if event.text == "+" || event.text == "=" {
+                root.set-zoom(root.zoom * 1.35);
+                return accept;
+            }
+            if event.text == "-" {
+                root.set-zoom(root.zoom / 1.35);
+                return accept;
+            }
+            reject
+        }
+    }
+
+    gestures := TouchArea {
+        enabled: root.has-image;
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                root.initial-x = root.center-x;
+                root.initial-y = root.center-y;
+                root.focus-viewer();
+            }
+        }
+        moved => {
+            if root.comparing {
+                root.split = min(0.98, max(0.02, self.mouse-x / root.width));
+            } else if !root.fit-mode {
+                root.manual-x = max(0, min(root.frame-width, root.initial-x + (self.pressed-x - self.mouse-x) / (root.zoom * 1px)));
+                root.manual-y = max(0, min(root.frame-height, root.initial-y + (self.pressed-y - self.mouse-y) / (root.zoom * 1px)));
+            }
+        }
+        scroll-event(event) => {
+            if event.delta-y == 0px { return reject; }
+            root.set-zoom(event.delta-y > 0px ? root.zoom * 1.2 : root.zoom / 1.2);
+            accept
+        }
+    }
+}
+
 export component Workspace inherits Window {
     title: "Pancake";
     min-width: 850px;
@@ -54,9 +202,21 @@ export component Workspace inherits Window {
     in property <[string]> results;
     in property <bool> running;
     in property <image> preview;
-    in property <bool> has-preview;
+
+    in property <int> preview-width;
+    in property <int> preview-height;
+    in property <int> preview-x;
+    in property <int> preview-y;
+    in property <int> base-width: preview-width;
+    in property <int> base-height: preview-height;
+    in property <image> comparison-preview;
+    in property <int> selected-source: -1;
+    in property <string> selected-result-method;
+    property <bool> has-preview: root.preview-width > 0 && root.preview-height > 0;
 
     callback save-preferences(string, string);
+    callback select-source(int);
+    callback close-request();
     callback stack();
     callback export-result();
 
@@ -82,20 +242,36 @@ export component Workspace inherits Window {
         root.update-theme();
     }
 
+    function change-source(step: int) {
+        if root.frames.length > 0 {
+            root.select-source(max(0, min(root.frames.length - 1, root.selected-source + step)));
+        }
+    }
+
+    MenuBar {
+        Menu {
+            title: "File";
+            MenuItem {
+                title: "Close window";
+                shortcut: @keys(Control + W);
+                activated => { root.close-request(); }
+            }
+        }
+    }
+
     VerticalLayout {
         Rectangle {
-            height: 58px;
+            height: 54px;
             background: Palette.alternate-background;
             HorizontalLayout {
-                padding-left: 14px;
-                padding-right: 14px;
+                padding: 10px;
                 spacing: 8px;
-                alignment: center;
                 SectionLabel {
                     text: "Pancake";
                     font-size: 18px;
-                    horizontal-stretch: 1;
+                    height: 34px;
                 }
+                Rectangle { horizontal-stretch: 1; }
                 Button {
                     text: "Sources";
                     accessible-id: "layout.sidebar";
@@ -141,11 +317,11 @@ export component Workspace inherits Window {
                         VerticalLayout {
                             spacing: 4px;
                             alignment: start;
-                            for name in root.frames: Text {
+                            for name[index] in root.frames: Button {
                                 text: name;
-                                color: Palette.foreground;
-                                height: 28px;
-                                overflow: elide;
+                                accessible-id: "frame.\{index}";
+                                primary: root.selected-source == index;
+                                clicked => { root.select-source(index); }
                             }
                         }
                     }
@@ -153,28 +329,20 @@ export component Workspace inherits Window {
             }
             VerticalLayout {
                         horizontal-stretch: 1;
-                Rectangle {
+                canvas := ViewCanvas {
                     vertical-stretch: 1;
-                    background: #141619;
-                    accessible-role: image;
-                    accessible-id: "viewer";
-                    accessible-label: "Image viewer";
-                    accessible-description: "{\"has_image\":\{root.has-preview ? "true" : "false"},\"zoom\":1,\"center\":[0,0],\"compare\":\{root.compare ? "true" : "false"},\"split\":0.5,\"fit\":true}";
-                    if root.has-preview: Image {
-                        width: parent.width;
-                        height: parent.height;
-                        source: root.preview;
-                        image-fit: contain;
-                        accessible-role: none;
-                    }
-                    if !root.has-preview: Text {
-                        x: 0px;
-                        width: parent.width;
-                        y: (parent.height - self.height) / 2;
-                        text: "No image to preview";
-                        color: #b2b8c1;
-                        horizontal-alignment: center;
-                    }
+                    primary-image: root.preview;
+                    image-width: root.preview-width;
+                    image-height: root.preview-height;
+                    image-x: root.preview-x;
+                    image-y: root.preview-y;
+                    frame-width: root.base-width;
+                    frame-height: root.base-height;
+                    comparison-image: root.comparison-preview;
+                    comparing: root.compare;
+                    selected-source: root.selected-source;
+                    result-method: root.selected-result-method;
+                    next-source(step) => { root.change-source(step); }
                 }
                 Rectangle {
                     height: 48px;
@@ -199,6 +367,12 @@ export component Workspace inherits Window {
                             checked: root.compare;
                             clicked => { root.compare = true; }
                         }
+                        Button { text: "Fit"; accessible-id: "viewer.fit"; enabled: root.has-preview; clicked => { canvas.fit-image(); } }
+                        Button { text: "1:1"; accessible-id: "viewer.actual"; enabled: root.has-preview; clicked => { canvas.set-zoom(1); } }
+                        Button { text: "−"; accessible-id: "viewer.zoom_out"; accessible-label: "Zoom out"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom / 1.35); } }
+                        Button { text: "+"; accessible-id: "viewer.zoom_in"; accessible-label: "Zoom in"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom * 1.35); } }
+                        Button { text: "‹"; accessible-id: "viewer.previous"; accessible-label: "Previous source"; enabled: root.frames.length > 0; clicked => { root.change-source(-1); } }
+                        Button { text: "›"; accessible-id: "viewer.next"; accessible-label: "Next source"; enabled: root.frames.length > 0; clicked => { root.change-source(1); } }
                         Rectangle { horizontal-stretch: 1; }
                         Button {
                             text: "Export";

@@ -5,11 +5,13 @@ use std::io::{self, Write as _};
 use std::path::PathBuf;
 
 use slint::{BackendSelector, ComponentHandle, SharedString};
-use slint_interpreter::{Compiler, ComponentInstance, Value};
+use slint_interpreter::{Compiler, ComponentDefinition, ComponentInstance, Value};
 
 use preferences::{Preferences, Store};
 
 pub mod preferences;
+pub mod preview;
+mod session;
 pub mod sources;
 
 /// Repository-owned declarative presentation.
@@ -78,25 +80,52 @@ fn main() -> Result<(), Box<dyn Error>> {
     BackendSelector::new()
         .backend_name("winit".into())
         .select()?;
-    let mut compiler = Compiler::default();
-    compiler.set_style("fluent".into());
-    compiler.set_edition((1, 19));
-    let built = spin_on::spin_on(compiler.build_from_source(WINDOW.into(), PathBuf::new()));
-    let window = built
-        .component("Workspace")
-        .ok_or_else(|| {
-            built
-                .diagnostics()
-                .map(|diagnostic| diagnostic.to_string())
-                .collect::<Vec<_>>()
-                .join("\n")
-        })?
-        .create()?;
+    let window = compile_workspace()?.create()?;
     window.set_property(
         "app-version",
         SharedString::from(env!("CARGO_PKG_VERSION")).into(),
     )?;
     configure_preferences(&window)?;
+    let paths: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
+    session::configure(&window, &paths)?;
+    let weak = window.as_weak();
+    window.set_callback("close-request", move |_| {
+        if let Err(error) = slint::quit_event_loop()
+            && let Some(window) = weak.upgrade()
+        {
+            show_error(&window, &error.to_string());
+        }
+        Value::Void
+    })?;
     window.run()?;
     Ok(())
+}
+
+/// Compile the pinned toolkit widgets and embedded workspace as one component.
+///
+/// # Errors
+///
+/// Returns the embedded source diagnostics if it cannot be compiled.
+fn compile_workspace() -> Result<ComponentDefinition, String> {
+    let mut compiler = Compiler::default();
+    compiler.set_style("fluent".into());
+    compiler.set_edition((1, 19));
+    let built = spin_on::spin_on(compiler.build_from_source(WINDOW.into(), PathBuf::new()));
+    built.component("Workspace").ok_or_else(|| {
+        built
+            .diagnostics()
+            .map(|diagnostic| diagnostic.to_string())
+            .collect::<Vec<_>>()
+            .join("\n")
+    })
+}
+
+/// Smoke-check the same declarative component compiled on application startup.
+///
+/// # Errors
+///
+/// Returns real parser and schema diagnostics.
+#[test]
+fn embedded_workspace_compiles() -> Result<(), String> {
+    compile_workspace().map(drop)
 }

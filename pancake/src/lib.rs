@@ -1,10 +1,8 @@
-//! Safe image-kernel qualification for the Pancake focus-stacking application.
+//! Shared image compute for the Pancake focus-stacking application.
 
 use cubecl::prelude::*;
 use cubecl::std::tensor::TensorHandle;
 
-/// Slint frontend API, using the same pinned wgpu generation as image compute.
-pub use slint;
 /// Shared GPU resource API for Slint rendering and `CubeCL` compute.
 pub use wgpu;
 
@@ -268,3 +266,8 @@ fn centered_variance(input: &Tensor<u32>, output: &mut Tensor<f32>, width: usize
     }
     output[ABSOLUTE_POS] = square_sum / f32::cast_from(width);
 }
+
+/// Validated settings and input discovery shared by both frontends.
+pub mod config;
+
+pub mod image_io;
