@@ -140,5 +140,56 @@
         "deps.log": "4f9763be709ad6ea3b0768d03ea334f369e885443de6ddd43755fcfd0255ccdb"
       }
     }
+  },
+  "x11_dialog_handoff_replay": {
+    "product_revision": "bc19261",
+    "tested_revision": "5216ba4227e14033483a21bb5eca1c6c168ef840",
+    "identical_input_paths": [
+      "pancake/Cargo.toml",
+      "pancake/Cargo.lock",
+      "pancake/src",
+      "pancake/crates",
+      "pancake/tests",
+      "pancake/dependency-policy.json"
+    ],
+    "lock_sha256": "639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd",
+    "package_count": 871,
+    "new_linux_gui_packages": {
+      "gdkx11": "0.19.0",
+      "gdkx11-sys": "0.19.0",
+      "x11": "2.21.0"
+    },
+    "new_direct_existing_gui_package": {
+      "x11rb": "0.13.2"
+    },
+    "exact_duplicate_skips": 38,
+    "existing_maintenance_reviews": 5,
+    "native_pkg_config_versions": {
+      "gtk+-3.0": "3.24.41",
+      "atk": "2.52.0",
+      "gdk-x11-3.0": "3.24.41",
+      "x11": "1.8.7"
+    },
+    "commands": {
+      "bash scripts/check.sh fast": {
+        "exit_status": 0,
+        "graph_and_policy_tests": 42,
+        "result": "PASS. All-feature workspace Clippy, private Rustdoc, formatting, ShellCheck and actionlint."
+      },
+      "bash scripts/check.sh deps": {
+        "exit_status": 0,
+        "dependency_policy_tests": 19,
+        "vendor_contract_tests": 7,
+        "result": "PASS. Existing exact reviews and skips suffice. All three manifests have no unused dependencies."
+      }
+    },
+    "archive": {
+      "path": "dependency-graph-x11-logs.tar.gz",
+      "sha256": "5b43570e16e2cc55300a22a35692cd64876e0cdb0096036cfcb5b6438eeb3d2e",
+      "logs": {
+        "fast.log": "0a180809cf487819aaba305b2634890b9e31eda8e7f54599e2e5bc6a6acb2c06",
+        "deps.log": "f291a8789d17059d843807498a2fb5cb75064b942798dbf39c857280a2bd0b3f"
+      }
+    }
   }
 }
