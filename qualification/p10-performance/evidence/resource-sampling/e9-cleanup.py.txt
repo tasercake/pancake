@@ -1,0 +1,60 @@
+"""Reverify and remove only this exact temporary E9 acquisition."""
+
+import hashlib
+import json
+from pathlib import Path
+
+root = Path(__file__).resolve().parent
+staging = root / "input"
+source = root / "receipt.json"
+acquired = json.loads(source.read_text())
+if acquired["root"] != str(staging) or staging.is_symlink():
+    raise ValueError("owned corpus root differs from the acquisition receipt")
+records = [acquired["archive"], *acquired["frames"]]
+if len(records) != 10:
+    raise ValueError("expected one exact archive and nine native frames")
+items = tuple(staging.rglob("*"))
+if any(path.is_symlink() or not (path.is_file() or path.is_dir()) for path in items):
+    raise ValueError("temporary input tree contains an unowned special file")
+files = {path.relative_to(staging) for path in items if path.is_file()}
+expected = {Path(record["path"]) for record in records}
+if files != expected:
+    raise ValueError("temporary input tree differs from the ten acquired paths")
+for record in records:
+    path = staging / record["path"]
+    with path.open("rb") as handle:
+        digest = hashlib.file_digest(handle, "sha256").hexdigest()
+    if (
+        path.stat().st_size != record.get("bytes", record.get("size"))
+        or digest != record["sha256"]
+    ):
+        raise ValueError(f"acquired payload was modified: {path}")
+removed = []
+receipt = root / "cleanup.json"
+with receipt.open("x") as handle:
+    try:
+        for path in sorted(files):
+            absolute = staging / path
+            size = absolute.stat().st_size
+            absolute.unlink()
+            removed.append({"path": str(path), "bytes": size})
+        for path in sorted(
+            (p for p in items if p.is_dir()), key=lambda p: len(p.parts), reverse=True
+        ):
+            path.rmdir()
+        staging.rmdir()
+    finally:
+        json.dump(
+            {
+                "source_acquisition_sha256": hashlib.sha256(
+                    source.read_bytes()
+                ).hexdigest(),
+                "root": str(staging),
+                "removed": removed,
+                "removed_bytes": sum(item["bytes"] for item in removed),
+                "owned_input_root_removed": not staging.exists(),
+            },
+            handle,
+            indent=2,
+        )
+        handle.write("\n")
