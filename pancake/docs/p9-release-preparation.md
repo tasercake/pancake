@@ -42,12 +42,13 @@ original failed or interrupted bundles for investigation.
 Build and link the locked macOS ARM64 release natively with CPU, wgpu Metal and
 native Metal enabled. Stage a macOS application bundle with the GUI under
 `Contents/MacOS`, bundle metadata and a versioned application identity. Ship a
-matching CLI and preserve the resolved `otool -L` dependencies. Verify a local
-signature appropriate to the test environment and the packaged GUI's actual
-Accessibility and Automation identity. Distribution signing needs a verified
-Developer ID identity and the release owner's distribution credentials. If
-hardened signing is selected, verify the CubeCL CPU JIT with the final signing
-options and review any required entitlement narrowly.
+matching CLI and preserve the resolved `otool -L` dependencies. Use ad-hoc
+signing for private package qualification and verify the packaged GUI's actual
+Accessibility and Automation identity. Distribution signing needs the owner's
+Developer ID identity and distribution credentials. If hardened signing is
+selected, verify the CubeCL CPU JIT with the final signing options and review
+any required entitlement narrowly. Native ARM64 build and signing tools and
+access to the owner's distribution credentials are outstanding.
 
 On an Apple Silicon host use the configured dedicated Tart guest for the
 34 compatible interface cases. The suite reconstructs its guest target
@@ -67,19 +68,18 @@ are best effort under the [milestone plan](implementation-plan.md).
 
 ## Slint interpreter and Rowan boundary
 
-Retain the safe interpreter for the embedded, repository-owned Slint source.
-Before release, audit the final compiler call sites and embedded imports so that
-input images, preferences, paths and other external data cannot supply Slint
-source. Review the exact Slint and Rowan lock and source, and retain the
-application assurance results together with the existing Rowan strict-Miri
-failure. The P0 representation patch leaves the ARC implementation untouched.
-The first-party unsafe prohibition and nightly Miri gates continue to apply.
-
-An upstream Rowan repair with the independent reproducer passing can clear that
-specific finding. Moving to compiled Slint glue would require reviewed policy
-for an isolated generated-code crate and evidence that the compiler and Rowan
-are absent at runtime. The integrated interpreter boundary review is pending
-the final GUI revision. [P0 UI review](p0-ui-qualification.md).
+The release decision retains the safe interpreter for the embedded,
+repository-owned Slint source. The `12f2151` compiler call, built-in source URI,
+single toolkit import and locked Slint and Rowan dependencies match the
+`5216ba4` packaged runtime witness. The native window opened with a
+colocated widget file present, and the file-open trace recorded zero reads
+of that file.
+The applicable Rowan strict-Miri ARC retag finding remains open. The P0
+representation patch leaves that ARC implementation untouched. Keep the
+first-party unsafe prohibition and nightly Miri gates and re-review the
+boundary if the application adds external Slint source or imports.
+[Interpreter decision](p9-slint-boundary.md).
+[Integrated source comparison](p9-linux-package-evidence/12f2151/slint-source-boundary.log.gz).
 [Rowan probe and patch evidence](p0-kernel-qualification.md#rowan-layout-boundary).
 
 ## GPU AddressSanitizer controls
@@ -109,5 +109,5 @@ The packaging tests compile temporary native ELF fixtures, exercise Debian
 assembly and extraction, and verify executable hashes and the desktop launcher.
 Ledger tests use the unchanged runner report serializer to exercise disjoint
 lane accounting, strict rejection, raw event checks, and package matching.
-These test the release tooling. The unchanged application's release acceptance
-still needs real case, package, assurance, hardware, and performance results.
+The application and package execution receipts are in the
+[Linux package evidence](p9-linux-package-evidence/README.md).

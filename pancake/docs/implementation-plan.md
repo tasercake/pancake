@@ -25,6 +25,13 @@ limit. GPU-memory sampling gaps and cross-application output-quality
 alignment remain open.
 [Exact E9 measurement and quality witnesses](../../qualification/p10-performance/evidence/integrated-e9-12f2151/README.md).
 
+The separate `12f2151` native CUDA release completed the matched real E9
+campaign on the same RTX 3090. The CUDA/OpenCL warm ratio of 0.5634 missed
+the 0.50 limit. Cold and peak RSS ratios of 0.0844 and 0.4252 met their limits.
+The candidate GPU-memory traces exceeded the required sampling interval, and
+equal output quality remains open.
+[Native CUDA E9 measurement](../../qualification/p10-performance/evidence/integrated-e9-cuda-12f2151/README.md).
+
 The earlier native viewer-cache replay at `89c6a22` measured 43.274 ms idle
 and 43.355 ms loaded P95 against the 33 ms limit. These viewer and prior
 lifecycle measurements apply to their recorded revisions.
