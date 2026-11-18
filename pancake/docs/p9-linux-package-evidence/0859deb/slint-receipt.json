@@ -1,0 +1,53 @@
+{
+  "app": "/tmp/p9-release-source-boundary-xckq01hw/app/usr/bin/pancake-gui",
+  "binary_sha256": "3326812d97511cedf8ae7aee011f66816fae274f84ae1a1157c5df806d879001",
+  "xvfb": "/tmp/pancake-worktrees.t3paqgWM/p7-ui/artifacts/p7/system/root/usr/bin/Xvfb",
+  "settings": {
+    "SLINT_BACKEND": "winit-software"
+  },
+  "shadow_source": "export component P9AuditMarker inherits Rectangle {}\n",
+  "runs": [
+    {
+      "variant": "empty-cwd",
+      "command": [
+        "dbus-run-session",
+        "--",
+        "strace",
+        "-f",
+        "-e",
+        "trace=openat",
+        "-o",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-linux-0859deb/slint/empty-cwd.strace",
+        "/tmp/p9-release-source-boundary-xckq01hw/app/usr/bin/pancake-gui"
+      ],
+      "display": ":1",
+      "exit_when_observed": null,
+      "window_observed": true,
+      "log": "empty-cwd.log",
+      "std_widget_openat_calls": [],
+      "raw_trace_sha256": "f64ccb41f1f64adcca1b76c2e31d6aedc16db75e662782ba827928769fdd1b05",
+      "log_sha256": "c3cd5e8d2e2e0f45a5dac1b8402d642f1d6d82b2b99b4b49504b898cfdd882b1"
+    },
+    {
+      "variant": "local-widget-shadow",
+      "command": [
+        "dbus-run-session",
+        "--",
+        "strace",
+        "-f",
+        "-e",
+        "trace=openat",
+        "-o",
+        "/tmp/pancake-worktrees.t3paqgWM/p9-release/artifacts/p9-linux-0859deb/slint/local-widget-shadow.strace",
+        "/tmp/p9-release-source-boundary-xckq01hw/app/usr/bin/pancake-gui"
+      ],
+      "display": ":1",
+      "exit_when_observed": null,
+      "window_observed": true,
+      "log": "local-widget-shadow.log",
+      "std_widget_openat_calls": [],
+      "raw_trace_sha256": "b0a62aac7c0a9df1e08111fda72c27b1a26d9322bff64f20a87846eeac8c1eee",
+      "log_sha256": "6bd951efa56a7230b05e9c04bd9a0138eadc9e2d7891495fc602d631a49f1e22"
+    }
+  ]
+}
