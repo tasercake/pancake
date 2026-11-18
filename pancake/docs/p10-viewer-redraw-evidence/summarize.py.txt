@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Cross-check and summarize the preserved, unfiltered native A/B receipts."""
+
+import hashlib
+import json
+import sys
+from collections import Counter
+from pathlib import Path
+
+
+def digest(path):
+    with path.open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def read(path):
+    return json.loads(path.read_text())
+
+
+def without_path(manifest):
+    return {name: value for name, value in manifest.items() if name != 'path'}
+
+
+root, first_try, preflight_path = map(Path, sys.argv[1:4])
+captures = {arm: read(root / arm / 'native-latency.json') for arm in 'ab'}
+archival = read(root / 'calibration/scenario.json')
+preflight = read(preflight_path)
+per_action = read(root / 'per-action.json')
+assert digest(root / 'calibration/scenario.json') == preflight['scenario_sha256']
+assert captures['a']['ordered_inputs'] == captures['b']['ordered_inputs']
+assert without_path(captures['a']['input_manifest']) == without_path(captures['b']['input_manifest'])
+assert captures['a']['performance_targets_sha256'] == captures['b']['performance_targets_sha256']
+assert captures['a']['collector_sha256'] == captures['b']['collector_sha256']
+fields = ('step', 'input', 'condition', 'action', 'expected_before', 'expected_after')
+for a, b in zip(captures['a']['viewer'], captures['b']['viewer'], strict=True):
+    assert all(a[field] == b[field] for field in fields)
+
+results = {}
+for arm, capture in captures.items():
+    build_path = root / f'{arm}.build.json'
+    build = read(build_path)
+    scenario = read(root / f'calibration/scenario-{arm}.json')
+    physical = scenario['physical_wgpu']
+    assert all(physical[key] == build[key] for key in ('commit', 'binary_sha256'))
+    assert physical['gpu_uuid'] == archival['physical_wgpu']['gpu_uuid']
+    assert scenario | {'physical_wgpu': archival['physical_wgpu']} == archival
+    worker = capture['physical_wgpu_run']
+    assert capture['status'] == 'captured' and capture['inputs_unchanged']
+    assert capture['size'] == [1440, 1000]
+    assert worker['gpu_uuid'] == archival['physical_wgpu']['gpu_uuid']
+    assert all(event['runtime'] == 'wgpu-vulkan' for event in worker['stack_completions'])
+    samples = capture['viewer']
+    assert len(samples) == 400 and all(event['valid'] for event in samples)
+    assert capture['candidate'] == build
+    reduction_path = root / f'{arm}.frozen-reduction.json'
+    reduction = read(reduction_path)
+    for limits in reduction['viewer'].values():
+        assert limits['input_to_present_ns']['count'] == 200
+        assert limits['status'] == 'fail'
+    assert not read(first_try / arm / 'native-latency.json')['viewer']
+    stage = Counter((event['condition'], event['worker_before'].split(' · ')[1]) for event in samples)
+    errors = [patch['max_channel_error'] for event in samples for patch in event['actual_after']]
+    results[arm] = {
+        'source': build['commit'],
+        'gui_sha256': build['binary_sha256'],
+        'gui_bytes': build['binary_size'],
+        'build_receipt_sha256': digest(build_path),
+        'lock_sha256': build['lock_sha256'],
+        'descriptor_sha256': build['descriptor_sha256'],
+        'capture_receipt_sha256': digest(root / arm / 'native-latency.json'),
+        'scenario_sha256': capture['scenario_sha256'],
+        'frozen_reduction_sha256': digest(reduction_path),
+        'windows': [(root / f'{arm}.{edge}').read_text().strip() for edge in ('start', 'end')],
+        'collector_exit': int((root / f'{arm}.collector.exit').read_text()),
+        'reducer_exit': int((root / f'{arm}.reducer.exit').read_text()),
+        'maximum_observation_gap_ns': max(sample['maximum_observation_gap_ns'] for sample in samples),
+        'reported_worker_stages': {f'{condition}/{name}': count for (condition, name), count in stage.items()},
+        'maximum_observed_rgb_channel_error': max(errors),
+        'hardware': capture['hardware'],
+        'visible_gpu_bytes': worker['process_gpu_residency_at_visible_launch_bytes'],
+        'stack_completion_count': len(worker['stack_completions']),
+        'viewer_by_condition': reduction['viewer'],
+        'viewer_by_condition_and_action': per_action[arm],
+    }
+summary = {
+    'physical_gpu_uuid': preflight['physical_gpu_uuid'],
+    'display_px': [1440, 1000],
+    'frozen_scenario_and_pixel_preflight': preflight,
+    'identical_action_sequence_and_input_bytes': True,
+    'valid_baseline_and_candidate_samples': 800,
+    'frozen_viewer_p95_ms': 33,
+    'collector_sha256': captures['a']['collector_sha256'],
+    'targets_sha256': captures['a']['performance_targets_sha256'],
+    't50_materialization_sha256': digest(root / 't50-materialization.json'),
+    'false_start': {
+        'product_launches': 0,
+        'samples': 0,
+        'reason': 'Private XDG output directory lacked the /artifacts/ marker required by the existing Openbox guard',
+        'raw_capture_sha256': {arm: digest(first_try / arm / 'native-latency.json') for arm in 'ab'},
+    },
+    'arms': results,
+}
+print(json.dumps(summary, indent=2))
