@@ -1,0 +1,23 @@
+{
+  "commit": "39a646c69354190f4159aa2026d188a1b1407d71",
+  "lock_sha256": "666860bfa8c0e1e652bfc18e635df364de9600bedae0a1c12ea36f128110bca2",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "component": "gui",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/resume-viewer/pancake/target/release/pancake-gui",
+  "binary_sha256": "6663a723cec40cecab454c4b6ff2fcbd8f81eed3d371536c75a25ef9893a77e6",
+  "producer_build_command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--release",
+    "-p",
+    "pancake-gui"
+  ],
+  "producer_build_environment": {
+    "CARGO_BUILD_JOBS": "4",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+  },
+  "producer_log_sha256": "884ed62961fc1e2ba9d745a5c50b12173d7d8a4e7e9cf7bf59b6a7efa42a0471",
+  "scope": "diagnostic only, Linux Vulkan FIFO maximum frame latency 1"
+}

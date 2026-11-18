@@ -1,0 +1,22 @@
+"""Select five complete rounds per condition from the exact archived qualification."""
+from json import dumps, loads
+from pathlib import Path
+import sys
+
+source, receipt, destination = (Path(arg) for arg in sys.argv[1:])
+plan = loads(source.read_text())
+identity = loads(receipt.read_text())
+steps = plan["steps"]
+idle = [i for i,row in enumerate(steps) if row.get("condition")=="idle"]
+loaded = [i for i,row in enumerate(steps) if row.get("condition")=="loaded"]
+assert len(idle)==len(loaded)==200
+selected = steps[:idle[24]+1]
+assert steps[loaded[0]-2].get("numerical") is True
+assert steps[loaded[24]+1].get("worker_phase")=="idle"
+selected += steps[loaded[0]-2:loaded[24]+2]
+assert len([row for row in selected if row["kind"]=="viewer"])==50
+plan["steps"]=selected
+for name in ("commit","binary_sha256"):
+    plan["physical_wgpu"][name]=identity[name]
+with destination.open("x") as stream:
+    stream.write(dumps(plan, indent=2)+"\n")

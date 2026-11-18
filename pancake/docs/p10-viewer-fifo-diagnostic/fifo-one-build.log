@@ -1,0 +1,10 @@
+39a646c69354190f4159aa2026d188a1b1407d71
+666860bfa8c0e1e652bfc18e635df364de9600bedae0a1c12ea36f128110bca2  Cargo.lock
+   Compiling i-slint-renderer-femtovg v1.19.0 (/tmp/pancake-worktrees.t3paqgWM/resume-viewer/pancake/vendor/i-slint-renderer-femtovg-1.19.0)
+   Compiling i-slint-backend-winit v1.19.0
+   Compiling i-slint-backend-selector v1.19.0
+   Compiling slint v1.19.0
+   Compiling slint-interpreter v1.19.0
+   Compiling pancake-gui v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/resume-viewer/pancake/crates/pancake-gui)
+    Finished `release` profile [optimized] target(s) in 1m 39s
+6663a723cec40cecab454c4b6ff2fcbd8f81eed3d371536c75a25ef9893a77e6  target/release/pancake-gui

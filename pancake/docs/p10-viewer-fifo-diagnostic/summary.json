@@ -1,0 +1,267 @@
+{
+  "status": "diagnostic_only",
+  "matching_inputs_and_witnesses": true,
+  "arms": {
+    "original": {
+      "candidate": {
+        "commit": "89c6a22775cd8877fc094dc4842108232f2d7183",
+        "lock_sha256": "639c5c88b9286e5583174f05168412db19f39dc3f651b6682b685d1db801e0dd",
+        "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+        "component": "gui",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/resume-viewer/pancake/target/release/pancake-gui",
+        "binary_sha256": "fee0bd832c5a4a452e184d35aa05faa5036bdd1e1440edb07d92888469e75a91",
+        "producer_build_command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--release",
+          "-p",
+          "pancake-gui"
+        ],
+        "producer_build_environment": {
+          "CARGO_BUILD_JOBS": "4",
+          "CARGO_INCREMENTAL": "0",
+          "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+        },
+        "producer_log_sha256": "6fb7f0bc80a182646173cb03a27a6ec27081374d8d028f024b3877d6cfdfd1d4",
+        "campaign_tool_sha256": {
+          "framebuffer.py": "4c1d3c836153a97795909599de34bcfd2fc61eb4f1eefb711f715da4a918d61e",
+          "linux_latency.py": "eb121716568526bd72b9bfe07589c4ffdaa5b1bbfecf9e5d3409de280d880af8",
+          "native_campaign.py": "cebbaa9961ab5c1ff4e60d20f30fabb0d4331a388302c858dacc4e864407acff",
+          "native_witness.py": "8b58d01242c1f947bae0626ef63827f152ef2c641551e861ddfdc8455c2a4e10",
+          "p10.py": "e098b47d0147a6ce1a9bb7d586ae07d05ade6714c067eebd0f8d59aba1bbbaa0",
+          "protocol.py": "e4868f65418eaf6604d3b0d2c0f5a259566939ff2a5f2bfcb2a8bce23dcfdbac"
+        }
+      },
+      "condition": {
+        "idle": {
+          "all": {
+            "count": 25,
+            "min_ms": 19.327707,
+            "p50_ms": 32.502268,
+            "p95_ms": 39.243155,
+            "max_ms": 672.198754,
+            "over_33_ms": 10
+          },
+          "comparison": {
+            "count": 5,
+            "min_ms": 19.327707,
+            "p50_ms": 19.491664,
+            "p95_ms": 20.53462,
+            "max_ms": 20.53462,
+            "over_33_ms": 0
+          },
+          "pan": {
+            "count": 5,
+            "min_ms": 32.502268,
+            "p50_ms": 34.726268,
+            "p95_ms": 36.894112,
+            "max_ms": 36.894112,
+            "over_33_ms": 3
+          },
+          "result": {
+            "count": 5,
+            "min_ms": 20.640328,
+            "p50_ms": 28.175335,
+            "p95_ms": 30.45578,
+            "max_ms": 30.45578,
+            "over_33_ms": 0
+          },
+          "source": {
+            "count": 5,
+            "min_ms": 32.549616,
+            "p50_ms": 34.780629,
+            "p95_ms": 672.198754,
+            "max_ms": 672.198754,
+            "over_33_ms": 4
+          },
+          "zoom": {
+            "count": 5,
+            "min_ms": 27.037772,
+            "p50_ms": 33.616536,
+            "p95_ms": 39.243155,
+            "max_ms": 39.243155,
+            "over_33_ms": 3
+          }
+        },
+        "loaded": {
+          "all": {
+            "count": 25,
+            "min_ms": 21.479221,
+            "p50_ms": 31.341732,
+            "p95_ms": 38.896847,
+            "max_ms": 41.265358,
+            "over_33_ms": 10
+          },
+          "comparison": {
+            "count": 5,
+            "min_ms": 21.479221,
+            "p50_ms": 22.57215,
+            "p95_ms": 30.178541,
+            "max_ms": 30.178541,
+            "over_33_ms": 0
+          },
+          "pan": {
+            "count": 5,
+            "min_ms": 23.883218,
+            "p50_ms": 33.582733,
+            "p95_ms": 38.896847,
+            "max_ms": 38.896847,
+            "over_33_ms": 3
+          },
+          "result": {
+            "count": 5,
+            "min_ms": 27.099519,
+            "p50_ms": 34.897398,
+            "p95_ms": 37.067457,
+            "max_ms": 37.067457,
+            "over_33_ms": 3
+          },
+          "source": {
+            "count": 5,
+            "min_ms": 22.893693,
+            "p50_ms": 35.780524,
+            "p95_ms": 38.140279,
+            "max_ms": 38.140279,
+            "over_33_ms": 3
+          },
+          "zoom": {
+            "count": 5,
+            "min_ms": 27.101943,
+            "p50_ms": 29.214543,
+            "p95_ms": 41.265358,
+            "max_ms": 41.265358,
+            "over_33_ms": 1
+          }
+        }
+      }
+    },
+    "fifo-one": {
+      "candidate": {
+        "commit": "39a646c69354190f4159aa2026d188a1b1407d71",
+        "lock_sha256": "666860bfa8c0e1e652bfc18e635df364de9600bedae0a1c12ea36f128110bca2",
+        "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+        "component": "gui",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/resume-viewer/pancake/target/release/pancake-gui",
+        "binary_sha256": "6663a723cec40cecab454c4b6ff2fcbd8f81eed3d371536c75a25ef9893a77e6",
+        "producer_build_command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--release",
+          "-p",
+          "pancake-gui"
+        ],
+        "producer_build_environment": {
+          "CARGO_BUILD_JOBS": "4",
+          "CARGO_INCREMENTAL": "0",
+          "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+        },
+        "producer_log_sha256": "884ed62961fc1e2ba9d745a5c50b12173d7d8a4e7e9cf7bf59b6a7efa42a0471",
+        "scope": "diagnostic only, Linux Vulkan FIFO maximum frame latency 1"
+      },
+      "condition": {
+        "idle": {
+          "all": {
+            "count": 25,
+            "min_ms": 19.339669,
+            "p50_ms": 29.240862,
+            "p95_ms": 39.085188,
+            "max_ms": 681.464443,
+            "over_33_ms": 4
+          },
+          "comparison": {
+            "count": 5,
+            "min_ms": 19.339669,
+            "p50_ms": 19.454354,
+            "p95_ms": 21.593494,
+            "max_ms": 21.593494,
+            "over_33_ms": 0
+          },
+          "pan": {
+            "count": 5,
+            "min_ms": 23.018546,
+            "p50_ms": 29.33039,
+            "p95_ms": 32.681432,
+            "max_ms": 32.681432,
+            "over_33_ms": 0
+          },
+          "result": {
+            "count": 5,
+            "min_ms": 24.069857,
+            "p50_ms": 29.267693,
+            "p95_ms": 38.910181,
+            "max_ms": 38.910181,
+            "over_33_ms": 2
+          },
+          "source": {
+            "count": 5,
+            "min_ms": 25.081835,
+            "p50_ms": 29.240862,
+            "p95_ms": 681.464443,
+            "max_ms": 681.464443,
+            "over_33_ms": 1
+          },
+          "zoom": {
+            "count": 5,
+            "min_ms": 26.28462,
+            "p50_ms": 31.475292,
+            "p95_ms": 39.085188,
+            "max_ms": 39.085188,
+            "over_33_ms": 1
+          }
+        },
+        "loaded": {
+          "all": {
+            "count": 25,
+            "min_ms": 22.547494,
+            "p50_ms": 27.532519,
+            "p95_ms": 40.438406,
+            "max_ms": 41.520285,
+            "over_33_ms": 7
+          },
+          "comparison": {
+            "count": 5,
+            "min_ms": 22.547494,
+            "p50_ms": 22.622143,
+            "p95_ms": 25.944472,
+            "max_ms": 25.944472,
+            "over_33_ms": 0
+          },
+          "pan": {
+            "count": 5,
+            "min_ms": 23.902023,
+            "p50_ms": 27.716735,
+            "p95_ms": 33.610305,
+            "max_ms": 33.610305,
+            "over_33_ms": 1
+          },
+          "result": {
+            "count": 5,
+            "min_ms": 25.068069,
+            "p50_ms": 26.162651,
+            "p95_ms": 32.554294,
+            "max_ms": 32.554294,
+            "over_33_ms": 0
+          },
+          "source": {
+            "count": 5,
+            "min_ms": 25.048061,
+            "p50_ms": 32.708343,
+            "p95_ms": 40.438406,
+            "max_ms": 40.438406,
+            "over_33_ms": 2
+          },
+          "zoom": {
+            "count": 5,
+            "min_ms": 27.222038,
+            "p50_ms": 38.913507,
+            "p95_ms": 41.520285,
+            "max_ms": 41.520285,
+            "over_33_ms": 4
+          }
+        }
+      }
+    }
+  }
+}

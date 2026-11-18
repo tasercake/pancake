@@ -1,0 +1,3 @@
+8482, /home/krishna/.local/share/Steam/ubuntu12_64/steamwebhelper, 9 MiB
+11746, /home/krishna/.local/opt/sunshine/current/root/usr/bin/sunshine, 334 MiB
+1285260, /tmp/pancake-worktrees.t3paqgWM/resume-gui-profiles/pancake/target/native-profile-target/debug/pancake-gui, 79 MiB

@@ -1,0 +1,37 @@
+"""Compare both diagnostic arms using only matching real observations."""
+from collections import defaultdict
+from json import dumps, loads
+from math import ceil
+from pathlib import Path
+from statistics import median
+import sys
+
+root = Path(sys.argv[1])
+arm_names = ("original", "fifo-one")
+captures = {name: loads((root/name/"native-latency.json").read_text()) for name in arm_names}
+original, modified = (captures[name] for name in arm_names)
+assert original["status"] == modified["status"] == "captured"
+assert original["inputs_unchanged"] and modified["inputs_unchanged"]
+assert original["ordered_inputs"] == modified["ordered_inputs"]
+for a,b in zip(original["viewer"],modified["viewer"],strict=True):
+    for name in ("input","action","condition","expected_before","expected_after"):
+        assert a[name] == b[name], name
+series = {}
+for arm,capture in captures.items():
+    groups = defaultdict(list)
+    assert len(capture["viewer"]) == 50
+    for row in capture["viewer"]:
+        assert row["valid"]
+        elapsed = (row["presented_ns"]-row["dispatched_ns"])/1e6
+        groups[row["condition"],"all"].append(elapsed)
+        groups[row["condition"],row["action"]].append(elapsed)
+    per_condition = {}
+    for (condition, action),times in sorted(groups.items()):
+        ranked = sorted(times)
+        per_condition.setdefault(condition,{})[action] = {
+            "count": len(ranked), "min_ms": ranked[0], "p50_ms": median(ranked),
+            "p95_ms": ranked[ceil(0.95*len(ranked))-1], "max_ms": ranked[-1],
+            "over_33_ms": sum(value>33 for value in ranked),
+        }
+    series[arm] = {"candidate": capture["candidate"],"condition": per_condition}
+print(dumps({"status":"diagnostic_only","matching_inputs_and_witnesses":True,"arms":series}, indent=2))
