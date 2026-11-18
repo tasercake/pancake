@@ -341,6 +341,7 @@ fn choose_runtime(settings: &JobSettings, options: &Options) -> Result<SelectedR
         && prepared.physical_gpu()
         && prepared.wgpu_setup().is_some()
     {
+        prepared.check_job_budget(options.working_bytes)?;
         return Ok(prepared.clone());
     }
     select_runtime(
