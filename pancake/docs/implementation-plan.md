@@ -4,6 +4,32 @@
 |---|---:|---|
 | P5 motion, crop and registration | 64/64 | [P5 replay](p5-registration.md) |
 
+The release uses the reviewed Slint interpreter with repository-owned
+source. The known upstream Rowan strict-Miri finding remains in the
+assurance record. [Interpreter release decision](p9-slint-boundary.md).
+
+The matching optional Linux CUDA and HIP release profiles both linked. The
+CUDA build passed four frozen CLI cases, with two CPU completions and two
+native CUDA completions on the RTX 3090. The HIP result is a build/link
+receipt. Apple execution and signed packaging, as well as the Windows
+native build, remain open.
+[Native Linux profile evidence](p9-linux-native-evidence/12f2151/README.md).
+[Windows build prerequisite](p9-windows-build-evidence/12f2151/README.md).
+
+At the packaged `12f2151` CLI, the aligned real E9 comparison completed 17
+launches per application in each CPU and physical NVIDIA lane. CPU warm,
+cold and peak RSS ratios against the reference were 0.4604, 0.0628 and 0.3188,
+meeting their numeric limits. Vulkan/OpenCL warm and RSS ratios of 0.7050
+and 0.7199 missed their 0.50 limits. The cold ratio of 0.0952 met its 1.00
+limit. GPU-memory sampling gaps and cross-application output-quality
+alignment remain open.
+[Exact E9 measurement and quality witnesses](../../qualification/p10-performance/evidence/integrated-e9-12f2151/README.md).
+
+The earlier native viewer-cache replay at `89c6a22` measured 43.274 ms idle
+and 43.355 ms loaded P95 against the 33 ms limit. These viewer and prior
+lifecycle measurements apply to their recorded revisions.
+[Viewer cache measurement](p10-viewer-cache-evidence/README.md).
+
 The isolated release replay passed all 20 P7 and 14 P8 interface IDs. It
 verified native panels, retained results, GUI and CLI export parity, and
 the actual 64-frame pause, resume, cancel, and worker reuse workflow.

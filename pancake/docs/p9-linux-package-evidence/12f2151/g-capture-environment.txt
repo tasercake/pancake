@@ -1,0 +1,7 @@
+capture=isolated-gui
+original_output=/tmp/pcg-12f2.5GaSuk/artifacts/g
+desktop_env=/home/krishna/Documents/focus-stacking/artifacts/p10-compare/native-tools/gui-env.sh
+renderer=winit-software
+a4abf3f639464b5e3647e9db3ecdbd68f464a6890cebd03e844da9f78a04ccfb  /home/krishna/Documents/focus-stacking/artifacts/p10-compare/native-tools/gui-env.sh
+8ed842aaaaf9aba9b38a9840fd5df2396079a589b28ba049d238350665b83766  /home/krishna/Documents/focus-stacking/artifacts/p10-compare/native-tools/system/commands/Xvfb
+84f1d68d11cc37dba798dcae026ae2dffcd5ee95d03d2b13233b1b2ce38fa9f4  /home/krishna/Documents/focus-stacking/artifacts/p10-compare/native-tools/system/commands/openbox

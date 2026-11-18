@@ -1,5 +1,34 @@
 # Linux package evidence
 
+## Integrated Linux package candidate `12f2151`
+
+The locked workspace release built both executables on Ubuntu 24.04.5 x86-64
+from `12f2151c8a198b5209c8f4d506dbd17fd9aaa74f` using Rust 1.100.0. The
+candidate passed `check.sh fast`, `check.sh deps`, and four package-tool
+regressions. [Build and verification summary](12f2151/summary.json).
+
+The local package is at
+`artifacts/pancake-packages/linux-12f2151/pancake_0.1.0_amd64.deb`.
+It is 69,404,690 bytes with SHA-256
+`0d5a428309fedb6de8ed741c9ba79bb75463ac219972b87c931bbac702b02123`.
+APT simulated the local installation. Rootless extraction verified the
+binaries, native dynamic libraries, desktop entry, CLI help and 1,036
+dependency notices, including both licenses from the pinned vendored
+`oneshot`. The inventory identifies 27 of 583 selected packages whose
+locked sources supplied no recognized notice. The packaging record is
+informational for redistribution review.
+[Package verification](12f2151/package-verification.json).
+[Dependency-notice inventory](12f2151/notice-inventory.json.gz).
+
+The embedded Slint compiler call, its single toolkit import, locked Slint
+and Rowan records, and pinned Rowan tree match the earlier packaged runtime
+witness at `5216ba4`. The exact Linux CLI production graph remains
+independent of the UI graph. [Slint source and dependency comparison](12f2151/slint-source-boundary.log.gz).
+
+The package remains provisional while required Apple execution, retained
+platform build and release decisions, complete assurance and the unchanged
+performance targets remain open. See the [implementation plan](../implementation-plan.md).
+
 ## Integrated Linux package candidate `5216ba4`
 
 The Linux x86-64 Debian package for
