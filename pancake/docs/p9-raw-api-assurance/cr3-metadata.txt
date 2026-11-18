@@ -1,0 +1,4 @@
+[File]          FileType                        : CR3
+[Canon]         CanonModelID                    : Unknown (0x80000496)
+[IFD0]          Model                           : Canon EOS R5m2
+[Composite]     ImageSize                       : 5088x3392

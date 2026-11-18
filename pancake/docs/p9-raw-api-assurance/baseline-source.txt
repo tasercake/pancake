@@ -1,0 +1,11 @@
+fbf01d1981546d017c5bacb762c789b16bbf51af
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+99051b2e08724bdf6aeb8c27a4c8aa495143d9ffa658d826c7ab089078c66817  tests/data/bayer-pattern.dng
+rustc 1.102.0-nightly (5f4effd57 2026-11-13)
+binary: rustc
+commit-hash: 5f4effd579500175af844241eb179e756190f1e7
+commit-date: 2026-11-13
+host: x86_64-unknown-linux-gnu
+release: 1.102.0-nightly
+LLVM version: 23.1.5
+cargo-llvm-cov 0.9.1

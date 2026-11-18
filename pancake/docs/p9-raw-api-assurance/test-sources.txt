@@ -1,0 +1,5 @@
+d8bc1e264ecfbae5b5d35479cfacdeec92edb056
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+9eccf70af2b99699d3d6f9d6de07fa908d73676809b1bda8bdfbb0579c88282d  tests/cpu_image_io.rs
+c9945a00102d18884c7323b16998b5360d0bceeb7d5e551b9de756d3a0584bad  ../artifacts/raw-api-assurance/real-cr3-probe.rs
+4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca  ../artifacts/raw-api-assurance/frame_000.CR3

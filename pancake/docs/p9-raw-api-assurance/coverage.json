@@ -1,0 +1,239 @@
+{
+  "baseline": {
+    "passed": 21,
+    "failed": 0,
+    "ignored": 0,
+    "files": {
+      "image_io/export.rs": {
+        "lines": [
+          0,
+          281
+        ],
+        "functions": [
+          0,
+          31
+        ],
+        "regions": [
+          0,
+          304
+        ],
+        "branches": [
+          0,
+          38
+        ]
+      },
+      "image_io/mod.rs": {
+        "lines": [
+          159,
+          182
+        ],
+        "functions": [
+          25,
+          39
+        ],
+        "regions": [
+          168,
+          200
+        ],
+        "branches": [
+          30,
+          30
+        ]
+      },
+      "image_io/npy.rs": {
+        "lines": [
+          95,
+          135
+        ],
+        "functions": [
+          12,
+          25
+        ],
+        "regions": [
+          115,
+          173
+        ],
+        "branches": [
+          13,
+          22
+        ]
+      },
+      "image_io/raw.rs": {
+        "lines": [
+          60,
+          101
+        ],
+        "functions": [
+          11,
+          28
+        ],
+        "regions": [
+          66,
+          118
+        ],
+        "branches": [
+          7,
+          8
+        ]
+      }
+    }
+  },
+  "permanent": {
+    "passed": 24,
+    "failed": 0,
+    "ignored": 0,
+    "files": {
+      "image_io/export.rs": {
+        "lines": [
+          0,
+          281
+        ],
+        "functions": [
+          0,
+          31
+        ],
+        "regions": [
+          0,
+          304
+        ],
+        "branches": [
+          0,
+          38
+        ]
+      },
+      "image_io/mod.rs": {
+        "lines": [
+          159,
+          182
+        ],
+        "functions": [
+          25,
+          39
+        ],
+        "regions": [
+          168,
+          200
+        ],
+        "branches": [
+          30,
+          30
+        ]
+      },
+      "image_io/npy.rs": {
+        "lines": [
+          95,
+          135
+        ],
+        "functions": [
+          12,
+          25
+        ],
+        "regions": [
+          115,
+          173
+        ],
+        "branches": [
+          13,
+          22
+        ]
+      },
+      "image_io/raw.rs": {
+        "lines": [
+          61,
+          101
+        ],
+        "functions": [
+          12,
+          28
+        ],
+        "regions": [
+          71,
+          118
+        ],
+        "branches": [
+          7,
+          8
+        ]
+      }
+    }
+  },
+  "real_cr3_diagnostic": {
+    "passed": 25,
+    "failed": 0,
+    "ignored": 0,
+    "files": {
+      "image_io/export.rs": {
+        "lines": [
+          0,
+          281
+        ],
+        "functions": [
+          0,
+          31
+        ],
+        "regions": [
+          0,
+          304
+        ],
+        "branches": [
+          0,
+          38
+        ]
+      },
+      "image_io/mod.rs": {
+        "lines": [
+          159,
+          182
+        ],
+        "functions": [
+          25,
+          39
+        ],
+        "regions": [
+          168,
+          200
+        ],
+        "branches": [
+          30,
+          30
+        ]
+      },
+      "image_io/npy.rs": {
+        "lines": [
+          95,
+          135
+        ],
+        "functions": [
+          12,
+          25
+        ],
+        "regions": [
+          115,
+          173
+        ],
+        "branches": [
+          13,
+          22
+        ]
+      },
+      "image_io/raw.rs": {
+        "lines": [
+          80,
+          101
+        ],
+        "functions": [
+          15,
+          28
+        ],
+        "regions": [
+          89,
+          118
+        ],
+        "branches": [
+          7,
+          8
+        ]
+      }
+    }
+  }
+}
