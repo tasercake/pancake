@@ -182,3 +182,39 @@ fn file_diagnostics_distinguish_no_matches_and_duplicate_paths() -> Result<(), B
     )?;
     require(!output.exists(), "rejection must leave output unpublished")
 }
+
+/// A malformed image reaches the real decoder, fails with its source path, and preserves export.
+///
+/// # Errors
+/// Returns fixture creation, process launch, or an incorrect decode outcome.
+#[test]
+fn malformed_inputs_are_rejected_by_the_decoder() -> Result<(), Box<dyn Error>> {
+    let directory = tempfile::tempdir()?;
+    let output = directory.path().join("out.png");
+    std::fs::write(&output, b"previous export")?;
+    for extension in ["png", "dng", "npy", "unknown"] {
+        let first = directory.path().join(format!("a.{extension}"));
+        let second = directory.path().join(format!("b.{extension}"));
+        std::fs::write(&first, b"not a supported raster")?;
+        std::fs::write(&second, b"not a supported raster")?;
+        let result = Command::new(env!("CARGO_BIN_EXE_pancake-cli"))
+            .arg("--input")
+            .arg(&first)
+            .arg(&second)
+            .arg("--output")
+            .arg(&output)
+            .arg("--cpu")
+            .output()?;
+        let stderr = String::from_utf8(result.stderr)?;
+        require(!result.status.success(), "a real malformed input must fail")?;
+        require(
+            stderr.contains("could not decode input") && stderr.contains(&format!("a.{extension}")),
+            format!("decoder must identify the first bad source: {stderr}"),
+        )?;
+        require(
+            std::fs::read(&output)? == b"previous export",
+            "a failed decode changed the previous export",
+        )?;
+    }
+    Ok(())
+}
