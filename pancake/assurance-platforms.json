@@ -5,11 +5,11 @@
   "nightly": "nightly-2026-11-15",
   "scope": "Five current pure-host library tests; OS-neutral checked shapes, budgets and readback validation. Not UI, JIT, GPU or transitive unsafe certification.",
   "reviewed_files": {
-    "src/lib.rs": "95a29677a5628ca417a73315f3b59e7692db8c775fd6650d945a98047c4c4b51",
+    "src/lib.rs": "b792d6de1209063495d2b91e2e914fff45606d57a309835dd93e51f1c29acf0d",
     "src/tests.rs": "c50f65f08d4f5a50aad6a48823be4684a459838d6d69200f53eec91f700fa88f",
-    "Cargo.toml": "9173035f372e70a3549d84d54124d7344da727389dafe005323912f835444649",
-    "Cargo.lock": "7c7c64dcbf4255efec0705b472765dd001b733999b122f67c78f36f79349ba7b"
+    "Cargo.toml": "e1eebd03924e1bf26f33da7199df2602175b573304a96aaa8c1a578a8a7f54d9",
+    "Cargo.lock": "f2603e6cb6e669617a5ef4098cfa9a27f042edd3e380be2e6c3e57820a32700f"
   },
-  "linux_limit": "tiny-xlib 0.2.5 XLIB eager constructor calls Xlib::load and dlopen before test entry; pinned Miri does not support Linux dlopen.",
+  "linux_limit": "The P0 Slint/tiny-xlib eager constructor was removed from the headless core dependency graph. Canonical Darwin Miri remains required; no new Linux Miri qualification is assumed from the graph change.",
   "reopen": "Any changed or new production source or dependency resolution requires review. New OS-specific authored code invalidates cross-host coverage unless separately qualified. Required CI must execute canonical macOS Miri; a Linux local all result cannot substitute."
 }
