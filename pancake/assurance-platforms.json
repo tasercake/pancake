@@ -42,7 +42,7 @@
     "src/fusion/mod.rs": "66f993dabccd8886a2ac38c48f1321253d18fa9e5a91263d85c69365e25bfd2b",
     "src/fusion/resize.rs": "3d672a872b3ece469973bb9e4add25ed0385316363bd0fbbc07b347e08072463",
     "src/image_io/export.rs": "7dbbe17c4aa909102d868c925a09bdc4d5f39672e6e2ddd3c2130ba3efd0fc72",
-    "src/image_io/mod.rs": "00814ac66e0e37de7fedc4669f4b2abbd9b23cf6756350b0e9bb17ef83dae287",
+    "src/image_io/mod.rs": "a010ee5f624e3404cb74b7bb7d81794ecded36e06e33f40c998a148c80ca7245",
     "src/image_io/npy.rs": "e8697e8d90d26ff24c7d17c0ab605f3b0cc8ebc08a7f0bd023759830e76f2b05",
     "src/image_io/raw.rs": "6335a39835eedb6f6f6dd372d4b41471549f3e6fd258994de6acd0e1d43b17a0",
     "src/job/events.rs": "9d4d8bcdd531d3d3a6d50911f63081bbe72bb6afde9d51a35df49dd2ba547312",
