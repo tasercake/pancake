@@ -30,6 +30,7 @@ fn gpu_advanced_fusion() -> Result<(), String> {
     advanced_fusion_cases::check_focus(&device)?;
     advanced_fusion_cases::check_exposure_batches(&device)?;
     advanced_fusion_cases::check_exposure_precision(&device)?;
+    advanced_fusion_cases::check_exposure_specialization(&device)?;
     let memory = &device.client().properties_shared().memory;
     std::fs::write(
         "target/advanced-fusion-gpu.txt",

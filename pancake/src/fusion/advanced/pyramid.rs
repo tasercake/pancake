@@ -3,7 +3,8 @@
 use cubecl::prelude::*;
 use cubecl::std::tensor::TensorHandle;
 
-use super::super::buffers::{ImageShape, elementwise, empty};
+use super::super::buffers::{ImageShape, empty};
+use super::elementwise;
 
 /// Include the original grid, retaining odd trailing rows and columns.
 ///
@@ -22,72 +23,102 @@ pub(super) fn grids(origin: ImageShape, reductions: usize) -> Result<Vec<ImageSh
     Ok(grids)
 }
 
-/// Apply separable binomial `[1,4,6,4,1]` weights and decimate on the even grid.
+/// Reduce the RGB and scalar planes together with separable binomial weights.
 ///
 /// # Errors
-/// Returns an error if intermediate sample counts exceed host addressing.
+/// Returns an error if intermediate geometry or launch addressing is invalid.
 pub(super) fn reduce(
     client: &Client,
-    input: &TensorHandle,
+    image: &TensorHandle,
+    weights: &TensorHandle,
     fine: ImageShape,
     coarse: ImageShape,
-    channels: usize,
-) -> Result<TensorHandle, String> {
-    let horizontal_samples = coarse
-        .width
-        .checked_mul(fine.height)
-        .and_then(|pixels| pixels.checked_mul(channels))
-        .ok_or("pyramid horizontal sample count overflow")?;
-    let reduced_samples = coarse
-        .area
-        .checked_mul(channels)
-        .ok_or("pyramid reduced sample count overflow")?;
-    let horizontal = empty(client, horizontal_samples);
-    let reduced = empty(client, reduced_samples);
-    let (blocks, threads) = elementwise(client, horizontal_samples);
+) -> Result<(TensorHandle, TensorHandle), String> {
+    let intermediate = ImageShape::new([coarse.width, fine.height])?;
+    let (horizontal_image, horizontal_weights) =
+        half_pass(client, image, weights, fine, intermediate, true)?;
+    half_pass(
+        client,
+        &horizontal_image,
+        &horizontal_weights,
+        intermediate,
+        coarse,
+        false,
+    )
+}
+
+/// Dispatch one axis for both input planes without changing the sample order.
+///
+/// # Errors
+/// Returns an error if the combined dispatch cannot use device indexing.
+fn half_pass(
+    client: &Client,
+    image: &TensorHandle,
+    weights: &TensorHandle,
+    input: ImageShape,
+    output: ImageShape,
+    horizontal: bool,
+) -> Result<(TensorHandle, TensorHandle), String> {
+    let samples = output
+        .samples
+        .checked_add(output.area)
+        .ok_or("pyramid work item count overflow")?;
+    let _addressable = u32::try_from(samples).map_err(|_| "pyramid dispatch exceeds u32")?;
+    let reduced_image = empty(client, output.samples);
+    let reduced_weights = empty(client, output.area);
+    let (blocks, threads) = elementwise(client, samples);
     half_axis::launch(
         client,
         blocks,
         threads,
-        input.clone().into_arg(),
-        horizontal.clone().into_arg(),
-        fine.width,
-        fine.height,
-        coarse.width,
-        channels,
-        1,
+        image.clone().into_arg(),
+        weights.clone().into_arg(),
+        reduced_image.clone().into_arg(),
+        reduced_weights.clone().into_arg(),
+        input.width,
+        input.height,
+        output.width,
+        u32::from(horizontal),
     );
-    let (blocks, threads) = elementwise(client, reduced_samples);
-    half_axis::launch(
-        client,
-        blocks,
-        threads,
-        horizontal.into_arg(),
-        reduced.clone().into_arg(),
-        coarse.width,
-        fine.height,
-        coarse.width,
-        channels,
-        0,
-    );
-    Ok(reduced)
+    Ok((reduced_image, reduced_weights))
+}
+
+/// Reduce independently indexed RGB and scalar buffers in a single dispatch.
+#[cube(launch, expand_only)]
+fn half_axis(
+    image: &Tensor<f32>,
+    weights: &Tensor<f32>,
+    reduced_image: &mut Tensor<f32>,
+    reduced_weights: &mut Tensor<f32>,
+    width: usize,
+    height: usize,
+    output_width: usize,
+    horizontal: u32,
+) {
+    let sample = ABSOLUTE_POS;
+    if sample < reduced_image.len() {
+        reduced_image[sample] =
+            half_value(image, sample, width, height, output_width, 3, horizontal);
+    } else {
+        let weight = sample - reduced_image.len();
+        if weight < reduced_weights.len() {
+            reduced_weights[weight] =
+                half_value(weights, weight, width, height, output_width, 1, horizontal);
+        }
+    }
 }
 
 /// Preserve constants exactly by filtering deviations from the central sample.
-#[cube(launch, expand_only)]
-fn half_axis(
+#[cube(expand_only)]
+fn half_value(
     input: &Tensor<f32>,
-    output: &mut Tensor<f32>,
+    sample: usize,
     width: usize,
     height: usize,
     output_width: usize,
     channels: usize,
     horizontal: u32,
-) {
-    let sample = ABSOLUTE_POS;
-    if sample >= output.len() {
-        terminate!();
-    }
+) -> f32 {
     let x = (sample / channels) % output_width;
     let y = (sample / channels) / output_width;
     let center = if horizontal != 0 { 2 * x } else { 2 * y };
@@ -113,7 +144,7 @@ fn half_axis(
         + (input[(base + upper_far * stride) * channels + lane] - origin);
     let near = (input[(base + lower_near * stride) * channels + lane] - origin)
         + (input[(base + upper_near * stride) * channels + lane] - origin);
-    output[sample] = origin + (far + near * 4.0) * 0.0625;
+    origin + (far + near * 4.0) * 0.0625
 }
 
 /// Neighbor at or before an index, clamped to the leading border.
