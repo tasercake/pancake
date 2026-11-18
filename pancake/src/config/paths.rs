@@ -15,6 +15,9 @@ const MAX_INPUT_ENTRIES: usize = 16_384;
 ///
 /// Canonicalization collapses path aliases while preserving differently named
 /// files that happen to share contents or hard-link storage.
+///
+/// # Errors
+/// Returns inaccessible paths, malformed patterns, or exceeded input limits.
 pub(super) fn resolve(arguments: &[PathBuf]) -> Result<Vec<PathBuf>, String> {
     let mut files = BTreeSet::new();
     let mut entries = limited_entries();
@@ -44,6 +47,9 @@ fn limited_entries() -> impl Iterator<Item = ()> {
 }
 
 /// Resolve a missing literal as a shell-like wildcard when applicable.
+///
+/// # Errors
+/// Returns unresolvable or invalid patterns, invalid files, or exceeded limits.
 fn expand(
     argument: &Path,
     files: &mut BTreeSet<PathBuf>,
@@ -56,7 +62,8 @@ fn expand(
     let mut matches = glob::glob_with(
         pattern,
         glob::MatchOptions {
-            require_literal_leading_dot: true,
+            // The crate's leading-dot filter assumes that every directory name is UTF-8.
+            require_literal_leading_dot: false,
             require_literal_separator: true,
             ..glob::MatchOptions::new()
         },
@@ -80,12 +87,15 @@ fn expand(
 }
 
 /// Store one canonical path and enforce the retained-file limit.
+///
+/// # Errors
+/// Returns path resolution or input count errors.
 fn insert(files: &mut BTreeSet<PathBuf>, path: &Path) -> Result<(), String> {
     let file = path
         .canonicalize()
         .map_err(|error| path_error(path, &error))?;
     let _added = files.insert(file);
-    if files.len() > usize::try_from(MAX_INPUT_COUNT).map_err(|error| error.to_string())? {
+    if u32::try_from(files.len()).unwrap_or(u32::MAX) > MAX_INPUT_COUNT {
         return Err(format!(
             "stack exceeds {MAX_INPUT_COUNT} distinct input files"
         ));
