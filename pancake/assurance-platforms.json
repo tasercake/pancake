@@ -26,7 +26,7 @@
     "src/image_io/export.rs": "7dbbe17c4aa909102d868c925a09bdc4d5f39672e6e2ddd3c2130ba3efd0fc72",
     "src/image_io/mod.rs": "1dd8fa64cc7f79ba297e1afa4fa00f400d4fbdefe1c20e12018340e82d78b11f",
     "src/image_io/npy.rs": "e8697e8d90d26ff24c7d17c0ab605f3b0cc8ebc08a7f0bd023759830e76f2b05",
-    "src/image_io/raw.rs": "386df65954cfd5ef5b97e965f1da6d1b525a139ab8d434eb4b8ccc2c41ebb930",
+    "src/image_io/raw.rs": "6335a39835eedb6f6f6dd372d4b41471549f3e6fd258994de6acd0e1d43b17a0",
     "src/job/events.rs": "9d4d8bcdd531d3d3a6d50911f63081bbe72bb6afde9d51a35df49dd2ba547312",
     "src/job/lifecycle/tests.rs": "95edc94553cf2ea311ff074fb92920f8dced4214f2b38bad0f6f0b1f347d5166",
     "src/job/lifecycle.rs": "921349167b868d8a189ab8bdfcf51f66b22d61b25cede60439fac7a106479638",
