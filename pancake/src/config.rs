@@ -150,6 +150,10 @@ impl FromStr for BitDepth {
 /// Image and working-memory limits are applied separately when dimensions and
 /// backend resources become known.
 #[derive(Clone, Copy, Debug, PartialEq)]
+#[expect(
+    clippy::struct_excessive_bools,
+    reason = "Each boolean is an independent option shared by the two frontends"
+)]
 pub struct JobSettings {
     /// Resolve the ordered inputs with this stacking algorithm.
     pub method: Method,
