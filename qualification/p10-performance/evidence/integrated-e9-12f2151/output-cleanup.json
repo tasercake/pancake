@@ -1,0 +1,33 @@
+{
+  "removed": [
+    {
+      "path": "cpu/warm-01/candidate/complete.tif",
+      "file_sha256": "e0365735dcf4b39bb65afa9187648935ca710ffc62340d5f9e9cff1ad4324528",
+      "pixel_sha256": "93baae1566df73152da06b6aa4753ff94c9c819191b84db4556ce1f9573bbed1",
+      "bytes": 1031446,
+      "review_receipt_sha256": "f7e4bdc99e7109ab03efe0c2cb285e20d5c93ba55f359c8f92497bab31152391"
+    },
+    {
+      "path": "cpu/warm-01/reference/complete.tif",
+      "file_sha256": "babe55824c0b24200981aab0f1e13ee59590d94781a2d6017d0216d367b617cd",
+      "pixel_sha256": "529d4566b7bfe3fc0c742ae1ba90e4bd090592b89b7283a4d94f342f88aa8230",
+      "bytes": 1019496,
+      "review_receipt_sha256": "f7e4bdc99e7109ab03efe0c2cb285e20d5c93ba55f359c8f92497bab31152391"
+    },
+    {
+      "path": "vulkan/warm-01/candidate/complete.tif",
+      "file_sha256": "6b9480b814aa1763b0e79e9d0ca606bb987b0d1e79c4ede2bc4ecd61156bef65",
+      "pixel_sha256": "92b3a6c7b52c1a51b83be4f72a812b8fcbae28089e810890738171c8650cd7c3",
+      "bytes": 1031446,
+      "review_receipt_sha256": "20c7eec0fa143a22e29c32b97f91fcdc3e6fd3dc01a0ee2969fc86cc93668c3f"
+    },
+    {
+      "path": "vulkan/warm-01/reference/complete.tif",
+      "file_sha256": "d996075e27f6bdccafcb2f6fa1fd260bcdc814264c8883a4679906fa17918d25",
+      "pixel_sha256": "42167e60f3ef006d0e3093bef7c3c1fd609ea8a53ec8db43d6db0c4cc913e547",
+      "bytes": 1019098,
+      "review_receipt_sha256": "20c7eec0fa143a22e29c32b97f91fcdc3e6fd3dc01a0ee2969fc86cc93668c3f"
+    }
+  ],
+  "remaining_tiffs": 0
+}
