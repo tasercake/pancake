@@ -1,0 +1,35 @@
+//! Read packed RGB produced by the unchanged Python fixture generator.
+
+use std::path::Path;
+use pancake::registration::{Frame, Model, estimate_pair};
+
+/// Read a packed little-endian f32 oracle.
+fn data(path: &Path) -> Result<Vec<f32>, String> {
+    let bytes = std::fs::read(path).map_err(|error| error.to_string())?;
+    let (samples, tail) = bytes.as_chunks::<4>();
+    if !tail.is_empty() {
+        return Err("invalid float oracle".to_owned());
+    }
+    Ok(samples.iter().map(|&value| f32::from_le_bytes(value)).collect())
+}
+
+/// Evaluate the real two-pixel shift under fixed stage limits.
+fn main() -> Result<(),String> {
+    let runtime=std::env::args().nth(1).ok_or("specify cpu or vulkan")?;
+    let device=match runtime.as_str() {
+        "cpu"=>cubecl::Device::cpu(),
+        "vulkan"=>cubecl::Device::vulkan(cubecl::device::WgpuDeviceKind::DiscreteGpu(0)),
+        other=>return Err(format!("unknown runtime {other}")),
+    }.map_err(|error| error.to_string())?;
+    let read = |index| {
+        let input=data(&Path::new("../artifacts/p5/cascade-probe").join(format!("wide-{index}.f32")))?;
+        pancake::registration::thumbnail_with_scale(&device,Frame::new(4097,257,&input)?,4097,257,6,100_000_000)
+    };
+    let estimate=estimate_pair(&device,&read(0)?,&read(1)?,Model::Euclidean,0.02,runtime=="cpu")?;
+    let [[a,b,c],[d,e,f]]=estimate.transform.matrix();
+    let worst = [[16.0_f32,16.0_f32],[4080.0,16.0],[16.0,240.0],[4080.0,240.0]].into_iter()
+        .map(|[x,y]| (((a-1.0)*x+b*y+c)-2.0).abs().max((d*x+(e-1.0)*y+f).abs()))
+        .fold(0.0_f32,f32::max);
+    println!("{estimate:?} gives {worst}px max interior-corner error");
+    if worst > 0.05 { Err("wide fixture registration exceeds 0.05px".to_owned()) } else { Ok(()) }
+}

@@ -1,0 +1,15 @@
+running 1 test
+test cpu_registration_geometry ... FAILED
+
+failures:
+
+---- cpu_registration_geometry stdout ----
+Error: "wide shift: expected [37.25, -25.5], found [0, 0]"
+
+
+failures:
+    cpu_registration_geometry
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.73s
+
+error: test failed, to rerun pass `--test cpu_registration_contract`

@@ -1,0 +1,7 @@
+fast=1
+native-dev=0
+deps=0
+coverage-cpu=1
+clippy=101
+rustdoc=101
+linux-miri=0

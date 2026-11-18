@@ -1,0 +1,9 @@
+{
+  "nominal_camera_max_from_cmp1_sensor_bits": 16383,
+  "actual_max_libraw_visible_mosaic": 16293,
+  "unadjusted_mean_absolute_error": 0.0020630550570786,
+  "unadjusted_max_absolute_error": 0.6514260172843933,
+  "unadjusted_p99_absolute_error": 0.012637467123568058,
+  "unadjusted_p99_absolute_error_interior_16px": 0.012619154527783394,
+  "comparison_recipe": "Both linear, PPG, camera WB, no auto brightness, camera metadata crop overlap, nominal sensor max from CMP1 tag, no LibRaw measured-max adjustment."
+}

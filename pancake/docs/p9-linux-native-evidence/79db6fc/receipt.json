@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "tested_revision": "79db6fc62bed7f61b136d7384992c4970dd09ef3",
+  "cargo_lock_sha256": "012cda6d161124eef8ecc3c5c6a4fed8db881e5f7606f4b9d7aee5f766f1a879",
+  "frozen_contract_file_count": 90,
+  "builds": {
+    "hip": {
+      "binary_sha256": "50552e07663fb35d2232f4592fba232a39644e1ee7487eee23b1b96a33f2a647",
+      "bytes": 164435424,
+      "linked_native_symbol_count": 270,
+      "metadata_sha256": "269ebe502a64d643b35542a548c36bc502b5f2677b85c68229b2cdf0c434811e",
+      "compile_and_link": "passed",
+      "dependency_policy": "passed",
+      "offline_cargo_deny": "passed",
+      "runtime_exercised": false
+    },
+    "cuda": {
+      "binary_sha256": "a7396a200ba2318559497f4527d32081ad66f189f76445675a009dfe2f7ea802",
+      "bytes": 130090232,
+      "linked_native_symbol_count": 281,
+      "metadata_sha256": "6eed4da3951af0efa81ff501c4cccae344eb81815cd8160afdb9ceae553b9708",
+      "compile_and_link": "passed",
+      "dependency_policy": "passed",
+      "offline_cargo_deny": "passed",
+      "runtime_exercised": true
+    }
+  },
+  "run_binary_sha256": "a7396a200ba2318559497f4527d32081ad66f189f76445675a009dfe2f7ea802",
+  "runs": {
+    "cpu": {
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "unsupported": 0
+      },
+      "completed": {}
+    },
+    "cuda": {
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "unsupported": 0
+      },
+      "completed": {}
+    }
+  },
+  "offline_advisory_database_revision": "233155b4025b854c68a4b199c0e32d7fd53291a2",
+  "build_commands": {
+    "hip": [
+      "cargo",
+      "build",
+      "--locked",
+      "--release",
+      "-p",
+      "pancake",
+      "-p",
+      "pancake-cli",
+      "--bin",
+      "pancake-cli",
+      "-j",
+      "3",
+      "--features",
+      "cubecl/hip"
+    ],
+    "cuda": [
+      "cargo",
+      "build",
+      "--locked",
+      "--release",
+      "-p",
+      "pancake",
+      "-p",
+      "pancake-cli",
+      "--bin",
+      "pancake-cli",
+      "-j",
+      "3",
+      "--features",
+      "cubecl/cuda"
+    ]
+  },
+  "cuda_build_environment": {
+    "CUDARC_CUDA_VERSION": "12050"
+  },
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+  "os": "Linux 6.8.0-147-generic x86_64 GNU/Linux",
+  "hardware": "NVIDIA GeForce RTX 3090, 00000000:01:00.0, 580.178.04, 24576 MiB",
+  "example_kind": "focused_contract_execution_not_performance_measurement",
+  "hashed_run_files": 79,
+  "raw_text_members": 73,
+  "retained_archive_sha256": {
+    "raw-text-records.tar.gz": "a7d499d79ef5a8dd15f8bea10c3da0d1eab7989aaa5ffb08517b5885b0da7aa0",
+    "run-file-manifest.json.gz": "ad88f997ab53ecdcf852caedb98e11b07ca794c044a54640ddc05b49b2c981a3"
+  }
+}

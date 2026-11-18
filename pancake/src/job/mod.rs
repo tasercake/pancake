@@ -60,7 +60,8 @@ impl Options {
                 let name = value
                     .to_str()
                     .ok_or("PANCAKE_RUNTIME must be valid UTF-8")?;
-                name.parse()
+                name.parse::<RuntimeOverride>()
+                    .map_err(|error| format!("invalid PANCAKE_RUNTIME {name:?}: {error}"))
             })
             .transpose()?;
         Ok(Self {
@@ -246,6 +247,7 @@ pub fn run_controlled(
     control: &JobControl,
     progress: impl FnMut(JobSnapshot),
 ) -> Result<StackResult, JobError> {
+    control.claim(config.inputs().len())?;
     let outcome = execute(config, options, control, progress);
     match &outcome {
         Ok(_) => control.finish(true)?,

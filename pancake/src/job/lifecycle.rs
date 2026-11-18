@@ -104,6 +104,8 @@ impl std::error::Error for Stop {}
 struct State {
     /// Externally observable state protected by the lifecycle mutex.
     snapshot: JobSnapshot,
+    /// Whether one executor has acquired this one-use job controller.
+    claimed: bool,
     /// Cancellation is requested separately from worker acknowledgement.
     cancel_requested: bool,
     /// The result crossed the final safe boundary and may now be published.
@@ -163,12 +165,31 @@ impl JobControl {
                         pause_acknowledged: None,
                         cancel_acknowledged: None,
                     },
+                    claimed: false,
                     cancel_requested: false,
                     committed: false,
                 }),
                 changed: Condvar::new(),
             }),
         })
+    }
+
+    /// Admit exactly one executor for the original request count.
+    ///
+    /// # Errors
+    ///
+    /// Reports mismatched input counts, duplicate admission or lock failure.
+    pub(super) fn claim(&self, total: usize) -> Result<(), String> {
+        let mut state = self.lock()?;
+        if state.claimed {
+            return Err("stack controller already owns an execution".to_owned());
+        }
+        if state.snapshot.total != total {
+            return Err("stack controller does not match the configured input count".to_owned());
+        }
+        state.claimed = true;
+        drop(state);
+        Ok(())
     }
 
     /// Read a consistent worker snapshot.

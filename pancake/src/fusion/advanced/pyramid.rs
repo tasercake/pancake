@@ -22,7 +22,7 @@ pub(super) fn grids(origin: ImageShape, reductions: usize) -> Result<Vec<ImageSh
     Ok(grids)
 }
 
-/// Apply separable binomial [1,4,6,4,1] weights and decimate on the even grid.
+/// Apply separable binomial `[1,4,6,4,1]` weights and decimate on the even grid.
 ///
 /// # Errors
 /// Returns an error if intermediate sample counts exceed host addressing.

@@ -25,12 +25,7 @@ impl SampleType {
     ///
     /// Returns malformed or unsupported scalar dtype errors.
     fn from_header(header: &str) -> Result<Self, String> {
-        let value = field(header, "descr")?
-            .split_once(',')
-            .ok_or_else(|| "NumPy dtype has no delimiter".to_owned())?
-            .0
-            .trim()
-            .trim_matches(['\'', '"']);
+        let value = scalar_field(header, "descr")?.trim_matches(['\'', '"']);
         match value {
             "|u1" => Ok(Self::U8),
             "<u2" => Ok(Self::U16(true)),
@@ -187,18 +182,24 @@ fn field<'a>(header: &'a str, key: &str) -> Result<&'a str, String> {
         .ok_or_else(|| format!("missing NumPy header field {key:?}"))
 }
 
+/// Read a scalar value whether or not another entry or trailing comma follows.
+/// # Errors
+/// Returns a missing or malformed header field error.
+fn scalar_field<'a>(header: &'a str, key: &str) -> Result<&'a str, String> {
+    let value = field(header, key)?.trim_end().trim_end_matches('}');
+    Ok(value
+        .split_once(',')
+        .map_or(value, |(scalar, _)| scalar)
+        .trim())
+}
+
 /// Identify a C-order, two- or three-dimensional grayscale/RGB image shape.
 ///
 /// # Errors
 ///
 /// Returns malformed, unsupported order, or unsupported channel errors.
 fn parse_shape(header: &str) -> Result<(usize, usize, ArrayLayout), String> {
-    let fortran = field(header, "fortran_order")?
-        .split_once(',')
-        .ok_or_else(|| "NumPy order has no delimiter".to_owned())?
-        .0
-        .trim();
-    if fortran != "False" {
+    if scalar_field(header, "fortran_order")? != "False" {
         return Err("NumPy image must use contiguous row-major order".to_owned());
     }
     let shape = field(header, "shape")?
