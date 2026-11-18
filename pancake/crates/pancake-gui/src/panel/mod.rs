@@ -1,0 +1,109 @@
+//! Platform-owned file selection for the native workspace.
+
+use std::path::PathBuf;
+
+use slint_interpreter::ComponentInstance;
+
+#[cfg(target_os = "linux")]
+mod linux;
+#[cfg(target_os = "linux")]
+mod pointer;
+#[cfg(target_os = "linux")]
+pub use pointer::PointerHandoff;
+
+/// File selection purpose.
+#[derive(Clone, Copy, Debug)]
+pub enum Picker<'a> {
+    /// Input images, selected individually or as a group.
+    Files,
+    /// A source or destination directory.
+    Folder,
+    /// An output path in a chosen directory.
+    Save(&'a str),
+}
+
+/// Present the native Linux file panel without blocking the Slint event loop.
+///
+/// # Errors
+///
+/// Returns a desktop setup error before registering the completion.
+#[cfg(target_os = "linux")]
+pub fn open(
+    window: &ComponentInstance,
+    kind: Picker<'_>,
+    completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
+) -> Result<(), String> {
+    use slint::ComponentHandle as _;
+    linux::open(x11_owner(window.window()), kind, completion)
+}
+
+/// Obtain the actual managed workspace's X11 owner for native transience.
+#[cfg(target_os = "linux")]
+fn x11_owner(window: &slint::Window) -> Option<std::ffi::c_ulong> {
+    use slint::winit_030::winit::raw_window_handle::{HasWindowHandle as _, RawWindowHandle};
+
+    let workspace = window.window_handle();
+    match workspace.window_handle().ok()?.as_raw() {
+        RawWindowHandle::Xlib(raw) => Some(raw.window).filter(|&id| id != 0),
+        RawWindowHandle::Xcb(raw) => Some(raw.window.get().into()),
+        _ => None,
+    }
+}
+
+/// Present the platform dialog with native window parenting.
+///
+/// # Errors
+///
+/// Returns an error if the platform picker reports a setup failure.
+/// The current system picker represents cancellation as an empty selection.
+#[cfg(any(target_os = "macos", target_os = "windows"))]
+pub fn open(
+    window: &ComponentInstance,
+    kind: Picker<'_>,
+    completion: impl FnOnce(Result<Vec<PathBuf>, String>) + 'static,
+) -> Result<(), String> {
+    use slint::ComponentHandle as _;
+
+    let panel = rfd::FileDialog::new().set_parent(&window.window().window_handle());
+    let selected = match kind {
+        Picker::Files => panel
+            .set_title("Open images")
+            .pick_files()
+            .unwrap_or_default(),
+        Picker::Folder => panel
+            .set_title("Choose folder")
+            .pick_folder()
+            .into_iter()
+            .collect(),
+        Picker::Save(name) => panel
+            .set_title("Save image")
+            .set_file_name(name)
+            .save_file()
+            .into_iter()
+            .collect(),
+    };
+    completion(Ok(selected));
+    Ok(())
+}
+
+/// Dispatch pending native panel events when the Slint event loop owns the UI.
+///
+/// When a modal GTK dialog closes, its native accessibility tree still needs
+/// to process window removal. A bounded main-context drain integrates both
+/// toolkits without keeping a second UI thread or retaining the old dialog.
+#[cfg(target_os = "linux")]
+pub fn service_events() {
+    if gtk::is_initialized_main_thread() {
+        let context = gtk::glib::MainContext::default();
+        for _ in 0_u8..32 {
+            if !context.pending() {
+                break;
+            }
+            let _handled = context.iteration(false);
+        }
+    }
+}
+
+/// Other supported desktops present native file panels through a shared loop.
+#[cfg(any(target_os = "macos", target_os = "windows"))]
+pub const fn service_events() {}

@@ -1,0 +1,27 @@
+//! Isolated linkage check for the production native services.
+#[path = "../../../../pancake/crates/pancake-gui/src/history.rs"]
+pub mod history;
+
+
+/// File selection purpose for the production Linux picker.
+#[cfg(feature = "native")]
+#[derive(Clone, Copy, Debug)]
+pub enum Picker<'a> {
+    /// Input files.
+    Files,
+    /// Source or destination directory.
+    Folder,
+    /// Output path.
+    Save(&'a str),
+}
+
+#[cfg(feature = "native")]
+#[path = "../../../../pancake/crates/pancake-gui/src/desktop_menu.rs"]
+pub mod desktop_menu;
+
+/// Picker wrapper preserving its production Rust module visibility.
+#[cfg(feature = "native")]
+pub mod gtk_probe;
+
+#[cfg(feature = "native")]
+pub use gtk_probe::open;

@@ -14,6 +14,9 @@ use crate::runtime::SelectedRuntime;
 use super::registration::{Alignment, SourceMap};
 use super::{JobControl, JobError, JobSnapshot, Stage};
 
+#[cfg(test)]
+mod tests;
+
 /// Geometry, budget partitions, and derived parameters for a stack.
 #[derive(Debug)]
 struct Plan {
@@ -322,30 +325,12 @@ fn finish(
 ///
 /// Returns invalid geometry or address overflow.
 fn crop_samples(samples: &mut Vec<f32>, old: Bounds, crop: Bounds) -> Result<(), String> {
-    let stride = rgb_stride(old.width())?;
     let row_width = rgb_stride(crop.width())?;
-    let offset = rgb_stride(crop.x())?;
-    let source_y_end = crop
-        .y()
-        .checked_add(crop.height())
-        .ok_or("crop y overflow")?;
-    let row_end = offset.checked_add(row_width).ok_or("crop x overflow")?;
-    if source_y_end > old.height() || row_end > stride {
-        return Err("crop extends outside the completed result".to_owned());
-    }
-    for (target_row, source_row) in (crop.y()..source_y_end).enumerate() {
-        let start = source_row
-            .checked_mul(stride)
-            .and_then(|row| row.checked_add(offset))
-            .ok_or("crop source overflow")?;
-        let end = start
-            .checked_add(row_width)
-            .filter(|&end| end <= samples.len())
-            .ok_or("crop source exceeds the complete raster")?;
+    for (target_row, range) in crop_rows(old, crop, samples.len())?.enumerate() {
         let target = target_row
             .checked_mul(row_width)
             .ok_or("crop destination overflow")?;
-        samples.copy_within(start..end, target);
+        samples.copy_within(range?, target);
     }
     let len = crop
         .height()
@@ -353,6 +338,72 @@ fn crop_samples(samples: &mut Vec<f32>, old: Bounds, crop: Bounds) -> Result<(),
         .ok_or("crop destination size overflow")?;
     samples.truncate(len);
     Ok(())
+}
+
+/// Copy only the selected reference rectangle, preserving the original raster.
+///
+/// # Errors
+///
+/// Returns invalid geometry, allocation failure or invalid samples.
+pub(super) fn copy_crop(image: &RgbImage, old: Bounds, crop: Bounds) -> Result<RgbImage, String> {
+    let original = image.samples();
+    let mut samples = Vec::new();
+    let count = rgb_stride(crop.width())?
+        .checked_mul(crop.height())
+        .ok_or("crop destination size overflow")?;
+    samples
+        .try_reserve_exact(count)
+        .map_err(|error| error.to_string())?;
+    for range in crop_rows(old, crop, original.len())? {
+        samples.extend_from_slice(original.get(range?).ok_or("crop row exceeded its input")?);
+    }
+    let mut cropped = RgbImage::new(crop.width(), crop.height(), samples)?;
+    if image.is_grayscale_array() {
+        cropped.mark_grayscale_array();
+    }
+    Ok(cropped)
+}
+
+/// Resolve exact RGB sample rows for absolute reference-space bounds.
+///
+/// # Errors
+///
+/// Returns invalid geometry or address overflow rather than clipping a crop.
+fn crop_rows(
+    old: Bounds,
+    crop: Bounds,
+    sample_count: usize,
+) -> Result<impl Iterator<Item = Result<Range<usize>, String>>, String> {
+    let stride = rgb_stride(old.width())?;
+    let row_width = rgb_stride(crop.width())?;
+    let column = crop
+        .x()
+        .checked_sub(old.x())
+        .ok_or("crop precedes its source column")?;
+    let offset = rgb_stride(column)?;
+    let source_y = crop
+        .y()
+        .checked_sub(old.y())
+        .ok_or("crop precedes its source row")?;
+    let source_y_end = source_y
+        .checked_add(crop.height())
+        .ok_or("crop y overflow")?;
+    let row_end = offset.checked_add(row_width).ok_or("crop x overflow")?;
+    if source_y_end > old.height() || row_end > stride {
+        return Err("crop extends outside the completed result".to_owned());
+    }
+
+    Ok((source_y..source_y_end).map(move |source_row| {
+        let start = source_row
+            .checked_mul(stride)
+            .and_then(|row| row.checked_add(offset))
+            .ok_or("crop source overflow")?;
+        let end = start
+            .checked_add(row_width)
+            .filter(|&end| end <= sample_count)
+            .ok_or("crop source exceeds the complete raster")?;
+        Ok(start..end)
+    }))
 }
 
 /// Address checked interleaved RGB samples.

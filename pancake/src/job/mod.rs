@@ -132,6 +132,20 @@ impl StackResult {
         self.safe_crop
     }
 
+    /// Produce the exact valid crop from an immutable completed result.
+    ///
+    /// Returns no image if a safe crop is unavailable or already represented.
+    ///
+    /// # Errors
+    ///
+    /// Returns invalid result geometry, allocation or sample errors.
+    pub fn manually_cropped(&self) -> Result<Option<RgbImage>, String> {
+        self.safe_crop
+            .filter(|&crop| crop != self.crop)
+            .map(|crop| stream::copy_crop(&self.image, self.crop, crop))
+            .transpose()
+    }
+
     /// Map a result-canvas pixel to the indexed original source.
     #[must_use]
     pub fn source_transform(&self, index: usize) -> Option<Affine> {

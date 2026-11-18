@@ -1,0 +1,69 @@
+{
+  "recent": {
+    "path": [
+      0,
+      1,
+      0,
+      3
+    ],
+    "id": "",
+    "role": "AXMenuItem",
+    "title": "\u8f93\u5165 caf\u00e9",
+    "value": "\u8f93\u5165 caf\u00e9",
+    "description": "",
+    "enabled": true,
+    "position": [
+      428,
+      505
+    ],
+    "size": [
+      156,
+      29
+    ]
+  },
+  "disabled_empty": {
+    "path": [
+      0,
+      1,
+      0,
+      3
+    ],
+    "id": "recent.empty",
+    "role": "AXMenuItem",
+    "title": "No Recent Folders",
+    "value": "No Recent Folders",
+    "description": "",
+    "enabled": false,
+    "position": [
+      428,
+      505
+    ],
+    "size": [
+      175,
+      27
+    ]
+  },
+  "reveal": {
+    "path": [
+      0,
+      1,
+      0,
+      0
+    ],
+    "id": "frames.reveal",
+    "role": "AXMenuItem",
+    "title": "Show in File Manager",
+    "value": "Show in File Manager",
+    "description": "",
+    "enabled": true,
+    "position": [
+      762,
+      450
+    ],
+    "size": [
+      192,
+      27
+    ]
+  },
+  "active_file_manager": "\u8f93\u5165 caf\u00e9 - Thunar"
+}

@@ -178,6 +178,11 @@
           "requirement": "^2.2.1"
         },
         {
+          "name": "cairo-rs",
+          "version": "0.22.11",
+          "requirement": "^2.10"
+        },
+        {
           "name": "calloop",
           "version": "0.13.0",
           "requirement": "^2.4"
@@ -221,6 +226,11 @@
           "name": "gbm",
           "version": "0.18.0",
           "requirement": "^2"
+        },
+        {
+          "name": "glib",
+          "version": "0.22.11",
+          "requirement": "^2.10"
         },
         {
           "name": "glutin",
@@ -610,6 +620,11 @@
           "requirement": "^0.6.2"
         },
         {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
           "name": "objc2-core-foundation",
           "version": "0.3.2",
           "requirement": ">=0.6.1, <0.8.0"
@@ -633,6 +648,11 @@
           "name": "objc2-ui-kit",
           "version": "0.3.2",
           "requirement": ">=0.6.1, <0.8.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
+          "requirement": "^0.6.0"
         },
         {
           "name": "wgpu-hal",
@@ -1147,7 +1167,7 @@
       "reviewed_on": "2026-11-17",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
-      "cargo_deny_skip": false
+      "cargo_deny_skip": true
     },
     {
       "name": "getrandom",
@@ -1199,7 +1219,7 @@
       "reviewed_on": "2026-11-17",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
-      "cargo_deny_skip": false
+      "cargo_deny_skip": true
     },
     {
       "name": "glow",
@@ -1277,6 +1297,11 @@
         {
           "name": "libflate_lz77",
           "version": "2.3.0",
+          "requirement": "^0.16"
+        },
+        {
+          "name": "slint-interpreter",
+          "version": "1.19.0",
           "requirement": "^0.16"
         }
       ],
@@ -1693,7 +1718,7 @@
       "reviewed_on": "2026-11-17",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
-      "cargo_deny_skip": false
+      "cargo_deny_skip": true
     },
     {
       "name": "linux-raw-sys",
@@ -2029,8 +2054,18 @@
           "requirement": ">=0.6.2, <0.8.0"
         },
         {
+          "name": "objc2-uniform-type-identifiers",
+          "version": "0.3.2",
+          "requirement": ">=0.6.2, <0.8.0"
+        },
+        {
           "name": "raw-window-metal",
           "version": "1.1.0",
+          "requirement": "^0.6.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.6.0"
         },
         {
@@ -2113,6 +2148,11 @@
         {
           "name": "muda",
           "version": "0.21.2",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.3.0"
         },
         {
@@ -2288,8 +2328,18 @@
           "requirement": "^0.3.2"
         },
         {
+          "name": "objc2-uniform-type-identifiers",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
           "name": "raw-window-metal",
           "version": "1.1.0",
+          "requirement": "^0.3.0"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.3.0"
         },
         {
@@ -2473,6 +2523,43 @@
       "expires_on": "2027-02-15",
       "clippy_allow": true,
       "cargo_deny_skip": false
+    },
+    {
+      "name": "objc2-uniform-type-identifiers",
+      "version": "0.2.2",
+      "reason": "UIKit needs its matching Uniform Type Identifiers binding generation in dormant iOS metadata. AppKit and rfd use the other generation to build native macOS panel filters. Platform panel types stay inside their own toolkit.",
+      "parents": [
+        {
+          "name": "objc2-ui-kit",
+          "version": "0.2.2",
+          "requirement": "^0.2.2"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
+    },
+    {
+      "name": "objc2-uniform-type-identifiers",
+      "version": "0.3.2",
+      "reason": "UIKit needs its matching Uniform Type Identifiers binding generation in dormant iOS metadata. AppKit and rfd use the other generation to build native macOS panel filters. Platform panel types stay inside their own toolkit.",
+      "parents": [
+        {
+          "name": "objc2-app-kit",
+          "version": "0.3.2",
+          "requirement": "^0.3.2"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
+          "requirement": "^0.3.0"
+        }
+      ],
+      "reviewed_on": "2026-11-18",
+      "expires_on": "2027-02-15",
+      "cargo_deny_skip": false,
+      "clippy_allow": true
     },
     {
       "name": "prettyplease",
@@ -2885,7 +2972,7 @@
       "reviewed_on": "2026-11-17",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
-      "cargo_deny_skip": false
+      "cargo_deny_skip": true
     },
     {
       "name": "rustix",
@@ -3127,6 +3214,11 @@
       "parents": [
         {
           "name": "i-slint-compiler",
+          "version": "1.19.0",
+          "requirement": "^0.3.1"
+        },
+        {
+          "name": "slint-interpreter",
           "version": "1.19.0",
           "requirement": "^0.3.1"
         }
@@ -3464,6 +3556,16 @@
         {
           "name": "futures-macro",
           "version": "0.3.34",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "glib-macros",
+          "version": "0.22.11",
+          "requirement": "^3.0"
+        },
+        {
+          "name": "gtk3-macros",
+          "version": "0.19.0",
           "requirement": "^3.0"
         },
         {
@@ -3875,6 +3977,11 @@
           "name": "skia-bindings",
           "version": "0.157.0",
           "requirement": "^1.0.3"
+        },
+        {
+          "name": "system-deps",
+          "version": "9.0.1",
+          "requirement": "^1"
         }
       ],
       "reviewed_on": "2026-11-18",
@@ -4344,7 +4451,7 @@
       "reviewed_on": "2026-11-17",
       "expires_on": "2027-02-15",
       "clippy_allow": true,
-      "cargo_deny_skip": false
+      "cargo_deny_skip": true
     },
     {
       "name": "windows-sys",
@@ -4392,6 +4499,11 @@
           "requirement": "^0.61.2"
         },
         {
+          "name": "gio-sys",
+          "version": "0.22.11",
+          "requirement": ">=0.52, <=0.61"
+        },
+        {
           "name": "home",
           "version": "0.5.12",
           "requirement": "^0.61"
@@ -4409,6 +4521,11 @@
         {
           "name": "polling",
           "version": "3.11.0",
+          "requirement": "^0.61"
+        },
+        {
+          "name": "rfd",
+          "version": "0.18.0",
           "requirement": "^0.61"
         },
         {
