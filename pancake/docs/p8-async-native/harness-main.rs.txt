@@ -1,0 +1,140 @@
+//! Independent Linux GTK3 native service probe.
+
+use std::path::{Path, PathBuf};
+
+use atk::prelude::AtkObjectExt as _;
+use gtk::prelude::{
+    BoxExt as _, ButtonExt as _, ContainerExt as _, GtkWindowExt as _, LabelExt as _, WidgetExt as _,
+};
+
+use pancake_native_probe::desktop_menu::{self, FileAction, SourceAction};
+use pancake_native_probe::history::RecentFolders;
+use pancake_native_probe::{self as panel, Picker};
+
+/// Exercise the selected picker through the production native service.
+fn show_pick(result: &gtk::Label, kind: Picker<'_>) {
+    let output = result.clone();
+    let saving = matches!(kind, Picker::Save(_));
+    match panel::open(kind, move |paths| {
+        match paths {
+            Ok(paths) => match paths.first() {
+                Some(path) => {
+                    if saving && let Err(error) = std::fs::write(path, b"native chooser probe") {
+                        output.set_text(&error.to_string());
+                        return;
+                    }
+                    output.set_text(&path.to_string_lossy());
+                }
+                None => output.set_text("Cancelled"),
+            },
+            Err(error) => output.set_text(&error),
+        }
+    }) {
+        Ok(()) => result.set_text("Picker open"),
+        Err(error) => result.set_text(&error),
+    }
+}
+
+/// Exercise the real asynchronous native File menu.
+///
+/// # Errors
+///
+/// Returns the active profile or native menu setup error.
+fn open_menu(label: &gtk::Label, profile: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    let mut history = RecentFolders::open(profile)?;
+    let entries = history.entries().to_vec();
+    let result = label.clone();
+    desktop_menu::open_file(&entries, move |choice| {
+        match choice {
+            Some(FileAction::OpenFiles) => show_pick(&result, Picker::Files),
+            Some(FileAction::OpenFolder) => show_pick(&result, Picker::Folder),
+            Some(FileAction::OpenRecent(path)) => result.set_text(&path.to_string_lossy()),
+            Some(FileAction::ClearRecent) => {
+                if let Err(error) = history.clear() {
+                    result.set_text(&error.to_string());
+                } else {
+                    result.set_text("History cleared");
+                }
+            }
+            Some(FileAction::Close) => gtk::main_quit(),
+            None => result.set_text("Menu dismissed"),
+        }
+    })?;
+    label.set_text("File menu open");
+    Ok(())
+}
+
+/// Set up a real button and stable native accessibility identifier.
+fn button(parent: &gtk::Box, label: &str, id: &str, action: impl Fn() + 'static) {
+    let button = gtk::Button::with_label(label);
+    if let Some(accessible) = button.accessible() {
+        accessible.set_accessible_id(id);
+    }
+    let _handler = button.connect_clicked(move |_| action());
+    parent.pack_start(&button, false, false, 0);
+}
+
+/// Launch the standalone native-service probe.
+///
+/// # Errors
+///
+/// Returns an invalid launch argument or GTK startup failure.
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    gtk::init()?;
+    let profile: PathBuf = std::env::var_os("CONFORMANCE_UI_SETTINGS_DIR")
+        .ok_or("missing independent probe profile")?.into();
+    let source: PathBuf = std::env::args_os().nth(1).ok_or("missing reveal source")?.into();
+    let source_parent = source.parent().ok_or("missing source parent")?;
+    let mut history = RecentFolders::open(&profile)?;
+    history.remember(source_parent)?;
+
+    let window = gtk::Window::new(gtk::WindowType::Toplevel);
+    window.set_title("Native desktop service probe");
+    window.set_default_size(640, 160);
+    let root = gtk::Box::new(gtk::Orientation::Vertical, 12);
+    let toolbar = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+    root.pack_start(&toolbar, false, false, 0);
+    let result = gtk::Label::new(Some("Ready"));
+    let label = result.accessible().ok_or("missing native result label")?;
+    label.set_accessible_id("operation.result");
+    root.pack_start(&result, true, false, 0);
+    {
+        let result = result.clone();
+        button(&toolbar, "File", "file.menu", move || {
+            if let Err(error) = open_menu(&result, &profile) {
+                result.set_text(&error.to_string());
+            }
+        });
+    }
+    for (title, id, picker) in [
+        ("Open", "open", Picker::Files),
+        ("Folder", "folder", Picker::Folder),
+        ("Save", "save", Picker::Save("output.png")),
+    ] {
+        let result = result.clone();
+        button(&toolbar, title, id, move || show_pick(&result, picker));
+    }
+    button(&toolbar, "Source Actions", "source", move || {
+        let output = result.clone();
+        let path = source.clone();
+        match desktop_menu::open_source(move |action| match action {
+            Some(SourceAction::Reveal) => {
+                if let Err(error) = desktop_menu::reveal(&path) {
+                    output.set_text(&error);
+                } else {
+                    output.set_text("Source revealed");
+                }
+            }
+            Some(SourceAction::Remove) => output.set_text("Remove selected"),
+            None => output.set_text("Menu dismissed"),
+        }) {
+            Ok(()) => result.set_text("Source menu open"),
+            Err(error) => result.set_text(&error),
+        }
+    });
+    window.add(&root);
+    let _destroy = window.connect_destroy(|_| gtk::main_quit());
+    window.show_all();
+    gtk::main();
+    Ok(())
+}

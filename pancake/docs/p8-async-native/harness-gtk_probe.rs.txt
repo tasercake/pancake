@@ -1,0 +1,18 @@
+//! Probe wrapper around the production Linux picker.
+
+use crate::Picker;
+
+#[path = "../../../../pancake/crates/pancake-gui/src/panel/linux.rs"]
+mod gtk_panel;
+
+/// Present the production Linux picker in the independent probe.
+///
+/// # Errors
+///
+/// Returns native picker setup errors.
+pub fn open(
+    kind: Picker<'_>,
+    completion: impl FnOnce(Result<Vec<std::path::PathBuf>, String>) + 'static,
+) -> Result<(), String> {
+    gtk_panel::open(kind, completion)
+}
