@@ -1,0 +1,94 @@
+"""Reproduce the precise frozen D150 sources from the selected Figshare archive."""
+
+import hashlib
+import json
+import shutil
+import zipfile
+from pathlib import Path
+from urllib.request import urlopen
+
+scratch = Path("artifacts/d150")
+targets = json.loads(Path("pancake/docs/performance-targets.json").read_bytes())
+pin = targets["corpus_evidence"]
+manifest_bytes = Path(pin["manifest_path"]).read_bytes()
+if hashlib.sha256(manifest_bytes).hexdigest() != pin["manifest_sha256"]:
+    raise ValueError("frozen D150 manifest checksum differs")
+manifest = json.loads(manifest_bytes)
+selected = next(
+    item for item in manifest["workloads"] if item["id"] == pin["D150"]["selected_id"]
+)
+frames = selected["frames"]
+if len(frames) != 150 or len({frame["sha256"] for frame in frames}) != len(frames):
+    raise ValueError("D150 requires 150 distinct native frames")
+source = next(
+    item for item in manifest["sources"] if item["id"] == selected["dataset_id"]
+)
+archives = source["selected_downloads"]["files"]
+archive_prefix = Path(frames[0]["path"]).parts[4]
+expected = next(
+    item
+    for item in archives
+    if f"{Path(item['path']).stem}-{item['sha256'][:12]}" == archive_prefix
+)
+if expected["size"] > manifest["native_download_budget_bytes"]:
+    raise ValueError("D150 archive exceeds the frozen source budget")
+if shutil.disk_usage(scratch).free < 15 * 1024**3 + expected["size"] + sum(
+    row["bytes"] for row in frames
+):
+    raise ValueError("insufficient disk reserve for D150 extraction")
+archive = scratch / Path(expected["path"]).name
+
+
+def copy_verified(from_stream, destination, size, digest):
+    checksum = hashlib.sha256()
+    remaining = size
+    with destination.open("xb") as output:
+        while remaining:
+            chunk = from_stream.read(min(remaining, 1024**2))
+            if not chunk:
+                raise ValueError(f"short payload for {destination}")
+            output.write(chunk)
+            checksum.update(chunk)
+            remaining -= len(chunk)
+        if from_stream.read(1) or checksum.hexdigest() != digest:
+            raise ValueError(f"frozen SHA-256 or size does not match {destination}")
+
+
+with urlopen(expected["url"], timeout=45) as stream:
+    copy_verified(stream, archive, expected["size"], expected["sha256"])
+
+input_root = scratch / "inputs"
+input_root.mkdir()
+(input_root / "ownership.json").write_text(
+    json.dumps(
+        {
+            "task": "D150 Hybrid CPU paired run",
+            "frozen_manifest_sha256": pin["manifest_sha256"],
+            "archive_sha256": expected["sha256"],
+        }
+    )
+    + "\n"
+)
+with zipfile.ZipFile(archive) as container:
+    for frame in frames:
+        relative = Path(frame["path"])
+        member = Path(*relative.parts[5:])
+        if relative.parts[4] != archive_prefix or not member.name.endswith(".jpg"):
+            raise ValueError("frozen D150 row does not match the selected ZIP")
+        output = input_root / relative
+        if not output.resolve().is_relative_to(input_root.resolve()):
+            raise ValueError("frozen D150 row escapes the staging root")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        with container.open(member.as_posix()) as stream:
+            copy_verified(stream, output, frame["bytes"], frame["sha256"])
+receipt = {
+    "frozen_manifest_sha256": pin["manifest_sha256"],
+    "selected_source": source["primary_url"],
+    "rights": source["rights_evidence"],
+    "archive": expected,
+    "ordered_frames": frames,
+    "frame_count": len(frames),
+    "extracted_bytes": sum(row["bytes"] for row in frames),
+}
+(scratch / "acquisition.json").write_text(json.dumps(receipt, indent=2) + "\n")
+print(f"Verified the D150 ZIP and all {len(frames)} selected originals")

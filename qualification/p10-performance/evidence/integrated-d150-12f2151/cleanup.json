@@ -1,0 +1,12 @@
+{
+  "local_owned_stage_removed": true,
+  "frozen_archive_removed_bytes": 53459291,
+  "review_previews_removed": 2,
+  "other_benchmark_caches_and_export_paths_removed": true,
+  "retained_registration_lease": "/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/d150-12f2151-review",
+  "originals_and_first_warm_exports_transferred": true,
+  "leased_original_count": 150,
+  "leased_review_exports": 2,
+  "archive_contains_all_36_resource_traces_and_no_rasters": true,
+  "isolated_sealed_execution_worktree_and_venv_removed": true
+}
