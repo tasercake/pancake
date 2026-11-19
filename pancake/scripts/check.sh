@@ -61,6 +61,17 @@ assurance_profile() {
     done <<< "$selected"
 }
 
+layout_tests() {
+    local seed=$1
+    shift
+    # jxl-coding 1.0.1 asserts a four-byte repr(Rust) prefix entry at compile time.
+    # Profile flags allow only that pinned package to keep its default layout.
+    CARGO_ENCODED_RUSTFLAGS=-Dwarnings cargo +"$PANCAKE_NIGHTLY" -Z profile-rustflags \
+        --config "profile.test.rustflags = [\"-Zrandomize-layout\", \"-Zlayout-seed=$seed\"]" \
+        --config 'profile.test.package."jxl-coding:1.0.1".rustflags = ["-Zrandomize-layout=no"]' \
+        test --locked --workspace --all-features "$@" -- --include-ignored
+}
+
 # Only this exact, single-target documentation-only scaffold has no coverage data.
 empty_scaffold() {
     [[ $(find src -type f -print) == src/lib.rs ]] || return 1
@@ -258,16 +269,11 @@ case $gate in
         ;;
     layouts | layouts-cpu)
         for seed in 1 42; do
-            # Bash 3.2 treats an empty array expansion as unset under nounset.
-            # Native tests retain Cargo's default unit/integration/doctest scope.
             if [[ $1 == layouts-cpu ]]; then
                 assurance_profile cpu
-                RUSTFLAGS="-Dwarnings -Zrandomize-layout -Zlayout-seed=$seed" \
-                    cargo +"$PANCAKE_NIGHTLY" test --locked --workspace --all-features \
-                        "${assurance_args[@]}" -- --include-ignored
+                layout_tests "$seed" "${assurance_args[@]}"
             else
-                RUSTFLAGS="-Dwarnings -Zrandomize-layout -Zlayout-seed=$seed" \
-                    cargo +"$PANCAKE_NIGHTLY" test --locked --workspace --all-features -- --include-ignored
+                layout_tests "$seed"
             fi
         done
         ;;

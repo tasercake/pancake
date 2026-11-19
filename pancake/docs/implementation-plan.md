@@ -39,6 +39,16 @@ original 34-job plus two-witness schedules retain their own verdicts.
 [T50 timing and quality](../../qualification/p10-performance/evidence/t50-weighted-11c-limited-measured/README.md).
 [T50 matched RSS evidence](../../qualification/p10-performance/evidence/t50-weighted-11c-rss-limited-measured/README.md).
 
+The hosted macOS run at `8069266` passed Miri and native layout seed 1,
+then hit a compile-time size assertion in `jxl-coding` 1.0.1 under seed 42.
+The layout test profile keeps that exact dependency's normal layout for
+both seeds because its private prefix entry requires four bytes. All
+first-party code and all other dependencies still compile with layout
+randomization, using seeds 1 and 42 and the same test rosters. The package
+build and Miri profiles are unchanged. The updated hosted layout gate
+must still run on the delivery revision.
+[Original macOS job](https://github.com/tasercake/focus-stacking/actions/runs/44485149821/job/135426767331).
+
 ## Earlier host checkpoints
 
 | Roadmap phase | Passed | Host evidence |
