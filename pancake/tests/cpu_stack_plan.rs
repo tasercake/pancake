@@ -22,6 +22,11 @@ fn every_method_preserves_a_textured_identity_stack() -> Result<(), String> {
     let height = 17;
     let image = textured(width, height, 0)?;
     let sources = create_sources(directory.path(), [&image, &image, &image, &image, &image])?;
+    let canonical_sources = sources
+        .iter()
+        .map(std::fs::canonicalize)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|error| error.to_string())?;
     let reference = decode(sources.first().ok_or("missing first input")?)?;
     for method in [
         Method::WeightedAverage,
@@ -50,7 +55,7 @@ fn every_method_preserves_a_textured_identity_stack() -> Result<(), String> {
             "overlap counted an original more than once",
         )?;
         require(
-            result.sources() == sources
+            result.sources() == canonical_sources
                 && result.settings() == &settings
                 && result.backend() == Backend::Cpu
                 && result.warnings().is_empty()
