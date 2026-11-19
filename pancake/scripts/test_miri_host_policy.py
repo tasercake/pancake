@@ -34,7 +34,7 @@ class MiriHostPolicyTests(unittest.TestCase):
     def test_linux_all_keeps_native_gates_and_names_required_external_miri(self):
         result = self.invoke('Linux', 'all-plan')
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout.splitlines(), ['fast', 'test', 'coverage', 'deps', 'mutants', 'layouts', 'branches', 'guardrails'])
+        self.assertEqual(result.stdout.splitlines(), ['fast', 'test-full', 'coverage', 'deps', 'mutants', 'layouts', 'branches', 'guardrails'])
         self.assertIn('Miri NOT RUN on Linux', result.stderr)
         self.assertIn('required macOS CI job: nightly', result.stderr)
         self.assertNotIn('PASS', result.stderr)

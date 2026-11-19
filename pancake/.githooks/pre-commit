@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 repo=$(git rev-parse --show-toplevel)
-if git diff --cached --quiet -- pancake .github/workflows/pancake.yml .github/dependabot.yml; then
+paths=(pancake .github/workflows/pancake.yml .github/workflows/pancake-assurance.yml .github/dependabot.yml)
+if git diff --cached --quiet -- "${paths[@]}"; then
     exit 0
 fi
-if ! git diff --quiet -- pancake .github/workflows/pancake.yml .github/dependabot.yml || \
+if ! git diff --quiet -- "${paths[@]}" || \
     [[ -n $(git ls-files --others --exclude-standard -- \
-        pancake .github/workflows/pancake.yml .github/dependabot.yml) ]]; then
+        "${paths[@]}") ]]; then
     printf 'Pancake: stage or stash unstaged project changes before checking commit.\n' >&2
     exit 1
 fi
 # Commit checks must not compile dependencies or execute the test suite.
-git diff --cached --check -- pancake .github/workflows/pancake.yml .github/dependabot.yml
+git diff --cached --check -- "${paths[@]}"
 if ! git diff --cached --quiet --diff-filter=ACMR -- \
     'pancake/*.rs' 'pancake/*Cargo.toml' 'pancake/*rustfmt.toml'; then
     cargo fmt --manifest-path "$repo/pancake/Cargo.toml" --all -- --check

@@ -7,6 +7,7 @@ export PATH="$root/target/tools/bin:$PATH"
 # shellcheck source=tool-versions.sh
 source "$root/scripts/tool-versions.sh"
 export RUST_BACKTRACE=1
+gate=${1:-test}
 
 require_tool() {
     local tool=$1 expected=${2:-} entry output
@@ -47,16 +48,17 @@ dependency_policy() {
 # Classify every integration target before selecting the memory-checking boundary.
 # Shared launch/readback code is in the library and must retain full CPU coverage.
 assurance_profile() {
-    local family=$1 target
-    mkdir -p target/assurance
-    cargo metadata --locked --no-deps --format-version 1 > target/assurance/metadata.json
-    python3 scripts/assurance_targets.py target/assurance/metadata.json "$family" \
-        > target/assurance/selected-targets.txt
+    local family=$1 target selected
+    selected=$(cargo metadata --locked --no-deps --format-version 1 |
+        python3 scripts/assurance_targets.py - "$family")
     assurance_args=()
-    if [[ $family == cpu ]]; then assurance_args=(--lib --bins); fi
+    case $family in
+        cpu | headless) assurance_args=(--lib --bins) ;;
+        gui) assurance_args=(--bins) ;;
+    esac
     while IFS= read -r target; do
-        assurance_args+=(--test "$target")
-    done < target/assurance/selected-targets.txt
+        if [[ -n $target ]]; then assurance_args+=(--test "$target"); fi
+    done <<< "$selected"
 }
 
 # Only this exact, single-target documentation-only scaffold has no coverage data.
@@ -77,8 +79,8 @@ RS
     )
 }
 
-case ${1:-all} in
-    fast)
+case $gate in
+    lint | fast)
         require_tool actionlint "$PANCAKE_ACTIONLINT_VERSION"
         require_tool shellcheck "$PANCAKE_SHELLCHECK_VERSION"
         python3 -m unittest scripts/test_dependency_policy.py scripts/test_guardrail_manifest.py \
@@ -87,33 +89,59 @@ case ${1:-all} in
         python3 scripts/miri_host_policy.py "$root" validate
         dependency_policy
         cargo fmt --all -- --check
+        lint_scope=(--workspace)
+        if [[ $gate == lint ]]; then lint_scope+=(--exclude pancake-gui); fi
         CLIPPY_CONF_DIR="$root/target/dependency-policy/clippy" \
-            cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
-        cargo doc --locked --workspace --all-features --no-deps --document-private-items
+            cargo clippy --locked "${lint_scope[@]}" --all-targets --all-features -- -D warnings
+        if [[ $gate == fast ]]; then
+            cargo doc --locked --workspace --all-features --no-deps --document-private-items
+        fi
         shellcheck --source-path=SCRIPTDIR --external-sources \
             scripts/bootstrap.sh scripts/check.sh scripts/test-guardrails.sh \
             scripts/install-actionlint.sh scripts/ci-linux-native-deps.sh .githooks/*
-        actionlint "$root/../.github/workflows/pancake.yml"
+        actionlint "$root/../.github/workflows/pancake.yml" "$root/../.github/workflows/pancake-assurance.yml"
         ;;
-    test | test-cpu | gpu)
+    test | test-cpu | test-gui | test-release | test-full | gpu)
         require_tool cargo-nextest
-        require_tool cargo-hack
-        if [[ $1 == test ]]; then
-            assurance_args=(--all-targets)
-        elif [[ $1 == gpu ]]; then
-            assurance_profile gpu
-        else
-            assurance_profile cpu
-        fi
-        # Docs-only crates have no tests. Coverage rejects untested executable code.
-        for profile in dev release; do
-            cargo nextest run --locked --workspace "${assurance_args[@]}" --all-features \
-                --cargo-profile "$profile" --profile ci --no-tests=pass --run-ignored all
+        test_scope=(--workspace)
+        profiles=(dev)
+        case $gate in
+            test)
+                test_scope+=(--exclude pancake-gui)
+                assurance_profile headless
+                ;;
+            test-cpu)
+                assurance_profile cpu
+                ;;
+            test-gui)
+                test_scope=(--package pancake-gui)
+                assurance_profile gui
+                ;;
+            test-release)
+                assurance_profile cpu
+                profiles=(release)
+                ;;
+            gpu)
+                assurance_profile gpu
+                profiles=(dev release)
+                ;;
+            test-full)
+                assurance_args=(--all-targets)
+                profiles=(dev release)
+                ;;
+        esac
+        for profile in "${profiles[@]}"; do
+            cargo nextest run --locked "${test_scope[@]}" "${assurance_args[@]}" --all-features \
+                --cargo-profile "$profile" --profile ci --no-tests=fail --run-ignored all
         done
-        if [[ $1 != gpu ]]; then
+        if [[ $gate == test-full ]]; then
             cargo test --locked --workspace --all-features --doc -- --include-ignored
-            cargo hack test --locked --workspace --feature-powerset \
-                "${assurance_args[@]}" -- --include-ignored
+            feature_count=$(cargo metadata --locked --no-deps --format-version 1 |
+                jq '[.packages[].features | length] | add // 0')
+            if ((feature_count > 0)); then
+                require_tool cargo-hack
+                cargo hack test --locked --workspace --feature-powerset --all-targets -- --include-ignored
+            fi
         fi
         ;;
     coverage | coverage-cpu)
@@ -189,8 +217,9 @@ case ${1:-all} in
         require_tool cargo-deny
         require_tool cargo-machete
         python3 -m unittest scripts/test_dependency_policy.py scripts/test_unused_dependencies.py
-        python3 -m unittest discover -s vendor/tests -v
         dependency_policy
+        # The macro fixtures use an isolated offline index and the populated registry.
+        python3 -m unittest discover -s vendor/tests -v
         # Omitting [licenses] alone would retain cargo-deny's default license gate.
         # User chose an informational inventory instead of license enforcement.
         cargo deny --locked --workspace --all-features \
@@ -200,15 +229,16 @@ case ${1:-all} in
         ;;
     mutants | mutants-cpu)
         require_tool cargo-mutants
-        # Members have behavior and downstream tests of the shared core.
-        mutation_scope=(--workspace --test-workspace true)
-        if [[ $1 == mutants-cpu ]]; then
+        shift
+        if [[ $gate == mutants-cpu ]]; then
             assurance_profile cpu
-            cargo mutants "${mutation_scope[@]}" --cap-lints true --all-features --in-place --timeout 60 \
-                --build-timeout 180 -- --locked "${assurance_args[@]}" -- --include-ignored
+            # A narrowed mutant roster may omit an entire crate. Keep its tests in the baseline and every mutant run.
+            cargo mutants --workspace --test-workspace false --cargo-arg=--workspace \
+                --cap-lints true --all-features --in-place --timeout 60 --build-timeout 180 \
+                "$@" -- --locked "${assurance_args[@]}" -- --include-ignored
         else
-            cargo mutants "${mutation_scope[@]}" --cap-lints true --all-features --in-place --timeout 60 \
-                --build-timeout 180 -- --locked -- --include-ignored
+            cargo mutants --workspace --test-workspace true --cap-lints true --all-features \
+                --in-place --timeout 60 --build-timeout 180 "$@" -- --locked -- --include-ignored
         fi
         ;;
     miri)
@@ -271,7 +301,7 @@ case ${1:-all} in
         done 3< target/assurance/local-gates.txt
         ;;
     *)
-        printf 'Usage: check.sh [all|fast|test|test-cpu|gpu|coverage|coverage-cpu|branches|branches-cpu|deps|mutants|mutants-cpu|miri|nightly|nightly-cpu|layouts|layouts-cpu|sanitizer|sanitizer-gpu|guardrails]\n' >&2
+        printf 'Usage: check.sh [all|lint|fast|test|test-cpu|test-gui|test-release|test-full|gpu|coverage|coverage-cpu|branches|branches-cpu|deps|mutants|mutants-cpu|miri|nightly|nightly-cpu|layouts|layouts-cpu|sanitizer|sanitizer-gpu|guardrails]\n' >&2
         exit 2
         ;;
 esac

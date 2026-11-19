@@ -2,10 +2,9 @@ name: Pancake
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
-  schedule:
-    - cron: "23 1 * * *"
 
 permissions:
   contents: read
@@ -20,118 +19,36 @@ defaults:
     working-directory: pancake
 
 jobs:
-  platform:
-    name: Platform (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-24.04, macos-15]
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          persist-credentials: false
-      - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
-        with:
-          tool: cargo-nextest@0.9.152,cargo-hack@0.6.46,shellcheck@0.11.0
-      - name: Provision Linux native build dependencies
-        if: runner.os == 'Linux'
-        run: bash scripts/ci-linux-native-deps.sh
-      - name: Install checksum-pinned actionlint release
-        run: bash scripts/install-actionlint.sh "$RUNNER_TEMP/pancake-lint-tools"
-      - run: bash scripts/check.sh fast
-      - run: bash scripts/check.sh test-cpu
-
-  windows-build:
-    name: Windows MSVC build and link
-    runs-on: windows-2025
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          persist-credentials: false
-      - name: Build and link every target without running Windows tests
-        run: cargo test --locked --workspace --all-targets --all-features --target x86_64-pc-windows-msvc --no-run
-
-  assurance:
-    name: Coverage, dependencies, mutation, and guardrails
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          persist-credentials: false
-      - name: Provision Linux native build dependencies
-        run: bash scripts/ci-linux-native-deps.sh
-      - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
-        with:
-          tool: cargo-llvm-cov@0.9.1,cargo-deny@0.20.2,cargo-mutants@27.1.0,cargo-machete@0.9.2
-      - name: Install nightly for branch guardrail fixture
-        run: |
-          source scripts/tool-versions.sh
-          rustup toolchain install "$PANCAKE_NIGHTLY" --profile minimal --component llvm-tools-preview
-      - run: bash scripts/check.sh coverage-cpu
-      - run: bash scripts/check.sh deps
-      - run: bash scripts/check.sh mutants-cpu
-      - run: bash scripts/check.sh layouts-cpu
-      - run: bash scripts/check.sh branches-cpu
-      - run: bash scripts/check.sh guardrails
-
-  nightly:
-    name: macOS Miri, randomized layouts, and branch coverage
-    runs-on: macos-15
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          persist-credentials: false
-      - name: Install pinned nightly
-        run: |
-          source scripts/tool-versions.sh
-          rustup toolchain install "$PANCAKE_NIGHTLY" --profile minimal --component miri --component rust-src --component llvm-tools-preview
-      - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
-        with:
-          tool: cargo-llvm-cov@0.9.1
-      - run: bash scripts/check.sh nightly-cpu
-      - run: bash scripts/check.sh branches-cpu
-
-  sanitizer:
-    name: Sanitizer (${{ matrix.kind }})
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        kind: [address, thread]
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          persist-credentials: false
-      - name: Provision Linux native build dependencies
-        run: bash scripts/ci-linux-native-deps.sh
-      - name: Install pinned nightly
-        run: |
-          source scripts/tool-versions.sh
-          rustup toolchain install "$PANCAKE_NIGHTLY" --profile minimal --component rust-src
-      - run: bash scripts/check.sh sanitizer "${{ matrix.kind }}"
-
   required:
     name: Pancake required
-    if: always()
-    needs: [platform, windows-build, assurance, nightly, sanitizer]
     runs-on: ubuntu-24.04
-    timeout-minutes: 2
-    defaults:
-      run:
-        shell: bash
-        working-directory: .
+    timeout-minutes: 15
+    env:
+      CARGO_PROFILE_DEV_DEBUG: line-tables-only
+      CARGO_INCREMENTAL: "0"
     steps:
-      - name: Require every gate
-        env:
-          RESULTS: ${{ join(needs.*.result, ',') }}
-        run: |
-          if [[ "$RESULTS" != "success,success,success,success,success" ]]; then
-            printf 'Pancake gates failed or were skipped: %s\n' "$RESULTS" >&2
-            exit 1
-          fi
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: registry
+        with:
+          path: |
+            ~/.cargo/registry/cache
+            ~/.cargo/registry/index
+          key: pancake-registry-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pancake/Cargo.lock') }}
+          restore-keys: pancake-registry-${{ runner.os }}-${{ runner.arch }}-
+      - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
+        with:
+          tool: cargo-nextest@0.9.152,shellcheck@0.11.0
+      - name: Install checksum-pinned actionlint release
+        run: bash scripts/install-actionlint.sh "$RUNNER_TEMP/pancake-lint-tools"
+      - run: bash scripts/check.sh lint
+      - run: bash scripts/check.sh test
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: github.event_name == 'push' && steps.registry.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/.cargo/registry/cache
+            ~/.cargo/registry/index
+          key: ${{ steps.registry.outputs.cache-primary-key }}

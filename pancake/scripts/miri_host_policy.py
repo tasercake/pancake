@@ -52,10 +52,10 @@ def main():
             print('Miri: executing required macOS pure-host tests; no Linux Miri pass is claimed.')
         elif args.mode == 'all-plan':
             if args.host == 'Darwin':
-                gates = ['fast', 'test', 'coverage', 'deps', 'mutants', 'nightly', 'branches', 'guardrails']
+                gates = ['fast', 'test-full', 'coverage', 'deps', 'mutants', 'nightly', 'branches', 'guardrails']
                 print('Miri: required local macOS execution in nightly gate.', file=sys.stderr)
             else:
-                gates = ['fast', 'test', 'coverage', 'deps', 'mutants', 'layouts', 'branches', 'guardrails']
+                gates = ['fast', 'test-full', 'coverage', 'deps', 'mutants', 'layouts', 'branches', 'guardrails']
                 print('Miri NOT RUN on Linux; required macOS CI job: nightly. Local all does not qualify the complete platform matrix.', file=sys.stderr)
             print('\n'.join(gates))
         else:

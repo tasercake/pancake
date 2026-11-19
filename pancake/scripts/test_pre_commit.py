@@ -72,6 +72,11 @@ class CommitHookTests(unittest.TestCase):
         self.stage('pancake/README.md', 'Trailing whitespace  \n')
         self.assertNotEqual(self.run_hook().returncode, 0)
 
+    def test_assurance_workflow_gets_the_whitespace_check(self):
+        self.stage('.github/workflows/pancake-assurance.yml', 'name: Assurance  \n')
+        self.assertNotEqual(self.run_hook().returncode, 0)
+        self.assertFalse((self.root / 'calls').exists())
+
     def test_partial_staging_is_rejected(self):
         self.stage('pancake/README.md', 'Staged\n')
         (self.root / 'pancake/README.md').write_text('Unstaged\n')

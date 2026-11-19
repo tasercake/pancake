@@ -16,14 +16,13 @@
 
 ## Verification
 
-Pre-commit is whitespace and formatting only. There is no pre-push hook or
-mandatory local full-suite check before pushing. CI runs the full required gates.
-Run focused local checks appropriate to the change; `bash scripts/check.sh all`
-remains available for an explicit full local verification. For hook/documentation
-changes, run focused hook regressions and static checks without compiling the
-application.
-CI also checks native Linux/macOS/Windows builds and Linux address/thread
-sanitizers. Report remote/platform checks that were not run locally.
+Pre-commit is whitespace and formatting only. There is no pre-push hook.
+Run focused checks for the change. `bash scripts/check.sh` runs the routine
+core/CLI CPU tests. **Pancake required** runs the headless lint and test gates
+on pull requests and main pushes. GUI, physical GPU, native platform,
+instrumented, and deep assurance checks have explicit entry points in the
+README. Select the appropriate ones for the change and report those left unrun.
+For hook and documentation changes, use focused script tests and static checks.
 
 The executable P0 library is subject to all assurance gates. Only the exact
 documentation-only, single-target scaffold is exempt from coverage reporting.
