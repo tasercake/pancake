@@ -1,0 +1,15 @@
+======== artifacts/r50-raw-audit/verification/baseline.tiff
+[IFD0]          ImageWidth                      : 5086
+[IFD0]          ImageHeight                     : 3390
+[IFD0]          BitsPerSample                   : 16 16 16
+[IFD0]          SampleFormat                    : Unsigned; Unsigned; Unsigned
+[IFD0]          SamplesPerPixel                 : 3
+[IFD0]          PhotometricInterpretation       : RGB
+======== artifacts/r50-raw-audit/verification/candidate.tiff
+[IFD0]          ImageWidth                      : 5086
+[IFD0]          ImageHeight                     : 3390
+[IFD0]          BitsPerSample                   : 16 16 16
+[IFD0]          SampleFormat                    : Unsigned; Unsigned; Unsigned
+[IFD0]          SamplesPerPixel                 : 3
+[IFD0]          PhotometricInterpretation       : RGB
+    2 image files read

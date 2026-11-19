@@ -1,0 +1,46 @@
+{
+  "target_commit": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "strict_gate_exit": 1,
+  "raw_map_sha256": "19f8a0866849b63f750cc3477e683345dae29554bb9d8eb0f0fa4df745ae7c11",
+  "metrics": {
+    "branches": {
+      "covered": 577,
+      "total": 764
+    },
+    "functions": {
+      "covered": 485,
+      "total": 760
+    },
+    "lines": {
+      "covered": 4730,
+      "total": 6516
+    },
+    "regions": {
+      "covered": 4849,
+      "total": 7328
+    }
+  },
+  "nonempty_test_harnesses": 19,
+  "doctest_count": 0,
+  "test_counts": {
+    "passed": 148,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered": 0
+  },
+  "file_branch_records": 1076,
+  "function_branch_records": 1106,
+  "gtk_outcomes": {
+    "count": 42,
+    "covered": 9,
+    "notcovered": 33,
+    "percent": 21.428571428571427
+  },
+  "gtk_hits": {
+    "27": 1,
+    "64": 1,
+    "65": 1,
+    "66": 1
+  }
+}

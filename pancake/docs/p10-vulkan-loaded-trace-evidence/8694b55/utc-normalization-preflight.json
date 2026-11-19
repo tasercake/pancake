@@ -1,0 +1,7 @@
+{
+  "real_previously_captured_nvtx_markers": 24,
+  "nsys_utc_export_uses_one_fixed_offset": true,
+  "local_realtime_monotonic_bracket_ns": 1222,
+  "maximum_utc_derived_marker_outside_original_monotonic_interval_ns": 0,
+  "scope": "Offline export of previously collected data. No profiler, GPU or desktop launched."
+}

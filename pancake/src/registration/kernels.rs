@@ -1,9 +1,13 @@
 //! Portable image sampling and registration scoring.
 
+use cubecl::bytes::Bytes;
 use cubecl::prelude::*;
 use cubecl::std::tensor::TensorHandle;
 
-use super::geometry::{Affine, Bounds, Extent, Frame};
+use super::{
+    ResidentRgb,
+    geometry::{Affine, Bounds, Extent, Frame},
+};
 
 /// Limit one warp output allocation to one MiB of f32 samples.
 const WARP_TILE: usize = 262_144;
@@ -39,8 +43,8 @@ pub fn warp(
         &[a, b, tx, c, d, ty, f32::from(output.x), f32::from(output.y)],
     );
     let mut output_samples = Vec::with_capacity(expected);
-    while output_samples.len() < expected {
-        let start = output_samples.len();
+    // A checked nonempty extent guarantees a positive tile size.
+    for start in (0..expected).step_by(tile) {
         let count = expected.saturating_sub(start).min(tile);
         let result = TensorHandle::empty(&client, [count], f32::cube_type());
         let dimension = CubeDim::new(&client, count);
@@ -59,6 +63,7 @@ pub fn warp(
         );
         output_samples.extend(read(&client, result, count)?);
     }
+    let _frame = Frame::new(output.width(), output.height(), &output_samples)?;
     Ok(output_samples)
 }
 
@@ -79,11 +84,10 @@ fn check_budget(input: usize, output: usize, tile: usize, budget: usize) -> Resu
 
 /// Upload packed rows or short affine parameters as one typed device tensor.
 fn upload(client: &Client, data: &[f32]) -> TensorHandle {
-    TensorHandle::new_contiguous(
-        [data.len()],
-        client.create_from_slice(f32::as_bytes(data)),
-        f32::cube_type(),
-    )
+    // Establish the native byte alignment before copying the source.
+    let mut bytes = Bytes::from_bytes_vec(Vec::new());
+    bytes.extend_from_byte_slice(f32::as_bytes(data));
+    TensorHandle::new_contiguous([data.len()], client.create(bytes), f32::cube_type())
 }
 
 /// Read exactly the declared number of finite device samples.
@@ -120,11 +124,13 @@ pub(super) fn make_luma(
     frame: Frame<'_>,
     dimensions: Extent,
     budget: usize,
-) -> Result<Vec<f32>, String> {
+    retain_input: bool,
+) -> Result<(Vec<f32>, Option<ResidentRgb>), String> {
     let count = dimensions.area()?;
     check_budget(frame.samples.len(), count, count, budget)?;
     let client = device.client();
     let input = upload(&client, frame.samples);
+    let resident = retain_input.then(|| ResidentRgb::new(frame.extent, input.clone()));
     let output = TensorHandle::empty(&client, [count], f32::cube_type());
     let dim = CubeDim::new(&client, count);
     let cubes = cubecl::calculate_cube_count_elemwise(&client, count, dim);
@@ -142,7 +148,8 @@ pub(super) fn make_luma(
         scale_x,
         scale_y,
     );
-    read(&client, output, count)
+    let pixels = read(&client, output, count)?;
+    Ok((pixels, resident))
 }
 
 /// Device-owned prepared pair reused across all search iterations.

@@ -1,0 +1,20 @@
+{
+  "kind": "locked headless RAW packing diagnostic release",
+  "revision": "c8f68cf79d143403ad9d5df906a5f8cfa2047526",
+  "production_source": "4f7b73db8b25bc145e5ba6811ea1b0f7557b2cfd",
+  "binary_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/raw-packing-c8f68cf/pancake-cli",
+  "binary_sha256": "bea745e2654042fd52499eccb634339a59ea493eeab8bb3e9582294a352fe4ca",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "control_revision": "07816a24a62f96bc3d3252e95fcfd2b4b5950269",
+  "control_binary_sha256": "aad46d08e71f1973ba4ffa1efa7d7fe0ee7747e02cf2a3834903af448587f9ed",
+  "build_status": 0,
+  "build_process_affinity": [
+    6,
+    7
+  ],
+  "build_jobs": 2,
+  "build_command": "CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0 RUSTC_WRAPPER=/tmp/pancake-tools/bin/pancake-rust-cache taskset -c 6,7 cargo build --release --locked -p pancake-cli --bin pancake-cli",
+  "started_utc": "2026-11-18T12:13:11Z",
+  "finished_utc": "2026-11-18T12:16:36Z",
+  "source_lineage": "source-lineage.json"
+}

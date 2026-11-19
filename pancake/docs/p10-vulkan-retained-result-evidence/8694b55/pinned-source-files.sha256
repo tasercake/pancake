@@ -1,0 +1,9 @@
+3dd58e5f948328f257fadb1e6c98c5e09abb5b8f98a02e6047e3404bd96450fd  cubecl-wgpu-0.11.4/src/compute/poll.rs
+83c17a28b9d4bb5806586c0a30c805ad0844bf5dc5c85c0dda20f1d9255b69cb  cubecl-wgpu-0.11.4/src/compute/stream.rs
+e961098f94edfeaf12934f50a3eea3ff6aedf90aa4420cfde95d74d6ebb84f77  cubecl-wgpu-0.11.4/src/runtime.rs
+799421ac2873c721eef091b1e0f46464cbc9d0927972f1d93ec52f44466e966b  wgpu-core-30.0.2/src/device/resource.rs
+cb53160d93ee210025cf4a483ce700b713d56c16daba87cad6b9934cc803f47b  wgpu-core-30.0.2/src/present.rs
+f6d5d2be4b970cf11af9dcbb04c915481e111995ef935b175b80ed5a94d67ed9  wgpu-types-30.0.2/src/lib.rs
+18d89c80589e6390c770784674174cdb6c5d996c63a2fd78a126620798bb329d  i-slint-renderer-femtovg-1.19.0/wgpu.rs
+86661891411a79cc939398f458c0585d14c715ac6a437ae8721ae815b7005f3d  i-slint-renderer-femtovg-1.19.0/lib.rs
+caa0e303e2d1956020b1c27ead24dbe9c45fa73559ab38fea9a71d5e111ba8c7  winit-0.30.13/src/platform_impl/linux/x11/window.rs

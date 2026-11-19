@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+bundle=$(cd "$(dirname "$0")" && pwd)
+assurance_args=(--lib --bins)
+while IFS= read -r target; do
+    assurance_args+=(--test "$target")
+done < "$bundle/selected-targets.txt"
+cargo nextest list --locked --workspace "${assurance_args[@]}" --all-features \
+    --cargo-profile dev --profile ci --run-ignored all --message-format json \
+    > "$bundle/nextest-inventory.json" 2> "$bundle/nextest-inventory.log"

@@ -1,0 +1,21 @@
+--- src/job/registration.rs
++++ replace == with != in Alignment::estimate
+@@ -205,17 +205,17 @@
+                     device,
+                     reference,
+                     &source,
+                     model,
+                     self.max_scale_step,
+                     self.max_precision,
+                 )?
+                 .transform;
+-                if self.reference == AlignmentReference::Previous {
++                if self.reference != /* ~ changed by cargo-mutants ~ */ AlignmentReference::Previous {
+                     sequential = relative;
+                     common = relative.compose(self.accumulated)?;
+                     self.proxy = Some(source);
+                 } else {
+                     common = relative;
+                 }
+             }
+         }

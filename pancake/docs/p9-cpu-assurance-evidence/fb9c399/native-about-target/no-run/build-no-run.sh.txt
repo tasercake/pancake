@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Build the additional Cargo integration target without running its test body.
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+proof="$repo/artifacts/native-about-proof-fb9c"
+cd "$repo/pancake"
+export CARGO_TARGET_DIR="$PWD/target/llvm-cov-target"
+source <(cargo llvm-cov show-env --sh)
+cargo test --locked --workspace --all-features --test cpu_gui_native --no-run

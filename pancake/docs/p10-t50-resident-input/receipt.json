@@ -1,0 +1,3891 @@
+{
+  "scope": "same-binary baseline/resident trace diagnostic outside the frozen timing schedule",
+  "product_base": "2143eda2b308497caee96334357dd23d324e1e8e",
+  "untraced_product": "37af4e2c55490c9937e279c988889edf5e3ad380",
+  "red_witness": "1e9602c6699d9d166c0ae8465927997b4fb526d3",
+  "traced_candidate": "3f6cd9bad7a58dbedf1b9d574a349db1a7618c17",
+  "native_cpu_checks": 14,
+  "traced_cpu_ab_tests": 2,
+  "cpu_regression_fixtures": [
+    "identity",
+    "shifted",
+    "mismatched"
+  ],
+  "integrated_scope": {
+    "revision": "9629212b8438aad688a026e0a57b550fbbf60d72",
+    "tree": "e6e15a05d07b85ced922ef362c78f13591ad4920",
+    "cpu_passes": 119,
+    "cpu_executables": 18,
+    "clippy_exit": 0,
+    "format_exit": 0,
+    "source_policy_exit": 0,
+    "first_clippy_log": "integrated-initial-clippy.log"
+  },
+  "physical_report": {
+    "scope": "same-binary baseline/resident trace diagnostic outside the frozen timing schedule",
+    "arms": {
+      "baseline": {
+        "job": {
+          "kind": "diagnostic",
+          "number": 1,
+          "target": "candidate",
+          "argv": [
+            "/tmp/pancake-worktrees.t3paqgWM/resident-input/pancake/target/resident-input-release/release/pancake-cli",
+            "--input",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_000.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_001.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_002.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_003.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_004.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_005.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_006.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_007.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_008.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_009.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_010.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_011.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_012.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_013.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_014.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_015.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_016.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_017.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_018.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_019.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_020.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_021.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_022.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_023.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_024.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_025.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_026.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_027.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_028.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_029.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_030.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_031.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_032.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_033.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_034.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_035.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_036.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_037.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_038.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_039.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_040.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_041.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_042.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_043.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_044.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_045.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_046.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_047.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_048.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_049.tif",
+            "--output",
+            "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/diagnostic-01/candidate/complete.tif",
+            "--gpu",
+            "--method",
+            "hybrid",
+            "--align",
+            "--alignment-mode",
+            "similarity",
+            "--alignment-ref",
+            "first",
+            "--kernel-size",
+            "6",
+            "--pyramid-levels",
+            "8",
+            "--scale-factor",
+            "6",
+            "--slab-size",
+            "0",
+            "--slab-overlap",
+            "0",
+            "--bit-depth",
+            "16",
+            "--auto-crop",
+            "--gpu-id",
+            "0"
+          ],
+          "cwd": "/tmp/pancake-worktrees.t3paqgWM/resident-input/pancake",
+          "environment": {
+            "LANG": "C.UTF-8",
+            "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.json",
+            "LC_CTYPE": "C.UTF-8",
+            "LC_ALL": "C.UTF-8",
+            "PATH": "/home/krishna/.local/bin:/home/krishna/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/krishna/.codex/tmp/arg0-linux/codex-arg0ZYngTQ:/home/krishna/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/home/krishna/.local/bin:/home/krishna/.bun/bin:/usr/local/cuda-12/bin:/home/krishna/.asdf/shims:/home/krishna/.asdf/bin:/home/krishna/.kiex/bin:/home/krishna/.nvm/versions/node/v26.7.0/bin:/home/krishna/.local/bin:/home/krishna/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/krishna/.cargo/bin:/home/krishna/.local/bin:/home/krishna/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/krishna/.dotnet/tools:/home/krishna/.dotnet/tools:/home/krishna/.cargo/bin:/home/krishna/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/usr/lib/chatgpt/resources:/home/krishna/.dotnet/tools",
+            "HOME": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/home",
+            "XDG_CACHE_HOME": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/cache",
+            "XDG_CONFIG_HOME": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/config",
+            "TMPDIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/tmp",
+            "CUDA_CACHE_PATH": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/cuda",
+            "__GL_SHADER_DISK_CACHE_PATH": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/nvidia",
+            "MESA_SHADER_CACHE_DIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/mesa",
+            "NUMBA_CACHE_DIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/numba",
+            "NUMBA_NUM_THREADS": "32",
+            "OMP_NUM_THREADS": "32",
+            "RAYON_NUM_THREADS": "32",
+            "OPENBLAS_NUM_THREADS": "1",
+            "PYTHONNOUSERSITE": "1",
+            "PANCAKE_STATE_DIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/home",
+            "PANCAKE_COMPUTE_CACHE_DIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-01/home/device-cache",
+            "PANCAKE_DEFAULT_DEVICE": "cpu",
+            "PANCAKE_T50_PHASE_TRACE": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/diagnostic-01/candidate/phases.tsv",
+            "PANCAKE_T50_RESIDENT_BASELINE": "1",
+            "CUDA_VISIBLE_DEVICES": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+            "PANCAKE_RUNTIME": "wgpu",
+            "CONFORMANCE_EVENTS_PATH": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/diagnostic-01/candidate/events.jsonl"
+          },
+          "rss_sampler_cpu": null,
+          "gpu_before": {
+            "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+            "pci.bus_id": "00000000:01:00.0",
+            "name": "NVIDIA GeForce RTX 3090",
+            "driver_version": "580.178.04",
+            "pstate": "P2",
+            "temperature.gpu": "68",
+            "power.draw": "124.60",
+            "power.limit": "350.00",
+            "clocks.gr": "1725",
+            "clocks.mem": "9501"
+          },
+          "cpu_temperature_before_millidegrees": {
+            "/sys/class/hwmon/hwmon1/temp3_input": 58625,
+            "/sys/class/hwmon/hwmon1/temp4_input": 53625,
+            "/sys/class/hwmon/hwmon1/temp1_input": 61125
+          },
+          "cache_before": {
+            "files": 0,
+            "bytes": 0
+          },
+          "valid": true,
+          "returncode": 0,
+          "timed_out": false,
+          "elapsed_ns": 72661331631,
+          "max_sample_acquisition_ns": 57482411,
+          "maximum_rss_sample_gap_ns": 9786345,
+          "rss_sample_count": 9083,
+          "observed_peak_rss_bytes": 1545895936,
+          "peak_rss_bytes": 1545895936,
+          "maximum_gpu_sample_gap_ns": 65292595,
+          "gpu_sample_count": 9075,
+          "observed_peak_gpu_bytes": 2518323200,
+          "peak_gpu_bytes": null,
+          "maximum_sample_gap_ns": 65292595,
+          "sample_count": 9083,
+          "kernel_process_peak_rss_bytes": 1547153408,
+          "kernel_process_user_cpu_seconds": 32.398822,
+          "kernel_process_system_cpu_seconds": 40.925149,
+          "resource_errors": [],
+          "sample_interval_ns": 8000000,
+          "rss_sampler_affinity": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "sampler_thread_cpu_ns": 16411255154,
+          "sampler_threads_cpu_ns": {
+            "gpu": 2952415132,
+            "rss": 13458840022
+          },
+          "gpu_after": {
+            "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+            "pci.bus_id": "00000000:01:00.0",
+            "name": "NVIDIA GeForce RTX 3090",
+            "driver_version": "580.178.04",
+            "pstate": "P2",
+            "temperature.gpu": "69",
+            "power.draw": "129.52",
+            "power.limit": "350.00",
+            "clocks.gr": "1725",
+            "clocks.mem": "9501"
+          },
+          "cpu_temperature_after_millidegrees": {
+            "/sys/class/hwmon/hwmon1/temp3_input": 57375,
+            "/sys/class/hwmon/hwmon1/temp4_input": 54500,
+            "/sys/class/hwmon/hwmon1/temp1_input": 66500
+          },
+          "cache_after": {
+            "files": 2,
+            "bytes": 166336
+          },
+          "output": {
+            "shape": [
+              3998,
+              5998,
+              3
+            ],
+            "dtype": "uint16",
+            "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302",
+            "pixel_sha256": "f54746784bcc278da2df734e9f034053a3b54105ddb2a30046baf6dab07a80a3",
+            "bytes": 143881378,
+            "minimum": 7663,
+            "maximum": 57895
+          },
+          "completion": {
+            "actual_backend": "gpu",
+            "alignment_transforms": {
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_000.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_001.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_002.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_003.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_004.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_005.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_006.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_007.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_008.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_009.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_010.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_011.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_012.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_013.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_014.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_015.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_016.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_017.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_018.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_019.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_020.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_021.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_022.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_023.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_024.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_025.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_026.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_027.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_028.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_029.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_030.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_031.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_032.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_033.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_034.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_035.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_036.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_037.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_038.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_039.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_040.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_041.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_042.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_043.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_044.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_045.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_046.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_047.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_048.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_049.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ]
+            },
+            "completed": true,
+            "device": "NVIDIA GeForce RTX 3090",
+            "device_fingerprint": "spirv_4318_8708",
+            "device_pci_address": "0000:01:00.0",
+            "event": "stack_complete",
+            "fallback_reason": null,
+            "physical_gpu": true,
+            "runtime": "wgpu-vulkan",
+            "sequential_transforms": [
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ]
+            ]
+          }
+        },
+        "trace": {
+          "format": "owner-thread host wall intervals and logical bytes",
+          "sha256": "9485c61ab12e8d60bf7e841a65f74a3e8f6ddc337dd8b4f956c10ab9b50b4625",
+          "bytes": 68419,
+          "records": 1661,
+          "job_total_ns": 72518707174,
+          "nonoverlapping_top_level_ns": 71404563673,
+          "unattributed_host_ns": 1114143501,
+          "phases": {
+            "raster_decode": {
+              "count": 50,
+              "total_ns": 23166167442,
+              "median_ns": 457054793.5,
+              "maximum_ns": 498185102,
+              "logical_bytes": null
+            },
+            "raster_orientation": {
+              "count": 50,
+              "total_ns": 38003,
+              "median_ns": 721.5,
+              "maximum_ns": 1012,
+              "logical_bytes": null
+            },
+            "tiff_profile": {
+              "count": 50,
+              "total_ns": 1250426,
+              "median_ns": 24596.0,
+              "maximum_ns": 31369,
+              "logical_bytes": null
+            },
+            "rgb_conversion": {
+              "count": 50,
+              "total_ns": 6034073914,
+              "median_ns": 120480693.5,
+              "maximum_ns": 124686686,
+              "logical_bytes": null
+            },
+            "rgb_validation": {
+              "count": 50,
+              "total_ns": 930375400,
+              "median_ns": 18548734.0,
+              "maximum_ns": 19340204,
+              "logical_bytes": null
+            },
+            "decode": {
+              "count": 50,
+              "total_ns": 30134770749,
+              "median_ns": 596957284.0,
+              "maximum_ns": 637715062,
+              "logical_bytes": null
+            },
+            "runtime_setup": {
+              "count": 1,
+              "total_ns": 437877269,
+              "median_ns": 437877269,
+              "maximum_ns": 437877269,
+              "logical_bytes": null
+            },
+            "registration_prepare": {
+              "count": 1,
+              "total_ns": 1313,
+              "median_ns": 1313,
+              "maximum_ns": 1313,
+              "logical_bytes": null
+            },
+            "fusion_prepare": {
+              "count": 1,
+              "total_ns": 29235,
+              "median_ns": 29235,
+              "maximum_ns": 29235,
+              "logical_bytes": null
+            },
+            "proxy_upload": {
+              "count": 50,
+              "total_ns": 20326617264,
+              "median_ns": 406745774.5,
+              "maximum_ns": 425903273,
+              "logical_bytes": 14400000000
+            },
+            "proxy_submit": {
+              "count": 50,
+              "total_ns": 1178039,
+              "median_ns": 22532.0,
+              "maximum_ns": 55704,
+              "logical_bytes": null
+            },
+            "proxy_readback": {
+              "count": 50,
+              "total_ns": 2803321406,
+              "median_ns": 55716978.5,
+              "maximum_ns": 77644562,
+              "logical_bytes": 78643200
+            },
+            "identity": {
+              "count": 50,
+              "total_ns": 2486,
+              "median_ns": 30.0,
+              "maximum_ns": 371,
+              "logical_bytes": null
+            },
+            "register": {
+              "count": 50,
+              "total_ns": 23462161959,
+              "median_ns": 467826518.0,
+              "maximum_ns": 523751893,
+              "logical_bytes": null
+            },
+            "fusion_validation": {
+              "count": 50,
+              "total_ns": 736778858,
+              "median_ns": 14675731.0,
+              "maximum_ns": 15520653,
+              "logical_bytes": null
+            },
+            "fusion_upload": {
+              "count": 50,
+              "total_ns": 13072598916,
+              "median_ns": 260278443.5,
+              "maximum_ns": 277443543,
+              "logical_bytes": 14400000000
+            },
+            "fusion_submit": {
+              "count": 50,
+              "total_ns": 68932929,
+              "median_ns": 139386.5,
+              "maximum_ns": 61815000,
+              "logical_bytes": null
+            },
+            "fusion_wait": {
+              "count": 50,
+              "total_ns": 3002228176,
+              "median_ns": 60092463.0,
+              "maximum_ns": 66607407,
+              "logical_bytes": null
+            },
+            "accumulate": {
+              "count": 50,
+              "total_ns": 16880704613,
+              "median_ns": 335837582.5,
+              "maximum_ns": 386515286,
+              "logical_bytes": null
+            },
+            "pair_upload": {
+              "count": 49,
+              "total_ns": 21419683,
+              "median_ns": 364465,
+              "maximum_ns": 2632603,
+              "logical_bytes": 154140672
+            },
+            "score_readback": {
+              "count": 752,
+              "total_ns": 177059491,
+              "median_ns": 185142.5,
+              "maximum_ns": 15330777,
+              "logical_bytes": 71254080
+            },
+            "estimate_pair": {
+              "count": 49,
+              "total_ns": 330640164,
+              "median_ns": 5069920,
+              "maximum_ns": 62994895,
+              "logical_bytes": null
+            },
+            "fusion_reconstruct": {
+              "count": 1,
+              "total_ns": 54212,
+              "median_ns": 54212,
+              "maximum_ns": 54212,
+              "logical_bytes": null
+            },
+            "fusion_readback": {
+              "count": 1,
+              "total_ns": 185690498,
+              "median_ns": 185690498,
+              "maximum_ns": 185690498,
+              "logical_bytes": 288000000
+            },
+            "fusion_finish": {
+              "count": 1,
+              "total_ns": 185751202,
+              "median_ns": 185751202,
+              "maximum_ns": 185751202,
+              "logical_bytes": null
+            },
+            "final_crop": {
+              "count": 1,
+              "total_ns": 16335612,
+              "median_ns": 16335612,
+              "maximum_ns": 16335612,
+              "logical_bytes": null
+            },
+            "job_drain": {
+              "count": 1,
+              "total_ns": 60043,
+              "median_ns": 60043,
+              "maximum_ns": 60043,
+              "logical_bytes": null
+            },
+            "encode": {
+              "count": 1,
+              "total_ns": 286840520,
+              "median_ns": 286840520,
+              "maximum_ns": 286840520,
+              "logical_bytes": null
+            },
+            "publish": {
+              "count": 1,
+              "total_ns": 31158,
+              "median_ns": 31158,
+              "maximum_ns": 31158,
+              "logical_bytes": null
+            }
+          }
+        }
+      },
+      "resident": {
+        "job": {
+          "kind": "diagnostic",
+          "number": 2,
+          "target": "candidate",
+          "argv": [
+            "/tmp/pancake-worktrees.t3paqgWM/resident-input/pancake/target/resident-input-release/release/pancake-cli",
+            "--input",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_000.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_001.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_002.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_003.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_004.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_005.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_006.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_007.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_008.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_009.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_010.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_011.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_012.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_013.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_014.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_015.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_016.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_017.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_018.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_019.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_020.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_021.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_022.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_023.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_024.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_025.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_026.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_027.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_028.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_029.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_030.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_031.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_032.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_033.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_034.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_035.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_036.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_037.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_038.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_039.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_040.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_041.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_042.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_043.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_044.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_045.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_046.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_047.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_048.tif",
+            "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_049.tif",
+            "--output",
+            "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/diagnostic-02/candidate/complete.tif",
+            "--gpu",
+            "--method",
+            "hybrid",
+            "--align",
+            "--alignment-mode",
+            "similarity",
+            "--alignment-ref",
+            "first",
+            "--kernel-size",
+            "6",
+            "--pyramid-levels",
+            "8",
+            "--scale-factor",
+            "6",
+            "--slab-size",
+            "0",
+            "--slab-overlap",
+            "0",
+            "--bit-depth",
+            "16",
+            "--auto-crop",
+            "--gpu-id",
+            "0"
+          ],
+          "cwd": "/tmp/pancake-worktrees.t3paqgWM/resident-input/pancake",
+          "environment": {
+            "LANG": "C.UTF-8",
+            "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/nvidia_icd.json",
+            "LC_CTYPE": "C.UTF-8",
+            "LC_ALL": "C.UTF-8",
+            "PATH": "/home/krishna/.local/bin:/home/krishna/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/krishna/.codex/tmp/arg0-linux/codex-arg0ZYngTQ:/home/krishna/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/home/krishna/.local/bin:/home/krishna/.bun/bin:/usr/local/cuda-12/bin:/home/krishna/.asdf/shims:/home/krishna/.asdf/bin:/home/krishna/.kiex/bin:/home/krishna/.nvm/versions/node/v26.7.0/bin:/home/krishna/.local/bin:/home/krishna/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/krishna/.cargo/bin:/home/krishna/.local/bin:/home/krishna/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/krishna/.dotnet/tools:/home/krishna/.dotnet/tools:/home/krishna/.cargo/bin:/home/krishna/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/usr/lib/chatgpt/resources:/home/krishna/.dotnet/tools",
+            "HOME": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/home",
+            "XDG_CACHE_HOME": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/cache",
+            "XDG_CONFIG_HOME": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/config",
+            "TMPDIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/tmp",
+            "CUDA_CACHE_PATH": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/cuda",
+            "__GL_SHADER_DISK_CACHE_PATH": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/nvidia",
+            "MESA_SHADER_CACHE_DIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/mesa",
+            "NUMBA_CACHE_DIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/numba",
+            "NUMBA_NUM_THREADS": "32",
+            "OMP_NUM_THREADS": "32",
+            "RAYON_NUM_THREADS": "32",
+            "OPENBLAS_NUM_THREADS": "1",
+            "PYTHONNOUSERSITE": "1",
+            "PANCAKE_STATE_DIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/home",
+            "PANCAKE_COMPUTE_CACHE_DIR": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/cache/candidate/diagnostic-02/home/device-cache",
+            "PANCAKE_DEFAULT_DEVICE": "cpu",
+            "PANCAKE_T50_PHASE_TRACE": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/diagnostic-02/candidate/phases.tsv",
+            "CUDA_VISIBLE_DEVICES": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+            "PANCAKE_RUNTIME": "wgpu",
+            "CONFORMANCE_EVENTS_PATH": "/tmp/pancake-worktrees.t3paqgWM/resident-input/artifacts/resident-input/run/diagnostic-02/candidate/events.jsonl"
+          },
+          "rss_sampler_cpu": null,
+          "gpu_before": {
+            "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+            "pci.bus_id": "00000000:01:00.0",
+            "name": "NVIDIA GeForce RTX 3090",
+            "driver_version": "580.178.04",
+            "pstate": "P2",
+            "temperature.gpu": "69",
+            "power.draw": "126.74",
+            "power.limit": "350.00",
+            "clocks.gr": "1725",
+            "clocks.mem": "9501"
+          },
+          "cpu_temperature_before_millidegrees": {
+            "/sys/class/hwmon/hwmon1/temp3_input": 57375,
+            "/sys/class/hwmon/hwmon1/temp4_input": 55375,
+            "/sys/class/hwmon/hwmon1/temp1_input": 66500
+          },
+          "cache_before": {
+            "files": 0,
+            "bytes": 0
+          },
+          "valid": true,
+          "returncode": 0,
+          "timed_out": false,
+          "elapsed_ns": 57063727280,
+          "max_sample_acquisition_ns": 67695283,
+          "maximum_rss_sample_gap_ns": 10157812,
+          "rss_sample_count": 7133,
+          "observed_peak_rss_bytes": 1546510336,
+          "peak_rss_bytes": 1546510336,
+          "maximum_gpu_sample_gap_ns": 75400210,
+          "gpu_sample_count": 7123,
+          "observed_peak_gpu_bytes": 2518323200,
+          "peak_gpu_bytes": null,
+          "maximum_sample_gap_ns": 75400210,
+          "sample_count": 7133,
+          "kernel_process_peak_rss_bytes": 1547554816,
+          "kernel_process_user_cpu_seconds": 28.164611999999998,
+          "kernel_process_system_cpu_seconds": 29.412894,
+          "resource_errors": [],
+          "sample_interval_ns": 8000000,
+          "rss_sampler_affinity": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+          ],
+          "sampler_thread_cpu_ns": 13027195027,
+          "sampler_threads_cpu_ns": {
+            "rss": 10595559374,
+            "gpu": 2431635653
+          },
+          "gpu_after": {
+            "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+            "pci.bus_id": "00000000:01:00.0",
+            "name": "NVIDIA GeForce RTX 3090",
+            "driver_version": "580.178.04",
+            "pstate": "P2",
+            "temperature.gpu": "69",
+            "power.draw": "129.16",
+            "power.limit": "350.00",
+            "clocks.gr": "1725",
+            "clocks.mem": "9501"
+          },
+          "cpu_temperature_after_millidegrees": {
+            "/sys/class/hwmon/hwmon1/temp3_input": 58625,
+            "/sys/class/hwmon/hwmon1/temp4_input": 55000,
+            "/sys/class/hwmon/hwmon1/temp1_input": 65625
+          },
+          "cache_after": {
+            "files": 2,
+            "bytes": 166331
+          },
+          "output": {
+            "shape": [
+              3998,
+              5998,
+              3
+            ],
+            "dtype": "uint16",
+            "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302",
+            "pixel_sha256": "f54746784bcc278da2df734e9f034053a3b54105ddb2a30046baf6dab07a80a3",
+            "bytes": 143881378,
+            "minimum": 7663,
+            "maximum": 57895
+          },
+          "completion": {
+            "actual_backend": "gpu",
+            "alignment_transforms": {
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_000.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_001.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_002.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_003.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_004.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_005.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_006.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_007.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_008.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_009.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_010.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_011.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_012.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_013.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_014.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_015.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_016.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_017.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_018.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_019.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_020.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_021.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_022.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_023.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_024.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_025.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_026.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_027.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_028.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_029.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_030.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_031.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_032.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_033.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_034.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_035.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_036.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_037.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_038.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_039.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_040.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_041.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_042.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_043.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_044.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_045.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_046.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_047.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_048.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/inputs/focus_049.tif": [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ]
+            },
+            "completed": true,
+            "device": "NVIDIA GeForce RTX 3090",
+            "device_fingerprint": "spirv_4318_8708",
+            "device_pci_address": "0000:01:00.0",
+            "event": "stack_complete",
+            "fallback_reason": null,
+            "physical_gpu": true,
+            "runtime": "wgpu-vulkan",
+            "sequential_transforms": [
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ],
+              [
+                [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                [
+                  0.0,
+                  1.0,
+                  0.0
+                ]
+              ]
+            ]
+          }
+        },
+        "trace": {
+          "format": "owner-thread host wall intervals and logical bytes",
+          "sha256": "2adb503911538c4b69f70bcccccf90eba694b68a4c2a808dccd7b02ba110ec84",
+          "bytes": 65785,
+          "records": 1611,
+          "job_total_ns": 56912687459,
+          "nonoverlapping_top_level_ns": 55753643543,
+          "unattributed_host_ns": 1159043916,
+          "phases": {
+            "raster_decode": {
+              "count": 50,
+              "total_ns": 23210822668,
+              "median_ns": 455761622.5,
+              "maximum_ns": 514476333,
+              "logical_bytes": null
+            },
+            "raster_orientation": {
+              "count": 50,
+              "total_ns": 42823,
+              "median_ns": 701.0,
+              "maximum_ns": 6833,
+              "logical_bytes": null
+            },
+            "tiff_profile": {
+              "count": 50,
+              "total_ns": 1277978,
+              "median_ns": 25092.0,
+              "maximum_ns": 33493,
+              "logical_bytes": null
+            },
+            "rgb_conversion": {
+              "count": 50,
+              "total_ns": 6065126904,
+              "median_ns": 120839163.5,
+              "maximum_ns": 129094819,
+              "logical_bytes": null
+            },
+            "rgb_validation": {
+              "count": 50,
+              "total_ns": 931215057,
+              "median_ns": 18536223.5,
+              "maximum_ns": 20136468,
+              "logical_bytes": null
+            },
+            "decode": {
+              "count": 50,
+              "total_ns": 30211227844,
+              "median_ns": 593633299.5,
+              "maximum_ns": 661741227,
+              "logical_bytes": null
+            },
+            "runtime_setup": {
+              "count": 1,
+              "total_ns": 394553084,
+              "median_ns": 394553084,
+              "maximum_ns": 394553084,
+              "logical_bytes": null
+            },
+            "registration_prepare": {
+              "count": 1,
+              "total_ns": 1593,
+              "median_ns": 1593,
+              "maximum_ns": 1593,
+              "logical_bytes": null
+            },
+            "fusion_prepare": {
+              "count": 1,
+              "total_ns": 21741,
+              "median_ns": 21741,
+              "maximum_ns": 21741,
+              "logical_bytes": null
+            },
+            "proxy_upload": {
+              "count": 50,
+              "total_ns": 20432882691,
+              "median_ns": 408333041.5,
+              "maximum_ns": 422906829,
+              "logical_bytes": 14400000000
+            },
+            "proxy_submit": {
+              "count": 50,
+              "total_ns": 1132442,
+              "median_ns": 22186.5,
+              "maximum_ns": 29526,
+              "logical_bytes": null
+            },
+            "proxy_readback": {
+              "count": 50,
+              "total_ns": 2773169782,
+              "median_ns": 55601643.0,
+              "maximum_ns": 75632609,
+              "logical_bytes": 78643200
+            },
+            "identity": {
+              "count": 50,
+              "total_ns": 1694,
+              "median_ns": 20.0,
+              "maximum_ns": 230,
+              "logical_bytes": null
+            },
+            "register": {
+              "count": 50,
+              "total_ns": 23528961923,
+              "median_ns": 468900573.0,
+              "maximum_ns": 526895312,
+              "logical_bytes": null
+            },
+            "fusion_validation": {
+              "count": 50,
+              "total_ns": 741096969,
+              "median_ns": 14687948.5,
+              "maximum_ns": 16589117,
+              "logical_bytes": null
+            },
+            "fusion_submit": {
+              "count": 50,
+              "total_ns": 66316462,
+              "median_ns": 134828.0,
+              "maximum_ns": 59754657,
+              "logical_bytes": null
+            },
+            "fusion_wait": {
+              "count": 50,
+              "total_ns": 326629682,
+              "median_ns": 6559541.5,
+              "maximum_ns": 8575091,
+              "logical_bytes": null
+            },
+            "accumulate": {
+              "count": 50,
+              "total_ns": 1134187822,
+              "median_ns": 21359529.5,
+              "maximum_ns": 83009511,
+              "logical_bytes": null
+            },
+            "pair_upload": {
+              "count": 49,
+              "total_ns": 21663931,
+              "median_ns": 365827,
+              "maximum_ns": 2415736,
+              "logical_bytes": 154140672
+            },
+            "score_readback": {
+              "count": 752,
+              "total_ns": 173800762,
+              "median_ns": 178861.0,
+              "maximum_ns": 14902952,
+              "logical_bytes": 71254080
+            },
+            "estimate_pair": {
+              "count": 49,
+              "total_ns": 321379840,
+              "median_ns": 5155420,
+              "maximum_ns": 56517538,
+              "logical_bytes": null
+            },
+            "fusion_reconstruct": {
+              "count": 1,
+              "total_ns": 49232,
+              "median_ns": 49232,
+              "maximum_ns": 49232,
+              "logical_bytes": null
+            },
+            "fusion_readback": {
+              "count": 1,
+              "total_ns": 185905553,
+              "median_ns": 185905553,
+              "maximum_ns": 185905553,
+              "logical_bytes": 288000000
+            },
+            "fusion_finish": {
+              "count": 1,
+              "total_ns": 185960968,
+              "median_ns": 185960968,
+              "maximum_ns": 185960968,
+              "logical_bytes": null
+            },
+            "final_crop": {
+              "count": 1,
+              "total_ns": 15497558,
+              "median_ns": 15497558,
+              "maximum_ns": 15497558,
+              "logical_bytes": null
+            },
+            "job_drain": {
+              "count": 1,
+              "total_ns": 65072,
+              "median_ns": 65072,
+              "maximum_ns": 65072,
+              "logical_bytes": null
+            },
+            "encode": {
+              "count": 1,
+              "total_ns": 283136122,
+              "median_ns": 283136122,
+              "maximum_ns": 283136122,
+              "logical_bytes": null
+            },
+            "publish": {
+              "count": 1,
+              "total_ns": 29816,
+              "median_ns": 29816,
+              "maximum_ns": 29816,
+              "logical_bytes": null
+            }
+          }
+        }
+      }
+    },
+    "profile": "T50.hybrid.gpu",
+    "settings": {
+      "device": "gpu",
+      "method": "hybrid",
+      "align": true,
+      "alignment_mode": "similarity",
+      "alignment_reference": "first",
+      "kernel_size": 6,
+      "pyramid_levels": 8,
+      "scale_factor": 6,
+      "slab_size": 0,
+      "slab_overlap": 0,
+      "bit_depth": 16,
+      "auto": false,
+      "auto_crop": true,
+      "quality_report": false
+    },
+    "identity": {
+      "commit": "3f6cd9bad7a58dbedf1b9d574a349db1a7618c17",
+      "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+      "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+      "executable": "/tmp/pancake-worktrees.t3paqgWM/resident-input/pancake/target/resident-input-release/release/pancake-cli",
+      "binary_sha256": "1cca8258d6c819193af16e74bea7702c737d2cb997296cadecfda3b6cbb00e49",
+      "instrumentation_source_sha256": "ec3b12ad853ed7e933b99e6f6cc445046d30f64c2f03cbf8ed3fda61970fcab3",
+      "runner_sha256": "0e6bfd273292454c42aa8aaf4785d87f2b6980dea7a7da5e4569ed8c815b1d40"
+    },
+    "materialization_sha256": "8e4742b2480e041ca95cceeb023627a4c3c69c27f618e3bc13c64874a75ff468",
+    "frozen_input_receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+    "source_frame_count": 50,
+    "historical_summary_sha256": "0ee9779cb7fc0ce6b5a57bf1845eb2b0e5c13c5e997dc1e61d747f8fc48a5b71",
+    "status": "completed_exact_identity",
+    "resource_guard": {
+      "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/pancake-t50-resident-3f6cd9b.scope",
+      "memory_max_bytes": 30064771072,
+      "memory_swap_max_bytes": 0,
+      "initial_host_available_bytes": 46565142528,
+      "required_host_available_bytes": 42949672960,
+      "initial_device_free_mib": 23469,
+      "required_device_free_mib": 8192,
+      "per_job_timeout_seconds": 900
+    },
+    "hardware": {
+      "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+      "cpu_affinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "kernel": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+      "os_release": {
+        "NAME": "Ubuntu",
+        "ID": "ubuntu",
+        "PRETTY_NAME": "Ubuntu 24.04.5 LTS",
+        "VERSION_ID": "24.04",
+        "VERSION": "24.04.5 LTS (Noble Numbat)",
+        "VERSION_CODENAME": "noble",
+        "ID_LIKE": "debian",
+        "HOME_URL": "https://www.ubuntu.com/",
+        "SUPPORT_URL": "https://help.ubuntu.com/",
+        "BUG_REPORT_URL": "https://bugs.launchpad.net/ubuntu/",
+        "PRIVACY_POLICY_URL": "https://www.ubuntu.com/legal/terms-and-policies/privacy-policy",
+        "UBUNTU_CODENAME": "noble",
+        "LOGO": "ubuntu-logo"
+      },
+      "frequency_policy": {
+        "/sys/devices/system/cpu/cpufreq/policy11": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy8": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy6": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy28": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy18": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy4": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy26": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy16": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy2": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy24": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy14": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy0": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy22": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy12": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy9": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy30": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy20": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy10": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy7": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy29": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy19": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy5": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy27": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy17": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy3": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy25": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy15": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy1": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy23": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy13": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy31": "powersave",
+        "/sys/devices/system/cpu/cpufreq/policy21": "powersave"
+      },
+      "timer": {
+        "python": "3.12.12 (main, Feb 12 2026, 00:42:14) [Clang 21.1.4 ]",
+        "clock": {
+          "implementation": "clock_gettime(CLOCK_MONOTONIC)",
+          "monotonic": true,
+          "adjustable": false,
+          "resolution": 1e-09
+        }
+      },
+      "memory": "Linux procfs session sum and NVIDIA NVML per PID; sampled, transient peaks can be missed",
+      "validator": {
+        "numpy": "2.5.4",
+        "tifffile": "2026.11.12",
+        "imagecodecs": "2026.11.11"
+      },
+      "gpu": {
+        "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+        "pci.bus_id": "00000000:01:00.0",
+        "name": "NVIDIA GeForce RTX 3090",
+        "driver_version": "580.178.04",
+        "pstate": "P2",
+        "temperature.gpu": "68",
+        "power.draw": "124.60",
+        "power.limit": "350.00",
+        "clocks.gr": "1725",
+        "clocks.mem": "9501"
+      }
+    },
+    "output_comparison": {
+      "complete_encoded_identity": true,
+      "complete_pixel_identity": true,
+      "historical_pixel_identity": true,
+      "historical_encoded_identity": true
+    },
+    "all_52_inputs_unchanged": true
+  },
+  "raw_archive": {
+    "file": "raw-records.tar.gz",
+    "sha256": "bf77c88fa3b7abbc47985a231851c9c56792054ab46716a46b9aaa855a2fc71a",
+    "files": {
+      "archive-study.py": {
+        "bytes": 4496,
+        "sha256": "03f01972f01ab679b139a539722f1540392a1dea7e38728a73fbb2d6b677d4ec"
+      },
+      "boundary-proof.txt": {
+        "bytes": 1365,
+        "sha256": "31a911592af6919fb605bb799944db5e61c8c6b3878c220054b091d3c33593c3"
+      },
+      "candidate-revision.txt": {
+        "bytes": 41,
+        "sha256": "53de4e893901e8f7374be7074d78dfc8ae938198006ccbd13211d0c1158be2a4"
+      },
+      "check-integrated.sh": {
+        "bytes": 2639,
+        "sha256": "7f64261ea21d08a2686be73747961c36fe9ddcfa2c9479fcb88cce6ab51021d2"
+      },
+      "cleanup-owned.sh": {
+        "bytes": 1545,
+        "sha256": "a44a74414463de59c43fb15248efbd45fa56c40d0f6888fd33e5779038dc25e5"
+      },
+      "core-first-compile.log": {
+        "bytes": 1364,
+        "sha256": "2771a1e09312cf68c5d3d00272f3aba482f0881454b0358dcfcee3a45ef263fd"
+      },
+      "core-lifecycle.log": {
+        "bytes": 1946,
+        "sha256": "d3244401d14d5e244ef0bb9757518e1a5df7741d6c4c116f7703e080cfd18841"
+      },
+      "core-lifecycle.status": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "core-revision.txt": {
+        "bytes": 41,
+        "sha256": "6976f1e032bcaeec3afdec2d053a06e4413ba927579ed04744fda6a0027ed19e"
+      },
+      "core-source-policy.log": {
+        "bytes": 81,
+        "sha256": "22e88bc8b11b052e64c7b4e1949a769853e31e3c521989d95067ff79b8b43b14"
+      },
+      "cpu-cleanup.command": {
+        "bytes": 106,
+        "sha256": "ab24b902f8ca3cde84f44c76fc34d38b44dca9ec271ba716edfada8c8f844857"
+      },
+      "cpu-cleanup.log": {
+        "bytes": 38,
+        "sha256": "cc01ee113d6eeb2bfe13b04386263514bc69f09ca1d2b4b03ca766332849269c"
+      },
+      "diagnostic-console.log": {
+        "bytes": 25,
+        "sha256": "8b5af9eef85438bd17ed8454e02099b633c8ff7c06651bac2c01c9208759cbfa"
+      },
+      "experimental-build.patch": {
+        "bytes": 52044,
+        "sha256": "cb38e270fa146a32cf627e508d0ace7f992cd73c7bb8ac8b230fc8dab47667d7"
+      },
+      "experimental-source-policy.log": {
+        "bytes": 81,
+        "sha256": "22e88bc8b11b052e64c7b4e1949a769853e31e3c521989d95067ff79b8b43b14"
+      },
+      "green.log": {
+        "bytes": 652,
+        "sha256": "837362f3136ff305462bd2a243a40336a6e85f6365dd6106e4a9197b53e11837"
+      },
+      "green.status": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "integrated-clippy-tool.txt": {
+        "bytes": 39,
+        "sha256": "66cf4e4ade0fef24fbb1d8bf1c2ee9af26c19d857a6b678e2c3f8f6d412636b0"
+      },
+      "integrated-clippy.command": {
+        "bytes": 247,
+        "sha256": "0a8ad2d73c060e3acf5851ef45b4d39d66ee971e0601a2a42fc4321f6d1c7892"
+      },
+      "integrated-clippy.log": {
+        "bytes": 251,
+        "sha256": "1a8a6c382479ebca1fa6d86c64d7cb85d4287531c7ae95670e747160b0827ee6"
+      },
+      "integrated-clippy.status": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "integrated-const-clippy.log": {
+        "bytes": 947,
+        "sha256": "9152cea59c6e01068b372dfee50be75fdf2b8fc280da6927a51f4e844e8f726b"
+      },
+      "integrated-const-revision.txt": {
+        "bytes": 41,
+        "sha256": "efa81894d43e8e078ce32f5efea3b7244a3b4e484dc691f0b7803f08ce8e26ec"
+      },
+      "integrated-cpu-targets.txt": {
+        "bytes": 269,
+        "sha256": "d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e"
+      },
+      "integrated-cpu.command": {
+        "bytes": 521,
+        "sha256": "bb621d92ad12d173875b191d7c0fbf0632ce85dfe7b3185004d548eddc0f2352"
+      },
+      "integrated-cpu.log": {
+        "bytes": 13013,
+        "sha256": "c9684fa768c7b397c405cf9f536968995b6a479ab1f26d6706f9196c79a3bf27"
+      },
+      "integrated-cpu.status": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "integrated-deny.toml": {
+        "bytes": 9171,
+        "sha256": "63657cc28fcb4e95116264748bf37e4c0260a38c0eaaa805aee26ce4eb6311a6"
+      },
+      "integrated-deps-policy.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "integrated-effective-clippy.toml": {
+        "bytes": 1113,
+        "sha256": "ff2dc0c17cf14c06a2e4a129b190787308c8c2fa271b2c329e5b6d64eb697f66"
+      },
+      "integrated-format.command": {
+        "bytes": 28,
+        "sha256": "751da502a6e5289011fb26c3723e31495bbe8a561083227fbe47b3cd8945620a"
+      },
+      "integrated-format.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "integrated-format.status": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "integrated-initial-clippy.log": {
+        "bytes": 9050,
+        "sha256": "380da15aa25f701b70b502e742bba4da56376780becb2249765ef2a7ffda1c16"
+      },
+      "integrated-initial-revision.txt": {
+        "bytes": 41,
+        "sha256": "3fc58844c99d131f93924b7ea796496cef7630cd20d7aedf7bc74cb3fd1533f2"
+      },
+      "integrated-lock.sha256": {
+        "bytes": 85,
+        "sha256": "c385fc34473e340b70720a77ab38feccb9561e6420aa4ffb445e23a349fad549"
+      },
+      "integrated-module-import-compiler.log": {
+        "bytes": 1408,
+        "sha256": "76ff7e642b7863b8234d5026e14b9cb75314e301bd2fd5928f18fdcb0d46008e"
+      },
+      "integrated-module-import-revision.txt": {
+        "bytes": 41,
+        "sha256": "c5151d694a43e84decf42897e26794381c5440faae52d406c30968b255ad4adf"
+      },
+      "integrated-policy.sha256": {
+        "bytes": 328,
+        "sha256": "3a38eb6f5115f9e284f4653e5e37077c91663bba90702555020c0ef44d09a644"
+      },
+      "integrated-preservation.txt": {
+        "bytes": 1925,
+        "sha256": "8f84624517c262d3c5be40d532055a32c739b9786757defb70ec300ec4e50573"
+      },
+      "integrated-private-module-clippy.log": {
+        "bytes": 1125,
+        "sha256": "fa45513871a14d646bb3f01e53f54e46d1f9d9a1cc14347a64a4fc168230cbbf"
+      },
+      "integrated-private-module-revision.txt": {
+        "bytes": 41,
+        "sha256": "e4dd7ae03cf5c7609762d5471f6018377a7e907a59acad17c3f63bcdd9799ca7"
+      },
+      "integrated-product.patch": {
+        "bytes": 23443,
+        "sha256": "6cd7a1902523cede176644cac3c458604bb20610aa46050e9f97a24fc7bdd4fe"
+      },
+      "integrated-revision.txt": {
+        "bytes": 41,
+        "sha256": "c8ae199eb7c7f5a960f21647646dad3f87fbb93a5bad00ef00993d762a744e50"
+      },
+      "integrated-rustc.txt": {
+        "bytes": 198,
+        "sha256": "be69adad9137eaa0bdac1dd07e2fe286b1831fc8bad193ea27806ca0c7c8e7c6"
+      },
+      "integrated-rustfmt-tool.txt": {
+        "bytes": 46,
+        "sha256": "3db4b244e4ba9d20ded3488fb3be0c2163fbd7c81d64b4b0348f5ad9c3da3b5d"
+      },
+      "integrated-source-policy.command": {
+        "bytes": 100,
+        "sha256": "f3b508907abeec6199a0ab12ddc28291e1c31ffbacb3e6becf49f7d65c4eaddd"
+      },
+      "integrated-source-policy.log": {
+        "bytes": 81,
+        "sha256": "22e88bc8b11b052e64c7b4e1949a769853e31e3c521989d95067ff79b8b43b14"
+      },
+      "integrated-source-policy.status": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "integrated-source-tree.txt": {
+        "bytes": 41,
+        "sha256": "1c726df77af8b15b3286390e63acdd64f8236883b4ec518a9d0997569d38a8b7"
+      },
+      "integrated-target-metadata.json": {
+        "bytes": 15328,
+        "sha256": "81ecf3eef77469748d7b9b1a2b4cfc06023679e84155684e37742a1af816f242"
+      },
+      "launch-finish.txt": {
+        "bytes": 26,
+        "sha256": "475a6cbf2760f707cdcf1de92d94f0dde64c469fbdf1cc3b6a80e48bcc36c48b"
+      },
+      "launch-input-digests.log": {
+        "bytes": 295,
+        "sha256": "4b829dc648159bd51780d6c8b54ec9def5fb564a8e6c3d874f111320d1bbcb0b"
+      },
+      "launch-pair.sh": {
+        "bytes": 1791,
+        "sha256": "263f75c4abc4d228b35a4070672ac69d9837110290052e1577eb2236b1359166"
+      },
+      "launch-start.txt": {
+        "bytes": 26,
+        "sha256": "b66c8937a736e78dccb678875f29d16bfb213c11e94c510acaa233c7a8d72b36"
+      },
+      "launch.command": {
+        "bytes": 723,
+        "sha256": "2d0a21544a088975c3f02d044d23f5506ce73cc8d4d36648e9f043dc4a834b99"
+      },
+      "launch.status": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "lock.txt": {
+        "bytes": 85,
+        "sha256": "c385fc34473e340b70720a77ab38feccb9561e6420aa4ffb445e23a349fad549"
+      },
+      "owned-cleanup.json": {
+        "bytes": 437,
+        "sha256": "0756eda65cdc2cff17591420c717a0c6ccdf6680325533c42823be0bccc3f354"
+      },
+      "pure-product.patch": {
+        "bytes": 22466,
+        "sha256": "9b311bbc34cfe9753a066bffafb6078210a9ca8521875d070b9051a6272676be"
+      },
+      "python-executable.sha256": {
+        "bytes": 135,
+        "sha256": "06f868d9c38def7c6257b8b4aaa84cf99163a334ab5f385fdebef4091d147c33"
+      },
+      "python-executable.txt": {
+        "bytes": 69,
+        "sha256": "3bd0ade6c047d458188eec927f8a42ce3501b579792f216c2312717404515879"
+      },
+      "quiet-mid.txt": {
+        "bytes": 118,
+        "sha256": "eed1f4c32713edb861878e711a2d3191087ad96dd938f1afbd8f8d973402a6b3"
+      },
+      "quiet-start.txt": {
+        "bytes": 27,
+        "sha256": "f390660ce65644c870f5ab4a374a12c1a62178b1e9ff79605be8df98065404c6"
+      },
+      "red-revision.txt": {
+        "bytes": 41,
+        "sha256": "15e664da0f596b8c30f3e8b1079fa6e6ee5359280282829748efb8e26eda1c40"
+      },
+      "red.log": {
+        "bytes": 11806,
+        "sha256": "3d7c101fc8987f78be9466972e28946229d964b6d4e38e2717f2581f70024ee3"
+      },
+      "red.status": {
+        "bytes": 4,
+        "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+      },
+      "release-binary.sha256": {
+        "bytes": 171,
+        "sha256": "7fcaf28476e215681dee6b129ef4691680f0ebe31cd6b9078c08345bf6fb67d6"
+      },
+      "release-build-id.txt": {
+        "bytes": 407,
+        "sha256": "6e42e3d2554e06a3f53e004632ddc5cb7f00e46c0287318eeba7b1e94d4434b9"
+      },
+      "release-build.log": {
+        "bytes": 11160,
+        "sha256": "760dfa42ba51ae1770e2172768916b8117cb1fe05b50b737e7ded35c84a08277"
+      },
+      "release-cleanup.log": {
+        "bytes": 38,
+        "sha256": "bf82c3dd8dd362364684fe854922c2c0b1b66e18e58ea542df067d784ca75c75"
+      },
+      "release-tree.txt": {
+        "bytes": 41,
+        "sha256": "6c725af22731a622e282e593d05df39663f3cd4053a7cc48236d0f03b3093fad"
+      },
+      "run/diagnostic-01/candidate/events.jsonl": {
+        "bytes": 8845,
+        "sha256": "cd71e1c778223de45dadf781cb6d5c2bef68d9d93e8f679b85810fa1bd242567"
+      },
+      "run/diagnostic-01/candidate/gpu-resources.jsonl.gz": {
+        "bytes": 216730,
+        "sha256": "42cb38302b757eeed4138ae2e9ae3ebf0653f018a55396271e8ec0c3bd74480a"
+      },
+      "run/diagnostic-01/candidate/launch.json": {
+        "bytes": 10375,
+        "sha256": "c11bf5b7737e887c8c37501f0008036c23b6f3f37024f80395266e31401ed1de"
+      },
+      "run/diagnostic-01/candidate/phases.tsv": {
+        "bytes": 68419,
+        "sha256": "9485c61ab12e8d60bf7e841a65f74a3e8f6ddc337dd8b4f956c10ab9b50b4625"
+      },
+      "run/diagnostic-01/candidate/resources.jsonl.gz": {
+        "bytes": 275211,
+        "sha256": "076e208014251e63cb783cf1438fcdb1aefbdc1b1725e3ee3c96dfb7e3583f4f"
+      },
+      "run/diagnostic-01/candidate/sample.json": {
+        "bytes": 32951,
+        "sha256": "35ae667ec6661ab1a08edf2a86a54f6f7a4d92d760815ecde6c16e99f3035c49"
+      },
+      "run/diagnostic-01/candidate/stderr.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/diagnostic-01/candidate/stdout.txt": {
+        "bytes": 741,
+        "sha256": "900cf3b159b0f80a96e8102d0fa5f8bc37816ca711c0643544826955f7487018"
+      },
+      "run/diagnostic-02/candidate/events.jsonl": {
+        "bytes": 8845,
+        "sha256": "cd71e1c778223de45dadf781cb6d5c2bef68d9d93e8f679b85810fa1bd242567"
+      },
+      "run/diagnostic-02/candidate/gpu-resources.jsonl.gz": {
+        "bytes": 170509,
+        "sha256": "0dc31e717acfad8e48bfdea52541ea4c669cb7a103982ce9ce8edb5344fc00a2"
+      },
+      "run/diagnostic-02/candidate/launch.json": {
+        "bytes": 10333,
+        "sha256": "65f52a437643a6a83140db5ee7e9d61655fb66d11da40a6f34f192ab18e297e3"
+      },
+      "run/diagnostic-02/candidate/phases.tsv": {
+        "bytes": 65785,
+        "sha256": "2adb503911538c4b69f70bcccccf90eba694b68a4c2a808dccd7b02ba110ec84"
+      },
+      "run/diagnostic-02/candidate/resources.jsonl.gz": {
+        "bytes": 215868,
+        "sha256": "44a5c3e62748dfb49de5411899bc388f88f443cc374521fe0f662b7e50a0dcf1"
+      },
+      "run/diagnostic-02/candidate/sample.json": {
+        "bytes": 32919,
+        "sha256": "8d47d77e86c1048dae1b283b9dd28e37f53692ab388f600be119e4fc45883f2e"
+      },
+      "run/diagnostic-02/candidate/stderr.txt": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/diagnostic-02/candidate/stdout.txt": {
+        "bytes": 741,
+        "sha256": "900cf3b159b0f80a96e8102d0fa5f8bc37816ca711c0643544826955f7487018"
+      },
+      "run/report.json": {
+        "bytes": 101846,
+        "sha256": "b5ac6a0cb61fbbd01083f8aae5cd9d8ce6979b7ade3fcfdd1487599c2091e20d"
+      },
+      "run-pair.py": {
+        "bytes": 13336,
+        "sha256": "e16424454cff3f6cebb64014bacc438023cabed6514d191f66f062601ce7e558"
+      },
+      "rustc.txt": {
+        "bytes": 198,
+        "sha256": "be69adad9137eaa0bdac1dd07e2fe286b1831fc8bad193ea27806ca0c7c8e7c6"
+      },
+      "shared-materialization.json": {
+        "bytes": 472619,
+        "sha256": "8e4742b2480e041ca95cceeb023627a4c3c69c27f618e3bc13c64874a75ff468"
+      },
+      "test-build-commands.txt": {
+        "bytes": 1017,
+        "sha256": "25078fee7c8bbd7ecf6f31617d278ce16c3ee5e441d839208b59b09998903329"
+      },
+      "test-cpu-topology.csv": {
+        "bytes": 405,
+        "sha256": "85b6a88f02bfb00e0a6f2d650af8fb1fa530c8f24288ffd8bd477594cb8b5146"
+      },
+      "test-os.txt": {
+        "bytes": 132,
+        "sha256": "62b2233ccf7ed82d068411dc66526b072d3a2418151f90862abd55c2f7772cc2"
+      },
+      "visibility-check.rs": {
+        "bytes": 157,
+        "sha256": "5732df3d810bdb0b909d9ede92a7490584e400e6ac734a174fee6a897715e2fc"
+      }
+    }
+  }
+}

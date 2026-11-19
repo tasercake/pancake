@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+proof=/tmp/pancake-near-equal-peak-replay
+run_variant() {
+    local tag=$1 code=0 export_code=0
+    /usr/bin/time -v -o "$proof/$tag.time" cargo +nightly-2026-11-15 llvm-cov \
+        --locked -p pancake --all-features --test cpu_job --branch --no-report \
+        -- --exact repeated_registration_keeps_unwarped_cpu_export --nocapture \
+        > "$proof/$tag.log" 2>&1 || code=$?
+    printf '%s\n' "$code" > "$proof/$tag.status"
+    cargo +nightly-2026-11-15 llvm-cov report --workspace --json \
+        --output-path "$proof/$tag-map.json" > "$proof/$tag-export.log" 2>&1 || export_code=$?
+    printf '%s\n' "$export_code" > "$proof/$tag-export.status"
+    if test "$export_code" = 0; then
+        cp -- target/llvm-cov-target/pancake.profdata "$proof/$tag.profdata"
+    fi
+}
+run_variant mutant
+patch --reverse --force --fuzz=0 --no-backup-if-mismatch src/registration/estimate.rs < "$proof/native.diff" > "$proof/restored.log"
+sha256sum -c "$proof/original-source.sha" >> "$proof/restored.log"
+test -z "$(git status --porcelain=v1)"
+cargo +nightly-2026-11-15 llvm-cov clean --profraw-only
+run_variant original
+printf 'mutant=%s original=%s mutant export=%s original export=%s\n' "$(cat "$proof/mutant.status")" "$(cat "$proof/original.status")" "$(cat "$proof/mutant-export.status")" "$(cat "$proof/original-export.status")"

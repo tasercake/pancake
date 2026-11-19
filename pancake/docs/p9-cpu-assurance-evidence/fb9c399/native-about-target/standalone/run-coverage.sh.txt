@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Reproduce the unchanged stable CPU coverage gate and its honest shell exit.
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+proof="$repo/artifacts/native-about-proof-fb9c"
+cd "$repo/pancake"
+test "$(git rev-parse HEAD)" = fb9c399a96658331cb76b843a1e565b503e94fdd
+test -z "$(git status --porcelain --untracked-files=all)"
+{
+    date -u +%FT%TZ
+    git rev-parse HEAD HEAD^{tree}
+    printf 'dirty=false\n'
+    sha256sum Cargo.lock rust-toolchain.toml scripts/check.sh scripts/compare_assurance_coverage.py scripts/assurance_targets.py scripts/tool-versions.sh
+    uname -srm
+    lscpu
+    rustc --version --verbose
+    cargo --version --verbose
+    cargo llvm-cov --version
+    df -k "$repo"
+    awk '/^Cpus_allowed_list:/{print}' /proc/self/status
+    printf 'CARGO_BUILD_JOBS=%s\nCARGO_INCREMENTAL=%s\nCARGO_PROFILE_DEV_DEBUG=%s\n' \
+        "$CARGO_BUILD_JOBS" "$CARGO_INCREMENTAL" "${CARGO_PROFILE_DEV_DEBUG-unset}"
+    printf 'RUSTFLAGS=%s\nRUSTC_WRAPPER=%s\nLLVM_PROFILE_FILE=%s\nRUST_TEST_THREADS=%s\n' \
+        "${RUSTFLAGS-unset}" "${RUSTC_WRAPPER-unset}" "${LLVM_PROFILE_FILE-unset}" "${RUST_TEST_THREADS-unset}"
+    printf 'DISPLAY=%s\nWAYLAND_DISPLAY=%s\nDBUS_SESSION_BUS_ADDRESS=%s\nAT_SPI_BUS_ADDRESS=%s\n' \
+        "${DISPLAY-unset}" "${WAYLAND_DISPLAY-unset}" "${DBUS_SESSION_BUS_ADDRESS-unset}" "${AT_SPI_BUS_ADDRESS-unset}"
+} >"$proof/environment.txt"
+python3 scripts/miri_host_policy.py "$PWD" validate >"$proof/reviewed-source.log" 2>&1
+date -u +%FT%TZ >"$proof/start"
+set +e
+/usr/bin/time -v -o "$proof/time.txt" bash scripts/check.sh coverage-cpu >"$proof/coverage-cpu.log" 2>&1
+status=$?
+set -e
+printf '%s\n' "$status" >"$proof/coverage-cpu.status"
+date -u +%FT%TZ >"$proof/end"
+exit "$status"

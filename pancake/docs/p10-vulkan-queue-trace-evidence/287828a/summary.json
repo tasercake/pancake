@@ -1,0 +1,264 @@
+{
+  "candidate": {
+    "commit": "287828aac07ffad2252785b73a52a59fc07b3409",
+    "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+    "component": "gui",
+    "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-queue-trace-preflight/pancake/target/release/pancake-gui",
+    "binary_sha256": "f27ead9db3b79429a1f924dd098ae2c253e7fd5bda28396238e21f9f72723961",
+    "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-287828a/pancake_0.1.0_amd64.deb",
+    "package_sha256": "34a63edea55c411a6082924c2fbe2c50094eea98753b1f75378459da78e4db99",
+    "package_verification_sha256": "096f88ea50620ad70edc86c53db0e2c79071a174cc863d741c82d21bae55e8b5",
+    "release_build_log_sha256": "5d514a08bdba728fe681d0555fb97281957155e835451d07e42bc3b75eacf325",
+    "extraction": "dpkg-deb --fsys-tarfile ARCHIVE | tar -xOf - ./usr/bin/pancake-gui"
+  },
+  "scope": "one nonqualifying 12-frame source pan/zoom run",
+  "outcome": {
+    "native_pixel_protocol": "captured",
+    "vulkan_api_trace": "missing",
+    "qualification": "none"
+  },
+  "nsys_report_sha256": "17ea00b190e5166a8e393037a5e41e3f2866bb54f4cf24ded533386f0fd972ad",
+  "nsys_sqlite_sha256": "9b9922662f6535d67f69d8062832c48582938c84b7fadb51d115204bc8b36830",
+  "raw_capture_sha256": "10920c2898430070bf446c19ab9ebe5b4b4aa8e1d6c46410a6ed7ec2b1107c5a",
+  "pids": {
+    "gui_pid": 239186,
+    "observer_pid": 238843
+  },
+  "process_matches": {
+    "239186": "pancake-gui"
+  },
+  "nsys_trace_flags": {
+    "CAPTURE_EVENT_TYPE": "Vulkan",
+    "VULKAN_OPTIONS:COLLECT_GPU_WORKLOAD": "false",
+    "PROCESS_0:COLLECT_VULKAN_TRACE": "false"
+  },
+  "nsys_relevant_diagnostics": [
+    {
+      "timestamp": -82735,
+      "timestamp_type": 1,
+      "severity": 1,
+      "message": "Vulkan runtime version 1.3.275 on target machine.",
+      "pid": 0
+    },
+    {
+      "timestamp": 17977043,
+      "timestamp_type": 2,
+      "severity": 2,
+      "message": "Vulkan profiling might have not been started correctly.",
+      "pid": 238843
+    },
+    {
+      "timestamp": 17977925,
+      "timestamp_type": 2,
+      "severity": 2,
+      "message": "No Vulkan events collected. Does the process use Vulkan?",
+      "pid": 238843
+    },
+    {
+      "timestamp": 27865714,
+      "timestamp_type": 1,
+      "severity": 1,
+      "message": "Common injection library initialized successfully.",
+      "pid": 238843
+    },
+    {
+      "timestamp": 330206865,
+      "timestamp_type": 1,
+      "severity": 1,
+      "message": "NVTX injection initialized successfully.",
+      "pid": 238843
+    }
+  ],
+  "vulkan_data_tables": [],
+  "nsys_names_with_credential_like_environment_names": 0,
+  "nsys_captured_environment_count": 103,
+  "nvtx_observer_markers": 24,
+  "nvtx_warmup_markers": 1,
+  "max_clock_uncertainty_ns": 27932,
+  "presented_rgb_patches_verified": 36,
+  "max_rgb_channel_error": 1,
+  "physical_stack": {
+    "runtime": "wgpu-vulkan",
+    "device_pci_address": "0000:01:00.0",
+    "device": "NVIDIA GeForce RTX 3090",
+    "physical_gpu": true,
+    "completed": true
+  },
+  "shutdown": {
+    "pid": 239186,
+    "returncode": 0,
+    "forced": false,
+    "status": "clean"
+  },
+  "samples": [
+    {
+      "step": 3,
+      "condition": "idle",
+      "action": "zoom",
+      "worker_before": "Completed · Publish · 12 of 12",
+      "worker_after": "Completed · Publish · 12 of 12",
+      "dispatch_to_visible_ns": 24019583,
+      "max_observation_gap_ns": 1137582,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322834272,
+        547083322851895
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 17623
+    },
+    {
+      "step": 4,
+      "condition": "idle",
+      "action": "pan",
+      "worker_before": "Completed · Publish · 12 of 12",
+      "worker_after": "Completed · Publish · 12 of 12",
+      "dispatch_to_visible_ns": 21847420,
+      "max_observation_gap_ns": 1122234,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322833752,
+        547083322852457
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 18705
+    },
+    {
+      "step": 6,
+      "condition": "idle",
+      "action": "zoom",
+      "worker_before": "Completed · Publish · 12 of 12",
+      "worker_after": "Completed · Publish · 12 of 12",
+      "dispatch_to_visible_ns": 22740033,
+      "max_observation_gap_ns": 1085334,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322834285,
+        547083322852049
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 17764
+    },
+    {
+      "step": 7,
+      "condition": "idle",
+      "action": "pan",
+      "worker_before": "Completed · Publish · 12 of 12",
+      "worker_after": "Completed · Publish · 12 of 12",
+      "dispatch_to_visible_ns": 22947232,
+      "max_observation_gap_ns": 1240356,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322835510,
+        547083322849917
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 14407
+    },
+    {
+      "step": 9,
+      "condition": "idle",
+      "action": "zoom",
+      "worker_before": "Completed · Publish · 12 of 12",
+      "worker_after": "Completed · Publish · 12 of 12",
+      "dispatch_to_visible_ns": 22727670,
+      "max_observation_gap_ns": 1091456,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322824412,
+        547083322852344
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 27932
+    },
+    {
+      "step": 10,
+      "condition": "idle",
+      "action": "pan",
+      "worker_before": "Completed · Publish · 12 of 12",
+      "worker_after": "Completed · Publish · 12 of 12",
+      "dispatch_to_visible_ns": 22797191,
+      "max_observation_gap_ns": 1111144,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322834193,
+        547083322850974
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 16781
+    },
+    {
+      "step": 13,
+      "condition": "loaded",
+      "action": "zoom",
+      "worker_before": "Running · Fuse · 0 of 12",
+      "worker_after": "Running · Fuse · 0 of 12",
+      "dispatch_to_visible_ns": 25012443,
+      "max_observation_gap_ns": 1121532,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322832506,
+        547083322853235
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 20729
+    },
+    {
+      "step": 14,
+      "condition": "loaded",
+      "action": "pan",
+      "worker_before": "Running · Fuse · 0 of 12",
+      "worker_after": "Running · Decode · 1 of 12",
+      "dispatch_to_visible_ns": 82487258,
+      "max_observation_gap_ns": 1120811,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322832980,
+        547083322852166
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 19186
+    },
+    {
+      "step": 18,
+      "condition": "loaded",
+      "action": "zoom",
+      "worker_before": "Running · Fuse · 0 of 12",
+      "worker_after": "Running · Fuse · 0 of 12",
+      "dispatch_to_visible_ns": 21727234,
+      "max_observation_gap_ns": 1105913,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322832711,
+        547083322852287
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 19576
+    },
+    {
+      "step": 19,
+      "condition": "loaded",
+      "action": "pan",
+      "worker_before": "Running · Fuse · 1 of 12",
+      "worker_after": "Running · Fuse · 1 of 12",
+      "dispatch_to_visible_ns": 22839620,
+      "max_observation_gap_ns": 1109570,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322833019,
+        547083322852937
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 19918
+    },
+    {
+      "step": 23,
+      "condition": "loaded",
+      "action": "zoom",
+      "worker_before": "Running · Fuse · 0 of 12",
+      "worker_after": "Running · Fuse · 0 of 12",
+      "dispatch_to_visible_ns": 22799835,
+      "max_observation_gap_ns": 1141930,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322832891,
+        547083322852258
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 19367
+    },
+    {
+      "step": 24,
+      "condition": "loaded",
+      "action": "pan",
+      "worker_before": "Running · Fuse · 1 of 12",
+      "worker_after": "Running · Fuse · 1 of 12",
+      "dispatch_to_visible_ns": 22794826,
+      "max_observation_gap_ns": 1119760,
+      "nsys_to_monotonic_local_offset_interval_ns": [
+        547083322833433,
+        547083322852830
+      ],
+      "nsys_to_monotonic_uncertainty_ns": 19397
+    }
+  ]
+}

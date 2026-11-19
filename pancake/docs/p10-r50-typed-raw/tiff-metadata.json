@@ -1,0 +1,36 @@
+[{
+  "SourceFile": "/tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/stock/mirrored.tiff",
+  "ImageWidth": 160,
+  "ImageHeight": 112,
+  "BitsPerSample": "16 16 16",
+  "SamplesPerPixel": 3,
+  "SampleFormat": "Unsigned; Unsigned; Unsigned",
+  "PhotometricInterpretation": "RGB"
+},
+{
+  "SourceFile": "/tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/stock/normal.tiff",
+  "ImageWidth": 160,
+  "ImageHeight": 112,
+  "BitsPerSample": "16 16 16",
+  "SamplesPerPixel": 3,
+  "SampleFormat": "Unsigned; Unsigned; Unsigned",
+  "PhotometricInterpretation": "RGB"
+},
+{
+  "SourceFile": "/tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/candidate/mirrored.tiff",
+  "ImageWidth": 160,
+  "ImageHeight": 112,
+  "BitsPerSample": "16 16 16",
+  "SamplesPerPixel": 3,
+  "SampleFormat": "Unsigned; Unsigned; Unsigned",
+  "PhotometricInterpretation": "RGB"
+},
+{
+  "SourceFile": "/tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/candidate/normal.tiff",
+  "ImageWidth": 160,
+  "ImageHeight": 112,
+  "BitsPerSample": "16 16 16",
+  "SamplesPerPixel": 3,
+  "SampleFormat": "Unsigned; Unsigned; Unsigned",
+  "PhotometricInterpretation": "RGB"
+}]

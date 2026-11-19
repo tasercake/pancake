@@ -1,0 +1,50 @@
+{
+  "scenario": {
+    "Mutant": {
+      "name": "src/fusion/advanced/weights.rs:68:53: replace + with - in luma",
+      "package": "pancake",
+      "file": "src/fusion/advanced/weights.rs",
+      "function": {
+        "function_name": "luma",
+        "return_type": "-> f32",
+        "span": {
+          "start": {
+            "line": 64,
+            "column": 1
+          },
+          "end": {
+            "line": 69,
+            "column": 2
+          }
+        }
+      },
+      "span": {
+        "start": {
+          "line": 68,
+          "column": 53
+        },
+        "end": {
+          "line": 68,
+          "column": 54
+        }
+      },
+      "replacement": "-",
+      "genre": "BinaryOperator"
+    }
+  },
+  "summary": "MissedMutant",
+  "log_path": "log/src__fusion__advanced__weights.rs_line_68_col_53.log",
+  "diff_path": "diff/src__fusion__advanced__weights.rs_line_68_col_53.diff",
+  "phase_results": [
+    {
+      "phase": "Build",
+      "duration": 22.194166068,
+      "process_status": "Success"
+    },
+    {
+      "phase": "Test",
+      "duration": 6.824108382,
+      "process_status": "Success"
+    }
+  ]
+}

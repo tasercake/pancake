@@ -1,0 +1,88 @@
+"""Temporary GDB probes for named production boundaries in the matched ELF."""
+
+import json
+import os
+import time
+from pathlib import Path
+
+import gdb
+
+HOST_CLOCK_TICKS = os.sysconf("SC_CLK_TCK")
+SYMBOLS = {
+    "decode": "pancake::image_io::decode",
+    "registration_thumbnail": "pancake::registration::frame_thumbnail",
+    "fusion_add": "<pancake::fusion::advanced::AdvancedAccumulator>::add_normalized_frame",
+    "fusion_finish": "<pancake::fusion::advanced::AdvancedAccumulator>::finish",
+    "estimate_pair": "pancake::registration::estimate::estimate_pair",
+    "prepare_export": "pancake::image_io::export::prepare_export",
+}
+trace = Path(os.environ["PANCAKE_PROBE_JSONL"]).open("x", buffering=1)
+interpretation = {
+    "gnu_linux_x86_64_abi": "Read the caller's return address at the exact function entry",
+    "cpu_ticks_per_second": HOST_CLOCK_TICKS,
+    "timing_scope": "Monotonic external timestamps while debugger is present. Phase diagnostics only.",
+    "symbols": SYMBOLS,
+    "debugger_affinity": sorted(os.sched_getaffinity(0)),
+}
+trace.write(json.dumps({"kind": "probe_ready", **interpretation}) + "\n")
+
+
+def process_cpu_ticks():
+    """Return user and system ticks summed across inferior threads."""
+    pid = gdb.selected_inferior().pid
+    data = Path(f"/proc/{pid}/stat").read_bytes().rsplit(b") ", 1)[1].split()
+    return int(data[11]) + int(data[12])
+
+
+class Exit(gdb.Breakpoint):
+    """Observe the return of one exact function entry on the calling thread."""
+
+    def __init__(self, address, label, start, cpu_ticks):
+        super().__init__(f"*{address:#x}", internal=True, temporary=True)
+        self.thread = gdb.selected_thread().global_num
+        self.label = label
+        self.start = start
+        self.cpu_ticks = cpu_ticks
+
+    def stop(self):
+        end = time.monotonic_ns()
+        trace.write(json.dumps({
+            "kind": "stage_return",
+            "stage": self.label,
+            "start_monotonic_ns": self.start,
+            "end_monotonic_ns": end,
+            "elapsed_ns": end - self.start,
+            "inferior_process_cpu_ticks": process_cpu_ticks() - self.cpu_ticks,
+        }) + "\n")
+        return False
+
+
+class Enter(gdb.Breakpoint):
+    """Start an exact entry breakpoint, before the function alters the stack."""
+
+    inferior_affinity_recorded = False
+
+    def __init__(self, label, symbol):
+        super().__init__(f"*'{symbol}'", internal=True)
+        self.label = label
+
+    def stop(self):
+        if not Enter.inferior_affinity_recorded:
+            pid = gdb.selected_inferior().pid
+            affinity = sorted(os.sched_getaffinity(pid))
+            trace.write(json.dumps({"kind": "inferior_affinity", "cpus": affinity}) + "\n")
+            Enter.inferior_affinity_recorded = True
+        start = time.monotonic_ns()
+        return_address = int(gdb.parse_and_eval("*(unsigned long long *) $rsp"))
+        Exit(return_address, self.label, start, process_cpu_ticks())
+        return False
+
+
+def finish(event):
+    trace.write(json.dumps({"kind": "inferior_exit", "exit_code": getattr(event, "exit_code", None)}) + "\n")
+    trace.close()
+
+
+for stage, symbol in SYMBOLS.items():
+    Enter(stage, symbol)
+gdb.events.exited.connect(finish)

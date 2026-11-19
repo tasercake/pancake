@@ -1,0 +1,14 @@
+{
+  "commit": "330c587612d792edc08be03789afc414caa5045a",
+  "lock_sha256": "101d2a8f9f26fc1970ff9194ddf2e5893392dc26955ee6fcf609cd91b34af7d0",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "component": "gui",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/mailbox-control-0a9ae85/pancake/target/release/pancake-gui",
+  "binary_sha256": "7edfac5009e12672c8b847de2db2820fd5d85cd61fe6d5ca20d1bdb9a3d8cb75",
+  "release_build_log_sha256": "1b39bc78dab02b76ee7771016fbcd495a584331ed047369edc077b81b14086d1",
+  "control_build_started_at": "2026-11-19T01:18:44+08:00",
+  "control_build_terminal_at": "2026-11-19T01:22:14+08:00",
+  "stock_base_commit": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "stock_configure_policy": "exact stock resize AutoVsync, configure-only witness",
+  "overlay_provenance_sha256": "4877abd3ef4b153997268ccf7d1003b3e2b8dac002fd56057b2fbb40cf048d70"
+}

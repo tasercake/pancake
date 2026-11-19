@@ -1,0 +1,30 @@
+Read-only replay from e81079dee4078d7a1149da0f5950aab8c89f8d44
+Reviewed verifier export: edc1d264f7202e82592118b43e756a945787599f:pancake/scripts/verify_mutation_shards.py
+Reviewed verifier SHA-256: 368f6c57a083ed3b6c18dd9d35a696677278f1136555712f9cb413b5a56c93cc
+Native inputs: fefc512:pancake/docs/p9-mutation-audit/c1e2cac-historical-ten/raw-native.tar.gz
+Native run source: c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb
+
+Genuine native historical subset control: 10 caught, 10 declared outcomes reconciled.
+Historical full roster SHA-256: af16665064d5f43759dc9b34b9b753bbb41bc6167c4fb06cce6662c6c6dff7df
+Historical canonical pick: 11/16, 165 of 2642 rows, 145 core + 19 GUI + 1 CLI.
+Historical ordered identity SHA-256: 525cd2bb54f3ffc1fa14bce3b8593fa04927ce69d3387caff04da1a1ac824c62
+Genuine ten-row list with zero native exit under canonical plan: rejected at independent native listing.
+Canonical independent listing with actual ten-row native execution list: rejected at native execution roster.
+Canonical lists and zero status with actual ten-row outcomes: rejected at missing, duplicate or unexpected outcomes.
+Canonical listings with missing native producer exit receipt: rejected at required native status.
+Selection receipt copied with a different full-roster digest: rejected at full-roster receipt.
+Changed reviewed guard bytes: rejected at guard digest.
+Future shell excerpt: bash -n passed.
+Negative controls used temporary envelopes and preserved all original archive bytes.
+No Cargo build, native test, new roster generation or mutation run was started.
+
+Read-only planning host snapshot, 2026-11-18T23:58:35+08:00
+Linux 6.8.0-147-generic x86_64, AMD Ryzen 9 7950X3D, 16 physical cores and 32 logical CPUs
+Proposed logical CPUs 6 and 7 mapped to distinct physical cores; no run affinity or slot was granted.
+107908706304 bytes free at /tmp on /dev/nvme0n1p2 during this snapshot.
+Pinned cargo-mutants binary SHA-256: f985f265ee3ea3e453aa98b04c52134953911f692f8ce8abf137f3873202a2d0
+Cargo.toml SHA-256: 245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043
+Cargo.lock SHA-256: f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc
+rust-toolchain.toml SHA-256: ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e
+assurance_targets.py SHA-256: 044dcaefaf20b04fda64f974d464c79298c54ee4bbac234661bb204809e27a3a
+Historical exact CPU selector list SHA-256: d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e

@@ -1,0 +1,1 @@
+Both same-PID synthetic calls preserved argv, exit status and authenticated LLVM counters.

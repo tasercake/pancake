@@ -1,0 +1,20 @@
+{
+  "source_commit": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+  "sanitized_ancestor": "841086351433cd15fef838b48ac470e459ba7bae",
+  "command": [
+    "git",
+    "-c",
+    "advice.graftFileDeprecated=false",
+    "rev-list",
+    "--objects",
+    "--no-object-names",
+    "e81079dee4078d7a1149da0f5950aab8c89f8d44"
+  ],
+  "replacement_refs_disabled": true,
+  "grafts_disabled": true,
+  "shallow_history": false,
+  "reachable_objects": 8366,
+  "sorted_reachable_object_ids_sha256": "a4c0a24df69aa7abaea676d069bad9dd1a068e59d9b74abb2ca0785ef4b2cfe7",
+  "excluded_opaque_object_id_sha256": "1d72c5991a467ad631b9bd1c575554a44bb0616b552d1ccb56e37ff7bdfd8917",
+  "excluded_object_reachable": false
+}

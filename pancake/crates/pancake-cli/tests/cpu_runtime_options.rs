@@ -4,8 +4,9 @@ use std::path::Path;
 use std::process::Command;
 
 use clap as _;
-use pancake::config::BitDepth;
+use pancake::config::{BitDepth, DevicePreference};
 use pancake::image_io::{RgbImage, SampleEncoding, decode, export};
+use pancake::runtime::select_runtime;
 
 /// Environment mistakes fail before numerical processing and preserve exports.
 ///
@@ -44,7 +45,7 @@ fn invalid_or_conflicting_runtime_preserves_the_export() -> Result<(), String> {
     Ok(())
 }
 
-/// A successful numeric stack reports measured sharpness and actual JPEG depth.
+/// A successful numeric stack reports sharpness, JPEG depth and actual runtime identity.
 ///
 /// # Errors
 ///
@@ -53,7 +54,9 @@ fn invalid_or_conflicting_runtime_preserves_the_export() -> Result<(), String> {
 fn jpeg_depth_warning_and_quality_describe_a_real_export() -> Result<(), String> {
     let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
     write_sources(directory.path())?;
+    let events = directory.path().join("completion.jsonl");
     let outcome = cmd(directory.path())
+        .env("CONFORMANCE_EVENTS_PATH", &events)
         .args([
             "--output",
             "stack.jpg",
@@ -90,6 +93,17 @@ fn jpeg_depth_warning_and_quality_describe_a_real_export() -> Result<(), String>
         return Err(
             "published JPEG did not have the requested geometry and eight-bit precision".to_owned(),
         );
+    }
+    let cpu = select_runtime(DevicePreference::Cpu, None, 1024, None)?;
+    let client = cpu.device().client();
+    let fingerprint = &client.properties().identity.fingerprint;
+    let completion = std::fs::read_to_string(events).map_err(|error| error.to_string())?;
+    if fingerprint.trim().is_empty()
+        || !completion.contains(r#""event":"stack_complete""#)
+        || !completion.contains(r#""actual_backend":"cpu""#)
+        || !completion.contains(&format!(r#""device_fingerprint":"{fingerprint}""#))
+    {
+        return Err("completed CPU export lost its runtime compilation identity".to_owned());
     }
     Ok(())
 }
@@ -236,6 +250,76 @@ fn missing_vulkan_device_falls_back_only_when_unforced() -> Result<(), String> {
                 "strict GPU request did not preserve the completed export: {message}"
             ));
         }
+    }
+    Ok(())
+}
+
+/// An absent progress reader must cause a CLI delivery failure
+/// while retaining the already completed stack and its truthful observation.
+///
+/// # Errors
+/// Returns a pipe, fixture, process, observer or publication error.
+#[test]
+fn closed_progress_stream_leaves_a_completed_export() -> Result<(), Box<dyn std::error::Error>> {
+    let directory = tempfile::tempdir()?;
+    let root = directory.path();
+    write_sources(root)?;
+    let destination = root.join("result.png");
+    let events = root.join("completion.jsonl");
+    let (reader, writer) = std::io::pipe()?;
+    drop(reader);
+    let outcome = cmd(root)
+        .env("CONFORMANCE_EVENTS_PATH", &events)
+        .stdout(writer)
+        .args(["--output", "result.png", "--bit-depth", "16"])
+        .output()?;
+    let diagnostic = String::from_utf8(outcome.stderr)?;
+    if outcome.status.code() != Some(1_i32)
+        || !diagnostic.contains("error:")
+        || !outcome.stdout.is_empty()
+    {
+        return Err(format!("closed progress stream reported success: {diagnostic}").into());
+    }
+    let exported = decode(&destination)?;
+    let source = decode(&root.join("first.png"))?;
+    let completion = std::fs::read_to_string(events)?;
+    if exported.samples() != source.samples()
+        || !completion.contains(r#""event":"stack_complete""#)
+        || !completion.contains(r#""actual_backend":"cpu""#)
+    {
+        return Err("progress delivery failure changed the completed CPU stack".into());
+    }
+    Ok(())
+}
+
+/// Closing the diagnostic reader makes the genuine JPEG precision warning
+/// undeliverable. The process reports that failure after publication.
+///
+/// # Errors
+/// Returns a pipe, fixture, process or JPEG verification error.
+#[test]
+fn closed_warning_stream_leaves_a_completed_export() -> Result<(), Box<dyn std::error::Error>> {
+    let directory = tempfile::tempdir()?;
+    let root = directory.path();
+    write_sources(root)?;
+    let (reader, writer) = std::io::pipe()?;
+    drop(reader);
+    let outcome = cmd(root)
+        .stderr(writer)
+        .args(["--output", "result.jpg", "--bit-depth", "16"])
+        .output()?;
+    let progress = String::from_utf8(outcome.stdout)?;
+    let published = decode(&root.join("result.jpg"))?;
+    if outcome.status.code() != Some(1_i32)
+        || !outcome.stderr.is_empty()
+        || !progress.lines().any(|line| line == "progress 2/2")
+        || (
+            published.width(),
+            published.height(),
+            published.sample_encoding(),
+        ) != (13, 11, SampleEncoding::U8)
+    {
+        return Err("closed warning stream lost or misrepresented the published JPEG".into());
     }
     Ok(())
 }

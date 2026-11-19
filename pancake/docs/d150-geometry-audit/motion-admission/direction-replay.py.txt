@@ -1,0 +1,57 @@
+"""Score already-measured reverse-anchor fits on independent bilateral holdouts."""
+
+import argparse
+import hashlib
+import json
+import math
+from pathlib import Path
+import runpy
+import statistics
+
+
+def score(matrix, row, audit):
+    inverse = audit["inverse"](matrix)
+    groups = [("forward", matrix), ("reverse", inverse)]
+    return {direction: statistics.median(math.dist(audit["apply"](value, patch["query"]), patch["match"])
+                                         for patch in row["holds"][direction])
+            for direction, value in groups}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--trace", type=Path, required=True)
+    parser.add_argument("--bilateral", type=Path, required=True)
+    args = parser.parse_args()
+    audit = runpy.run_path(str(Path(__file__).with_name("audit.py.txt")))
+    trace = args.trace.read_bytes()
+    product = json.loads(trace)
+    measured = json.loads(args.bilateral.read_bytes())
+    assert hashlib.sha256(trace).hexdigest() == measured["product_trace_sha256"]
+    anchor = product["source_order"][0]
+    fits = {(row["reference"], row["source"]): row for row in product["estimates"] if row["role"] == "anchor"}
+    identity = audit["IDENTITY"]
+    results = []
+    for row in measured["comparisons"]:
+        before, after = row["before"], row["after"]
+        a, b = fits[(before, anchor)], fits[(after, anchor)]
+        record = {"interval": [before, after], "reverse_confidence": [a["confidence"], b["confidence"]],
+                  "witnesses_forward_reverse": row["holdout_count_forward_reverse"]}
+        if min(a["confidence"], b["confidence"]) <= 0 or row["status"] != "witnesses_available":
+            record["status"] = "unsupported"
+            results.append(record)
+            continue
+        reverse = audit["relative"](audit["inverse"](a["transform"]), audit["inverse"](b["transform"]))
+        direct = row["residuals"]["fresh_implied_direct"]["matrix"]
+        record.update({"status": "observed", "reverse_anchor_step": reverse,
+                       "reverse_anchor_max_canvas_change_px": audit["change"](reverse),
+                       "direct_anchor_step": direct, "direct_anchor_max_canvas_change_px": audit["change"](direct),
+                       "reverse_anchor_median_errors_px": score(reverse, row, audit),
+                       "direct_anchor_median_errors_px": score(direct, row, audit),
+                       "identity_median_errors_px": score(identity, row, audit)})
+        results.append(record)
+    print(json.dumps({"scope": "Replay of archived probe hypotheses against independently acquired holdouts",
+                      "source_trace_sha256": measured["product_trace_sha256"], "results": results}, indent=2, allow_nan=False))
+
+
+if __name__ == "__main__":
+    main()

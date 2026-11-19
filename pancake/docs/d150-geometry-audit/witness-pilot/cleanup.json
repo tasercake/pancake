@@ -1,0 +1,15 @@
+{
+  "verified_utc": "2026-11-18T12:48:46.541061+00:00",
+  "verified_and_removed_originals": 9,
+  "removed_bytes": 2989067,
+  "archive_verified_and_removed": true,
+  "archive_sha256": "311ca6aab7d3bff03c714fd2d81c741f3847de1d4d3f2f9cfa767b6eb62cf56a",
+  "manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+  "cpu_test_binary_sha256": "b599f2b4c2ac92d5dfa1fcc86a2d325868436ad95f187101c8f16d249bef0b08",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "synthetic_overlay_sha256": "f2a0c79b874f2100363dddf35059fb95fb9f14514b1a7825c86368baa66099b0",
+  "real_overlay_sha256": "394fd8a0e550ddc1a86a9269658400b06b387b29fc9ee91e98417aac627b8c83",
+  "candidate_oracle_sha256": "cd731499f278851c0ee1ad57540f69e583ac7d74d483ee4104b234c177b00d25",
+  "witness_record_sha256": "5a039f2c59f7a427e8e302c6e6ae11405fa193686315549f0833934496c9364d",
+  "remaining_owned_originals": 0
+}

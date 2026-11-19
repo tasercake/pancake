@@ -1,0 +1,71 @@
+{
+  "canonical_source_revision": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "test_only_revision": "60ad2e31c5d8962bb1c4af150790f0e1ce44b911",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "original_mutant_patch_sha256": "a0023649aaf27be05c34afc4f694e70f98fddf20ef2f6bdc258259569c1d0b64",
+  "green_estimator_source_sha256": "eb759d5846c7136c7e3aab680a6bd9253a81b1ef0d4488007d05e56ed08c3ab6",
+  "test_sources_sha256": {
+    "pancake/tests/cpu_registration_contract.rs": "cb0a286fddc780420c56bb4dba8d069c9631664d502f985ba30aa263bb2f3b38",
+    "pancake/tests/common/registration_cases.rs": "1b7cc511c3eda8f33b55f191926109463c653df571a5737a415a451b8f1ca134"
+  },
+  "host": {
+    "cpu_affinity": [
+      12,
+      13
+    ],
+    "build_jobs": 2,
+    "rust": "1.100.0",
+    "backend": "native CPU"
+  },
+  "canonical_mutant": {
+    "name": "src/registration/estimate.rs:243:27: replace == with != in estimate_pair",
+    "result": "MissedMutant",
+    "phases": [
+      {
+        "phase": "Build",
+        "duration": 21.067276394,
+        "process_status": "Success"
+      },
+      {
+        "phase": "Test",
+        "duration": 6.572919018,
+        "process_status": "Success"
+      }
+    ]
+  },
+  "fixture": {
+    "method": "analytic inverse-coordinate render of existing nonperiodic texture",
+    "native_width_height": [
+      321,
+      257
+    ],
+    "center": [
+      160.0,
+      128.0
+    ],
+    "true_scale": 1.03,
+    "loose_limit": 0.05,
+    "tight_limit": 0.01,
+    "max_precision": true,
+    "maximum_center_error_px": 0.5,
+    "required_confidence": "finite positive in both fits"
+  },
+  "replay": {
+    "command": "taskset --cpu-list 12\\,13 cargo +1.100.0 test --locked --offline -p pancake --test cpu_registration_contract cpu_breathing_clamps_a_supported_expansion -- --exact --test-threads=1",
+    "with_exact_mutation_exit": 101,
+    "restored_production_exit": 0,
+    "ordinary_warning_policy": true,
+    "inferred_faulty_tight_scale": [
+      1.0300202,
+      1.0300202
+    ],
+    "faulty_tight_confidence": 0.9983695,
+    "green_tests_passed": 1,
+    "complete_cpu_registration_passed": 4
+  },
+  "source_policy": "Miri platform contract: reviewed production source and dependency closure match.",
+  "archive": {
+    "sha256": "500857bfc9c6d4f8e3c5524b1588cce03e758837a443b5c276bdbfa36cd43df2",
+    "file_count": 18
+  }
+}

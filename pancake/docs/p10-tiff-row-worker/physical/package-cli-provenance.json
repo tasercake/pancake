@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "status": "staged",
+  "worktree_commit": "91f51305f13b5f5edd885ce290173f8bc45b6a47",
+  "staged_directory": "/home/krishna/Documents/focus-stacking/pancake/target/release/.pancake-release-287828a-igjyxzqn",
+  "archive": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "34a63edea55c411a6082924c2fbe2c50094eea98753b1f75378459da78e4db99",
+    "bytes": 69551694
+  },
+  "source_commit": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "old_archive": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "e6b4d83e8100d04d1692fc8d2f0e276e249fa5a1d79e6e8f623801632c860758",
+    "bytes": 69478602
+  },
+  "old_source_commit": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+  "old_receipt_path": "pancake/docs/p9-linux-package-evidence/d6359e1/package-verification.json",
+  "old_receipt_sha256": "4dd25faa9dd17e152daeee9d9561824f483659580a4a8371f22ab0d9e886fd0c",
+  "old_binaries": {
+    "pancake-cli": {
+      "sha256": "b8ad68ecc01907d62f1f3787e28f0653b150a392bdb2001249b3f2d70f746fe4",
+      "bytes": 122119304
+    },
+    "pancake-gui": {
+      "sha256": "eea214ed6c57477480b0f5897a12ae8b9c05a9595730dbfcedabfd15650f6f50",
+      "bytes": 156209128
+    }
+  },
+  "package_receipt_sha256": "6c9bd6b6d4b7106e0e99a650c9329b841f9b1c2730341a78509fc87dead19298",
+  "package_seal_sha256": "096f88ea50620ad70edc86c53db0e2c79071a174cc863d741c82d21bae55e8b5",
+  "staged_binaries": {
+    "pancake-cli": {
+      "sha256": "874c8683623131b5619858a9cba61cb6219bc2eae6d6bdb30ed1bc5d8634ce8e",
+      "bytes": 122256352
+    },
+    "pancake-gui": {
+      "sha256": "f27ead9db3b79429a1f924dd098ae2c253e7fd5bda28396238e21f9f72723961",
+      "bytes": 156347592
+    }
+  },
+  "package_controls": {
+    "Package": "pancake",
+    "Version": "0.1.0",
+    "Architecture": "amd64",
+    "Depends": "libatk1.0-0t64 (>= 2.33.1), libc6 (>= 2.39), libfontconfig1 (>= 2.12.6), libgcc-s1 (>= 4.2), libglib2.0-0t64 (>= 2.54.0), libgtk-3-0t64 (>= 3.21.5), libstdc++6 (>= 12), at-spi2-core, libvulkan1, libwayland-client0, libxcursor1, libxi6, libx11-6, libx11-xcb1, libxcb1, libxkbcommon0, libxkbcommon-x11-0, xdg-utils"
+  },
+  "cli_version": "pancake-cli 0.1.0",
+  "cli_help_sha256": "3d887c31a9403629425529585194ab0a989c876df8089ef541a3a60fa5670616",
+  "cli_libraries": [
+    "ld-linux-x86-64.so.2",
+    "libc.so.6",
+    "libgcc_s.so.1",
+    "libm.so.6",
+    "libstdc++.so.6",
+    "linux-vdso.so.1"
+  ],
+  "locked_graph_tests_passed": 2,
+  "ldd_library_counts": {
+    "pancake-cli": 6,
+    "pancake-gui": 71
+  },
+  "notices_verified": 1036,
+  "rootless_extraction_removed": true,
+  "gui_launched": false
+}

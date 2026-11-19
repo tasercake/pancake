@@ -1,0 +1,24 @@
+Command exited with non-zero status 1
+	Command being timed: "taskset -c 0,1 nice -n 5 env -u DISPLAY -u WAYLAND_DISPLAY -u WAYLAND_SOCKET -u DBUS_SESSION_BUS_ADDRESS -u DBUS_STARTER_ADDRESS -u AT_SPI_BUS_ADDRESS -u LLVM_PROFILE_FILE -u RUSTC_WRAPPER -u RUSTC_WORKSPACE_WRAPPER -u CARGO_BUILD_RUSTC_WRAPPER PATH=/tmp/pancake-tools/bin:/home/krishna/.local/bin:/home/krishna/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/krishna/.codex/tmp/arg0-linux/codex-arg0ZYngTQ:/home/krishna/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/home/krishna/.local/bin:/home/krishna/.bun/bin:/usr/local/cuda-12/bin:/home/krishna/.asdf/shims:/home/krishna/.asdf/bin:/home/krishna/.kiex/bin:/home/krishna/.nvm/versions/node/v26.7.0/bin:/home/krishna/.local/bin:/home/krishna/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/home/krishna/.cargo/bin:/home/krishna/.local/bin:/home/krishna/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin:/home/krishna/.dotnet/tools:/home/krishna/.dotnet/tools:/home/krishna/.cargo/bin:/home/krishna/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/usr/lib/chatgpt/resources:/home/krishna/.dotnet/tools CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0 CARGO_NET_OFFLINE=true bash scripts/check.sh branches-cpu"
+	User time (seconds): 15.33
+	System time (seconds): 4.03
+	Percent of CPU this job got: 141%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:13.67
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1351800
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 156
+	Minor (reclaiming a frame) page faults: 1466320
+	Voluntary context switches: 10164
+	Involuntary context switches: 16524
+	Swaps: 0
+	File system inputs: 1424
+	File system outputs: 1499352
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 1

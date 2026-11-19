@@ -1,0 +1,34 @@
+{
+  "source_commit": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+  "materialization_sha256": "1d9be3f1cd20a01083b11c10c4d17ab75a4f3b6bb7e2ebef682824e345ba649d",
+  "frozen_receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+  "materialization": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/materialization.json",
+  "input_root": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/inputs",
+  "frozen_records_matched": 52,
+  "focus_count": 50,
+  "truth_count": 2,
+  "verified_bytes": 2775174405,
+  "generation_seconds": 243.74347387603484,
+  "peak_generation_rss_kib": 83680,
+  "resource_policy": {
+    "cpu_affinity": [
+      6
+    ],
+    "nice": 12,
+    "io": "idle",
+    "thread_limits": 1,
+    "decode_buffer_bytes": 8388608,
+    "full_frame_buffers": 0,
+    "full_set_preflight_bytes": 3067213930,
+    "max_generated_bytes": 3067213930,
+    "maximum_decode_workers": 1,
+    "reserve_bytes": 16106127360
+  },
+  "started_at": "2026-11-19T00:20:03+08:00",
+  "finished_at": "2026-11-19T00:24:07+08:00",
+  "benchmark_jobs": 0,
+  "package_archive_verified_sha256": "8ed6e70d7552140c0257520a07ac2b9fc5f97ff82a5fb3126864df821df4507e",
+  "package_verification_sha256": "f0a6402c9d79038ef86876f91a0ae36fa526e97332746b13ee8a8ba242ea1fae",
+  "read_only_borrowers": [],
+  "cleanup": "after all declared borrowers explicitly release and root gives disposition"
+}

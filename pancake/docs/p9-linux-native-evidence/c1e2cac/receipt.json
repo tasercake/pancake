@@ -1,0 +1,531 @@
+{
+  "schema_version": 1,
+  "tested_revision": "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb",
+  "source_tree": "a10967050f9579d7e82f8b6b4287be6997d1f885",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+  "host_report": "Linux krishna-desktop 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+  "logical_cpus": [
+    12,
+    13
+  ],
+  "parallel_build_jobs": 2,
+  "physical_gpu": "NVIDIA GeForce RTX 3090, GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac, 00000000:01:00.0, 580.178.04",
+  "native_cuda_runtime_build": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2024 NVIDIA Corporation\nBuilt on Wed_Apr_17_19:19:55_PDT_2024\nCuda compilation tools, release 12.5, V12.5.40\nBuild cuda_12.5.r12.5/compiler.34177558_0",
+  "frozen_contract_file_count": 90,
+  "builds": {
+    "hip": {
+      "binary_sha256": "35f465351906a222f5eef81097d131d1b27d6041e2bbc3bd47d2e381c4289bf5",
+      "bytes": 164646192,
+      "elf_build_id": "e7305c5215476786edfd12d466734928c173449f",
+      "linked_native_symbol_count": 270,
+      "metadata_sha256": "a2e9f2eb1c3921c667a0acef0deb5ddec6883877712b10719290a65ade934160",
+      "compile_and_link": "passed",
+      "dependency_policy": "passed",
+      "offline_cargo_deny": "passed",
+      "runtime_exercised": false,
+      "command": "env -u CUDARC_CUDA_VERSION cargo build --locked --offline --release -p pancake -p pancake-cli --bin pancake-cli -j 2 --features cubecl/hip",
+      "started": "2026-11-18T20:58:45+08:00",
+      "finished": "2026-11-18T21:02:12+08:00",
+      "target_bytes": 2776880413
+    },
+    "cuda": {
+      "binary_sha256": "8bc02636ff0439d23a74b40ddc56c3b7b84a21f7147a7b2ae7b30dd9c77efd57",
+      "bytes": 130301952,
+      "elf_build_id": "8a42936d01d83265f687755f5f9877a938285d10",
+      "linked_native_symbol_count": 281,
+      "metadata_sha256": "62aa60e8ccc71b201ce54438d7b7ce1294f4bb181fabd1df58514a2d0429c473",
+      "compile_and_link": "passed",
+      "dependency_policy": "passed",
+      "offline_cargo_deny": "passed",
+      "runtime_exercised": true,
+      "command": "env CUDARC_CUDA_VERSION=12050 cargo build --locked --offline --release -p pancake -p pancake-cli --bin pancake-cli -j 2 --features cubecl/cuda",
+      "started": "2026-11-18T20:51:47+08:00",
+      "finished": "2026-11-18T20:58:44+08:00",
+      "target_bytes": 2000445309
+    }
+  },
+  "run_binary_sha256": "8bc02636ff0439d23a74b40ddc56c3b7b84a21f7147a7b2ae7b30dd9c77efd57",
+  "runs": {
+    "cpu": {
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "unsupported": 0
+      },
+      "completed": {},
+      "started": "2026-11-18T21:24:02+08:00",
+      "finished": "2026-11-18T21:24:04+08:00"
+    },
+    "cuda": {
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "unsupported": 0
+      },
+      "completed": {},
+      "started": "2026-11-18T21:24:04+08:00",
+      "finished": "2026-11-18T21:24:05+08:00"
+    }
+  },
+  "export_hashes_match_native_replay_revision": "8694b555666a1ddf4051e2839bbced4bcc625859",
+  "offline_advisory_database_revision": "472a4c9a785030434f15d7da84964d60fbe789ab",
+  "retained_local_cuda_binary": {
+    "path": "artifacts/pancake-linux-native/c1e2cac/pancake-cli",
+    "sha256": "8bc02636ff0439d23a74b40ddc56c3b7b84a21f7147a7b2ae7b30dd9c77efd57"
+  },
+  "evidence_archives": {
+    "raw-text-records.tar.gz": {
+      "sha256": "b4502d92cf2e441d8b72a6d7dbe2dd82ab22ed10dc3e5bf42f496aad30486ffd",
+      "bytes": 822732,
+      "files": {
+        "advisory-db.txt": {
+          "sha256": "9838ab3811deb928e859d9ba05f6e8606b3d1cd4a87b2f8a11e80cca2c578fae",
+          "bytes": 41
+        },
+        "affinity-topology.csv": {
+          "sha256": "af0706e594e6010bc6aeeeeb96da02fd212fe3a7d334bf9e6c0ee51efd130e46",
+          "bytes": 474
+        },
+        "archive-evidence.py": {
+          "sha256": "b2e800bfc7db3d2158b75989cc5af5414116ff6630d67a9697d3ee5185c671f4",
+          "bytes": 4613
+        },
+        "audit.json": {
+          "sha256": "6301901525de29b5a1b053e8a2cbe8b14677010df863d7d2ebd0ae50319f54e9",
+          "bytes": 7528
+        },
+        "audit.py": {
+          "sha256": "c06b36b9877a596cc9c918604c93c0a9eabdd622c295ce4ab75e14c50a3bda9c",
+          "bytes": 8210
+        },
+        "build-affinity.txt": {
+          "sha256": "564557d94f18fa3a945787cf26e4b3ed5f31ebb1ceca56e3b5d340adcb4a0b49",
+          "bytes": 42
+        },
+        "build-invocation.txt": {
+          "sha256": "beadf40db6060255769b5dd0c6e0f5fa5406c1b4aa431e21ffa8d4e9332e771f",
+          "bytes": 134
+        },
+        "build-profiles.sh": {
+          "sha256": "9f4a2d9264b756fa7d76db09bc75328e349c91936101587bcd6af585623dfe24",
+          "bytes": 2791
+        },
+        "build-tools.sha256": {
+          "sha256": "8c12a388449369d7e17031673cc091f4a54c49fde9f1e37b1f5b3860624f8daa",
+          "bytes": 305
+        },
+        "cache-worker-affinity.txt": {
+          "sha256": "8cbad2e5c1e9072050038a198954a4753a33e21f77c4a2e4680d9fa8cc9905ff",
+          "bytes": 135
+        },
+        "cargo-deny-version.txt": {
+          "sha256": "1758f5ea93d8ad3585079f05c19358b7bb969cce1bf6c7bdab6659a8cd1ef6b8",
+          "bytes": 18
+        },
+        "cargo.txt": {
+          "sha256": "c952f4703d7d611c7c389445c9b9575e8d678083ffdb8bdd4ab1c78bb155df7f",
+          "bytes": 337
+        },
+        "check-profile-graphs.sh": {
+          "sha256": "5dbca561812cdf43b32a44b62baf59db8a379786b2d7e46a7e81a96a674d891c",
+          "bytes": 1953
+        },
+        "cleanup-owned.sh": {
+          "sha256": "8726e86dd9a8a9665dd3bba751d4363ff76f420d956da71c6ef0f720366c7800",
+          "bytes": 479
+        },
+        "cleanup.log": {
+          "sha256": "f6688c0da629218fe5e5763422fa500f680b8a7fc62601250331c7c177f0cb01",
+          "bytes": 77
+        },
+        "cpu-console.log": {
+          "sha256": "8deacb2e720870516fb6b39917a239ee8f1788241d69b28df33bc81bf8d2580e",
+          "bytes": 263
+        },
+        "cpu-finished.txt": {
+          "sha256": "3e7aa06ec6dd9f8433a8b3fe53c7601f851c078424c04ccadc38ae7c9ef699e5",
+          "bytes": 26
+        },
+        "cpu-resource.txt": {
+          "sha256": "c15113b00b97ee3e7de2267c6a3dfc7a0fabb62e3f6eb47d880819d683fce0c8",
+          "bytes": 1585
+        },
+        "cpu-run/junit.xml": {
+          "sha256": "bb7ec32447bafa6420d31061134660d8910b909862f86584c9a7db95e035503a",
+          "bytes": 313
+        },
+        "cpu-run/provenance.json": {
+          "sha256": "457b085ce2791fea7a0cfdea08b11c4831fcf52e54450a0c844c4bad483f4797",
+          "bytes": 954
+        },
+        "cpu-run/report.json": {
+          "sha256": "520ac51ef535a5024e526c37225c9d2eb44a1110742bab265b3728aed6d5b3cd",
+          "bytes": 10609
+        },
+        "cpu-run.status": {
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        "cpu-staged-inode.txt": {
+          "sha256": "08289cf287020193cc7cc6da1856a9ddfafe4fb185f8a318237932834a6bfc52",
+          "bytes": 186
+        },
+        "cpu-started.txt": {
+          "sha256": "cf639385795d8d3f73bb46d20775c749b69b3a149da555b42b31ed0bb2475158",
+          "bytes": 26
+        },
+        "cpu.txt": {
+          "sha256": "bff585b1a15ab4a3a29a3d570d8a39c5eecc2c82ed4fa0edffdae9e853fc6a9a",
+          "bytes": 3699
+        },
+        "cuda/binary.sha256": {
+          "sha256": "e7b755066410a246d2b200f3ffa9f98bc41bfce9bdb17771fb4274cf156054ba",
+          "bytes": 169
+        },
+        "cuda/build-disk-after.txt": {
+          "sha256": "7c13e9f91ad81a39bf08878ea005554eb9a8af4f95991d61cf40dc8720fc5be6",
+          "bytes": 133
+        },
+        "cuda/build-disk-before.txt": {
+          "sha256": "ad90f0727f5f3aedfb98a961d0cce7e3023329ecb09b5d38e297b312fda7707f",
+          "bytes": 135
+        },
+        "cuda/build-finished.txt": {
+          "sha256": "5d861dd42c97182da8b7102b05ebbd45d2bdc3f775c5ea1678747ab86ae30a18",
+          "bytes": 26
+        },
+        "cuda/build-resource.txt": {
+          "sha256": "9f242d561caea9ef41e094b89f63f374c564896d1f9f2567e11f8f929b03b2a9",
+          "bytes": 887
+        },
+        "cuda/build-started.txt": {
+          "sha256": "6e57312080633fdb529ffa344de479a1381925fc5d2dd844a88343cb9d6efeaa",
+          "bytes": 26
+        },
+        "cuda/build-target-size.txt": {
+          "sha256": "3046a3cb745053481ca08d71e8829bf1c216c4e4534b678f24e1eea947a3d3ae",
+          "bytes": 94
+        },
+        "cuda/build.command": {
+          "sha256": "fd414fcbd43eab5f02412c61fcf94b4badcfdf32874446675977c389c83140b3",
+          "bytes": 144
+        },
+        "cuda/build.log": {
+          "sha256": "7d99007d2898cc1658c42c00945216c66fbb8258534fcf56558cd70eb5c2ac05",
+          "bytes": 11409
+        },
+        "cuda/build.status": {
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        "cuda/cargo-deny.log": {
+          "sha256": "9c97eff057dde47e35c90012f8ded8880f95791a27f0fe144f66200f66000342",
+          "bytes": 35
+        },
+        "cuda/cargo-deny.status": {
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        "cuda/deny-effective.toml": {
+          "sha256": "63657cc28fcb4e95116264748bf37e4c0260a38c0eaaa805aee26ce4eb6311a6",
+          "bytes": 9171
+        },
+        "cuda/dependency-graph.stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "cuda/dependency-graph.txt": {
+          "sha256": "426eb1acd60e8927c4ec5807bc01882a6576a2c60de93394bc416f2e19fe999d",
+          "bytes": 53477
+        },
+        "cuda/dependency-policy.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "cuda/dependency-policy.status": {
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        "cuda/elf-dynamic.txt": {
+          "sha256": "9719f47bf683432308c3d8855217157e4353f8586168c0de681228da2bc5fd66",
+          "bytes": 1775
+        },
+        "cuda/elf-notes.txt": {
+          "sha256": "6f705ae86342bc18480a820e329b508c7fdc1ea9c425b2d0be2269806e20d6fd",
+          "bytes": 407
+        },
+        "cuda/elf.txt": {
+          "sha256": "0238e38a386748e41b05dcb35da9db6e91dcd134a32ec1aaf316a446138a6ba2",
+          "bytes": 312
+        },
+        "cuda/licenses.json": {
+          "sha256": "5311d4de4a4f149e6bf8d214902c28aa6c2652052b9d452d5bf4c787c3870d8a",
+          "bytes": 90113
+        },
+        "cuda/metadata.json": {
+          "sha256": "62aa60e8ccc71b201ce54438d7b7ce1294f4bb181fabd1df58514a2d0429c473",
+          "bytes": 4473375
+        },
+        "cuda/metadata.stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "cuda/nvcc.txt": {
+          "sha256": "20f83cc11fc3b5eae70864415c5002961488d31e67fd6f0d8215194913b5334f",
+          "bytes": 208
+        },
+        "cuda/runtime-libraries.sha256": {
+          "sha256": "35f2fbd047be69407f80f2bed873ba1b86431a5562a4f16de9a3312ed0bef58c",
+          "bytes": 387
+        },
+        "cuda/runtime-symbols.txt": {
+          "sha256": "d8cbe76d27da5d05dabdd2412d15c761a1dd951af00f578ba2e767895c141e35",
+          "bytes": 44254
+        },
+        "cuda-children-after.txt": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "cuda-console.log": {
+          "sha256": "871e24923fc0e4c44ba07ab4011845ea6522d3d75d39af888ec428e961ab7d69",
+          "bytes": 277
+        },
+        "cuda-finished.txt": {
+          "sha256": "d812e12a6b73565d0c690963ef54448c01b28f924357e5ffeb4d235f9c3fed67",
+          "bytes": 26
+        },
+        "cuda-libdevice.sha256": {
+          "sha256": "75827cec32d82a4ea587ed8226181abcecefa50f23389b80540da81083fceec5",
+          "bytes": 118
+        },
+        "cuda-resource.txt": {
+          "sha256": "611691eecd19cd882afb681e55d5f78752a4f247ccd2d0c84a4a8cba3cde3e27",
+          "bytes": 1662
+        },
+        "cuda-run/junit.xml": {
+          "sha256": "eaca0b24e5e693e41c267e27d95ae8899832e9cfaadc46632eb10407c2f621eb",
+          "bytes": 326
+        },
+        "cuda-run/provenance.json": {
+          "sha256": "752c1746d0f44e8d861016617e98aa96b1ed4c8e721d26d87fdb430181f287b2",
+          "bytes": 967
+        },
+        "cuda-run/report.json": {
+          "sha256": "8344a370946efb2724f2df792efd1943031aa81c58f813f832836339fb980fbc",
+          "bytes": 5650
+        },
+        "cuda-run.status": {
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        "cuda-staged-inode.txt": {
+          "sha256": "08289cf287020193cc7cc6da1856a9ddfafe4fb185f8a318237932834a6bfc52",
+          "bytes": 186
+        },
+        "cuda-started.txt": {
+          "sha256": "3e7aa06ec6dd9f8433a8b3fe53c7601f851c078424c04ccadc38ae7c9ef699e5",
+          "bytes": 26
+        },
+        "distribution.txt": {
+          "sha256": "87458b3b1f1ca0e5c693ade771de7007c3783bdc692fa6b39eb6414bf2af2763",
+          "bytes": 400
+        },
+        "hardware-handoff.txt": {
+          "sha256": "a1380b8b00607eee7e898f41254b0e121884288f6c40055f7cc04e73400c4ad0",
+          "bytes": 212
+        },
+        "hip/binary.sha256": {
+          "sha256": "9e60d1ba0b7ccfc90588be23a0746258008eea8576780cf2d442b2ca24341380",
+          "bytes": 168
+        },
+        "hip/build-disk-after.txt": {
+          "sha256": "11dd6d127075b4dfa909a3b28b12be387ebdcc0038cce6aa6927a4e22130c298",
+          "bytes": 135
+        },
+        "hip/build-disk-before.txt": {
+          "sha256": "9e72c4c2b201385f098e731a020d7b7f497d2d840d7334ddfc453f4602653d9d",
+          "bytes": 133
+        },
+        "hip/build-finished.txt": {
+          "sha256": "62cffc92a9b9ab6ac6a00c412a750ddf107770bc7eb52b0e41d2bed6e5c7d926",
+          "bytes": 26
+        },
+        "hip/build-resource.txt": {
+          "sha256": "57c2daf869052905d7c6dffb03d2a392b24072a96c97db0ba271ad04b9775211",
+          "bytes": 879
+        },
+        "hip/build-started.txt": {
+          "sha256": "6dbd01c1f935d9549188ea27b6be7f6c6ac7585f90bbd93bca5e0a6e48314937",
+          "bytes": 26
+        },
+        "hip/build-target-size.txt": {
+          "sha256": "e99cf07f8485e723bbe1f2b84e22d1d3c87d52fbb1578c69057a515608eecfb2",
+          "bytes": 94
+        },
+        "hip/build.command": {
+          "sha256": "c59e489da5f2f314d61bb4818c9bf2272d3a0f565d0fd4e05bf35d0a3480eccd",
+          "bytes": 140
+        },
+        "hip/build.log": {
+          "sha256": "05c32fd187df0a94af83edf558132984ad13a7e82418f3deb78072bd1479d418",
+          "bytes": 1256
+        },
+        "hip/build.status": {
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        "hip/cargo-deny.log": {
+          "sha256": "9c97eff057dde47e35c90012f8ded8880f95791a27f0fe144f66200f66000342",
+          "bytes": 35
+        },
+        "hip/cargo-deny.status": {
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        "hip/deny-effective.toml": {
+          "sha256": "63657cc28fcb4e95116264748bf37e4c0260a38c0eaaa805aee26ce4eb6311a6",
+          "bytes": 9171
+        },
+        "hip/dependency-graph.stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "hip/dependency-graph.txt": {
+          "sha256": "50cca846a4df6418396c20bf91c1930dd9c57a8cc97b66b36d4c73c0074a923c",
+          "bytes": 53682
+        },
+        "hip/dependency-policy.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "hip/dependency-policy.status": {
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        "hip/elf-dynamic.txt": {
+          "sha256": "1f7296d23dd0f65736fc93359a34ec3ac2c3957ee446fae5dfcb6275cf5c0b03",
+          "bytes": 1775
+        },
+        "hip/elf-notes.txt": {
+          "sha256": "dbc4276d0be971a0ad9ef8a91b3ceb564c9367b22ff043dca600e772ee9c3d7b",
+          "bytes": 407
+        },
+        "hip/elf.txt": {
+          "sha256": "398615785aacec1d9aa4871d483f19ccaba53999c805715ee68e4d0def595479",
+          "bytes": 311
+        },
+        "hip/licenses.json": {
+          "sha256": "5311d4de4a4f149e6bf8d214902c28aa6c2652052b9d452d5bf4c787c3870d8a",
+          "bytes": 90113
+        },
+        "hip/metadata.json": {
+          "sha256": "a2e9f2eb1c3921c667a0acef0deb5ddec6883877712b10719290a65ade934160",
+          "bytes": 4473373
+        },
+        "hip/metadata.stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "hip/runtime-symbols.txt": {
+          "sha256": "ab776d76b7a197cc39227e99ccf058ee79c218306e8e10a13680fbc1ee62316c",
+          "bytes": 42891
+        },
+        "host-build-tools.txt": {
+          "sha256": "67cb1c4c245a65c26d9e086b2c2e9ec671eaabc8c034ba784c0468250786262a",
+          "bytes": 1512
+        },
+        "lock-check.txt": {
+          "sha256": "9180c7938f0c9c63417cdc4ea93fcdfecb0839ba83086ee9074c448efa70d008",
+          "bytes": 23
+        },
+        "lock.txt": {
+          "sha256": "c385fc34473e340b70720a77ab38feccb9561e6420aa4ffb445e23a349fad549",
+          "bytes": 85
+        },
+        "nvidia.txt": {
+          "sha256": "12a544d5125c9ab9ec53e147073fdb423b11978c050055823be1eb79bb0954fc",
+          "bytes": 96
+        },
+        "os.txt": {
+          "sha256": "62b2233ccf7ed82d068411dc66526b072d3a2418151f90862abd55c2f7772cc2",
+          "bytes": 132
+        },
+        "profile-metadata.sha256": {
+          "sha256": "46c98ca5dff8b98cceb9ccd815dcffe6348a70cfc31033674aa62649cf71b30b",
+          "bytes": 341
+        },
+        "replay-case.sh": {
+          "sha256": "1515639c1b3d13f8fbcca6126320ae1ac9f53d553c847b4bc13f5b6992f2da9a",
+          "bytes": 505
+        },
+        "retained-cuda-inode.txt": {
+          "sha256": "ff7b376c411a6479583b96cea35b7532e1bc762dfe4db474ef303da242d8cd2c",
+          "bytes": 241
+        },
+        "retained-cuda.sha256": {
+          "sha256": "582f0aa746cee3eafad58ba6b4b0b2dcd0c537bfc2cd489f29c660e8173814eb",
+          "bytes": 156
+        },
+        "review/cargo-lock.diff": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "run-frozen.sh": {
+          "sha256": "a0f27132663125278a07521b2caeb2f3d4e68bf433662143196611d2c9e5d3cc",
+          "bytes": 2307
+        },
+        "rustc.txt": {
+          "sha256": "be69adad9137eaa0bdac1dd07e2fe286b1831fc8bad193ea27806ca0c7c8e7c6",
+          "bytes": 198
+        },
+        "script-syntax.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        "source-policy.log": {
+          "sha256": "22e88bc8b11b052e64c7b4e1949a769853e31e3c521989d95067ff79b8b43b14",
+          "bytes": 81
+        },
+        "source-tree.txt": {
+          "sha256": "d650fd5d0cb8cf9077d10c1ad7322ecd42691aadf15c808e382265706dd2dc0b",
+          "bytes": 41
+        },
+        "source.txt": {
+          "sha256": "a02bd1078ff6a75b5f691ef5563e2d597adfa1c6a9de8e2d2e9b8297bd0a27a7",
+          "bytes": 41
+        },
+        "staged-preflight-date.txt": {
+          "sha256": "72144e1288feac33f2ca287b9742189d81f8e9ea079d47bfaf8407ab2ba06955",
+          "bytes": 26
+        },
+        "staged-preflight-inode.txt": {
+          "sha256": "08289cf287020193cc7cc6da1856a9ddfafe4fb185f8a318237932834a6bfc52",
+          "bytes": 186
+        },
+        "stored-input-review.commands": {
+          "sha256": "9d36d1cc52331aac406dab2e385082379e46361bcdf9549e79e628871bd7e06f",
+          "bytes": 119
+        },
+        "tested-source.sha256": {
+          "sha256": "17ae3518e325d58414ee94192488e1ffc036a98df660594775276eb6a7bd8853",
+          "bytes": 616
+        },
+        "uv.txt": {
+          "sha256": "2bc10c4f5d082e998dceed919dec76c0a7c641d86b6a1d05d882f50694e4bbc1",
+          "bytes": 9
+        },
+        "vendor-policy.log": {
+          "sha256": "b815f4c0584d7d76ecc1395358c91f5c14d777cef32bbd5b52428a5554e13695",
+          "bytes": 960
+        }
+      }
+    },
+    "run-file-manifest.json.gz": {
+      "sha256": "afab45176b7a96e0258ea757b7990499b43afedea0eec661accc69159848965f",
+      "bytes": 3148,
+      "file_count": 69
+    }
+  }
+}

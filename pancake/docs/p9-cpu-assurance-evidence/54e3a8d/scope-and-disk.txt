@@ -1,0 +1,7 @@
+Prior pinned comparison
+M	pancake/assurance-platforms.json
+M	pancake/src/registration/spectral.rs
+M	pancake/tests/cpu_registration_contract.rs
+Policy and suite files compared to 5b98890
+Observed target size before cleanup
+6.7G	pancake/target

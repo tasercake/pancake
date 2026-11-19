@@ -1,0 +1,11 @@
+{
+  "commit": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "component": "gui",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-command-control/pancake/target/release/pancake-gui",
+  "binary_sha256": "eea214ed6c57477480b0f5897a12ae8b9c05a9595730dbfcedabfd15650f6f50",
+  "workspace_refresh_receipt_sha256": "2c6c6e484a8e7eef7e6d844b12014635cc70d3125e5c9e3edbf04316d19cd872",
+  "package_refresh_receipt_source": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+  "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-d6359e1/pancake_0.1.0_amd64.deb"
+}

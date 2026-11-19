@@ -1,0 +1,3 @@
+native normal RAW generic validation calls=1
+native EXR generic validation calls=2
+RED: complete U16 RAW packing reached the generic finite-value traversal

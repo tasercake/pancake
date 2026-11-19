@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exe=$(realpath "$1")
+record=$(realpath "$2")
+label=$3
+nm -n -C "$exe" | awk '$3=="pancake::image_io::validate_samples" {print}' > "$record/$label-validator-symbol.txt"
+test "$(wc -l < "$record/$label-validator-symbol.txt")" = 1
+for pair in \
+    raw:bayer_dng_develops_true_sixteen_bit_rgb \
+    exr:exr_decode_keeps_float_bits_and_rejects_nonfinite_values; do
+    name=${pair%%:*}
+    test_name=${pair#*:}
+    PANCAKE_VALIDATION_TRACE="$record/$label-$name.jsonl" taskset -c 14,15 \
+        gdb -nx -q -batch --return-child-result -iex 'set auto-load off' \
+        -iex 'set debuginfod enabled off' -ex 'set disable-randomization off' \
+        -ex 'set print thread-events off' -x "$record/observe-validation.py" -ex run \
+        --args "$exe" --exact "$test_name" --test-threads 1 > "$record/$label-$name.log" 2>&1
+done
+python3 "$record/assert-validation.py" "$record/$label-raw.jsonl" "$record/$label-exr.jsonl"

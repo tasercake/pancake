@@ -1,0 +1,39 @@
+{
+  "target_commit": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "strict_gate_exit": 1,
+  "raw_map_sha256": "1738331fe01e6d396df47345c4315ca4a4a8d06232806cd6f7dd828d316dbd17",
+  "metrics": {
+    "branches": {
+      "covered": 0,
+      "total": 0
+    },
+    "functions": {
+      "covered": 485,
+      "total": 760
+    },
+    "lines": {
+      "covered": 4730,
+      "total": 6516
+    },
+    "regions": {
+      "covered": 4849,
+      "total": 7328
+    }
+  },
+  "test_harnesses": 19,
+  "test_counts": {
+    "passed": 148,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered": 0
+  },
+  "file_branch_records": 0,
+  "function_branch_records": 0,
+  "gtk_hits": {
+    "27": 1,
+    "64": 1,
+    "65": 1,
+    "66": 1
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "profile": "T50.weighted_average.cpu",
+  "settings": {
+    "device": "cpu",
+    "method": "weighted_average",
+    "align": true,
+    "alignment_mode": "similarity",
+    "alignment_reference": "first",
+    "kernel_size": 6,
+    "pyramid_levels": 8,
+    "scale_factor": 6,
+    "slab_size": 0,
+    "slab_overlap": 0,
+    "bit_depth": 16,
+    "auto": false,
+    "auto_crop": true,
+    "quality_report": false
+  },
+  "order": [
+    "reference",
+    "candidate"
+  ],
+  "sample_interval_ns": 2000000,
+  "max_sample_gap_ns": 20000000,
+  "limit": 0.55,
+  "cache_state": "fresh isolated app caches for both arms; normal OS caches",
+  "worker_cpus": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "rss_sampler_cpu": 15,
+  "frames": 50,
+  "materialization_sha256": "1d9be3f1cd20a01083b11c10c4d17ab75a4f3b6bb7e2ebef682824e345ba649d",
+  "frozen_full_credit": false,
+  "base_operator_sha256": "210b7465a501e8e8280f4f1b1163c414c3a585c25fb24034e9954a6f22863b98",
+  "candidate_package_sha256": "74a764f99ba72be40f02e6b3b9faf3981f19e35f0b46e0231f665b1ccbe8c729",
+  "candidate_binary_sha256": "d54c4aaa135c9d2bef0fcbfcdefab82915038afa09af3f48fd067714f1188fdd",
+  "status": "static_preregistration_only"
+}

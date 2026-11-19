@@ -1,0 +1,61 @@
+"""Validate each actual CLI completion against the previous passing frozen P2 roster."""
+from collections import Counter
+from gzip import open as gzip_open
+from json import dumps, load, loads
+from pathlib import Path
+import sys
+
+repo = Path.cwd()
+proof = repo / "artifacts/r50-workers"
+previous = repo / "pancake/docs/p10-r50-raw-audit/f2f1bb3/p2"
+expected_revision = "b10fbec440069602ed16e6055c6bb5f1c4212757"
+suite_digest = "485eaae7724d8706e991c6067af7739e370ed57e9e0e15cf5d9d6f5c57804a2a"
+
+with gzip_open(previous / "actual-events.json.gz", "rt") as original:
+    original_events = load(original)
+
+for lane in sys.argv[1:]:
+    directory = proof / f"p2-{lane}"
+    selected = (previous / f"{lane}-cases.txt").read_text().splitlines()
+    report = loads((directory / "report.json").read_text())
+    provenance = loads((directory / "provenance.json").read_text())
+    if not (
+        report["status"] == "passed" and report["complete"] is True
+        and report["completed_count"] == report["selected_count"] == len(selected)
+        and report["counts"] == {"passed": len(selected), "failed": 0, "unsupported": 0}
+        and {case["id"] for case in report["cases"]} == set(selected)
+        and all(case["status"] == "passed" for case in report["cases"])
+        and provenance["target_commit"] == expected_revision
+        and provenance["suite_source_sha256"] == suite_digest
+        and not (provenance["target_dirty"] or provenance["suite_dirty"])
+    ):
+        raise ValueError(f"Nonmatching frozen P2 {lane} report")
+    expected = {
+        key: value for key, value in original_events.items() if key.split("/")[0] in selected
+    }
+    actual_events = {}
+    original_fields = (
+        "actual_backend", "runtime", "completed", "physical_gpu",
+        "device_pci_address", "fallback_reason", "event",
+    )
+    for path in sorted((directory / "cases").glob("**/events.jsonl")):
+        rows = [loads(line) for line in path.read_text().splitlines()]
+        if len(rows) != 1:
+            raise ValueError(f"Invalid observed completion file {path}")
+        key = path.relative_to(directory / "cases").as_posix()
+        event = rows[0]
+        original = expected[key]
+        if any(event[field] != original[field] for field in original_fields):
+            raise ValueError(f"Backend provenance differs for {key}")
+        if event["physical_gpu"] and event["device"] != original["device"]:
+            raise ValueError(f"Physical device differs for {key}")
+        actual_events[key] = event
+    if actual_events.keys() != expected.keys():
+        raise ValueError(f"Completed CLI call roster differs for P2 {lane}")
+    events_path = proof / f"p2-{lane}-events.json"
+    events_path.write_text(dumps(actual_events, indent=2) + "\n")
+    summary = {"lane": lane, "revision": expected_revision, "suite_source_sha256": suite_digest,
+               "passed": len(selected), "failed": 0, "unsupported": 0, "unrun": 0,
+               "events": dict(Counter(row["actual_backend"] for row in actual_events.values()))}
+    (proof / f"p2-{lane}-summary.json").write_text(dumps(summary, indent=2) + "\n")
+    print(dumps(summary))

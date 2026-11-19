@@ -1,0 +1,10 @@
+M	pancake/crates/pancake-gui/src/desktop_menu.rs
+M	pancake/crates/pancake-gui/src/panel/linux.rs
+M	pancake/src/image_io/mod.rs
+M	pancake/src/image_io/tiled.rs
+A	pancake/src/image_io/tiled/tests.rs
+M	pancake/src/registration/kernels.rs
+M	pancake/tests/cpu_fusion_contract.rs
+M	pancake/tests/cpu_image_io.rs
+M	pancake/tests/cpu_registration_contract.rs
+A	pancake/tests/data/tiled-rgb16-worker-bands.tif

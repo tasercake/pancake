@@ -39,16 +39,42 @@ original failed or interrupted bundles for investigation.
 
 ## Apple and retained builds
 
-Build and link the locked macOS ARM64 release natively with CPU, wgpu Metal and
-native Metal enabled. Stage a macOS application bundle with the GUI under
-`Contents/MacOS`, bundle metadata and a versioned application identity. Ship a
-matching CLI and preserve the resolved `otool -L` dependencies. Use ad-hoc
-signing for private package qualification and verify the packaged GUI's actual
-Accessibility and Automation identity. Distribution signing needs the owner's
-Developer ID identity and distribution credentials. If hardened signing is
-selected, verify the CubeCL CPU JIT with the final signing options and review
-any required entitlement narrowly. Native ARM64 build and signing tools and
-access to the owner's distribution credentials are outstanding.
+On a clean native Apple Silicon worktree with Python 3.11 or newer, the
+[private package recipe](../scripts/package_macos.py) builds the locked
+ARM64 release with CPU, wgpu Metal, and the explicit `cubecl/metal-native`
+dependency feature. Supply a stable private bundle identifier and a build
+number from 1 through 9999. The display version comes from the release crates.
+
+```sh
+python3 pancake/scripts/package_macos.py \
+  --output artifacts/p9-macos-package \
+  --bundle-identifier "$PANCAKE_BUNDLE_IDENTIFIER" \
+  --build-number "$PANCAKE_BUILD_NUMBER"
+```
+
+The output contains `pancake-cli`, `Pancake.app/Contents/MacOS/pancake-gui`,
+`Info.plist`, the build log, and the package receipt. The recipe checks the
+plist with `plutil`, verifies each executable's ARM64 slice with `lipo`,
+and records direct loader dependencies with `otool -L`. It accepts macOS
+system library and framework install names. The recipe ad-hoc signs only the
+packaged copies and checks both identities with strict `codesign` verification.
+The receipt records the exact source and lock, build command, selected
+developer directory and SDK, compiler and SDK linker identities, explicit
+SDK, deployment and linker overrides, and executable hashes before and
+after signing.
+
+The [portable tests](../scripts/test_package_macos.py) replay the staging
+contract with Apple-tool fixtures. They cover the plist, command and byte
+receipts, failure cleanup, and existing and concurrently created outputs.
+Run them with
+`python3 -m unittest discover -s pancake/scripts -p test_package_macos.py`.
+Six portable tests passed on Linux x86-64. The locked Apple ARM64 feature
+tree resolved `cubecl-metal` and wgpu's Metal backend on that host.
+Actual native building, signing, and application identity checks need Apple
+Silicon. Developer ID signing, a distribution package and its notice review,
+and any notarization decision remain with the release owner. If hardened
+signing is selected, verify the CubeCL CPU JIT with the final signing
+options and review any required entitlement narrowly.
 
 On an Apple Silicon host use the configured dedicated Tart guest for the
 34 compatible interface cases. The suite reconstructs its guest target

@@ -1,0 +1,2 @@
+/tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/original.dng	160	112	U16	270537642
+/tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/oriented.dng	160	112	U16	58022555

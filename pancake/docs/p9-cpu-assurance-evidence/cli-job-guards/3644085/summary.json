@@ -1,0 +1,135 @@
+{
+  "before": {
+    "candidate": "2143eda2b308497caee96334357dd23d324e1e8e",
+    "status": 1,
+    "tests": {
+      "passed": 127,
+      "failed": 0,
+      "ignored": 0
+    },
+    "coverage": {
+      "lines": {
+        "count": 5932,
+        "covered": 4202
+      },
+      "functions": {
+        "count": 684,
+        "covered": 426
+      },
+      "regions": {
+        "count": 6713,
+        "covered": 4303
+      },
+      "branches": {
+        "count": 640,
+        "covered": 520
+      }
+    }
+  },
+  "after": {
+    "candidate": "3644085723a4781712c113f6626ac3d2ade0cb0d",
+    "status": 1,
+    "tests": {
+      "passed": 132,
+      "failed": 0,
+      "ignored": 0
+    },
+    "coverage": {
+      "lines": {
+        "count": 5932,
+        "covered": 4206
+      },
+      "functions": {
+        "count": 684,
+        "covered": 429
+      },
+      "regions": {
+        "count": 6713,
+        "covered": 4310
+      },
+      "branches": {
+        "count": 640,
+        "covered": 521
+      }
+    }
+  },
+  "changed_files": {
+    "crates/pancake-cli/src/main.rs": {
+      "before": {
+        "lines": {
+          "count": 99,
+          "covered": 95
+        },
+        "functions": {
+          "count": 9,
+          "covered": 6
+        },
+        "regions": {
+          "count": 103,
+          "covered": 96
+        },
+        "branches": {
+          "count": 16,
+          "covered": 15
+        }
+      },
+      "after": {
+        "lines": {
+          "count": 99,
+          "covered": 98
+        },
+        "functions": {
+          "count": 9,
+          "covered": 8
+        },
+        "regions": {
+          "count": 103,
+          "covered": 101
+        },
+        "branches": {
+          "count": 16,
+          "covered": 16
+        }
+      }
+    },
+    "src/job/events.rs": {
+      "before": {
+        "lines": {
+          "count": 73,
+          "covered": 64
+        },
+        "functions": {
+          "count": 9,
+          "covered": 6
+        },
+        "regions": {
+          "count": 74,
+          "covered": 63
+        },
+        "branches": {
+          "count": 8,
+          "covered": 6
+        }
+      },
+      "after": {
+        "lines": {
+          "count": 73,
+          "covered": 65
+        },
+        "functions": {
+          "count": 9,
+          "covered": 7
+        },
+        "regions": {
+          "count": 74,
+          "covered": 65
+        },
+        "branches": {
+          "count": 8,
+          "covered": 6
+        }
+      }
+    }
+  },
+  "focused_clippy_status": 0
+}

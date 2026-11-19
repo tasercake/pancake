@@ -1,0 +1,104 @@
+{
+  "revision": "7551f73dbe5132f7e9723a9ac4b0c9144504a27a",
+  "baseline_revision": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "strict_status": 1,
+  "test_result_records": 20,
+  "nonempty_test_groups": 19,
+  "tests": {
+    "passed": 145,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered": 0
+  },
+  "gate_diagnostics": [
+    "CPU assurance: uncovered CPU lines"
+  ],
+  "selected_integration_targets": [
+    "cpu_advanced_fusion",
+    "cpu_array_layout",
+    "cpu_cli",
+    "cpu_config",
+    "cpu_fusion_contract",
+    "cpu_gray_array_export",
+    "cpu_image_export",
+    "cpu_image_io",
+    "cpu_job",
+    "cpu_kernel_contract",
+    "cpu_npy",
+    "cpu_numerical_contract",
+    "cpu_registration_contract",
+    "cpu_runtime_contract",
+    "cpu_runtime_options",
+    "cpu_stack_plan"
+  ],
+  "identical_cpu_selection": true,
+  "before": {
+    "lines": {
+      "covered": 4466,
+      "total": 6250,
+      "uncovered": 1784
+    },
+    "functions": {
+      "covered": 454,
+      "total": 728,
+      "uncovered": 274
+    },
+    "regions": {
+      "covered": 4551,
+      "total": 7025,
+      "uncovered": 2474
+    },
+    "branches": {
+      "covered": 552,
+      "total": 686,
+      "uncovered": 134
+    }
+  },
+  "after": {
+    "lines": {
+      "covered": 4644,
+      "total": 6456,
+      "uncovered": 1812
+    },
+    "functions": {
+      "covered": 474,
+      "total": 753,
+      "uncovered": 279
+    },
+    "regions": {
+      "covered": 4766,
+      "total": 7271,
+      "uncovered": 2505
+    },
+    "branches": {
+      "covered": 573,
+      "total": 762,
+      "uncovered": 189
+    }
+  },
+  "delta": {
+    "lines": {
+      "covered": 178,
+      "total": 206,
+      "uncovered": 28
+    },
+    "functions": {
+      "covered": 20,
+      "total": 25,
+      "uncovered": 5
+    },
+    "regions": {
+      "covered": 215,
+      "total": 246,
+      "uncovered": 31
+    },
+    "branches": {
+      "covered": 21,
+      "total": 76,
+      "uncovered": 55
+    }
+  },
+  "baseline_llvm_gzip_sha256": "ae270dd527216371b507930dd8e2b21aca61418f1d6effc0103fcbf490280740",
+  "current_llvm_json_sha256": "8833411ff32932f660be77aeca8636cc3438c321be648e0e59cf4152fe0b30fd"
+}

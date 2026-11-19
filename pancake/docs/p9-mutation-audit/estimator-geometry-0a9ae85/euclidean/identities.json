@@ -1,0 +1,40 @@
+{
+  "base": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "test_revision": "599dc5caa7e52200bf3e4c21f33081bc0da5611d",
+  "rust": "1.100.0 (0ef1bc386 2026-11-09)",
+  "platform": "Linux x86_64 6.8.0-147-generic",
+  "cpu": "AMD Ryzen 9 7950X3D",
+  "cpu_affinity": [
+    4,
+    5
+  ],
+  "cargo_jobs": 2,
+  "offline": true,
+  "compiler_wrappers_unset": true,
+  "mutant_exit": 101,
+  "stock_exit": 0,
+  "stock_native_test_counts": {
+    "unit": 24,
+    "cpu_registration": 3
+  },
+  "scoped_clippy_exit": 0,
+  "format_exit": 0,
+  "source_inventory_exit": 0,
+  "files_sha256": {
+    "clippy.log.gz": "bb39861873695a7ebb97661c1e8ea753ba75abb8aaa6571e40dcbd07da8cc2a2",
+    "clippy.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "fmt.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "green-inputs.sha256": "19cdba3afe4c9dd843474f12fe0a24bd3506a56558bc271a47e786800e56c929",
+    "green.log.gz": "1cfe73a7cfd15a1668b63347705b43efa7bce76f61697b29f320a0637343fd44",
+    "green.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "initial-clippy.log.gz": "defdcb6d9d1646b21bd3cd11d7ae93bf8dae3d823be1483cc76114ab8bf390d3",
+    "patch-preflight.log": "29790b2d7ae0bf4a69d4cf2082aecd4bc2d90efa42a47c58a60ac66b5d5df1a1",
+    "patch-red.log": "3ec640cb0abb03d937f16393ca0a4e0a59c83de8afe6af8942738b8bb2fa0841",
+    "red-inputs.sha256": "740cd71ea7f0f429ac8249048d78e895ed27c8b77e9579d379c032d4cb7bc55a",
+    "red.log.gz": "4ff039118cdfdbd574e493b2fe4e07e2c853f11ba9c215ad2656e29636b04999",
+    "red.status": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+    "saved.diff": "87a8e6455e37fe870a662a62d2f13537becfe81c06916533fc42832966f3f336",
+    "shard-outcome.json": "0eaec106ce5966ccabcb47b706b8dcf920529970a4a64ae8adea9dadb95fa93e",
+    "source-policy.log": "22e88bc8b11b052e64c7b4e1949a769853e31e3c521989d95067ff79b8b43b14"
+  }
+}

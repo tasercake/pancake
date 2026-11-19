@@ -1,0 +1,865 @@
+{
+  "source_revision": "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb",
+  "native_exit": 0,
+  "baseline": "Success",
+  "baseline_passed_tests": 146,
+  "baseline_test_targets": 19,
+  "baseline_phases": [
+    {
+      "phase": "Build",
+      "duration": 395.752270442,
+      "process_status": "Success",
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--no-run",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--package=pancake-gui@0.1.0",
+        "--all-features",
+        "--workspace"
+      ]
+    },
+    {
+      "phase": "Test",
+      "duration": 6.628545233,
+      "process_status": "Success",
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--package=pancake-gui@0.1.0",
+        "--all-features",
+        "--workspace",
+        "--locked",
+        "--lib",
+        "--bins",
+        "--test",
+        "cpu_advanced_fusion",
+        "--test",
+        "cpu_array_layout",
+        "--test",
+        "cpu_cli",
+        "--test",
+        "cpu_config",
+        "--test",
+        "cpu_fusion_contract",
+        "--test",
+        "cpu_gray_array_export",
+        "--test",
+        "cpu_image_export",
+        "--test",
+        "cpu_image_io",
+        "--test",
+        "cpu_job",
+        "--test",
+        "cpu_kernel_contract",
+        "--test",
+        "cpu_npy",
+        "--test",
+        "cpu_numerical_contract",
+        "--test",
+        "cpu_registration_contract",
+        "--test",
+        "cpu_runtime_contract",
+        "--test",
+        "cpu_runtime_options",
+        "--test",
+        "cpu_stack_plan",
+        "--",
+        "--include-ignored"
+      ]
+    }
+  ],
+  "scope": "Exact ten historical operations from 287828a 255/256",
+  "current_full_universe": 2642,
+  "observed_candidates": 10,
+  "missing_selected_candidates": 0,
+  "counts": {
+    "CaughtMutant": 10
+  },
+  "target_allocated_bytes": 7331131392,
+  "start": "2026-11-18T20:54:26+08:00",
+  "end": "2026-11-18T21:04:48+08:00",
+  "actual_affinity": "665628 Cpus_allowed_list:\t6-7",
+  "locked_cpu_targets_sha256": "d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e",
+  "mutants_in_execution_order": [
+    {
+      "mutant": "src/registration/mod.rs:54:47: replace != with == in ResidentRgb::into_tensor",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 21.596731188,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.10715056,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test interrupted_execution_retains_an_existing_export ... FAILED",
+        "Error: \"cancellation request was rejected during real accumulation\""
+      ],
+      "log_path": "native-exact/mutants.out/log/src__registration__mod.rs_line_54_col_47.log"
+    },
+    {
+      "mutant": "src/fusion/focus.rs:384:61: replace - with / in focus_energy",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 21.274471333,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 0.901739888,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test cpu_fusion_and_resize ... FAILED",
+        "test weighted_focus_uses_the_requested_window ... FAILED",
+        "Error: \"device returned a nonfinite image sample\"",
+        "Error: \"focus window 1 column 0 expected 0.125, got [0.13318834, 0.13318834, 0.13318834]\""
+      ],
+      "log_path": "native-exact/mutants.out/log/src__fusion__focus.rs_line_384_col_61.log"
+    },
+    {
+      "mutant": "src/image_io/npy.rs:121:15: replace == with != in decode",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 20.992556098,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 0.751715596,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test identifies_two_dimensional_arrays_without_marking_native_grayscale ... FAILED",
+        "test grayscale_array_exports_keep_native_sample_layout ... FAILED",
+        "Error: Custom { kind: Other, error: \"unexpected array metadata for (1, 2)\" }",
+        "Error: Custom { kind: Other, error: \"gray.png changed 16-bit gray samples\" }"
+      ],
+      "log_path": "native-exact/mutants.out/log/src__image_io__npy.rs_line_121_col_15.log"
+    },
+    {
+      "mutant": "src/registration/estimate.rs:162:36: replace / with * in prepare_thumbnail",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 20.771926805,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.812023375,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test cpu_panorama_thumbnail_respects_proxy_budget ... FAILED",
+        "Error: \"the bounded panorama proxy must fit 4246496 bytes: kernel working-data budget exceeded\""
+      ],
+      "log_path": "native-exact/mutants.out/log/src__registration__estimate.rs_line_162_col_36.log"
+    },
+    {
+      "mutant": "src/registration/kernels.rs:103:5: replace read -> Result<Vec<f32>, String> with Ok(vec![])",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 20.667998457,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.507364829,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test cpu_registration_geometry ... FAILED",
+        "test cpu_registration_preserves_partial_final_tile ... FAILED",
+        "Error: \"registration frame does not match RGB dimensions\"",
+        "Error: \"registration frame does not match RGB dimensions\""
+      ],
+      "log_path": "native-exact/mutants.out/log/src__registration__kernels.rs_line_103_col_5.log"
+    },
+    {
+      "mutant": "src/registration/kernels.rs:440:55: replace + with * in correlation_moments",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 20.815360529,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.76220513,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test cpu_registration_geometry ... FAILED",
+        "Error: \"expected [3.25, -1.5], found [0, 0] at 0 confidence\""
+      ],
+      "log_path": "native-exact/mutants.out/log/src__registration__kernels.rs_line_440_col_55.log"
+    },
+    {
+      "mutant": "src/registration/spectral.rs:267:32: replace + with * in cross_phase",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 20.706928599,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 2.861084963,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test cpu_registration_geometry ... FAILED",
+        "Error: \"wide shift: expected [37.25, -25.5], found [0, 0]\""
+      ],
+      "log_path": "native-exact/mutants.out/log/src__registration__spectral.rs_line_267_col_32.log"
+    },
+    {
+      "mutant": "src/fusion/advanced/pyramid.rs:153:5: replace clamp_before -> usize with 1",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 20.817712912,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 0.651597063,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test cpu_advanced_fusion ... FAILED",
+        "Error: \"Laplacian blurred a focus plane at (19, 18): [0.8325, 0.8325, 0.8325]\""
+      ],
+      "log_path": "native-exact/mutants.out/log/src__fusion__advanced__pyramid.rs_line_153_col_5.log"
+    },
+    {
+      "mutant": "crates/pancake-gui/src/desktop_menu.rs:9:5: replace reveal -> Result<(), String> with Ok(())",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 20.761946658,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake-gui@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 6.521544483,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake-gui@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test desktop_menu::tests::reveal_reports_a_missing_source ... FAILED",
+        "Error: \"Revealing a missing source reported success.\""
+      ],
+      "log_path": "native-exact/mutants.out/log/crates__pancake-gui__src__desktop_menu.rs_line_9_col_5.log"
+    },
+    {
+      "mutant": "crates/pancake-gui/src/panel/linux.rs:65:5: replace build -> Result<(Dialog, FileChooserWidget, Entry), String> with Ok((Default::default(), Default::default(), Default::default()))",
+      "summary": "CaughtMutant",
+      "phases": [
+        {
+          "phase": "Build",
+          "duration": 2.372892915,
+          "process_status": "Success",
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--no-run",
+            "--verbose",
+            "--package=pancake-gui@0.1.0",
+            "--all-features",
+            "--workspace"
+          ]
+        },
+        {
+          "phase": "Test",
+          "duration": 6.382523665,
+          "process_status": {
+            "Failure": 101
+          },
+          "argv": [
+            "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+            "test",
+            "--verbose",
+            "--package=pancake-gui@0.1.0",
+            "--all-features",
+            "--workspace",
+            "--locked",
+            "--lib",
+            "--bins",
+            "--test",
+            "cpu_advanced_fusion",
+            "--test",
+            "cpu_array_layout",
+            "--test",
+            "cpu_cli",
+            "--test",
+            "cpu_config",
+            "--test",
+            "cpu_fusion_contract",
+            "--test",
+            "cpu_gray_array_export",
+            "--test",
+            "cpu_image_export",
+            "--test",
+            "cpu_image_io",
+            "--test",
+            "cpu_job",
+            "--test",
+            "cpu_kernel_contract",
+            "--test",
+            "cpu_npy",
+            "--test",
+            "cpu_numerical_contract",
+            "--test",
+            "cpu_registration_contract",
+            "--test",
+            "cpu_runtime_contract",
+            "--test",
+            "cpu_runtime_options",
+            "--test",
+            "cpu_stack_plan",
+            "--",
+            "--include-ignored"
+          ]
+        }
+      ],
+      "failure_lines": [
+        "test panel::linux::tests::unavailable_display_rejects_native_panel ... FAILED",
+        "Error: \"Headless GTK test failed: exit status: 101\\n\\nrunning 1 test\\ntest panel::linux::tests::unavailable_display_rejects_native_panel ... FAILED\\n\\nfailures:\\n\\n---- panel::linux::tests::unavailable_display_rejects_native_panel stdout ----\\n\\nthread 'panel::linux::tests::unavailable_display_rejects_native_panel' (746215) panicked at /home/krishna/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk-0.19.0/src/auto/dialog.rs:31:9:\\nGTK has not been initialized. Call `gtk::init` first.\\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\\n\\n\\nfailures:\\n    panel::linux::tests::unavailable_display_rejects_native_panel\\n\\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.00s\\n\\n\\n\""
+      ],
+      "log_path": "native-exact/mutants.out/log/crates__pancake-gui__src__panel__linux.rs_line_65_col_5.log"
+    }
+  ]
+}

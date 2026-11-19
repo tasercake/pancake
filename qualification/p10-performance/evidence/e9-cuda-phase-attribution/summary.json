@@ -1,0 +1,1519 @@
+{
+  "scope": "Host phase attribution and separate instrumented CUDA API witness",
+  "production_base": "2143eda2b308497caee96334357dd23d324e1e8e",
+  "trace_source": "4cd35b981dc664bc8a6c2d1809a31ad5a4b7ee4b",
+  "trace_source_tree": "5ef874a6d73d8b13a94a0e4d2e0d0238bee8d333",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "historical_control_revision": "12f2151c8a198b5209c8f4d506dbd17fd9aaa74f",
+  "phase_results": {
+    "scope": "Phase attribution on fresh processes. Candidate-to-candidate only.",
+    "gpu_before": [
+      "NVIDIA GeForce RTX 3090, GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac, 00000000:01:00.0, 580.178.04, 68, P2"
+    ],
+    "gpu_after": [
+      "NVIDIA GeForce RTX 3090, GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac, 00000000:01:00.0, 580.178.04, 69, P2"
+    ],
+    "binary_sha256": {
+      "stock": "45cb96ed124a3c8145e3c7cbbf836a3334580d14d63fde59596b393225910ec4",
+      "trace": "c3c88993cf2015cdeb7b97a3ad6d8f2bf5b5bcfdf9f0d63dca2eb46a9448981d"
+    },
+    "medians_ns": {
+      "stock": 464341568,
+      "trace": 464356947
+    },
+    "trace_median_stage_ns": {
+      "raster_decode": 9241474,
+      "raster_orientation": 5839,
+      "rgb_conversion": 2378901,
+      "rgb_validation": 1095444,
+      "decode": 12998743,
+      "native-discover-device": 13075158,
+      "runtime-acquire-client": 87007136,
+      "runtime-variance-probe": 16005906,
+      "runtime_setup": 116574151,
+      "registration_prepare": 511,
+      "fusion_prepare": 11581,
+      "proxy_upload": 19433614,
+      "proxy_submit": 55515,
+      "proxy_readback": 20481200,
+      "identity": 340,
+      "register": 188177920,
+      "fusion_validation": 1250938,
+      "fusion_upload": 8907959,
+      "fusion_submit": 1128077,
+      "fusion_wait": 39332774,
+      "accumulate": 50732407,
+      "pair_upload": 3769751,
+      "score_readback": 38214831,
+      "registration-baseline": 11334393,
+      "registration-seed": 114082388,
+      "registration-refine": 18671768,
+      "estimate_pair": 147952894,
+      "fusion_readback": 3966551,
+      "fusion_finish": 3989554,
+      "final_crop": 24777,
+      "job_drain": 19045,
+      "encode": 13020826,
+      "publish": 22382,
+      "job_total": 387257346
+    },
+    "samples": [
+      {
+        "kind": "warmup",
+        "iteration": 0,
+        "variant": "stock",
+        "elapsed_ns": 614701127,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {}
+      },
+      {
+        "kind": "warmup",
+        "iteration": 0,
+        "variant": "trace",
+        "elapsed_ns": 614609605,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {
+          "raster_decode": {
+            "count": 9,
+            "total_ns": 9308512
+          },
+          "raster_orientation": {
+            "count": 9,
+            "total_ns": 6542
+          },
+          "rgb_conversion": {
+            "count": 9,
+            "total_ns": 2251394
+          },
+          "rgb_validation": {
+            "count": 9,
+            "total_ns": 1102228
+          },
+          "decode": {
+            "count": 9,
+            "total_ns": 13000378
+          },
+          "native-discover-device": {
+            "count": 1,
+            "total_ns": 13163845
+          },
+          "runtime-acquire-client": {
+            "count": 1,
+            "total_ns": 85565802
+          },
+          "runtime-variance-probe": {
+            "count": 1,
+            "total_ns": 31186883
+          },
+          "runtime_setup": {
+            "count": 1,
+            "total_ns": 129927922
+          },
+          "registration_prepare": {
+            "count": 1,
+            "total_ns": 371
+          },
+          "fusion_prepare": {
+            "count": 1,
+            "total_ns": 11732
+          },
+          "proxy_upload": {
+            "count": 9,
+            "total_ns": 17793148
+          },
+          "proxy_submit": {
+            "count": 9,
+            "total_ns": 72136
+          },
+          "proxy_readback": {
+            "count": 9,
+            "total_ns": 34852749
+          },
+          "identity": {
+            "count": 9,
+            "total_ns": 621
+          },
+          "register": {
+            "count": 9,
+            "total_ns": 267868644
+          },
+          "fusion_validation": {
+            "count": 9,
+            "total_ns": 1291332
+          },
+          "fusion_upload": {
+            "count": 9,
+            "total_ns": 8637454
+          },
+          "fusion_submit": {
+            "count": 9,
+            "total_ns": 1169203
+          },
+          "fusion_wait": {
+            "count": 9,
+            "total_ns": 85204776
+          },
+          "accumulate": {
+            "count": 9,
+            "total_ns": 96312372
+          },
+          "pair_upload": {
+            "count": 8,
+            "total_ns": 3807564
+          },
+          "score_readback": {
+            "count": 258,
+            "total_ns": 55417449
+          },
+          "registration-baseline": {
+            "count": 8,
+            "total_ns": 19760338
+          },
+          "registration-seed": {
+            "count": 8,
+            "total_ns": 172250084
+          },
+          "registration-refine": {
+            "count": 8,
+            "total_ns": 19294488
+          },
+          "estimate_pair": {
+            "count": 8,
+            "total_ns": 215123479
+          },
+          "fusion_readback": {
+            "count": 1,
+            "total_ns": 10445284
+          },
+          "fusion_finish": {
+            "count": 1,
+            "total_ns": 10469339
+          },
+          "final_crop": {
+            "count": 1,
+            "total_ns": 35717
+          },
+          "job_drain": {
+            "count": 1,
+            "total_ns": 19126
+          },
+          "encode": {
+            "count": 1,
+            "total_ns": 3233846
+          },
+          "publish": {
+            "count": 1,
+            "total_ns": 19005
+          },
+          "job_total": {
+            "count": 1,
+            "total_ns": 521353255
+          }
+        }
+      },
+      {
+        "kind": "warmup",
+        "iteration": 1,
+        "variant": "trace",
+        "elapsed_ns": 464355193,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {
+          "raster_decode": {
+            "count": 9,
+            "total_ns": 9373175
+          },
+          "raster_orientation": {
+            "count": 9,
+            "total_ns": 7241
+          },
+          "rgb_conversion": {
+            "count": 9,
+            "total_ns": 2165020
+          },
+          "rgb_validation": {
+            "count": 9,
+            "total_ns": 1128438
+          },
+          "decode": {
+            "count": 9,
+            "total_ns": 12999536
+          },
+          "native-discover-device": {
+            "count": 1,
+            "total_ns": 13533587
+          },
+          "runtime-acquire-client": {
+            "count": 1,
+            "total_ns": 88842479
+          },
+          "runtime-variance-probe": {
+            "count": 1,
+            "total_ns": 15956122
+          },
+          "runtime_setup": {
+            "count": 1,
+            "total_ns": 118344282
+          },
+          "registration_prepare": {
+            "count": 1,
+            "total_ns": 561
+          },
+          "fusion_prepare": {
+            "count": 1,
+            "total_ns": 13185
+          },
+          "proxy_upload": {
+            "count": 9,
+            "total_ns": 18851643
+          },
+          "proxy_submit": {
+            "count": 9,
+            "total_ns": 49494
+          },
+          "proxy_readback": {
+            "count": 9,
+            "total_ns": 20991338
+          },
+          "identity": {
+            "count": 9,
+            "total_ns": 371
+          },
+          "register": {
+            "count": 9,
+            "total_ns": 187026243
+          },
+          "fusion_validation": {
+            "count": 9,
+            "total_ns": 1230439
+          },
+          "fusion_upload": {
+            "count": 9,
+            "total_ns": 8831516
+          },
+          "fusion_submit": {
+            "count": 9,
+            "total_ns": 1164094
+          },
+          "fusion_wait": {
+            "count": 9,
+            "total_ns": 41222349
+          },
+          "accumulate": {
+            "count": 9,
+            "total_ns": 52455753
+          },
+          "pair_upload": {
+            "count": 8,
+            "total_ns": 3707423
+          },
+          "score_readback": {
+            "count": 258,
+            "total_ns": 38004183
+          },
+          "registration-baseline": {
+            "count": 8,
+            "total_ns": 10901802
+          },
+          "registration-seed": {
+            "count": 8,
+            "total_ns": 113456383
+          },
+          "registration-refine": {
+            "count": 8,
+            "total_ns": 19033745
+          },
+          "estimate_pair": {
+            "count": 8,
+            "total_ns": 147110627
+          },
+          "fusion_readback": {
+            "count": 1,
+            "total_ns": 3758721
+          },
+          "fusion_finish": {
+            "count": 1,
+            "total_ns": 3782355
+          },
+          "final_crop": {
+            "count": 1,
+            "total_ns": 36899
+          },
+          "job_drain": {
+            "count": 1,
+            "total_ns": 31539
+          },
+          "encode": {
+            "count": 1,
+            "total_ns": 13144668
+          },
+          "publish": {
+            "count": 1,
+            "total_ns": 23353
+          },
+          "job_total": {
+            "count": 1,
+            "total_ns": 388442880
+          }
+        }
+      },
+      {
+        "kind": "warmup",
+        "iteration": 1,
+        "variant": "stock",
+        "elapsed_ns": 464219298,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {}
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 2,
+        "variant": "stock",
+        "elapsed_ns": 464296443,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {}
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 2,
+        "variant": "trace",
+        "elapsed_ns": 464356947,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {
+          "raster_decode": {
+            "count": 9,
+            "total_ns": 9241474
+          },
+          "raster_orientation": {
+            "count": 9,
+            "total_ns": 3184
+          },
+          "rgb_conversion": {
+            "count": 9,
+            "total_ns": 2380466
+          },
+          "rgb_validation": {
+            "count": 9,
+            "total_ns": 1032338
+          },
+          "decode": {
+            "count": 9,
+            "total_ns": 12998743
+          },
+          "native-discover-device": {
+            "count": 1,
+            "total_ns": 13134388
+          },
+          "runtime-acquire-client": {
+            "count": 1,
+            "total_ns": 86429644
+          },
+          "runtime-variance-probe": {
+            "count": 1,
+            "total_ns": 16111053
+          },
+          "runtime_setup": {
+            "count": 1,
+            "total_ns": 115687688
+          },
+          "registration_prepare": {
+            "count": 1,
+            "total_ns": 581
+          },
+          "fusion_prepare": {
+            "count": 1,
+            "total_ns": 12223
+          },
+          "proxy_upload": {
+            "count": 9,
+            "total_ns": 19555905
+          },
+          "proxy_submit": {
+            "count": 9,
+            "total_ns": 50104
+          },
+          "proxy_readback": {
+            "count": 9,
+            "total_ns": 20347452
+          },
+          "identity": {
+            "count": 9,
+            "total_ns": 261
+          },
+          "register": {
+            "count": 9,
+            "total_ns": 190420640
+          },
+          "fusion_validation": {
+            "count": 9,
+            "total_ns": 1250938
+          },
+          "fusion_upload": {
+            "count": 9,
+            "total_ns": 9584559
+          },
+          "fusion_submit": {
+            "count": 9,
+            "total_ns": 1124919
+          },
+          "fusion_wait": {
+            "count": 9,
+            "total_ns": 39332774
+          },
+          "accumulate": {
+            "count": 9,
+            "total_ns": 51299523
+          },
+          "pair_upload": {
+            "count": 8,
+            "total_ns": 4240594
+          },
+          "score_readback": {
+            "count": 258,
+            "total_ns": 38598791
+          },
+          "registration-baseline": {
+            "count": 8,
+            "total_ns": 11939268
+          },
+          "registration-seed": {
+            "count": 8,
+            "total_ns": 115755356
+          },
+          "registration-refine": {
+            "count": 8,
+            "total_ns": 18500386
+          },
+          "estimate_pair": {
+            "count": 8,
+            "total_ns": 150444959
+          },
+          "fusion_readback": {
+            "count": 1,
+            "total_ns": 3966551
+          },
+          "fusion_finish": {
+            "count": 1,
+            "total_ns": 3989554
+          },
+          "final_crop": {
+            "count": 1,
+            "total_ns": 23675
+          },
+          "job_drain": {
+            "count": 1,
+            "total_ns": 18424
+          },
+          "encode": {
+            "count": 1,
+            "total_ns": 12543911
+          },
+          "publish": {
+            "count": 1,
+            "total_ns": 20499
+          },
+          "job_total": {
+            "count": 1,
+            "total_ns": 387586162
+          }
+        }
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 3,
+        "variant": "trace",
+        "elapsed_ns": 464358970,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {
+          "raster_decode": {
+            "count": 9,
+            "total_ns": 9336956
+          },
+          "raster_orientation": {
+            "count": 9,
+            "total_ns": 2998
+          },
+          "rgb_conversion": {
+            "count": 9,
+            "total_ns": 2378901
+          },
+          "rgb_validation": {
+            "count": 9,
+            "total_ns": 1187718
+          },
+          "decode": {
+            "count": 9,
+            "total_ns": 13218135
+          },
+          "native-discover-device": {
+            "count": 1,
+            "total_ns": 13965207
+          },
+          "runtime-acquire-client": {
+            "count": 1,
+            "total_ns": 87007136
+          },
+          "runtime-variance-probe": {
+            "count": 1,
+            "total_ns": 15589344
+          },
+          "runtime_setup": {
+            "count": 1,
+            "total_ns": 116574151
+          },
+          "registration_prepare": {
+            "count": 1,
+            "total_ns": 451
+          },
+          "fusion_prepare": {
+            "count": 1,
+            "total_ns": 13104
+          },
+          "proxy_upload": {
+            "count": 9,
+            "total_ns": 18737660
+          },
+          "proxy_submit": {
+            "count": 9,
+            "total_ns": 57187
+          },
+          "proxy_readback": {
+            "count": 9,
+            "total_ns": 20809816
+          },
+          "identity": {
+            "count": 9,
+            "total_ns": 390
+          },
+          "register": {
+            "count": 9,
+            "total_ns": 189679660
+          },
+          "fusion_validation": {
+            "count": 9,
+            "total_ns": 1254153
+          },
+          "fusion_upload": {
+            "count": 9,
+            "total_ns": 8619898
+          },
+          "fusion_submit": {
+            "count": 9,
+            "total_ns": 1240448
+          },
+          "fusion_wait": {
+            "count": 9,
+            "total_ns": 39111868
+          },
+          "accumulate": {
+            "count": 9,
+            "total_ns": 50234064
+          },
+          "pair_upload": {
+            "count": 8,
+            "total_ns": 3719889
+          },
+          "score_readback": {
+            "count": 258,
+            "total_ns": 38434688
+          },
+          "registration-baseline": {
+            "count": 8,
+            "total_ns": 11334393
+          },
+          "registration-seed": {
+            "count": 8,
+            "total_ns": 116411968
+          },
+          "registration-refine": {
+            "count": 8,
+            "total_ns": 18571748
+          },
+          "estimate_pair": {
+            "count": 8,
+            "total_ns": 150048376
+          },
+          "fusion_readback": {
+            "count": 1,
+            "total_ns": 3931836
+          },
+          "fusion_finish": {
+            "count": 1,
+            "total_ns": 3956933
+          },
+          "final_crop": {
+            "count": 1,
+            "total_ns": 24777
+          },
+          "job_drain": {
+            "count": 1,
+            "total_ns": 19045
+          },
+          "encode": {
+            "count": 1,
+            "total_ns": 13020826
+          },
+          "publish": {
+            "count": 1,
+            "total_ns": 21640
+          },
+          "job_total": {
+            "count": 1,
+            "total_ns": 387257346
+          }
+        }
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 3,
+        "variant": "stock",
+        "elapsed_ns": 464385791,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {}
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 4,
+        "variant": "stock",
+        "elapsed_ns": 464321150,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {}
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 4,
+        "variant": "trace",
+        "elapsed_ns": 464368058,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {
+          "raster_decode": {
+            "count": 9,
+            "total_ns": 9198414
+          },
+          "raster_orientation": {
+            "count": 9,
+            "total_ns": 5839
+          },
+          "rgb_conversion": {
+            "count": 9,
+            "total_ns": 2019811
+          },
+          "rgb_validation": {
+            "count": 9,
+            "total_ns": 1143403
+          },
+          "decode": {
+            "count": 9,
+            "total_ns": 12707248
+          },
+          "native-discover-device": {
+            "count": 1,
+            "total_ns": 12876095
+          },
+          "runtime-acquire-client": {
+            "count": 1,
+            "total_ns": 88747802
+          },
+          "runtime-variance-probe": {
+            "count": 1,
+            "total_ns": 15993001
+          },
+          "runtime_setup": {
+            "count": 1,
+            "total_ns": 117629001
+          },
+          "registration_prepare": {
+            "count": 1,
+            "total_ns": 441
+          },
+          "fusion_prepare": {
+            "count": 1,
+            "total_ns": 11581
+          },
+          "proxy_upload": {
+            "count": 9,
+            "total_ns": 19665410
+          },
+          "proxy_submit": {
+            "count": 9,
+            "total_ns": 54522
+          },
+          "proxy_readback": {
+            "count": 9,
+            "total_ns": 20481200
+          },
+          "identity": {
+            "count": 9,
+            "total_ns": 653
+          },
+          "register": {
+            "count": 9,
+            "total_ns": 188177920
+          },
+          "fusion_validation": {
+            "count": 9,
+            "total_ns": 1242010
+          },
+          "fusion_upload": {
+            "count": 9,
+            "total_ns": 8907959
+          },
+          "fusion_submit": {
+            "count": 9,
+            "total_ns": 1135451
+          },
+          "fusion_wait": {
+            "count": 9,
+            "total_ns": 39438583
+          },
+          "accumulate": {
+            "count": 9,
+            "total_ns": 50732407
+          },
+          "pair_upload": {
+            "count": 8,
+            "total_ns": 3820598
+          },
+          "score_readback": {
+            "count": 258,
+            "total_ns": 38214831
+          },
+          "registration-baseline": {
+            "count": 8,
+            "total_ns": 11368265
+          },
+          "registration-seed": {
+            "count": 8,
+            "total_ns": 114082388
+          },
+          "registration-refine": {
+            "count": 8,
+            "total_ns": 18671768
+          },
+          "estimate_pair": {
+            "count": 8,
+            "total_ns": 147952894
+          },
+          "fusion_readback": {
+            "count": 1,
+            "total_ns": 4184720
+          },
+          "fusion_finish": {
+            "count": 1,
+            "total_ns": 4208404
+          },
+          "final_crop": {
+            "count": 1,
+            "total_ns": 34875
+          },
+          "job_drain": {
+            "count": 1,
+            "total_ns": 17743
+          },
+          "encode": {
+            "count": 1,
+            "total_ns": 3152684
+          },
+          "publish": {
+            "count": 1,
+            "total_ns": 22382
+          },
+          "job_total": {
+            "count": 1,
+            "total_ns": 377240465
+          }
+        }
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 5,
+        "variant": "trace",
+        "elapsed_ns": 464287747,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {
+          "raster_decode": {
+            "count": 9,
+            "total_ns": 9484572
+          },
+          "raster_orientation": {
+            "count": 9,
+            "total_ns": 6815
+          },
+          "rgb_conversion": {
+            "count": 9,
+            "total_ns": 2381989
+          },
+          "rgb_validation": {
+            "count": 9,
+            "total_ns": 1095444
+          },
+          "decode": {
+            "count": 9,
+            "total_ns": 13296392
+          },
+          "native-discover-device": {
+            "count": 1,
+            "total_ns": 13075158
+          },
+          "runtime-acquire-client": {
+            "count": 1,
+            "total_ns": 92718340
+          },
+          "runtime-variance-probe": {
+            "count": 1,
+            "total_ns": 16064105
+          },
+          "runtime_setup": {
+            "count": 1,
+            "total_ns": 121870186
+          },
+          "registration_prepare": {
+            "count": 1,
+            "total_ns": 511
+          },
+          "fusion_prepare": {
+            "count": 1,
+            "total_ns": 11372
+          },
+          "proxy_upload": {
+            "count": 9,
+            "total_ns": 19433614
+          },
+          "proxy_submit": {
+            "count": 9,
+            "total_ns": 63009
+          },
+          "proxy_readback": {
+            "count": 9,
+            "total_ns": 21328699
+          },
+          "identity": {
+            "count": 9,
+            "total_ns": 191
+          },
+          "register": {
+            "count": 9,
+            "total_ns": 186658372
+          },
+          "fusion_validation": {
+            "count": 9,
+            "total_ns": 1213267
+          },
+          "fusion_upload": {
+            "count": 9,
+            "total_ns": 9136088
+          },
+          "fusion_submit": {
+            "count": 9,
+            "total_ns": 1128077
+          },
+          "fusion_wait": {
+            "count": 9,
+            "total_ns": 39661581
+          },
+          "accumulate": {
+            "count": 9,
+            "total_ns": 51146565
+          },
+          "pair_upload": {
+            "count": 8,
+            "total_ns": 3769751
+          },
+          "score_readback": {
+            "count": 258,
+            "total_ns": 37826234
+          },
+          "registration-baseline": {
+            "count": 8,
+            "total_ns": 11330894
+          },
+          "registration-seed": {
+            "count": 8,
+            "total_ns": 112003236
+          },
+          "registration-refine": {
+            "count": 8,
+            "total_ns": 18694657
+          },
+          "estimate_pair": {
+            "count": 8,
+            "total_ns": 145809934
+          },
+          "fusion_readback": {
+            "count": 1,
+            "total_ns": 3784510
+          },
+          "fusion_finish": {
+            "count": 1,
+            "total_ns": 3809086
+          },
+          "final_crop": {
+            "count": 1,
+            "total_ns": 35967
+          },
+          "job_drain": {
+            "count": 1,
+            "total_ns": 21330
+          },
+          "encode": {
+            "count": 1,
+            "total_ns": 13118228
+          },
+          "publish": {
+            "count": 1,
+            "total_ns": 26480
+          },
+          "job_total": {
+            "count": 1,
+            "total_ns": 390600607
+          }
+        }
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 5,
+        "variant": "stock",
+        "elapsed_ns": 464341568,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {}
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 6,
+        "variant": "stock",
+        "elapsed_ns": 464349293,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {}
+      },
+      {
+        "kind": "diagnostic",
+        "iteration": 6,
+        "variant": "trace",
+        "elapsed_ns": 464303035,
+        "encoded_sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "phases": {
+          "raster_decode": {
+            "count": 9,
+            "total_ns": 9156747
+          },
+          "raster_orientation": {
+            "count": 9,
+            "total_ns": 9367
+          },
+          "rgb_conversion": {
+            "count": 9,
+            "total_ns": 2032895
+          },
+          "rgb_validation": {
+            "count": 9,
+            "total_ns": 1042914
+          },
+          "decode": {
+            "count": 9,
+            "total_ns": 12580901
+          },
+          "native-discover-device": {
+            "count": 1,
+            "total_ns": 12598494
+          },
+          "runtime-acquire-client": {
+            "count": 1,
+            "total_ns": 86441946
+          },
+          "runtime-variance-probe": {
+            "count": 1,
+            "total_ns": 16005906
+          },
+          "runtime_setup": {
+            "count": 1,
+            "total_ns": 115059320
+          },
+          "registration_prepare": {
+            "count": 1,
+            "total_ns": 1072
+          },
+          "fusion_prepare": {
+            "count": 1,
+            "total_ns": 10700
+          },
+          "proxy_upload": {
+            "count": 9,
+            "total_ns": 18703247
+          },
+          "proxy_submit": {
+            "count": 9,
+            "total_ns": 55515
+          },
+          "proxy_readback": {
+            "count": 9,
+            "total_ns": 20274583
+          },
+          "identity": {
+            "count": 9,
+            "total_ns": 340
+          },
+          "register": {
+            "count": 9,
+            "total_ns": 185445927
+          },
+          "fusion_validation": {
+            "count": 9,
+            "total_ns": 1289359
+          },
+          "fusion_upload": {
+            "count": 9,
+            "total_ns": 8619460
+          },
+          "fusion_submit": {
+            "count": 9,
+            "total_ns": 1092910
+          },
+          "fusion_wait": {
+            "count": 9,
+            "total_ns": 39002595
+          },
+          "accumulate": {
+            "count": 9,
+            "total_ns": 50010295
+          },
+          "pair_upload": {
+            "count": 8,
+            "total_ns": 3520867
+          },
+          "score_readback": {
+            "count": 258,
+            "total_ns": 38191483
+          },
+          "registration-baseline": {
+            "count": 8,
+            "total_ns": 11256014
+          },
+          "registration-seed": {
+            "count": 8,
+            "total_ns": 112675619
+          },
+          "registration-refine": {
+            "count": 8,
+            "total_ns": 18930681
+          },
+          "estimate_pair": {
+            "count": 8,
+            "total_ns": 146392559
+          },
+          "fusion_readback": {
+            "count": 1,
+            "total_ns": 4017386
+          },
+          "fusion_finish": {
+            "count": 1,
+            "total_ns": 4040349
+          },
+          "final_crop": {
+            "count": 1,
+            "total_ns": 24235
+          },
+          "job_drain": {
+            "count": 1,
+            "total_ns": 20429
+          },
+          "encode": {
+            "count": 1,
+            "total_ns": 13394216
+          },
+          "publish": {
+            "count": 1,
+            "total_ns": 26009
+          },
+          "job_total": {
+            "count": 1,
+            "total_ns": 381091108
+          }
+        }
+      }
+    ]
+  },
+  "per_frame_seed_observations": {
+    "1": [
+      {
+        "launch": "diagnostic-02-trace",
+        "seed_ns": 103562342,
+        "contained_score_readback_ns": 8464037
+      },
+      {
+        "launch": "diagnostic-03-trace",
+        "seed_ns": 104226067,
+        "contained_score_readback_ns": 8768609
+      },
+      {
+        "launch": "diagnostic-04-trace",
+        "seed_ns": 101682997,
+        "contained_score_readback_ns": 8466241
+      },
+      {
+        "launch": "diagnostic-05-trace",
+        "seed_ns": 99764518,
+        "contained_score_readback_ns": 8142154
+      },
+      {
+        "launch": "diagnostic-06-trace",
+        "seed_ns": 100495570,
+        "contained_score_readback_ns": 8304729
+      }
+    ],
+    "2": [
+      {
+        "launch": "diagnostic-02-trace",
+        "seed_ns": 1744493,
+        "contained_score_readback_ns": 95179
+      },
+      {
+        "launch": "diagnostic-03-trace",
+        "seed_ns": 1754481,
+        "contained_score_readback_ns": 97974
+      },
+      {
+        "launch": "diagnostic-04-trace",
+        "seed_ns": 1755714,
+        "contained_score_readback_ns": 101821
+      },
+      {
+        "launch": "diagnostic-05-trace",
+        "seed_ns": 1743771,
+        "contained_score_readback_ns": 96832
+      },
+      {
+        "launch": "diagnostic-06-trace",
+        "seed_ns": 1746086,
+        "contained_score_readback_ns": 95639
+      }
+    ],
+    "3": [
+      {
+        "launch": "diagnostic-02-trace",
+        "seed_ns": 1767886,
+        "contained_score_readback_ns": 120145
+      },
+      {
+        "launch": "diagnostic-03-trace",
+        "seed_ns": 1790358,
+        "contained_score_readback_ns": 141435
+      },
+      {
+        "launch": "diagnostic-04-trace",
+        "seed_ns": 1762386,
+        "contained_score_readback_ns": 121888
+      },
+      {
+        "launch": "diagnostic-05-trace",
+        "seed_ns": 1783796,
+        "contained_score_readback_ns": 125666
+      },
+      {
+        "launch": "diagnostic-06-trace",
+        "seed_ns": 1765071,
+        "contained_score_readback_ns": 119424
+      }
+    ],
+    "4": [
+      {
+        "launch": "diagnostic-02-trace",
+        "seed_ns": 1746777,
+        "contained_score_readback_ns": 96862
+      },
+      {
+        "launch": "diagnostic-03-trace",
+        "seed_ns": 1748460,
+        "contained_score_readback_ns": 96321
+      },
+      {
+        "launch": "diagnostic-04-trace",
+        "seed_ns": 1953785,
+        "contained_score_readback_ns": 96350
+      },
+      {
+        "launch": "diagnostic-05-trace",
+        "seed_ns": 1736217,
+        "contained_score_readback_ns": 95279
+      },
+      {
+        "launch": "diagnostic-06-trace",
+        "seed_ns": 1736067,
+        "contained_score_readback_ns": 95960
+      }
+    ],
+    "5": [
+      {
+        "launch": "diagnostic-02-trace",
+        "seed_ns": 1729665,
+        "contained_score_readback_ns": 92263
+      },
+      {
+        "launch": "diagnostic-03-trace",
+        "seed_ns": 1726830,
+        "contained_score_readback_ns": 92474
+      },
+      {
+        "launch": "diagnostic-04-trace",
+        "seed_ns": 1734915,
+        "contained_score_readback_ns": 94868
+      },
+      {
+        "launch": "diagnostic-05-trace",
+        "seed_ns": 1756395,
+        "contained_score_readback_ns": 99987
+      },
+      {
+        "launch": "diagnostic-06-trace",
+        "seed_ns": 1739594,
+        "contained_score_readback_ns": 92844
+      }
+    ],
+    "6": [
+      {
+        "launch": "diagnostic-02-trace",
+        "seed_ns": 1741878,
+        "contained_score_readback_ns": 93095
+      },
+      {
+        "launch": "diagnostic-03-trace",
+        "seed_ns": 1724145,
+        "contained_score_readback_ns": 92794
+      },
+      {
+        "launch": "diagnostic-04-trace",
+        "seed_ns": 1732450,
+        "contained_score_readback_ns": 91852
+      },
+      {
+        "launch": "diagnostic-05-trace",
+        "seed_ns": 1751976,
+        "contained_score_readback_ns": 93856
+      },
+      {
+        "launch": "diagnostic-06-trace",
+        "seed_ns": 1728843,
+        "contained_score_readback_ns": 94457
+      }
+    ],
+    "7": [
+      {
+        "launch": "diagnostic-02-trace",
+        "seed_ns": 1746336,
+        "contained_score_readback_ns": 92112
+      },
+      {
+        "launch": "diagnostic-03-trace",
+        "seed_ns": 1726589,
+        "contained_score_readback_ns": 91962
+      },
+      {
+        "launch": "diagnostic-04-trace",
+        "seed_ns": 1752167,
+        "contained_score_readback_ns": 96171
+      },
+      {
+        "launch": "diagnostic-05-trace",
+        "seed_ns": 1737069,
+        "contained_score_readback_ns": 92654
+      },
+      {
+        "launch": "diagnostic-06-trace",
+        "seed_ns": 1736868,
+        "contained_score_readback_ns": 93275
+      }
+    ],
+    "8": [
+      {
+        "launch": "diagnostic-02-trace",
+        "seed_ns": 1715979,
+        "contained_score_readback_ns": 94607
+      },
+      {
+        "launch": "diagnostic-03-trace",
+        "seed_ns": 1715038,
+        "contained_score_readback_ns": 96231
+      },
+      {
+        "launch": "diagnostic-04-trace",
+        "seed_ns": 1707974,
+        "contained_score_readback_ns": 93405
+      },
+      {
+        "launch": "diagnostic-05-trace",
+        "seed_ns": 1729494,
+        "contained_score_readback_ns": 108734
+      },
+      {
+        "launch": "diagnostic-06-trace",
+        "seed_ns": 1727520,
+        "contained_score_readback_ns": 94046
+      }
+    ]
+  },
+  "median_seed_ns": 114082388,
+  "median_seed_score_wait_ns": 9148300,
+  "median_seed_other_ns": 104919792,
+  "cuda_api_witness": {
+    "time_base": "Nsight profiler-relative nanoseconds",
+    "initial_window": [
+      719339277,
+      719342317,
+      "window_luma_7c652f0e",
+      719317628,
+      719340431,
+      281
+    ],
+    "initial_fft": [
+      814716097,
+      814996999,
+      "fft_lines_456158b6",
+      812336523,
+      814717099,
+      289
+    ],
+    "preceding_module_load": [
+      811904869,
+      812254689,
+      284
+    ],
+    "window_launch_to_fft_module_load_ns": 92587241,
+    "first_fft_gpu_elapsed_ns": 280902,
+    "fft_dispatch_count": 48,
+    "fft_gpu_total_ns": 12257312,
+    "cuda_sqlite_sha256": "5a64fd9598e2a328daa78d84d30814d3b95d050c8f05bb196403d6239b636719",
+    "nsys_report_sha256": "70ee42423901a2cfc15a7564c13fd69a32afbdb3b3cd0cebe52f275ac12138b1"
+  },
+  "raw_archive": {
+    "sha256": "c9b9d278de824a56792c4de462e238351f33c82780f23fa2e9b1981d8bec11ce",
+    "entries_sha256": {
+      "compiler-run/compiler-witness-00-trace/cuda-api.tsv": "057a863ba7ad47e0bdf43e0ab95c5b9e04fd281199bb748b7869d0369425bb0e",
+      "compiler-run/compiler-witness-00-trace/cuda-kernels.tsv": "99052c74335b2495e8204d2ece5c12c1c3569ce78d660468ff3690dd7f11b4a8",
+      "compiler-run/compiler-witness-00-trace/phase.tsv": "592cded8a3464e21ba9473d72d21d8564f579577a2ffe1c31cbe282c4ec238b4",
+      "evidence-manifest.json": "4460796419db345a2cbc695b6526e612cb7e4710d808ef9695ec6f088c493393",
+      "phase-run/diagnostic-02-trace/phase.tsv": "6bc1a04b4a5cb2e965ac6f5da1463744658c43d28b70aaa74d31ff1b53b36504",
+      "phase-run/diagnostic-03-trace/phase.tsv": "f72ee084298a5743728d3b2494e84e099e9e8c24e97374ccc16bbcc29341e995",
+      "phase-run/diagnostic-04-trace/phase.tsv": "b32664d90050ac57e09e0347ea4ed6e6ed26a74de42429688a599de05598d48b",
+      "phase-run/diagnostic-05-trace/phase.tsv": "56c877911c93f2177c6ae6796df29d041a67aa46bbc4b9f6c42e60ca39adfc6b",
+      "phase-run/diagnostic-06-trace/phase.tsv": "f3b9e2898abba41199302af99d5a3906c0413c77ca67580261668903d96b9764",
+      "phase-run/warmup-00-trace/phase.tsv": "602c942ffe79bc7e07bb6883374bafc29823d9ce4f296de8490da3b5a5abc950",
+      "phase-run/warmup-01-trace/phase.tsv": "3bb5c52b6af6fa27a87208f0c7446f7289f4c393ca852229db507e0767293a17"
+    }
+  },
+  "private_original_raw_archive": {
+    "sha256": "c0bc4c3407b0715967a8c50569780f72a9de29dd4434f4274cefc951da77614a",
+    "entries_sha256": {
+      "approx-baseline.py": "eb0f8d0d8ed61340fa32a8552ee37d9291e98411fd6544e40a005f1514c53786",
+      "approx-identity-baseline.log": "0e803df8be54404268b078aa126d21bc5f2013b3b52be72391ca35d44cfd2617",
+      "cargo-lock.sha256": "c385fc34473e340b70720a77ab38feccb9561e6420aa4ffb445e23a349fad549",
+      "compiler-finish.txt": "4a1d8a18d631c4248cba514eaf694704cb7ccdfe66c5f13c2fa8c396c29b8e18",
+      "compiler-run/compiler-witness-00-trace/cuda.nsys-rep": "70ee42423901a2cfc15a7564c13fd69a32afbdb3b3cd0cebe52f275ac12138b1",
+      "compiler-run/compiler-witness-00-trace/cuda.sqlite": "5a64fd9598e2a328daa78d84d30814d3b95d050c8f05bb196403d6239b636719",
+      "compiler-run/compiler-witness-00-trace/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "compiler-run/compiler-witness-00-trace/launch.json": "a7d6a3da1e78a617fcf1902b8086c120fd5bc18db81e7aabc3669f7216cd10ff",
+      "compiler-run/compiler-witness-00-trace/phase.tsv": "592cded8a3464e21ba9473d72d21d8564f579577a2ffe1c31cbe282c4ec238b4",
+      "compiler-run/compiler-witness-00-trace/sample.json": "37abb3f6ade02699cca94ce2f0fa799667811a6a246b0869f8f73c6b9e487bd5",
+      "compiler-run/compiler-witness-00-trace/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "compiler-run/compiler-witness-00-trace/stdout.txt": "4a3b8d8884e3c2f52db84692aec352c357fc9ef30933619e04c6113d8f299924",
+      "compiler-run/profile-session.json": "a55aa83bcd48c6af5ca3bf7ba8bd12f836767513fd14361d4b587a13121470b7",
+      "compiler-start.txt": "700e611467a42d48c3ed2b76dfc40667dccd8089c21389181e0e0a1a63240f61",
+      "compiler.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "compiler.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "diagnostic.patch": "df0cffa682c61236617fef3559f662ae658e88b0abc1a97c9695dd2404c6ea67",
+      "historical-cuda-sample.json": "5388995cc65eefe0b690b5906e65dcc7e7a41d7520df907c29dbc59b35f8c392",
+      "host-processes-after.txt": "fba406eb9d40f63e160ed641c1f9799f3ad4843b1b5d1c1954aef6784cdae8d1",
+      "host-processes-before.txt": "f4085a3791401ea01a7f995c4b09c8353457378329c9976d54f010bd362f22e4",
+      "materialized-e9.json": "0e74e2d255d1479166629ebc845b607d6f2f12b76d4ed504e2b24d0cae504a8f",
+      "measure-e9.py": "bdbb0dbeeb8080dfa777e6838ba7d5aaaacbdea6822530e9b995b06a8c8a7166",
+      "phase-run/diagnostic-02-stock/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-02-stock/launch.json": "577dc1881983efa32ebb165af3efbc1aef0dbd561508904b81a701bf3c17aeaa",
+      "phase-run/diagnostic-02-stock/sample.json": "5d8b14ede9ff3f6d7fa7eee0b64c8d80b4bd6c0907ea0690bb2ed76bbfd10ce7",
+      "phase-run/diagnostic-02-stock/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-02-stock/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/diagnostic-02-trace/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-02-trace/launch.json": "a1b84768ea611e92a16bf4644461c0842bdf7d4748231f2f05130b4ad4fd53cc",
+      "phase-run/diagnostic-02-trace/phase.tsv": "6bc1a04b4a5cb2e965ac6f5da1463744658c43d28b70aaa74d31ff1b53b36504",
+      "phase-run/diagnostic-02-trace/sample.json": "7ef02ca3e0df9a4f50de18e22c17aae21360404576ad57154e5f336f1f6c7061",
+      "phase-run/diagnostic-02-trace/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-02-trace/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/diagnostic-03-stock/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-03-stock/launch.json": "de5b1d70315d21696e704a4aa31a9eee3e6a4a964a3bcd69a75a0385958cfc6f",
+      "phase-run/diagnostic-03-stock/sample.json": "8182b13a97f83f7aed4002c172d13f14a6bfc0a673d1f16fd1096e62d0456172",
+      "phase-run/diagnostic-03-stock/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-03-stock/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/diagnostic-03-trace/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-03-trace/launch.json": "5a3e20ddf99d233f56d49c7d695af91b46fd53a6bebe040e1f1c37d176e3b2c8",
+      "phase-run/diagnostic-03-trace/phase.tsv": "f72ee084298a5743728d3b2494e84e099e9e8c24e97374ccc16bbcc29341e995",
+      "phase-run/diagnostic-03-trace/sample.json": "52226d98971652e2db5c3b0a7f06ba92dcd0040e269a3992a2bae011c9182c9c",
+      "phase-run/diagnostic-03-trace/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-03-trace/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/diagnostic-04-stock/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-04-stock/launch.json": "4f980cd8ce112ad26734d652ed01010d9898e3f06b1f68aa0d14a12e11fc1d10",
+      "phase-run/diagnostic-04-stock/sample.json": "74132b66e296c98d09cec65327f45db05bd65012fa1e87f2dbf0a2a83dc76f8a",
+      "phase-run/diagnostic-04-stock/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-04-stock/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/diagnostic-04-trace/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-04-trace/launch.json": "dc5ced80ab7e0fd55eb6d1976b1e04ac8082db6f29ed9c96cf7ea80e98bde842",
+      "phase-run/diagnostic-04-trace/phase.tsv": "b32664d90050ac57e09e0347ea4ed6e6ed26a74de42429688a599de05598d48b",
+      "phase-run/diagnostic-04-trace/sample.json": "a22a2e17e3789d892257de56a4836bfa128d6809bff65c57176d0badf486ac8f",
+      "phase-run/diagnostic-04-trace/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-04-trace/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/diagnostic-05-stock/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-05-stock/launch.json": "6187904ddbf8b38ff9bcbfa54bcb417fc3bef2a5c0be334747d56a73eb5106a7",
+      "phase-run/diagnostic-05-stock/sample.json": "7dabbed7b353ab8e34f632f17c151c6f9358655e3c68c9579198f5446b0fd099",
+      "phase-run/diagnostic-05-stock/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-05-stock/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/diagnostic-05-trace/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-05-trace/launch.json": "7c9b13897490f6d817a8982924abc2959f814d554bdcdca187f41566275e946c",
+      "phase-run/diagnostic-05-trace/phase.tsv": "56c877911c93f2177c6ae6796df29d041a67aa46bbc4b9f6c42e60ca39adfc6b",
+      "phase-run/diagnostic-05-trace/sample.json": "008020e746ab340f32aa2bf54223ef0f6b5072a02f9bdbeaa7db45674435e552",
+      "phase-run/diagnostic-05-trace/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-05-trace/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/diagnostic-06-stock/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-06-stock/launch.json": "ea567459079bd45e1f24ea410495895cf41626a4b17aa5bf793396a8fb39778c",
+      "phase-run/diagnostic-06-stock/sample.json": "9ce7209292da3b5b0d063933d932f9dda56fbf975292b6401547a791eeab57bb",
+      "phase-run/diagnostic-06-stock/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-06-stock/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/diagnostic-06-trace/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/diagnostic-06-trace/launch.json": "183ec06257786f44dfe1a84f203ebff3b9f88cc8b4374f761f29e81d82be5583",
+      "phase-run/diagnostic-06-trace/phase.tsv": "f3b9e2898abba41199302af99d5a3906c0413c77ca67580261668903d96b9764",
+      "phase-run/diagnostic-06-trace/sample.json": "c01b208ed7addbfebd266f224ebc4f86827cb2a244cdd8164f8b0c73adc34d63",
+      "phase-run/diagnostic-06-trace/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/diagnostic-06-trace/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/summary.json": "faa4df470a598c27107370faa3cd5d6cd243f10bf0f4417afb1102f8d52c446d",
+      "phase-run/warmup-00-stock/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/warmup-00-stock/launch.json": "f201cc4f32dc7e4313f081e69144485029f09c0ed0bbc1e0fcdeb8cd1cff7294",
+      "phase-run/warmup-00-stock/sample.json": "3ac457029061bab06b17fa5abc2fa3917989493267f8c11bb9e47206ce6a9ea8",
+      "phase-run/warmup-00-stock/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/warmup-00-stock/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/warmup-00-trace/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/warmup-00-trace/launch.json": "4dd28dd2bfdca165d39f99318cd9d527b137ea6e8fa948dab97a9949f1b43d94",
+      "phase-run/warmup-00-trace/phase.tsv": "602c942ffe79bc7e07bb6883374bafc29823d9ce4f296de8490da3b5a5abc950",
+      "phase-run/warmup-00-trace/sample.json": "01a55bdde9cd24d6e3c8d4bac3abe08903dc9add36c76108f5bb4232fe792327",
+      "phase-run/warmup-00-trace/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/warmup-00-trace/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/warmup-01-stock/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/warmup-01-stock/launch.json": "73781eee26d1a7206678fafcc569f332ddb8be7b7ad6d32f680ca3c60a1e8ff0",
+      "phase-run/warmup-01-stock/sample.json": "8662b0abbe1a41324aa38f462b227150b7b880d227aca8771b052dead65edc45",
+      "phase-run/warmup-01-stock/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/warmup-01-stock/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "phase-run/warmup-01-trace/events.jsonl": "44ef1dc2cf894fce291415ec92f376bd2fd2bbff712fba89b5aeb9cda12f7cf8",
+      "phase-run/warmup-01-trace/launch.json": "f6ae44aea9ea5bedb4c3597f6ea1d42d2e7d05c99230c1047f5749a20a0b9ebf",
+      "phase-run/warmup-01-trace/phase.tsv": "3bb5c52b6af6fa27a87208f0c7446f7289f4c393ca852229db507e0767293a17",
+      "phase-run/warmup-01-trace/sample.json": "51b6ee8bec3b6ca47b6f1e76d1ffa696daf45da4272c72476277e38f1ea865cf",
+      "phase-run/warmup-01-trace/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "phase-run/warmup-01-trace/stdout.txt": "93e6dcc96dc4e99afe7ab9d49a8f8da4550b0904788573cb1b61d0fb8a2c0ca9",
+      "physical-finish.txt": "b3ed6cf8d23ca6d92d87fdc6cb4e825c2668380a08f01cb40ba00cd9bd144fef",
+      "physical-start.txt": "df84cb5b48367ded50884ada9c3ec19e53f9b6bdd1b6ee1c7aaa76dc64207197",
+      "physical.log": "ba0dee21f4082c0fddc770c5bd145ab967ec6c6663a064d037c5baad3716a0c4",
+      "physical.status": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "prepare-e9.py": "f1f13481e96175f2b823b1f6092eb20ebb4bc0a11287fe7922bfe4f92c8d8b07",
+      "stock-cli.sha256": "a3c62083bdd4eff192a9ea9b9cf705125de95f9d4c5d04164a7881aae503589e",
+      "stock-help-dynamic-loader.log": "a077d5be732916ceaa09f6b525f6251a94f0e3b766ef81e34bd93d543cabd809",
+      "summarize-attribution.py": "d7d1ffc808b55d6ad151809d8122823aa123187efa4b484482a160ebfc811e83",
+      "trace-binary.sha256": "5498bf49cd4119d640713aebcb1aee31bafd9b9711d17d45f30f6a7849b14d80",
+      "trace-release-command-error.log": "478960eee2db132ee0deee9f9289e3d0737413513eef92229ac26325088ccc16",
+      "trace-release.log": "cb043b4ddce11c7b17f6ced6023de6472dd2a8b49057897c1099d964cb56cca4",
+      "trace-source-revision.txt": "8f898a4e98d5b7076467c8c2db1370c96e6b5a5c1fc81e200a8fd58d4349d7c9",
+      "trace-source-tree.txt": "ddd429374d4461cf1218d2e18b49da1daef011e9d1e32db604214edbf6af2cde"
+    }
+  }
+}

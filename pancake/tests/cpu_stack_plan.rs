@@ -6,7 +6,8 @@ use pancake::config::{
     AlignmentMode, AlignmentReference, BitDepth, DevicePreference, JobConfig, JobSettings, Method,
 };
 use pancake::image_io::{RgbImage, decode, export};
-use pancake::job::{Generation, JobControl, Options, run, run_controlled};
+use pancake::job::{Generation, JobControl, Options, StackResult, run, run_controlled};
+use pancake::registration::Affine;
 use pancake::runtime::Backend;
 
 /// Exercise real in-memory results, exposure and focus streams, auto and slabs.
@@ -94,14 +95,21 @@ fn registration_preserves_all_reference_conventions_and_crop() -> Result<(), Str
             method: Method::WeightedAverage,
             alignment: mode,
             alignment_reference: reference,
+            bit_depth: BitDepth::Sixteen,
             device: DevicePreference::Cpu,
             auto_crop: true,
             max_precision: true,
             ..JobSettings::default()
         };
-        let request = JobConfig::new(&inputs, None, settings)?;
-        let result =
-            run(request, &Options::default(), |_| {}).map_err(|error| error.to_string())?;
+        let previous = reference == AlignmentReference::Previous;
+        let output = directory.path().join(format!("{mode:?}.png"));
+        let events = directory.path().join(format!("{mode:?}.jsonl"));
+        let request = JobConfig::new(&inputs, previous.then(|| output.clone()), settings)?;
+        let options = Options {
+            events_path: previous.then(|| events.clone()),
+            ..Options::default()
+        };
+        let result = run(request, &options, |_| {}).map_err(|error| error.to_string())?;
         let canvas = result.canvas();
         let crop = result.crop();
         let transform = result
@@ -132,8 +140,67 @@ fn registration_preserves_all_reference_conventions_and_crop() -> Result<(), Str
                 && result.safe_crop() == Some(crop),
             "auto-crop lost the rectangle retained with the full-precision result",
         )?;
+        if previous {
+            check_previous_completion(&result, &events, &output)?;
+        }
     }
     Ok(())
+}
+
+/// Verify the relative +3 and −3 steps independently of the common source maps.
+///
+/// # Errors
+///
+/// Returns observer, file, geometry or sample mismatch errors.
+fn check_previous_completion(
+    result: &StackResult,
+    events: &Path,
+    output: &Path,
+) -> Result<(), String> {
+    let line = std::fs::read_to_string(events).map_err(|error| error.to_string())?;
+    let event: serde_json::Value =
+        serde_json::from_str(&line).map_err(|error| error.to_string())?;
+    require(
+        event.get("event").and_then(serde_json::Value::as_str) == Some("stack_complete")
+            && event.get("completed").and_then(serde_json::Value::as_bool) == Some(true)
+            && event
+                .get("actual_backend")
+                .and_then(serde_json::Value::as_str)
+                == Some("cpu"),
+        "previous-reference observer did not describe a completed CPU export",
+    )?;
+    let steps = event
+        .get("sequential_transforms")
+        .ok_or("completion lost its sequential transforms")?;
+    let [first, forward, backward]: [[[f32; 3]; 2]; 3] =
+        serde_json::from_value(steps.clone()).map_err(|error| error.to_string())?;
+    let [[_, _, forward_x], [_, _, forward_y]] = forward;
+    let [[_, _, backward_x], [_, _, backward_y]] = backward;
+    require(
+        first == Affine::IDENTITY.matrix()
+            && (2.0_f32..=4.0_f32).contains(&forward_x)
+            && forward_y.abs() < 1.0_f32
+            && (-4.0_f32..=-2.0_f32).contains(&backward_x)
+            && backward_y.abs() < 1.0_f32,
+        &format!("previous-reference sequential steps must track +3 then -3 pixels: {steps}"),
+    )?;
+    let [[_, _, common_x], [_, _, common_y]] = result
+        .source_transform(2)
+        .ok_or("missing common map for the returning source")?
+        .matrix();
+    require(
+        result.source_transform(0) == Some(Affine::IDENTITY)
+            && common_x.abs() < 1.0_f32
+            && common_y.abs() < 1.0_f32,
+        "returning source did not restore its original common-canvas position",
+    )?;
+    let exported = decode(output)?;
+    require(
+        exported.width() == result.image().width()
+            && exported.height() == result.image().height()
+            && close_samples(exported.samples(), result.image().samples(), 0.000_016_f32),
+        "published sixteen-bit crop disagrees with the retained registration result",
+    )
 }
 
 /// Process differently sized originals both with and without registration.

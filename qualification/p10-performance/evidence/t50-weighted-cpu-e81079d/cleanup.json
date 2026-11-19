@@ -1,0 +1,26 @@
+{
+  "terminal_at_sgt": "2026-11-19T00:42:12.256738+08:00",
+  "deleted_exports": [
+    {
+      "role": "reference",
+      "path": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/weighted-cpu-pair-001/diagnostic-01/reference/complete.tif",
+      "bytes": 165542082,
+      "file_sha256": "550e72982e03844c4a5d40575ab3c8b89ea067e5f38d07d0f0736445484922c2",
+      "decoded_pixels_sha256": "dc4e21deab6381c662de86a89c4f58385ccbe2b54d51a22addcd50db1f4f6d34"
+    },
+    {
+      "role": "candidate",
+      "path": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/weighted-cpu-pair-001/diagnostic-01/candidate/complete.tif",
+      "bytes": 143881378,
+      "file_sha256": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+      "decoded_pixels_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7"
+    }
+  ],
+  "deleted_export_count": 2,
+  "deleted_export_bytes": 309423460,
+  "deleted_owned_cache_files": 12,
+  "deleted_owned_cache_bytes": 806993,
+  "remaining_pair_export_count": 0,
+  "shared_stage_materialization_sha256": "1d9be3f1cd20a01083b11c10c4d17ab75a4f3b6bb7e2ebef682824e345ba649d",
+  "shared_stage_tiffs_retained": 52
+}

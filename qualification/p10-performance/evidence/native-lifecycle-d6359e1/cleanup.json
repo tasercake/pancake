@@ -1,0 +1,10 @@
+{
+  "owned_input_root": "/tmp/pancake-worktrees.t3paqgWM/lifecycle-d6359e1/artifacts/d150/inputs",
+  "acquisition_sha256": "0fc4a4f4eb80a64e0faba1b50e2df57288941f6d8490f57670d34dd9cdd1e05e",
+  "verified_then_removed_originals": 150,
+  "verified_original_bytes": 52911148,
+  "verified_then_removed_archive_sha256": "311ca6aab7d3bff03c714fd2d81c741f3847de1d4d3f2f9cfa767b6eb62cf56a",
+  "verified_archive_bytes": 53459291,
+  "fixture-64_fixture_profile_and_cache_removed": true,
+  "real-D150_fixture_profile_and_cache_removed": true
+}

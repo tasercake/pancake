@@ -1,0 +1,391 @@
+{
+  "source_revision": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "gate": "bash scripts/check.sh sanitizer address",
+  "started_utc": "2026-11-18T17:00:41Z",
+  "finished_utc": "2026-11-18T17:07:29Z",
+  "gate_exit_status": 0,
+  "pinned_toolchain": "nightly-2026-11-15",
+  "effective_cpus": "14-15",
+  "cargo_build_jobs": 2,
+  "external_sanitizer_options": false,
+  "classified_cpu_integration_targets": [
+    "cpu_advanced_fusion",
+    "cpu_array_layout",
+    "cpu_cli",
+    "cpu_config",
+    "cpu_fusion_contract",
+    "cpu_gray_array_export",
+    "cpu_image_export",
+    "cpu_image_io",
+    "cpu_job",
+    "cpu_kernel_contract",
+    "cpu_npy",
+    "cpu_numerical_contract",
+    "cpu_registration_contract",
+    "cpu_runtime_contract",
+    "cpu_runtime_options",
+    "cpu_stack_plan"
+  ],
+  "expected_result_groups_for_this_workspace": 19,
+  "completed_result_groups": 19,
+  "totals": {
+    "passed": 148,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "diagnostic_lines": [],
+  "passing": true,
+  "test_results": [
+    {
+      "target": "unittests src/lib.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/fc6fb46334d54d80/out/pancake-fc6fb46334d54d80",
+      "summary": {
+        "status": "ok",
+        "passed": 23,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.04
+      }
+    },
+    {
+      "target": "tests/cpu_advanced_fusion.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/711da7967eeb7621/out/cpu_advanced_fusion-711da7967eeb7621",
+      "summary": {
+        "status": "ok",
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 1.53
+      }
+    },
+    {
+      "target": "tests/cpu_array_layout.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/1ac731ef2d8e0e9b/out/cpu_array_layout-1ac731ef2d8e0e9b",
+      "summary": {
+        "status": "ok",
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.04
+      }
+    },
+    {
+      "target": "tests/cpu_fusion_contract.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/0d27f3d528f607cf/out/cpu_fusion_contract-0d27f3d528f607cf",
+      "summary": {
+        "status": "ok",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.72
+      }
+    },
+    {
+      "target": "tests/cpu_gray_array_export.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/520a1dba6de929ca/out/cpu_gray_array_export-520a1dba6de929ca",
+      "summary": {
+        "status": "ok",
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.02
+      }
+    },
+    {
+      "target": "tests/cpu_image_export.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/c43833268d7f604b/out/cpu_image_export-c43833268d7f604b",
+      "summary": {
+        "status": "ok",
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.03
+      }
+    },
+    {
+      "target": "tests/cpu_image_io.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/63b5098253085f71/out/cpu_image_io-63b5098253085f71",
+      "summary": {
+        "status": "ok",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 9.33
+      }
+    },
+    {
+      "target": "tests/cpu_job.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/31ca2e425bd2c203/out/cpu_job-31ca2e425bd2c203",
+      "summary": {
+        "status": "ok",
+        "passed": 13,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 1.57
+      }
+    },
+    {
+      "target": "tests/cpu_kernel_contract.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/3a0d14c71f020ebb/out/cpu_kernel_contract-3a0d14c71f020ebb",
+      "summary": {
+        "status": "ok",
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.13
+      }
+    },
+    {
+      "target": "tests/cpu_npy.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/d75a6a28043ea6cc/out/cpu_npy-d75a6a28043ea6cc",
+      "summary": {
+        "status": "ok",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.0
+      }
+    },
+    {
+      "target": "tests/cpu_numerical_contract.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/b7d68dd392998895/out/cpu_numerical_contract-b7d68dd392998895",
+      "summary": {
+        "status": "ok",
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.94
+      }
+    },
+    {
+      "target": "tests/cpu_registration_contract.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/8acacd4f9996c72d/out/cpu_registration_contract-8acacd4f9996c72d",
+      "summary": {
+        "status": "ok",
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 1.28
+      }
+    },
+    {
+      "target": "tests/cpu_runtime_contract.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/5c57792c7f6c0eb3/out/cpu_runtime_contract-5c57792c7f6c0eb3",
+      "summary": {
+        "status": "ok",
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.2
+      }
+    },
+    {
+      "target": "tests/cpu_stack_plan.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/b889ae116a7bae83/out/cpu_stack_plan-b889ae116a7bae83",
+      "summary": {
+        "status": "ok",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 3.26
+      }
+    },
+    {
+      "target": "unittests src/main.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-cli/c55dc397d6d2a9f9/out/pancake_cli-c55dc397d6d2a9f9",
+      "summary": {
+        "status": "ok",
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.02
+      }
+    },
+    {
+      "target": "tests/cpu_cli.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-cli/1884de87a61c0832/out/cpu_cli-1884de87a61c0832",
+      "summary": {
+        "status": "ok",
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 1.22
+      }
+    },
+    {
+      "target": "tests/cpu_config.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-cli/e659f664f91ac68b/out/cpu_config-e659f664f91ac68b",
+      "summary": {
+        "status": "ok",
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 0.72
+      }
+    },
+    {
+      "target": "tests/cpu_runtime_options.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-cli/57576c85c330a361/out/cpu_runtime_options-57576c85c330a361",
+      "summary": {
+        "status": "ok",
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 1.57
+      }
+    },
+    {
+      "target": "unittests src/main.rs",
+      "elf_path": "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-gui/1fe5ddb7402ad0f4/out/pancake_gui-1fe5ddb7402ad0f4",
+      "summary": {
+        "status": "ok",
+        "passed": 18,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "elapsed_s": 10.2
+      }
+    }
+  ],
+  "tested_and_application_elfs": {
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/0d27f3d528f607cf/out/cpu_fusion_contract-0d27f3d528f607cf": {
+      "sha256": "d72dfc1dabf68343d864f5622d963088680d141ceb7ead9456f9e4a535e5addf",
+      "bytes": 775666192,
+      "elf_build_id": "20dd68a70e401d410f9c16ecb15ab1495a6ee418"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/1ac731ef2d8e0e9b/out/cpu_array_layout-1ac731ef2d8e0e9b": {
+      "sha256": "45e369b8fb6db1f86abbbe8db9069d75eda1acb3bc0d930d27b5d73c8c3a9791",
+      "bytes": 722356984,
+      "elf_build_id": "d3434967637fcca9195ec5cd4a8576bd69bdf1bc"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/31ca2e425bd2c203/out/cpu_job-31ca2e425bd2c203": {
+      "sha256": "637a34f78b2a970da5ea86e6628ef71ae67b6b0815e22d076010e739f6d6b433",
+      "bytes": 867647624,
+      "elf_build_id": "9e000caba9d67fff693147bdb6394d7f84f85d20"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/3a0d14c71f020ebb/out/cpu_kernel_contract-3a0d14c71f020ebb": {
+      "sha256": "12313a179e480f680dd95fd6bee5671240d714aa2644c5e0af63d3ea4333d7f3",
+      "bytes": 774421416,
+      "elf_build_id": "d1451a5da07e0a98e014a627efc71ff7437d8cf2"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/520a1dba6de929ca/out/cpu_gray_array_export-520a1dba6de929ca": {
+      "sha256": "7ba882391a235f682fc6a58dc4ec83f52258e1345a167b5f862d699ada01952c",
+      "bytes": 722222872,
+      "elf_build_id": "c1e088596be3f5ea446e2c13a23dc69661768822"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/5c57792c7f6c0eb3/out/cpu_runtime_contract-5c57792c7f6c0eb3": {
+      "sha256": "2b9825e555f989aeb38568a1db8d56b1149e336eb2fcd0ca603d974d9672d650",
+      "bytes": 775607648,
+      "elf_build_id": "f4066f67ccbb12591c3f393175413f54e058379a"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/63b5098253085f71/out/cpu_image_io-63b5098253085f71": {
+      "sha256": "1c5ac79f8e01ac64d4b558ac2e86511c00de1ddc7a79eb264082954d2278e969",
+      "bytes": 718456128,
+      "elf_build_id": "961db54e55f75e53fa095e06cfdd84d7e4363577"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/711da7967eeb7621/out/cpu_advanced_fusion-711da7967eeb7621": {
+      "sha256": "58934ffae0c8349aeb17174a29503f5a8bacbbb6abed818c750f7e87808b194b",
+      "bytes": 776777224,
+      "elf_build_id": "d7ec9b14b017150b775f0dd8213a48000902d2b8"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/8acacd4f9996c72d/out/cpu_registration_contract-8acacd4f9996c72d": {
+      "sha256": "43c16b06b343b74d789ef0abe3259627b800c7659e3dc8f0f0ee70bc3878c5a4",
+      "bytes": 776156504,
+      "elf_build_id": "2c54d27226bf15262ac26a93b22e258a5f374afd"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/b7d68dd392998895/out/cpu_numerical_contract-b7d68dd392998895": {
+      "sha256": "5d2990890fff62181857a9a02ca090ca694380ab9f579288fd3a66df6396d5af",
+      "bytes": 774787728,
+      "elf_build_id": "baed211604b4dd421bb063fedd79c76c06614dcc"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/b889ae116a7bae83/out/cpu_stack_plan-b889ae116a7bae83": {
+      "sha256": "72678415bface3fd748d801c3842c1fd04cbe62f3abd20121ba95ff418012ff7",
+      "bytes": 865389880,
+      "elf_build_id": "9397aa470c2dbb44d367464247390801cab4697f"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/c43833268d7f604b/out/cpu_image_export-c43833268d7f604b": {
+      "sha256": "f5bac03f436e7b14b68355a2f24e10e6f712dc4a1a44c614c1f368fe867e0012",
+      "bytes": 720196088,
+      "elf_build_id": "57cfb1193a5a34ef8a8a12cb6a22cea197b4fbe1"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/d75a6a28043ea6cc/out/cpu_npy-d75a6a28043ea6cc": {
+      "sha256": "eadd312468c07c333cedbf4858e1d84504715028752d986f9000cc18e794e2c9",
+      "bytes": 707787400,
+      "elf_build_id": "f7bfd6d6da5e77b61ee204a916fd8d5bad1ca5be"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake/fc6fb46334d54d80/out/pancake-fc6fb46334d54d80": {
+      "sha256": "ce9478fd24267114ee81eb8114f3b09e98e913ab2c0de903bf78c09f25b83246",
+      "bytes": 589014744,
+      "elf_build_id": "05003d1219fda5ce0bc742a2b87899a81cac4a9b"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-cli/1884de87a61c0832/out/cpu_cli-1884de87a61c0832": {
+      "sha256": "d7b52f9befa931bbda5c7d26c930464d1825183afeadd77ab259001b3b582c6e",
+      "bytes": 714636880,
+      "elf_build_id": "36230bb3f498183329ccc9495efc1556f3b31d63"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-cli/57576c85c330a361/out/cpu_runtime_options-57576c85c330a361": {
+      "sha256": "c07ba1dbf1bd33b8dfe8116b25ee18942ee5f52eb558a3242f20634badedc5fc",
+      "bytes": 720501112,
+      "elf_build_id": "efce8a4578ab4f9b9a46e83b55022a1c1921fee4"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-cli/c55dc397d6d2a9f9/out/pancake_cli-c55dc397d6d2a9f9": {
+      "sha256": "4a7b0b39347fad0aa8d425b7ffd863252b54ab352b0640f5122ba1234df414eb",
+      "bytes": 643232616,
+      "elf_build_id": "0ae045c73995179016eb08315d83d8c3aa5ce0d1"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-cli/e659f664f91ac68b/out/cpu_config-e659f664f91ac68b": {
+      "sha256": "b669714a8319b828321c58d6dcb3ca81afbfde0fe40bbbd886f75b9679bdbc7f",
+      "bytes": 636634136,
+      "elf_build_id": "cc2d03554ce6f8a9e2feda4cf3605a2e5c2be620"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-gui/1fe5ddb7402ad0f4/out/pancake_gui-1fe5ddb7402ad0f4": {
+      "sha256": "79f13d64e109b5783734d16954677625dd0dbfdd1f6388a301e29ec0d2c4d2dd",
+      "bytes": 1343918096,
+      "elf_build_id": "8cfe319d43b93d0eaf912a2432b3866b5e470eef"
+    },
+    "target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/pancake-cli": {
+      "sha256": "03ae9539f3f9ebefd1e282ad9df4e5dfb34269aab4dacf15e614e19dc98477c6",
+      "bytes": 869252144,
+      "elf_build_id": "fd61116536a5448f01137b42ff486b10f92c859a"
+    }
+  }
+}

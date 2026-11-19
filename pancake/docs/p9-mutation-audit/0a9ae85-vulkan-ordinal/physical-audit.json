@@ -1,0 +1,28 @@
+{
+  "physical_scope": {
+    "api": "wgpu-vulkan",
+    "adapter_count": 1,
+    "pci": "00000000:01:00.0",
+    "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+    "model": "NVIDIA GeForce RTX 3090",
+    "driver": "580.178.04"
+  },
+  "requested_first_absent_ordinal": 1,
+  "stock_rejected_absent_ordinal": true,
+  "mutant_completed_blur_on_wrong_ordinal": [
+    2,
+    8,
+    14
+  ],
+  "decoded_mutant_assertion": "absent wgpu Vulkan GPU index 1 ran on NVIDIA GeForce RTX 3090 at Some(\"0000:01:00.0\"); runtime=wgpu-vulkan, physical=true, fallback=None, samples=[2, 8, 14]",
+  "original_wrapper_exit": 1,
+  "original_wrapper_issue": "Fixed-string comparison omitted escaping introduced by Rust test error formatting.",
+  "observed_process_exits": {
+    "positive": 0,
+    "stock": 0,
+    "exact-mutant": 101,
+    "restored-stock": 0
+  },
+  "device_terminal_utc": "2026-11-18T18:31:02Z",
+  "canonical_cpu_mutant_gate_closed_by_this_gpu_replay": false
+}

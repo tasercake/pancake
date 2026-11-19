@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "source_commit": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "source_tree": "fde57a0b461e3ea031ea969e1e841927bead17f9",
+  "pancake_tree": "a0efab90fdc3c5f4731d9e0af29acf3f7c5f7d9e",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "host_architecture": "x86_64",
+  "host_cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "logical_cpus": [
+    10,
+    11
+  ],
+  "parallel_build_jobs": 2,
+  "toolchain": "1.100.0-x86_64-unknown-linux-gnu",
+  "build_cmd": "taskset -c 10\\,11 cargo +1.100.0 build --locked --offline --release -p pancake -p pancake-cli --bin pancake-cli -j 2 --features cubecl/hip",
+  "build_started_utc": "2026-11-18T17:02:36Z",
+  "verified_utc": "2026-11-18T17:08:44Z",
+  "build_wall_seconds": 293.9,
+  "max_child_rss_kib": 2180024,
+  "target_bytes": 2052994494,
+  "binary_bytes": 164655352,
+  "binary_sha256": "8859fed3fd7772aaf98c7cf880b089f7fdd9eb801dca8c4ed0171e93eb13995b",
+  "elf_build_id": "309a2b2e72a2de622d6c1efd2a77a107d12eda90",
+  "retained_executable": "/home/krishna/Documents/focus-stacking/artifacts/pancake-linux-native/0a9ae85/pancake-cli-hip",
+  "requested_feature": "cubecl/hip",
+  "resolved": {
+    "cubecl-hip": "0.11.4",
+    "cubecl-hip-sys": "7.14.6085001"
+  },
+  "hip_abi_cfg": "hip_60850",
+  "optional_cuda_in_graph": false,
+  "native_hip_runtime_defined_symbols": 270,
+  "native_hip_binding_defined_symbols": 78,
+  "compile_and_link_pass": true,
+  "hip_runtime_exercised": false
+}

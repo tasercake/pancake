@@ -1,0 +1,83 @@
+{
+  "scope": "quiet synthetic working-RGB16 packing tail only",
+  "candidate_source": "4f7b73db8b25bc145e5ba6811ea1b0f7557b2cfd",
+  "probe_elf_sha256": "ac42ed9fb2df6dd09c1aaf7beb5440ff5b5e134650118217613c81dc7724b115",
+  "input": {
+    "source": "synthetic float codes near 16-bit thresholds",
+    "modeled_raw_working_shape": [
+      3392,
+      5088,
+      3
+    ],
+    "samples": 51775488,
+    "quantization": "pinned Rawler convert_from_f32_scaled_u16 plus exact normalization",
+    "compared_candidate_values": 207101952,
+    "candidate_values_match_serial_bit_for_bit": true
+  },
+  "hardware": "AMD Ryzen 9 7950X3D",
+  "cpu_affinity": "0-14",
+  "window": {
+    "started_utc": "2026-11-18T12:10:36Z",
+    "finished_utc": "2026-11-18T12:10:38Z"
+  },
+  "run_output_sha256": "37aefcd5b58d718a235920e52a32fa725970034cfaf4ef12c8f5e3b23b1f7ec9",
+  "rows": [
+    {
+      "schedule": "serial",
+      "samples": 51775488,
+      "configured_pool_workers": 14,
+      "seconds": 0.039205469
+    },
+    {
+      "schedule": "pool",
+      "samples": 51775488,
+      "configured_pool_workers": 14,
+      "seconds": 0.006242145
+    },
+    {
+      "schedule": "pool",
+      "samples": 51775488,
+      "configured_pool_workers": 14,
+      "seconds": 0.005822988
+    },
+    {
+      "schedule": "serial",
+      "samples": 51775488,
+      "configured_pool_workers": 14,
+      "seconds": 0.037016551
+    },
+    {
+      "schedule": "pool",
+      "samples": 51775488,
+      "configured_pool_workers": 14,
+      "seconds": 0.005495914
+    },
+    {
+      "schedule": "serial",
+      "samples": 51775488,
+      "configured_pool_workers": 14,
+      "seconds": 0.0373624
+    },
+    {
+      "schedule": "serial",
+      "samples": 51775488,
+      "configured_pool_workers": 14,
+      "seconds": 0.036582566
+    },
+    {
+      "schedule": "pool",
+      "samples": 51775488,
+      "configured_pool_workers": 14,
+      "seconds": 0.005531291
+    }
+  ],
+  "median_seconds": {
+    "serial": 0.0371894755,
+    "pool": 0.0056771395
+  },
+  "serial_to_pool_ratio": 6.550741883302321,
+  "median_reduction_per_tail_seconds": 0.031512336,
+  "fifty_tail_delta_arithmetic_seconds": 1.5756168000000002,
+  "timing_boundaries": "the helper call inside an already-installed pool; fixture construction, clone, result comparison and Rawler development outside the timed interval",
+  "full_r50_speed_or_resources_measured": false
+}

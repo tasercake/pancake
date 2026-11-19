@@ -1,0 +1,144 @@
+{
+  "backend": "wgpu-vulkan",
+  "gpu": "NVIDIA GeForce RTX 3090",
+  "pci": "00000000:01:00.0",
+  "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+  "driver": "580.178.04",
+  "fingerprint": "spirv_4318_8708",
+  "fixture_pairs": 6,
+  "jobs": 12,
+  "foreign_cpu_service_and_layout_rejected": true,
+  "gpu_weights_and_scores_match_after_first_frame_recovery": true,
+  "fixtures": {
+    "9-Translation-0-113-[0.0, 0.0]": {
+      "fusion_uploads": [
+        9,
+        0
+      ],
+      "progress": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "f32le": {
+        "sha256": "68f9f040c6e6929f9b90abbfaee7119c1fc3e335ea069f5e80cb28ebb0b7a1ae",
+        "bytes": 128820
+      },
+      "tif": {
+        "sha256": "c6a52b3520b5f978e0badcb6dd86852946db734fa4f17e4910009a198c17e153",
+        "bytes": 64620
+      }
+    },
+    "5-Translation-0-113-[3.25, -1.5]": {
+      "fusion_uploads": [
+        5,
+        1
+      ],
+      "progress": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "f32le": {
+        "sha256": "da6cf98aba11de1ffb8b0b658484fa8d88877d94e2fb6f31a61397da808b4d8d",
+        "bytes": 128820
+      },
+      "tif": {
+        "sha256": "a1e2fd8ac67c6c359098448d9d1c19c71c2baa1e4efa80fac7dfa4f952210f5c",
+        "bytes": 64620
+      }
+    },
+    "5-Translation-0-111-[0.0, 0.0]": {
+      "fusion_uploads": [
+        5,
+        1
+      ],
+      "progress": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "f32le": {
+        "sha256": "427fcc319b5cebcf05a34eaa8b622402ca0095de2efd17f9a2e49122ab1c429e",
+        "bytes": 128820
+      },
+      "tif": {
+        "sha256": "79b65dcf1bb7df9886e6bac767ccd5e6fde110aaa3163879f2b803f08a1c9539",
+        "bytes": 64620
+      }
+    },
+    "5-Off-0-113-[0.0, 0.0]": {
+      "fusion_uploads": [
+        5,
+        5
+      ],
+      "progress": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "f32le": {
+        "sha256": "0a1dc99ccf815c16d61606368577e98489b224b5726a54f46864665985cd0e13",
+        "bytes": 128820
+      },
+      "tif": {
+        "sha256": "51028a4a50d51bc5b651cf5f4d1fca5a27c601853e29d67832f1af14087481d9",
+        "bytes": 64620
+      }
+    },
+    "5-Translation-3-113-[0.0, 0.0]": {
+      "fusion_uploads": [
+        7,
+        7
+      ],
+      "progress": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "f32le": {
+        "sha256": "bb0dbbe02913fa228f0d3ffb21424b3fa12d72a64eb34f3e743c41e7c5ead6ff",
+        "bytes": 128820
+      },
+      "tif": {
+        "sha256": "95525ddcf9f9ccd9c8831f0ac615c55bf48609081da904d1d00e6394d2b62229",
+        "bytes": 64620
+      }
+    },
+    "5-Off-0-111-[0.0, 0.0]": {
+      "fusion_uploads": [
+        5,
+        5
+      ],
+      "progress": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "f32le": {
+        "sha256": "a61a79f1a7a68f6d80fe32f7e515b18ee0c5fadebe1e9d2944938bfa3332cf9a",
+        "bytes": 128820
+      },
+      "tif": {
+        "sha256": "55b34f843a601e8ebc1d5991c4f1b173e0cd24138430570d0364febd8657d0a7",
+        "bytes": 64620
+      }
+    }
+  }
+}

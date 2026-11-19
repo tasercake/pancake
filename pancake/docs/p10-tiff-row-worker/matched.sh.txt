@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+proof=$(dirname "$(realpath "$0")")
+stage=$1
+probe="$proof/probe/target/release/pancake-t50-tiff-probe"
+expected=62200bca0567ae06e2b6d3eba406aea259e601904c756b64ea7b245ede2625a4
+printf '%s  %s\n' "$expected" "$stage/materialization.json" | sha256sum --check
+for frame in 000 024 049; do test -r "$stage/inputs/focus_$frame.tif"; done
+{
+  date -u '+%FT%TZ'
+  uname -srm
+  lscpu | rg 'Model name:'
+  lscpu -e=CPU,CORE,NODE | rg '^(CPU|\s*[0-3] )'
+  sha256sum "$probe" "$proof/probe/Cargo.lock"
+  ps -eo psr,comm,pcpu --sort=-pcpu | sed -n '1,15p'
+} > "$proof/match-environment.txt"
+/usr/bin/time -f 'elapsed_seconds %e' -o "$proof/alternating.time" \
+  taskset -c 0-3 "$probe" alternating "$stage/inputs/focus_000.tif" \
+  "$stage/inputs/focus_024.tif" "$stage/inputs/focus_049.tif" | tee "$proof/alternating.tsv"
+for arm in serial rows; do
+  /usr/bin/time -f 'elapsed_seconds %e\npeak_rss_kib %M' -o "$proof/$arm.time"     taskset -c 0-3 "$probe" "$arm" "$stage/inputs/focus_024.tif" > "$proof/$arm.tsv"
+done
+python3 "$proof/observe-threads.py" "$probe" 0-3 serial "$stage/inputs/focus_024.tif" > "$proof/threads-serial.json"
+python3 "$proof/observe-threads.py" "$probe" 0-3 rows "$stage/inputs/focus_024.tif" > "$proof/threads-rows.json"
+python3 "$proof/observe-threads.py" "$probe" 0 rows "$stage/inputs/focus_024.tif" > "$proof/threads-one-core.json"
+taskset -c 0 "$probe" alternating "$stage/inputs/focus_024.tif" > "$proof/one-core-parity.tsv"
+cat "$proof/serial.time" "$proof/rows.time" "$proof"/threads-*.json

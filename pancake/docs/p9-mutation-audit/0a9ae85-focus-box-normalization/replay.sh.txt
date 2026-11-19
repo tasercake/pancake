@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+proof="$repo/artifacts/focus-normalization-mutant"
+cd "$repo/pancake"
+test "$(git rev-parse HEAD)" = 0a9ae85b88519a795e3b6ba90860c3b3e664bcaa
+export CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_DEV_DEBUG=0
+unset RUSTC_WRAPPER RUSTC_WORKSPACE_WRAPPER RUSTFLAGS CARGO_ENCODED_RUSTFLAGS
+{
+  date -u +%FT%TZ
+  git rev-parse HEAD HEAD^{tree}
+  sha256sum Cargo.lock src/fusion/focus.rs tests/cpu_fusion_contract.rs "$proof/archived-mutant.diff"
+  uname -srm
+  lscpu | awk '/^Model name:/'
+  awk '/^Cpus_allowed_list:/{print}' /proc/self/status
+  rustc +1.100.0 --version --verbose
+  printf 'CARGO_BUILD_JOBS=%s\nRUSTC_WRAPPER=%s\nRUSTFLAGS=%s\n' "$CARGO_BUILD_JOBS" "${RUSTC_WRAPPER-unset}" "${RUSTFLAGS-unset}"
+} > "$proof/environment.txt"
+
+record_elf() {
+  local log=$1 arm=$2
+  local binary
+  binary=$(sed -n 's/^ *Running tests\/cpu_fusion_contract.rs (\(.*\))$/\1/p' "$log")
+  [[ -x "$binary" ]]
+  sha256sum "$binary" > "$proof/$arm-elf.sha256"
+  readelf -n "$binary" | rg 'Build ID:' > "$proof/$arm-elf-build-id.txt"
+}
+
+sha256sum --quiet --check "$proof/stock-focus.sha256"
+patch --batch --forward --dry-run src/fusion/focus.rs "$proof/archived-mutant.diff" > "$proof/patch-dry-run.log"
+patch --batch --forward src/fusion/focus.rs "$proof/archived-mutant.diff" > "$proof/patch-applied.log"
+trap 'git restore --worktree --source=0a9ae85 -- src/fusion/focus.rs' EXIT
+sha256sum --quiet --check "$proof/mutated-focus.sha256"
+status=0
+cargo +1.100.0 test --locked --offline --test cpu_fusion_contract -- --test-threads=1 > "$proof/red-full-target.log" 2>&1 || status=$?
+printf '%s\n' "$status" > "$proof/red-full-target.status"
+test "$status" = 101
+rg -F '3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out' "$proof/red-full-target.log"
+rg -F 'depth map selected row [0.125, 0.125, 0.125] and column [0.125, 0.125, 0.125]' "$proof/red-full-target.log"
+record_elf "$proof/red-full-target.log" red
+git restore --worktree --source=0a9ae85 -- src/fusion/focus.rs
+trap - EXIT
+sha256sum --check "$proof/stock-focus.sha256" > "$proof/restored-source.log"
+git diff --exit-code -- src/fusion/focus.rs
+
+cargo +1.100.0 test --locked --offline --test cpu_fusion_contract -- --test-threads=1 > "$proof/green.log" 2>&1
+printf '%s\n' 0 > "$proof/green.status"
+rg -F '4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out' "$proof/green.log"
+record_elf "$proof/green.log" green
+mkdir -p target/dependency-policy
+cargo +1.100.0 metadata --locked --offline --format-version 1 --all-features > target/dependency-policy/metadata.json
+python3 scripts/dependency_policy.py --config deny.toml --ledger dependency-policy.json --metadata target/dependency-policy/metadata.json --effective-config target/dependency-policy/deny-effective.toml --license-inventory target/dependency-policy/licenses.json --clippy-config clippy.toml --effective-clippy-dir target/dependency-policy/clippy
+CLIPPY_CONF_DIR="$PWD/target/dependency-policy/clippy" \
+    cargo +1.100.0 clippy --locked --offline --test cpu_fusion_contract -- -D warnings > "$proof/green-clippy.log" 2>&1
+python3 scripts/miri_host_policy.py . validate > "$proof/source-inventory.log"
+cargo +1.100.0 fmt --all --check
+git diff --check
+tail -6 "$proof/green-clippy.log"

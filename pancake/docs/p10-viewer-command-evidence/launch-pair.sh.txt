@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+main=/home/krishna/Documents/focus-stacking
+baseline=/tmp/pancake-worktrees.t3paqgWM/viewer-command-control
+candidate=/tmp/pancake-worktrees.t3paqgWM/viewer-input-cost
+t50="$main/artifacts/pancake-performance/t50-shared-2143eda"
+output="$main/artifacts/p10-viewer-command"
+bash "$candidate/pancake/docs/p10-viewer-redraw-evidence/run-pair.sh.txt" \
+  "$main" "$baseline" "$candidate" "$output/calibration" \
+  "$t50/inputs" "$t50/materialization.json" \
+  "$output/original.build.json" "$output/immediate.build.json" \
+  | tee "$output/full-launch.log"

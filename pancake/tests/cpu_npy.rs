@@ -182,6 +182,44 @@ fn invalid_metadata_reports_the_failing_field_or_shape() -> TestResult {
     Ok(())
 }
 
+/// Read complete version 2 payloads through the inclusive metadata limit.
+/// # Errors
+/// Returns a fixture, decoded sample, or metadata boundary error.
+#[test]
+fn version_two_header_limit_is_inclusive() -> TestResult {
+    let scratch = tempfile::tempdir()?;
+    let path = scratch.path().join("boundary.npy");
+    let dictionary = b"{'descr': '<u2', 'fortran_order': False, 'shape': (1, 1, 3)}";
+    let payload = [1, 0, 2, 1, 255, 255];
+    let expected = [1.0_f32 / 65_535.0, 258.0_f32 / 65_535.0, 1.0_f32];
+    // The aligned control has a twelve-byte prefix. At the exact metadata
+    // limit, readers use the declared offset regardless of writer alignment.
+    for (length, accepted) in [(65_524_usize, true), (65_536, true), (65_537, false)] {
+        let mut header = dictionary.to_vec();
+        header.resize(length.saturating_sub(1), b' ');
+        header.push(b'\n');
+        write_array(&path, 2, &header, &payload)?;
+        if !accepted {
+            require_rejection(&path, "metadata limit")?;
+            continue;
+        }
+        let frame =
+            decode(&path).map_err(|error| format!("v2 payload at {length} bytes: {error}"))?;
+        require(
+            [frame.width(), frame.height()] == [1, 1]
+                && frame.sample_encoding() == SampleEncoding::U16
+                && frame
+                    .samples()
+                    .iter()
+                    .copied()
+                    .map(f32::to_bits)
+                    .eq(expected.into_iter().map(f32::to_bits)),
+            format!("v2 header at {length} bytes changed the decoded RGB16 payload"),
+        )?;
+    }
+    Ok(())
+}
+
 /// Binary headers and channel payloads must be complete and bounded.
 /// # Errors
 /// Returns unexpected acceptance, wrong error class, or fixture setup errors.

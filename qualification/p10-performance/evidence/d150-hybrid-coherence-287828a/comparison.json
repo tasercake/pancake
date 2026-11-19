@@ -1,0 +1,101 @@
+{
+  "scope": "fixed-input optical CPU diagnostic, no timing or resource gate credit",
+  "matching_historical_input_hashes": true,
+  "all_common_inputs_unchanged": true,
+  "outputs": {
+    "package-287828a": {
+      "encoded_sha256": "c0df2617a85686ce550e50464bf152c090a274f15ac6d26ee7d9376e2f2a795f",
+      "events_sha256": "4eabb397fb4a2028031f585ddbe8e7f5b2cd7f37d59882547518ed47294402bc",
+      "native_shape_hwc": [
+        1728,
+        2304,
+        3
+      ],
+      "dtype": "uint16"
+    },
+    "coherence": {
+      "encoded_sha256": "dbd831dcd2a71ea3e6e383a7b3457c8abc64f840739b32168ffc66a9e2e0898c",
+      "events_sha256": "4eabb397fb4a2028031f585ddbe8e7f5b2cd7f37d59882547518ed47294402bc",
+      "native_shape_hwc": [
+        1728,
+        2304,
+        3
+      ],
+      "dtype": "uint16"
+    }
+  },
+  "regions": [
+    {
+      "shape_xywh": [
+        670,
+        675,
+        96,
+        96
+      ],
+      "phase_source": "P9160589_d2.jpg",
+      "phase_source_index": 73,
+      "source_laplace_p90": 0.027893482871748088,
+      "patch_sha256": "5f8a156a2b1fc7536769c04414589b6b49880599a24ae1c34e8b6533feb3dcad",
+      "package-287828a": {
+        "luma_laplacian_absolute_p90": 0.04660082856488901,
+        "signed_projection_on_source": 0.30888820200829037,
+        "signed_phase_correlation": 0.1820795119972064
+      },
+      "coherence": {
+        "luma_laplacian_absolute_p90": 0.04197896391241318,
+        "signed_projection_on_source": 0.3414818472805576,
+        "signed_phase_correlation": 0.22610966459131382
+      },
+      "historical_live_pinned_reference_same_pixels": {
+        "first_canvas_xywh": [
+          670,
+          675,
+          96,
+          96
+        ],
+        "witness": "P9160589_d2.jpg",
+        "source_p90": 0.027893482871748088,
+        "luma_laplacian_absolute_p90": 0.0587709346150912,
+        "signed_projection_on_source": 0.3921576857728745,
+        "signed_phase_correlation": 0.1850350704338439
+      },
+      "stock_prototype_roi_mae_u16": 217.05837673611111
+    },
+    {
+      "shape_xywh": [
+        1505,
+        1045,
+        96,
+        96
+      ],
+      "phase_source": "P9160566_d2.jpg",
+      "phase_source_index": 50,
+      "source_laplace_p90": 0.03087029983978018,
+      "patch_sha256": "b5b8c295dc788b9df5e1740a5c6376dee0535d3d118e14a10a44f00021843292",
+      "package-287828a": {
+        "luma_laplacian_absolute_p90": 0.052345069047074144,
+        "signed_projection_on_source": 0.23739285504653046,
+        "signed_phase_correlation": 0.1384802501027296
+      },
+      "coherence": {
+        "luma_laplacian_absolute_p90": 0.04554439154650203,
+        "signed_projection_on_source": 0.24718532255318423,
+        "signed_phase_correlation": 0.17008624622865384
+      },
+      "historical_live_pinned_reference_same_pixels": {
+        "first_canvas_xywh": [
+          1505,
+          1045,
+          96,
+          96
+        ],
+        "witness": "P9160566_d2.jpg",
+        "source_p90": 0.03087029983978018,
+        "luma_laplacian_absolute_p90": 0.06530626840619513,
+        "signed_projection_on_source": 0.2985398114169743,
+        "signed_phase_correlation": 0.13985742665352496
+      },
+      "stock_prototype_roi_mae_u16": 311.91948784722223
+    }
+  ]
+}

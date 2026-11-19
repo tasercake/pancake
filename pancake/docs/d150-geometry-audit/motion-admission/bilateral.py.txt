@@ -1,0 +1,169 @@
+"""Compare product motion hypotheses against independently measured bilateral landmarks."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import runpy
+
+import cv2
+import numpy as np
+
+
+TRACKER = Path(__file__).resolve().parent.parent / "local-track.py.txt"
+
+
+def homogeneous(matrix):
+    assert np.asarray(matrix).shape == (2, 3)
+    result = np.vstack((matrix, [0, 0, 1])).astype(np.float64)
+    assert np.isfinite(result).all() and np.linalg.det(result) > 0
+    return result
+
+
+def transfer(matrix, points):
+    return np.column_stack((points, np.ones(len(points)))) @ matrix[:2].T
+
+
+def residual(matrix, forward_matches, reverse_matches):
+    start, end = forward_matches
+    reverse_start, reverse_end = reverse_matches
+    forward = np.linalg.norm(transfer(matrix, start) - end, axis=1)
+    reverse = np.linalg.norm(transfer(np.linalg.inv(matrix), reverse_start) - reverse_end, axis=1)
+    return {"forward_median_px": float(np.median(forward)),
+            "reverse_median_px": float(np.median(reverse))}
+
+
+def local_fit(tracker, before, after, reserved):
+    choices = tracker["training_points"](before, reserved)
+    if len(choices) < 12:
+        return None, 0
+    start, end = tracker["reciprocal"](before, after, choices)
+    return tracker["robust_step"](start, end, before.shape)
+
+
+def bilateral(tracker, before, after, alternatives):
+    reserved = tracker["witness_points"](before.shape)
+    direct, direct_count = local_fit(tracker, before, after, reserved)
+    reverse, reverse_count = local_fit(tracker, after, before, reserved)
+    forward_matches = tracker["reciprocal"](before, after, reserved)
+    reverse_matches = tracker["reciprocal"](after, before, reserved)
+    accepted = [len(forward_matches[0]), len(reverse_matches[0])]
+    result = {"training_inliers_forward_reverse": [direct_count, reverse_count],
+              "holdout_count": min(accepted), "holdout_count_forward_reverse": accepted,
+              "holds": {}, "residuals": {}}
+    if min(accepted) < 3:
+        result["status"] = "insufficient_witnesses"
+        return result
+    for label, (start, end) in (("forward", forward_matches), ("reverse", reverse_matches)):
+        result["holds"][label] = [{"query": a.tolist(), "match": b.tolist()}
+                                  for a, b in zip(start, end, strict=True)]
+    hypotheses = dict(alternatives)
+    if direct is not None:
+        hypotheses["independent_local"] = direct
+    if reverse is not None:
+        hypotheses["inverse_independent_reverse"] = np.linalg.inv(reverse)
+    result["status"] = "witnesses_available"
+    for name, matrix in hypotheses.items():
+        result["residuals"][name] = {"matrix": matrix[:2].tolist(), **residual(matrix, forward_matches, reverse_matches)}
+    return result
+
+
+def preference(result, candidate, alternative, uncertainty):
+    metrics = result["residuals"]
+    if candidate not in metrics or alternative not in metrics:
+        return "abstain"
+    errors = [metrics[candidate][direction] - metrics[alternative][direction]
+              for direction in ("forward_median_px", "reverse_median_px")]
+    if min(errors) > 2 * uncertainty:
+        return "alternative"
+    if max(errors) < -2 * uncertainty:
+        return "candidate"
+    return "abstain"
+
+
+def self_test(tracker):
+    rng = np.random.default_rng(73)
+    samples = rng.integers(24, 229, size=(541, 760), dtype=np.uint8)
+    source = cv2.GaussianBlur(samples, (5, 5), 1.1)
+    known = homogeneous([[1.000_22, 0, 3.43], [0, 1.000_22, -2.63]])
+    changed = cv2.warpAffine(source, known[:2], source.shape[::-1], flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    changed = cv2.convertScaleAbs(changed, alpha=0.97, beta=4)
+    actual = bilateral(tracker, source, changed, {"identity": np.eye(3), "known": known})
+    assert actual["holdout_count"] >= 8
+    for model in ("independent_local", "inverse_independent_reverse"):
+        assert max(actual["residuals"][model][key] for key in ("forward_median_px", "reverse_median_px")) < 0.30
+        assert preference(actual, "identity", model, 0.20) == "alternative"
+    stationary = bilateral(tracker, source, source,
+                           {"identity": np.eye(3), "bad": homogeneous([[1.028, 0, -38], [0, 1.028, 26]])})
+    assert preference(stationary, "bad", "identity", 0.20) == "alternative"
+    flat = np.full(source.shape, 121, dtype=np.uint8)
+    blank = bilateral(tracker, flat, flat, {"identity": np.eye(3)})
+    assert preference(blank, "identity", "missing", 0.20) == "abstain"
+    assert preference(stationary, "identity", "identity", 0.20) == "abstain"
+    print(json.dumps({"scope": "independent synthetic bilateral measurement, selection and abstention",
+                      "moving_witnesses": actual["holdout_count"], "moving_residuals": actual["residuals"],
+                      "stationary_witnesses": stationary["holdout_count"], "flat_status": blank["status"]}, indent=2))
+
+
+def actual(tracker, acquired, trace, archived):
+    receipt = json.loads(acquired.read_bytes())
+    assert receipt["original_count"] == 9
+    files = {Path(row["acquired_path"]).name: row for row in receipt["records"]}
+    frames = {name: tracker["image"](Path(row["acquired_path"]), row) for name, row in files.items()}
+    product = json.loads(trace.read_bytes())
+    assert product["source_order"] == list(files) and product["runtime"] == "cpu"
+    assert len(product["estimates"]) == 28
+    fits = {(row["role"], row["reference"], row["source"]): row for row in product["estimates"]}
+    assert len(fits) == 28
+    old = json.loads(archived.read_bytes())
+    historical = {tuple(old[name]["sources"]): old[name]["packaged_step"]
+                  for name in ("genuine_transition", "erroneous_transition")}
+    anchor, *ordered = files
+    windows = [ordered[:4], ordered[4:]]
+    result = []
+    for window in windows:
+        for before, after in zip(window, window[1:]):
+            old_anchor = fits[("anchor", anchor, before)]
+            new_anchor = fits[("anchor", anchor, after)]
+            neighbor = fits[("neighbor", before, after)]
+            rev_neighbor = fits[("neighbor", after, before)]
+            hypotheses = {"identity": np.eye(3), "fresh_implied_direct":
+                          homogeneous(new_anchor["transform"]) @ np.linalg.inv(homogeneous(old_anchor["transform"]))}
+            for name, row, inverse in (("fresh_forward_neighbor", neighbor, False),
+                                       ("inverse_fresh_reverse_neighbor", rev_neighbor, True)):
+                if row["confidence"] > 0:
+                    value = homogeneous(row["transform"])
+                    hypotheses[name] = np.linalg.inv(value) if inverse else value
+            if (before, after) in historical:
+                hypotheses["packaged_implied_direct"] = homogeneous(historical[(before, after)])
+            evidence = bilateral(tracker, frames[before], frames[after], hypotheses)
+            result.append({"before": before, "after": after,
+                           "fresh_forward_neighbor_confidence": neighbor["confidence"],
+                           "fresh_reverse_neighbor_confidence": rev_neighbor["confidence"], **evidence})
+    for row in receipt["records"]:
+        path = Path(row["acquired_path"])
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == row["sha256"]
+    print(json.dumps({"scope": "unfrozen CPU geometry probe; no timing or frozen-catalog credit",
+                      "cv2": cv2.__version__, "all_input_hashes_stable": True,
+                      "product_trace_sha256": hashlib.sha256(trace.read_bytes()).hexdigest(),
+                      "comparisons": result}, indent=2, allow_nan=False))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--acquisition", type=Path)
+    parser.add_argument("--trace", type=Path)
+    parser.add_argument("--archive-audit", type=Path)
+    args = parser.parse_args()
+    cv2.setNumThreads(1)
+    cv2.ocl.setUseOpenCL(False)
+    tracker = runpy.run_path(str(TRACKER))
+    if args.self_test:
+        self_test(tracker)
+    else:
+        actual(tracker, args.acquisition, args.trace, args.archive_audit)
+
+
+if __name__ == "__main__":
+    main()

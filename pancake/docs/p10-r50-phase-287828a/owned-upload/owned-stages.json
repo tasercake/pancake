@@ -1,0 +1,61 @@
+{
+  "scope": "External GDB phase observation; instrumentation perturbation is reported. No official timing credit.",
+  "candidate_untraced_completed_ns": 42072283228,
+  "candidate_traced_completed_ns": 42284320834,
+  "sealed_untraced_completed_ns": 51520890619,
+  "traced_untraced_candidate_pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+  "matched_pixel_metrics": {
+    "status": "decoded_pair",
+    "mean_absolute_u16": 0.0,
+    "maximum_absolute_u16": 0,
+    "rms_u16": 0.0,
+    "changed_sample_fraction": 0.0
+  },
+  "raw_return_callback_count": 4954,
+  "repeat_return_callbacks_excluded": 4753,
+  "total_ns_inside_observed_functions": 40863118571,
+  "stages": {
+    "decode": {
+      "visits": 50,
+      "wall_ns_total": 17807620137,
+      "wall_ns_median": 353559946.0,
+      "inferior_cpu_seconds_total": 79.99,
+      "average_busy_cores": 4.491897254355724
+    },
+    "registration_thumbnail": {
+      "visits": 50,
+      "wall_ns_total": 7943800810,
+      "wall_ns_median": 151691338.5,
+      "inferior_cpu_seconds_total": 14.3,
+      "average_busy_cores": 1.8001458422772312
+    },
+    "estimate_pair": {
+      "visits": 49,
+      "wall_ns_total": 400849624,
+      "wall_ns_median": 6366152,
+      "inferior_cpu_seconds_total": 3.79,
+      "average_busy_cores": 9.45491718859639
+    },
+    "fusion_add": {
+      "visits": 50,
+      "wall_ns_total": 14218674980,
+      "wall_ns_median": 278971073.0,
+      "inferior_cpu_seconds_total": 197.36,
+      "average_busy_cores": 13.88033697075197
+    },
+    "fusion_finish": {
+      "visits": 1,
+      "wall_ns_total": 280219965,
+      "wall_ns_median": 280219965,
+      "inferior_cpu_seconds_total": 2.19,
+      "average_busy_cores": 7.815288964153571
+    },
+    "prepare_export": {
+      "visits": 1,
+      "wall_ns_total": 211953055,
+      "wall_ns_median": 211953055,
+      "inferior_cpu_seconds_total": 0.2,
+      "average_busy_cores": 0.9436051770992403
+    }
+  }
+}

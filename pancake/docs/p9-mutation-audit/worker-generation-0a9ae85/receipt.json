@@ -1,0 +1,131 @@
+{
+  "archive": {
+    "bytes": 11325,
+    "sha256": "f48a1edb1532aa30c1e3a9fcf14c17195d4ad30bd3cba9aea5aefc9b1511fd79"
+  },
+  "changed_production_code": false,
+  "files": {
+    "affinity.csv": {
+      "bytes": 16,
+      "sha256": "808eff5f3b8ae671f7a7d2f837890f7cb769729bd6e2ebf86c18c10c82e9469e"
+    },
+    "applied-stock-difference.diff": {
+      "bytes": 519,
+      "sha256": "ef226668ce2b5a7673d4f840cadbf4f3d910e1cf3d047a86691a0dd0e7617363"
+    },
+    "apply.log": {
+      "bytes": 32,
+      "sha256": "2908611f41e0dec7078e3a42837699d51b833a6b30054e8b52c0e6e7aad7d32c"
+    },
+    "canonical-outcome.json": {
+      "bytes": 2529,
+      "sha256": "ba37d914e9fb4f017472bc757f83a79d7d71ab5d988b7d0b760c4d98665c92d6"
+    },
+    "cleanup.log": {
+      "bytes": 38,
+      "sha256": "9f731081319c40034ef3bf6644d3027bf83525ff4baa2fbd0d51654098f6c7fa"
+    },
+    "clippy-without-reviewed-config.log": {
+      "bytes": 17958,
+      "sha256": "fed3f24670bc9a0a6dbc2ec36e00587ea8b5a018242e48bda7a425e1d1771881"
+    },
+    "clippy-without-reviewed-config.status": {
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+    },
+    "clippy.log": {
+      "bytes": 159,
+      "sha256": "9f2bbee40be47ce713829f9c9d63f413fcd0efe39f5c24983e7524199e2655de"
+    },
+    "clippy.status": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "commands.txt": {
+      "bytes": 1757,
+      "sha256": "47c759ce2bfc3f864d587d275af727978e81e60546d265e5d828fa46e957eed6"
+    },
+    "dependency-policy.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "effective-clippy.sha256": {
+      "bytes": 197,
+      "sha256": "d7fc3e29d5952322d600a4b6e486fca1a715d8cbe41859fe1681248ee022ff0c"
+    },
+    "green.log": {
+      "bytes": 2135,
+      "sha256": "2563b481c1847883a6c4712434c0e83764daf9a06337e28311fa2a7d540daee6"
+    },
+    "green.status": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "input-sha256.txt": {
+      "bytes": 351,
+      "sha256": "351c34b299c55cac830679ea6b787b0c88b6934628e62226d8ff531efa623f76"
+    },
+    "pancake-tree.txt": {
+      "bytes": 41,
+      "sha256": "066e24069625e42799b58c285f47e7c8e9920f3448170f741015d75751ce9818"
+    },
+    "policy.log": {
+      "bytes": 81,
+      "sha256": "22e88bc8b11b052e64c7b4e1949a769853e31e3c521989d95067ff79b8b43b14"
+    },
+    "red.log": {
+      "bytes": 12249,
+      "sha256": "9d18c9ec1c12a798ed5a90ed1d61af9fcdeb1a49b930713aa07f822e85b95a01"
+    },
+    "red.status": {
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+    },
+    "restore.log": {
+      "bytes": 32,
+      "sha256": "2908611f41e0dec7078e3a42837699d51b833a6b30054e8b52c0e6e7aad7d32c"
+    },
+    "saved-mutant.diff": {
+      "bytes": 902,
+      "sha256": "a51c5bcf77a122b65ee8abd9b546c19b60764779d2ab08f562b4adb1ff487fa9"
+    },
+    "stock-status.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "terminal-timestamps.txt": {
+      "bytes": 413,
+      "sha256": "4f34446aef3d31b08b46f2fbf2f4be6e6cf65b51519e2678656a30cdbb10c229"
+    },
+    "test-source.txt": {
+      "bytes": 41,
+      "sha256": "e2785eedb83bc7919d5454019fde79c25a29480b6f4b110bde038f602f732c4c"
+    },
+    "tested-source.sha256": {
+      "bytes": 276,
+      "sha256": "c66b4d3dfaaa91973b1eeded9ef0d4989255f62635dfb9da75aee844a44b25b3"
+    },
+    "toolchain.txt": {
+      "bytes": 235,
+      "sha256": "1bb0bb55c9ce0742e66ba0ed1e0d9eeb980f6b019e02be13ba44b3624216006e"
+    }
+  },
+  "native_mutant": "src/job/worker.rs:153:28: replace match guard outcome.generation == generation with true in StackWorker::take_result",
+  "native_prior_status": "MissedMutant",
+  "policy_validation": "Miri platform contract: reviewed production source and dependency closure match.",
+  "red_test_failure": "The current caller accepted the stale payload.",
+  "saved_mutant_diff": {
+    "bytes": 902,
+    "sha256": "a51c5bcf77a122b65ee8abd9b546c19b60764779d2ab08f562b4adb1ff487fa9"
+  },
+  "scope": "Actual bounded native mpsc receive guard in the job library",
+  "source_base": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "status": {
+    "clippy": 0,
+    "clippy-without-reviewed-config": 101,
+    "green": 0,
+    "red": 101
+  },
+  "stock_native_lib_passed": 24,
+  "test_source": "df6a317f7d8bdf1739f5530d17339ae663e3aa49"
+}

@@ -29,8 +29,9 @@ pub(super) fn phase_peak(
     };
     let area = side.saturating_mul(side);
     let complex = area.saturating_mul(2);
-    let a = forward(client, reference, extent, side, complex);
-    let b = forward(client, source, extent, side, complex);
+    let twiddles = TensorHandle::empty(client, [side.saturating_mul(2)], f32::cube_type());
+    let a = forward(client, reference, extent, side, complex, &twiddles, true);
+    let b = forward(client, source, extent, side, complex, &twiddles, false);
     let phase = TensorHandle::empty(client, [complex], f32::cube_type());
     let dim = CubeDim::new(client, complex);
     let count = cubecl::calculate_cube_count_elemwise(client, complex, dim);
@@ -43,7 +44,7 @@ pub(super) fn phase_peak(
         phase.clone().into_arg(),
         side,
     );
-    let inverse = transform(client, phase, side, complex, true);
+    let inverse = transform(client, phase, side, complex, &twiddles, true);
     let samples = read(client, inverse, complex)?;
     dominant_peak(&samples, side, extent)
 }
@@ -55,6 +56,8 @@ fn forward(
     extent: Extent,
     side: usize,
     complex: usize,
+    twiddles: &TensorHandle,
+    prepare_twiddles: bool,
 ) -> TensorHandle {
     let input = TensorHandle::empty(client, [complex], f32::cube_type());
     let dim = CubeDim::new(client, complex);
@@ -65,11 +68,13 @@ fn forward(
         dim,
         samples.clone().into_arg(),
         input.clone().into_arg(),
+        twiddles.clone().into_arg(),
         usize::from(extent.width),
         usize::from(extent.height),
         side,
+        u32::from(prepare_twiddles),
     );
-    transform(client, input, side, complex, false)
+    transform(client, input, side, complex, twiddles, false)
 }
 
 /// Execute row and column passes on the same client.
@@ -78,22 +83,24 @@ fn transform(
     input: TensorHandle,
     side: usize,
     complex: usize,
+    twiddles: &TensorHandle,
     inverse: bool,
 ) -> TensorHandle {
     let dim = CubeDim::new(client, side);
     let count = cubecl::calculate_cube_count_elemwise(client, side, dim);
     let scratch = TensorHandle::empty(client, [complex], f32::cube_type());
     let result = TensorHandle::empty(client, [complex], f32::cube_type());
-    let direction = if inverse { 1.0 } else { -1.0 };
+    let direction_offset = if inverse { 2 } else { 0 };
     fft_lines::launch(
         client,
         count.clone(),
         dim,
         input.into_arg(),
         scratch.clone().into_arg(),
+        twiddles.clone().into_arg(),
         side,
         0,
-        direction,
+        direction_offset,
     );
     fft_lines::launch(
         client,
@@ -101,9 +108,10 @@ fn transform(
         dim,
         scratch.into_arg(),
         result.clone().into_arg(),
+        twiddles.clone().into_arg(),
         side,
         1,
-        direction,
+        direction_offset,
     );
     result
 }
@@ -154,10 +162,24 @@ fn dominant_peak(matrix: &[f32], side: usize, extent: Extent) -> Result<Option<[
 fn window_luma(
     input: &Tensor<f32>,
     output: &mut Tensor<f32>,
+    twiddles: &mut Tensor<f32>,
     width: usize,
     height: usize,
     side: usize,
+    prepare_twiddles: u32,
 ) {
+    let half = side / 2;
+    if prepare_twiddles != 0 && ABSOLUTE_POS < half {
+        let at = ABSOLUTE_POS * 4;
+        let scale = f32::cast_from(half);
+        let numerator = core::f32::consts::PI * f32::cast_from(ABSOLUTE_POS);
+        let forward = -numerator / scale;
+        let inverse = numerator / scale;
+        twiddles[at] = forward.cos();
+        twiddles[at + 1] = forward.sin();
+        twiddles[at + 2] = inverse.cos();
+        twiddles[at + 3] = inverse.sin();
+    }
     let pixel = ABSOLUTE_POS / 2;
     if ABSOLUTE_POS % 2 == 0 {
         let edge = f32::cast_from(side);
@@ -209,9 +231,10 @@ fn cell(line: usize, index: usize, side: usize, vertical: bool) -> usize {
 fn fft_lines(
     input: &Tensor<f32>,
     output: &mut Tensor<f32>,
+    twiddles: &Tensor<f32>,
     side: usize,
     axis: usize,
-    direction: f32,
+    direction_offset: usize,
 ) {
     if ABSOLUTE_POS >= side {
         terminate!();
@@ -228,14 +251,15 @@ fn fft_lines(
 
     let mut half = 1_usize;
     while half < side {
+        // Every earlier stage is a dyadic subsample of the final-stage angles.
+        let step = side / (2 * half);
         for pair in 0..side / 2 {
             let offset = pair % half;
             let first = 2 * (pair - offset) + offset;
             let second = first + half;
-            let angle =
-                direction * core::f32::consts::PI * f32::cast_from(offset) / f32::cast_from(half);
-            let cos = angle.cos();
-            let sin = angle.sin();
+            let term = 4 * offset * step + direction_offset;
+            let cos = twiddles[term];
+            let sin = twiddles[term + 1];
             let re = real[second] * cos - imaginary[second] * sin;
             let im = real[second] * sin + imaginary[second] * cos;
             real[second] = real[first] - re;
@@ -271,4 +295,36 @@ fn cross_phase(
     } else {
         0.0_f32
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Extent, dominant_peak};
+
+    /// A unique weak peak abstains and the supported signed peak is retained.
+    /// # Errors
+    /// Returns invalid test geometry or an incorrect reduction result.
+    #[test]
+    fn weak_spectral_peak_abstains_before_displacement() -> Result<(), String> {
+        const SIDE: usize = 64;
+        // The interleaved real slot for column 61 (wrapped to -3), row 8.
+        const REAL_PEAK_SLOT: usize = 1146;
+        let extent = Extent::new(192, 80)?;
+        let mut surface = vec![0.0_f32; 8192];
+        // Five percent of the 4096-point normalization area is 204.8.
+        for (strength, expected) in [(204.75, None), (204.875, Some([-9.0_f32, 10.0_f32]))] {
+            *surface
+                .get_mut(REAL_PEAK_SLOT)
+                .ok_or("missing fixture peak slot")? = strength;
+            let observed = dominant_peak(&surface, SIDE, extent)?;
+            if observed.map(|shift| shift.map(f32::to_bits))
+                != expected.map(|shift| shift.map(f32::to_bits))
+            {
+                return Err(format!(
+                    "spectral peak {strength} returned {observed:?}, expected {expected:?}"
+                ));
+            }
+        }
+        Ok(())
+    }
 }

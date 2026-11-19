@@ -1,0 +1,107 @@
+{
+  "scope": "focused exact mutant and restored-stock native CPU replay",
+  "status": "verified_red_green",
+  "base_commit": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "test_only_commit": "81f4ac2936a337436cc22a656b89821f8bdc85f5",
+  "test": "cpu_hybrid_retains_selected_fine_detail_across_scales",
+  "mutant": {
+    "path": "pancake/src/fusion/advanced/mod.rs",
+    "line": 280,
+    "column": 70,
+    "original": "index < 2",
+    "replacement": "index == 2",
+    "exit": 101,
+    "tests_executed": 1,
+    "reported_detail_power_ratio": {
+      "period_2": 0.16,
+      "period_4": 0.16
+    }
+  },
+  "stock": {
+    "exit": 0,
+    "passed": 5,
+    "failed": 0
+  },
+  "configured_clippy_exit": 0,
+  "format_and_diff_check": "passed",
+  "test_floor_detail_power_ratio": 0.65,
+  "fixture": {
+    "width": 64,
+    "height": 1,
+    "reductions": 3,
+    "periods_pixels": [
+      2,
+      4
+    ]
+  },
+  "host": {
+    "os": "Linux 6.8.0-147-generic x86_64",
+    "cpu": "AMD Ryzen 9 7950X3D",
+    "cpu_affinity": [
+      4,
+      5
+    ],
+    "max_build_jobs": 2,
+    "rustc": "1.100.0",
+    "llvm": "23.1.5"
+  },
+  "policy_sha256": {
+    "pancake/rust-toolchain.toml": "ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e",
+    "pancake/.cargo/config.toml": "9c2e6a6c88b24725f0eae28d1c6d87de8ea8c4bffa9971cf4284c209cefcbc07",
+    "pancake/Cargo.toml": "245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043",
+    "pancake/Cargo.lock": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "pancake/clippy.toml": "ad6c3667dfa599f52feb977d29a450890653b2ae076cd1641175c4fbce655fba",
+    "pancake/deny.toml": "3c796ee0d127da2ba2ecd5598d54d61dd6a1b1fff0fa601f526edc536ee20b92",
+    "pancake/dependency-policy.json": "91d090dba5002cca17eb9e46f2c4d7967018f9c36a86a05dfa9f6e4cb16d48c4",
+    "pancake/scripts/dependency_policy.py": "70daa6f90e237c6c95044a7ceefb31a2cb0e169f3f19ad41aea26ae0eef15184"
+  },
+  "local_source_checksum_ledger_sha256": "848d4391e43490d714b9c622072628c8b518bfc1d0b7a669d79e3d7df85d7872",
+  "local_test_diff_sha256": "d737038a5733adfa1ea78f0241159dfab53a5c188eccdd6709ff71c7bcc776c2",
+  "saved_raw_archive_sha256": "0e174cf8d4960f14868a55a947b675337be4f58b3204c448a170ccd905a35064",
+  "saved_raw_files": {
+    "exact-mutant.diff": {
+      "bytes": 699,
+      "sha256": "142efd037b8833e7975d902e8743b32e084486ad541b0081e50b45e041914a8e"
+    },
+    "provenance.txt": {
+      "bytes": 659,
+      "sha256": "08c125f6e0ee5b7d0eb27017cc299760f90fac122bb6b8170eaef16da9c4e308"
+    },
+    "final-verification.txt": {
+      "bytes": 737,
+      "sha256": "b621cf38de2cc0e162485779a0f118a67e3fc0fd0fd68a92734be934ef211e9a"
+    },
+    "test-commit.txt": {
+      "bytes": 41,
+      "sha256": "06194c4d47c9363bbebceb8fb2ee9909f522f1ba58a09aa83f79cf54db7fa326"
+    },
+    "mutant-final-red.log": {
+      "bytes": 844,
+      "sha256": "7119e044d7c56335ac6e2c0425ad9f8ad6dc6635699dcdad4e64b1481aa51121"
+    },
+    "mutant-final-red.exit": {
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+    },
+    "stock-final-green.log": {
+      "bytes": 686,
+      "sha256": "fb93ac30f23f8a28dbb1a8deb36b1fa48789bd1e635ceadb8795cc245b528b0f"
+    },
+    "stock-final-green.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "dependency-policy.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy-final.log": {
+      "bytes": 160,
+      "sha256": "5dfc2a108848a1f5684e4c3cc1d7102e95e923ee0e9a595c824d6fb36cedbbc7"
+    },
+    "clippy-final.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    }
+  }
+}

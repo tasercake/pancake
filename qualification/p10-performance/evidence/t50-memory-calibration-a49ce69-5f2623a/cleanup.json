@@ -1,0 +1,37 @@
+{
+  "scope": "owned calibration exports and per-case caches after independent read release",
+  "cleaned_at": "2026-11-19T10:58:38.788173+08:00",
+  "raw_archive_sha256": "82bea26c1968f28aaec1846d1a56a0fa10378aa3eda8c0ed2866de87439c6633",
+  "reviewer_read_released": true,
+  "exports": [
+    {
+      "role": "reference",
+      "output": "reference/diagnostic-01/reference/complete.tif",
+      "encoded_sha256_after_reviewer_release": "550e72982e03844c4a5d40575ab3c8b89ea067e5f38d07d0f0736445484922c2",
+      "bytes": 165542082,
+      "independently_checked_pixel_sha256": "dc4e21deab6381c662de86a89c4f58385ccbe2b54d51a22addcd50db1f4f6d34",
+      "cache_root": "reference/cache"
+    },
+    {
+      "role": "stock",
+      "output": "stock/diagnostic-01/candidate/complete.tif",
+      "encoded_sha256_after_reviewer_release": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+      "bytes": 143881378,
+      "independently_checked_pixel_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7",
+      "cache_root": "stock/cache"
+    },
+    {
+      "role": "candidate",
+      "output": "candidate/diagnostic-01/candidate/complete.tif",
+      "encoded_sha256_after_reviewer_release": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+      "bytes": 143881378,
+      "independently_checked_pixel_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7",
+      "cache_root": "candidate/cache"
+    }
+  ],
+  "remaining_derived_tiff_count": 0,
+  "remaining_owned_cache_count": 0,
+  "stage6": "read-only loan returned; owner retained originals",
+  "other_corpora_touched": false,
+  "stable_producer_binaries_retained": true
+}

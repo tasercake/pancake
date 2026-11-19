@@ -1,0 +1,523 @@
+{
+  "archive": {
+    "bytes": 19690,
+    "files": {
+      "affinity-topology.csv": {
+        "bytes": 20,
+        "sha256": "f8e30c3d091f2c29fe201f1ac5f8444d3d74f6bf8f986b7d28e05e6dd18c314b"
+      },
+      "collect.py": {
+        "bytes": 6465,
+        "sha256": "801c5dc7ece5a86e996a4a879c7d812bdcc9f9e00df8b32226f75d884a23b985"
+      },
+      "cpu.txt": {
+        "bytes": 3699,
+        "sha256": "8f4090c194783517edc3d574873152852fb722c069cfaabc7ea8fbc0390d367c"
+      },
+      "distribution.txt": {
+        "bytes": 400,
+        "sha256": "87458b3b1f1ca0e5c693ade771de7007c3783bdc692fa6b39eb6414bf2af2763"
+      },
+      "environment.txt": {
+        "bytes": 157,
+        "sha256": "831686756a509b702e917dd4f23159c8bc463642563466c58db82e33257b0fc3"
+      },
+      "fontconfig-build-id.txt": {
+        "bytes": 418,
+        "sha256": "7f43b914c59bb4314305d57498cba74c71c591315de083d2e72f8fa1e422e497"
+      },
+      "os.txt": {
+        "bytes": 132,
+        "sha256": "62b2233ccf7ed82d068411dc66526b072d3a2418151f90862abd55c2f7772cc2"
+      },
+      "pancake-tree.txt": {
+        "bytes": 41,
+        "sha256": "b1edd033519532ec0858b1949503e3ac85cdd9ab3c5479214c35589bd7112049"
+      },
+      "process-affinity.txt": {
+        "bytes": 41,
+        "sha256": "19b807b8bd573062f15f03347493930ef493f2af4106caee8bdda63ba8bf1453"
+      },
+      "replay.sh": {
+        "bytes": 3398,
+        "sha256": "dcdeda5c78c1951a37bf74487dbb2b5ee2da6ad971aaf268e96284b8b8c0cb8d"
+      },
+      "source-delta-from-0a9ae85.txt": {
+        "bytes": 637,
+        "sha256": "86c01d68fa93efbbdc6b824c9a63e38f4172f8a11630ee1dbfd3ea790339445b"
+      },
+      "source-policy.log": {
+        "bytes": 81,
+        "sha256": "22e88bc8b11b052e64c7b4e1949a769853e31e3c521989d95067ff79b8b43b14"
+      },
+      "source-revision.txt": {
+        "bytes": 41,
+        "sha256": "4cdcbb06a8fc1c51b9acacef96151ec3d0b590d89eeacd3de7ca4cdd31d912db"
+      },
+      "source-tree.txt": {
+        "bytes": 41,
+        "sha256": "2620008a472655cd56a1eb6ed6a871cdcd6b695832ea35245d152aecf8ff4b5a"
+      },
+      "tested-source.sha256": {
+        "bytes": 1681,
+        "sha256": "4bdb5ed09b55a33c490e0fbd407836c4932501e9ea3cb6a3fef1b4f62574e6c2"
+      },
+      "thread-binaries.sha256": {
+        "bytes": 4008,
+        "sha256": "1d4c097f550cb9e8cafc3ba2f82d63902d24e3d3df3562ca72e575ed9edcaec1"
+      },
+      "thread-build-ids.txt": {
+        "bytes": 3483,
+        "sha256": "8ed11abcca8042d7ea993923fd2eee71163b938f624a9efdeaf5328fb07a8284"
+      },
+      "thread-cleanup.log": {
+        "bytes": 39,
+        "sha256": "648dba8470326174aba7682f7e9095007fb241a9625c73de5189ff6c21a90bd5"
+      },
+      "thread-executables.txt": {
+        "bytes": 2622,
+        "sha256": "5c505fdee1d6caa5fdbc0fe5c0a8d96076861d422aa49b436110d25f9194ec48"
+      },
+      "thread-finish.txt": {
+        "bytes": 26,
+        "sha256": "700f3b2f4c4a429b337f9d9ea5ae72fbe6ec97325631b0c41bbe5a72d8cea8f1"
+      },
+      "thread-instrumentation-symbols.txt": {
+        "bytes": 461,
+        "sha256": "a144b677b3954c5473af701389e508f7260010ac18ff7caea4a7cb87de9c2684"
+      },
+      "thread-selected-targets.txt": {
+        "bytes": 289,
+        "sha256": "3f22c81d0d34ec39679623009b0533e9c5be103579828cd8b05922c7c563c0ce"
+      },
+      "thread-start.txt": {
+        "bytes": 26,
+        "sha256": "d77f9986b32f234c0cc096eadd2ecb0e87f098a957ff1443fec9e741b077601e"
+      },
+      "thread.log": {
+        "bytes": 37444,
+        "sha256": "fb9970965f4bf2c4fd54e3e530b380147c1f33a72994dc92e6c19a6f3384626e"
+      },
+      "thread.status": {
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "tool-versions.sh": {
+        "bytes": 340,
+        "sha256": "119585a7f2da02dede75bc9e253540e409c4c14e2933e9c77d15ed2b88396c92"
+      },
+      "toolchain.txt": {
+        "bytes": 259,
+        "sha256": "e30e038c0af814977b49b7c16155db397936fcd7e412ec341d621290d464844b"
+      },
+      "untracked-check.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "sha256": "5719b021eb46120d7ecbb7ede82bb9ba3e3677753bbbbe54ac7bd26a0feab030"
+  },
+  "campaign": "Exact integrated Linux workspace CPU ThreadSanitizer replay",
+  "compiler": [
+    "rustc 1.102.0-nightly (5f4effd57 2026-11-13)",
+    "binary: rustc",
+    "commit-hash: 5f4effd579500175af844241eb179e756190f1e7",
+    "commit-date: 2026-11-13",
+    "host: x86_64-unknown-linux-gnu",
+    "release: 1.102.0-nightly",
+    "LLVM version: 23.1.5",
+    "cargo 1.102.0-nightly (ede6cefea 2026-11-11)"
+  ],
+  "compiler_wrappers_disabled": true,
+  "host": {
+    "affinity": "pid 71913's current affinity list: 14,15",
+    "affinity_topology_cpu_core_socket_node": [
+      [
+        14,
+        14,
+        0,
+        0
+      ],
+      [
+        15,
+        15,
+        0,
+        0
+      ]
+    ],
+    "compile_jobs": 2,
+    "distribution": [
+      "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"",
+      "NAME=\"Ubuntu\"",
+      "VERSION_ID=\"24.04\"",
+      "VERSION=\"24.04.5 LTS (Noble Numbat)\"",
+      "VERSION_CODENAME=noble",
+      "ID=ubuntu",
+      "ID_LIKE=debian",
+      "HOME_URL=\"https://www.ubuntu.com/\"",
+      "SUPPORT_URL=\"https://help.ubuntu.com/\"",
+      "BUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"",
+      "PRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"",
+      "UBUNTU_CODENAME=noble",
+      "LOGO=ubuntu-logo"
+    ],
+    "fontconfig_elf_build_id": "9ea8985291d6ca9e904a796a5767d191039d813d",
+    "kernel": "Linux krishna-desktop 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux"
+  },
+  "offline": true,
+  "pancake_tree": "789e6bad6369cd8c33d59598f2a5fcf4c1c9f487",
+  "result": {
+    "counts": {
+      "failed": 0,
+      "filtered": 0,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 164
+    },
+    "executable_elf_build_id": {
+      "/tmp/pancake-worktrees.t3paqgWM/tsan-11cfcf8/pancake/target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/pancake-cli": "52ce5f546e10f83545d672b411d58fb5dccb5d94",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/0b407cad0e22426d/out/cpu_cli-0b407cad0e22426d": "3d69fcd14767ade7a861b472885865cb50b9888d",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/7f7b311de044171c/out/cpu_runtime_options-7f7b311de044171c": "14314f98fbe47efa4bbcc3184aca6a9101048501",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/85182ec3fe8c5695/out/cpu_config-85182ec3fe8c5695": "4c80c8b47cd31c439f172f27d6357516dd6ae780",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/86db7d7b22ef1505/out/pancake_cli-86db7d7b22ef1505": "fd708e5f3108e4b5efdfa09d3ce4494ba51ec48e",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-gui/2c92bd3db313b05c/out/pancake_gui-2c92bd3db313b05c": "f08b91869505dc9e79dc097af26d39ed464fdec9",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/09fdbffe0880f44b/out/cpu_image_io-09fdbffe0880f44b": "b6247bcff42c9be43f7d651a8cfcd2701ab4aed7",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/289c194c92601c49/out/cpu_job-289c194c92601c49": "4c51f4ca7bcdb869d1d48d05dde59c694f55c4fb",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/2b4e1cf169a1bc42/out/cpu_numerical_contract-2b4e1cf169a1bc42": "cbe5ad4ea1b67b10540d2ae504b98f54660e34b5",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/3840640c93601ab5/out/cpu_stack_plan-3840640c93601ab5": "9d3742d0d85f4867d425482a059c723aec2070e9",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/3d7e515bfcfa6a04/out/cpu_runtime_contract-3d7e515bfcfa6a04": "8895cba444cfd456627919080d20f0984edde4b7",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/5244523e2446c10c/out/cpu_image_export-5244523e2446c10c": "c8cb4b1450ef556da2ab42e75c78a75f6696d3da",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/5ca3fcfbb400be8b/out/cpu_array_layout-5ca3fcfbb400be8b": "6118d49f3bfded6b6111d037cffc5b98c018641b",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/69dcdea29e4c766d/out/cpu_registration_contract-69dcdea29e4c766d": "7b839e112771b482bff3077dcf11daafa8320bff",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/9139c74bc55aa296/out/cpu_npy-9139c74bc55aa296": "c3dd0f2e841d84c829ab632b2177a22007892c7f",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/95daaff6e9044ba2/out/cpu_fusion_contract-95daaff6e9044ba2": "0308a107009b469a65df677e6fbb22b0f50ae36a",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/98e54184abeb795b/out/cpu_resident_policy-98e54184abeb795b": "8c349ec6e1e0db2a33827568d67a0097b83ed3d6",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/9a639defe07b2048/out/pancake-9a639defe07b2048": "092557601fb057ffcb80ebbbaee822d643c43bc4",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/aee7e3151c0fe155/out/cpu_gray_array_export-aee7e3151c0fe155": "5c1d5fb8e63fef1a363d2caaac8133c79672b2b1",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/bcb0cd778bad4441/out/cpu_kernel_contract-bcb0cd778bad4441": "1350511f8c2543f2a7790ab26646c23cd5b74aa9",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/dc63b3be1535d863/out/cpu_advanced_fusion-dc63b3be1535d863": "6d9a4363f053f25d95db1f454248dfe92d1f4fcc"
+    },
+    "executable_sha256": {
+      "/tmp/pancake-worktrees.t3paqgWM/tsan-11cfcf8/pancake/target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/pancake-cli": "a301fa2c6dfc7b893b48f2b91bd6f7e65ed1ce4a6dc6604526a010c582a13f57",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/0b407cad0e22426d/out/cpu_cli-0b407cad0e22426d": "c9de4a95a90599dea51e44ee70b568a00df8b6aa991d75381adbfd33aa49ea4a",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/7f7b311de044171c/out/cpu_runtime_options-7f7b311de044171c": "47bde946c1be22eb010600e485327e64ed8883b0ad5ed898493fa7d5629353df",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/85182ec3fe8c5695/out/cpu_config-85182ec3fe8c5695": "48f5c6b65ef2441215a8c06befceba318bfe1d5f6e32c8158b336ead88fa4ce2",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/86db7d7b22ef1505/out/pancake_cli-86db7d7b22ef1505": "2fcd4fbeb25f40aa5f589415727eaa76d62dbf08178a7773fd005a87de7717f0",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-gui/2c92bd3db313b05c/out/pancake_gui-2c92bd3db313b05c": "1096cba49fe29d8187d7c50aba8afc48006a56b0412f482bf63f5b105b9e3c8d",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/09fdbffe0880f44b/out/cpu_image_io-09fdbffe0880f44b": "40c82a70469afd9ad7b72a25326e5191027b5f1d6f4f14c79a2b19c39712eb1d",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/289c194c92601c49/out/cpu_job-289c194c92601c49": "a9a059fa4d75eb2252ac5e472473eb13a112c9dd79d5cbb945fc1eeb1bc7d472",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/2b4e1cf169a1bc42/out/cpu_numerical_contract-2b4e1cf169a1bc42": "045b8f8be913a799583030a150c2bc2910819ace00e022f9c42bc00371bf6ea0",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/3840640c93601ab5/out/cpu_stack_plan-3840640c93601ab5": "eb42fb9e7f266ad166763d88b24d67e33598bfe2548e0ef9accd0fb4d60a1f8b",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/3d7e515bfcfa6a04/out/cpu_runtime_contract-3d7e515bfcfa6a04": "7ef6b167e7b9aea76c26150bc64fd4fcea6ac49d2facc9a39e794d16a8a249ad",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/5244523e2446c10c/out/cpu_image_export-5244523e2446c10c": "9086c28a4fd9ce2713a7dc6ed2c5ccf45a580419b7d13f008dfa957a89ee082d",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/5ca3fcfbb400be8b/out/cpu_array_layout-5ca3fcfbb400be8b": "a7a38e738693018324ea3f2fa9f5bcc52852d0039e9a6f351d1c75d2defceff4",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/69dcdea29e4c766d/out/cpu_registration_contract-69dcdea29e4c766d": "c5e2745f913c988af11b7ab772bed07d95df4284f504dfbb40bf693d0f97f90a",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/9139c74bc55aa296/out/cpu_npy-9139c74bc55aa296": "ca4abad74e978ff34efe280e8ded01d4c4c41ebfa56dc8508c3fc9676e773b1c",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/95daaff6e9044ba2/out/cpu_fusion_contract-95daaff6e9044ba2": "a3fa448e63b7776e929af15c21b221768242cda428a942e883898aeb17100be8",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/98e54184abeb795b/out/cpu_resident_policy-98e54184abeb795b": "0c870ab73db531b98e6df3017d814ce9ff40ab6e2ae9a4a2cd08e47d6db2e124",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/9a639defe07b2048/out/pancake-9a639defe07b2048": "e4a27966db5554d18ff18140e304642b8d5836ffec92319a62ee9bc89c87f08a",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/aee7e3151c0fe155/out/cpu_gray_array_export-aee7e3151c0fe155": "893c6b1930886631578e8c6d275d67c1ecd52166e2b31c115a1bb74e0be7edb8",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/bcb0cd778bad4441/out/cpu_kernel_contract-bcb0cd778bad4441": "d6cac7ceb9b033e03d75a7488b59585a3a8e54c8e078406b838476a8ae8dbb77",
+      "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/dc63b3be1535d863/out/cpu_advanced_fusion-dc63b3be1535d863": "6f9bb2942ab428a6e6e49514c8ac869d6921aeea442156f9ec15db6df63890a0"
+    },
+    "executables": [
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 27
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/9a639defe07b2048/out/pancake-9a639defe07b2048",
+        "status": "ok",
+        "target": "unittests src/lib.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 7
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/dc63b3be1535d863/out/cpu_advanced_fusion-dc63b3be1535d863",
+        "status": "ok",
+        "target": "tests/cpu_advanced_fusion.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 2
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/5ca3fcfbb400be8b/out/cpu_array_layout-5ca3fcfbb400be8b",
+        "status": "ok",
+        "target": "tests/cpu_array_layout.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 4
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/95daaff6e9044ba2/out/cpu_fusion_contract-95daaff6e9044ba2",
+        "status": "ok",
+        "target": "tests/cpu_fusion_contract.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 2
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/aee7e3151c0fe155/out/cpu_gray_array_export-aee7e3151c0fe155",
+        "status": "ok",
+        "target": "tests/cpu_gray_array_export.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 10
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/5244523e2446c10c/out/cpu_image_export-5244523e2446c10c",
+        "status": "ok",
+        "target": "tests/cpu_image_export.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 29
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/09fdbffe0880f44b/out/cpu_image_io-09fdbffe0880f44b",
+        "status": "ok",
+        "target": "tests/cpu_image_io.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 14
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/289c194c92601c49/out/cpu_job-289c194c92601c49",
+        "status": "ok",
+        "target": "tests/cpu_job.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 2
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/bcb0cd778bad4441/out/cpu_kernel_contract-bcb0cd778bad4441",
+        "status": "ok",
+        "target": "tests/cpu_kernel_contract.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 4
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/9139c74bc55aa296/out/cpu_npy-9139c74bc55aa296",
+        "status": "ok",
+        "target": "tests/cpu_npy.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 2
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/2b4e1cf169a1bc42/out/cpu_numerical_contract-2b4e1cf169a1bc42",
+        "status": "ok",
+        "target": "tests/cpu_numerical_contract.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 7
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/69dcdea29e4c766d/out/cpu_registration_contract-69dcdea29e4c766d",
+        "status": "ok",
+        "target": "tests/cpu_registration_contract.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 1
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/98e54184abeb795b/out/cpu_resident_policy-98e54184abeb795b",
+        "status": "ok",
+        "target": "tests/cpu_resident_policy.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 5
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/3d7e515bfcfa6a04/out/cpu_runtime_contract-3d7e515bfcfa6a04",
+        "status": "ok",
+        "target": "tests/cpu_runtime_contract.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 6
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake/3840640c93601ab5/out/cpu_stack_plan-3840640c93601ab5",
+        "status": "ok",
+        "target": "tests/cpu_stack_plan.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 2
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/86db7d7b22ef1505/out/pancake_cli-86db7d7b22ef1505",
+        "status": "ok",
+        "target": "unittests src/main.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 7
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/0b407cad0e22426d/out/cpu_cli-0b407cad0e22426d",
+        "status": "ok",
+        "target": "tests/cpu_cli.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 9
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/85182ec3fe8c5695/out/cpu_config-85182ec3fe8c5695",
+        "status": "ok",
+        "target": "tests/cpu_config.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 6
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-cli/7f7b311de044171c/out/cpu_runtime_options-7f7b311de044171c",
+        "status": "ok",
+        "target": "tests/cpu_runtime_options.rs"
+      },
+      {
+        "counts": {
+          "failed": 0,
+          "filtered": 0,
+          "ignored": 0,
+          "measured": 0,
+          "passed": 18
+        },
+        "path": "target/isolated-cpu-tsan/x86_64-unknown-linux-gnu/debug/build/pancake-gui/2c92bd3db313b05c/out/pancake_gui-2c92bd3db313b05c",
+        "status": "ok",
+        "target": "unittests src/main.rs"
+      }
+    ],
+    "finish_time": "2026-11-19T11:04:59+08:00",
+    "identity_complete": true,
+    "integration_tests": [
+      "cpu_advanced_fusion",
+      "cpu_array_layout",
+      "cpu_cli",
+      "cpu_config",
+      "cpu_fusion_contract",
+      "cpu_gray_array_export",
+      "cpu_image_export",
+      "cpu_image_io",
+      "cpu_job",
+      "cpu_kernel_contract",
+      "cpu_npy",
+      "cpu_numerical_contract",
+      "cpu_registration_contract",
+      "cpu_resident_policy",
+      "cpu_runtime_contract",
+      "cpu_runtime_options",
+      "cpu_stack_plan"
+    ],
+    "process_status": 0,
+    "sanitizer_reports": [],
+    "scope_complete": true,
+    "start_time": "2026-11-19T10:57:43+08:00",
+    "workspace_gate_passed": true
+  },
+  "sanitizer_options_override": [],
+  "scope": "All workspace CPU integration cases, library, CLI and offscreen GUI unit tests",
+  "source_file_sha256": {
+    "pancake/Cargo.lock": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "pancake/Cargo.toml": "245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043",
+    "pancake/assurance-platforms.json": "dcfd14372725334770790f8795e8d49c5110c0fce7de2b858ab635714d7daff4",
+    "pancake/crates/pancake-gui/src/tests.rs": "74f22899e2df1fbe8332535d32400d2d3f4404fdce3ed822a503e5dd73830e80",
+    "pancake/crates/pancake-gui/src/workspace.slint": "8a29b0d05db90b45264c51f82980f93d43531848904637a6879e6a1cd04f9f04",
+    "pancake/rust-toolchain.toml": "ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e",
+    "pancake/scripts/assurance_targets.py": "044dcaefaf20b04fda64f974d464c79298c54ee4bbac234661bb204809e27a3a",
+    "pancake/scripts/check.sh": "63ce2ccca53e1e4e73666b5bc72374d2ea5f8a25fe474e0c87ee41284d27eec7",
+    "pancake/src/fusion/focus.rs": "64d09845159260ac793cf0ccbadae8d4a57f4c42f0793fc1e2945a97fe250826",
+    "pancake/src/image_io/raw.rs": "2488f7280341d802942a34da284cac69270c997d2ea953c3b0e2e0fe3816926d",
+    "pancake/src/job/stream.rs": "4ac8655e1bab780715d3d35081e39a480d86f470efea94c5a86a519ff4cb466e",
+    "pancake/tests/common/fusion_cases.rs": "c25d456d045700e44fedb239556152b41c2618669e21daa1598c94fddaf96edb",
+    "pancake/tests/cpu_fusion_contract.rs": "b8cdad9172d2cb9efcf40916ba05d90149fe2970a8ad3cd9fdb60269666520b5",
+    "pancake/tests/cpu_image_io.rs": "858136fd51aa1ffb7add300f2efee81a3a05e1f5141a5d8d37225d20bea6d808",
+    "pancake/tests/cpu_registration_contract.rs": "6643b1c36281dffba869b3bc4d1cbaaba36e06d6d512dfb7756f0d490b8127b9",
+    "pancake/vendor/oneshot-0.2.1/src/receiver.rs": "065a10346822ee15a039a68565ff22c8d14df56b1513060edf54dc4117ad6ce5",
+    "pancake/vendor/upstream-sources.json": "f342a877e1ced3ffa4978f72e85eac6e25f57163e12ac3de02a35d615d5ce347"
+  },
+  "source_revision": "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6",
+  "source_tree": "0ea17aeb65a346e3cb6b5593d8c8b4a02e827832",
+  "target": "x86_64-unknown-linux-gnu",
+  "test_scheduling": "default libtest, no RUST_TEST_THREADS setting",
+  "unmodified_gate_command": [
+    "bash",
+    "scripts/check.sh",
+    "sanitizer",
+    "thread"
+  ]
+}

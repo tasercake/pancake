@@ -1,0 +1,1049 @@
+{
+  "baseline": [
+    "Success"
+  ],
+  "clean_shard": false,
+  "counts": {
+    "caught": 108,
+    "missed": 45,
+    "timeout": 1,
+    "unviable": 13
+  },
+  "expected": 167,
+  "findings": [
+    {
+      "diff_path": "diff/src__job__mod.rs_line_336_col_9.diff",
+      "log_path": "log/src__job__mod.rs_line_336_col_9.log",
+      "name": "src/job/mod.rs:336:9: replace && with || in choose_runtime",
+      "phases": [
+        {
+          "duration": 1.003345376,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/src__runtime__mod.rs_line_174_col_9.diff",
+      "log_path": "log/src__runtime__mod.rs_line_174_col_9.log",
+      "name": "src/runtime/mod.rs:174:9: replace SelectedRuntime::fingerprint -> &str with \"\"",
+      "phases": [
+        {
+          "duration": 21.013306734,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.522915196,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__advanced__mod.rs_line_280_col_70.diff",
+      "log_path": "log/src__fusion__advanced__mod.rs_line_280_col_70.log",
+      "name": "src/fusion/advanced/mod.rs:280:70: replace < with == in AdvancedAccumulator::reconstruct",
+      "phases": [
+        {
+          "duration": 20.758253859,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.470787218,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__buffers.rs_line_60_col_5.diff",
+      "log_path": "log/src__fusion__buffers.rs_line_60_col_5.log",
+      "name": "src/fusion/buffers.rs:60:5: replace empty -> TensorHandle with Default::default()",
+      "phases": [
+        {
+          "duration": 1.103585525,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/src__fusion__focus.rs_line_313_col_26.diff",
+      "log_path": "log/src__fusion__focus.rs_line_313_col_26.log",
+      "name": "src/fusion/focus.rs:313:26: replace + with * in sum_rows",
+      "phases": [
+        {
+          "duration": 21.562922389,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.725015963,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__focus.rs_line_387_col_43.diff",
+      "log_path": "log/src__fusion__focus.rs_line_387_col_43.log",
+      "name": "src/fusion/focus.rs:387:43: replace * with / in focus_energy",
+      "phases": [
+        {
+          "duration": 22.987541409,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 7.069618961,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__focus.rs_line_428_col_19.diff",
+      "log_path": "log/src__fusion__focus.rs_line_428_col_19.log",
+      "name": "src/fusion/focus.rs:428:19: replace != with == in aggregate",
+      "phases": [
+        {
+          "duration": 22.780848848,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.874588035,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__image_io__npy.rs_line_157_col_15.diff",
+      "log_path": "log/src__image_io__npy.rs_line_157_col_15.log",
+      "name": "src/image_io/npy.rs:157:15: replace > with >= in read_header",
+      "phases": [
+        {
+          "duration": 21.175103329,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.727587589,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__image_io__raw.rs_line_70_col_14.diff",
+      "log_path": "log/src__image_io__raw.rs_line_70_col_14.log",
+      "name": "src/image_io/raw.rs:70:14: replace > with == in decode",
+      "phases": [
+        {
+          "duration": 20.823841315,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.623860582,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__image_io__tiled.rs_line_452_col_5.diff",
+      "log_path": "log/src__image_io__tiled.rs_line_452_col_5.log",
+      "name": "src/image_io/tiled.rs:452:5: replace decode -> Result<Option<RgbImage>, String> with Ok(Some(Default::default()))",
+      "phases": [
+        {
+          "duration": 1.053918718,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/src__job__registration.rs_line_213_col_35.diff",
+      "log_path": "log/src__job__registration.rs_line_213_col_35.log",
+      "name": "src/job/registration.rs:213:35: replace == with != in Alignment::estimate",
+      "phases": [
+        {
+          "duration": 21.46583798,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.887137411,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__job__stream.rs_line_199_col_31.diff",
+      "log_path": "log/src__job__stream.rs_line_199_col_31.log",
+      "name": "src/job/stream.rs:199:31: replace == with != in process",
+      "phases": [
+        {
+          "duration": 21.513574126,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.476786627,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__job__stream.rs_line_385_col_5.diff",
+      "log_path": "log/src__job__stream.rs_line_385_col_5.log",
+      "name": "src/job/stream.rs:385:5: replace crop_rows -> Result<impl Iterator<Item = Result<Range<usize>, String>>, String> with Ok(::std::iter::once(Ok(Range::from_iter([1]))))",
+      "phases": [
+        {
+          "duration": 1.155480248,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/src__job__worker.rs_line_80_col_13.diff",
+      "log_path": "log/src__job__worker.rs_line_80_col_13.log",
+      "name": "src/job/worker.rs:80:13: replace && with || in StackWorker::start",
+      "phases": [
+        {
+          "duration": 0.953036469,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/src__job__worker.rs_line_153_col_28.diff",
+      "log_path": "log/src__job__worker.rs_line_153_col_28.log",
+      "name": "src/job/worker.rs:153:28: replace match guard outcome.generation == generation with true in StackWorker::take_result",
+      "phases": [
+        {
+          "duration": 20.913606318,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.519854344,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__estimate.rs_line_243_col_27.diff",
+      "log_path": "log/src__registration__estimate.rs_line_243_col_27.log",
+      "name": "src/registration/estimate.rs:243:27: replace == with != in estimate_pair",
+      "phases": [
+        {
+          "duration": 21.067276394,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.572919018,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__estimate.rs_line_311_col_23.diff",
+      "log_path": "log/src__registration__estimate.rs_line_311_col_23.log",
+      "name": "src/registration/estimate.rs:311:23: replace - with / in Coordinates::convert",
+      "phases": [
+        {
+          "duration": 21.031828491,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.623848035,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__estimate.rs_line_362_col_85.diff",
+      "log_path": "log/src__registration__estimate.rs_line_362_col_85.log",
+      "name": "src/registration/estimate.rs:362:85: replace - with + in seed",
+      "phases": [
+        {
+          "duration": 21.421752534,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.523631535,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__estimate.rs_line_453_col_29.diff",
+      "log_path": "log/src__registration__estimate.rs_line_453_col_29.log",
+      "name": "src/registration/estimate.rs:453:29: replace > with >= in Refiner<'_>::improve",
+      "phases": [
+        {
+          "duration": 21.125532638,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.62562627,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__estimate.rs_line_494_col_45.diff",
+      "log_path": "log/src__registration__estimate.rs_line_494_col_45.log",
+      "name": "src/registration/estimate.rs:494:45: replace * with / in is_plausible",
+      "phases": [
+        {
+          "duration": 20.937967228,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.670969061,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__geometry.rs_line_76_col_17.diff",
+      "log_path": "log/src__registration__geometry.rs_line_76_col_17.log",
+      "name": "src/registration/geometry.rs:76:17: delete - in Affine::inverse",
+      "phases": [
+        {
+          "duration": 21.68329848,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.725078646,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__geometry.rs_line_265_col_41.diff",
+      "log_path": "log/src__registration__geometry.rs_line_265_col_41.log",
+      "name": "src/registration/geometry.rs:265:41: replace - with / in symmetric_crop",
+      "phases": [
+        {
+          "duration": 21.71701375,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.671046553,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__kernels.rs_line_236_col_34.diff",
+      "log_path": "log/src__registration__kernels.rs_line_236_col_34.log",
+      "name": "src/registration/kernels.rs:236:34: replace * with + in Pair::correlate",
+      "phases": [
+        {
+          "duration": 23.576826272,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 7.128963388,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__kernels.rs_line_309_col_26.diff",
+      "log_path": "log/src__registration__kernels.rs_line_309_col_26.log",
+      "name": "src/registration/kernels.rs:309:26: replace * with / in pearson",
+      "phases": [
+        {
+          "duration": 23.127907256,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.825265647,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__kernels.rs_line_395_col_32.diff",
+      "log_path": "log/src__registration__kernels.rs_line_395_col_32.log",
+      "name": "src/registration/kernels.rs:395:32: replace + with - in smooth_luma",
+      "phases": [
+        {
+          "duration": 21.614466261,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.976123908,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__kernels.rs_line_400_col_36.diff",
+      "log_path": "log/src__registration__kernels.rs_line_400_col_36.log",
+      "name": "src/registration/kernels.rs:400:36: replace * with + in smooth_luma",
+      "phases": [
+        {
+          "duration": 21.467446632,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.926776929,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__spectral.rs_line_146_col_17.diff",
+      "log_path": "log/src__registration__spectral.rs_line_146_col_17.log",
+      "name": "src/registration/spectral.rs:146:17: replace < with == in dominant_peak",
+      "phases": [
+        {
+          "duration": 21.067788373,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.61887014,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__spectral.rs_line_194_col_39.diff",
+      "log_path": "log/src__registration__spectral.rs_line_194_col_39.log",
+      "name": "src/registration/spectral.rs:194:39: replace + with - in window_luma",
+      "phases": [
+        {
+          "duration": 21.556723635,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.974783492,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__spectral.rs_line_199_col_45.diff",
+      "log_path": "log/src__registration__spectral.rs_line_199_col_45.log",
+      "name": "src/registration/spectral.rs:199:45: replace * with + in window_luma",
+      "phases": [
+        {
+          "duration": 22.070770234,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.926131312,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__spectral.rs_line_223_col_23.diff",
+      "log_path": "log/src__registration__spectral.rs_line_223_col_23.log",
+      "name": "src/registration/spectral.rs:223:23: replace + with - in cell",
+      "phases": [
+        {
+          "duration": 22.572922294,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.776635581,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__registration__spectral.rs_line_259_col_32.diff",
+      "log_path": "log/src__registration__spectral.rs_line_259_col_32.log",
+      "name": "src/registration/spectral.rs:259:32: replace + with - in fft_lines",
+      "phases": [
+        {
+          "duration": 21.94906867,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 60.054764632,
+          "phase": "Test",
+          "process_status": "Timeout"
+        }
+      ],
+      "status": "Timeout"
+    },
+    {
+      "diff_path": "diff/src__registration__spectral.rs_line_289_col_68.diff",
+      "log_path": "log/src__registration__spectral.rs_line_289_col_68.log",
+      "name": "src/registration/spectral.rs:289:68: replace * with / in cross_phase",
+      "phases": [
+        {
+          "duration": 22.069647824,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.573691817,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__runtime__portable.rs_line_38_col_85.diff",
+      "log_path": "log/src__runtime__portable.rs_line_38_col_85.log",
+      "name": "src/runtime/portable.rs:38:85: replace == with != in prepare_wgpu_runtime",
+      "phases": [
+        {
+          "duration": 20.921594612,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.622008764,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__advanced__levels.rs_line_156_col_9.diff",
+      "log_path": "log/src__fusion__advanced__levels.rs_line_156_col_9.log",
+      "name": "src/fusion/advanced/levels.rs:156:9: replace Level::finish -> TensorHandle with Default::default()",
+      "phases": [
+        {
+          "duration": 1.053494219,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/src__fusion__advanced__plan.rs_line_56_col_5.diff",
+      "log_path": "log/src__fusion__advanced__plan.rs_line_56_col_5.log",
+      "name": "src/fusion/advanced/plan.rs:56:5: replace slab_ranges -> Result<Vec<Range<usize>>, String> with Ok(vec![Range::from_iter([0])])",
+      "phases": [
+        {
+          "duration": 1.103165499,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/src__fusion__advanced__pyramid.rs_line_123_col_21.diff",
+      "log_path": "log/src__fusion__advanced__pyramid.rs_line_123_col_21.log",
+      "name": "src/fusion/advanced/pyramid.rs:123:21: replace / with % in half_value",
+      "phases": [
+        {
+          "duration": 21.083521898,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.820228805,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__advanced__pyramid.rs_line_177_col_32.diff",
+      "log_path": "log/src__fusion__advanced__pyramid.rs_line_177_col_32.log",
+      "name": "src/fusion/advanced/pyramid.rs:177:32: replace * with / in expanded",
+      "phases": [
+        {
+          "duration": 21.064941889,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.524599081,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__advanced__pyramid.rs_line_179_col_35.diff",
+      "log_path": "log/src__fusion__advanced__pyramid.rs_line_179_col_35.log",
+      "name": "src/fusion/advanced/pyramid.rs:179:35: replace * with / in expanded",
+      "phases": [
+        {
+          "duration": 21.123790653,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.731117733,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__advanced__pyramid.rs_line_183_col_30.diff",
+      "log_path": "log/src__fusion__advanced__pyramid.rs_line_183_col_30.log",
+      "name": "src/fusion/advanced/pyramid.rs:183:30: replace + with * in expanded",
+      "phases": [
+        {
+          "duration": 21.142484336,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.525614736,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__advanced__weights.rs_line_68_col_53.diff",
+      "log_path": "log/src__fusion__advanced__weights.rs_line_68_col_53.log",
+      "name": "src/fusion/advanced/weights.rs:68:53: replace + with - in luma",
+      "phases": [
+        {
+          "duration": 22.194166068,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.824108382,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/src__fusion__advanced__weights.rs_line_97_col_36.diff",
+      "log_path": "log/src__fusion__advanced__weights.rs_line_97_col_36.log",
+      "name": "src/fusion/advanced/weights.rs:97:36: replace + with * in measure",
+      "phases": [
+        {
+          "duration": 22.636521823,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.923034404,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-cli__src__main.rs_line_99_col_9.diff",
+      "log_path": "log/crates__pancake-cli__src__main.rs_line_99_col_9.log",
+      "name": "crates/pancake-cli/src/main.rs:99:9: replace Arguments::into_job -> Result<JobConfig, String> with Ok(Default::default())",
+      "phases": [
+        {
+          "duration": 8.786203321,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__delivery__mod.rs_line_78_col_34.diff",
+      "log_path": "log/crates__pancake-gui__src__delivery__mod.rs_line_78_col_34.log",
+      "name": "crates/pancake-gui/src/delivery/mod.rs:78:34: replace || with && in viewport",
+      "phases": [
+        {
+          "duration": 13.759172572,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.825836014,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__desktop_menu.rs_line_22_col_5.diff",
+      "log_path": "log/crates__pancake-gui__src__desktop_menu.rs_line_22_col_5.log",
+      "name": "crates/pancake-gui/src/desktop_menu.rs:22:5: replace reveal_native -> Result<(), String> with Ok(())",
+      "phases": [
+        {
+          "duration": 2.415325955,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.780790704,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__desktop_menu.rs_line_230_col_40.diff",
+      "log_path": "log/crates__pancake-gui__src__desktop_menu.rs_line_230_col_40.log",
+      "name": "crates/pancake-gui/src/desktop_menu.rs:230:40: replace && with || in linux::folder_label",
+      "phases": [
+        {
+          "duration": 2.409417067,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.987528082,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__desktop_menu.rs_line_377_col_12.diff",
+      "log_path": "log/crates__pancake-gui__src__desktop_menu.rs_line_377_col_12.log",
+      "name": "crates/pancake-gui/src/desktop_menu.rs:377:12: delete ! in linux::item",
+      "phases": [
+        {
+          "duration": 2.568136627,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 7.13051944,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__panel__mod.rs_line_47_col_72.diff",
+      "log_path": "log/crates__pancake-gui__src__panel__mod.rs_line_47_col_72.log",
+      "name": "crates/pancake-gui/src/panel/mod.rs:47:72: replace != with == in x11_owner",
+      "phases": [
+        {
+          "duration": 2.4698358799999998,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.829018696,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__preview.rs_line_193_col_9.diff",
+      "log_path": "log/crates__pancake-gui__src__preview.rs_line_193_col_9.log",
+      "name": "crates/pancake-gui/src/preview.rs:193:9: replace PreviewDevice::retain -> Result<Image, String> with Ok(Default::default())",
+      "phases": [
+        {
+          "duration": 2.513754697,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.72965851,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__session.rs_line_216_col_9.diff",
+      "log_path": "log/crates__pancake-gui__src__session.rs_line_216_col_9.log",
+      "name": "crates/pancake-gui/src/session.rs:216:9: replace Session::show_result -> UiResult with Default::default()",
+      "phases": [
+        {
+          "duration": 0.751745118,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__session.rs_line_298_col_9.diff",
+      "log_path": "log/crates__pancake-gui__src__session.rs_line_298_col_9.log",
+      "name": "crates/pancake-gui/src/session.rs:298:9: replace Session::settle -> UiResult with Default::default()",
+      "phases": [
+        {
+          "duration": 0.701850062,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__session.rs_line_618_col_5.diff",
+      "log_path": "log/crates__pancake-gui__src__session.rs_line_618_col_5.log",
+      "name": "crates/pancake-gui/src/session.rs:618:5: replace select_source -> UiResult with Default::default()",
+      "phases": [
+        {
+          "duration": 0.701665846,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__session.rs_line_738_col_9.diff",
+      "log_path": "log/crates__pancake-gui__src__session.rs_line_738_col_9.log",
+      "name": "crates/pancake-gui/src/session.rs:738:9: delete match arm 2_i32 in settings",
+      "phases": [
+        {
+          "duration": 2.6221523700000002,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.873740502,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__session.rs_line_768_col_5.diff",
+      "log_path": "log/crates__pancake-gui__src__session.rs_line_768_col_5.log",
+      "name": "crates/pancake-gui/src/session.rs:768:5: replace ordinal -> UiResult<usize> with UiResult::from_iter([1])",
+      "phases": [
+        {
+          "duration": 0.701832417,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__session.rs_line_924_col_21.diff",
+      "log_path": "log/crates__pancake-gui__src__session.rs_line_924_col_21.log",
+      "name": "crates/pancake-gui/src/session.rs:924:21: replace > with < in crop_result",
+      "phases": [
+        {
+          "duration": 2.410447901,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.927871112,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__session.rs_line_1015_col_46.diff",
+      "log_path": "log/crates__pancake-gui__src__session.rs_line_1015_col_46.log",
+      "name": "crates/pancake-gui/src/session.rs:1015:46: delete ! in transition",
+      "phases": [
+        {
+          "duration": 2.4682581199999998,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.822496726,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__session.rs_line_1222_col_5.diff",
+      "log_path": "log/crates__pancake-gui__src__session.rs_line_1222_col_5.log",
+      "name": "crates/pancake-gui/src/session.rs:1222:5: replace open_recent -> UiResult with Default::default()",
+      "phases": [
+        {
+          "duration": 0.651952839,
+          "phase": "Build",
+          "process_status": {
+            "Failure": 101
+          }
+        }
+      ],
+      "status": "Unviable"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__sources__mod.rs_line_67_col_9.diff",
+      "log_path": "log/crates__pancake-gui__src__sources__mod.rs_line_67_col_9.log",
+      "name": "crates/pancake-gui/src/sources/mod.rs:67:9: replace Sources::clear with ()",
+      "phases": [
+        {
+          "duration": 2.41674189,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.676524254,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__panel__linux.rs_line_118_col_5.diff",
+      "log_path": "log/crates__pancake-gui__src__panel__linux.rs_line_118_col_5.log",
+      "name": "crates/pancake-gui/src/panel/linux.rs:118:5: replace set_native_owner with ()",
+      "phases": [
+        {
+          "duration": 2.364871656,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.773323985,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    },
+    {
+      "diff_path": "diff/crates__pancake-gui__src__panel__pointer.rs_line_54_col_70.diff",
+      "log_path": "log/crates__pancake-gui__src__panel__pointer.rs_line_54_col_70.log",
+      "name": "crates/pancake-gui/src/panel/pointer.rs:54:70: replace == with != in PointerHandoff::install",
+      "phases": [
+        {
+          "duration": 2.46594462,
+          "phase": "Build",
+          "process_status": "Success"
+        },
+        {
+          "duration": 6.885158148,
+          "phase": "Test",
+          "process_status": "Success"
+        }
+      ],
+      "status": "MissedMutant"
+    }
+  ],
+  "log-writer": 0,
+  "missing_identities": [],
+  "native-exit": 3,
+  "native_end": "2026-11-18T18:34:05.88141882Z",
+  "native_start": "2026-11-18T17:30:24.777418376Z",
+  "processed": 167,
+  "producer": 1,
+  "scope_complete": true,
+  "scope_problems": [],
+  "unexpected_identities": [],
+  "verdict": 1
+}

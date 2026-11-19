@@ -1,11 +1,11 @@
 //! Hardware-specific runtime qualification on the production selector.
 
-use cubecl as _;
+use cubecl::Device;
+use cubecl::device::{WgpuBackend, WgpuDevice, WgpuDeviceKind};
 use pancake::config::DevicePreference;
 use pancake::runtime::{
     Backend, RuntimeOverride, SelectedRuntime, prepare_wgpu_runtime, select_runtime,
 };
-use wgpu as _;
 
 include!("common/runtime_assertions.rs");
 
@@ -99,6 +99,86 @@ fn explicit_gpu_override_completes_on_named_runtime() -> Result<(), String> {
     )?;
     runtime.synchronize().map_err(|error| error.to_string())?;
     write_receipt(&runtime)
+}
+
+/// An explicit wgpu ordinal past the physical inventory must fail.
+///
+/// The probe first qualifies and uses the real ordinal-zero adapter. It then
+/// counts the currently visible physical adapters for that same graphics API.
+///
+/// # Errors
+/// Returns inventory, runtime, native readback, or ordinal-selection errors.
+#[test]
+fn explicit_wgpu_rejects_first_absent_physical_ordinal() -> Result<(), String> {
+    let first = select_runtime(
+        DevicePreference::Gpu,
+        Some(0),
+        1024,
+        Some(RuntimeOverride::Wgpu),
+    )?;
+    require(
+        first.physical_gpu() && first.fallback_reason().is_none(),
+        "explicit wgpu ordinal zero did not qualify physical hardware",
+    )?;
+    let setup = first
+        .wgpu_setup()
+        .ok_or("wgpu ordinal zero did not return its setup")?;
+    let api = match setup.backend {
+        wgpu::Backend::Vulkan => WgpuBackend::Vulkan,
+        wgpu::Backend::Metal => WgpuBackend::Metal,
+        wgpu::Backend::Dx12 => WgpuBackend::Dx12,
+        backend => return Err(format!("unexpected physical wgpu API {backend:?}")),
+    };
+    let input = [0, 8, 16];
+    require(
+        pancake::blur_horizontal_u16(first.device(), 3, 1, &input)? == [2, 8, 14],
+        "physical wgpu ordinal zero returned wrong samples",
+    )?;
+    first.synchronize().map_err(|error| error.to_string())?;
+    write_receipt(&first)?;
+
+    let first_absent = [
+        WgpuDeviceKind::DiscreteGpu(0),
+        WgpuDeviceKind::IntegratedGpu(0),
+    ]
+    .into_iter()
+    .flat_map(|kind| Device::enumerate(Device::Wgpu(WgpuDevice::new(kind).on(api)).to_id()))
+    .count();
+    require(
+        first_absent > 0,
+        "qualified GPU is absent from the physical inventory",
+    )?;
+
+    match select_runtime(
+        DevicePreference::Gpu,
+        Some(first_absent),
+        1024,
+        Some(RuntimeOverride::Wgpu),
+    ) {
+        Err(error)
+            if error
+                == format!(
+                    "wgpu {api:?} GPU index {first_absent} is absent ({first_absent} physical adapters)"
+                ) =>
+        {
+            Ok(())
+        }
+        Err(error) => Err(format!(
+            "unexpected error for wgpu ordinal {first_absent}: {error}"
+        )),
+        Ok(other) => {
+            let samples = pancake::blur_horizontal_u16(other.device(), 3, 1, &input)?;
+            other.synchronize().map_err(|error| error.to_string())?;
+            Err(format!(
+                "absent wgpu {api:?} GPU index {first_absent} ran on {} at {:?}; runtime={}, physical={}, fallback={:?}, samples={samples:?}",
+                other.device_name(),
+                other.device_pci_address(),
+                other.runtime_name(),
+                other.physical_gpu(),
+                other.fallback_reason(),
+            ))
+        }
+    }
 }
 
 /// Automatic mode uses a qualified real device and identifies setup fallback.

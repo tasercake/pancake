@@ -1,0 +1,24 @@
+[{
+  "SourceFile": "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/inputs/frame_000.CR3",
+  "SensorWidth": 5376,
+  "SensorHeight": 3574,
+  "SensorLeftBorder": 272,
+  "SensorTopBorder": 172,
+  "SensorRightBorder": 5359,
+  "SensorBottomBorder": 3563,
+  "CroppedImageWidth": 5088,
+  "CroppedImageHeight": 3392,
+  "Orientation": 1
+},
+{
+  "SourceFile": "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/inputs/frame_049.CR3",
+  "SensorWidth": 5376,
+  "SensorHeight": 3574,
+  "SensorLeftBorder": 272,
+  "SensorTopBorder": 172,
+  "SensorRightBorder": 5359,
+  "SensorBottomBorder": 3563,
+  "CroppedImageWidth": 5088,
+  "CroppedImageHeight": 3392,
+  "Orientation": 1
+}]

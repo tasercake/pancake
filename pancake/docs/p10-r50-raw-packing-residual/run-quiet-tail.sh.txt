@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(dirname "$(realpath "$0")")
+probe=/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/raw-pack-probe-4f7b73d/pancake-raw-pack-probe
+test ! -e "$root/tail-quiet.tsv"
+printf '%s  %s\n' ac42ed9fb2df6dd09c1aaf7beb5440ff5b5e134650118217613c81dc7724b115 "$probe" | sha256sum --check
+{
+  date -u +%FT%TZ
+  uname -srm
+  lscpu | rg 'Model name:'
+  ps -eo pid,psr,comm,pcpu --sort=-pcpu | sed -n '1,16p'
+} > "$root/tail-census.txt"
+taskset -c 0-14 "$probe" alternating | tee "$root/tail-quiet.tsv"
+date -u +%FT%TZ > "$root/tail-finished.txt"

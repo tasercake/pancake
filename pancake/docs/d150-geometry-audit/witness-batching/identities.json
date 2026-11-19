@@ -1,0 +1,20 @@
+{
+  "product_base_revision": "86d4df2d43a52b89eff4b4ba5fad94a3e68161a4",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "packed_test_executable_sha256": "a333f8040d51826579a6d35f30c0eb340c7dfdecc5dd8c4e0da47d3bafdb229c",
+  "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+  "cpu": "AMD Ryzen 9 7950X3D",
+  "kernel": "6.8.0-147-generic",
+  "logical_cpu_affinity": [
+    12,
+    13
+  ],
+  "jitter_warning": "Short two-core development-profile diagnostic. This did not own the exclusive benchmark lease.",
+  "files": {
+    "green.log.gz": "db445130d57246b654f07a1842ee8b804a1ab79a5d859984060275e9ad4e38bc",
+    "packed-overlay.patch.gz": "efeb04524f301b2f2f05c46a79001982c879bd1d0b6a0d3915ead3b772602cfd",
+    "red.log.gz": "27ce2a2576d4e49db797d6c0af2c95b0acba9bac712af903863b5f9037f85836",
+    "serial-control-overlay.patch.gz": "e3c940689916d9c6c9ba1930ff3bc6ae338161c0614fc565113fa79135ab4bdc",
+    "synthetic-cost.json": "4ecf81ec5b083aef6c7ddd454dac6fa7d553ea04b50352e6b6cf3c4dfb1787bc"
+  }
+}

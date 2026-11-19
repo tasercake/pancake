@@ -1,0 +1,206 @@
+{
+  "source_revision": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "start": "2026-11-18T19:23:08+08:00",
+  "end": "2026-11-18T19:33:10+08:00",
+  "cpu_affinity": "75440 Cpus_allowed_list:\t20-21",
+  "native_exit": 3,
+  "log_writer_exit": 0,
+  "clean_before_and_after": true,
+  "native_launch": "cargo mutants --workspace --test-workspace false --cargo-arg=--workspace --cap-lints true --all-features --in-place --timeout 60 --build-timeout 180 --jobserver-tasks 2 --no-shuffle --shard 255/256 --sharding round-robin --output /tmp/pancake-worktrees.t3paqgWM/p9-native-mutation-next/artifacts/pancake-mutation/287828a-native-next/native-255-256 -- --locked --lib --bins --test cpu_advanced_fusion --test cpu_array_layout --test cpu_cli --test cpu_config --test cpu_fusion_contract --test cpu_gray_array_export --test cpu_image_export --test cpu_image_io --test cpu_job --test cpu_kernel_contract --test cpu_npy --test cpu_numerical_contract --test cpu_registration_contract --test cpu_runtime_contract --test cpu_runtime_options --test cpu_stack_plan -- --include-ignored",
+  "exact_partition": {
+    "full_candidates": 2583,
+    "parent_index": "15/16",
+    "parent_candidates": 161,
+    "selected_index": "255/256",
+    "selected_candidates": 10,
+    "selected_full_roster_ordinals": [
+      255,
+      511,
+      767,
+      1023,
+      1279,
+      1535,
+      1791,
+      2047,
+      2303,
+      2559
+    ],
+    "listing_sha256": {
+      "full.json": "a97e2a6c014d47a908afc1a786576f9b49230724896d1f6ca3e62af1b42ebc64",
+      "parent.json": "09da8e48b30529f42100245fecf3615c483d7f79d944ef524a651c30f0b8f05b",
+      "list.json": "b2b1c29114e199902fa9ec35dbf4d4cc2d71c1c410547234f8969c4e5af02bde"
+    }
+  },
+  "target_allocated_bytes_after": 7326187520,
+  "baseline_tests": 137,
+  "baseline_targets": 19,
+  "baseline_phases": [
+    {
+      "phase": "Build",
+      "duration": 203.97662594,
+      "process_status": "Success",
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--no-run",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--package=pancake-gui@0.1.0",
+        "--all-features",
+        "--workspace"
+      ]
+    },
+    {
+      "phase": "Test",
+      "duration": 11.467165927,
+      "process_status": "Success",
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--package=pancake-gui@0.1.0",
+        "--all-features",
+        "--workspace",
+        "--locked",
+        "--lib",
+        "--bins",
+        "--test",
+        "cpu_advanced_fusion",
+        "--test",
+        "cpu_array_layout",
+        "--test",
+        "cpu_cli",
+        "--test",
+        "cpu_config",
+        "--test",
+        "cpu_fusion_contract",
+        "--test",
+        "cpu_gray_array_export",
+        "--test",
+        "cpu_image_export",
+        "--test",
+        "cpu_image_io",
+        "--test",
+        "cpu_job",
+        "--test",
+        "cpu_kernel_contract",
+        "--test",
+        "cpu_npy",
+        "--test",
+        "cpu_numerical_contract",
+        "--test",
+        "cpu_registration_contract",
+        "--test",
+        "cpu_runtime_contract",
+        "--test",
+        "cpu_runtime_options",
+        "--test",
+        "cpu_stack_plan",
+        "--",
+        "--include-ignored"
+      ]
+    }
+  ],
+  "observed_candidate_count": 10,
+  "missing_in_selected_partition": 0,
+  "outcomes_selected_partition": {
+    "CaughtMutant": 6,
+    "MissedMutant": 3,
+    "Timeout": 1
+  },
+  "unrun_full_roster": 2573,
+  "mutants": [
+    {
+      "name": "src/registration/mod.rs:54:47: replace != with == in ResidentRgb::into_tensor",
+      "summary": "CaughtMutant",
+      "phase_seconds": {
+        "Build": 32.072622308,
+        "Test": 4.481730091
+      },
+      "raw_log": "native-255-256/mutants.out/log/src__registration__mod.rs_line_54_col_47.log"
+    },
+    {
+      "name": "src/fusion/focus.rs:384:61: replace - with / in focus_energy",
+      "summary": "CaughtMutant",
+      "phase_seconds": {
+        "Build": 32.505851815,
+        "Test": 2.169162776
+      },
+      "raw_log": "native-255-256/mutants.out/log/src__fusion__focus.rs_line_384_col_61.log"
+    },
+    {
+      "name": "src/image_io/npy.rs:121:15: replace == with != in decode",
+      "summary": "CaughtMutant",
+      "phase_seconds": {
+        "Build": 32.636476448,
+        "Test": 2.506129522
+      },
+      "raw_log": "native-255-256/mutants.out/log/src__image_io__npy.rs_line_121_col_15.log"
+    },
+    {
+      "name": "src/registration/estimate.rs:162:36: replace / with * in prepare_thumbnail",
+      "summary": "MissedMutant",
+      "phase_seconds": {
+        "Build": 32.840758167,
+        "Test": 12.222554984
+      },
+      "raw_log": "native-255-256/mutants.out/log/src__registration__estimate.rs_line_162_col_36.log"
+    },
+    {
+      "name": "src/registration/kernels.rs:102:5: replace read -> Result<Vec<f32>, String> with Ok(vec![])",
+      "summary": "Timeout",
+      "phase_seconds": {
+        "Build": 31.86466005,
+        "Test": 60.058065057
+      },
+      "raw_log": "native-255-256/mutants.out/log/src__registration__kernels.rs_line_102_col_5.log"
+    },
+    {
+      "name": "src/registration/kernels.rs:439:55: replace + with * in correlation_moments",
+      "summary": "CaughtMutant",
+      "phase_seconds": {
+        "Build": 33.447290969,
+        "Test": 5.187775767
+      },
+      "raw_log": "native-255-256/mutants.out/log/src__registration__kernels.rs_line_439_col_55.log"
+    },
+    {
+      "name": "src/registration/spectral.rs:267:32: replace + with * in cross_phase",
+      "summary": "CaughtMutant",
+      "phase_seconds": {
+        "Build": 32.270387937,
+        "Test": 5.792884601
+      },
+      "raw_log": "native-255-256/mutants.out/log/src__registration__spectral.rs_line_267_col_32.log"
+    },
+    {
+      "name": "src/fusion/advanced/pyramid.rs:153:5: replace clamp_before -> usize with 1",
+      "summary": "CaughtMutant",
+      "phase_seconds": {
+        "Build": 29.457474778,
+        "Test": 0.806121019
+      },
+      "raw_log": "native-255-256/mutants.out/log/src__fusion__advanced__pyramid.rs_line_153_col_5.log"
+    },
+    {
+      "name": "crates/pancake-gui/src/desktop_menu.rs:9:5: replace reveal -> Result<(), String> with Ok(())",
+      "summary": "MissedMutant",
+      "phase_seconds": {
+        "Build": 21.305991206,
+        "Test": 6.170566883
+      },
+      "raw_log": "native-255-256/mutants.out/log/crates__pancake-gui__src__desktop_menu.rs_line_9_col_5.log"
+    },
+    {
+      "name": "crates/pancake-gui/src/panel/linux.rs:65:5: replace build -> Result<(Dialog, FileChooserWidget, Entry), String> with Ok((Default::default(), Default::default(), Default::default()))",
+      "summary": "MissedMutant",
+      "phase_seconds": {
+        "Build": 2.364755616,
+        "Test": 6.429514554
+      },
+      "raw_log": "native-255-256/mutants.out/log/crates__pancake-gui__src__panel__linux.rs_line_65_col_5.log"
+    }
+  ],
+  "raw_sha256": "56582a5a4c1f3fb2f503fb4ad9921efa031fe69df8e17f1d1a107cdb0d94335d"
+}

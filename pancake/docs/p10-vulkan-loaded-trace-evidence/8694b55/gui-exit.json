@@ -1,0 +1,8 @@
+{
+  "gui_pid": 463285,
+  "normal_close_requested_ns": 549132430515372,
+  "exit_observed_by_pidfd": true,
+  "forced_after_native_close": false,
+  "exit_code_available_to_driver": false,
+  "close_exception": null
+}

@@ -1,0 +1,23 @@
+//! Independently fingerprint the two already-verified baseline byte streams.
+use std::error::Error;
+use std::fs::File;
+use std::hash::{DefaultHasher, Hasher as _};
+use std::io::{self, Read as _, Write as _};
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let location = std::env::args_os().nth(1).ok_or("baseline path missing")?;
+    let mut input = File::open(location)?;
+    let mut working_bytes = vec![0_u8; 207_101_952];
+    let mut output = io::stdout().lock();
+    for _ in 0..2 {
+        input.read_exact(&mut working_bytes)?;
+        let mut checksum = DefaultHasher::new();
+        checksum.write(&working_bytes);
+        writeln!(output, "{:016x}", checksum.finish())?;
+    }
+    let mut extra = [0_u8];
+    if input.read(&mut extra)? != 0 {
+        return Err("extra baseline samples".into());
+    }
+    Ok(())
+}

@@ -1,0 +1,11 @@
+9681d091831e1f703735e5e33f56a0e1a6edcd1e
+    Finished `test` profile [unoptimized] target(s) in 0.27s
+     Running unittests src/main.rs (target/debug/build/pancake-gui/c855531277e79884/out/pancake_gui-c855531277e79884)
+running 1 test
+Error: "Hovering on Fit scheduled a decorative animation."
+test tests::viewer_fit_updates_without_decorative_animation ... FAILED
+failures:
+failures:
+    tests::viewer_fit_updates_without_decorative_animation
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.68s
+error: test failed, to rerun pass `-p pancake-gui --bin pancake-gui`

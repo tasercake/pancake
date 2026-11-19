@@ -1,0 +1,19 @@
+5dfc816274c2f8651d503c7a1a7bdacc7ae3664e98d61d0c1d9d2f2964e28dbb  target/release/pancake-cli
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+
+Displaying notes found in: .note.ABI-tag
+  Owner                Data size 	Description
+  GNU                  0x00000010	NT_GNU_ABI_TAG (ABI version tag)
+    OS: Linux, ABI: 3.2.0
+
+Displaying notes found in: .note.gnu.build-id
+  Owner                Data size 	Description
+  GNU                  0x00000014	NT_GNU_BUILD_ID (unique build ID bitstring)
+    Build ID: 853720f7c298feecc530a16b06b1f5d5fa2d8712
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5

@@ -1,0 +1,37 @@
+"""Identify every native test executable retained from each layout seed."""
+from hashlib import file_digest
+import json
+from pathlib import Path
+import re
+import subprocess
+
+root = Path.cwd()
+proof = root / "artifacts/linux-layouts-11cfcf8"
+scope = json.loads((proof / "receipt.json").read_text())["cpu_layouts"]
+identities = {}
+seen = set()
+for seed, runner in scope["seeds"].items():
+    by_path = {}
+    for row in runner["test_results"]:
+        relative = row["artifact"]
+        if relative in seen:
+            raise ValueError(f"Native test reused output path {relative}")
+        seen.add(relative)
+        output = root / "pancake" / relative
+        with output.open("rb") as handle:
+            if handle.read(4) != b"\x7fELF":
+                raise ValueError(f"Expected an ELF artifact at {relative}")
+            handle.seek(0)
+            digest = file_digest(handle, "sha256").hexdigest()
+        notes = subprocess.run(
+            ["readelf", "-n", str(output)], capture_output=True, text=True, check=True
+        ).stdout
+        build_id = re.search(r"Build ID: ([0-9a-f]+)", notes)
+        by_path[relative] = {"target": row["target"], "sha256": digest,
+                             "size_bytes": output.stat().st_size,
+                             "elf_build_id": build_id[1] if build_id else None}
+    if len(by_path) != scope["seeds"][seed]["expected_groups"]:
+        raise ValueError(f"Native ELF roster is incomplete for seed {seed}")
+    identities[seed] = by_path
+(proof / "native-artifacts.json").write_text(json.dumps(identities, indent=2) + "\n")
+print(f"Identified {len(seen)} exact native test ELFs")

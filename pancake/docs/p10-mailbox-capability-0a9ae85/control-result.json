@@ -1,0 +1,18 @@
+{
+  "scope": "functional startup and resize; zero viewer timing credit",
+  "start": "2026-11-19T01:27:56+08:00",
+  "terminal": "2026-11-19T01:27:58+08:00",
+  "collector_exit": 0,
+  "resolved_after_resize": "Fifo",
+  "advertised_modes": [
+    "Fifo",
+    "Immediate"
+  ],
+  "mailbox_supported": false,
+  "native_graphics_surface_configurations": 4,
+  "raw_mode_csv_sha256": "9b26475871cab9f29003318d6d3634eb1088e4031af1aa1ab7e6949e9f9a448f",
+  "mode_contract_sha256": "aebdd33bcb33528e5f01db39467bc60733aca797b47adfd344cc16e3b0e2840a",
+  "native_shutdown_sha256": "e6b248ae2880d258974b5f0eeaf9f6f5f6998efa46cfec7ca2813b5405a51b56",
+  "private_profile_removed": true,
+  "candidate_b": "not built because exact live surface has no Mailbox support"
+}

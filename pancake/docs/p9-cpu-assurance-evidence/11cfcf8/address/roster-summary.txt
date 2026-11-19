@@ -1,0 +1,30 @@
+{
+  "source_revision": "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6",
+  "matched_nextest_dev_names": 164,
+  "sanitizer_roster_names": 164,
+  "matched_groups": 20,
+  "counts": {
+    "pancake": 27,
+    "pancake-cli::bin/pancake-cli": 2,
+    "pancake-cli::cpu_cli": 7,
+    "pancake-cli::cpu_config": 9,
+    "pancake-cli::cpu_runtime_options": 6,
+    "pancake-gui::bin/pancake-gui": 18,
+    "pancake::cpu_advanced_fusion": 7,
+    "pancake::cpu_array_layout": 2,
+    "pancake::cpu_fusion_contract": 4,
+    "pancake::cpu_gray_array_export": 2,
+    "pancake::cpu_image_export": 10,
+    "pancake::cpu_image_io": 29,
+    "pancake::cpu_job": 14,
+    "pancake::cpu_kernel_contract": 2,
+    "pancake::cpu_npy": 4,
+    "pancake::cpu_numerical_contract": 2,
+    "pancake::cpu_registration_contract": 7,
+    "pancake::cpu_resident_policy": 1,
+    "pancake::cpu_runtime_contract": 5,
+    "pancake::cpu_stack_plan": 6
+  },
+  "nextest_junit_gzip_sha256": "db121aec0efd1f931ab3b5110c544f89686963ccdb9a02a440782f4422729ace",
+  "sanitizer_log_sha256": "a7a465c2c126b08f06d0ab658def5826ece2c8bab049eda3c6dbab08a3fbb364"
+}

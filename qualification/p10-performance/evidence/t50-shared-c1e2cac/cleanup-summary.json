@@ -1,0 +1,13 @@
+{
+  "materialization_sha256": "cd4942acd3127518340dd7f10a9c68d5768923beb45dfd36614ba7a11bf10eb4",
+  "raw_cleanup_sha256": "62debca2d25beab609d4b634a82c59c89633317187089855fed8651103370609",
+  "roles_terminal": [
+    "packaged_stock_viewer",
+    "experimental_bounded_poll_viewer"
+  ],
+  "deleted_images": 52,
+  "deleted_bytes": 2775174405,
+  "remaining_tiffs": 0,
+  "cleanup_started": "2026-11-18T21:49:44+08:00",
+  "cleanup_ended": "2026-11-18T21:49:45+08:00"
+}

@@ -1,0 +1,165 @@
+{
+  "source_commit": "d6ac366623e73736b252d044374d4ae92019585a",
+  "candidate_count": 2504,
+  "files": {
+    "src/registration/kernels.rs": 308,
+    "src/registration/spectral.rs": 222,
+    "src/fusion/focus.rs": 211,
+    "src/fusion/advanced/pyramid.rs": 195,
+    "src/registration/estimate.rs": 182,
+    "src/fusion/advanced/weights.rs": 134,
+    "crates/pancake-gui/src/session.rs": 126,
+    "src/fusion/advanced/levels.rs": 91,
+    "src/lib.rs": 79,
+    "src/fusion/resize.rs": 78,
+    "src/registration/geometry.rs": 75,
+    "src/image_io/mod.rs": 70,
+    "src/runtime/mod.rs": 63,
+    "src/image_io/export.rs": 59,
+    "src/config.rs": 51,
+    "src/job/lifecycle.rs": 47,
+    "src/job/mod.rs": 46,
+    "src/image_io/npy.rs": 43,
+    "src/job/stream.rs": 36,
+    "src/fusion/advanced/plan.rs": 34,
+    "crates/pancake-gui/src/desktop_menu.rs": 34,
+    "src/config/paths.rs": 32,
+    "src/fusion/advanced/mod.rs": 32,
+    "src/job/worker.rs": 30,
+    "crates/pancake-gui/src/history.rs": 26,
+    "crates/pancake-gui/src/sources/mod.rs": 23,
+    "src/job/registration.rs": 22,
+    "crates/pancake-gui/src/preferences/mod.rs": 21,
+    "crates/pancake-gui/src/delivery/mod.rs": 18,
+    "src/image_io/raw.rs": 17,
+    "crates/pancake-gui/src/panel/pointer.rs": 16,
+    "src/fusion/buffers.rs": 14,
+    "src/runtime/portable.rs": 14,
+    "crates/pancake-gui/src/preview.rs": 14,
+    "crates/pancake-gui/src/panel/linux.rs": 11,
+    "crates/pancake-gui/src/panel/mod.rs": 9,
+    "src/job/events.rs": 8,
+    "crates/pancake-gui/src/main.rs": 7,
+    "crates/pancake-cli/src/main.rs": 6
+  },
+  "modules": {
+    "src/fusion": 789,
+    "src/registration": 787,
+    "crates/pancake-gui": 305,
+    "src/image_io": 189,
+    "src/job": 189,
+    "src/lib.rs": 79,
+    "src/runtime": 77,
+    "src/config.rs": 51,
+    "src/config": 32,
+    "crates/pancake-cli": 6
+  },
+  "candidates_by_package": {
+    "pancake": 2193,
+    "pancake-cli": 6,
+    "pancake-gui": 305
+  },
+  "candidates_by_kind": {
+    "FnValue": 667,
+    "BinaryOperator": 1643,
+    "UnaryOperator": 81,
+    "MatchArm": 60,
+    "StructField": 11,
+    "MatchArmGuard": 42
+  },
+  "enabled_full_cpu_integration_targets": [
+    "cpu_advanced_fusion",
+    "cpu_array_layout",
+    "cpu_cli",
+    "cpu_config",
+    "cpu_fusion_contract",
+    "cpu_gray_array_export",
+    "cpu_image_export",
+    "cpu_image_io",
+    "cpu_job",
+    "cpu_kernel_contract",
+    "cpu_npy",
+    "cpu_numerical_contract",
+    "cpu_registration_contract",
+    "cpu_runtime_contract",
+    "cpu_runtime_options",
+    "cpu_stack_plan"
+  ],
+  "pinned_tool_sha256": "f985f265ee3ea3e453aa98b04c52134953911f692f8ce8abf137f3873202a2d0",
+  "full_roster_raw_sha256": "9977b1fbcb823299ee8dd50b0c4a5a72c4dd7f0a605b84b8c07a8e540ed73b6a",
+  "historical_only_not_full_gate_credit": [
+    {
+      "label": "P0 closure",
+      "source_commit": "bc67159a3d4569c8f4cc789eaee41a3d877f35a1",
+      "receipt": "pancake/docs/p0-close-evidence/closure-mutation-outcomes.json.gz",
+      "candidates": 79,
+      "historical_outcomes": {
+        "CaughtMutant": 79
+      },
+      "unchanged_function_body_and_relative_mutant_overlaps": {
+        "CaughtMutant": 79
+      },
+      "elapsed_seconds": 431.484,
+      "baseline_seconds": 11.654,
+      "mean_mutant_phase_seconds": 5.313,
+      "median_mutant_phase_seconds": 5.291,
+      "linear_scenario_hours_excluding_baseline": 3.696
+    },
+    {
+      "label": "P1 CLI/config",
+      "source_commit": "f69a639f2b40fb3b43376c692f6d8f87f9da36ee",
+      "receipt": "pancake/docs/p1-assurance-evidence/cli-config/mutation-outcomes.json.gz",
+      "candidates": 88,
+      "historical_outcomes": {
+        "CaughtMutant": 85,
+        "Unviable": 3
+      },
+      "unchanged_function_body_and_relative_mutant_overlaps": {
+        "CaughtMutant": 82,
+        "Unviable": 3
+      },
+      "elapsed_seconds": 265.197,
+      "baseline_seconds": 41.642,
+      "mean_mutant_phase_seconds": 2.537,
+      "median_mutant_phase_seconds": 2.564,
+      "linear_scenario_hours_excluding_baseline": 1.767
+    },
+    {
+      "label": "P6 lifecycle",
+      "source_commit": "2375efa",
+      "receipt": "pancake/docs/p6-core-resume-evidence/mutation-outcomes.json",
+      "candidates": 18,
+      "historical_outcomes": {
+        "CaughtMutant": 17,
+        "Timeout": 1
+      },
+      "unchanged_function_body_and_relative_mutant_overlaps": {
+        "CaughtMutant": 17,
+        "Timeout": 1
+      },
+      "elapsed_seconds": 238.05,
+      "baseline_seconds": 67.466,
+      "mean_mutant_phase_seconds": 9.476,
+      "median_mutant_phase_seconds": 4.885,
+      "linear_scenario_hours_excluding_baseline": 6.592
+    },
+    {
+      "label": "P6 resume follow-up",
+      "source_commit": "5056563",
+      "receipt": "pancake/docs/p6-core-resume-evidence/resume-mutation-outcomes.json",
+      "candidates": 1,
+      "historical_outcomes": {
+        "CaughtMutant": 1
+      },
+      "unchanged_function_body_and_relative_mutant_overlaps": {
+        "CaughtMutant": 1
+      },
+      "elapsed_seconds": 42.503,
+      "baseline_seconds": 32.807,
+      "mean_mutant_phase_seconds": 9.692,
+      "median_mutant_phase_seconds": 9.692,
+      "linear_scenario_hours_excluding_baseline": 6.744
+    }
+  ],
+  "complete_current_mutant_execution_receipt_present": false
+}

@@ -1,0 +1,8 @@
+c8f68cf79d143403ad9d5df906a5f8cfa2047526
+bea745e2654042fd52499eccb634339a59ea493eeab8bb3e9582294a352fe4ca  pancake/target/release/pancake-cli
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  pancake/Cargo.lock
+1c120223a21772711cef875a934f639d985d576d49fc04c1ce1e2f7adc07aef8  pancake/docs/p10-r50-raw-audit/f2f1bb3/p2/cpu-cases.txt
+Linux 6.8.0-147-generic x86_64
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+uv 0.6.4
+2026-11-18T12:23:52Z

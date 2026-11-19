@@ -1,0 +1,2 @@
+414203904 /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/verification/baseline.rgbf32
+414203904 /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/verification/candidate.rgbf32

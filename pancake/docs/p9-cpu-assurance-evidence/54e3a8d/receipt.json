@@ -1,0 +1,91 @@
+{
+  "source_revision": "54e3a8d60025cf77daa655e5e66781a82f515f7c",
+  "prior_revision": "5b98890d5e976d7287c354091671fff6f87d266c",
+  "started_sgt": "2026-11-19T02:28:06+08:00",
+  "fast_ended_sgt": "2026-11-19T02:30:16+08:00",
+  "cpu_nextest_ended_sgt": "2026-11-19T02:32:42+08:00",
+  "fast": {
+    "exit": 0,
+    "python_policy_tests": 54
+  },
+  "cpu_nextest_dev": {
+    "exit": 0,
+    "passed": 162,
+    "binaries": 20,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0,
+    "selected_integration_targets": [
+      "cpu_advanced_fusion",
+      "cpu_array_layout",
+      "cpu_cli",
+      "cpu_config",
+      "cpu_fusion_contract",
+      "cpu_gray_array_export",
+      "cpu_image_export",
+      "cpu_image_io",
+      "cpu_job",
+      "cpu_kernel_contract",
+      "cpu_npy",
+      "cpu_numerical_contract",
+      "cpu_registration_contract",
+      "cpu_resident_policy",
+      "cpu_runtime_contract",
+      "cpu_runtime_options",
+      "cpu_stack_plan"
+    ],
+    "retained_prior_tests": 160,
+    "added": [
+      {
+        "suite": "pancake",
+        "test": "registration::spectral::tests::weak_spectral_peak_abstains_before_displacement",
+        "seconds": 0.006
+      },
+      {
+        "suite": "pancake::cpu_registration_contract",
+        "test": "cpu_registration_requires_detail_in_the_reference",
+        "seconds": 0.241
+      }
+    ],
+    "inventory_matches_junit": true,
+    "inventory_declared_ignored_but_selected": 0,
+    "test_count_per_binary": {
+      "pancake": 27,
+      "pancake-cli::bin/pancake-cli": 2,
+      "pancake-cli::cpu_cli": 7,
+      "pancake-cli::cpu_config": 9,
+      "pancake-cli::cpu_runtime_options": 6,
+      "pancake-gui::bin/pancake-gui": 18,
+      "pancake::cpu_advanced_fusion": 5,
+      "pancake::cpu_array_layout": 2,
+      "pancake::cpu_fusion_contract": 4,
+      "pancake::cpu_gray_array_export": 2,
+      "pancake::cpu_image_export": 10,
+      "pancake::cpu_image_io": 29,
+      "pancake::cpu_job": 14,
+      "pancake::cpu_kernel_contract": 2,
+      "pancake::cpu_npy": 4,
+      "pancake::cpu_numerical_contract": 2,
+      "pancake::cpu_registration_contract": 7,
+      "pancake::cpu_resident_policy": 1,
+      "pancake::cpu_runtime_contract": 5,
+      "pancake::cpu_stack_plan": 6
+    }
+  },
+  "execution": {
+    "nextest": "0.9.152",
+    "rust": "1.100.0",
+    "cpus": "0,1",
+    "jobs": 2,
+    "offline": true
+  },
+  "raw_sha256": {
+    "fast.log": "e5b60f2afedafafc7ce38e5625987e5b7e50f9d6a0955ed4e385729965a702e8",
+    "cpu-dev.log": "99ca1c14028a05009d7900779902841bcd50360521261d55ae740730852b90b8",
+    "junit.xml": "8f7e1ac62e016a66f22ebb46ddc418c861522c3cff7e82006f7ed11e7ea63fda",
+    "nextest-inventory.json": "ef86fa7950233386792942bdeebfd6803c6336aa000b7d75a0de59244149faca",
+    "metadata.json": "a5a8f5d2b69602ce4ab6acbffe7321eb49446edb1593187c29a8dbc5b9177b8b",
+    "selected-targets.txt": "3f22c81d0d34ec39679623009b0533e9c5be103579828cd8b05922c7c563c0ce",
+    "baseline-junit.xml.gz": "168757132fe161f95e0800d6b4b86b0f38b98ecd0e3420b47c2377514bd12e25"
+  }
+}

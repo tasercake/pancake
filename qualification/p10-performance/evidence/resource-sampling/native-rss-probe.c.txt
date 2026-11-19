@@ -1,0 +1,120 @@
+#define _GNU_SOURCE
+
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+/* /proc/PID/stat fields 3 through 24 follow the last ')' of the name. */
+static int process_pages(int proc_fd, const char *name, int session, uint64_t *pages) {
+    char path[64];
+    int path_size = snprintf(path, sizeof(path), "%s/stat", name);
+    if (path_size < 0 || (size_t)path_size >= sizeof(path)) {
+        return ENAMETOOLONG;
+    }
+    int fd = openat(proc_fd, path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) {
+        return errno;
+    }
+    char stat[4096];
+    ssize_t length = read(fd, stat, sizeof(stat) - 1);
+    int error = errno;
+    close(fd);
+    if (length < 0) {
+        return error;
+    }
+    stat[length] = '\0';
+    char *last_paren = strrchr(stat, ')');
+    if (last_paren == NULL) {
+        return EIO;
+    }
+
+    char *cursor = NULL;
+    char *field = strtok_r(last_paren + 1, " ", &cursor);
+    for (int index = 3; index <= 24; index++) {
+        if (field == NULL) {
+            return EIO;
+        }
+        if (index == 3 && strcmp(field, "Z") == 0) {
+            return ESRCH;
+        }
+        if (index == 6 && strtol(field, NULL, 10) != session) {
+            return ESRCH;
+        }
+        if (index == 24) {
+            char *end;
+            errno = 0;
+            long long rss = strtoll(field, &end, 10);
+            if (errno || field == end || *end != '\0') {
+                return EIO;
+            }
+            *pages = rss > 0 ? (uint64_t)rss : 0;
+            return 0;
+        }
+        field = strtok_r(NULL, " ", &cursor);
+    }
+    return EIO;
+}
+
+int pancake_session_rss(int session, int *members, size_t capacity,
+                        size_t *count, uint64_t *bytes) {
+    long page_size = sysconf(_SC_PAGESIZE);
+    if (page_size <= 0) {
+        return EIO;
+    }
+    DIR *proc = opendir("/proc");
+    if (proc == NULL) {
+        return errno;
+    }
+    int proc_fd = dirfd(proc);
+    int error = 0;
+    *count = 0;
+    *bytes = 0;
+    for (;;) {
+        errno = 0;
+        struct dirent *entry = readdir(proc);
+        if (entry == NULL) {
+            error = errno;
+            break;
+        }
+        if (entry->d_name[0] < '0' || entry->d_name[0] > '9') {
+            continue;
+        }
+        char *end;
+        long pid = strtol(entry->d_name, &end, 10);
+        if (*end != '\0' || pid <= 0 || pid > INT_MAX) {
+            continue;
+        }
+        pid_t actual_session = getsid((pid_t)pid);
+        if (actual_session < 0 && errno != ESRCH) {
+            error = errno;
+            break;
+        }
+        if (actual_session != session) {
+            continue;
+        }
+        uint64_t pages;
+        int read_status = process_pages(proc_fd, entry->d_name, session, &pages);
+        if (read_status == ENOENT || read_status == ESRCH) {
+            continue;
+        }
+        if (read_status) {
+            error = read_status;
+            break;
+        }
+        if (*count == capacity || pages > (UINT64_MAX - *bytes) / (uint64_t)page_size) {
+            error = EOVERFLOW;
+            break;
+        }
+        members[*count] = (int)pid;
+        *count += 1;
+        *bytes += pages * (uint64_t)page_size;
+    }
+    closedir(proc);
+    return error;
+}

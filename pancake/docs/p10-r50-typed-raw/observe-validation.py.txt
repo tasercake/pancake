@@ -1,0 +1,37 @@
+"""Trace the real generic RGB sample validator from an exact native test binary."""
+
+import json
+import os
+from pathlib import Path
+
+import gdb
+
+trace = Path(os.environ["PANCAKE_VALIDATION_TRACE"]).open("x", buffering=1)
+symbol = "pancake::image_io::validate_samples"
+
+
+def emit(**event):
+    trace.write(json.dumps(event) + "\n")
+
+
+class Validate(gdb.Breakpoint):
+    """Count active, non-inlined entry into the full generic validator."""
+
+    def stop(self):
+        frames = []
+        frame = gdb.newest_frame()
+        while frame is not None and len(frames) < 12:
+            frames.append(frame.name())
+            frame = frame.older()
+        emit(event="validate_samples", frames=frames)
+        return False
+
+
+def done(event):
+    emit(event="inferior_exit", exit_code=getattr(event, "exit_code", None))
+    trace.close()
+
+
+probe = Validate(symbol, internal=True)
+emit(event="probe_armed", symbol=symbol)
+gdb.events.exited.connect(done)

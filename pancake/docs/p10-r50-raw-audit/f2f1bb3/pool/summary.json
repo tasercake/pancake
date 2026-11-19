@@ -1,0 +1,49 @@
+{
+  "two": {
+    "available_cpus": 15,
+    "workers": 2,
+    "two_frame_stage_seconds": [
+      1.847541321,
+      1.875686056,
+      1.829967609,
+      1.870166069
+    ],
+    "median_two_frame_stage_seconds": 1.858853695,
+    "wall_seconds": [
+      1.88,
+      1.91,
+      1.86,
+      1.9
+    ],
+    "peak_rss_kib": [
+      566404,
+      565404,
+      564980,
+      566652
+    ]
+  },
+  "affinity": {
+    "available_cpus": 15,
+    "workers": 15,
+    "two_frame_stage_seconds": [
+      1.052881106,
+      1.042148623,
+      1.015806236,
+      1.045346229
+    ],
+    "median_two_frame_stage_seconds": 1.043747426,
+    "wall_seconds": [
+      1.09,
+      1.08,
+      1.05,
+      1.08
+    ],
+    "peak_rss_kib": [
+      593628,
+      594224,
+      575812,
+      594272
+    ]
+  },
+  "affinity_over_two_median": 0.5615005789898919
+}

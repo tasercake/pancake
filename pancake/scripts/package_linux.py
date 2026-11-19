@@ -12,6 +12,7 @@ import tempfile
 import tomllib
 from pathlib import Path
 
+from package_native_llvm import stage_native_llvm_notices, verify_native_llvm_notices
 from package_notices import file_sha256, stage_notices, verify_notices
 
 BINARIES = ("pancake-cli", "pancake-gui")
@@ -69,7 +70,8 @@ def _dependency_report(staging, binaries, control):
     return ", ".join(dependencies), result.stderr
 
 
-def build_package(release, output, version, maintainer, revision, lock_digest, *, source_root):
+def build_package(release, output, version, maintainer, revision, lock_digest, *, source_root,
+                  native_llvm_receipt=None):
     """Stage, extract and verify the package before publishing local artifacts."""
     if sys.platform != "linux" or platform.machine() != "x86_64":
         raise ValueError("Build the Debian package on a Linux x86-64 package host")
@@ -112,6 +114,11 @@ def build_package(release, output, version, maintainer, revision, lock_digest, *
             "[Desktop Entry]\nType=Application\nName=Pancake\n"
             "Exec=pancake-gui %F\nCategories=Graphics;Photography;\n", encoding="utf-8")
         notices = stage_notices(payload, source_root, revision, lock_digest)
+        native_notices = None
+        if native_llvm_receipt is not None:
+            identities = {name: {key: record[key] for key in ("sha256", "bytes")} for name, record in audit.items()}
+            native_notices = stage_native_llvm_notices(payload, source_root / "notices/llvm",
+                                                      native_llvm_receipt, revision, lock_digest, identities)
         metadata = payload / "DEBIAN"
         metadata.mkdir()
         (metadata / "control").write_text(f"{control}Depends: {dependencies}\n", encoding="utf-8")
@@ -121,6 +128,8 @@ def build_package(release, output, version, maintainer, revision, lock_digest, *
         extracted = staging / "verify"
         _run("dpkg-deb", "--extract", archive, extracted)
         verify_notices(extracted, notices)
+        if native_notices is not None:
+            verify_native_llvm_notices(extracted, native_notices)
         for name, expected in audit.items():
             binary = extracted / "usr" / "bin" / name
             if not os.access(binary, os.X_OK) or file_sha256(binary) != expected["sha256"]:
@@ -130,6 +139,8 @@ def build_package(release, output, version, maintainer, revision, lock_digest, *
                    "depends": dependencies, "shlibdeps_diagnostics": diagnostics, "binaries": audit,
                    "dependency_notices": notices,
                    "archive": {"file": archive_name, "sha256": file_sha256(archive), "bytes": archive.stat().st_size}}
+        if native_notices is not None:
+            receipt["native_llvm"] = native_notices
         output.mkdir()
         archive.rename(output / archive_name)
         (output / "package-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
@@ -141,6 +152,8 @@ def main(argv=None):
     parser.add_argument("--release-dir", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--maintainer", required=True)
+    parser.add_argument("--native-llvm-receipt", type=Path,
+                        help="Include native LLVM notices and exact release-build evidence")
     args = parser.parse_args(argv)
     pancake = Path(__file__).resolve().parents[1]
     try:
@@ -150,7 +163,8 @@ def main(argv=None):
             raise ValueError(f"Commit Pancake source changes before packaging:\n{dirty}")
         revision = _run("git", "-C", pancake, "rev-parse", "HEAD").stdout.strip()
         build_package(args.release_dir, args.output, manifest["package"]["version"], args.maintainer,
-                      revision, file_sha256(pancake / "Cargo.lock"), source_root=pancake)
+                      revision, file_sha256(pancake / "Cargo.lock"), source_root=pancake,
+                      native_llvm_receipt=args.native_llvm_receipt)
         print(args.output / "package-receipt.json")
         return 0
     except subprocess.CalledProcessError as error:

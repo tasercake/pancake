@@ -1,0 +1,6 @@
+temporary_owner=/root/assurance
+verified_before_and_after=2 frozen files
+removed=frame_000.CR3 frame_049.CR3 ownership.json
+lease_directory_present=no
+2026-11-18T08:08:42Z
+retained_candidate=/home/krishna/Documents/focus-stacking/artifacts/pancake-assurance/r50-raw-copy-f2f1bb3/pancake-cli

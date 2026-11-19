@@ -1,0 +1,10 @@
+Prior pinned comparison
+M	pancake/assurance-platforms.json
+M	pancake/src/fusion/focus.rs
+M	pancake/src/job/stream.rs
+M	pancake/tests/cpu_advanced_fusion.rs
+M	pancake/tests/cpu_job.rs
+M	pancake/tests/gpu_runtime_contract.rs
+Policy and suite files compared to 54e3a8d
+Observed target size before cleanup
+6.7G	pancake/target

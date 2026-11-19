@@ -1,0 +1,52 @@
+"""Audit observed process membership from the archived R50 primary RSS traces."""
+
+import collections
+import gzip
+import json
+import sys
+import tarfile
+
+
+def main():
+    runs = collections.defaultdict(dict)
+    with tarfile.open(sys.argv[1]) as archive:
+        for member in archive:
+            directory, _, name = member.name.rpartition("/")
+            if "/diagnostic-" in directory:
+                continue
+            if name in {"sample.json", "resources.jsonl.gz"}:
+                runs[directory][name] = archive.extractfile(member).read()
+
+    results = collections.defaultdict(list)
+    for name, receipt in sorted(runs.items()):
+        job = json.loads(receipt["sample.json"])
+        collisions = []
+        pids = set()
+        count = 0
+        for row in map(
+            json.loads, gzip.decompress(receipt["resources.jsonl.gz"]).splitlines()
+        ):
+            if row["rss_elapsed_ns"] > job["elapsed_ns"]:
+                break
+            count += 1
+            pids.update(row["processes"])
+            if len(row["processes"]) > 1:
+                collisions.append(row)
+        assert count == job["rss_sample_count"], name
+        results[job["target"]].append(
+            {
+                "sample": name,
+                "rss_observations": count,
+                "observed_pids": sorted(pids),
+                "multi_pid_observations": collisions,
+                "maximum_single_process_rss_bytes": job[
+                    "kernel_process_peak_rss_bytes"
+                ],
+                "maximum_observed_session_rss_bytes": job["observed_peak_rss_bytes"],
+            }
+        )
+    print(json.dumps(results, indent=2))
+
+
+if __name__ == "__main__":
+    main()

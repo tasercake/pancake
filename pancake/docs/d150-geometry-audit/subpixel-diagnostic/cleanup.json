@@ -1,0 +1,15 @@
+{
+  "validated_utc": "2026-11-18T09:43:31.634683+00:00",
+  "workspace_stage": "/tmp/pancake-worktrees.t3paqgWM/d150-subpixel/artifacts/d150",
+  "frozen_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+  "owned_archive_sha256": "311ca6aab7d3bff03c714fd2d81c741f3847de1d4d3f2f9cfa767b6eb62cf56a",
+  "owned_original_count": 150,
+  "owned_original_bytes": 52911148,
+  "removed_archive_bytes": 53459291,
+  "removed_tiff_bytes": 22569754,
+  "removed_tiff_sha256": "4d961f511d0c8fd3159eb73c40c10255fd3e4c817b3adcb42e5aa12a231daa9f",
+  "retained_binary": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/d150-subpixel-0cc9159/pancake-cli",
+  "retained_binary_sha256": "e0c3544dce5b8cf53396a0f5a1cc6c44e8d9f34a2da2a098e5f5db619a31f7ea",
+  "retained_trace_sha256": "d759bcd0973de94679de3c94165729bd471f2a92b9314a731db270cf663f05ad",
+  "remaining_owned_originals_or_tiffs": 0
+}

@@ -1,0 +1,329 @@
+{
+  "identity": {
+    "sources": {
+      "stock": "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb",
+      "lut": "a919045e8004e138df9fcc05650d9e87e50e0e36",
+      "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+      "source_trees": {
+        "stock": "9b3a0b85ab11544cfd5484402f57a3cc177c2dad",
+        "lut": "9a7a949205d2a36c354f96cf0e4f3baea424d15f"
+      },
+      "spectral_rs_sha256": {
+        "stock": "a184047d5119828e96e67b6873f3de881b99124c30778d48dfa8161510ea7216",
+        "lut": "21bcc91c44faade8fb5c53a59d52ac8a077bdb7448a232d201663ee35a14d577"
+      },
+      "production_paths_changed": [
+        "pancake/assurance-platforms.json",
+        "pancake/src/registration/spectral.rs"
+      ]
+    },
+    "inputs": {
+      "frames": [
+        {
+          "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0163.png",
+          "sha256": "65bef59ae2cffaac5a0401780c884fc1f0cb87c3fb6ba7057213bbb03b775f9d",
+          "bytes": 112938,
+          "shape": [
+            339,
+            512,
+            3
+          ],
+          "native_mode": "RGB",
+          "native_sample_precision_bits": 8
+        },
+        {
+          "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0164.png",
+          "sha256": "37094f4247a7e5cac3af1876137f42c88263ace0d075d99daec7b1e796e33ad0",
+          "bytes": 133941,
+          "shape": [
+            339,
+            512,
+            3
+          ],
+          "native_mode": "RGB",
+          "native_sample_precision_bits": 8
+        },
+        {
+          "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0165.png",
+          "sha256": "8582dc34b2035c4daafc5784a9f7191a6aff3161a7fd54b4d493c45145d6a8e6",
+          "bytes": 154601,
+          "shape": [
+            339,
+            512,
+            3
+          ],
+          "native_mode": "RGB",
+          "native_sample_precision_bits": 8
+        },
+        {
+          "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0166.png",
+          "sha256": "5fc9ade7715c0110ec5b4d18777ce2718c2f70946fa23833222b98b425b2ca7c",
+          "bytes": 175787,
+          "shape": [
+            339,
+            512,
+            3
+          ],
+          "native_mode": "RGB",
+          "native_sample_precision_bits": 8
+        },
+        {
+          "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0167.png",
+          "sha256": "530a91ac82e4406acc23913088efb0ab0d056e686345088e41f60e4fc6176f60",
+          "bytes": 191648,
+          "shape": [
+            339,
+            512,
+            3
+          ],
+          "native_mode": "RGB",
+          "native_sample_precision_bits": 8
+        },
+        {
+          "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0168.png",
+          "sha256": "5c7ed4b5bba42b52c93eeaaf462b1531717d1abd43938445a1e6bea9c19c1ae3",
+          "bytes": 211350,
+          "shape": [
+            339,
+            512,
+            3
+          ],
+          "native_mode": "RGB",
+          "native_sample_precision_bits": 8
+        },
+        {
+          "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0169.png",
+          "sha256": "4f26850b1aee4fe40ab0f060fc24568f54e637d9b5158b74c4a99a865c991e35",
+          "bytes": 228010,
+          "shape": [
+            339,
+            512,
+            3
+          ],
+          "native_mode": "RGB",
+          "native_sample_precision_bits": 8
+        },
+        {
+          "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0170.png",
+          "sha256": "e20b37e52a492042647c15edb5e9f45990e5bd585f38d1fc14282e95752597da",
+          "bytes": 214462,
+          "shape": [
+            339,
+            512,
+            3
+          ],
+          "native_mode": "RGB",
+          "native_sample_precision_bits": 8
+        },
+        {
+          "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0171.png",
+          "sha256": "029ae94dfcc2d105a2ee2f91e5d535820c00e9e73c6b4bdf7b0ba690df670c32",
+          "bytes": 202755,
+          "shape": [
+            339,
+            512,
+            3
+          ],
+          "native_mode": "RGB",
+          "native_sample_precision_bits": 8
+        }
+      ],
+      "previous_real_exports": {
+        "cpu": {
+          "shape": [
+            337,
+            510,
+            3
+          ],
+          "dtype": "uint16",
+          "sha256": "e0365735dcf4b39bb65afa9187648935ca710ffc62340d5f9e9cff1ad4324528",
+          "pixel_sha256": "93baae1566df73152da06b6aa4753ff94c9c819191b84db4556ce1f9573bbed1",
+          "bytes": 1031446,
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "cuda": {
+          "shape": [
+            337,
+            510,
+            3
+          ],
+          "dtype": "uint16",
+          "sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+          "pixel_sha256": "00370e27a5da2a592572ca13cfcae3206ba33feec51b1f3d0333c5be14920d57",
+          "bytes": 1031446,
+          "minimum": 0,
+          "maximum": 65535
+        }
+      },
+      "targets_sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc"
+    },
+    "plan": [
+      [
+        "warmup",
+        1,
+        "stock"
+      ],
+      [
+        "warmup",
+        1,
+        "lut"
+      ],
+      [
+        "warmup",
+        2,
+        "lut"
+      ],
+      [
+        "warmup",
+        2,
+        "stock"
+      ],
+      [
+        "measured",
+        1,
+        "stock"
+      ],
+      [
+        "measured",
+        1,
+        "lut"
+      ],
+      [
+        "measured",
+        2,
+        "lut"
+      ],
+      [
+        "measured",
+        2,
+        "stock"
+      ],
+      [
+        "measured",
+        3,
+        "stock"
+      ],
+      [
+        "measured",
+        3,
+        "lut"
+      ],
+      [
+        "measured",
+        4,
+        "lut"
+      ],
+      [
+        "measured",
+        4,
+        "stock"
+      ]
+    ],
+    "settings": {
+      "device": "gpu",
+      "method": "exposure_fusion",
+      "align": true,
+      "alignment_mode": "euclidean",
+      "alignment_reference": "first",
+      "kernel_size": 6,
+      "pyramid_levels": 8,
+      "scale_factor": 6,
+      "slab_size": 0,
+      "slab_overlap": 0,
+      "bit_depth": 16,
+      "auto": false,
+      "auto_crop": true,
+      "quality_report": false
+    },
+    "tool_sha256": "2e325c734a0f2f3b80568c796c09db3263692fba0b9206e38e22acf1ca48833c",
+    "required_cuda_runtime_files": {
+      "/usr/local/cuda-12.5/lib64/libnvrtc.so.12.5.40": "fb37b3f5b0ed35bf6b24f31f1277d30f2fadb08f8562e90d1e6ce208817fc8ed",
+      "/usr/local/cuda-12.5/lib64/libnvrtc-builtins.so.12.5.40": "1237ef425d116b1faee57d924e099b877fd6548ce3b367e50a7e1ef912eeb08c",
+      "/usr/lib/x86_64-linux-gnu/libcuda.so.580.178.04": "dcdf334aeb177c95b3385b797c9b871d03a287895713c6d107f79096b0985aa9"
+    },
+    "binaries": {
+      "stock": {
+        "source": "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb",
+        "sha256": "8bc02636ff0439d23a74b40ddc56c3b7b84a21f7147a7b2ae7b30dd9c77efd57",
+        "elf_build_id": "8a42936d01d83265f687755f5f9877a938285d10",
+        "path": "/tmp/pancake-worktrees.t3paqgWM/e9-cuda-lut-diagnostic/artifacts/e9-cuda-lut-diagnostic/binaries/stock"
+      },
+      "lut": {
+        "source": "a919045e8004e138df9fcc05650d9e87e50e0e36",
+        "sha256": "95923ea36d753a348352b7eba91a1d14e08322617d16c5239f7b357eb6682671",
+        "elf_build_id": "025bae3414e7580a420d7f610a85b0ea3b5a22ee",
+        "path": "/tmp/pancake-worktrees.t3paqgWM/e9-cuda-lut-diagnostic/artifacts/e9-cuda-lut-diagnostic/binaries/lut"
+      }
+    },
+    "native_lut_build": {
+      "artifact": {
+        "source": "a919045e8004e138df9fcc05650d9e87e50e0e36",
+        "sha256": "95923ea36d753a348352b7eba91a1d14e08322617d16c5239f7b357eb6682671",
+        "elf_build_id": "025bae3414e7580a420d7f610a85b0ea3b5a22ee"
+      },
+      "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+      "exit": 0,
+      "build_command": "/tmp/pancake-worktrees.t3paqgWM/e9-persistence-review/pancake\nCUDARC_CUDA_VERSION=12050 CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_TARGET_DIR=/tmp/pancake-worktrees.t3paqgWM/e9-persistence-review/pancake/target/e9-lut-release RUSTC_WRAPPER=/tmp/pancake-tools/bin/pancake-rust-cache\ntaskset --cpu-list 12\\,13 cargo +1.100.0 build --locked --offline --release -p pancake -p pancake-cli --bin pancake-cli --features cubecl/cuda \n",
+      "build_log": "/tmp/pancake-worktrees.t3paqgWM/e9-cuda-lut-diagnostic/artifacts/e9-cuda-lut-diagnostic/lut-build.log",
+      "build_log_sha256": "a30759ccde955a11bcdefba53314f5076bc8713bc86965daa357fc56fa4c38a1",
+      "host_proof_commit": "22fc031",
+      "host_proof_archive_sha256": "5e6dc9011b35290956997fc9d11ed4ad5d2392a2b42f88e3a39e53036d6212c6",
+      "candidate_root_tree": "091ddb2826ea29a0889556e123fe43d3bee67f2e"
+    },
+    "native_lut_build_sha256": "943593942c238383516046d086ad1404b8232590f8934d0ecbeb712efc844ee6"
+  },
+  "physical_before": "NVIDIA GeForce RTX 3090, GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac, 00000000:01:00.0, 580.178.04, P8, 42, 0, 579",
+  "status": "completed_diagnostic",
+  "warm_median_ns": {
+    "stock": 410182513.0,
+    "lut": 393650744.5
+  },
+  "paired_lut_minus_stock_ns": [
+    -16484900,
+    -18058120,
+    -16578637,
+    -6459207
+  ],
+  "warm_median_lut_to_stock_ratio": 0.9596965546407874,
+  "physical_after": "NVIDIA GeForce RTX 3090, GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac, 00000000:01:00.0, 580.178.04, P2, 52, 7, 579",
+  "inputs_and_executables_unchanged": true,
+  "primary_diagnostic_pairs": 4,
+  "warmups_per_arm": 2,
+  "valid_jobs": 12,
+  "all_export_and_registration_bytes_matched": true,
+  "scope": "native same-application experiment with no frozen P10 credit",
+  "archive": {
+    "sha256": "81154d6f28ce457be4d7d5ddfb3871240e1bcc9fadc391d0cc92c8cd419ae966",
+    "members": 74,
+    "size": 18857,
+    "no_raster_payloads": true,
+    "allowlisted_environment_keys": [
+      "CONFORMANCE_EVENTS_PATH",
+      "CUDA_CACHE_PATH",
+      "CUDA_VISIBLE_DEVICES",
+      "HOME",
+      "LANG",
+      "LC_ALL",
+      "LC_CTYPE",
+      "LD_LIBRARY_PATH",
+      "MESA_SHADER_CACHE_DIR",
+      "NUMBA_CACHE_DIR",
+      "NUMBA_NUM_THREADS",
+      "OMP_NUM_THREADS",
+      "OPENBLAS_NUM_THREADS",
+      "PANCAKE_COMPUTE_CACHE_DIR",
+      "PANCAKE_DEFAULT_DEVICE",
+      "PANCAKE_RUNTIME",
+      "PANCAKE_STATE_DIR",
+      "PATH",
+      "PYTHONNOUSERSITE",
+      "RAYON_NUM_THREADS",
+      "TMPDIR",
+      "XDG_CACHE_HOME",
+      "XDG_CONFIG_HOME",
+      "__GL_SHADER_DISK_CACHE_PATH"
+    ]
+  },
+  "cleanup_sha256": "0788f12fa2d69397d5bbf90b0a690783136973b66e45a3b35c78858777cac0f2"
+}

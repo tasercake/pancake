@@ -1,0 +1,290 @@
+{
+  "paired_report_sha256": "511356bddb6938dff370d4fd6bb1d4f4437436246c05a66285aeca5b22085dc3",
+  "input_hashes": [
+    "65bef59ae2cffaac5a0401780c884fc1f0cb87c3fb6ba7057213bbb03b775f9d",
+    "37094f4247a7e5cac3af1876137f42c88263ace0d075d99daec7b1e796e33ad0",
+    "8582dc34b2035c4daafc5784a9f7191a6aff3161a7fd54b4d493c45145d6a8e6",
+    "5fc9ade7715c0110ec5b4d18777ce2718c2f70946fa23833222b98b425b2ca7c",
+    "530a91ac82e4406acc23913088efb0ab0d056e686345088e41f60e4fc6176f60",
+    "5c7ed4b5bba42b52c93eeaaf462b1531717d1abd43938445a1e6bea9c19c1ae3",
+    "4f26850b1aee4fe40ab0f060fc24568f54e637d9b5158b74c4a99a865c991e35",
+    "e20b37e52a492042647c15edb5e9f45990e5bd585f38d1fc14282e95752597da",
+    "029ae94dfcc2d105a2ee2f91e5d535820c00e9e73c6b4bdf7b0ba690df670c32"
+  ],
+  "roles": {
+    "reference": {
+      "output": {
+        "shape": [
+          337,
+          510,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "f66f27a89d50bf5697b0ba207aba935057f90c26d7a6566fc860ce5e0160bccd",
+        "pixel_sha256": "e4133ebad2cdf9b8212ea5f81bf6b091094dc409e1003601247a5e97ea8390be",
+        "bytes": 1063928,
+        "minimum": 266,
+        "maximum": 65535
+      },
+      "diagnostic_sha256": "9e126609503c15c8631c6ee4772618c5ebdc5689aaaef5d2b19edc16da427d49",
+      "identity_maps": 9
+    },
+    "candidate": {
+      "output": {
+        "shape": [
+          337,
+          510,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "614c7a9701c5d4757df95852e03a7b5eccaab6abafb222901f3525725da6da84",
+        "pixel_sha256": "00370e27a5da2a592572ca13cfcae3206ba33feec51b1f3d0333c5be14920d57",
+        "bytes": 1031446,
+        "minimum": 0,
+        "maximum": 65535
+      },
+      "diagnostic_sha256": "448030b3243ee4c8bb4384743dfbf4fad3cea382cbd4aebf9a2a19158be79c97",
+      "identity_maps": 9
+    }
+  },
+  "settings": {
+    "device": "gpu",
+    "method": "exposure_fusion",
+    "align": true,
+    "alignment_mode": "euclidean",
+    "alignment_reference": "first",
+    "kernel_size": 6,
+    "pyramid_levels": 8,
+    "scale_factor": 6,
+    "slab_size": 0,
+    "slab_overlap": 0,
+    "bit_depth": 16,
+    "auto": false,
+    "auto_crop": true,
+    "quality_report": false
+  },
+  "gpu_uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+  "historical_window_receipts": {
+    "cpu-review.json": "f7e4bdc99e7109ab03efe0c2cb285e20d5c93ba55f359c8f92497bab31152391",
+    "vulkan-review.json": "20c7eec0fa143a22e29c32b97f91fcdc3e6fd3dc01a0ee2969fc86cc93668c3f"
+  },
+  "windows": [
+    {
+      "name": "upper-left",
+      "xywh": [
+        103,
+        60,
+        48,
+        48
+      ],
+      "mean_absolute_u16": 304.78096064814815,
+      "max_absolute_u16": 2612,
+      "edge_correlation": 0.9992041123792523,
+      "candidate_vs_reference_luma_edge_abs_mean": 1.0279517351341132,
+      "luma_mean_candidate_minus_reference_u16": -161.02147265625172,
+      "role_metrics": {
+        "reference": {
+          "channel_span_mean_u16": 10621.761284722223,
+          "floor_samples": 0,
+          "ceiling_samples": 0
+        },
+        "candidate": {
+          "channel_span_mean_u16": 10185.475694444445,
+          "floor_samples": 0,
+          "ceiling_samples": 0
+        }
+      }
+    },
+    {
+      "name": "center",
+      "xywh": [
+        231,
+        144,
+        48,
+        48
+      ],
+      "mean_absolute_u16": 261.88570601851853,
+      "max_absolute_u16": 998,
+      "edge_correlation": 0.9997306277409795,
+      "candidate_vs_reference_luma_edge_abs_mean": 0.993280056342796,
+      "luma_mean_candidate_minus_reference_u16": -112.48809635416183,
+      "role_metrics": {
+        "reference": {
+          "channel_span_mean_u16": 6288.439236111111,
+          "floor_samples": 0,
+          "ceiling_samples": 0
+        },
+        "candidate": {
+          "channel_span_mean_u16": 6154.113715277777,
+          "floor_samples": 0,
+          "ceiling_samples": 0
+        }
+      }
+    },
+    {
+      "name": "lower-right",
+      "xywh": [
+        358,
+        228,
+        48,
+        48
+      ],
+      "mean_absolute_u16": 657.9674479166666,
+      "max_absolute_u16": 1565,
+      "edge_correlation": 0.9992627606082302,
+      "candidate_vs_reference_luma_edge_abs_mean": 1.0186896328325328,
+      "luma_mean_candidate_minus_reference_u16": 679.1177773437485,
+      "role_metrics": {
+        "reference": {
+          "channel_span_mean_u16": 17032.121527777777,
+          "floor_samples": 0,
+          "ceiling_samples": 0
+        },
+        "candidate": {
+          "channel_span_mean_u16": 17703.336805555555,
+          "floor_samples": 0,
+          "ceiling_samples": 0
+        }
+      }
+    }
+  ],
+  "whole": {
+    "mean_absolute_u16": 515.076889509513,
+    "max_absolute_u16": 4991,
+    "edge_correlation": 0.9957335606750836,
+    "candidate_vs_reference_luma_edge_abs_mean": 1.0366193153102812,
+    "luma_mean_candidate_minus_reference_u16": 133.3468529935417,
+    "role_metrics": {
+      "reference": {
+        "channel_span_mean_u16": 8026.101937510909,
+        "floor_samples": 0,
+        "ceiling_samples": 683
+      },
+      "candidate": {
+        "channel_span_mean_u16": 8236.395141676849,
+        "floor_samples": 364,
+        "ceiling_samples": 1414
+      }
+    }
+  },
+  "new_endpoints": {
+    "floor": {
+      "channels_rgb": [
+        0,
+        0,
+        364
+      ],
+      "matching_reference_u16_range": [
+        266,
+        1199
+      ],
+      "xyxy_bounds": [
+        43,
+        119,
+        504,
+        336
+      ],
+      "coarse_grid_counts": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          196
+        ],
+        [
+          2,
+          0,
+          0,
+          119
+        ],
+        [
+          4,
+          0,
+          4,
+          39
+        ]
+      ],
+      "coarse_grid_xy_edges": [
+        [
+          0,
+          150,
+          260,
+          350,
+          510
+        ],
+        [
+          0,
+          100,
+          150,
+          200,
+          337
+        ]
+      ]
+    },
+    "ceiling": {
+      "channels_rgb": [
+        446,
+        202,
+        83
+      ],
+      "matching_reference_u16_range": [
+        61270,
+        65519
+      ],
+      "xyxy_bounds": [
+        170,
+        95,
+        228,
+        144
+      ],
+      "coarse_grid_counts": [
+        [
+          0,
+          19,
+          0,
+          0
+        ],
+        [
+          0,
+          697,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "coarse_grid_xy_edges": [
+        [
+          0,
+          150,
+          260,
+          350,
+          510
+        ],
+        [
+          0,
+          100,
+          150,
+          200,
+          337
+        ]
+      ]
+    }
+  }
+}

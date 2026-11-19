@@ -1,0 +1,6 @@
+Original native probe used initial tracked tiled.rs by module path, revised probe copied exact tracked 1a887017 module.
+CARGO_BUILD_JOBS=1 CARGO_INCREMENTAL=0 taskset -c 0 nice -n 10 cargo +1.100.0 build --offline --locked
+RAYON_NUM_THREADS=128 taskset -c 0-3 nice -n 10 ./target/debug/pancake-tiff-review-native-probe "$proof/fixtures"
+
+Revised supplementary isolated Miri compiled copies of both tracked 1a887017 module and its test module.
+CARGO_BUILD_JOBS=1 MIRIFLAGS="-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check" taskset -c 0 nice -n 10 cargo +nightly-2026-11-15 miri test --offline --locked --lib tiled::tests -- --include-ignored

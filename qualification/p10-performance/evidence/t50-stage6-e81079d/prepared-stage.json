@@ -1,0 +1,47 @@
+{
+  "status": "verified_preflight",
+  "source_commit": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+  "checked_at": "2026-11-19T00:20:02+08:00",
+  "frozen_recipe": {
+    "frames": 50,
+    "height": 4000,
+    "seed": 20261117,
+    "tile": 256,
+    "width": 6000
+  },
+  "frozen_file_records": 52,
+  "expected_retained_bytes": 2775174405,
+  "free_disk_bytes": 124357509120,
+  "available_memory_kib": 45949360,
+  "full_set_preflight_bytes": 3067213930,
+  "generator_reserve_bytes": 16106127360,
+  "candidate_package": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "8ed6e70d7552140c0257520a07ac2b9fc5f97ff82a5fb3126864df821df4507e",
+    "bytes": 69568056
+  },
+  "candidate_binaries": {
+    "pancake-cli": {
+      "sha256": "9630572be5e637c38c604f2fcd6d7a44e31e171a5ccf17dadb1f59ba345c24f0",
+      "bytes": 122319448
+    },
+    "pancake-gui": {
+      "sha256": "770ad910a8ac1f29a519504fd06dcd1051e593965813ce94665c986b57d16310",
+      "bytes": 156407072
+    }
+  },
+  "input_root": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/inputs",
+  "materialization": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/materialization.json",
+  "launch": [
+    "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/materialize.sh",
+    "6"
+  ],
+  "launch_script_sha256": "838602715c1d52d818af2afacfbad11c5928caac524f314029f2d14f76568a3c",
+  "frozen_receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+  "performance_targets_sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc",
+  "generator_sha256": "8791abb1f964755ca0b2b3f8e30cb6566320bc9036ac57a273563735a3279bcf",
+  "oracle_sha256": "02ef3f567e84e2e11459e3af0d642f867740de24125a29145c8500ed7b36a116",
+  "package_verification_sha256": "f0a6402c9d79038ef86876f91a0ae36fa526e97332746b13ee8a8ba242ea1fae",
+  "planned_roles": [],
+  "generated_pixels_license": "CC0-1.0"
+}

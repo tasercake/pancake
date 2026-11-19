@@ -1,0 +1,247 @@
+{
+  "status": "diagnostic_only",
+  "matching_inputs_and_witnesses": true,
+  "arms": {
+    "original": {
+      "candidate": {
+        "commit": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+        "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+        "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+        "component": "gui",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-command-control/pancake/target/release/pancake-gui",
+        "binary_sha256": "eea214ed6c57477480b0f5897a12ae8b9c05a9595730dbfcedabfd15650f6f50",
+        "workspace_refresh_receipt_sha256": "2c6c6e484a8e7eef7e6d844b12014635cc70d3125e5c9e3edbf04316d19cd872",
+        "package_refresh_receipt_source": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+        "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-d6359e1/pancake_0.1.0_amd64.deb"
+      },
+      "condition": {
+        "idle": {
+          "all": {
+            "count": 25,
+            "min_ms": 19.412176,
+            "p50_ms": 28.251422,
+            "p95_ms": 44.303481,
+            "max_ms": 667.575926,
+            "over_33_ms": 8
+          },
+          "comparison": {
+            "count": 5,
+            "min_ms": 19.412176,
+            "p50_ms": 19.446772,
+            "p95_ms": 21.751939,
+            "max_ms": 21.751939,
+            "over_33_ms": 0
+          },
+          "pan": {
+            "count": 5,
+            "min_ms": 20.563257,
+            "p50_ms": 32.512283,
+            "p95_ms": 39.057581,
+            "max_ms": 39.057581,
+            "over_33_ms": 2
+          },
+          "result": {
+            "count": 5,
+            "min_ms": 24.856739,
+            "p50_ms": 27.152409,
+            "p95_ms": 44.303481,
+            "max_ms": 44.303481,
+            "over_33_ms": 2
+          },
+          "source": {
+            "count": 5,
+            "min_ms": 23.86684,
+            "p50_ms": 30.346276,
+            "p95_ms": 667.575926,
+            "max_ms": 667.575926,
+            "over_33_ms": 2
+          },
+          "zoom": {
+            "count": 5,
+            "min_ms": 27.160343,
+            "p50_ms": 29.162734,
+            "p95_ms": 34.747229,
+            "max_ms": 34.747229,
+            "over_33_ms": 2
+          }
+        },
+        "loaded": {
+          "all": {
+            "count": 25,
+            "min_ms": 20.416181,
+            "p50_ms": 30.467372,
+            "p95_ms": 42.161979,
+            "max_ms": 42.391641,
+            "over_33_ms": 8
+          },
+          "comparison": {
+            "count": 5,
+            "min_ms": 20.416181,
+            "p50_ms": 21.625322,
+            "p95_ms": 34.333691,
+            "max_ms": 34.333691,
+            "over_33_ms": 1
+          },
+          "pan": {
+            "count": 5,
+            "min_ms": 29.311563,
+            "p50_ms": 31.389494,
+            "p95_ms": 33.710933,
+            "max_ms": 33.710933,
+            "over_33_ms": 1
+          },
+          "result": {
+            "count": 5,
+            "min_ms": 23.902548,
+            "p50_ms": 27.215747,
+            "p95_ms": 28.320662,
+            "max_ms": 28.320662,
+            "over_33_ms": 0
+          },
+          "source": {
+            "count": 5,
+            "min_ms": 31.331796,
+            "p50_ms": 41.253764,
+            "p95_ms": 42.391641,
+            "max_ms": 42.391641,
+            "over_33_ms": 4
+          },
+          "zoom": {
+            "count": 5,
+            "min_ms": 26.133485,
+            "p50_ms": 32.834938,
+            "p95_ms": 39.046992,
+            "max_ms": 39.046992,
+            "over_33_ms": 2
+          }
+        }
+      }
+    },
+    "immediate": {
+      "candidate": {
+        "commit": "6489af6ea4e9611d5ef26bbba6109dbf0fbe8947",
+        "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+        "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+        "component": "gui",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-input-cost/pancake/target/release/pancake-gui",
+        "binary_sha256": "ad97c445535aa822677f40afc59d48c21bf72cc9e9af7d521c9f2cf571296ac4",
+        "producer_build_command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--release",
+          "-p",
+          "pancake-gui"
+        ],
+        "producer_build_environment": {
+          "CARGO_BUILD_JOBS": "2",
+          "CARGO_INCREMENTAL": "0",
+          "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+        },
+        "producer_log_sha256": "acd51de0c93043f0e6de183dc47c25845628ee6c9fee75ef4a2aa97540713b65"
+      },
+      "condition": {
+        "idle": {
+          "all": {
+            "count": 25,
+            "min_ms": 18.468193,
+            "p50_ms": 19.800304,
+            "p95_ms": 22.83405,
+            "max_ms": 663.505141,
+            "over_33_ms": 1
+          },
+          "comparison": {
+            "count": 5,
+            "min_ms": 19.323309,
+            "p50_ms": 19.410082,
+            "p95_ms": 20.523673,
+            "max_ms": 20.523673,
+            "over_33_ms": 0
+          },
+          "pan": {
+            "count": 5,
+            "min_ms": 18.468193,
+            "p50_ms": 19.527853,
+            "p95_ms": 19.870276,
+            "max_ms": 19.870276,
+            "over_33_ms": 0
+          },
+          "result": {
+            "count": 5,
+            "min_ms": 19.525789,
+            "p50_ms": 19.621339,
+            "p95_ms": 20.616828,
+            "max_ms": 20.616828,
+            "over_33_ms": 0
+          },
+          "source": {
+            "count": 5,
+            "min_ms": 20.679144,
+            "p50_ms": 20.696657,
+            "p95_ms": 663.505141,
+            "max_ms": 663.505141,
+            "over_33_ms": 1
+          },
+          "zoom": {
+            "count": 5,
+            "min_ms": 18.701652,
+            "p50_ms": 19.833016,
+            "p95_ms": 22.83405,
+            "max_ms": 22.83405,
+            "over_33_ms": 0
+          }
+        },
+        "loaded": {
+          "all": {
+            "count": 25,
+            "min_ms": 18.375249,
+            "p50_ms": 20.620214,
+            "p95_ms": 21.81141,
+            "max_ms": 22.84988,
+            "over_33_ms": 0
+          },
+          "comparison": {
+            "count": 5,
+            "min_ms": 19.383882,
+            "p50_ms": 20.52763,
+            "p95_ms": 21.535892,
+            "max_ms": 21.535892,
+            "over_33_ms": 0
+          },
+          "pan": {
+            "count": 5,
+            "min_ms": 18.375249,
+            "p50_ms": 19.530939,
+            "p95_ms": 20.577904,
+            "max_ms": 20.577904,
+            "over_33_ms": 0
+          },
+          "result": {
+            "count": 5,
+            "min_ms": 19.668206,
+            "p50_ms": 20.874852,
+            "p95_ms": 21.709819,
+            "max_ms": 21.709819,
+            "over_33_ms": 0
+          },
+          "source": {
+            "count": 5,
+            "min_ms": 20.553549,
+            "p50_ms": 21.046975,
+            "p95_ms": 21.729927,
+            "max_ms": 21.729927,
+            "over_33_ms": 0
+          },
+          "zoom": {
+            "count": 5,
+            "min_ms": 20.568366,
+            "p50_ms": 21.630891,
+            "p95_ms": 22.84988,
+            "max_ms": 22.84988,
+            "over_33_ms": 0
+          }
+        }
+      }
+    }
+  }
+}

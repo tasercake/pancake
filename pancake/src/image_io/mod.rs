@@ -3,15 +3,17 @@
 mod export;
 mod npy;
 mod raw;
+mod tiled;
 
 pub use export::{ExportFormat, PreparedExport, export, prepare_export};
 
 use std::ffi::OsStr;
 use std::fs::{self, File};
-use std::io::{BufReader, Seek};
+use std::io::{BufReader, Read, Seek};
 use std::path::Path;
 
 use image::{ColorType, DynamicImage, ImageDecoder, ImageFormat, ImageReader, Limits};
+use tiff::decoder::Decoder;
 use tiff::tags::{Tag, Type, ValueBuffer};
 
 /// Per-axis limit applied to supported format headers before raster decode.
@@ -68,6 +70,31 @@ impl RgbImage {
             samples,
             sample_encoding: SampleEncoding::Float,
             icc_profile: None,
+            grayscale_array: false,
+        })
+    }
+
+    /// Finish a private decoder's fully normalized unsigned sixteen-bit raster.
+    ///
+    /// The caller has replaced every sample with an unsigned code divided by
+    /// the nonzero sixteen-bit white level, or initialized it to finite zero.
+    ///
+    /// # Errors
+    ///
+    /// Rejects invalid dimensions or a mismatched sample count.
+    fn from_normalized_u16(
+        width: usize,
+        height: usize,
+        samples: Vec<f32>,
+        icc_profile: Option<Vec<u8>>,
+    ) -> Result<Self, String> {
+        validate_sample_count(width, height, samples.len())?;
+        Ok(Self {
+            width,
+            height,
+            samples,
+            sample_encoding: SampleEncoding::U16,
+            icc_profile,
             grayscale_array: false,
         })
     }
@@ -168,6 +195,15 @@ fn decode_raster(input: File) -> Result<RgbImage, String> {
         .with_guessed_format()
         .map_err(|error| error.to_string())?;
     let format = reader.format();
+    let is_tiff = format == Some(ImageFormat::Tiff);
+    if is_tiff {
+        let source = reader.into_inner();
+        if let Some(frame) = tiled::decode(source.get_ref())? {
+            return Ok(frame);
+        }
+        source.rewind().map_err(|error| error.to_string())?;
+        reader = ImageReader::with_format(source, ImageFormat::Tiff);
+    }
     let mut limits = Limits::default();
     limits.max_image_width = Some(MAX_AXIS);
     limits.max_image_height = Some(MAX_AXIS);
@@ -186,7 +222,6 @@ fn decode_raster(input: File) -> Result<RgbImage, String> {
         .set_limits(limits)
         .map_err(|error| error.to_string())?;
     let orientation = decoder.orientation().map_err(|error| error.to_string())?;
-    let is_tiff = format == Some(ImageFormat::Tiff);
     let profile = if is_tiff {
         None
     } else {
@@ -212,12 +247,16 @@ fn decode_raster(input: File) -> Result<RgbImage, String> {
 /// Returns a stream seek or directory read error.
 fn read_tiff_profile(stream: &mut BufReader<File>) -> Result<Option<Vec<u8>>, String> {
     stream.rewind().map_err(|error| error.to_string())?;
+    let decoder = Decoder::new(stream).map_err(|error| error.to_string())?;
+    Ok(profile_from_tiff(decoder))
+}
+
+/// Return a TIFF's optional byte profile within the native directory metadata budget.
+fn profile_from_tiff<R: Read + Seek>(decoder: Decoder<R>) -> Option<Vec<u8>> {
     let mut limits = tiff::decoder::Limits::default();
     // The pinned byte-buffer reader charges tag storage against the decoder's data cap.
     limits.decoding_buffer_size = limits.ifd_value_size;
-    let mut decoder = tiff::decoder::Decoder::new(stream)
-        .map_err(|error| error.to_string())?
-        .with_limits(limits);
+    let mut decoder = decoder.with_limits(limits);
     let mut payload = ValueBuffer::empty(Type::UNDEFINED);
     let found = decoder
         .image_ifd()
@@ -225,10 +264,8 @@ fn read_tiff_profile(stream: &mut BufReader<File>) -> Result<Option<Vec<u8>>, St
         .ok()
         .flatten()
         .is_some();
-    Ok(
-        (found && matches!(payload.data_type(), Type::BYTE | Type::UNDEFINED))
-            .then(|| payload.as_bytes().to_vec()),
-    )
+    (found && matches!(payload.data_type(), Type::BYTE | Type::UNDEFINED))
+        .then(|| payload.as_bytes().to_vec())
 }
 
 /// Return a checked pixel count before allocating a buffer or reading samples.
@@ -258,14 +295,24 @@ fn checked_pixel_count(width: usize, height: usize) -> Result<usize, String> {
 ///
 /// Rejects shape, sample count, and nonfinite values.
 fn validate_samples(width: usize, height: usize, samples: &[f32]) -> Result<(), String> {
+    validate_sample_count(width, height, samples.len())?;
+    if samples.iter().any(|sample| !sample.is_finite()) {
+        return Err("image contains nonfinite samples".to_owned());
+    }
+    Ok(())
+}
+
+/// Require a fully sized packed RGB raster.
+///
+/// # Errors
+///
+/// Rejects invalid dimensions, unaddressable RGB or a mismatched sample count.
+fn validate_sample_count(width: usize, height: usize, samples: usize) -> Result<(), String> {
     let count = checked_pixel_count(width, height)?
         .checked_mul(3)
         .ok_or_else(|| "RGB sample count overflowed".to_owned())?;
-    if samples.len() != count {
+    if samples != count {
         return Err("sample count does not match image dimensions".to_owned());
-    }
-    if samples.iter().any(|sample| !sample.is_finite()) {
-        return Err("image contains nonfinite samples".to_owned());
     }
     Ok(())
 }

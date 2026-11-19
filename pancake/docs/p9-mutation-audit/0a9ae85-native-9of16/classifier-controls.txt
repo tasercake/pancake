@@ -1,0 +1,3 @@
+fefc512 raw terminal counts {'caught': 10, 'missed': 0, 'timeout': 0, 'unviable': 0} reconcile; missing row and missing native terminal timestamp rejected.
+e464093 raw terminal counts {'caught': 6, 'missed': 3, 'timeout': 1, 'unviable': 0} reconcile; missing row and missing native terminal timestamp rejected.
+Artifact-only controls. Original archives unchanged. No Cargo or mutator executed.

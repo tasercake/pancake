@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-preflight/qualification/p10-performance/evidence/t50-weighted-phase-preflight/test-ledger.py.txt", line 7, in <module>
+    probe = runpy.run_path(str(Path(__file__).with_name("weighted-probe.py.txt")))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 285, in run_path
+  File "<frozen runpy>", line 254, in _get_code_from_file
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-preflight/qualification/p10-performance/evidence/t50-weighted-phase-preflight/weighted-probe.py.txt'

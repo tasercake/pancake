@@ -1,0 +1,15 @@
+======== /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/dng/baseline.tiff
+[IFD0]          ImageWidth                      : 160
+[IFD0]          ImageHeight                     : 112
+[IFD0]          BitsPerSample                   : 16 16 16
+[IFD0]          SampleFormat                    : Unsigned; Unsigned; Unsigned
+[IFD0]          SamplesPerPixel                 : 3
+[IFD0]          PhotometricInterpretation       : RGB
+======== /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/dng/candidate.tiff
+[IFD0]          ImageWidth                      : 160
+[IFD0]          ImageHeight                     : 112
+[IFD0]          BitsPerSample                   : 16 16 16
+[IFD0]          SampleFormat                    : Unsigned; Unsigned; Unsigned
+[IFD0]          SamplesPerPixel                 : 3
+[IFD0]          PhotometricInterpretation       : RGB
+    2 image files read

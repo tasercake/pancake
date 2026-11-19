@@ -1,0 +1,3 @@
+native normal RAW generic validation calls=0
+native EXR generic validation calls=2
+PASS: native normal RAW avoids the repeated scan and ordinary EXR still validates

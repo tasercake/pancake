@@ -1,0 +1,287 @@
+{
+  "scope": "CPU-only TIFF import diagnostic using frozen T50 inputs",
+  "baseline_revision": "2143eda2b308497caee96334357dd23d324e1e8e",
+  "candidate_source_sha256": {
+    "pancake/src/image_io/mod.rs": "07e6d02b3fbad024c58bca4666a9b12a4767f6083f046050d96260be8c75d691",
+    "pancake/src/image_io/tiled.rs": "08c6234bd44c0fbd1787087eff555d586d8ec39ab42467669f75e50c823ba39e"
+  },
+  "application_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "probe_identity": {
+    "src/main.rs": "c907995b7ff57d8587bd85b4153e9c22a427612561e120916f807180903e56ac",
+    "Cargo.lock": "f0db5d1a84bfe6a7451c03ab86f87e182c8002b429bbe73b6671f60d85c0add3",
+    "target/release/pancake-t50-tiff-probe": "5d5dd023471277bf6555b6370711f0fad4323e8bcd6e9928094f4a0fe90410dd",
+    "probe-source.tar.gz": "022d30f6f88f42801f5c10f1232461a12fad4965c933084f4b31ce5559acfc24"
+  },
+  "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "cpu_affinity": [
+    20
+  ],
+  "kernel": "6.8.0-147-generic",
+  "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+  "codec_versions": [
+    "image 0.25.10",
+    "tiff 0.11.3",
+    "flate2 1.1.11",
+    "miniz_oxide 0.9.1"
+  ],
+  "simultaneous_process_snapshot": [
+    "PSR COMMAND         %CPU",
+    "  1 pancake-cli      435",
+    " 14 rustc            193",
+    " 18 rustc            191",
+    " 21 rustc            188",
+    "  1 rustc            121",
+    " 16 rustc            119",
+    "  4 rustc            105",
+    " 13 rustc            104",
+    "  2 pancake-cli     84.0",
+    " 11 pancake-conform 26.5",
+    "  9 bash            20.0",
+    "  3 sccache          9.3",
+    "  9 kube-apiserver   1.8",
+    " 22 cargo            1.8",
+    "  2 brave            1.5",
+    " 30 kubelet          1.1",
+    "  7 etcd             1.0"
+  ],
+  "dataset": {
+    "reference_receipt": "qualification/t50-generated/evidence/native-t50-receipt.json",
+    "reference_receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+    "materialization_receipt": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/t50-shared-2143eda/materialization.json",
+    "materialization_receipt_sha256": "8e4742b2480e041ca95cceeb023627a4c3c69c27f618e3bc13c64874a75ff468",
+    "read_only": true,
+    "verified_focus_files": 50,
+    "verified_total_files": 52,
+    "total_generated_tiff_bytes": 2775174405,
+    "materialization_seconds": 326.4907057019882,
+    "generator_environment": {
+      "imagecodecs": "2026.11.11",
+      "numpy": "2.5.4",
+      "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+      "python": "3.12.12",
+      "tifffile": "2026.11.12",
+      "zlib": "1.3.1"
+    },
+    "measured_files": [
+      {
+        "name": "focus_000.tif",
+        "shape": [
+          4000,
+          6000,
+          3
+        ],
+        "bytes": 52884845,
+        "file_sha256": "22321de901e18d3c655f96268b78e2c5fb7121d57d3734cff67d2bd761c1c78c",
+        "decoded_pixel_sha256": "542c86f2933852faeef135915d05ec087b793865562c19f1436f137148f62011"
+      },
+      {
+        "name": "focus_024.tif",
+        "shape": [
+          4000,
+          6000,
+          3
+        ],
+        "bytes": 62455395,
+        "file_sha256": "c0409b17c65c76564640c1db4078f15d2ee0bdba0d1e8762e15aba57b44ce5dc",
+        "decoded_pixel_sha256": "702b77ce61e63755df408090f3e529de773cbf5000ad71b078dec18ddcb8310b"
+      },
+      {
+        "name": "focus_049.tif",
+        "shape": [
+          4000,
+          6000,
+          3
+        ],
+        "bytes": 52931359,
+        "file_sha256": "c801b563c2059dd9202971aa300545c79b3e02734358b5e054c95edc55b47939",
+        "decoded_pixel_sha256": "ca30585fb6c52464f0302c55f62a79c95a628423df649b574f149f198853665a"
+      }
+    ],
+    "materialization_command": "ionice -c3 nice -n 15 uv run --no-project --python 3.12.12 --with-requirements qualification/t50-generated/requirements.txt python qualification/t50-generated/t50_generated.py --materialize-from qualification/t50-generated/evidence/native-t50-receipt.json --output \"$stage/inputs\" --receipt \"$stage/materialization.json\"",
+    "retained_materialization_receipt": "t50-materialization.json.gz",
+    "retained_cleanup_receipt": "t50-cleanup.json",
+    "cleanup_receipt_sha256": "90fe604e953e04fe33e348d19e4421a3bf6b3b5bea6f8c23663bd8d9708fedb9"
+  },
+  "test_first_red": {
+    "command": "cargo test --locked --test cpu_image_io tiled_tiff -- --nocapture",
+    "exit_status": 101,
+    "passed": 1,
+    "failed": 1,
+    "expected_contract_failure": "malformed short-count.tif supplied a complete frame"
+  },
+  "diagnostic": {
+    "completed_local": "2026-11-18T17:39:32.983003+08:00",
+    "dtype": "f32 normalized RGB",
+    "compared_candidate_values": 648000000,
+    "all_candidate_sample_bits_equal": true,
+    "arm_order_per_input": [
+      "native",
+      "streamed",
+      "streamed",
+      "native",
+      "native",
+      "streamed"
+    ],
+    "runs": [
+      {
+        "input": "focus_000.tif",
+        "decoder": "native",
+        "seconds": 0.996788942
+      },
+      {
+        "input": "focus_000.tif",
+        "decoder": "streamed",
+        "seconds": 0.570214437
+      },
+      {
+        "input": "focus_000.tif",
+        "decoder": "streamed",
+        "seconds": 0.580608615
+      },
+      {
+        "input": "focus_000.tif",
+        "decoder": "native",
+        "seconds": 1.193393725
+      },
+      {
+        "input": "focus_000.tif",
+        "decoder": "native",
+        "seconds": 0.915275994
+      },
+      {
+        "input": "focus_000.tif",
+        "decoder": "streamed",
+        "seconds": 0.969183613
+      },
+      {
+        "input": "focus_024.tif",
+        "decoder": "native",
+        "seconds": 1.029834014
+      },
+      {
+        "input": "focus_024.tif",
+        "decoder": "streamed",
+        "seconds": 0.947199988
+      },
+      {
+        "input": "focus_024.tif",
+        "decoder": "streamed",
+        "seconds": 1.052929938
+      },
+      {
+        "input": "focus_024.tif",
+        "decoder": "native",
+        "seconds": 1.409305723
+      },
+      {
+        "input": "focus_024.tif",
+        "decoder": "native",
+        "seconds": 1.348962438
+      },
+      {
+        "input": "focus_024.tif",
+        "decoder": "streamed",
+        "seconds": 1.071953277
+      },
+      {
+        "input": "focus_049.tif",
+        "decoder": "native",
+        "seconds": 1.075858062
+      },
+      {
+        "input": "focus_049.tif",
+        "decoder": "streamed",
+        "seconds": 0.916778057
+      },
+      {
+        "input": "focus_049.tif",
+        "decoder": "streamed",
+        "seconds": 0.92183442
+      },
+      {
+        "input": "focus_049.tif",
+        "decoder": "native",
+        "seconds": 0.701706729
+      },
+      {
+        "input": "focus_049.tif",
+        "decoder": "native",
+        "seconds": 2.823330409
+      },
+      {
+        "input": "focus_049.tif",
+        "decoder": "streamed",
+        "seconds": 2.08227794
+      }
+    ],
+    "median_seconds": {
+      "native": 1.075858062,
+      "streamed": 0.947199988
+    },
+    "separate_focus_024_peak_rss_kib": {
+      "native": 425392,
+      "streamed": 285184
+    },
+    "separate_focus_024_decode_seconds": {
+      "native": 1.431240573,
+      "streamed": 1.077243
+    }
+  },
+  "test_green": {
+    "commands": [
+      "cargo fmt --all -- --check",
+      "python3 scripts/miri_host_policy.py . validate",
+      "CLIPPY_CONF_DIR=\"$PWD/target/dependency-policy/clippy\" cargo clippy --locked -p pancake --lib --test cpu_image_io -- -D warnings",
+      "cargo test --locked --test cpu_image_io --test cpu_image_export --test cpu_npy"
+    ],
+    "counts": {
+      "cpu_image_io": 26,
+      "cpu_image_export": 10,
+      "cpu_npy": 3,
+      "failed": 0
+    },
+    "test_inputs_sha256": {
+      "pancake/tests/data/tiled-rgb16-zip-rotated.tif": "5873c2ad78054109c33b9e93e09e55d4b8d265bbc201f8fbc97379d1678c82b8",
+      "pancake/tests/data/tiled-rgb16-zip.tif": "d3290dbadc3e8f21113f5033f51b2af16ff2c263630ac9e12807dcf7e5c9bf09"
+    }
+  },
+  "candidate_revision": "cd34f7796cf4bbdaf5aaa5e331ae95f9c886e900",
+  "p2_replay": {
+    "candidate_revision": "70ee7bfe7696105c58caafe4269b594feb3619e6",
+    "locked_release_cli_sha256": "23e6fdae7593e53e4ded6199fd08141bb9002f21662b42fbe4589b8b8222ed31",
+    "cpu": {
+      "lane": "cpu",
+      "revision": "70ee7bfe7696105c58caafe4269b594feb3619e6",
+      "suite_source_sha256": "485eaae7724d8706e991c6067af7739e370ed57e9e0e15cf5d9d6f5c57804a2a",
+      "passed": 68,
+      "failed": 0,
+      "unsupported": 0,
+      "unrun": 0,
+      "events": {
+        "cpu": 27
+      }
+    },
+    "gpu": {
+      "lane": "gpu",
+      "revision": "70ee7bfe7696105c58caafe4269b594feb3619e6",
+      "suite_source_sha256": "485eaae7724d8706e991c6067af7739e370ed57e9e0e15cf5d9d6f5c57804a2a",
+      "passed": 16,
+      "failed": 0,
+      "unsupported": 0,
+      "unrun": 0,
+      "events": {
+        "gpu": 16,
+        "cpu": 16
+      }
+    },
+    "retained_cli": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/t50-tiff-70ee7bf/pancake-cli",
+    "focused_codec_log": "focused-codec-70ee7bf.log.gz",
+    "old_deflate_fixture": {
+      "filename": "pancake/tests/data/tiled-rgb16-old-deflate.tif",
+      "sha256": "a81235bac7b6ec66d50d29071098185480f6bc71c8020c4bfae87ed122f21251",
+      "compression_tag": 32946,
+      "verified_independent_source_array": true,
+      "verified_exact_application_decode": true
+    }
+  }
+}

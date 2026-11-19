@@ -1,0 +1,13 @@
+51298f3af5e3437f25d9b3b87176ec091867032a
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+6335a39835eedb6f6f6dd372d4b41471549f3e6fd258994de6acd0e1d43b17a0  src/image_io/raw.rs
+ce697ea6030c3615de2da1de3d2ab80f68d0112d513ba4fc5067df786e9e1924  examples/raw_decode_probe.rs
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+2026-11-18T07:46:17Z
+c6123bf7b7f720f90f73319b672426ae63f492ba655b7656f024dfd330d25856  ../artifacts/r50-raw-audit/decode-baseline

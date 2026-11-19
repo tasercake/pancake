@@ -1,0 +1,62 @@
+{
+  "qualification": "synthetic profile transport only",
+  "profiles": [
+    {
+      "pid": 731061,
+      "argv": [
+        "/tmp/pancake-worktrees.t3paqgWM/stable-coverage-c1e2cac/artifacts/stable-coverage-c1e2cac/transport/probe",
+        "--accept",
+        "two words",
+        "*[literal]",
+        "\u00e9l\u00e9ment"
+      ],
+      "call": "cases/synthetic-transport/call-01",
+      "elf": {
+        "path": "/tmp/pancake-worktrees.t3paqgWM/stable-coverage-c1e2cac/artifacts/stable-coverage-c1e2cac/transport/probe",
+        "build_id": "0ad61c6fbad8dac4a45d33d29eabdbfea9fd9bf3",
+        "sha256": "acfdbf4e056e43f5e1037de54005c782a53805070fdeb321e220f23bfebed51d",
+        "stat": [
+          66306,
+          6069870,
+          4701416,
+          1795006914442003529
+        ]
+      },
+      "profile": "/tmp/pancake-worktrees.t3paqgWM/stable-coverage-c1e2cac/artifacts/stable-coverage-c1e2cac/transport/raw/cases/synthetic-transport/call-01/pancake-731061-0ad61c6fbad8dac4a45d33d29eabdbfea9fd9bf3.profraw",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "profile_sha256": "9fd7b3291a02f31cf1429672061b2f768552a599ae0ce91869645a1fbfaa4104",
+      "profile_bytes": 440,
+      "llvm_profdata_show": "Instrumentation level: Front-end\nTotal functions: 2\nMaximum function count: 1\nMaximum internal block count: 5\nTotal number of blocks: 4\nTotal count: 7\nBinary IDs: \n0ad61c6fbad8dac4a45d33d29eabdbfea9fd9bf3\n"
+    },
+    {
+      "pid": 731063,
+      "argv": [
+        "/tmp/pancake-worktrees.t3paqgWM/stable-coverage-c1e2cac/artifacts/stable-coverage-c1e2cac/transport/probe",
+        "--reject",
+        "two words",
+        "*[literal]",
+        "\u00e9l\u00e9ment"
+      ],
+      "call": "cases/synthetic-transport/call-02",
+      "elf": {
+        "path": "/tmp/pancake-worktrees.t3paqgWM/stable-coverage-c1e2cac/artifacts/stable-coverage-c1e2cac/transport/probe",
+        "build_id": "0ad61c6fbad8dac4a45d33d29eabdbfea9fd9bf3",
+        "sha256": "acfdbf4e056e43f5e1037de54005c782a53805070fdeb321e220f23bfebed51d",
+        "stat": [
+          66306,
+          6069870,
+          4701416,
+          1795006914442003529
+        ]
+      },
+      "profile": "/tmp/pancake-worktrees.t3paqgWM/stable-coverage-c1e2cac/artifacts/stable-coverage-c1e2cac/transport/raw/cases/synthetic-transport/call-02/pancake-731063-0ad61c6fbad8dac4a45d33d29eabdbfea9fd9bf3.profraw",
+      "expected_exit": 17,
+      "actual_exit": 17,
+      "profile_sha256": "340cd70f462acaf49f8dff7db60196ff32f90be6620fd8cec1d176aeb2c1c8e6",
+      "profile_bytes": 440,
+      "llvm_profdata_show": "Instrumentation level: Front-end\nTotal functions: 2\nMaximum function count: 1\nMaximum internal block count: 5\nTotal number of blocks: 4\nTotal count: 8\nBinary IDs: \n0ad61c6fbad8dac4a45d33d29eabdbfea9fd9bf3\n"
+    }
+  ],
+  "indexed_sha256": "a199e211881ba6b27413a5438fda381d2897861aacdabb579c212fae15d99ed9"
+}

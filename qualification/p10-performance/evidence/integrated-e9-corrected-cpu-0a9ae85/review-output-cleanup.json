@@ -1,0 +1,25 @@
+{
+  "verified_tiff_pair_released_by_independent_reviewer": true,
+  "exact_owned_files_removed_after_hash_verification": [
+    {
+      "path": "pancake/target/release/pancake-cli",
+      "sha256": "67f8bdab62b7a1014df34034fd1f3a8b7c04b65fb89a1333a5daebd324f048bd",
+      "bytes": 122321712
+    },
+    {
+      "path": "artifacts/e9-cpu-0a9ae85/paired/warm-01/reference/complete.tif",
+      "sha256": "e0e479e0a2314dd615e190a6051c669f6689bd23dc7803cfdb4ecbcfd16f90f7",
+      "bytes": 1064222
+    },
+    {
+      "path": "artifacts/e9-cpu-0a9ae85/paired/warm-01/candidate/complete.tif",
+      "sha256": "e0365735dcf4b39bb65afa9187648935ca710ffc62340d5f9e9cff1ad4324528",
+      "bytes": 1031446
+    }
+  ],
+  "run_caches_already_removed": true,
+  "shared_nine_originals_retained_in_original_stage": true,
+  "original_notice_bearing_debian_archive_preserved": true,
+  "completed_CUDA_functional_output_and_caches_previously_removed": true,
+  "paired_archive_sha256": "eba9f139ee8a5db02cbcc684520a784e359281aae1be17d08ea0f2d48e2970a5"
+}

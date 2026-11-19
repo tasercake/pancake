@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# This is a memory-lifetime canary using the production public decoder.
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+proof="$repo/artifacts/r50-workers"
+cd "$proof"
+inputs=(inputs/frame_000.CR3 inputs/frame_049.CR3)
+{
+    date -u +%FT%TZ
+    git rev-parse HEAD
+    sha256sum repeat-probe "${inputs[@]}"
+} >repeat-environment.txt
+sha256sum "${inputs[@]}" > repeat-before.txt
+RAYON_NUM_THREADS=15 LC_ALL=C /usr/bin/time -f 'process_peak_rss_kib=%M' \
+    taskset -c 0-14 ./repeat-probe "${inputs[@]}" \
+    >repeat-observations.tsv 2>repeat-high-water.txt
+sha256sum -c repeat-before.txt >repeat-after.txt
+date -u +%FT%TZ >>repeat-environment.txt

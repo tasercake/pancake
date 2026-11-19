@@ -1,0 +1,118 @@
+{
+  "witness": {
+    "gui": "/tmp/pancake-worktrees.t3paqgWM/native-about-proof-fb9c/pancake/target/llvm-cov-target/debug/pancake-gui",
+    "shutdown": {
+      "forced": false,
+      "pid": 1017058,
+      "returncode": 0,
+      "status": "clean"
+    },
+    "version": "0.1.0"
+  },
+  "producer": {
+    "path": "/tmp/pancake-worktrees.t3paqgWM/native-about-proof-fb9c/pancake/target/llvm-cov-target/debug/pancake-gui",
+    "sha256": "9f9748cae5ee299b1cd7952ff83325d8e1163d9646f594e3475b1dfc17964e5e",
+    "build_id": "8a9b8561610a77487aa9cb1e254d838987411c08"
+  },
+  "app_raw": {
+    "file": "pancake-1017058-4511120949909355851_0.profraw",
+    "bytes": 80080,
+    "sha256": "88ace5c653edb443667b54ffc8c14b728ba9774496524f94fe5fe2ec96638be2",
+    "internal_profile_show": "Instrumentation level: Front-end\nTotal functions: 747\nMaximum function count: 80\nMaximum internal block count: 80\nTotal number of blocks: 2174\nTotal count: 1107\nBinary IDs: \n8a9b8561610a77487aa9cb1e254d838987411c08"
+  },
+  "picked_by_ordinary_exporter": true,
+  "authored_mapping_and_counts_preserved": true,
+  "baseline": {
+    "branches": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "functions": {
+      "count": 756,
+      "covered": 476,
+      "percent": 62.96296296296296
+    },
+    "instantiations": {
+      "count": 1657,
+      "covered": 644,
+      "percent": 38.86541943270972
+    },
+    "lines": {
+      "count": 6475,
+      "covered": 4658,
+      "percent": 71.93822393822393
+    },
+    "mcdc": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "regions": {
+      "count": 7288,
+      "covered": 4776,
+      "notcovered": 2512,
+      "percent": 65.5323819978046
+    }
+  },
+  "ordinary_export_with_about": {
+    "branches": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "functions": {
+      "count": 756,
+      "covered": 498,
+      "percent": 65.87301587301587
+    },
+    "instantiations": {
+      "count": 1657,
+      "covered": 679,
+      "percent": 40.97767048883525
+    },
+    "lines": {
+      "count": 6475,
+      "covered": 4863,
+      "percent": 75.10424710424711
+    },
+    "mcdc": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "regions": {
+      "count": 7288,
+      "covered": 4986,
+      "notcovered": 2302,
+      "percent": 68.41383095499451
+    }
+  },
+  "line_gains": [
+    {
+      "path": "crates/pancake-gui/src/main.rs",
+      "line_gain": 22
+    },
+    {
+      "path": "crates/pancake-gui/src/panel/mod.rs",
+      "line_gain": 4
+    },
+    {
+      "path": "crates/pancake-gui/src/panel/pointer.rs",
+      "line_gain": 18
+    },
+    {
+      "path": "crates/pancake-gui/src/preferences/mod.rs",
+      "line_gain": 9
+    },
+    {
+      "path": "crates/pancake-gui/src/session.rs",
+      "line_gain": 152
+    }
+  ],
+  "live_indexed_sha256": "0ebae062f7de843db664ce42fc074aaffde51eadb6436116db3b8463bbe5f3a0"
+}

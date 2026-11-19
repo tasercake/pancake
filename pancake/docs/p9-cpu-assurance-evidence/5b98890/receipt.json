@@ -1,0 +1,137 @@
+{
+  "source_commit": "5b98890d5e976d7287c354091671fff6f87d266c",
+  "baseline_commit": "870f7f923d70b1a7b0e7fe73d5f9a4987770fdc4",
+  "status": "passed",
+  "fast": {
+    "exit": 0,
+    "python_policy_tests": 54
+  },
+  "cpu_nextest_dev": {
+    "exit": 0,
+    "passed": 160,
+    "binaries": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "selected_integration_targets": [
+      "cpu_advanced_fusion",
+      "cpu_array_layout",
+      "cpu_cli",
+      "cpu_config",
+      "cpu_fusion_contract",
+      "cpu_gray_array_export",
+      "cpu_image_export",
+      "cpu_image_io",
+      "cpu_job",
+      "cpu_kernel_contract",
+      "cpu_npy",
+      "cpu_numerical_contract",
+      "cpu_registration_contract",
+      "cpu_resident_policy",
+      "cpu_runtime_contract",
+      "cpu_runtime_options",
+      "cpu_stack_plan"
+    ],
+    "baseline_tests_retained": 151,
+    "added": [
+      {
+        "suite": "pancake",
+        "test": "job::worker::tests::stale_worker_outcome_leaves_current_result_available"
+      },
+      {
+        "suite": "pancake",
+        "test": "registration::estimate::tests::euclidean_parameters_produce_a_rigid_map"
+      },
+      {
+        "suite": "pancake",
+        "test": "registration::estimate::tests::plausibility_rejects_translation_outside_search_radius"
+      },
+      {
+        "suite": "pancake::cpu_image_io",
+        "test": "encoded_raw_at_limit_develops_identically"
+      },
+      {
+        "suite": "pancake::cpu_npy",
+        "test": "version_two_header_limit_is_inclusive"
+      },
+      {
+        "suite": "pancake::cpu_registration_contract",
+        "test": "cpu_affine_inverse_reverses_signed_shear"
+      },
+      {
+        "suite": "pancake::cpu_registration_contract",
+        "test": "cpu_breathing_clamps_a_supported_expansion"
+      },
+      {
+        "suite": "pancake::cpu_registration_contract",
+        "test": "cpu_scaled_crop_uses_the_last_pixel_center"
+      },
+      {
+        "suite": "pancake::cpu_resident_policy",
+        "test": "configured_slabs_do_not_hold_the_registration_rgb"
+      }
+    ],
+    "required_witnesses": {
+      "sparse_raw": {
+        "suite": "pancake::cpu_image_io",
+        "test": "encoded_raw_at_limit_develops_identically",
+        "seconds": 0.473
+      },
+      "configured_single_slab": {
+        "suite": "pancake::cpu_resident_policy",
+        "test": "configured_slabs_do_not_hold_the_registration_rgb",
+        "seconds": 0.355
+      }
+    }
+  },
+  "started_sgt": "2026-11-19T02:15:23+08:00",
+  "fast_ended_sgt": "2026-11-19T02:17:32+08:00",
+  "ended_sgt": "2026-11-19T02:19:55+08:00",
+  "runtime": {
+    "logical_cpus": [
+      0,
+      1
+    ],
+    "build_jobs": 2,
+    "offline": true,
+    "compiler_wrappers": "unset",
+    "rust": "1.100.0",
+    "nextest": "0.9.152"
+  },
+  "test_gated_source_paths": [
+    "pancake/src/job/worker.rs",
+    "pancake/src/registration/estimate.rs",
+    "pancake/src/registration/estimate/tests.rs"
+  ],
+  "different_integration_test_paths": [
+    "pancake/tests/common/registration_cases.rs",
+    "pancake/tests/cpu_image_io.rs",
+    "pancake/tests/cpu_npy.rs",
+    "pancake/tests/cpu_registration_contract.rs",
+    "pancake/tests/cpu_resident_policy.rs",
+    "pancake/tests/cpu_stack_plan.rs"
+  ],
+  "source_inventory": {
+    "path": "pancake/assurance-platforms.json",
+    "sha256": "4bfdd2a59b0dd01c87dc4d29d8478cfb1b830cd879140b958828add2bf908211",
+    "updated_test_gated_entries": {
+      "src/job/worker.rs": "09214f2eb922cbdc695001fc2569084d5ad15777b0379dacd86f96d7371be9c7",
+      "src/registration/estimate.rs": "f84b6e5795cdc27986a2d304aff25fbe13e1280242f91465d55d4d1a7861545a",
+      "src/registration/estimate/tests.rs": "1c425f52749baf05b8f9fa04ccb527acaaf0a932027419e8f1c0b85e0eebd710"
+    }
+  },
+  "original_receipt_sha256": {
+    "fast.log": "2669afd1ab5c44c150fc1c141b985c0a60cecd15460343c3a6539d252c985146",
+    "cpu-dev.log": "38f7ae7aab86b5f7b9108ccf99328ee76d9676a692f3cc8df134b857e426347f",
+    "junit.xml": "b9f7994cd1bfa1d2e4557b3019b0281ef4efe94456d4476fd8a695805a26f11d",
+    "metadata.json": "a0aa311202855ab0db541f55db8de61ebe9f22be3406e91cd6dc9382264b889d"
+  },
+  "unchanged_policy_sha256": {
+    "pancake/Cargo.lock": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "pancake/rust-toolchain.toml": "ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e",
+    "pancake/scripts/check.sh": "63ce2ccca53e1e4e73666b5bc72374d2ea5f8a25fe474e0c87ee41284d27eec7",
+    "pancake/scripts/assurance_targets.py": "044dcaefaf20b04fda64f974d464c79298c54ee4bbac234661bb204809e27a3a",
+    "pancake/.config/nextest.toml": "c53b6c83d095bfb7551b98c232ca3591744c870d577921f40db952185fbd2fa2",
+    ".github/workflows/pancake.yml": "6cfe7f4b6d511e788a63d188a92b72b7d423785adc9b7d9d3b5405bad53ba3ab"
+  }
+}

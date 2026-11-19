@@ -30,6 +30,76 @@ component Parameter inherits HorizontalLayout {
     }
 }
 
+// Viewer commands acknowledge input immediately, without animating their chrome.
+component ViewCommand inherits Rectangle {
+    in property <string> text;
+    in property <bool> enabled: true;
+    in property <bool> primary;
+    in property <bool> checkable;
+    in property <bool> checked;
+    callback clicked();
+
+    private property <bool> emphasized: root.enabled && (root.primary || root.checked || pointer.pressed);
+    private property <bool> hovered: root.enabled && pointer.has-hover;
+
+    min-width: max(32px, content.min-width);
+    min-height: max(32px, content.min-height);
+    horizontal-stretch: 0;
+    vertical-stretch: 0;
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: keys.has-focus && root.enabled
+        ? (root.emphasized ? Palette.accent-foreground : Palette.accent-background)
+        : Palette.border;
+    background: root.emphasized ? Palette.accent-background
+        : root.hovered ? Palette.selection-background
+        : root.enabled ? Palette.control-background : Palette.alternate-background;
+    forward-focus: keys;
+    accessible-role: button;
+    accessible-enabled: root.enabled;
+    accessible-checkable: root.checkable;
+    accessible-checked: root.checked;
+    accessible-label: root.text;
+    accessible-action-default => {
+        if root.enabled { root.clicked(); }
+    }
+
+    content := HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        alignment: center;
+        Text {
+            text: root.text;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            color: root.emphasized ? Palette.accent-foreground
+                : root.hovered ? Palette.selection-foreground
+                : root.enabled ? Palette.control-foreground : Palette.alternate-foreground;
+            accessible-role: none;
+        }
+    }
+
+    pointer := TouchArea {
+        enabled: root.enabled;
+        clicked => { root.clicked(); }
+    }
+
+    keys := FocusScope {
+        x: 0px;
+        width: 0px;
+        enabled: root.enabled;
+        key-pressed(event) => {
+            if event.text == Key.Space || event.text == Key.Return {
+                root.clicked();
+                return accept;
+            }
+            return reject;
+        }
+    }
+}
+
 // Read-only native state and rendered geometry share the same bindings.
 component ViewCanvas inherits Rectangle {
     in property <image> primary-image;
@@ -342,7 +412,7 @@ export component Workspace inherits Window {
                     clicked => { root.import-folder(); }
                 }
                 Rectangle { horizontal-stretch: 1; }
-                Button {
+                ViewCommand {
                     text: "View";
                     accessible-id: "mode.view";
                     enabled: root.has-preview;
@@ -350,7 +420,7 @@ export component Workspace inherits Window {
                     checked: !root.compare;
                     clicked => { root.compare = false; }
                 }
-                Button {
+                ViewCommand {
                     text: "Compare";
                     accessible-id: "mode.compare";
                     enabled: root.selected-result >= 0 && root.frames.length > 0;
@@ -529,7 +599,7 @@ export component Workspace inherits Window {
                             spacing: 4px;
                             SectionLabel { text: "Results"; }
                             Text { text: "\{root.results.length}"; accessible-id: "results.count"; color: Palette.foreground; }
-                            for label[index] in root.results: Button {
+                            for label[index] in root.results: ViewCommand {
                                 text: label;
                                 primary: root.selected-result == index;
                                 accessible-id: "result.\{index}";
@@ -564,12 +634,12 @@ export component Workspace inherits Window {
                         padding-left: 10px;
                         padding-right: 10px;
                         spacing: 8px;
-                        Button { text: "Fit"; accessible-id: "viewer.fit"; enabled: root.has-preview; clicked => { canvas.fit-image(); } }
-                        Button { text: "1:1"; accessible-id: "viewer.actual"; enabled: root.has-preview; clicked => { canvas.set-zoom(1); } }
-                        Button { text: "−"; accessible-id: "viewer.zoom_out"; accessible-label: "Zoom out"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom / 1.35); } }
-                        Button { text: "+"; accessible-id: "viewer.zoom_in"; accessible-label: "Zoom in"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom * 1.35); } }
-                        Button { text: "‹"; accessible-id: "viewer.previous"; accessible-label: "Previous source"; enabled: root.frames.length > 0; clicked => { root.change-source(-1); } }
-                        Button { text: "›"; accessible-id: "viewer.next"; accessible-label: "Next source"; enabled: root.frames.length > 0; clicked => { root.change-source(1); } }
+                        ViewCommand { text: "Fit"; accessible-id: "viewer.fit"; enabled: root.has-preview; clicked => { canvas.fit-image(); } }
+                        ViewCommand { text: "1:1"; accessible-id: "viewer.actual"; enabled: root.has-preview; clicked => { canvas.set-zoom(1); } }
+                        ViewCommand { text: "−"; accessible-id: "viewer.zoom_out"; accessible-label: "Zoom out"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom / 1.35); } }
+                        ViewCommand { text: "+"; accessible-id: "viewer.zoom_in"; accessible-label: "Zoom in"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom * 1.35); } }
+                        ViewCommand { text: "‹"; accessible-id: "viewer.previous"; accessible-label: "Previous source"; enabled: root.frames.length > 0; clicked => { root.change-source(-1); } }
+                        ViewCommand { text: "›"; accessible-id: "viewer.next"; accessible-label: "Next source"; enabled: root.frames.length > 0; clicked => { root.change-source(1); } }
                         Rectangle { horizontal-stretch: 1; }
                         Button {
                             text: "Crop";

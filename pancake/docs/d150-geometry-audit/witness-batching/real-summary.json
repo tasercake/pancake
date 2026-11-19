@@ -1,0 +1,175 @@
+{
+  "prior_results_sha256": "c84afeaf274f087a3d519b73853efcd8d4e9e5b469ea04fc516e6e4e7657ef75",
+  "results_sha256": "3119cb8f931b95101618ccd55731447557f5b051aa60cbf1d6f6908ac0209fc8",
+  "proxy_extent": [
+    384,
+    288
+  ],
+  "prior_max_abs_loss_error": 0.0,
+  "prior_geometry_and_all_support_unchanged": true,
+  "one_to_one_bit_identical_scalar_moments": 3240,
+  "sample_pairs": 42,
+  "serial_median_ns": 18632352.0,
+  "serial_range_ns": [
+    12870781,
+    20239815
+  ],
+  "packed_median_ns": 597010.5,
+  "packed_range_ns": [
+    358102,
+    637738
+  ],
+  "median_within_pair_ratio": 0.030458415622195832,
+  "edge_summary": [
+    {
+      "interval": [
+        "P9160579_d2.jpg",
+        "P9160580_d2.jpg"
+      ],
+      "support": [
+        {
+          "hypothesis": "direct",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        },
+        {
+          "hypothesis": "inverse_reverse",
+          "rank_two_footprint": true,
+          "supporting_cells": 6
+        },
+        {
+          "hypothesis": "no_step",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        }
+      ],
+      "serial_median_ns": 18654789,
+      "packed_median_ns": 590929
+    },
+    {
+      "interval": [
+        "P9160580_d2.jpg",
+        "P9160581_d2.jpg"
+      ],
+      "support": [
+        {
+          "hypothesis": "direct",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        },
+        {
+          "hypothesis": "inverse_reverse",
+          "rank_two_footprint": true,
+          "supporting_cells": 8
+        },
+        {
+          "hypothesis": "no_step",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        }
+      ],
+      "serial_median_ns": 16533948,
+      "packed_median_ns": 617840
+    },
+    {
+      "interval": [
+        "P9160581_d2.jpg",
+        "P9160582_d2.jpg"
+      ],
+      "support": [
+        {
+          "hypothesis": "direct",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        },
+        {
+          "hypothesis": "inverse_reverse",
+          "rank_two_footprint": true,
+          "supporting_cells": 8
+        },
+        {
+          "hypothesis": "no_step",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        }
+      ],
+      "serial_median_ns": 17804924,
+      "packed_median_ns": 600227
+    },
+    {
+      "interval": [
+        "P9160653_d2.jpg",
+        "P9160654_d2.jpg"
+      ],
+      "support": [
+        {
+          "hypothesis": "direct",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        },
+        {
+          "hypothesis": "inverse_reverse",
+          "rank_two_footprint": false,
+          "supporting_cells": 2
+        },
+        {
+          "hypothesis": "no_step",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        }
+      ],
+      "serial_median_ns": 17089731,
+      "packed_median_ns": 599185
+    },
+    {
+      "interval": [
+        "P9160654_d2.jpg",
+        "P9160655_d2.jpg"
+      ],
+      "support": [
+        {
+          "hypothesis": "direct",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        },
+        {
+          "hypothesis": "inverse_reverse",
+          "rank_two_footprint": false,
+          "supporting_cells": 1
+        },
+        {
+          "hypothesis": "no_step",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        }
+      ],
+      "serial_median_ns": 16545831,
+      "packed_median_ns": 593955
+    },
+    {
+      "interval": [
+        "P9160655_d2.jpg",
+        "P9160656_d2.jpg"
+      ],
+      "support": [
+        {
+          "hypothesis": "direct",
+          "rank_two_footprint": false,
+          "supporting_cells": 1
+        },
+        {
+          "hypothesis": "inverse_reverse",
+          "rank_two_footprint": false,
+          "supporting_cells": 0
+        },
+        {
+          "hypothesis": "no_step",
+          "rank_two_footprint": false,
+          "supporting_cells": 2
+        }
+      ],
+      "serial_median_ns": 19405319,
+      "packed_median_ns": 483578
+    }
+  ]
+}

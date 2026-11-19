@@ -1,0 +1,46 @@
+"""Preregistered ten-job arithmetic, separate from the frozen P10 reducer."""
+from statistics import median
+
+PAIRS = (
+    ("warmup", 1, ("reference", "candidate")),
+    ("warm", 1, ("candidate", "reference")),
+    ("warm", 2, ("reference", "candidate")),
+    ("warm", 3, ("candidate", "reference")),
+    ("cold", 1, ("reference", "candidate")),
+)
+SCHEDULE = tuple((kind, number, role) for kind, number, order in PAIRS for role in order)
+LIMITS = {"warm": 1 / 1.8, "rss": 0.55, "cold": 1.0}
+
+
+def ratio(reference, candidate, limit):
+    if reference is None or candidate is None:
+        return {"status": "pending", "limit": limit, "reference": reference, "candidate": candidate}
+    value = candidate / reference
+    return {"status": "pass" if value <= limit else "fail", "ratio": value, "limit": limit,
+            "reference": reference, "candidate": candidate}
+
+
+def reduce_gates(rows):
+    result = {"frozen_full_credit": False, "scope": "limited T50 Weighted CPU numeric evidence only"}
+    observed = tuple((row["kind"], row["number"], row["target"]) for row in rows)
+    if observed != SCHEDULE[:len(observed)] or any(
+        row["valid"] is not True or type(row["elapsed_ns"]) is not int or row["elapsed_ns"] <= 0
+        or (row["peak_rss_bytes"] is not None
+            and (type(row["peak_rss_bytes"]) is not int or row["peak_rss_bytes"] <= 0))
+        for row in rows
+    ):
+        return result | {"status": "fail", "reason": "malformed, invalid, or out-of-order job"}
+    if observed != SCHEDULE:
+        return result | {"status": "pending", "reason": "incomplete bounded schedule"}
+    roles = ("reference", "candidate")
+    elapsed = {
+        kind: [median(row["elapsed_ns"] for row in rows if row["target"] == role and row["kind"] == kind)
+               for role in roles]
+        for kind in ("warm", "cold")
+    }
+    peaks = [[row["peak_rss_bytes"] for row in rows if row["target"] == role] for role in roles]
+    peak = [max(values) if None not in values else None for values in peaks]
+    ratios = {key: ratio(*operands, LIMITS[key]) for key, operands in (elapsed | {"rss": peak}).items()}
+    statuses = {entry["status"] for entry in ratios.values()}
+    status = "fail" if "fail" in statuses else "pending" if "pending" in statuses else "pass"
+    return result | {"status": status, "ratios": ratios}

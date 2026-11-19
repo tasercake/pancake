@@ -1,0 +1,47 @@
+{
+  "canonical_source_revision": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "test_only_revision": "e3ff8aa80b6ae8d307088750ea2a62d3a43775a0",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "original_mutant_patch_sha256": "041c9628543852872dc06a0b2d1b208ff908481433ea9109b2f8f5cac266f367",
+  "green_runtime_source_sha256": "630623ae62ca7417005743df56579fb9e5bfefaf66a7a338e20a9e0b2132e3a0",
+  "test_source_sha256": "cdd966d064d2df27c9cb7e1ea872a49a45548ae17686210ed00f4c3e31a3a633",
+  "host": {
+    "cpu_affinity": [
+      12,
+      13
+    ],
+    "build_jobs": 2,
+    "rust": "1.100.0",
+    "backend": "explicit native CPU"
+  },
+  "canonical_mutant": {
+    "name": "src/runtime/mod.rs:174:9: replace SelectedRuntime::fingerprint -> &str with \"\"",
+    "result": "MissedMutant",
+    "phases": [
+      {
+        "phase": "Build",
+        "duration": 21.013306734,
+        "process_status": "Success"
+      },
+      {
+        "phase": "Test",
+        "duration": 6.522915196,
+        "process_status": "Success"
+      }
+    ]
+  },
+  "focused_replay": {
+    "command": "taskset --cpu-list 12\\,13 cargo +1.100.0 test --locked --offline -p pancake-cli --test cpu_runtime_options jpeg_depth_warning_and_quality_describe_a_real_export -- --exact --test-threads=1",
+    "rustc_cap_lints": "warn; both arms",
+    "with_exact_mutation_exit": 101,
+    "restored_production_exit": 0,
+    "negative_assertion": "completed CPU export lost its runtime compilation identity",
+    "green_tests_passed": 1,
+    "green_tests_failed": 0
+  },
+  "source_policy": "Miri platform contract: reviewed production source and dependency closure match.",
+  "archive": {
+    "sha256": "9a70fa64c1c5f8da2d04a3a4f75842610f8d83a5d60f7baf36815491c052e52d",
+    "file_count": 15
+  }
+}

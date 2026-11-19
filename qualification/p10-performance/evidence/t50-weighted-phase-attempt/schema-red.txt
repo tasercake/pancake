@@ -1,0 +1,54 @@
+.FEEE
+======================================================================
+ERROR: test_original_event_preserves_50_ordered_sequential_identity_maps (__main__.StockEventSchema.test_original_event_preserves_50_ordered_sequential_identity_maps)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/test-control-schema.py.txt", line 28, in test_original_event_preserves_50_ordered_sequential_identity_maps
+    captured, _ = validate(control, frames)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/weighted-phase-run.py.txt", line 72, in decode_and_validate
+    set(sequential) != ordered or any(matrix != identity for matrix in sequential.values())
+    ^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'list'
+
+======================================================================
+ERROR: test_reordered_or_wrong_source_maps_are_rejected (__main__.StockEventSchema.test_reordered_or_wrong_source_maps_are_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/test-control-schema.py.txt", line 57, in test_reordered_or_wrong_source_maps_are_rejected
+    self.validate_modified(
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/test-control-schema.py.txt", line 40, in validate_modified
+    validate(directory, frames)
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/weighted-phase-run.py.txt", line 72, in decode_and_validate
+    set(sequential) != ordered or any(matrix != identity for matrix in sequential.values())
+    ^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'list'
+
+======================================================================
+ERROR: test_short_and_nonidentity_sequential_map_are_rejected (__main__.StockEventSchema.test_short_and_nonidentity_sequential_map_are_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/test-control-schema.py.txt", line 43, in test_short_and_nonidentity_sequential_map_are_rejected
+    self.validate_modified(lambda event: event["sequential_transforms"].pop(), "sequential")
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/test-control-schema.py.txt", line 40, in validate_modified
+    validate(directory, frames)
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/weighted-phase-run.py.txt", line 72, in decode_and_validate
+    set(sequential) != ordered or any(matrix != identity for matrix in sequential.values())
+    ^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'list'
+
+======================================================================
+FAIL: test_keyed_and_missing_sequential_map_are_rejected (__main__.StockEventSchema.test_keyed_and_missing_sequential_map_are_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/test-control-schema.py.txt", line 50, in test_keyed_and_missing_sequential_map_are_rejected
+    self.validate_modified(
+  File "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-phase-followup/qualification/p10-performance/evidence/t50-weighted-phase-preflight/test-control-schema.py.txt", line 39, in validate_modified
+    with self.assertRaisesRegex(ValueError, expected):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.003s
+
+FAILED (failures=1, errors=3)

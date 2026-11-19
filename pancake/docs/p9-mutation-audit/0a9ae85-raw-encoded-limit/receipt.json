@@ -1,0 +1,77 @@
+{
+  "baseline_revision": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "test_only_revision": "e97f137e17f41b6a4555e15bc19d9ded895a8e5e",
+  "candidate_mutation": "src/image_io/raw.rs:70:14: replace > with == in decode",
+  "previous_shard_result": "MissedMutant",
+  "original_diff_sha256": "5219ec8fae90421aeed061c7719b3b4ea58ea589ca6d34e24a72b86d159267f6",
+  "stock_raw_rs_sha256": "2488f7280341d802942a34da284cac69270c997d2ea953c3b0e2e0fe3816926d",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "fixture_sha256": "99051b2e08724bdf6aeb8c27a4c8aa495143d9ffa658d826c7ab089078c66817",
+  "fixture_original_bytes": 36352,
+  "padded_bytes": 268435456,
+  "overflow_bytes": 268435457,
+  "shape_whc": [
+    160,
+    112,
+    3
+  ],
+  "sample_encoding": "U16",
+  "exact_working_f32_samples": 53760,
+  "toolchain": "1.100.0",
+  "cpu_affinity": [
+    8,
+    9
+  ],
+  "jobs": 2,
+  "offline": true,
+  "rust_wrappers_disabled": true,
+  "instrument": "GNU time -f %e,%M for actual test executable",
+  "outcomes": {
+    "mutant": {
+      "exit": 101,
+      "wall_s": 0.39,
+      "max_rss_kib": 315792,
+      "observed": "compressed RAW source exceeds the byte limit",
+      "log": "mutant.log"
+    },
+    "stock-unpadded": {
+      "exit": 0,
+      "wall_s": 0.21,
+      "max_rss_kib": 51020,
+      "observed": "1 passed; 0 failed",
+      "log": "stock-unpadded.log"
+    },
+    "stock-exact-cap": {
+      "exit": 0,
+      "wall_s": 0.43,
+      "max_rss_kib": 316184,
+      "observed": "1 passed; 0 failed",
+      "log": "stock-exact-cap.log"
+    },
+    "stock-cap-plus-one": {
+      "exit": 0,
+      "wall_s": 0.0,
+      "max_rss_kib": 23296,
+      "observed": "1 passed; 0 failed",
+      "log": "stock-cap-plus-one.log"
+    },
+    "stock-suite": {
+      "exit": 0,
+      "wall_s": 1.12,
+      "max_rss_kib": 318632,
+      "observed": "29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out",
+      "log": "stock-suite.log"
+    }
+  },
+  "exact_minus_unpadded": {
+    "wall_s": 0.22,
+    "max_rss_kib": 265164
+  },
+  "cleanup": {
+    "every_test_tmpdir_empty_at_exit": true,
+    "private_target_removed": true,
+    "private_tmpdir_removed": true
+  },
+  "format_exit": 0,
+  "capture_archive_sha256": "0dfc888d73cc48cbe415873cdd41a5d749ccc7a8aa41320f2abc21120fb4f9cf"
+}

@@ -1,0 +1,21 @@
+{
+  "commit": "12f2151c8a198b5209c8f4d506dbd17fd9aaa74f",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/r50-paired-sealed/pancake/target/release/pancake-cli",
+  "binary_sha256": "32caffd65ed785b1883c39ec69cfd726f2a6f836e42c653a6385dacf80267055",
+  "build": "P9 locked 12f2151 build, CLI payload re-extracted from its exact Debian archive",
+  "package_file": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-12f2151/pancake_0.1.0_amd64.deb",
+  "package_archive_sha256": "0d5a428309fedb6de8ed741c9ba79bb75463ac219972b87c931bbac702b02123",
+  "package_validation_sha256": "b179f710339172df9ba099133944f8d909d910070cb96e21a2fbacf184bb2401",
+  "release_build_log_sha256": "e4fca0931ca03babab1fed149b8ddd5b4782559bdf608f8acfb7e763c0a6e11e",
+  "corrected_r50_launcher_sha256": "0272c8f3dff4a8b31e5bb7817a02225b7c44d51a6a8c8ed90bf22712a4396992",
+  "paired_harness_commit": "08d5b6dc5bd057126d4ac5cc4982d363774d1d20",
+  "paired_harness_sources_sha256": {
+    "p10.py": "0e6bfd273292454c42aa8aaf4785d87f2b6980dea7a7da5e4569ed8c815b1d40",
+    "resources.py": "20fa18abed5d48a6b8fd6a9c2bd3b5b7f26c716b3e4bd1e80f63409a8239e231",
+    "protocol.py": "e4868f65418eaf6604d3b0d2c0f5a259566939ff2a5f2bfcb2a8bce23dcfdbac",
+    "physical.py": "b55db52361af0b6effdb48293a36e7d04dc2930aedac8c76e950b837074adb32"
+  },
+  "paired_harness_diff_sha256": "a5afce720e7f581f8aaa008a481a87b3fab0591cd0b4781903be863ab73f66b7"
+}

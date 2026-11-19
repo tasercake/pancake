@@ -1,0 +1,143 @@
+{
+  "scope": "one completed diagnostic pair, no frozen performance gate credit",
+  "candidate_source": "8694b555666a1ddf4051e2839bbced4bcc625859",
+  "candidate_elf_sha256": "e5fa8d2cb31a55071c999a83e35b4c3d31d6c569717b7baca328c16ea7ed4b6f",
+  "frozen_protocol_sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc",
+  "owner_materialization_sha256": "317f4b0c9be5837cd7082227bf700ee232e7e995471ee44be8488cbf3511603c",
+  "owner_input_count": 52,
+  "owner_input_bytes": 2775174405,
+  "both_targets_and_all_52_inputs_authenticated_postflight": true,
+  "gpu": {
+    "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+    "pci.bus_id": "00000000:01:00.0",
+    "name": "NVIDIA GeForce RTX 3090",
+    "driver_version": "580.178.04",
+    "pstate": "P8",
+    "temperature.gpu": "45",
+    "power.draw": "18.13",
+    "power.limit": "350.00",
+    "clocks.gr": "210",
+    "clocks.mem": "405"
+  },
+  "opencl_match": {
+    "name": "NVIDIA GeForce RTX 3090",
+    "driver_version": "580.178.04",
+    "index": 0,
+    "platform": "NVIDIA CUDA",
+    "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac"
+  },
+  "jobs": {
+    "reference": {
+      "elapsed_ns": 26301475260,
+      "output": {
+        "shape": [
+          3998,
+          5998,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "476c42d7656104f8275f4188aa96cad1643337bc6f49a9913006731edceeba57",
+        "pixel_sha256": "0a47d36947de71c6549a6854be60678d69a83590526a6879ae76b573e60eb4b6",
+        "bytes": 78347120,
+        "minimum": 2891,
+        "maximum": 61523
+      },
+      "rgb16_samples_not_multiple_257": 71661072,
+      "rgb16_samples_not_multiple_256": 71655471,
+      "identity_transforms": 50,
+      "symmetric_crop_origin": [
+        1,
+        1
+      ],
+      "truth_regions": 50,
+      "truth_copy_sha256": "a241647cd990536e498be314e72e1e1f9a3d8748dee3066c9b7f8c701255b985",
+      "truth_mae_u16": 979.5945022500135,
+      "detail_variance_range": [
+        1.1663986444473267,
+        1.1664015054702759
+      ],
+      "cadence": {
+        "rss": {
+          "sample_count": 3222,
+          "maximum_gap_ns": 26474590,
+          "observed_peak_bytes": 6701006848,
+          "qualified_peak_bytes": null
+        },
+        "gpu": {
+          "sample_count": 3283,
+          "maximum_gap_ns": 27562510,
+          "observed_peak_bytes": 4315938816,
+          "qualified_peak_bytes": null
+        }
+      },
+      "backend": "gpu",
+      "backend_by_stage": {
+        "fusion": "gpu",
+        "alignment_estimation": "cpu",
+        "warping": "gpu"
+      },
+      "runtime_reported": null,
+      "reference_alignment_helper_warnings": {
+        "GPU alignment help failed (Singular matrix); using the CPU": 3
+      }
+    },
+    "candidate": {
+      "elapsed_ns": 22171824618,
+      "output": {
+        "shape": [
+          3998,
+          5998,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302",
+        "pixel_sha256": "f54746784bcc278da2df734e9f034053a3b54105ddb2a30046baf6dab07a80a3",
+        "bytes": 143881378,
+        "minimum": 7663,
+        "maximum": 57895
+      },
+      "rgb16_samples_not_multiple_257": 71660544,
+      "rgb16_samples_not_multiple_256": 71658092,
+      "identity_transforms": 50,
+      "symmetric_crop_origin": [
+        1,
+        1
+      ],
+      "truth_regions": 50,
+      "truth_copy_sha256": "a241647cd990536e498be314e72e1e1f9a3d8748dee3066c9b7f8c701255b985",
+      "truth_mae_u16": 843.3282649855549,
+      "detail_variance_range": [
+        0.8667194247245789,
+        0.8918330073356628
+      ],
+      "cadence": {
+        "rss": {
+          "sample_count": 2772,
+          "maximum_gap_ns": 9677289,
+          "observed_peak_bytes": 987627520,
+          "qualified_peak_bytes": 987627520
+        },
+        "gpu": {
+          "sample_count": 2762,
+          "maximum_gap_ns": 78152984,
+          "observed_peak_bytes": 2518323200,
+          "qualified_peak_bytes": null
+        }
+      },
+      "backend": "gpu",
+      "backend_by_stage": null,
+      "runtime_reported": "wgpu-vulkan",
+      "reference_alignment_helper_warnings": {}
+    }
+  },
+  "candidate_over_reference_elapsed_ratio": 0.842987870407388,
+  "paired_pixels": {
+    "status": "decoded_pair",
+    "mean_absolute_u16": 1792.1332831025939,
+    "maximum_absolute_u16": 19611,
+    "rms_u16": 2207.6263127691477,
+    "changed_sample_fraction": 0.999754795703954
+  },
+  "export_bytes_to_remove": 222228498,
+  "environment_scope": "Raw child logs/events/cadence retained. Ambient launch environments excluded; derived controlled settings only."
+}

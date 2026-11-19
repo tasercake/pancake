@@ -1,0 +1,23 @@
+2026-11-18T11:13:46Z
+    PID PSR COMMAND         %CPU
+  46285   0 ps               100
+   9773  24 sccache          2.1
+   6487   9 kube-apiserver   1.8
+   5842  30 kubelet          1.1
+   6467   9 etcd             1.0
+   6474  20 kube-controller  0.7
+   5547  11 steam            0.6
+ 104627   4 codex            0.5
+   4933  29 containerd       0.5
+3535722  11 brave            0.4
+ 104104   6 ChatGPT          0.4
+ 104712   1 brave            0.4
+  42721   5 python           0.4
+   5644  11 bitwarden-app    0.4
+   6464  15 kube-scheduler   0.3
+   8444  11 steamwebhelper   0.3
+   2448   2 dockerd          0.3
+pid, process_name, used_gpu_memory [MiB]
+8482, /home/krishna/.local/share/Steam/ubuntu12_64/steamwebhelper, 9 MiB
+11746, /home/krishna/.local/opt/sunshine/current/root/usr/bin/sunshine, 256 MiB
+Cpus_allowed_list:	0-31

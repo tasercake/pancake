@@ -1,0 +1,572 @@
+{
+  "scope": "One ordered control\u2192bounded quiet pair, no profiler and no retry",
+  "ceiling_ns": 33000000,
+  "target_sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc",
+  "t50_materialization_sha256": "cd4942acd3127518340dd7f10a9c68d5768923beb45dfd36614ba7a11bf10eb4",
+  "gpu": {
+    "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+    "pci.bus_id": "00000000:01:00.0",
+    "name": "NVIDIA GeForce RTX 3090",
+    "driver_version": "580.178.04",
+    "power.limit": "350.00"
+  },
+  "by_matched_step_and_same_predispatch_stage": {
+    "Decode": {
+      "observations": 21,
+      "median_bounded_minus_control_ns": 920530,
+      "bounded_slower": 13
+    },
+    "Fuse": {
+      "observations": 109,
+      "median_bounded_minus_control_ns": 83161,
+      "bounded_slower": 57
+    }
+  },
+  "stage_caveat": "Predispatch stage labels are sampled from active worker state and do not identify a critical subsystem or prove a cause",
+  "arms": {
+    "control": {
+      "source_commit": "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb",
+      "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+      "binary_sha256": "b6f169340937281be06701715d4394c732495ef43a70f09bfdbe03319693bbbd",
+      "source_event_ledger_sha256": "42ee2311a9bdffd82eddc7240a770dc31c37131afc130fe8a153882e567f372f",
+      "collect_sha256": "f3098803feb8fb405d422da393b5b13c80be466ceea86750de69e86a1dafb85c",
+      "verification_sha256": "c65c7151082ad18714d90b988ef5adcb81a0df3ff4487613af0d505c2a18d027",
+      "unchanged_frame_count": 50,
+      "independent_png_witnesses": 19,
+      "checked_presentation_patches": 1120,
+      "maximum_rgb_error": 1,
+      "maximum_observation_gap_ns": 1334493,
+      "physical_completions": 1,
+      "clean_shutdown": true,
+      "start": "2026-11-18T21:37:22+08:00",
+      "end": "2026-11-18T21:41:31+08:00",
+      "viewer": {
+        "idle": {
+          "status": "pass",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 20526627,
+            "p50": 22614133.5,
+            "p95": 23747685,
+            "max": 203538543
+          },
+          "over_deadline": 1
+        },
+        "loaded": {
+          "status": "fail",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 19508509,
+            "p50": 22784507.0,
+            "p95": 52322024,
+            "max": 207219947
+          },
+          "over_deadline": 35
+        }
+      },
+      "collector_exit": 0,
+      "reducer_exit": 1,
+      "distributions": {
+        "condition/action": {
+          "idle/comparison": {
+            "count": 40,
+            "p50_ns": 22586305.0,
+            "nearest_rank_p95_ns": 23689649,
+            "maximum_ns": 23747685,
+            "over_ceiling": 0
+          },
+          "idle/pan": {
+            "count": 40,
+            "p50_ns": 21755630.0,
+            "nearest_rank_p95_ns": 22768949,
+            "maximum_ns": 22987455,
+            "over_ceiling": 0
+          },
+          "idle/result": {
+            "count": 40,
+            "p50_ns": 22746055.0,
+            "nearest_rank_p95_ns": 23772690,
+            "maximum_ns": 23917024,
+            "over_ceiling": 0
+          },
+          "idle/source": {
+            "count": 40,
+            "p50_ns": 22810000.5,
+            "nearest_rank_p95_ns": 24264946,
+            "maximum_ns": 203538543,
+            "over_ceiling": 1
+          },
+          "idle/zoom": {
+            "count": 40,
+            "p50_ns": 21733006.5,
+            "nearest_rank_p95_ns": 22885358,
+            "maximum_ns": 23850918,
+            "over_ceiling": 0
+          },
+          "loaded/comparison": {
+            "count": 40,
+            "p50_ns": 22718254.5,
+            "nearest_rank_p95_ns": 44215497,
+            "maximum_ns": 207219947,
+            "over_ceiling": 10
+          },
+          "loaded/pan": {
+            "count": 40,
+            "p50_ns": 22706633.5,
+            "nearest_rank_p95_ns": 52322024,
+            "maximum_ns": 171763122,
+            "over_ceiling": 6
+          },
+          "loaded/result": {
+            "count": 40,
+            "p50_ns": 22821573.0,
+            "nearest_rank_p95_ns": 40599795,
+            "maximum_ns": 47502584,
+            "over_ceiling": 6
+          },
+          "loaded/source": {
+            "count": 40,
+            "p50_ns": 21862442.0,
+            "nearest_rank_p95_ns": 24136201,
+            "maximum_ns": 30444228,
+            "over_ceiling": 0
+          },
+          "loaded/zoom": {
+            "count": 40,
+            "p50_ns": 29323523.5,
+            "nearest_rank_p95_ns": 56638525,
+            "maximum_ns": 134796486,
+            "over_ceiling": 13
+          }
+        },
+        "loaded/stage": {
+          "Decode": {
+            "count": 55,
+            "p50_ns": 27018029,
+            "nearest_rank_p95_ns": 46478062,
+            "maximum_ns": 47502584,
+            "over_ceiling": 17
+          },
+          "Fuse": {
+            "count": 145,
+            "p50_ns": 21894479,
+            "nearest_rank_p95_ns": 55345040,
+            "maximum_ns": 207219947,
+            "over_ceiling": 18
+          }
+        },
+        "loaded/stage/action": {
+          "Decode/comparison": {
+            "count": 14,
+            "p50_ns": 24964300.5,
+            "nearest_rank_p95_ns": 40850161,
+            "maximum_ns": 40850161,
+            "over_ceiling": 6
+          },
+          "Decode/pan": {
+            "count": 18,
+            "p50_ns": 23123362.5,
+            "nearest_rank_p95_ns": 47458184,
+            "maximum_ns": 47458184,
+            "over_ceiling": 3
+          },
+          "Decode/result": {
+            "count": 13,
+            "p50_ns": 32552308,
+            "nearest_rank_p95_ns": 47502584,
+            "maximum_ns": 47502584,
+            "over_ceiling": 6
+          },
+          "Decode/zoom": {
+            "count": 10,
+            "p50_ns": 24357709.0,
+            "nearest_rank_p95_ns": 45410088,
+            "maximum_ns": 45410088,
+            "over_ceiling": 2
+          },
+          "Fuse/comparison": {
+            "count": 26,
+            "p50_ns": 22029043.5,
+            "nearest_rank_p95_ns": 45115080,
+            "maximum_ns": 207219947,
+            "over_ceiling": 4
+          },
+          "Fuse/pan": {
+            "count": 22,
+            "p50_ns": 21373249.5,
+            "nearest_rank_p95_ns": 89582873,
+            "maximum_ns": 171763122,
+            "over_ceiling": 3
+          },
+          "Fuse/result": {
+            "count": 27,
+            "p50_ns": 21790203,
+            "nearest_rank_p95_ns": 23880351,
+            "maximum_ns": 25359079,
+            "over_ceiling": 0
+          },
+          "Fuse/source": {
+            "count": 40,
+            "p50_ns": 21862442.0,
+            "nearest_rank_p95_ns": 24136201,
+            "maximum_ns": 30444228,
+            "over_ceiling": 0
+          },
+          "Fuse/zoom": {
+            "count": 30,
+            "p50_ns": 30083903.0,
+            "nearest_rank_p95_ns": 57733564,
+            "maximum_ns": 134796486,
+            "over_ceiling": 11
+          }
+        }
+      },
+      "worst_loaded": [
+        {
+          "step": 436,
+          "action": "comparison",
+          "stage": "Fuse",
+          "ns": 207219947
+        },
+        {
+          "step": 408,
+          "action": "pan",
+          "stage": "Fuse",
+          "ns": 171763122
+        },
+        {
+          "step": 542,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 134796486
+        },
+        {
+          "step": 840,
+          "action": "pan",
+          "stage": "Fuse",
+          "ns": 89582873
+        },
+        {
+          "step": 506,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 57733564
+        },
+        {
+          "step": 854,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 56638525
+        },
+        {
+          "step": 458,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 56124424
+        },
+        {
+          "step": 626,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 55345040
+        },
+        {
+          "step": 806,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 54006576
+        },
+        {
+          "step": 470,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 52923210
+        }
+      ],
+      "gpu_at_preflight": {
+        "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+        "pci.bus_id": "00000000:01:00.0",
+        "name": "NVIDIA GeForce RTX 3090",
+        "driver_version": "580.178.04",
+        "pstate": "P8",
+        "temperature.gpu": "41",
+        "power.draw": "18.00",
+        "power.limit": "350.00",
+        "clocks.gr": "210",
+        "clocks.mem": "405"
+      }
+    },
+    "bounded": {
+      "source_commit": "962bbdd69b112c88528ea5ed1ea3190e3bf41bbd",
+      "lock_sha256": "bc328dbe8185901d2ca1f21f82b0dc59201afb43997eed1c0fca53fbca1c590f",
+      "binary_sha256": "31aad9f09767bc3d37fcde4006332192b69e13fa9c2e6ff047591ae582c801da",
+      "source_event_ledger_sha256": "42ee2311a9bdffd82eddc7240a770dc31c37131afc130fe8a153882e567f372f",
+      "collect_sha256": "962e91ca6c47aa777beb98180da400b18601f7251d4609e01fc689a141c7f94f",
+      "verification_sha256": "82124f0c0b0936145250038bb58c83355c9ae9248f9014f23aabb3757d1cdd3d",
+      "unchanged_frame_count": 50,
+      "independent_png_witnesses": 19,
+      "checked_presentation_patches": 1120,
+      "maximum_rgb_error": 1,
+      "maximum_observation_gap_ns": 1329494,
+      "physical_completions": 1,
+      "clean_shutdown": true,
+      "start": "2026-11-18T21:41:31+08:00",
+      "end": "2026-11-18T21:45:44+08:00",
+      "viewer": {
+        "idle": {
+          "status": "pass",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 20548688,
+            "p50": 22604595.5,
+            "p95": 23697456,
+            "max": 205626947
+          },
+          "over_deadline": 1
+        },
+        "loaded": {
+          "status": "fail",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 19659367,
+            "p50": 22825581.0,
+            "p95": 66942485,
+            "max": 117973249
+          },
+          "over_deadline": 45
+        }
+      },
+      "collector_exit": 0,
+      "reducer_exit": 1,
+      "distributions": {
+        "condition/action": {
+          "idle/comparison": {
+            "count": 40,
+            "p50_ns": 22607501.5,
+            "nearest_rank_p95_ns": 23783779,
+            "maximum_ns": 23924104,
+            "over_ceiling": 0
+          },
+          "idle/pan": {
+            "count": 40,
+            "p50_ns": 21694369.0,
+            "nearest_rank_p95_ns": 22774457,
+            "maximum_ns": 23046619,
+            "over_ceiling": 0
+          },
+          "idle/result": {
+            "count": 40,
+            "p50_ns": 22764404.5,
+            "nearest_rank_p95_ns": 23178074,
+            "maximum_ns": 23932577,
+            "over_ceiling": 0
+          },
+          "idle/source": {
+            "count": 40,
+            "p50_ns": 22805630.5,
+            "nearest_rank_p95_ns": 23869122,
+            "maximum_ns": 205626947,
+            "over_ceiling": 1
+          },
+          "idle/zoom": {
+            "count": 40,
+            "p50_ns": 21672852.0,
+            "nearest_rank_p95_ns": 22911422,
+            "maximum_ns": 23938738,
+            "over_ceiling": 0
+          },
+          "loaded/comparison": {
+            "count": 40,
+            "p50_ns": 30684263.0,
+            "nearest_rank_p95_ns": 65566334,
+            "maximum_ns": 102953431,
+            "over_ceiling": 17
+          },
+          "loaded/pan": {
+            "count": 40,
+            "p50_ns": 22850203.5,
+            "nearest_rank_p95_ns": 46655666,
+            "maximum_ns": 117973249,
+            "over_ceiling": 6
+          },
+          "loaded/result": {
+            "count": 40,
+            "p50_ns": 22758095.0,
+            "nearest_rank_p95_ns": 31471005,
+            "maximum_ns": 47511837,
+            "over_ceiling": 2
+          },
+          "loaded/source": {
+            "count": 40,
+            "p50_ns": 21868026.0,
+            "nearest_rank_p95_ns": 24939565,
+            "maximum_ns": 26057378,
+            "over_ceiling": 0
+          },
+          "loaded/zoom": {
+            "count": 40,
+            "p50_ns": 33088578.5,
+            "nearest_rank_p95_ns": 82382043,
+            "maximum_ns": 86676890,
+            "over_ceiling": 20
+          }
+        },
+        "loaded/stage": {
+          "Decode": {
+            "count": 57,
+            "p50_ns": 23869288,
+            "nearest_rank_p95_ns": 46655666,
+            "maximum_ns": 47973408,
+            "over_ceiling": 14
+          },
+          "Fuse": {
+            "count": 143,
+            "p50_ns": 22756026,
+            "nearest_rank_p95_ns": 75569398,
+            "maximum_ns": 117973249,
+            "over_ceiling": 31
+          }
+        },
+        "loaded/stage/action": {
+          "Decode/comparison": {
+            "count": 15,
+            "p50_ns": 23855642,
+            "nearest_rank_p95_ns": 43058257,
+            "maximum_ns": 43058257,
+            "over_ceiling": 6
+          },
+          "Decode/pan": {
+            "count": 29,
+            "p50_ns": 23869288,
+            "nearest_rank_p95_ns": 46655666,
+            "maximum_ns": 47973408,
+            "over_ceiling": 5
+          },
+          "Decode/result": {
+            "count": 11,
+            "p50_ns": 22863867,
+            "nearest_rank_p95_ns": 47511837,
+            "maximum_ns": 47511837,
+            "over_ceiling": 1
+          },
+          "Decode/zoom": {
+            "count": 2,
+            "p50_ns": 40039522.0,
+            "nearest_rank_p95_ns": 44263312,
+            "maximum_ns": 44263312,
+            "over_ceiling": 2
+          },
+          "Fuse/comparison": {
+            "count": 25,
+            "p50_ns": 31371021,
+            "nearest_rank_p95_ns": 98884489,
+            "maximum_ns": 102953431,
+            "over_ceiling": 11
+          },
+          "Fuse/pan": {
+            "count": 11,
+            "p50_ns": 21791627,
+            "nearest_rank_p95_ns": 117973249,
+            "maximum_ns": 117973249,
+            "over_ceiling": 1
+          },
+          "Fuse/result": {
+            "count": 29,
+            "p50_ns": 22729436,
+            "nearest_rank_p95_ns": 31471005,
+            "maximum_ns": 43638502,
+            "over_ceiling": 1
+          },
+          "Fuse/source": {
+            "count": 40,
+            "p50_ns": 21868026.0,
+            "nearest_rank_p95_ns": 24939565,
+            "maximum_ns": 26057378,
+            "over_ceiling": 0
+          },
+          "Fuse/zoom": {
+            "count": 38,
+            "p50_ns": 30351090.5,
+            "nearest_rank_p95_ns": 85335542,
+            "maximum_ns": 86676890,
+            "over_ceiling": 18
+          }
+        }
+      },
+      "worst_loaded": [
+        {
+          "step": 744,
+          "action": "pan",
+          "stage": "Fuse",
+          "ns": 117973249
+        },
+        {
+          "step": 436,
+          "action": "comparison",
+          "stage": "Fuse",
+          "ns": 102953431
+        },
+        {
+          "step": 484,
+          "action": "comparison",
+          "stage": "Fuse",
+          "ns": 98884489
+        },
+        {
+          "step": 854,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 86676890
+        },
+        {
+          "step": 578,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 85335542
+        },
+        {
+          "step": 638,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 82382043
+        },
+        {
+          "step": 770,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 81193568
+        },
+        {
+          "step": 566,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 75569398
+        },
+        {
+          "step": 794,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 72341750
+        },
+        {
+          "step": 614,
+          "action": "zoom",
+          "stage": "Fuse",
+          "ns": 68144799
+        }
+      ],
+      "gpu_at_preflight": {
+        "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+        "pci.bus_id": "00000000:01:00.0",
+        "name": "NVIDIA GeForce RTX 3090",
+        "driver_version": "580.178.04",
+        "pstate": "P8",
+        "temperature.gpu": "48",
+        "power.draw": "28.55",
+        "power.limit": "350.00",
+        "clocks.gr": "540",
+        "clocks.mem": "810"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+e228c68472767f6ddd71a1de5e585f200685812e
+5dfc816274c2f8651d503c7a1a7bdacc7ae3664e98d61d0c1d9d2f2964e28dbb  pancake/target/release/pancake-cli
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  pancake/Cargo.lock
+2c0a83701ded4ffb88df53b26dc22cde77c901d8367d98451b9dbe8784804a83  pancake/docs/p10-r50-raw-audit/f2f1bb3/p2/gpu-cases.txt
+Linux 6.8.0-147-generic x86_64
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+NVIDIA GeForce RTX 3090, GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac, 580.178.04, 00000000:01:00.0
+7bdb6f27d35b66fc848df6f94b8773bba30ea3a7f06f114100d14154a235a34b  /usr/share/vulkan/icd.d/nvidia_icd.json
+uv 0.6.4
+2026-11-18T11:12:40Z

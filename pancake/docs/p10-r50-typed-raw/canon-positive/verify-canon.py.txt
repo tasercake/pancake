@@ -1,0 +1,154 @@
+"""Validate exact Canon working pixels and independent source/stack TIFF decoding."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import struct
+
+import numpy as np
+import tifffile
+
+NATIVE = (3392, 5088, 3)
+STACK = (3390, 5086, 3)
+SAMPLES = 51_775_488
+FILES = ["frame_000.CR3", "frame_049.CR3"]
+LABELS = ["first", "last"]
+EXPECTED_PAST = "ed3351ff2b8f5f1f3b278c806258170d6a2b89b75da55014f5dc875535c8a0b2"
+
+
+def require(condition, issue):
+    if not condition:
+        raise ValueError(issue)
+
+
+def digest(path):
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def confirm_source(scope, receipt):
+    independent = json.loads((scope / "source-geometry.json").read_bytes())
+    originals = [scope / "inputs" / name for name in FILES]
+    require([item["name"] for item in receipt["verified"]] == FILES, "unexpected source IDs")
+    require(len(independent) == len(originals) == 2, "unexpected source count")
+    for original, pin, meta in zip(originals, receipt["verified"], independent, strict=True):
+        require(original.stat().st_size == pin["bytes"] and digest(original) == pin["sha256"],
+                f"source length or checksum differs: {original}")
+        require(Path(meta["SourceFile"]) == original and meta["Orientation"] == 1,
+                f"path or original orientation disagrees: {original}")
+        left, top = meta["SensorLeftBorder"], meta["SensorTopBorder"]
+        width = meta["SensorRightBorder"] + 1 - left
+        height = meta["SensorBottomBorder"] + 1 - top
+        require((left, top, width, height) == (272, 172, NATIVE[1], NATIVE[0]),
+                f"sensor borders do not match historical camera crop: {original}")
+        require((meta["CroppedImageHeight"], meta["CroppedImageWidth"], 3) == NATIVE,
+                f"camera-recommended extent differs: {original}")
+    return originals
+
+
+def read_rgb16(path, dimensions):
+    with tifffile.TiffFile(path) as content:
+        require(len(content.pages) == 1, f"expected one TIFF page: {path}")
+        page = content.pages[0]
+        require(page.photometric == tifffile.PHOTOMETRIC.RGB
+                and page.samplesperpixel == 3 and page.bitspersample == 16,
+                f"expected actual RGB16 TIFF: {path}")
+        array = page.asarray()
+        require(array.dtype.kind == "u" and array.dtype.itemsize == 2 and array.shape == dimensions,
+                f"decoded TIFF precision or dimensions differ: {path}")
+        require(np.any(array % 257) and np.any(array % 256), f"input only has promoted u8: {path}")
+        return array, {
+            "file_bytes": path.stat().st_size,
+            "file_sha256": digest(path),
+            "pixel_sha256": hashlib.sha256(np.ascontiguousarray(array, dtype="<u2")).hexdigest(),
+            "shape_hwc": list(array.shape),
+            "dtype": str(array.dtype),
+        }
+
+
+def transforms(completion, kind, originals):
+    value = completion[kind]
+    if isinstance(value, dict):
+        keys = [str(frame) for frame in originals]
+        require(set(value) == set(keys), f"alignment sources disagree: {kind}")
+        value = [value[key] for key in keys]
+    matrices = np.asarray(value, dtype="<f4")
+    require(matrices.shape == (2, 2, 3) and np.isfinite(matrices).all(),
+            f"invalid matrices: {kind}")
+    bits = matrices.tobytes()
+    identity = struct.pack("<12f", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+                           1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    return {"sha256_f32_le": hashlib.sha256(bits).hexdigest(), "historical_identity": bits == identity}
+
+
+def check_arm(scope, label, originals):
+    case = scope / label
+    expected_stdout = [f"{name}\t{NATIVE[1]}\t{NATIVE[0]}\tU16\t{SAMPLES}" for name in LABELS]
+    require((case / "native.stdout").read_text().splitlines() == expected_stdout,
+            f"native source type or dimensions differ: {label}")
+    with (case / "events.jsonl").open() as stream:
+        events = [json.loads(line) for line in stream if line.strip()]
+    require(not any(event["event"] in ("backend_fallback", "observer_error") for event in events),
+            f"fallback/observer error in explicit CPU request: {label}")
+    completions = [event for event in events if event["event"] == "stack_complete"]
+    require(len(completions) == 1, f"expected a single actual stack completion: {label}")
+    completed = completions[0]
+    require(completed["actual_backend"] == completed["runtime"] == "cpu"
+            and completed["completed"] is True and completed["physical_gpu"] is False
+            and completed["fallback_reason"] is None, f"not a real CPU-only completion: {label}")
+    maps = {kind: transforms(completed, kind, originals)
+            for kind in ("alignment_transforms", "sequential_transforms")}
+    native = {}
+    combined = hashlib.sha256()
+    for name in LABELS:
+        working_path = case / "source" / f"{name}.rgbf32"
+        require(working_path.stat().st_size == SAMPLES * 4,
+                f"working raster has unexpected byte length: {label} {name}")
+        working = np.memmap(working_path, dtype="<f4", mode="r", shape=NATIVE)
+        rgb16, recorded = read_rgb16(case / "source" / f"{name}.tiff", NATIVE)
+        for start in range(0, NATIVE[0], 64):
+            end = start + 64
+            slab = working[start:end]
+            codes = rgb16[start:end]
+            require(np.isfinite(slab).all() and (slab >= 0).all() and (slab <= 1).all(),
+                    f"working values are out of bounds: {label} {name}")
+            # Check each normalized working value against its independently decoded TIFF code.
+            require(np.array_equal(slab.view("<u4"),
+                                   (codes.astype("<f4") / np.float32(65535)).view("<u4")),
+                    f"decoded source TIFF codes do not match working bits: {label} {name}")
+        with working_path.open("rb") as stream:
+            for block in iter(lambda: stream.read(1 << 20), b""):
+                combined.update(block)
+        native[name] = {**recorded, "working_sha256_f32_le": digest(working_path)}
+    _, export = read_rgb16(case / "stack.tiff", STACK)
+    return {
+        "native": native, "combined_working_sha256_f32_le": combined.hexdigest(),
+        "historical_working_sha_match": combined.hexdigest() == EXPECTED_PAST,
+        "stack": export, "transforms": maps, "actual_backend": completed["actual_backend"],
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("scope", type=Path)
+    parser.add_argument("mode", choices=("stock", "pair"))
+    args = parser.parse_args()
+    scope = args.scope.resolve(strict=True)
+    receipt = json.loads((scope / "acquisition.json").read_bytes())
+    originals = confirm_source(scope, receipt)
+    stock = check_arm(scope, "stock", originals)
+    result = {"stock": stock, "inputs": receipt, "numpy": np.__version__,
+              "tifffile": tifffile.__version__, "source_grid_and_rgb16_decoded": True}
+    if args.mode == "pair":
+        candidate = check_arm(scope, "candidate", originals)
+        result.update(candidate=candidate, exact_parity=(stock == candidate))
+    with (scope / f"verify-{args.mode}.json").open("x") as stream:
+        json.dump(result, stream, indent=2)
+        stream.write("\n")
+    if args.mode == "pair":
+        require(result["exact_parity"], "stock and candidate output receipts differ")
+
+
+if __name__ == "__main__":
+    main()

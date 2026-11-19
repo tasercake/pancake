@@ -1,0 +1,2 @@
+'DISPLAY' environment variable not set... skipping surface info
+error: socket path "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/phys-canon/inventory-xdg/wayland-0" plus null terminator exceeds 108 bytes

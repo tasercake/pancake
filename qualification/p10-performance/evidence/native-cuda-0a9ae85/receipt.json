@@ -1,0 +1,56 @@
+{
+  "source": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "repository_tree": "fde57a0b461e3ea031ea969e1e841927bead17f9",
+  "pancake_tree": "a0efab90fdc3c5f4731d9e0af29acf3f7c5f7d9e",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "native_cuda_artifact": {
+    "sha256": "0734a90ba35ef3534fd6a66a86682ef98662e87a9f0ecc8b25c42b3fccdbdad3",
+    "elf_build_id": "223d96ea4ead73d82eb2173d0169c26b8b8f5e5b",
+    "bytes": 130311144,
+    "path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-linux-native/0a9ae85/pancake-cli"
+  },
+  "compile_status": "passed",
+  "release_build_minutes_seconds": "4m50s",
+  "rustc_and_command": "cwd=/tmp/pancake-worktrees.t3paqgWM/0a9ae85-native-cuda/pancake\nCUDARC_CUDA_VERSION=12050\nCARGO_INCREMENTAL=0\nCARGO_BUILD_JOBS=2\nCARGO_TARGET_DIR=/tmp/pancake-worktrees.t3paqgWM/0a9ae85-native-cuda/artifacts/native-cuda-0a9ae85/target\nRUSTC_WRAPPER=unset\nRUSTC_WORKSPACE_WRAPPER=unset\ntaskset --cpu-list 12\\,13 cargo +1.100.0 build --locked --offline --release -p pancake -p pancake-cli --bin pancake-cli -j 2 --features cubecl/cuda \n",
+  "compiler_jobs": 2,
+  "verified_rustc_logical_cpu_affinity": "12-13",
+  "rustc_wrappers": "unset",
+  "native_cuda_symbols": 281,
+  "nvptx_symbols": 1364,
+  "features": {
+    "cubecl_cuda": "0.11.4",
+    "pancake_gui_and_slint_in_cli_graph": false,
+    "native_hip_in_cli_graph": false
+  },
+  "runtime_libraries_sha256": {
+    "/usr/local/cuda-12.5/lib64/libnvrtc.so.12.5.40": "fb37b3f5b0ed35bf6b24f31f1277d30f2fadb08f8562e90d1e6ce208817fc8ed",
+    "/usr/local/cuda-12.5/lib64/libnvrtc-builtins.so.12.5.40": "1237ef425d116b1faee57d924e099b877fd6548ce3b367e50a7e1ef912eeb08c",
+    "/usr/lib/x86_64-linux-gnu/libcuda.so.580.178.04": "dcdf334aeb177c95b3385b797c9b871d03a287895713c6d107f79096b0985aa9",
+    "/usr/local/cuda-12.5/nvvm/libdevice/libdevice.10.bc": "8c593e48547f85458b6bfbed93a2e6b05484644ccc6b429bb0d8424e06a68b6c"
+  },
+  "application_launches": 0,
+  "gpu_device_queries": 0,
+  "physical_runtime_evidence": "pending at this source",
+  "raw_archive": {
+    "sha256": "4221317f0bfe8bb1bbab7411835c20e98ba84e238b6926b855d53ba185ec1720",
+    "members": {
+      "build-identity.txt": "ad5f9ab53abc00065a0b6e0d2192a1d295d3163ddff1277cad74f307552b1668",
+      "build-command.txt": "84ba62223d474573b0610fe619706b815a5ee776d9fc0f1595347bdf2b261e4c",
+      "build-resources.txt": "0183b414f17447f7954b6aa54c5b5196f0272bac67bd7a7aef449983d52e8c0f",
+      "build-status.txt": "e0185cd9825562491df596ae2b46c13476d0e510f2b16d95e2c9f4338cea6e14",
+      "build.log": "8c0c809391c274731f640012350fc3e2ae14cbeda124c5cfb837589398525d3b",
+      "compiler-affinity.txt": "19bced378206b1c4695fcf46fe46d3278b710a92f8ae827a414efa75b4299636",
+      "elf-notes.txt": "463e213fdfd7d2dea1602bc07ed5f9283163ebc80fd5b7e04e877e2907cef400",
+      "elf-dynamic.txt": "beb568473031e12ba0384a29fb305a4f6063b846cb82918f2cf30d938229c95c",
+      "link-witness.txt": "c41446e933a6890395271d21537dae9b4ebd0f311a5b273a6aab1cdb32efa0b3",
+      "native-binary.sha256": "ce9068c4ac922a0fbe870d543cdc9cf305f4f1f43234c76ed34d9cd010dd2ce8",
+      "runtime-libraries.sha256": "c3db7fc6e906d9ae25f7d49a20c04e58ae131c54ae93a83b0327f246ff5a5f91",
+      "runtime-libraries-verify.txt": "f19b84e149b2eac987b670178d8b0ee2180657c3c94f3df43cb0c9aea98ec5d1",
+      "native-feature-tree.txt": "c7435fba57e84d49c81156aa0884ba86c586674e7ccbf3d0d1e56aeee9adc8c1",
+      "seal-native.sh": "f0502f68da945da445ede14216a7d0c14a9d1469461930e85821c3c11789b557"
+    },
+    "bytes": 22606,
+    "contains_no_ELF_or_media_payload": true
+  }
+}

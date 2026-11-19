@@ -1,0 +1,22 @@
+{
+  "scope": "offline exact 12-file prefix and independent nine-patch reprojection",
+  "prefix_materialization_sha256": "2bf5080658823eec0e87eea358e5860d636ad5db31bca6e3627c065545c9ef27",
+  "frozen_reference_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+  "verified_files": 12,
+  "verified_bytes": 622541539,
+  "generation_seconds": 55.289055199944414,
+  "same_verified_records_as_previous_prefix": true,
+  "reprojected_pngs_rgb_equal": [
+    "source0-actual-00.png",
+    "source0-actual-01.png",
+    "source0-actual-02.png",
+    "source0-fit-00.png",
+    "source0-fit-01.png",
+    "source0-fit-02.png",
+    "source0-pan-00.png",
+    "source0-pan-01.png",
+    "source0-pan-02.png"
+  ],
+  "scenario_sha256": "e0a11aec1928d3db1eb2362885833e3c2892361a5019d740b367da0bbf61e1ef",
+  "gpu_or_desktop_launched": false
+}

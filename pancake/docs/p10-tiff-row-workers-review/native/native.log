@@ -1,0 +1,5 @@
+/tmp/pancake-worktrees.t3paqgWM/review-tiff-3529ea4/artifacts/tiff-review-3529ea4/fixtures/classic.tiff 3158025 samples and ICC match
+/tmp/pancake-worktrees.t3paqgWM/review-tiff-3529ea4/artifacts/tiff-review-3529ea4/fixtures/legacy-big.tiff 3158025 samples and ICC match
+rotated legacy TIFF takes standard raster fallback
+/tmp/pancake-worktrees.t3paqgWM/review-tiff-3529ea4/artifacts/tiff-review-3529ea4/fixtures/held.tiff 3158025 samples and ICC match
+decoded original held file after its pathname was replaced

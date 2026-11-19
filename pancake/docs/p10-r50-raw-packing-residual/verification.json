@@ -1,0 +1,65 @@
+{
+  "base_revision": "b820da05d3982a7912cb7c7c9d8aa926ece14a9c",
+  "source_revision": "4f7b73db8b25bc145e5ba6811ea1b0f7557b2cfd",
+  "source_sha256": {
+    "pancake/src/image_io/raw.rs": "07ff254ab257325630e650da7c27d78145a6c2e74ce44b236c49900eeea15333",
+    "pancake/src/image_io/raw/tests.rs": "6b4523b9d0187f40cd0df0e74ba1c42c98e6bf8774e7887111387ebb4f8a5428"
+  },
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "cpu_affinity": [
+    6,
+    7
+  ],
+  "red": {
+    "status": 101,
+    "observed_workers": 1,
+    "expected_workers": 2,
+    "command": "taskset -c 6,7 cargo test --locked --lib image_io::raw::tests::native_raw_packing_uses_only_the_installed_pool -- --exact"
+  },
+  "native_witness": {
+    "passed": 3,
+    "observed_workers_inside_exact_pool": 2,
+    "extra_workers_outside_pool": 0,
+    "synthetic_quantized_bits_equal": 1273809,
+    "dng_quantized_bits_equal": 2483016,
+    "all_input_hashes_preserved": true
+  },
+  "committed_source_checks": {
+    "pure_raw_tests": 4,
+    "cpu_image_io": 27,
+    "cpu_image_export": 10,
+    "cpu_npy": 3,
+    "scoped_strict_clippy": "passed",
+    "miri_platform_inventory": "passed",
+    "configuration": "workspace original"
+  },
+  "pre_existing_broad_clippy": {
+    "failing_file": "pancake/tests/cpu_fusion_contract.rs",
+    "reported_errors": 20,
+    "matches_base": true
+  },
+  "sample_model": {
+    "width": 5088,
+    "height": 3392,
+    "samples": 51775488,
+    "chunks": 791,
+    "max_rgb16_scratch_bytes": 1966080
+  },
+  "release_probe": {
+    "registry_packages_equal_to_application_subset": 134,
+    "lock_sha256": "af8411cf9257256a501ed8dbc7d0678bce44fb5fff514318daae5895fdea9ae9",
+    "executable_sha256": "ac42ed9fb2df6dd09c1aaf7beb5440ff5b5e134650118217613c81dc7724b115",
+    "retained_executable": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/raw-pack-probe-4f7b73d/pancake-raw-pack-probe",
+    "scope": "only the production packing helper and pinned quantizer, with both schedules in one executable",
+    "built_cpu_affinity": [
+      6,
+      7
+    ]
+  },
+  "r50_one_copy_trace": {
+    "revision": "9248cec",
+    "complete_raw_seconds": 17.808,
+    "mean_busy_cores": 4.49,
+    "scope": "full RAW source read through normalized working F32"
+  }
+}

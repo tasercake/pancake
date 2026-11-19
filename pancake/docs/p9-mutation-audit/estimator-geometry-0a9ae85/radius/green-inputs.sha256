@@ -1,0 +1,3 @@
+f84b6e5795cdc27986a2d304aff25fbe13e1280242f91465d55d4d1a7861545a  src/registration/estimate.rs
+1c425f52749baf05b8f9fa04ccb527acaaf0a932027419e8f1c0b85e0eebd710  src/registration/estimate/tests.rs
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock

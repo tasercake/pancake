@@ -8,7 +8,7 @@ use crate::fusion::advanced::{
 };
 use crate::fusion::{FocusAccumulator, FocusMethod, sharpness};
 use crate::image_io::{RgbImage, decode};
-use crate::registration::{Bounds, symmetric_crop};
+use crate::registration::{Bounds, ResidentRgb, symmetric_crop};
 use crate::runtime::SelectedRuntime;
 
 use super::registration::{Alignment, SourceMap};
@@ -142,10 +142,10 @@ impl Accumulator {
     /// # Errors
     ///
     /// Returns invalid sample or device completion errors.
-    fn add_frame(&mut self, samples: &[f32]) -> Result<(), String> {
+    fn add_frame(&mut self, samples: &[f32], resident: Option<ResidentRgb>) -> Result<(), String> {
         match self {
-            Self::Focus(accumulator) => accumulator.add_frame(samples),
-            Self::Advanced(accumulator) => accumulator.add_frame(samples),
+            Self::Focus(accumulator) => accumulator.add_normalized_frame(samples, resident),
+            Self::Advanced(accumulator) => accumulator.add_normalized_frame(samples, resident),
         }
     }
 
@@ -195,6 +195,10 @@ pub(super) fn process(
     let device = runtime.device();
     let plan = Plan::new(config, &first, bytes)?;
     let settings = config.settings();
+    let retain_input = matches!(
+        settings.method,
+        Method::Hybrid | Method::ExposureFusion | Method::WeightedAverage
+    ) && settings.slab_size == 0;
     let mut alignment = Alignment::new(
         device,
         config,
@@ -228,10 +232,16 @@ pub(super) fn process(
                 )?
             };
             grayscale_array &= image.is_grayscale_array();
-            let pixels =
-                alignment.normalize(device, index, image, plan.registration_bytes, control)?;
+            let (pixels, resident) = alignment.normalize(
+                device,
+                index,
+                image,
+                plan.registration_bytes,
+                control,
+                retain_input,
+            )?;
             control.checkpoint(Stage::Fuse)?;
-            accumulator.add_frame(&pixels)?;
+            accumulator.add_frame(&pixels, resident)?;
             drop(pixels);
             if index == control.snapshot()?.completed {
                 control.complete_frame()?;
@@ -242,7 +252,7 @@ pub(super) fn process(
         let result = accumulator.finish()?;
         if let Some(accumulator) = &mut final_accumulator {
             control.checkpoint(Stage::Fuse)?;
-            accumulator.add_frame(&result)?;
+            accumulator.add_frame(&result, None)?;
         } else {
             single_slab_result = Some(result);
         }

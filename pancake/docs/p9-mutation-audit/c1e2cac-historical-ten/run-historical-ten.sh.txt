@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Execute the verified ten historical operations with the full native CPU selection.
+set -euo pipefail
+proof=$(realpath -- "${1:?Supply the verified preflight directory}")
+repo=$(git rev-parse --show-toplevel)
+cd "$repo/pancake"
+revision=c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb
+[[ "$(git rev-parse HEAD)" == "$revision" && -z $(git status --porcelain=v1 --untracked-files=all) ]]
+export PATH="/tmp/pancake-tools/bin:$PATH"
+export CARGO_NET_OFFLINE=true CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0
+export RUSTC_WRAPPER=/tmp/pancake-tools/bin/pancake-rust-cache
+export CARGO_TARGET_DIR="$repo/pancake/target/historical-mutants-c1e2cac"
+unset DISPLAY WAYLAND_DISPLAY DBUS_SESSION_BUS_ADDRESS AT_SPI_BUS_ADDRESS
+unset PANCAKE_RUNTIME PANCAKE_TEST_GPU_RUNTIME CONFORMANCE_EVENTS_PATH
+[[ $(cargo mutants --version) == 'cargo-mutants 27.1.0' ]]
+[[ $(rustc --version) == 'rustc 1.100.0 (0ef1bc386 2026-11-09)' ]]
+taskset -pc "$$" | grep -Eq 'affinity list: 6[-,]7$'
+printf '%s  %s\n' \
+    b2b1c29114e199902fa9ec35dbf4d4cc2d71c1c410547234f8969c4e5af02bde "$proof/original-list.json" \
+    f985f265ee3ea3e453aa98b04c52134953911f692f8ce8abf137f3873202a2d0 "$(command -v cargo-mutants)" \
+    d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e "$proof/cpu-targets.txt" \
+    98179368fa796fb1874f2809a9071bf0054b1b84e87bcd7aefd9ad044faca046 "$proof/current-native-list.json" | sha256sum -c
+out="$proof/native-exact"
+mkdir -- "$out"
+{
+    git rev-parse HEAD
+    taskset -pc "$$"
+    sha256sum Cargo.lock "$(command -v cargo-mutants)"
+    rustc -Vv
+    cargo -V
+    cargo mutants --version
+    uname -srmo
+    printf 'CARGO_BUILD_JOBS=%s\nCARGO_INCREMENTAL=%s\nCARGO_PROFILE_DEV_DEBUG=%s\nCARGO_TARGET_DIR=%s\nRUSTC_WRAPPER=%s\n' \
+        "$CARGO_BUILD_JOBS" "$CARGO_INCREMENTAL" "$CARGO_PROFILE_DEV_DEBUG" "$CARGO_TARGET_DIR" "$RUSTC_WRAPPER"
+} >"$out/provenance.txt"
+selectors=(--lib --bins)
+while IFS= read -r target; do selectors+=(--test "$target"); done <"$proof/cpu-targets.txt"
+files=()
+while IFS= read -r file; do files+=(--file "$file"); done < <(jq -r 'map(.file) | unique[]' "$proof/current-native-list.json")
+mutation=(cargo mutants --workspace --test-workspace false --cargo-arg=--workspace
+    --cap-lints true --all-features --in-place --timeout 60 --build-timeout 180
+    --jobserver-tasks 2 --no-shuffle "${files[@]}" --re "$(cat "$proof/exact-mutant-names.re")")
+test_args=(--locked "${selectors[@]}" -- --include-ignored)
+"${mutation[@]}" --list --json -- "${test_args[@]}" >"$out/list.json"
+cmp "$proof/current-native-list.json" "$out/list.json"
+argv=("${mutation[@]}" --output "$out" -- "${test_args[@]}")
+printf '%q ' "${argv[@]}" >"$out/run.argv"
+printf '\n' >>"$out/run.argv"
+git status --porcelain=v1 --untracked-files=all >"$out/source-status-before.txt"
+test ! -s "$out/source-status-before.txt"
+df -B1 --output=avail "$repo" >"$out/disk-before.txt"
+date --iso-8601=seconds >"$out/start.txt"
+set +e
+/usr/bin/time -v -o "$out/run.time" "${argv[@]}" 2>&1 | tee "$out/terminal.log"
+status=("${PIPESTATUS[@]}")
+set -e
+printf '%s\n' "${status[0]}" >"$out/native-exit.status"
+printf '%s\n' "${status[1]}" >"$out/log-writer.status"
+date --iso-8601=seconds >"$out/end.txt"
+git rev-parse HEAD >"$out/source-after.txt"
+git status --porcelain=v1 --untracked-files=all >"$out/source-status-after.txt"
+df -B1 --output=avail "$repo" >"$out/disk-after.txt"
+if [[ -d $CARGO_TARGET_DIR ]]; then
+    du -sB1 -- "$CARGO_TARGET_DIR" >"$out/target-allocated-bytes.txt"
+fi
+if [[ -s $out/mutants.out/outcomes.json ]]; then
+    cp -- "$out/mutants.out/outcomes.json" "$out/outcomes.json"
+fi
+[[ "$(cat "$out/source-after.txt")" == "$revision" && "${status[1]}" == 0 ]]
+test ! -s "$out/source-status-after.txt"
+exit "${status[0]}"

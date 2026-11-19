@@ -1,0 +1,92 @@
+{
+  "source_commit": "870f7f923d70b1a7b0e7fe73d5f9a4987770fdc4",
+  "scope": "one saved native mutation; no source or fixture additions",
+  "variants": {
+    "original": {
+      "map_sha256": "e5e05cd09d45a99737277ed5d81fccc5128eea259d8b2b2cc32f839bc92d4b6c",
+      "test_exit": 0,
+      "export_exit": 0,
+      "near_equal_score_regions": [
+        [
+          362,
+          79,
+          362,
+          100,
+          20,
+          0,
+          0,
+          0
+        ]
+      ],
+      "ambiguity_branch": [
+        [
+          220,
+          8,
+          220,
+          22,
+          1,
+          0,
+          0,
+          0,
+          4
+        ]
+      ],
+      "later_reference_branch": [
+        [
+          254,
+          12,
+          254,
+          57,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ]
+    },
+    "mutant": {
+      "map_sha256": "96056e7cb85ca42d1d1868b802b213ce779dd33ff549049fb41e4b9ee70b346a",
+      "test_exit": 101,
+      "export_exit": 0,
+      "near_equal_score_regions": [
+        [
+          362,
+          79,
+          362,
+          135,
+          56,
+          0,
+          0,
+          0
+        ]
+      ],
+      "ambiguity_branch": [
+        [
+          220,
+          8,
+          220,
+          22,
+          0,
+          1,
+          0,
+          0,
+          4
+        ]
+      ],
+      "later_reference_branch": [
+        [
+          254,
+          12,
+          254,
+          57,
+          0,
+          1,
+          0,
+          0,
+          4
+        ]
+      ]
+    }
+  }
+}

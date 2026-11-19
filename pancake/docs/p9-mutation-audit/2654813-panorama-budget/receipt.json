@@ -1,0 +1,171 @@
+{
+  "actual_native_exit": 0,
+  "baseline_passed": 143,
+  "baseline_targets": 19,
+  "mutant": "src/registration/estimate.rs:162:36: replace / with * in prepare_thumbnail",
+  "specific_test": "cpu_panorama_thumbnail_respects_proxy_budget",
+  "baseline_test_outcome": "passed",
+  "mutant_test_outcome": "failed with budget diagnostic",
+  "counts": {
+    "caught": 1,
+    "unviable": 0
+  },
+  "test_source_revision": "26548131bd44d798816ebcfa7690d4eee03501eb",
+  "prior_native_miss_source": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "test_parent_revision": "8694b55",
+  "source_worktree_clean_before_and_after": true,
+  "source_dimensions": [
+    2,
+    2
+  ],
+  "reference_dimensions": [
+    8192,
+    160
+  ],
+  "expected_proxy_dimensions": [
+    3686,
+    72
+  ],
+  "accepted_budget_bytes": 4246496,
+  "rejected_budget_bytes": 4246495,
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "exact_mutant_roster_sha256": "a13eca449f2bf549ab27ee15300e12e9895af260efbc3fe330138b7a07dfb9f6",
+  "start": "2026-11-18T19:42:51+08:00",
+  "end": "2026-11-18T19:48:10+08:00",
+  "elapsed_wall_seconds": 319.2,
+  "baseline_phases": [
+    {
+      "phase": "Build",
+      "duration": 271.599282342,
+      "process_status": "Success",
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--no-run",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--all-features",
+        "--workspace"
+      ]
+    },
+    {
+      "phase": "Test",
+      "duration": 13.635663537,
+      "process_status": "Success",
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--all-features",
+        "--workspace",
+        "--locked",
+        "--lib",
+        "--bins",
+        "--test",
+        "cpu_advanced_fusion",
+        "--test",
+        "cpu_array_layout",
+        "--test",
+        "cpu_cli",
+        "--test",
+        "cpu_config",
+        "--test",
+        "cpu_fusion_contract",
+        "--test",
+        "cpu_gray_array_export",
+        "--test",
+        "cpu_image_export",
+        "--test",
+        "cpu_image_io",
+        "--test",
+        "cpu_job",
+        "--test",
+        "cpu_kernel_contract",
+        "--test",
+        "cpu_npy",
+        "--test",
+        "cpu_numerical_contract",
+        "--test",
+        "cpu_registration_contract",
+        "--test",
+        "cpu_runtime_contract",
+        "--test",
+        "cpu_runtime_options",
+        "--test",
+        "cpu_stack_plan",
+        "--",
+        "--include-ignored"
+      ]
+    }
+  ],
+  "mutant_phases": [
+    {
+      "phase": "Build",
+      "duration": 29.225671451,
+      "process_status": "Success",
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--no-run",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--all-features",
+        "--workspace"
+      ]
+    },
+    {
+      "phase": "Test",
+      "duration": 4.582347857,
+      "process_status": {
+        "Failure": 101
+      },
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--all-features",
+        "--workspace",
+        "--locked",
+        "--lib",
+        "--bins",
+        "--test",
+        "cpu_advanced_fusion",
+        "--test",
+        "cpu_array_layout",
+        "--test",
+        "cpu_cli",
+        "--test",
+        "cpu_config",
+        "--test",
+        "cpu_fusion_contract",
+        "--test",
+        "cpu_gray_array_export",
+        "--test",
+        "cpu_image_export",
+        "--test",
+        "cpu_image_io",
+        "--test",
+        "cpu_job",
+        "--test",
+        "cpu_kernel_contract",
+        "--test",
+        "cpu_npy",
+        "--test",
+        "cpu_numerical_contract",
+        "--test",
+        "cpu_registration_contract",
+        "--test",
+        "cpu_runtime_contract",
+        "--test",
+        "cpu_runtime_options",
+        "--test",
+        "cpu_stack_plan",
+        "--",
+        "--include-ignored"
+      ]
+    }
+  ],
+  "raw_native_archive_sha256": "fa8e418617a5a7f1fa49c13725793ca7ea1d47b397129ce0ea8f9c6a8c36db84"
+}

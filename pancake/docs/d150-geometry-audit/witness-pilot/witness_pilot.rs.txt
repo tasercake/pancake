@@ -1,0 +1,215 @@
+//! Passive CubeCL witness tests for measured and ambiguous adjacent motion.
+
+use super::{Affine, Extent, Pair, correlation_moments, read, upload};
+use cubecl::prelude::*;
+use cubecl::std::tensor::TensorHandle;
+
+/// Existing moment record in f64 for cross-fit arithmetic.
+type Moments = [f64; 5];
+
+/// Synthetic source and common thumbnail side.
+const SIDE: u16 = 96;
+/// Bounded tile origins, with room for both maps' interpolation footprints.
+const ORIGINS: [u32; 3] = [8, 38, 68];
+/// Sample count in each 16×16 region at stride two.
+const SAMPLES: u32 = 64;
+/// Unit rounding error guarded across a short f32 accumulation.
+const MOMENT_FLOOR: f64 = 1.0_f64 / 65_536.0_f64;
+
+/// Evidence leaves ambiguous proposals unresolved.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum Witness {
+    /// The first hypothesis has broad bilateral support.
+    First,
+    /// The second hypothesis has broad bilateral support.
+    Second,
+    /// The pair cannot distinguish a hypothesis with broad support.
+    Unresolved,
+}
+
+/// Reuse the production moment kernel for a single small fixed region.
+///
+/// # Errors
+///
+/// Returns invalid execution or incomplete readback errors.
+fn moments(pair: &Pair, map: Affine, x: u32, y: u32, reverse: bool) -> Result<Moments, String> {
+    let width = u32::from(pair.extent.width);
+    let height = u32::from(pair.extent.height);
+    let layout = [width, height, x, y, 2, 8, SAMPLES, 1, 1];
+    let metadata = TensorHandle::new_contiguous(
+        [layout.len()],
+        pair.client.create_from_slice(u32::as_bytes(&layout)),
+        u32::cube_type(),
+    );
+    let coefficients = map.matrix().into_iter().flatten().collect::<Vec<_>>();
+    let parameters = upload(&pair.client, &coefficients);
+    let output = TensorHandle::empty(&pair.client, [5], f32::cube_type());
+    let dimension = CubeDim::new(&pair.client, 1);
+    let cubes = cubecl::calculate_cube_count_elemwise(&pair.client, 1, dimension);
+    let (reference, source) = if reverse {
+        (&pair.source, &pair.reference)
+    } else {
+        (&pair.reference, &pair.source)
+    };
+    correlation_moments::launch(
+        &pair.client,
+        cubes,
+        dimension,
+        reference.clone().into_arg(),
+        source.clone().into_arg(),
+        parameters.into_arg(),
+        metadata.into_arg(),
+        output.clone().into_arg(),
+    );
+    let values = read(&pair.client, output, 5)?;
+    let values: [f32; 5] = values.try_into().map_err(|_| "short witness moments")?;
+    Ok(values.map(f64::from))
+}
+
+/// Fit affine exposure on one lattice and validate on the other.
+fn loss(train: Moments, tested: Moments) -> Option<f64> {
+    let count = f64::from(SAMPLES);
+    let [sx, sy, _, syy, sxy] = train;
+    let source_energy = (-sy / count).mul_add(sy, syy);
+    if source_energy <= MOMENT_FLOOR * syy {
+        return None;
+    }
+    let gain = (-sy / count).mul_add(sx, sxy) / source_energy;
+    let offset = (-gain).mul_add(sy, sx) / count;
+    let [x, y, xx, yy, xy] = tested;
+    let variance = (-x / count).mul_add(x, xx);
+    if gain <= 0.0 || variance <= MOMENT_FLOOR * xx {
+        return None;
+    }
+    let error =
+        xx + gain * gain * yy + count * offset * offset - 2.0 * gain * xy - 2.0 * offset * x
+            + 2.0 * gain * offset * y;
+    Some(error.max(0.0) / variance)
+}
+
+/// Check strict separated preference in both cross-fits.
+fn preference(first: [Moments; 2], second: [Moments; 2]) -> Witness {
+    let [a0, a1] = first;
+    let [b0, b1] = second;
+    let Some(both) = loss(a0, a1)
+        .zip(loss(b0, b1))
+        .zip(loss(a1, a0).zip(loss(b1, b0)))
+    else {
+        return Witness::Unresolved;
+    };
+    let ((a, b), (c, d)) = both;
+    if a + MOMENT_FLOOR < b && c + MOMENT_FLOOR < d {
+        Witness::First
+    } else if b + MOMENT_FLOOR < a && d + MOMENT_FLOOR < c {
+        Witness::Second
+    } else {
+        Witness::Unresolved
+    }
+}
+
+/// Three noncollinear block origins provide a two-dimensional footprint.
+fn distributed(cells: &[(f64, f64)]) -> bool {
+    let Some(&(x0, y0)) = cells.first() else {
+        return false;
+    };
+    cells.iter().any(|&(x1, y1)| {
+        cells
+            .iter()
+            .any(|&(x2, y2)| ((x1 - x0).mul_add(y2 - y0, -(y1 - y0) * (x2 - x0))).abs() > 0.0)
+    })
+}
+
+/// Compare two predeclared, valid-overlap hypotheses through the actual CPU kernel.
+///
+/// # Errors
+///
+/// Returns invalid geometry, runtime or readback errors.
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "fixed tile origins are below 69 before their single-pixel lattice offset"
+)]
+fn compare(pair: &Pair, first: Affine, second: Affine) -> Result<Witness, String> {
+    let backward = [first.inverse()?, second.inverse()?];
+    let mut supported = [Vec::new(), Vec::new()];
+    for y in ORIGINS {
+        for x in ORIGINS {
+            let mut direction = Vec::new();
+            for (reverse, [a, b]) in [(false, [first, second]), (true, backward)] {
+                let left = [
+                    moments(pair, a, x, y, reverse)?,
+                    moments(pair, a, x + 1, y + 1, reverse)?,
+                ];
+                let right = [
+                    moments(pair, b, x, y, reverse)?,
+                    moments(pair, b, x + 1, y + 1, reverse)?,
+                ];
+                direction.push(preference(left, right));
+            }
+            let cell = (f64::from(x), f64::from(y));
+            let [left, right] = &mut supported;
+            match direction.as_slice() {
+                [Witness::First, Witness::First] => left.push(cell),
+                [Witness::Second, Witness::Second] => right.push(cell),
+                _ => {}
+            }
+        }
+    }
+    let [left, right] = &supported;
+    Ok(match (distributed(left), distributed(right)) {
+        (true, false) if left.len() > right.len().saturating_add(1) => Witness::First,
+        (false, true) if right.len() > left.len().saturating_add(1) => Witness::Second,
+        _ => Witness::Unresolved,
+    })
+}
+
+/// Independent continuous intensity field, parameterized by spatial support.
+fn scene(x: f32, y: f32, one_axis: bool, one_side: bool) -> f32 {
+    if one_side && x >= 24.0 {
+        return 0.35;
+    }
+    let vertical = 0.22_f32.mul_add(y, 0.4).cos();
+    if one_axis {
+        0.18_f32.mul_add(vertical, 0.48)
+    } else {
+        let horizontal = 0.31_f32.mul_add(x, 0.07 * y).sin();
+        let diagonal = 0.16_f32.mul_add(x, 0.33 * y).sin();
+        0.16_f32.mul_add(
+            horizontal,
+            0.16_f32.mul_add(vertical, 0.09_f32.mul_add(diagonal, 0.5)),
+        )
+    }
+}
+
+/// Move independently generated textures, including two unobservable cases.
+///
+/// # Errors
+///
+/// Returns runtime, geometry or witness selection errors.
+#[test]
+fn witness_bilateral_motion_and_ambiguity() -> Result<(), String> {
+    let device = cubecl::Device::cpu().map_err(|error| error.to_string())?;
+    let extent = Extent::new(usize::from(SIDE), usize::from(SIDE))?;
+    for (one_axis, one_side, dy, expected) in [
+        (false, false, -3.0_f32, Witness::Second),
+        (true, false, 0.0_f32, Witness::Unresolved),
+        (false, true, -3.0_f32, Witness::Unresolved),
+    ] {
+        let mut reference = Vec::new();
+        let mut source = Vec::new();
+        for y in (0..SIDE).map(f32::from) {
+            for x in (0..SIDE).map(f32::from) {
+                reference.push(scene(x, y, one_axis, one_side));
+                source.push(0.84_f32.mul_add(scene(x - 2.0, y - dy, one_axis, one_side), 0.07));
+            }
+        }
+        let map = Affine::from_matrix([[1.0, 0.0, 2.0], [0.0, 1.0, dy]])?;
+        let pair = Pair::new(&device, &reference, &source, extent);
+        let actual = compare(&pair, Affine::IDENTITY, map)?;
+        if actual != expected {
+            return Err(format!(
+                "one_axis={one_axis} one_side={one_side}: expected {expected:?}, saw {actual:?}"
+            ));
+        }
+    }
+    Ok(())
+}

@@ -1,0 +1,48 @@
+"""Check adjacent-chain estimates against withheld cross-gap native D150 landmarks."""
+
+import argparse
+import json
+from pathlib import Path
+import runpy
+
+import cv2
+import numpy as np
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source-root", type=Path, required=True)
+    parser.add_argument("--tracking", type=Path, required=True)
+    parser.add_argument("--reference", type=Path, required=True)
+    parser.add_argument("--candidate", type=Path, required=True)
+    parser.add_argument("--short", action="store_true")
+    args = parser.parse_args()
+    api = runpy.run_path(str(Path(__file__).with_name("landmarks.py.txt")))
+    cv2.setNumThreads(1)
+    cv2.ocl.setUseOpenCL(False)
+    long_intervals = [(0, 24), (0, 60), (21, 61), (55, 91), (60, 120), (90, 138), (120, 149), (0, 149)]
+    short_intervals = [(base, base + gap) for base in range(0, 141, 20) for gap in (4, 8)]
+    intervals = short_intervals if args.short else long_intervals
+    tracking = json.loads(args.tracking.read_bytes())
+    maps = {name: np.vstack((matrix, [0, 0, 1])) for name, matrix in tracking["alignment_transforms"].items()}
+    ordered = list(maps)
+    sources = [ordered[i] for i in sorted({i for span in intervals for i in span})]
+    decodes, hashes = api["frames"](args.source_root.resolve(strict=True), sources)
+    candidates = {"local_chain": maps, "sealed_candidate": api["trace"](args.candidate),
+                  "pinned_reference": api["trace"](args.reference),
+                  "identity": {name: np.eye(3) for name in sources}}
+    results = []
+    for start, finish in intervals:
+        before, after = ordered[start], ordered[finish]
+        patches = api["landmarks"](decodes[before], decodes[after], dense=True)
+        fits = api["residuals"](candidates, before, after, patches) if len(patches) >= 3 else None
+        results.append({"span": [start, finish], "before": before, "after": after, "matches": patches, "fits": fits})
+    assert all(api["file_sha"](Path(item["path"])) == item["sha256"] for item in hashes.values())
+    print(json.dumps({"scope": "Withheld raw 72px patches, no predictor used for correspondence or search",
+                      "inputs": hashes, "tracking_sha256": api["file_sha"](args.tracking),
+                      "reference_sha256": api["file_sha"](args.reference), "candidate_sha256": api["file_sha"](args.candidate),
+                      "spans": results}, indent=2, allow_nan=False))
+
+
+if __name__ == "__main__":
+    main()

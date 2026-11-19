@@ -1,0 +1,11 @@
+{
+  "shard-0": {
+    "Unviable": 1,
+    "CaughtMutant": 2
+  },
+  "changed_selector_rejected": true,
+  "missing_outcome_rejected": true,
+  "shard-1": {
+    "CaughtMutant": 3
+  }
+}

@@ -1,0 +1,76 @@
+"""Exercise the launcher postflight on the untouched real CPU event."""
+
+import copy
+import json
+import runpy
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+control = Path(sys.argv.pop(1))
+launcher = runpy.run_path(str(Path(__file__).with_name("weighted-phase-run.py.txt")))
+validate = launcher["decode_and_validate"]
+events = [json.loads(line) for line in (control / "events.jsonl").read_text().splitlines()]
+original = next(item for item in events if item["event"] == "stack_complete")
+frames = [Path(path) for path in original["alignment_transforms"]]
+fixed_image = {"shape": [3998, 5998, 3], **launcher["PINNED_OUTPUT"]}
+
+
+class StockEventSchema(unittest.TestCase):
+    def setUp(self):
+        observer = patch.dict(validate.__globals__, {"verify_output": lambda *_: fixed_image})
+        observer.start()
+        self.addCleanup(observer.stop)
+
+    def test_original_event_preserves_50_ordered_sequential_identity_maps(self):
+        captured, _ = validate(control, frames)
+        self.assertEqual(captured, original)
+        self.assertIsInstance(captured["sequential_transforms"], list)
+        self.assertEqual(len(captured["sequential_transforms"]), 50)
+
+    def validate_modified(self, change, expected):
+        event = copy.deepcopy(original)
+        change(event)
+        with tempfile.TemporaryDirectory() as scratch:
+            directory = Path(scratch)
+            (directory / "events.jsonl").write_text(json.dumps(event) + "\n")
+            with self.assertRaisesRegex(ValueError, expected):
+                validate(directory, frames)
+
+    def test_short_and_nonidentity_sequential_map_are_rejected(self):
+        self.validate_modified(lambda event: event["sequential_transforms"].pop(), "sequential")
+        self.validate_modified(
+            lambda event: event["sequential_transforms"][0][0].__setitem__(2, 1),
+            "sequential",
+        )
+
+    def test_keyed_and_missing_sequential_map_are_rejected(self):
+        self.validate_modified(
+            lambda event: event.__setitem__("sequential_transforms", event["alignment_transforms"]),
+            "sequential",
+        )
+        self.validate_modified(lambda event: event.pop("sequential_transforms"), "sequential")
+
+    def test_reordered_or_wrong_source_maps_are_rejected(self):
+        self.validate_modified(
+            lambda event: event.__setitem__("alignment_transforms", dict(reversed(
+                list(event["alignment_transforms"].items())
+            ))),
+            "reference-to-source",
+        )
+        self.validate_modified(
+            lambda event: event["alignment_transforms"].__setitem__(
+                "/wrong-frame.tif", event["alignment_transforms"].pop(str(frames[-1]))
+            ),
+            "reference-to-source",
+        )
+
+    def test_duplicate_requested_sources_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "reference-to-source"):
+            validate(control, [*frames[:-1], frames[0]])
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,13 @@
+Run from pancake/ in a clean 71c27bd checkout. Apply the saved native.diff with zero fuzz before the red run. The paired driver reverses the same diff and verifies the original source digest before running the green test.
+
+patch --force --fuzz=0 --no-backup-if-mismatch src/job/registration.rs < native.diff
+
+taskset -c 10,11 nice -n 5 env -u DISPLAY -u WAYLAND_DISPLAY -u WAYLAND_SOCKET -u DBUS_SESSION_BUS_ADDRESS -u DBUS_STARTER_ADDRESS -u AT_SPI_BUS_ADDRESS -u RUSTC_WRAPPER -u RUSTC_WORKSPACE_WRAPPER -u CARGO_BUILD_RUSTC_WRAPPER CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0 CARGO_NET_OFFLINE=true bash /tmp/pancake-previous-reference-oracle/run-pair.sh
+
+After restoration, on the same Cargo environment:
+
+cargo test --locked -p pancake --all-features --test cpu_stack_plan -- --include-ignored
+
+With the generated reviewed CLIPPY_CONF_DIR from the existing dependency-policy command:
+
+cargo clippy --locked -p pancake --test cpu_stack_plan --all-features -- -D warnings

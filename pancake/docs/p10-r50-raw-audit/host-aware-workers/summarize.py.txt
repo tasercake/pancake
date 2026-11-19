@@ -1,0 +1,67 @@
+"""Verify both original frames and CPU event provenance, then reduce all samples."""
+from json import dumps, loads
+from pathlib import Path
+from re import MULTILINE, fullmatch, search
+from statistics import median
+import sys
+
+root = Path(sys.argv[1])
+variants = sys.argv[2:]
+names = ["frame_000.CR3", "frame_049.CR3"]
+identity = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]
+results = {}
+for key in variants:
+    lines = (root / f"{key}-decode-timing.log").read_text().splitlines()
+    if len(lines) != 12:
+        raise ValueError(f"Expected four two-frame decode probe processes for {key}")
+    runs = []
+    for i in range(0, len(lines), 3):
+        samples = []
+        for j, name in enumerate(names):
+            path, width, height, precision, nanoseconds = lines[i + j].split("\t")
+            if (Path(path).name, width, height, precision) != (name, "5088", "3392", "U16"):
+                raise ValueError(f"Unexpected decoded input row {lines[i+j]}")
+            samples.append(int(nanoseconds) / 1e9)
+        high_water = fullmatch(r"elapsed=([0-9.]+) peak_rss_kib=(\d+)", lines[i+2])
+        if high_water is None:
+            raise ValueError(f"Missing decoder high-water data for {key}")
+        runs.append({"decode_s": sum(samples), "per_frame_s": samples,
+                     "process_s": float(high_water[1]), "peak_rss_kib": int(high_water[2])})
+    events = [
+        loads(line) for line in (root / f"{key}-events.jsonl").read_text().splitlines()
+    ]
+    if len(events) != 1:
+        raise ValueError(f"Missing exact CPU completion for {key}")
+    event = events[0]
+    transforms = {
+        Path(path).name: transform for path, transform in event["alignment_transforms"].items()
+    }
+    if not (
+        event["event"] == "stack_complete"
+        and event["actual_backend"] == event["runtime"] == "cpu"
+        and event["completed"] is True and event["physical_gpu"] is False
+        and event["fallback_reason"] is None
+        and transforms == dict.fromkeys(names, identity)
+    ):
+        raise ValueError(f"Unexpected CPU completion for {key}: {event}")
+    cli_data = search(
+        r"^elapsed=([0-9.]+) peak_rss_kib=(\d+)$",
+        (root / f"{key}-cli.log").read_text(),
+        flags=MULTILINE,
+    )
+    if cli_data is None:
+        raise ValueError(f"Missing CPU Hybrid high-water data for {key}")
+    results[key] = {"samples": runs,
+                    "median_stage_seconds": median(run["decode_s"] for run in runs),
+                    "median_decoder_peak_rss_kib": median(run["peak_rss_kib"] for run in runs),
+                    "pair_hybrid_process_seconds_descriptive": float(cli_data[1]),
+                    "pair_hybrid_peak_rss_kib_descriptive": int(cli_data[2])}
+results["comparisons"] = {
+    key: {"decode_time_ratio": results[key]["median_stage_seconds"]
+          / results["baseline"]["median_stage_seconds"],
+          "peak_rss_ratio": results[key]["median_decoder_peak_rss_kib"]
+          / results["baseline"]["median_decoder_peak_rss_kib"]}
+    for key in variants if key != "baseline"
+}
+(root / "summary.json").write_text(dumps(results, indent=2) + "\n")
+print(dumps(results["comparisons"], indent=2))

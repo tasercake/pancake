@@ -1,0 +1,75 @@
+"""Offline RSS cross-check for a single frozen-settings CPU calibration triplet."""
+
+COLLECTOR = "df780846a4dcc40bf460bcaaba04f1538290e71c"
+PROFILE = "T50.weighted_average.cpu"
+ROLES = ("reference", "stock", "candidate")
+PERIOD_NS = 3_000_000
+MAX_GAP_NS = 20_000_000
+
+
+def arm_rss(role, job):
+    """Check the sampled process-tree summary against raw measured timestamps."""
+    launch, sample = job["launch"], job["sample"]
+    if launch["sample_interval_ns"] != PERIOD_NS or sample["sample_interval_ns"] != PERIOD_NS:
+        raise ValueError(f"{role} did not use the registered sampler period")
+    if launch["rss_sampler_cpu"] != 15 or sample["rss_sampler_affinity"] != [15]:
+        raise ValueError(f"{role} did not verify sampler CPU15 affinity")
+    if sample["valid"] is not True or sample["resource_errors"]:
+        raise ValueError(f"{role} is missing valid completed-job resource evidence")
+    elapsed = sample["elapsed_ns"]
+    if type(elapsed) is not int or elapsed <= 0:
+        raise ValueError(f"{role} has invalid elapsed time")
+    stamps = []
+    observed = []
+    unavailable = False
+    for row in job["observations"]:
+        timestamp, value = row["rss_elapsed_ns"], row["rss_bytes"]
+        if type(timestamp) is not int or timestamp < 0:
+            raise ValueError(f"{role} has an invalid raw RSS timestamp")
+        if not isinstance(row["processes"], list) or any(
+            type(pid) is not int or pid <= 0 for pid in row["processes"]
+        ):
+            raise ValueError(f"{role} has an invalid process roster")
+        if value is not None and (type(value) is not int or value < 0):
+            raise ValueError(f"{role} has an invalid RSS byte count")
+        if timestamp > elapsed:
+            continue
+        if stamps and timestamp <= stamps[-1]:
+            raise ValueError(f"{role} raw RSS observation order differs")
+        stamps.append(timestamp)
+        if value is None:
+            unavailable = True
+        else:
+            observed.append(value)
+    if not stamps:
+        raise ValueError(f"{role} lacks actual raw RSS observations within the job")
+    before = [0, *stamps]
+    after = [*stamps, elapsed]
+    gap = max(end - start for start, end in zip(before, after, strict=True))
+    observed_peak = max(observed, default=None)
+    eligible_peak = observed_peak if gap <= MAX_GAP_NS and not unavailable and observed_peak else None
+    measured = {
+        "observed_peak_rss_bytes": observed_peak,
+        "maximum_rss_sample_gap_ns": gap,
+        "peak_rss_bytes": eligible_peak,
+        "rss_sample_count": len(stamps),
+    }
+    if any(sample[key] != value for key, value in measured.items()):
+        raise ValueError(f"{role} sample summary disagrees with raw RSS observations")
+    return measured
+
+
+def calibration(report):
+    """Keep sampled lower bounds and leave any unobserved ratio pending."""
+    if report["collector_commit"] != COLLECTOR:
+        raise ValueError("wrong collector revision")
+    if report["profile"] != PROFILE or tuple(report["jobs"]) != ROLES:
+        raise ValueError("wrong diagnostic profile or arm order")
+    if report["sample_interval_ns"] != PERIOD_NS:
+        raise ValueError("wrong calibration sampler period")
+    rss = {role: arm_rss(role, report["jobs"][role]) for role in ROLES}
+    result = {"status": "diagnostic_rss_only", "frozen_credit": False, "rss": rss}
+    for left, right in (("stock", "reference"), ("candidate", "reference"), ("candidate", "stock")):
+        a, b = (rss[role]["peak_rss_bytes"] for role in (left, right))
+        result[f"{left}/{right}_rss_ratio"] = a / b if a is not None and b is not None else None
+    return result

@@ -233,3 +233,57 @@ fn serve(options: &Options, work: &Receiver<Work>, done: &SyncSender<Outcome>) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{Generation, JobControl, Outcome, StackWorker, mpsc};
+
+    /// A stale message cannot take ownership of a current generation's outcome.
+    ///
+    /// # Errors
+    ///
+    /// Returns a channel, control, or outcome protocol failure.
+    #[test]
+    fn stale_worker_outcome_leaves_current_result_available() -> Result<(), String> {
+        let stale = Generation::from_counter(1);
+        let current = Generation::from_counter(2);
+        let (sender, outcomes) = mpsc::sync_channel(1);
+        let mut worker = StackWorker {
+            counter: 2,
+            current: Some(JobControl::new(current, 2)?),
+            delivered: false,
+            requests: None,
+            outcomes,
+            thread: None,
+        };
+        sender
+            .try_send(Outcome {
+                generation: stale,
+                result: Err("older request failure".to_owned()),
+            })
+            .map_err(|error| error.to_string())?;
+        if worker.take_result(stale)?.is_some() {
+            return Err("a stale caller received an outcome".to_owned());
+        }
+        let observed = worker.take_result(current);
+        if !matches!(&observed, Err(message) if message == "stack worker returned a stale result") {
+            return Err(format!(
+                "current caller did not reject the stale outcome: {observed:?}"
+            ));
+        }
+        let expected = "current request failure";
+        sender
+            .try_send(Outcome {
+                generation: current,
+                result: Err(expected.to_owned()),
+            })
+            .map_err(|error| error.to_string())?;
+        let observed = worker.take_result(current)?;
+        if !matches!(&observed, Some(Err(message)) if message == expected) {
+            return Err(format!(
+                "current outcome was lost or replaced: {observed:?}"
+            ));
+        }
+        Ok(())
+    }
+}

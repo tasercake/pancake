@@ -1,0 +1,36 @@
+{
+  "binary": "pancake-cli",
+  "binary_sha256": "aad46d08e71f1973ba4ffa1efa7d7fe0ee7747e02cf2a3834903af448587f9ed",
+  "tested_revision": "07816a24a62f96bc3d3252e95fcfd2b4b5950269",
+  "tested_tree": "fb731072babb7c0df9fd9e058449ed4b9fd9ace7",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "build_environment": {
+    "CARGO_BUILD_JOBS": 2,
+    "CARGO_INCREMENTAL": 0,
+    "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+  },
+  "build_argv": [
+    "taskset",
+    "--cpu-list",
+    "20,21",
+    "cargo",
+    "+1.100.0",
+    "build",
+    "--offline",
+    "--locked",
+    "--release",
+    "-p",
+    "pancake",
+    "-p",
+    "pancake-cli",
+    "--example",
+    "registration_upload_probe",
+    "--bin",
+    "pancake-cli"
+  ],
+  "headless_t50_evidence_commit": "16ba77910e862cc45cbbdd084edcdcbd3b1a82b7",
+  "qualification": {
+    "cpu_p5_passed": 63,
+    "p5_p6_device_replay_passed": 73
+  }
+}

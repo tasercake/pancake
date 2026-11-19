@@ -1,0 +1,743 @@
+{
+  "scope": "preregistered original 50-frame retained-result instrumented trace, no frozen credit",
+  "candidate": {
+    "commit": "8694b555666a1ddf4051e2839bbced4bcc625859",
+    "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+    "component": "gui",
+    "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-queue-loaded-8694/pancake/target/release/pancake-gui",
+    "binary_sha256": "62e77cb6305514c2a1bbd1bcf3fc4e1518cbae572d48483e4e5e2f938daacf06",
+    "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-8694b55/pancake_0.1.0_amd64.deb",
+    "package_sha256": "7dbc969e1813bc62aa4df206bb77982e3f7705298f753e12b7a493ae89ce3784",
+    "package_verification_sha256": "7b9db7b7c92b0272cdce60000cdef309d42e77afc19eb56392418251c3c32b71",
+    "release_build_log_sha256": "bfc21d0b6414f4c39890808b24c1222374a04ae5685f6c03b0ac0bbfd7b7aa00"
+  },
+  "gui": {
+    "pid": 585748,
+    "size": [
+      1440,
+      1000
+    ],
+    "gpu": {
+      "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+      "pci.bus_id": "00000000:01:00.0",
+      "name": "NVIDIA GeForce RTX 3090",
+      "driver_version": "580.178.04",
+      "pstate": "P8",
+      "temperature.gpu": "44",
+      "power.draw": "17.25",
+      "power.limit": "350.00",
+      "clocks.gr": "210",
+      "clocks.mem": "405"
+    },
+    "resident_bytes": 117088256
+  },
+  "ordered_t50_focus_frames": 50,
+  "materialization_sha256": "317f4b0c9be5837cd7082227bf700ee232e7e995471ee44be8488cbf3511603c",
+  "scenario_sha256": "3066e27e3c732c1731806764c0321abcbd3583da07938cd91a709146d148b7c3",
+  "native_case_counts": {
+    "idle/source": 40,
+    "idle/result": 40,
+    "idle/pan": 40,
+    "idle/zoom": 40,
+    "idle/comparison": 40,
+    "loaded/source": 16,
+    "loaded/result": 16,
+    "loaded/pan": 16,
+    "loaded/zoom": 16,
+    "loaded/comparison": 16
+  },
+  "verified_actual_rgb_patches": 784,
+  "max_rgb_error": 1,
+  "native_gui_exit": {
+    "gui_pid": 585748,
+    "normal_close_requested_ns": 550988961946254,
+    "exit_observed_by_pidfd": true,
+    "forced_after_native_close": false,
+    "exit_code_available_to_driver": false,
+    "close_exception": null
+  },
+  "api_counts": {
+    "vkQueueSubmit": 5481,
+    "vkAcquireNextImageKHR": 2674,
+    "vkQueuePresentKHR": 2674
+  },
+  "max_clock_envelope_ns": 1403,
+  "loaded_late_sample_count": 15,
+  "maximum_loaded_ns": 148177211,
+  "physical_completion_count": 1,
+  "actual_process_start": "2026-11-18T20:43:41+08:00",
+  "actual_process_terminal": "2026-11-18T20:46:44+08:00",
+  "selected_raw_api_boundaries": {
+    "480": {
+      "worker_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+      "worker_after": "Running \u00b7 Decode \u00b7 2 of 50",
+      "dispatch_to_visible_ns": 148177211,
+      "api_rows_with_15ms_lookback": [
+        {
+          "tid": 586031,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005968847652223,
+          "end_utc_ns": 1795005969079687907,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 557721,
+          "start_ns_from_dispatch": [
+            -128883208,
+            -128882878
+          ],
+          "end_ns_from_dispatch": [
+            103152476,
+            103152806
+          ],
+          "duration_ns": 232035684
+        },
+        {
+          "tid": 586031,
+          "api": "vkFreeMemory",
+          "start_utc_ns": 1795005969079711281,
+          "end_utc_ns": 1795005969083563062,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 557965,
+          "start_ns_from_dispatch": [
+            103175850,
+            103176180
+          ],
+          "end_ns_from_dispatch": [
+            107027631,
+            107027961
+          ],
+          "duration_ns": 3851781
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueuePresentKHR",
+          "start_utc_ns": 1795005969083620931,
+          "end_utc_ns": 1795005969101813008,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 557991,
+          "start_ns_from_dispatch": [
+            107085500,
+            107085830
+          ],
+          "end_ns_from_dispatch": [
+            125277577,
+            125277907
+          ],
+          "duration_ns": 18192077
+        },
+        {
+          "tid": 585748,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005969102222355,
+          "end_utc_ns": 1795005969102223998,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 557992,
+          "start_ns_from_dispatch": [
+            125686924,
+            125687254
+          ],
+          "end_ns_from_dispatch": [
+            125688567,
+            125688897
+          ],
+          "duration_ns": 1643
+        },
+        {
+          "tid": 585748,
+          "api": "vkAcquireNextImageKHR",
+          "start_utc_ns": 1795005969102225270,
+          "end_utc_ns": 1795005969102226843,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 557993,
+          "start_ns_from_dispatch": [
+            125689839,
+            125690169
+          ],
+          "end_ns_from_dispatch": [
+            125691412,
+            125691742
+          ],
+          "duration_ns": 1573
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005969103718700,
+          "end_utc_ns": 1795005969103736023,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 558230,
+          "start_ns_from_dispatch": [
+            127183269,
+            127183599
+          ],
+          "end_ns_from_dispatch": [
+            127200592,
+            127200922
+          ],
+          "duration_ns": 17323
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005969103782891,
+          "end_utc_ns": 1795005969103785826,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 558241,
+          "start_ns_from_dispatch": [
+            127247460,
+            127247790
+          ],
+          "end_ns_from_dispatch": [
+            127250395,
+            127250725
+          ],
+          "duration_ns": 2935
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueuePresentKHR",
+          "start_utc_ns": 1795005969103787640,
+          "end_utc_ns": 1795005969123420407,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 558242,
+          "start_ns_from_dispatch": [
+            127252209,
+            127252539
+          ],
+          "end_ns_from_dispatch": [
+            146884976,
+            146885306
+          ],
+          "duration_ns": 19632767
+        }
+      ]
+    },
+    "508": {
+      "worker_before": "Running \u00b7 Fuse \u00b7 3 of 50",
+      "worker_after": "Running \u00b7 Decode \u00b7 4 of 50",
+      "dispatch_to_visible_ns": 122463793,
+      "api_rows_with_15ms_lookback": [
+        {
+          "tid": 586031,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005976215039972,
+          "end_utc_ns": 1795005976348822740,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 598222,
+          "start_ns_from_dispatch": [
+            -35030398,
+            -35029657
+          ],
+          "end_ns_from_dispatch": [
+            98752370,
+            98753111
+          ],
+          "duration_ns": 133782768
+        },
+        {
+          "tid": 585748,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005976250519830,
+          "end_utc_ns": 1795005976250520602,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 598223,
+          "start_ns_from_dispatch": [
+            449460,
+            450201
+          ],
+          "end_ns_from_dispatch": [
+            450232,
+            450973
+          ],
+          "duration_ns": 772
+        },
+        {
+          "tid": 585748,
+          "api": "vkAcquireNextImageKHR",
+          "start_utc_ns": 1795005976250527935,
+          "end_utc_ns": 1795005976250530600,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 598224,
+          "start_ns_from_dispatch": [
+            457565,
+            458306
+          ],
+          "end_ns_from_dispatch": [
+            460230,
+            460971
+          ],
+          "duration_ns": 2665
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005976252067582,
+          "end_utc_ns": 1795005976252088030,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 598465,
+          "start_ns_from_dispatch": [
+            1997212,
+            1997953
+          ],
+          "end_ns_from_dispatch": [
+            2017660,
+            2018401
+          ],
+          "duration_ns": 20448
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005976252103349,
+          "end_utc_ns": 1795005976252105994,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 598469,
+          "start_ns_from_dispatch": [
+            2032979,
+            2033720
+          ],
+          "end_ns_from_dispatch": [
+            2035624,
+            2036365
+          ],
+          "duration_ns": 2645
+        },
+        {
+          "tid": 586031,
+          "api": "vkFreeMemory",
+          "start_utc_ns": 1795005976348841826,
+          "end_utc_ns": 1795005976352777404,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 598471,
+          "start_ns_from_dispatch": [
+            98771456,
+            98772197
+          ],
+          "end_ns_from_dispatch": [
+            102707034,
+            102707775
+          ],
+          "duration_ns": 3935578
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueuePresentKHR",
+          "start_utc_ns": 1795005976352829702,
+          "end_utc_ns": 1795005976371550751,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 598497,
+          "start_ns_from_dispatch": [
+            102759332,
+            102760073
+          ],
+          "end_ns_from_dispatch": [
+            121480381,
+            121481122
+          ],
+          "duration_ns": 18721049
+        }
+      ]
+    },
+    "434": {
+      "worker_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+      "worker_after": "Running \u00b7 Decode \u00b7 3 of 50",
+      "dispatch_to_visible_ns": 107454611,
+      "api_rows_with_15ms_lookback": [
+        {
+          "tid": 585832,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005957203926295,
+          "end_utc_ns": 1795005957203943036,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 490776,
+          "start_ns_from_dispatch": [
+            -12053735,
+            -12053094
+          ],
+          "end_ns_from_dispatch": [
+            -12036994,
+            -12036353
+          ],
+          "duration_ns": 16741
+        },
+        {
+          "tid": 586031,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005957204010503,
+          "end_utc_ns": 1795005957299629060,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 490784,
+          "start_ns_from_dispatch": [
+            -11969527,
+            -11968886
+          ],
+          "end_ns_from_dispatch": [
+            83649030,
+            83649671
+          ],
+          "duration_ns": 95618557
+        },
+        {
+          "tid": 585748,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005957216583505,
+          "end_utc_ns": 1795005957216585078,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 490785,
+          "start_ns_from_dispatch": [
+            603475,
+            604116
+          ],
+          "end_ns_from_dispatch": [
+            605048,
+            605689
+          ],
+          "duration_ns": 1573
+        },
+        {
+          "tid": 585748,
+          "api": "vkAcquireNextImageKHR",
+          "start_utc_ns": 1795005957216590187,
+          "end_utc_ns": 1795005957216591159,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 490786,
+          "start_ns_from_dispatch": [
+            610157,
+            610798
+          ],
+          "end_ns_from_dispatch": [
+            611129,
+            611770
+          ],
+          "duration_ns": 972
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005957218657593,
+          "end_utc_ns": 1795005957218679254,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 491023,
+          "start_ns_from_dispatch": [
+            2677563,
+            2678204
+          ],
+          "end_ns_from_dispatch": [
+            2699224,
+            2699865
+          ],
+          "duration_ns": 21661
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005957218697648,
+          "end_utc_ns": 1795005957218700544,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 491027,
+          "start_ns_from_dispatch": [
+            2717618,
+            2718259
+          ],
+          "end_ns_from_dispatch": [
+            2720514,
+            2721155
+          ],
+          "duration_ns": 2896
+        },
+        {
+          "tid": 586031,
+          "api": "vkFreeMemory",
+          "start_utc_ns": 1795005957299664927,
+          "end_utc_ns": 1795005957303043331,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 491029,
+          "start_ns_from_dispatch": [
+            83684897,
+            83685538
+          ],
+          "end_ns_from_dispatch": [
+            87063301,
+            87063942
+          ],
+          "duration_ns": 3378404
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueuePresentKHR",
+          "start_utc_ns": 1795005957303129663,
+          "end_utc_ns": 1795005957321987307,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 491055,
+          "start_ns_from_dispatch": [
+            87149633,
+            87150274
+          ],
+          "end_ns_from_dispatch": [
+            106007277,
+            106007918
+          ],
+          "duration_ns": 18857644
+        }
+      ]
+    },
+    "554": {
+      "worker_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+      "worker_after": "Running \u00b7 Decode \u00b7 3 of 50",
+      "dispatch_to_visible_ns": 101649369,
+      "api_rows_with_15ms_lookback": [
+        {
+          "tid": 586031,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005987829473402,
+          "end_utc_ns": 1795005987925165958,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 665410,
+          "start_ns_from_dispatch": [
+            -15450443,
+            -15449952
+          ],
+          "end_ns_from_dispatch": [
+            80242113,
+            80242604
+          ],
+          "duration_ns": 95692556
+        },
+        {
+          "tid": 585748,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005987845356560,
+          "end_utc_ns": 1795005987845357682,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 665411,
+          "start_ns_from_dispatch": [
+            432715,
+            433206
+          ],
+          "end_ns_from_dispatch": [
+            433837,
+            434328
+          ],
+          "duration_ns": 1122
+        },
+        {
+          "tid": 585748,
+          "api": "vkAcquireNextImageKHR",
+          "start_utc_ns": 1795005987845361078,
+          "end_utc_ns": 1795005987845361569,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 665412,
+          "start_ns_from_dispatch": [
+            437233,
+            437724
+          ],
+          "end_ns_from_dispatch": [
+            437724,
+            438215
+          ],
+          "duration_ns": 491
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005987846478864,
+          "end_utc_ns": 1795005987846492530,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 665648,
+          "start_ns_from_dispatch": [
+            1555019,
+            1555510
+          ],
+          "end_ns_from_dispatch": [
+            1568685,
+            1569176
+          ],
+          "duration_ns": 13666
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005987846505093,
+          "end_utc_ns": 1795005987846507868,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 665652,
+          "start_ns_from_dispatch": [
+            1581248,
+            1581739
+          ],
+          "end_ns_from_dispatch": [
+            1584023,
+            1584514
+          ],
+          "duration_ns": 2775
+        },
+        {
+          "tid": 586031,
+          "api": "vkFreeMemory",
+          "start_utc_ns": 1795005987925189221,
+          "end_utc_ns": 1795005987928338626,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 665654,
+          "start_ns_from_dispatch": [
+            80265376,
+            80265867
+          ],
+          "end_ns_from_dispatch": [
+            83414781,
+            83415272
+          ],
+          "duration_ns": 3149405
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueuePresentKHR",
+          "start_utc_ns": 1795005987928393369,
+          "end_utc_ns": 1795005987946107369,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 665680,
+          "start_ns_from_dispatch": [
+            83469524,
+            83470015
+          ],
+          "end_ns_from_dispatch": [
+            101183524,
+            101184015
+          ],
+          "duration_ns": 17714000
+        }
+      ]
+    },
+    "518": {
+      "worker_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+      "worker_after": "Running \u00b7 Decode \u00b7 3 of 50",
+      "dispatch_to_visible_ns": 92855171,
+      "api_rows_with_15ms_lookback": [
+        {
+          "tid": 586031,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005978830989717,
+          "end_utc_ns": 1795005978926809301,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 613209,
+          "start_ns_from_dispatch": [
+            -25795396,
+            -25794524
+          ],
+          "end_ns_from_dispatch": [
+            70024188,
+            70025060
+          ],
+          "duration_ns": 95819584
+        },
+        {
+          "tid": 585748,
+          "api": "vkWaitSemaphores",
+          "start_utc_ns": 1795005978857395894,
+          "end_utc_ns": 1795005978857396595,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 613210,
+          "start_ns_from_dispatch": [
+            610781,
+            611653
+          ],
+          "end_ns_from_dispatch": [
+            611482,
+            612354
+          ],
+          "duration_ns": 701
+        },
+        {
+          "tid": 585748,
+          "api": "vkAcquireNextImageKHR",
+          "start_utc_ns": 1795005978857400613,
+          "end_utc_ns": 1795005978857401875,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 613211,
+          "start_ns_from_dispatch": [
+            615500,
+            616372
+          ],
+          "end_ns_from_dispatch": [
+            616762,
+            617634
+          ],
+          "duration_ns": 1262
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005978858933988,
+          "end_utc_ns": 1795005978858953154,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 613447,
+          "start_ns_from_dispatch": [
+            2148875,
+            2149747
+          ],
+          "end_ns_from_dispatch": [
+            2168041,
+            2168913
+          ],
+          "duration_ns": 19166
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueueSubmit",
+          "start_utc_ns": 1795005978858968583,
+          "end_utc_ns": 1795005978858971077,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 613451,
+          "start_ns_from_dispatch": [
+            2183470,
+            2184342
+          ],
+          "end_ns_from_dispatch": [
+            2185964,
+            2186836
+          ],
+          "duration_ns": 2494
+        },
+        {
+          "tid": 586031,
+          "api": "vkFreeMemory",
+          "start_utc_ns": 1795005978926832094,
+          "end_utc_ns": 1795005978930489762,
+          "vulkan_context": 3,
+          "vulkan_correlation_id": 613453,
+          "start_ns_from_dispatch": [
+            70046981,
+            70047853
+          ],
+          "end_ns_from_dispatch": [
+            73704649,
+            73705521
+          ],
+          "duration_ns": 3657668
+        },
+        {
+          "tid": 585748,
+          "api": "vkQueuePresentKHR",
+          "start_utc_ns": 1795005978930544374,
+          "end_utc_ns": 1795005978948714730,
+          "vulkan_context": 2,
+          "vulkan_correlation_id": 613479,
+          "start_ns_from_dispatch": [
+            73759261,
+            73760133
+          ],
+          "end_ns_from_dispatch": [
+            91929617,
+            91930489
+          ],
+          "duration_ns": 18170356
+        }
+      ]
+    }
+  },
+  "raw_sha256": {
+    "queue.nsys-rep": "e52eb151a2f828992b158e84d15cf76bf0c6828c9d02d80dc0e914a6f394e353",
+    "queue-utc.sqlite": "c6210c9e64f922241aa986934af0a54424585c4fedc90433bab44652b1f9f9a8",
+    "artifacts/capture/native-latency.json": "492691da20cc9b05e7171e7002820facab285a0366c2e3239e5185e749d59c3c",
+    "diagnostic-timeline.json": "42e865ad464a12dad29e40480dfac30caf9a382a78fb5ee1a015aea10a83fd4f"
+  }
+}

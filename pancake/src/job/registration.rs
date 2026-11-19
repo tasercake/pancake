@@ -3,7 +3,7 @@
 use crate::config::{AlignmentMode, AlignmentReference, JobConfig};
 use crate::image_io::{RgbImage, decode};
 use crate::registration::{
-    Affine, Bounds, Frame, Model, Thumbnail, estimate_pair, thumbnail_with_scale, warp,
+    Affine, Bounds, Frame, Model, ResidentRgb, Thumbnail, estimate_pair, frame_thumbnail, warp,
 };
 
 use super::{JobControl, JobError, Stage};
@@ -87,7 +87,8 @@ impl Alignment {
             control.checkpoint(Stage::Decode)?;
             let image = decode(path)?;
             control.checkpoint(Stage::Register)?;
-            Some(make_proxy(device, &image, canvas, scale_factor, budget)?)
+            let (proxy, _) = make_proxy(device, &image, canvas, scale_factor, budget, false)?;
+            Some(proxy)
         };
         Ok(Self {
             model,
@@ -115,24 +116,32 @@ impl Alignment {
         image: RgbImage,
         budget: usize,
         control: &JobControl,
-    ) -> Result<Vec<f32>, JobError> {
+        retain_input: bool,
+    ) -> Result<(Vec<f32>, Option<ResidentRgb>), JobError> {
         control.checkpoint(Stage::Register)?;
-        let map = if let Some(previous) = self.transforms.get(index) {
-            *previous
+        let matching_canvas =
+            image.width() == self.canvas.width() && image.height() == self.canvas.height();
+        let (map, resident) = if let Some(previous) = self.transforms.get(index) {
+            (*previous, None)
         } else {
             if index != self.transforms.len() {
                 return Err("registration inputs were not presented in order".into());
             }
-            let new = self.estimate(device, index, &image, budget, control)?;
+            let (new, resident) = self.estimate(
+                device,
+                index,
+                &image,
+                budget,
+                control,
+                retain_input && matching_canvas,
+            )?;
             self.transforms.push(new);
-            new
+            (new, resident)
         };
-        if map.original == Affine::IDENTITY
-            && image.width() == self.canvas.width()
-            && image.height() == self.canvas.height()
-        {
-            return Ok(image.into_samples());
+        if map.original == Affine::IDENTITY && matching_canvas {
+            return Ok((image.into_samples(), resident));
         }
+        drop(resident);
         control.checkpoint(Stage::Register)?;
         let samples = if self.model.is_some() {
             warp(device, frame(&image)?, map.original, self.canvas, budget)?
@@ -145,7 +154,7 @@ impl Alignment {
                 budget,
             )?
         };
-        Ok(samples)
+        Ok((samples, None))
     }
 
     /// Include no more than one prior reference image in the working set.
@@ -160,20 +169,33 @@ impl Alignment {
         image: &RgbImage,
         budget: usize,
         control: &JobControl,
-    ) -> Result<SourceMap, JobError> {
+        retain_input: bool,
+    ) -> Result<(SourceMap, Option<ResidentRgb>), JobError> {
         let mut sequential = Affine::IDENTITY;
         let mut common = Affine::IDENTITY;
+        let mut resident = None;
         if let Some(model) = self.model {
             if index == self.anchor && self.proxy.is_none() {
-                self.proxy = Some(make_proxy(
+                let (proxy, input) = make_proxy(
                     device,
                     image,
                     self.canvas,
                     self.scale_factor,
                     budget,
-                )?);
+                    retain_input,
+                )?;
+                self.proxy = Some(proxy);
+                resident = input;
             } else if index != self.anchor {
-                let source = make_proxy(device, image, self.canvas, self.scale_factor, budget)?;
+                let (source, input) = make_proxy(
+                    device,
+                    image,
+                    self.canvas,
+                    self.scale_factor,
+                    budget,
+                    retain_input,
+                )?;
+                resident = input;
                 let reference = self
                     .proxy
                     .as_ref()
@@ -205,11 +227,14 @@ impl Alignment {
             [self.canvas.width(), self.canvas.height()],
             [image.width(), image.height()],
         )?;
-        Ok(SourceMap {
-            common,
-            original,
-            sequential,
-        })
+        Ok((
+            SourceMap {
+                common,
+                original,
+                sequential,
+            },
+            resident,
+        ))
     }
 
     /// Release compact reference data and take the geometry for result export.
@@ -229,14 +254,15 @@ fn make_proxy(
     canvas: Bounds,
     factor: u32,
     budget: usize,
-) -> Result<Thumbnail, String> {
-    thumbnail_with_scale(
+    retain_input: bool,
+) -> Result<(Thumbnail, Option<ResidentRgb>), String> {
+    frame_thumbnail(
         device,
         frame(image)?,
-        canvas.width(),
-        canvas.height(),
+        [canvas.width(), canvas.height()],
         factor,
         budget,
+        retain_input,
     )
 }
 

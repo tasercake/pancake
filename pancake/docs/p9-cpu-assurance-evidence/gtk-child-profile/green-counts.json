@@ -1,0 +1,101 @@
+{
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/p9-gtk-child-profile/pancake/target/llvm-cov-target/debug/build/pancake-gui/c855531277e79884/out/pancake_gui-c855531277e79884",
+  "elf_build_id": "789714a3e5091ae94fbb8b2f01779f59783903bd",
+  "elf_sha256": "688086a5597e132a8dfdf3cead0df77a5f7939029c97fffc2084baa8b7299888",
+  "profiles": [
+    {
+      "role": "parent",
+      "pid": 1590536,
+      "file": "pancake-1590536-4703546444111433498_0.profraw",
+      "sha256": "4be508a81afc7e2c09a9c90e4f2bd704075dc99e6e0e015cecb10362190e8ab5",
+      "bytes": 28016,
+      "llvm_profdata_show": "Instrumentation level: Front-end\nTotal functions: 183\nMaximum function count: 1\nMaximum internal block count: 1\nTotal number of blocks: 678\nTotal count: 5\nBinary IDs: \n789714a3e5091ae94fbb8b2f01779f59783903bd\n"
+    },
+    {
+      "role": "child",
+      "pid": 1590538,
+      "file": "pancake-1590538-4703546444111433498_0.profraw",
+      "sha256": "959e75297f76f4b2163b2a7b0388b84e01731de6456d2e39c1fa6253ed12d841",
+      "bytes": 28016,
+      "llvm_profdata_show": "Instrumentation level: Front-end\nTotal functions: 183\nMaximum function count: 6\nMaximum internal block count: 1\nTotal number of blocks: 678\nTotal count: 15\nBinary IDs: \n789714a3e5091ae94fbb8b2f01779f59783903bd\n"
+    }
+  ],
+  "lines": {
+    "27": 1,
+    "64": 1,
+    "65": 1,
+    "66": 1,
+    "187": 2,
+    "222": 1
+  },
+  "panel_stats": {
+    "branches": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0.0
+    },
+    "mcdc": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0.0
+    },
+    "functions": {
+      "count": 15,
+      "covered": 8,
+      "percent": 53.333333333333336
+    },
+    "instantiations": {
+      "count": 15,
+      "covered": 8,
+      "percent": 53.333333333333336
+    },
+    "lines": {
+      "count": 176,
+      "covered": 59,
+      "percent": 33.52272727272727
+    },
+    "regions": {
+      "count": 197,
+      "covered": 64,
+      "notcovered": 133,
+      "percent": 32.48730964467005
+    }
+  },
+  "totals": {
+    "branches": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "functions": {
+      "count": 748,
+      "covered": 8,
+      "percent": 1.06951871657754
+    },
+    "instantiations": {
+      "count": 775,
+      "covered": 8,
+      "percent": 1.032258064516129
+    },
+    "lines": {
+      "count": 6390,
+      "covered": 59,
+      "percent": 0.9233176838810642
+    },
+    "mcdc": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "regions": {
+      "count": 7199,
+      "covered": 64,
+      "notcovered": 7135,
+      "percent": 0.8890123628281705
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "source_revision": "1a887017c5a1d791cec7957ab21bf637545b1890",
+  "source_and_fixture_hashes": {
+    "pancake/src/image_io/mod.rs": "7630226e19389b7e56d0c58456ee52685a41b16633e931c0d208cc63e58fbf95",
+    "pancake/src/image_io/tiled.rs": "176c1a7649444882d129f7ecaf2184a09550079bafa5dbdc596ff5a0b4434df9",
+    "pancake/src/image_io/tiled/tests.rs": "68eceede849fab2510f32307d184ec5da5b27feeedff696aee76b1bb7aaa72d1",
+    "pancake/tests/cpu_image_io.rs": "a66e72dcda5460e45bdb2f177ca103530d2ea43e82de285083ce215829859508",
+    "pancake/tests/data/tiled-rgb16-worker-bands.tif": "6ab043117061afd0eab85ec519ad9745160e7dca6071c4c06570f94aeac72067"
+  },
+  "baseline_focused_passes": 39,
+  "pure_red": {
+    "variant": "missing seek inside shared input lock",
+    "failure": "left cursor began at the wrong tile",
+    "exit_status": 101
+  },
+  "commands": [
+    "cargo fmt --all -- --check",
+    "python3 scripts/miri_host_policy.py . validate",
+    "taskset -c 24,25 cargo clippy --locked -p pancake --tests -- -D warnings",
+    "taskset -c 24,25 cargo test --locked --lib image_io::tiled::tests::",
+    "taskset -c 24,25 cargo test --locked --test cpu_image_io --test cpu_image_export --test cpu_npy"
+  ],
+  "tests": {
+    "pure_unit": 2,
+    "cpu_image_io": 27,
+    "cpu_image_export": 10,
+    "cpu_npy": 3,
+    "failed": 0
+  },
+  "fixture": {
+    "shape": [
+      1027,
+      1025,
+      3
+    ],
+    "tile": [
+      64,
+      64
+    ],
+    "source_dtype": "uint16",
+    "compression": 8,
+    "predictor": 2,
+    "last_tile_index": 288,
+    "last_count_field_byte": 2560
+  }
+}

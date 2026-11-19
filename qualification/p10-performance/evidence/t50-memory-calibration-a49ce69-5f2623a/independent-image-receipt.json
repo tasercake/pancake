@@ -1,0 +1,41 @@
+{
+  "reference": {
+    "shape": [
+      3998,
+      5998,
+      3
+    ],
+    "dtype": "uint16",
+    "bytes": 165542082,
+    "sha256": "550e72982e03844c4a5d40575ab3c8b89ea067e5f38d07d0f0736445484922c2",
+    "pixel_sha256": "dc4e21deab6381c662de86a89c4f58385ccbe2b54d51a22addcd50db1f4f6d34",
+    "minimum": 7096,
+    "maximum": 58532
+  },
+  "stock": {
+    "shape": [
+      3998,
+      5998,
+      3
+    ],
+    "dtype": "uint16",
+    "bytes": 143881378,
+    "sha256": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+    "pixel_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7",
+    "minimum": 7089,
+    "maximum": 58530
+  },
+  "candidate": {
+    "shape": [
+      3998,
+      5998,
+      3
+    ],
+    "dtype": "uint16",
+    "bytes": 143881378,
+    "sha256": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+    "pixel_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7",
+    "minimum": 7089,
+    "maximum": 58530
+  }
+}

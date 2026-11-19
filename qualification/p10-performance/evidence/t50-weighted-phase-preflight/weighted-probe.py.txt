@@ -1,0 +1,211 @@
+"""Observe the exact e81079d CPU ELF with x86-64 software breakpoints."""
+
+from collections import Counter, defaultdict
+import json
+import os
+from pathlib import Path
+import time
+
+ADD = "<pancake::fusion::focus::FocusAccumulator>::add_frame"
+BASE = 0x2B43950
+ENTRIES = {
+    "decode": ("pancake::image_io::decode", 0x2B57AA0, 50),
+    "proxy": ("pancake::registration::frame_thumbnail", 0x2B54060, 50),
+    "estimate": ("pancake::registration::estimate::estimate_pair", 0x2B5C5C0, 49),
+    "add": (ADD, BASE, 50),
+    "focus_finish": ("<pancake::fusion::focus::FocusAccumulator>::finish", 0x2B434A0, 1),
+    "crop_finalize": ("pancake::job::stream::finish", 0x2B649F0, 1),
+    "prepare_export": ("pancake::image_io::export::prepare_export", 0x2B74B10, 1),
+    "publish_export": ("<pancake::image_io::export::PreparedExport>::publish", 0x2B4D760, 1),
+    "proxy_upload": ("pancake::registration::kernels::upload", 0x2B5C1D0, 50),
+    "focus_filter_submit": ("<pancake::fusion::focus::FocusState>::filter", 0x2B2C5C0, 50),
+    "focus_aggregate_submit": ("pancake::fusion::focus::aggregate::launch", 0x2B793A0, 100),
+    "focus_readback": ("pancake::fusion::buffers::read_image", 0x2B69CB0, 1),
+}
+FIXED_CALLS = {
+    "focus_frame_upload": (0x2B4426F, 0x2B44274),
+    "focus_sync_block_on": (0x2B452BC, 0x2B452C1),
+}
+PARENTS = {
+    "proxy_upload": "proxy",
+    "focus_filter_submit": "add",
+    "focus_aggregate_submit": "focus_filter_submit",
+    "focus_readback": "focus_finish",
+    "focus_frame_upload": "add",
+    "focus_sync_block_on": "add",
+}
+EXPECTED = {label: row[2] for label, row in ENTRIES.items()} | {
+    label: 50 for label in FIXED_CALLS
+}
+
+
+class Ledger:
+    """Match entries and returns by thread, program counter and stack pointer."""
+
+    def __init__(self):
+        self.live = defaultdict(list)
+        self.rows = []
+
+    def parent(self, thread):
+        return self.live[thread][-1]["label"] if self.live[thread] else None
+
+    def enter(self, thread, label, return_pc, return_sp, start):
+        parent = self.parent(thread)
+        self.live[thread].append({
+            "thread": thread, "label": label, "parent": parent,
+            "return_pc": return_pc, "return_sp": return_sp, "start_ns": start,
+        })
+
+    def leave(self, thread, pc, sp, end):
+        closed = False
+        frames = self.live[thread]
+        while frames and (frames[-1]["return_pc"], frames[-1]["return_sp"]) == (pc, sp):
+            frame = frames[-1]
+            if end < frame["start_ns"]:
+                raise ValueError("nonmonotonic trace interval")
+            frames.pop()
+            self.rows.append(frame | {"end_ns": end, "elapsed_ns": end - frame["start_ns"]})
+            closed = True
+        return closed
+
+
+def summarize(rows, expected=EXPECTED):
+    """Check the fixed call roster and preserve nonadditive nested intervals."""
+    counts = Counter(row["label"] for row in rows)
+    if counts != expected:
+        raise ValueError(f"unexpected call counts: {dict(counts)}")
+    parents = defaultdict(set)
+    for row in rows:
+        parents[row["label"]].add(row["parent"])
+    for label in expected:
+        if label in EXPECTED and parents[label] != {PARENTS.get(label)}:
+            raise ValueError(f"unexpected parent for {label}: {parents[label]}")
+    top = sorted((row for row in rows if row["parent"] is None), key=lambda row: row["start_ns"])
+    if any(a["end_ns"] > b["start_ns"] for a, b in zip(top, top[1:])):
+        raise ValueError("top-level intervals overlap")
+    totals = defaultdict(int)
+    for row in rows:
+        totals[row["label"]] += row["elapsed_ns"]
+    return dict(counts), {
+        "top_level_ns": sum(row["elapsed_ns"] for row in top),
+        "by_label_ns": dict(totals),
+    }
+
+
+def main():
+    """Resolve preflight breakpoints without an inferior, or record one routed run."""
+    import gdb
+
+    mode = os.environ["PANCAKE_WEIGHTED_PHASE_MODE"]
+    output = Path(os.environ["PANCAKE_WEIGHTED_PHASE_RECEIPT"])
+    if gdb.selected_inferior().pid:
+        raise ValueError("probe expects an unstarted exact executable")
+    actions = {}
+    inventory = {}
+
+    def static(label, action, expression, elf_address):
+        breakpoint = gdb.Breakpoint(expression, internal=True)
+        locations = breakpoint.locations
+        if len(locations) != 1 or locations[0].address != elf_address:
+            raise ValueError(f"wrong exact ELF location for {label}/{action}")
+        actions[breakpoint.number] = (label, action)
+        inventory[label + "." + action] = elf_address
+
+    for label, (symbol, address, _) in ENTRIES.items():
+        static(label, "entry", f"*'{symbol}'", address)
+    for label, (first, last) in FIXED_CALLS.items():
+        static(label, "call", f"*'{ADD}'+{first - BASE}", first)
+        static(label, "return", f"*'{ADD}'+{last - BASE}", last)
+    receipt = {"mode": mode, "gdb": gdb.VERSION, "elf_locations": inventory}
+    if mode == "preflight":
+        with output.open("x") as stream:
+            json.dump(receipt | {"inferior_pid": gdb.selected_inferior().pid}, stream, indent=2)
+        return
+    if mode != "trace" or os.sched_getaffinity(0) != {15}:
+        raise ValueError("trace requires the preplanned debugger on CPU15")
+    # The inferior gets the same controlled environment as the untraced control.
+    for key in ("PANCAKE_WEIGHTED_PHASE_MODE", "PANCAKE_WEIGHTED_PHASE_RECEIPT"):
+        gdb.execute(f"unset environment {key}")
+
+    ledger = Ledger()
+    dynamic = {}
+    stops = []
+    exits = []
+    handled = 0
+    ignored = 0
+    observer_ns = 0
+    inferior_affinity = None
+
+    def stopped(event):
+        stops.append((time.monotonic_ns(), event))
+
+    def exited(event):
+        exits.append((time.monotonic_ns(), getattr(event, "exit_code", None)))
+
+    gdb.events.stop.connect(stopped)
+    gdb.events.exited.connect(exited)
+    inferior_start = time.monotonic_ns()
+    try:
+        gdb.execute("run")
+        while stops and not exits:
+            observed, event = stops.pop(0)
+            if not isinstance(event, gdb.BreakpointEvent) or len(event.breakpoints) != 1:
+                raise ValueError("unexpected non-phase stop or breakpoint collision")
+            breakpoint = event.breakpoints[0]
+            if inferior_affinity is None:
+                inferior_affinity = sorted(os.sched_getaffinity(gdb.selected_inferior().pid))
+                if inferior_affinity != list(range(15)):
+                    raise ValueError("inferior has incorrect CPU affinity")
+            thread = gdb.selected_thread().global_num
+            pc = gdb.selected_frame().pc()
+            sp = int(gdb.parse_and_eval("$rsp"))
+            handled += 1
+            if handled > 2400:
+                raise ValueError("weighted phase stop roster exceeded its bound")
+            if breakpoint.number in actions:
+                label, action = actions[breakpoint.number]
+                if action == "return":
+                    if not ledger.leave(thread, pc, sp, observed):
+                        raise ValueError(f"unmatched fixed return for {label}")
+                elif label in PARENTS and ledger.parent(thread) != PARENTS[label]:
+                    if label != "proxy_upload":
+                        raise ValueError(f"unexpected dynamic parent for {label}")
+                    ignored += 1
+                elif action == "call":
+                    first, last = FIXED_CALLS[label]
+                    ledger.enter(thread, label, pc + last - first, sp, observed)
+                else:
+                    address = int(gdb.parse_and_eval("*(unsigned long long *) $rsp"))
+                    ledger.enter(thread, label, address, sp + 8, observed)
+                    if address not in dynamic:
+                        dynamic[address] = gdb.Breakpoint(f"*{address:#x}", internal=True)
+            elif pc in dynamic and dynamic[pc].number == breakpoint.number:
+                if not ledger.leave(thread, pc, sp, observed):
+                    ignored += 1
+                if not any(row["return_pc"] == pc for frames in ledger.live.values() for row in frames):
+                    dynamic.pop(pc).delete()
+            else:
+                raise ValueError("breakpoint lacks a defined phase")
+            observer_ns += time.monotonic_ns() - observed
+            gdb.execute("continue")
+
+        if len(exits) != 1 or exits[0][1] != 0 or any(ledger.live.values()):
+            raise ValueError("inferior did not exit cleanly with all phase returns")
+        counts, timings = summarize(ledger.rows)
+        receipt.update({
+            "status": "completed", "inferior_exit": exits[0][1],
+            "inferior_affinity": inferior_affinity, "stops_handled": handled,
+            "ignored_stops": ignored, "observer_callback_wall_ns": observer_ns,
+            "gdb_run_through_inferior_exit_ns": exits[0][0] - inferior_start,
+            "counts": counts, "timings": timings,
+        })
+    except (RuntimeError, ValueError, gdb.error) as error:
+        receipt.update(status="invalid", error=str(error))
+        raise
+    finally:
+        with output.open("x") as stream:
+            json.dump(receipt | {"intervals": ledger.rows}, stream, indent=2)
+
+
+if __name__ == "__main__":
+    main()

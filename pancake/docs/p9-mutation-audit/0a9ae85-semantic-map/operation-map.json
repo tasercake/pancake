@@ -1,0 +1,2073 @@
+{
+  "canonical_source": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "canonical_partition": "9/16",
+  "canonical_archive_revision": "6d0ebb52baa7bc6a6d02e3350c20c7eb32213a5e",
+  "observed_main_snapshot": "54e3a8d60025cf77daa655e5e66781a82f515f7c",
+  "qualified_staged_snapshot": "d5d750560f5884e5f6da0b25dd6186204b06e9df",
+  "follow_up_counts": {
+    "cpu_focused_integrated_at_main_snapshot": 18,
+    "no_qualified_exact_replay_found": 21,
+    "unresolved_timeout": 1,
+    "physical_rtx3090_only": 1,
+    "cpu_focused_qualified_on_staged_line": 5
+  },
+  "canonical_shard_status": "failed; exact historic 108 caught, 45 missed, 1 timeout, 13 unviable",
+  "rows": [
+    {
+      "native_identity": {
+        "file": "src/runtime/mod.rs",
+        "function": {
+          "function_name": "SelectedRuntime::fingerprint",
+          "return_type": "-> &str",
+          "span": {
+            "start": {
+              "line": 171,
+              "column": 5
+            },
+            "end": {
+              "line": 175,
+              "column": 6
+            }
+          }
+        },
+        "genre": "FnValue",
+        "name": "src/runtime/mod.rs:174:9: replace SelectedRuntime::fingerprint -> &str with \"\"",
+        "package": "pancake",
+        "replacement": "\"\"",
+        "span": {
+          "start": {
+            "line": 174,
+            "column": 9
+          },
+          "end": {
+            "line": 174,
+            "column": 26
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "041c9628543852872dc06a0b2d1b208ff908481433ea9109b2f8f5cac266f367",
+      "canonical_native_log": "log/src__runtime__mod.rs_line_174_col_9.log",
+      "semantic_effect": "CPU completion loses the actual compilation fingerprint.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "a78adf3963eec70a6b320faca81857af849298c4",
+        "directory": "pancake/docs/p9-mutation-audit/runtime-fingerprint",
+        "patch_member": "raw-native.tar.gz:survived.patch",
+        "patch_sha256": "041c9628543852872dc06a0b2d1b208ff908481433ea9109b2f8f5cac266f367",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-native.tar.gz:red.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-native.tar.gz:green.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/advanced/mod.rs",
+        "function": {
+          "function_name": "AdvancedAccumulator::reconstruct",
+          "return_type": "-> Result<TensorHandle, String>",
+          "span": {
+            "start": {
+              "line": 270,
+              "column": 5
+            },
+            "end": {
+              "line": 285,
+              "column": 6
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/advanced/mod.rs:280:70: replace < with == in AdvancedAccumulator::reconstruct",
+        "package": "pancake",
+        "replacement": "==",
+        "span": {
+          "start": {
+            "line": 280,
+            "column": 70
+          },
+          "end": {
+            "line": 280,
+            "column": 71
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "8db5e812cca870274bd40980fd7b99612a2e2325b21c4a7f859905400e61d9a3",
+      "canonical_native_log": "log/src__fusion__advanced__mod.rs_line_280_col_70.log",
+      "semantic_effect": "Hybrid applies sharp-band treatment to the wrong frequency levels.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "d95e162d54ba1b563f10349a2720cec9020800b0",
+        "directory": "pancake/docs/p9-mutation-audit/hybrid-fine-band-0a9ae85",
+        "patch_member": "raw-native.tar.gz:exact-mutant.diff",
+        "patch_sha256": "142efd037b8833e7975d902e8743b32e084486ad541b0081e50b45e041914a8e",
+        "patch_comparison": "same_stock_blob_and_single_replacement_git_diff",
+        "mutated_exit_locator": "raw-native.tar.gz:mutant-final-red.exit",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-native.tar.gz:stock-final-green.exit",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/focus.rs",
+        "function": {
+          "function_name": "sum_rows",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 304,
+              "column": 1
+            },
+            "end": {
+              "line": 316,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/focus.rs:313:26: replace + with * in sum_rows",
+        "package": "pancake",
+        "replacement": "*",
+        "span": {
+          "start": {
+            "line": 313,
+            "column": 26
+          },
+          "end": {
+            "line": 313,
+            "column": 27
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "82c9ccc7d1d3433915da3a5f7561ddb74585ed973b1aa07c71e199fbd9638f8e",
+      "canonical_native_log": "log/src__fusion__focus.rs_line_313_col_26.log",
+      "semantic_effect": "Sharpness samples the wrong values when summing a row.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "6816ca7354344cfbec82033560b842186f971492",
+        "directory": "pancake/docs/p9-mutation-audit/0a9ae85-sharpness-row",
+        "patch_member": "native-capture.tar.gz:original.diff",
+        "patch_sha256": "82c9ccc7d1d3433915da3a5f7561ddb74585ed973b1aa07c71e199fbd9638f8e",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "native-capture.tar.gz:mutant.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "native-capture.tar.gz:stock.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/focus.rs",
+        "function": {
+          "function_name": "focus_energy",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 369,
+              "column": 1
+            },
+            "end": {
+              "line": 394,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/focus.rs:387:43: replace * with / in focus_energy",
+        "package": "pancake",
+        "replacement": "/",
+        "span": {
+          "start": {
+            "line": 387,
+            "column": 43
+          },
+          "end": {
+            "line": 387,
+            "column": 44
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "9a9fc9804d742e6ad48d5484dfafaf6c15fc6143f13ee8ccefb3934b79ec6afa",
+      "canonical_native_log": "log/src__fusion__focus.rs_line_387_col_43.log",
+      "semantic_effect": "Sharpness uses the wrong reflected lower-neighbor row.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "6816ca7354344cfbec82033560b842186f971492",
+        "directory": "pancake/docs/p9-mutation-audit/0a9ae85-sharpness-row",
+        "patch_member": "native-capture.tar.gz:vertical-original.diff",
+        "patch_sha256": "9a9fc9804d742e6ad48d5484dfafaf6c15fc6143f13ee8ccefb3934b79ec6afa",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "native-capture.tar.gz:vertical-mutant.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "native-capture.tar.gz:stock-after-vertical.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/focus.rs",
+        "function": {
+          "function_name": "aggregate",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 396,
+              "column": 1
+            },
+            "end": {
+              "line": 435,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/focus.rs:428:19: replace != with == in aggregate",
+        "package": "pancake",
+        "replacement": "==",
+        "span": {
+          "start": {
+            "line": 428,
+            "column": 19
+          },
+          "end": {
+            "line": 428,
+            "column": 21
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "f3a44fb8f9c1e3efad8c5f24172251bbf5913270986d90b1dc43b1cc5472b826",
+      "canonical_native_log": "log/src__fusion__focus.rs_line_428_col_19.log",
+      "semantic_effect": "Box-filter normalization condition inverts. The separate accumulation predicate is unchanged.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "1bb2803fc5435a68fa2080b0d33557fc5a755054",
+        "directory": "pancake/docs/p9-mutation-audit/0a9ae85-focus-box-normalization",
+        "patch_member": "archived-mutant.diff.gz",
+        "patch_sha256": "f3a44fb8f9c1e3efad8c5f24172251bbf5913270986d90b1dc43b1cc5472b826",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "red-full-target.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "green.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/image_io/npy.rs",
+        "function": {
+          "function_name": "read_header",
+          "return_type": "-> Result<String, String>",
+          "span": {
+            "start": {
+              "line": 130,
+              "column": 1
+            },
+            "end": {
+              "line": 169,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/image_io/npy.rs:157:15: replace > with >= in read_header",
+        "package": "pancake",
+        "replacement": ">=",
+        "span": {
+          "start": {
+            "line": 157,
+            "column": 15
+          },
+          "end": {
+            "line": 157,
+            "column": 16
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "55d5e9cb48ddf419fbb9290631bce95fdd8fc6fa16a3b31d8b23766dba819065",
+      "canonical_native_log": "log/src__image_io__npy.rs_line_157_col_15.log",
+      "semantic_effect": "A complete NumPy header at the inclusive limit is rejected.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "30004f1eb4fe92026ec2edb90d93a185653cc800",
+        "directory": "pancake/docs/p9-mutation-audit/npy-v2-limit",
+        "patch_member": "raw-native.tar.gz:survived.patch",
+        "patch_sha256": "55d5e9cb48ddf419fbb9290631bce95fdd8fc6fa16a3b31d8b23766dba819065",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-native.tar.gz:red.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-native.tar.gz:green.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/image_io/raw.rs",
+        "function": {
+          "function_name": "decode",
+          "return_type": "-> Result<RgbImage, String>",
+          "span": {
+            "start": {
+              "line": 54,
+              "column": 1
+            },
+            "end": {
+              "line": 80,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/image_io/raw.rs:70:14: replace > with == in decode",
+        "package": "pancake",
+        "replacement": "==",
+        "span": {
+          "start": {
+            "line": 70,
+            "column": 14
+          },
+          "end": {
+            "line": 70,
+            "column": 15
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "5219ec8fae90421aeed061c7719b3b4ea58ea589ca6d34e24a72b86d159267f6",
+      "canonical_native_log": "log/src__image_io__raw.rs_line_70_col_14.log",
+      "semantic_effect": "A valid camera RAW exactly at the inclusive encoded-size limit is rejected after reading.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "ec7667428af4260842a7c5eaf9c00f811c6aacf0",
+        "directory": "pancake/docs/p9-mutation-audit/0a9ae85-raw-encoded-limit",
+        "patch_member": "native-capture.tar.gz:original.diff",
+        "patch_sha256": "5219ec8fae90421aeed061c7719b3b4ea58ea589ca6d34e24a72b86d159267f6",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "native-capture.tar.gz:mutant.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "native-capture.tar.gz:stock-suite.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/job/registration.rs",
+        "function": {
+          "function_name": "Alignment::estimate",
+          "return_type": "-> Result<(SourceMap, Option<ResidentRgb>), JobError>",
+          "span": {
+            "start": {
+              "line": 160,
+              "column": 5
+            },
+            "end": {
+              "line": 238,
+              "column": 6
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/job/registration.rs:213:35: replace == with != in Alignment::estimate",
+        "package": "pancake",
+        "replacement": "!=",
+        "span": {
+          "start": {
+            "line": 213,
+            "column": 35
+          },
+          "end": {
+            "line": 213,
+            "column": 37
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "c5ece2e76c3a9a1fa746d45a66b5076622d82a6836f9c072f9657472841f00d7",
+      "canonical_native_log": "log/src__job__registration.rs_line_213_col_35.log",
+      "semantic_effect": "Previous-frame mode loses the relative transform and updates the wrong reference chain.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "13f0933782f86c17fa06d802f4b6ffa0c095b060",
+        "directory": "pancake/docs/p9-mutation-audit/previous-reference-sequence",
+        "patch_member": "native.diff",
+        "patch_sha256": "c5ece2e76c3a9a1fa746d45a66b5076622d82a6836f9c072f9657472841f00d7",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "mutant.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "original.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/job/stream.rs",
+        "function": {
+          "function_name": "process",
+          "return_type": "-> Result<Product, JobError>",
+          "span": {
+            "start": {
+              "line": 182,
+              "column": 1
+            },
+            "end": {
+              "line": 276,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/job/stream.rs:199:31: replace == with != in process",
+        "package": "pancake",
+        "replacement": "!=",
+        "span": {
+          "start": {
+            "line": 199,
+            "column": 31
+          },
+          "end": {
+            "line": 199,
+            "column": 33
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "e94307b97fadc0716aa9798ae32b2faef1d409457cc926e551ac5e6e49291274",
+      "canonical_native_log": "log/src__job__stream.rs_line_199_col_31.log",
+      "semantic_effect": "Slab policy keeps the wrong normalized input allocation alive at the CPU boundary.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "981699297d052eb573eb10522f85b1c0aace859b",
+        "directory": "pancake/docs/p9-mutation-audit/0a9ae85-resident-rgb-retention",
+        "patch_member": "raw-records.tar.gz:./0a9ae85-exact-mutant.diff",
+        "patch_sha256": "e94307b97fadc0716aa9798ae32b2faef1d409457cc926e551ac5e6e49291274",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-records.tar.gz:./final-exact-mutant/exit.txt",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-records.tar.gz:./final-restored-stock/exit.txt",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/job/worker.rs",
+        "function": {
+          "function_name": "StackWorker::take_result",
+          "return_type": "-> Result<Option<Result<StackResult, String>>, String>",
+          "span": {
+            "start": {
+              "line": 140,
+              "column": 5
+            },
+            "end": {
+              "line": 161,
+              "column": 6
+            }
+          }
+        },
+        "genre": "MatchArmGuard",
+        "name": "src/job/worker.rs:153:28: replace match guard outcome.generation == generation with true in StackWorker::take_result",
+        "package": "pancake",
+        "replacement": "true",
+        "span": {
+          "start": {
+            "line": 153,
+            "column": 28
+          },
+          "end": {
+            "line": 153,
+            "column": 60
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "a51c5bcf77a122b65ee8abd9b546c19b60764779d2ab08f562b4adb1ff487fa9",
+      "canonical_native_log": "log/src__job__worker.rs_line_153_col_28.log",
+      "semantic_effect": "A stale completion can bypass the actual worker channel's generation check.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "5edc4b85ae70c5f6e3b063d41502cc3df605cdf9",
+        "directory": "pancake/docs/p9-mutation-audit/worker-generation-0a9ae85",
+        "patch_member": "raw-records.tar.gz:./saved-mutant.diff",
+        "patch_sha256": "a51c5bcf77a122b65ee8abd9b546c19b60764779d2ab08f562b4adb1ff487fa9",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-records.tar.gz:./red.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-records.tar.gz:./green.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/estimate.rs",
+        "function": {
+          "function_name": "estimate_pair",
+          "return_type": "-> Result<Estimate, String>",
+          "span": {
+            "start": {
+              "line": 180,
+              "column": 1
+            },
+            "end": {
+              "line": 269,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/estimate.rs:243:27: replace == with != in estimate_pair",
+        "package": "pancake",
+        "replacement": "!=",
+        "span": {
+          "start": {
+            "line": 243,
+            "column": 27
+          },
+          "end": {
+            "line": 243,
+            "column": 29
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "a0023649aaf27be05c34afc4f694e70f98fddf20ef2f6bdc258259569c1d0b64",
+      "canonical_native_log": "log/src__registration__estimate.rs_line_243_col_27.log",
+      "semantic_effect": "Breathing loses its fitted-scale cap.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "152e8784635957a21f81ed10852621f3bc46bbe1",
+        "directory": "pancake/docs/p9-mutation-audit/breathing-clamp",
+        "patch_member": "raw-native.tar.gz:survived.patch",
+        "patch_sha256": "a0023649aaf27be05c34afc4f694e70f98fddf20ef2f6bdc258259569c1d0b64",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-native.tar.gz:red.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-native.tar.gz:green.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/estimate.rs",
+        "function": {
+          "function_name": "Coordinates::convert",
+          "return_type": "-> Result<Affine, String>",
+          "span": {
+            "start": {
+              "line": 298,
+              "column": 5
+            },
+            "end": {
+              "line": 320,
+              "column": 6
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/estimate.rs:311:23: replace - with / in Coordinates::convert",
+        "package": "pancake",
+        "replacement": "/",
+        "span": {
+          "start": {
+            "line": 311,
+            "column": 23
+          },
+          "end": {
+            "line": 311,
+            "column": 24
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "87a8e6455e37fe870a662a62d2f13537becfe81c06916533fc42832966f3f336",
+      "canonical_native_log": "log/src__registration__estimate.rs_line_311_col_23.log",
+      "semantic_effect": "Euclidean transform does not preserve unit-length orthogonal basis vectors.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "7ca5cf9fd280ce0d40106ead43c2f67102067f4e",
+        "directory": "pancake/docs/p9-mutation-audit/estimator-geometry-0a9ae85/euclidean",
+        "patch_member": "saved.diff",
+        "patch_sha256": "87a8e6455e37fe870a662a62d2f13537becfe81c06916533fc42832966f3f336",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "red.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "green.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/estimate.rs",
+        "function": {
+          "function_name": "seed",
+          "return_type": "-> Result<(Parameters, bool), String>",
+          "span": {
+            "start": {
+              "line": 323,
+              "column": 1
+            },
+            "end": {
+              "line": 365,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/estimate.rs:362:85: replace - with + in seed",
+        "package": "pancake",
+        "replacement": "+",
+        "span": {
+          "start": {
+            "line": 362,
+            "column": 85
+          },
+          "end": {
+            "line": 362,
+            "column": 86
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "c8b2076ebebf79d3ab7bb30d14644db583ba40a2797d1e719365d8e52476ed5b",
+      "canonical_native_log": "log/src__registration__estimate.rs_line_362_col_85.log",
+      "semantic_effect": "Distant near-equal strong peak no longer triggers ambiguity rejection.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "fcc467c222e2ba85c15afb6bc0742971957364c9",
+        "directory": "pancake/docs/p9-mutation-audit/near-equal-registration-peak",
+        "patch_member": "native.diff.gz",
+        "patch_sha256": "c8b2076ebebf79d3ab7bb30d14644db583ba40a2797d1e719365d8e52476ed5b",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "mutant.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "original.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/estimate.rs",
+        "function": {
+          "function_name": "Refiner<'_>::improve",
+          "return_type": "-> Result<Option<(Parameters, f32)>, String>",
+          "span": {
+            "start": {
+              "line": 424,
+              "column": 5
+            },
+            "end": {
+              "line": 478,
+              "column": 6
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/estimate.rs:453:29: replace > with >= in Refiner<'_>::improve",
+        "package": "pancake",
+        "replacement": ">=",
+        "span": {
+          "start": {
+            "line": 453,
+            "column": 29
+          },
+          "end": {
+            "line": 453,
+            "column": 30
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "6777a08943e2499b4f229546a4b4add18ef158358d359297a1cbd87b08cb35fc",
+      "canonical_native_log": "log/src__registration__estimate.rs_line_453_col_29.log",
+      "semantic_effect": "Zero-curvature equal-score probes select the opposite fallback direction. No public difference or equivalence established.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/estimate.rs",
+        "function": {
+          "function_name": "is_plausible",
+          "return_type": "-> bool",
+          "span": {
+            "start": {
+              "line": 481,
+              "column": 1
+            },
+            "end": {
+              "line": 495,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/estimate.rs:494:45: replace * with / in is_plausible",
+        "package": "pancake",
+        "replacement": "/",
+        "span": {
+          "start": {
+            "line": 494,
+            "column": 45
+          },
+          "end": {
+            "line": 494,
+            "column": 46
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "65cd89d555886e762ef289a5009ec86c9a33d938181bdaa9d2b3fa9723b138df",
+      "canonical_native_log": "log/src__registration__estimate.rs_line_494_col_45.log",
+      "semantic_effect": "Translation plausibility admits a substantially larger displacement.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "f970ddb461fcf0a1fc0fabad339bc2b3952baf40",
+        "directory": "pancake/docs/p9-mutation-audit/estimator-geometry-0a9ae85/radius",
+        "patch_member": "saved.diff.gz",
+        "patch_sha256": "65cd89d555886e762ef289a5009ec86c9a33d938181bdaa9d2b3fa9723b138df",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "red.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "green.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/geometry.rs",
+        "function": {
+          "function_name": "Affine::inverse",
+          "return_type": "-> Result<Self, String>",
+          "span": {
+            "start": {
+              "line": 58,
+              "column": 5
+            },
+            "end": {
+              "line": 81,
+              "column": 6
+            }
+          }
+        },
+        "genre": "UnaryOperator",
+        "name": "src/registration/geometry.rs:76:17: delete - in Affine::inverse",
+        "package": "pancake",
+        "replacement": "",
+        "span": {
+          "start": {
+            "line": 76,
+            "column": 17
+          },
+          "end": {
+            "line": 76,
+            "column": 18
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "57e49debb2d580346bf0e45fae48cad1a10395577eca5ef15d379d4acb23ecf4",
+      "canonical_native_log": "log/src__registration__geometry.rs_line_76_col_17.log",
+      "semantic_effect": "Inverse has the wrong signed lower-left coefficient for a shear.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "f2e23f9c89d53f2fe8a9820b312a9d167b6b4c63",
+        "directory": "pancake/docs/p9-mutation-audit/0a9ae85-p5-geometry",
+        "patch_member": "native-capture.tar.gz:inverse.diff",
+        "patch_sha256": "57e49debb2d580346bf0e45fae48cad1a10395577eca5ef15d379d4acb23ecf4",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "native-capture.tar.gz:inverse.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "native-capture.tar.gz:stock-after-inverse.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/geometry.rs",
+        "function": {
+          "function_name": "symmetric_crop",
+          "return_type": "-> Result<Bounds, String>",
+          "span": {
+            "start": {
+              "line": 249,
+              "column": 1
+            },
+            "end": {
+              "line": 279,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/geometry.rs:265:41: replace - with / in symmetric_crop",
+        "package": "pancake",
+        "replacement": "/",
+        "span": {
+          "start": {
+            "line": 265,
+            "column": 41
+          },
+          "end": {
+            "line": 265,
+            "column": 42
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "b9752f19a9210106e2e97d7349d4bb4827e714343bf966025a891f3da7540f60",
+      "canonical_native_log": "log/src__registration__geometry.rs_line_265_col_41.log",
+      "semantic_effect": "Crop uses a corner past the final pixel center.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "f2e23f9c89d53f2fe8a9820b312a9d167b6b4c63",
+        "directory": "pancake/docs/p9-mutation-audit/0a9ae85-p5-geometry",
+        "patch_member": "native-capture.tar.gz:crop.diff",
+        "patch_sha256": "b9752f19a9210106e2e97d7349d4bb4827e714343bf966025a891f3da7540f60",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "native-capture.tar.gz:crop.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "native-capture.tar.gz:stock-after-crop.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/kernels.rs",
+        "function": {
+          "function_name": "Pair::correlate",
+          "return_type": "-> Result<Vec<f32>, String>",
+          "span": {
+            "start": {
+              "line": 215,
+              "column": 5
+            },
+            "end": {
+              "line": 285,
+              "column": 6
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/kernels.rs:236:34: replace * with + in Pair::correlate",
+        "package": "pancake",
+        "replacement": "+",
+        "span": {
+          "start": {
+            "line": 236,
+            "column": 34
+          },
+          "end": {
+            "line": 236,
+            "column": 35
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "a055863557d50a0d1194c0f339ebeb2c6683fbb3bb35b9ea1a68a4f7ade1923a",
+      "canonical_native_log": "log/src__registration__kernels.rs_line_236_col_34.log",
+      "semantic_effect": "Symmetric vertical correlation crop becomes h - border_y + 2, changing sampled rows.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/kernels.rs",
+        "function": {
+          "function_name": "pearson",
+          "return_type": "-> f32",
+          "span": {
+            "start": {
+              "line": 288,
+              "column": 1
+            },
+            "end": {
+              "line": 314,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/kernels.rs:309:26: replace * with / in pearson",
+        "package": "pancake",
+        "replacement": "/",
+        "span": {
+          "start": {
+            "line": 309,
+            "column": 26
+          },
+          "end": {
+            "line": 309,
+            "column": 27
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "52715b861ea943962c92f1ecc02f8dec3e4fed9586fd954dec53aaf077cb9af7",
+      "canonical_native_log": "log/src__registration__kernels.rs_line_309_col_26.log",
+      "semantic_effect": "Near-flat reference can pass the Pearson variance floor.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "a14bcc28767a9fa3a7d538bd2d5a3e9a3ce8302f",
+        "directory": "pancake/docs/p9-mutation-audit/pearson-variance-0a9ae85",
+        "patch_member": "saved.diff.gz",
+        "patch_sha256": "52715b861ea943962c92f1ecc02f8dec3e4fed9586fd954dec53aaf077cb9af7",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "identities.json#status.red",
+        "mutated_exit": 101,
+        "restored_exit_locator": "identities.json#status.green",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/kernels.rs",
+        "function": {
+          "function_name": "smooth_luma",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 378,
+              "column": 1
+            },
+            "end": {
+              "line": 404,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/kernels.rs:395:32: replace + with - in smooth_luma",
+        "package": "pancake",
+        "replacement": "-",
+        "span": {
+          "start": {
+            "line": 395,
+            "column": 32
+          },
+          "end": {
+            "line": 395,
+            "column": 33
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "166658aa691771e4fe96d1c56cb1d1488535ce254758ed0f6590483d7030524e",
+      "canonical_native_log": "log/src__registration__kernels.rs_line_395_col_32.log",
+      "semantic_effect": "Horizontal luma neighbor lattice uses the wrong offset direction.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/kernels.rs",
+        "function": {
+          "function_name": "smooth_luma",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 378,
+              "column": 1
+            },
+            "end": {
+              "line": 404,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/kernels.rs:400:36: replace * with + in smooth_luma",
+        "package": "pancake",
+        "replacement": "+",
+        "span": {
+          "start": {
+            "line": 400,
+            "column": 36
+          },
+          "end": {
+            "line": 400,
+            "column": 37
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "adae02a5dc08babc9f8b58a5ace71f01909d1b90609bed20cb928818df578ac6",
+      "canonical_native_log": "log/src__registration__kernels.rs_line_400_col_36.log",
+      "semantic_effect": "Separable luma binomial weights can change constants and linear ramps.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/spectral.rs",
+        "function": {
+          "function_name": "dominant_peak",
+          "return_type": "-> Result<Option<[f32; 2]>, String>",
+          "span": {
+            "start": {
+              "line": 119,
+              "column": 1
+            },
+            "end": {
+              "line": 158,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/spectral.rs:146:17: replace < with == in dominant_peak",
+        "package": "pancake",
+        "replacement": "==",
+        "span": {
+          "start": {
+            "line": 146,
+            "column": 17
+          },
+          "end": {
+            "line": 146,
+            "column": 18
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "2d46d2a9bbce44821911e1215cdda9100055ceadfc573c0e946c7fd51582e279",
+      "canonical_native_log": "log/src__registration__spectral.rs_line_146_col_17.log",
+      "semantic_effect": "Weak, unique spectral peak is reported as a displacement.",
+      "follow_up": {
+        "disposition": "cpu_focused_integrated_at_main_snapshot",
+        "evidence_revision": "24649aba2bb165d5b77ce5082dea0b09ca2bd9ac",
+        "directory": "pancake/docs/p9-mutation-audit/spectral-weak-peak",
+        "patch_member": "native-raw.tar.gz:./survived.patch",
+        "patch_sha256": "2d46d2a9bbce44821911e1215cdda9100055ceadfc573c0e946c7fd51582e279",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "native-raw.tar.gz:./red.status",
+        "mutated_exit": 101,
+        "restored_exit_locator": "native-raw.tar.gz:./green.status",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/spectral.rs",
+        "function": {
+          "function_name": "window_luma",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 160,
+              "column": 1
+            },
+            "end": {
+              "line": 203,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/spectral.rs:194:39: replace + with - in window_luma",
+        "package": "pancake",
+        "replacement": "-",
+        "span": {
+          "start": {
+            "line": 194,
+            "column": 39
+          },
+          "end": {
+            "line": 194,
+            "column": 40
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "88ed20190701de762fdacb09f041e8d6dcf0043e7ddca7952a2c7756968d449c",
+      "canonical_native_log": "log/src__registration__spectral.rs_line_194_col_39.log",
+      "semantic_effect": "FFT input window duplicates the left neighbor and drops the right.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/spectral.rs",
+        "function": {
+          "function_name": "window_luma",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 160,
+              "column": 1
+            },
+            "end": {
+              "line": 203,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/spectral.rs:199:45: replace * with + in window_luma",
+        "package": "pancake",
+        "replacement": "+",
+        "span": {
+          "start": {
+            "line": 199,
+            "column": 45
+          },
+          "end": {
+            "line": 199,
+            "column": 46
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "7f4725f50afb74de5ebcac37e60039e01ad1ad99689bebe7efb861030b965250",
+      "canonical_native_log": "log/src__registration__spectral.rs_line_199_col_45.log",
+      "semantic_effect": "FFT taper contributes a spurious additive term to the windowed Laplacian.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/spectral.rs",
+        "function": {
+          "function_name": "cell",
+          "return_type": "-> usize",
+          "span": {
+            "start": {
+              "line": 219,
+              "column": 1
+            },
+            "end": {
+              "line": 227,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/spectral.rs:223:23: replace + with - in cell",
+        "package": "pancake",
+        "replacement": "-",
+        "span": {
+          "start": {
+            "line": 223,
+            "column": 23
+          },
+          "end": {
+            "line": 223,
+            "column": 24
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "5b7a3e7cb0631b5cb9b2f781ffdcf9969213c95f2471344167fd2e7c7d9ed466",
+      "canonical_native_log": "log/src__registration__spectral.rs_line_223_col_23.log",
+      "semantic_effect": "Vertical FFT selects the wrong complex column and can underflow for the first row.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/spectral.rs",
+        "function": {
+          "function_name": "fft_lines",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 229,
+              "column": 1
+            },
+            "end": {
+              "line": 278,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/spectral.rs:259:32: replace + with - in fft_lines",
+        "package": "pancake",
+        "replacement": "-",
+        "span": {
+          "start": {
+            "line": 259,
+            "column": 32
+          },
+          "end": {
+            "line": 259,
+            "column": 33
+          }
+        }
+      },
+      "canonical_disposition": "Timeout",
+      "canonical_patch_sha256": "288f5686dac4032a7ba3275dff806b258331c9e281f04966b737839fc0ac20f5",
+      "canonical_native_log": "log/src__registration__spectral.rs_line_259_col_32.log",
+      "semantic_effect": "FFT butterfly second index can underflow. Original Build succeeded, Test timed out.",
+      "follow_up": {
+        "disposition": "unresolved_timeout"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/registration/spectral.rs",
+        "function": {
+          "function_name": "cross_phase",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 280,
+              "column": 1
+            },
+            "end": {
+              "line": 298,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/registration/spectral.rs:289:68: replace * with / in cross_phase",
+        "package": "pancake",
+        "replacement": "/",
+        "span": {
+          "start": {
+            "line": 289,
+            "column": 68
+          },
+          "end": {
+            "line": 289,
+            "column": 69
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "d2c787dbdd377c0cacc707a122d7dea59147dcd4f8a1b30e2688b55252f70a57",
+      "canonical_native_log": "log/src__registration__spectral.rs_line_289_col_68.log",
+      "semantic_effect": "Complex cross-power dot product is nonphysical for nonzero imaginary operands.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/runtime/portable.rs",
+        "function": {
+          "function_name": "prepare_wgpu_runtime",
+          "return_type": "-> Result<SelectedRuntime, String>",
+          "span": {
+            "start": {
+              "line": 19,
+              "column": 1
+            },
+            "end": {
+              "line": 70,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/runtime/portable.rs:38:85: replace == with != in prepare_wgpu_runtime",
+        "package": "pancake",
+        "replacement": "!=",
+        "span": {
+          "start": {
+            "line": 38,
+            "column": 85
+          },
+          "end": {
+            "line": 38,
+            "column": 87
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "6611ef0d4a09ab11607368613526d57467bb581b67a7b16e9a47d094db1e4f9f",
+      "canonical_native_log": "log/src__runtime__portable.rs_line_38_col_85.log",
+      "semantic_effect": "An explicitly absent Vulkan ordinal can run physical work on ordinal zero.",
+      "follow_up": {
+        "disposition": "physical_rtx3090_only",
+        "evidence_revision": "d5d750560f5884e5f6da0b25dd6186204b06e9df",
+        "directory": "pancake/docs/p9-mutation-audit/0a9ae85-vulkan-ordinal",
+        "patch_member": "raw-records.tar.gz:./0a9ae85-exact-mutant.diff",
+        "patch_sha256": "6611ef0d4a09ab11607368613526d57467bb581b67a7b16e9a47d094db1e4f9f",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-records.tar.gz:./physical/exact-mutant/exit.txt",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-records.tar.gz:./physical/restored-stock/exit.txt",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/advanced/pyramid.rs",
+        "function": {
+          "function_name": "half_value",
+          "return_type": "-> f32",
+          "span": {
+            "start": {
+              "line": 111,
+              "column": 1
+            },
+            "end": {
+              "line": 148,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/advanced/pyramid.rs:123:21: replace / with % in half_value",
+        "package": "pancake",
+        "replacement": "%",
+        "span": {
+          "start": {
+            "line": 123,
+            "column": 21
+          },
+          "end": {
+            "line": 123,
+            "column": 22
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "6553acd439aba9dae87a752c49ffc524bdb45eacbf34561c15e33bca3df35f2b",
+      "canonical_native_log": "log/src__fusion__advanced__pyramid.rs_line_123_col_21.log",
+      "semantic_effect": "Pixel row uses channel remainder, folding multiple rows onto row zero in the tested layout.",
+      "follow_up": {
+        "disposition": "cpu_focused_qualified_on_staged_line",
+        "evidence_revision": "d2b92ecd5d120d4039a25743cf378d5caa9e9952",
+        "directory": "pancake/docs/p9-mutation-audit/pyramid-axis-0a9ae85",
+        "patch_member": "raw-native.tar.gz:exact-row-mutant.diff",
+        "patch_sha256": "6553acd439aba9dae87a752c49ffc524bdb45eacbf34561c15e33bca3df35f2b",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-native.tar.gz:row-native.exit",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-native.tar.gz:stock-native.exit",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/advanced/pyramid.rs",
+        "function": {
+          "function_name": "expanded",
+          "return_type": "-> f32",
+          "span": {
+            "start": {
+              "line": 162,
+              "column": 1
+            },
+            "end": {
+              "line": 185,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/advanced/pyramid.rs:177:32: replace * with / in expanded",
+        "package": "pancake",
+        "replacement": "/",
+        "span": {
+          "start": {
+            "line": 177,
+            "column": 32
+          },
+          "end": {
+            "line": 177,
+            "column": 33
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "6b4c4d67a7938107552ab706d0bf194d97839338ab691efc233f600752591779",
+      "canonical_native_log": "log/src__fusion__advanced__pyramid.rs_line_177_col_32.log",
+      "semantic_effect": "Top-right interpolation sample can read the wrong coarse row.",
+      "follow_up": {
+        "disposition": "cpu_focused_qualified_on_staged_line",
+        "evidence_revision": "d2b92ecd5d120d4039a25743cf378d5caa9e9952",
+        "directory": "pancake/docs/p9-mutation-audit/pyramid-axis-0a9ae85",
+        "patch_member": "raw-native.tar.gz:exact-top-right-mutant.diff",
+        "patch_sha256": "6b4c4d67a7938107552ab706d0bf194d97839338ab691efc233f600752591779",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-native.tar.gz:top-right-native.exit",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-native.tar.gz:stock-native.exit",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/advanced/pyramid.rs",
+        "function": {
+          "function_name": "expanded",
+          "return_type": "-> f32",
+          "span": {
+            "start": {
+              "line": 162,
+              "column": 1
+            },
+            "end": {
+              "line": 185,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/advanced/pyramid.rs:179:35: replace * with / in expanded",
+        "package": "pancake",
+        "replacement": "/",
+        "span": {
+          "start": {
+            "line": 179,
+            "column": 35
+          },
+          "end": {
+            "line": 179,
+            "column": 36
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "20a2ca297ee69d9f68770d7e07f7a7847f7b619df655ec413ab7116537695146",
+      "canonical_native_log": "log/src__fusion__advanced__pyramid.rs_line_179_col_35.log",
+      "semantic_effect": "Bottom-right interpolation sample can read the wrong coarse row.",
+      "follow_up": {
+        "disposition": "cpu_focused_qualified_on_staged_line",
+        "evidence_revision": "d2b92ecd5d120d4039a25743cf378d5caa9e9952",
+        "directory": "pancake/docs/p9-mutation-audit/pyramid-axis-0a9ae85",
+        "patch_member": "raw-native.tar.gz:exact-bottom-right-mutant.diff",
+        "patch_sha256": "20a2ca297ee69d9f68770d7e07f7a7847f7b619df655ec413ab7116537695146",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-native.tar.gz:bottom-right-native.exit",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-native.tar.gz:stock-native.exit",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/advanced/pyramid.rs",
+        "function": {
+          "function_name": "expanded",
+          "return_type": "-> f32",
+          "span": {
+            "start": {
+              "line": 162,
+              "column": 1
+            },
+            "end": {
+              "line": 185,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/advanced/pyramid.rs:183:30: replace + with * in expanded",
+        "package": "pancake",
+        "replacement": "*",
+        "span": {
+          "start": {
+            "line": 183,
+            "column": 30
+          },
+          "end": {
+            "line": 183,
+            "column": 31
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "7d7ccbd61f458b9d480a267a69171c10bc227c293091243313ea845208e5270a",
+      "canonical_native_log": "log/src__fusion__advanced__pyramid.rs_line_183_col_30.log",
+      "semantic_effect": "Bottom horizontal interpolation multiplies the base rather than adding the weighted delta.",
+      "follow_up": {
+        "disposition": "cpu_focused_qualified_on_staged_line",
+        "evidence_revision": "d2b92ecd5d120d4039a25743cf378d5caa9e9952",
+        "directory": "pancake/docs/p9-mutation-audit/pyramid-axis-0a9ae85",
+        "patch_member": "raw-native.tar.gz:exact-bottom-lerp-mutant.diff",
+        "patch_sha256": "7d7ccbd61f458b9d480a267a69171c10bc227c293091243313ea845208e5270a",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "raw-native.tar.gz:bottom-lerp-native.exit",
+        "mutated_exit": 101,
+        "restored_exit_locator": "raw-native.tar.gz:stock-native.exit",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/advanced/weights.rs",
+        "function": {
+          "function_name": "luma",
+          "return_type": "-> f32",
+          "span": {
+            "start": {
+              "line": 64,
+              "column": 1
+            },
+            "end": {
+              "line": 69,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/advanced/weights.rs:68:53: replace + with - in luma",
+        "package": "pancake",
+        "replacement": "-",
+        "span": {
+          "start": {
+            "line": 68,
+            "column": 53
+          },
+          "end": {
+            "line": 68,
+            "column": 54
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "529f05debae02dd93584195fe72f986cd1220a1e95b8519a3613bbd6c3db47b6",
+      "canonical_native_log": "log/src__fusion__advanced__weights.rs_line_68_col_53.log",
+      "semantic_effect": "Blue detail subtracts from Rec.601 luminance contrast.",
+      "follow_up": {
+        "disposition": "cpu_focused_qualified_on_staged_line",
+        "evidence_revision": "9a82cd1f95eff10cbefa9c2bb81c904c4409af8e",
+        "directory": "pancake/docs/p9-mutation-audit/advanced-blue-luma-0a9ae85",
+        "patch_member": "saved.diff.gz",
+        "patch_sha256": "529f05debae02dd93584195fe72f986cd1220a1e95b8519a3613bbd6c3db47b6",
+        "patch_comparison": "identical_patch_bytes",
+        "mutated_exit_locator": "identities.json#status.red",
+        "mutated_exit": 101,
+        "restored_exit_locator": "identities.json#status.green",
+        "restored_exit": 0
+      }
+    },
+    {
+      "native_identity": {
+        "file": "src/fusion/advanced/weights.rs",
+        "function": {
+          "function_name": "measure",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 71,
+              "column": 1
+            },
+            "end": {
+              "line": 111,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "src/fusion/advanced/weights.rs:97:36: replace + with * in measure",
+        "package": "pancake",
+        "replacement": "*",
+        "span": {
+          "start": {
+            "line": 97,
+            "column": 36
+          },
+          "end": {
+            "line": 97,
+            "column": 37
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "3597e3f6b7f914df84fd8bc67cf46c7e3fbc29a02e08e2ddaa3992359c740477",
+      "canonical_native_log": "log/src__fusion__advanced__weights.rs_line_97_col_36.log",
+      "semantic_effect": "Exposure contrast replaces the signed-axis sum with a product, erasing one-axis contrast.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/delivery/mod.rs",
+        "function": {
+          "function_name": "viewport",
+          "return_type": "-> Result<RgbImage, Box<dyn Error>>",
+          "span": {
+            "start": {
+              "line": 41,
+              "column": 1
+            },
+            "end": {
+              "line": 102,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "crates/pancake-gui/src/delivery/mod.rs:78:34: replace || with && in viewport",
+        "package": "pancake-gui",
+        "replacement": "&&",
+        "span": {
+          "start": {
+            "line": 78,
+            "column": 34
+          },
+          "end": {
+            "line": 78,
+            "column": 36
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "61d99be247ebc5757beeb94063d90245caa80ae89d071c3b7eec2531b294be6a",
+      "canonical_native_log": "log/crates__pancake-gui__src__delivery__mod.rs_line_78_col_34.log",
+      "semantic_effect": "Viewport can accept empty height or an out-of-range right edge.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/desktop_menu.rs",
+        "function": {
+          "function_name": "reveal_native",
+          "return_type": "-> Result<(), String>",
+          "span": {
+            "start": {
+              "line": 15,
+              "column": 1
+            },
+            "end": {
+              "line": 47,
+              "column": 2
+            }
+          }
+        },
+        "genre": "FnValue",
+        "name": "crates/pancake-gui/src/desktop_menu.rs:22:5: replace reveal_native -> Result<(), String> with Ok(())",
+        "package": "pancake-gui",
+        "replacement": "Ok(())",
+        "span": {
+          "start": {
+            "line": 22,
+            "column": 5
+          },
+          "end": {
+            "line": 46,
+            "column": 82
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "4fa47013a73a674bdeb27b5b81c3f8949691b607f29dac4192ed699d1644a39d",
+      "canonical_native_log": "log/crates__pancake-gui__src__desktop_menu.rs_line_22_col_5.log",
+      "semantic_effect": "Reveal reports success without dispatching file-manager selection or its fallback.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/desktop_menu.rs",
+        "function": {
+          "function_name": "linux::folder_label",
+          "return_type": "-> std::borrow::Cow<'a, str>",
+          "span": {
+            "start": {
+              "line": 222,
+              "column": 5
+            },
+            "end": {
+              "line": 236,
+              "column": 6
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "crates/pancake-gui/src/desktop_menu.rs:230:40: replace && with || in linux::folder_label",
+        "package": "pancake-gui",
+        "replacement": "||",
+        "span": {
+          "start": {
+            "line": 230,
+            "column": 40
+          },
+          "end": {
+            "line": 230,
+            "column": 42
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "207340984e9fbcb7d9f519c5177882381d30944a1e8ed52a4458fe0d6e643d19",
+      "canonical_native_log": "log/crates__pancake-gui__src__desktop_menu.rs_line_230_col_40.log",
+      "semantic_effect": "Unique recent folders can display full paths where only duplicate leaf labels require disambiguation.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/desktop_menu.rs",
+        "function": {
+          "function_name": "linux::item",
+          "return_type": "-> MenuItem",
+          "span": {
+            "start": {
+              "line": 374,
+              "column": 5
+            },
+            "end": {
+              "line": 383,
+              "column": 6
+            }
+          }
+        },
+        "genre": "UnaryOperator",
+        "name": "crates/pancake-gui/src/desktop_menu.rs:377:12: delete ! in linux::item",
+        "package": "pancake-gui",
+        "replacement": "",
+        "span": {
+          "start": {
+            "line": 377,
+            "column": 12
+          },
+          "end": {
+            "line": 377,
+            "column": 13
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "5f821b6b5e020aeb9ce24877b6fac90742a75171af87efecd52c1c5cb0838041",
+      "canonical_native_log": "log/crates__pancake-gui__src__desktop_menu.rs_line_377_col_12.log",
+      "semantic_effect": "Native nonempty GTK accessibility IDs are omitted.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/panel/mod.rs",
+        "function": {
+          "function_name": "x11_owner",
+          "return_type": "-> Option<std::ffi::c_ulong>",
+          "span": {
+            "start": {
+              "line": 40,
+              "column": 1
+            },
+            "end": {
+              "line": 51,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "crates/pancake-gui/src/panel/mod.rs:47:72: replace != with == in x11_owner",
+        "package": "pancake-gui",
+        "replacement": "==",
+        "span": {
+          "start": {
+            "line": 47,
+            "column": 72
+          },
+          "end": {
+            "line": 47,
+            "column": 74
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "6a8d13fbf6a7eff677b6932b0b3fed744611a5c340d93cb2d61ab59b4c69e6b4",
+      "canonical_native_log": "log/crates__pancake-gui__src__panel__mod.rs_line_47_col_72.log",
+      "semantic_effect": "Valid nonzero Xlib owners are dropped and zero can be accepted.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/preview.rs",
+        "function": {
+          "function_name": "PreviewDevice::retain",
+          "return_type": "-> Result<Image, String>",
+          "span": {
+            "start": {
+              "line": 187,
+              "column": 5
+            },
+            "end": {
+              "line": 226,
+              "column": 6
+            }
+          }
+        },
+        "genre": "FnValue",
+        "name": "crates/pancake-gui/src/preview.rs:193:9: replace PreviewDevice::retain -> Result<Image, String> with Ok(Default::default())",
+        "package": "pancake-gui",
+        "replacement": "Ok(Default::default())",
+        "span": {
+          "start": {
+            "line": 193,
+            "column": 9
+          },
+          "end": {
+            "line": 225,
+            "column": 68
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "3f0fcd85501a82abb4080cf3f85c353c4c1f234a0192cc0acfc5392b293e1808",
+      "canonical_native_log": "log/crates__pancake-gui__src__preview.rs_line_193_col_9.log",
+      "semantic_effect": "Retained preview can be an empty image instead of the uploaded owned texture.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/session.rs",
+        "function": {
+          "function_name": "settings",
+          "return_type": "-> UiResult<JobSettings>",
+          "span": {
+            "start": {
+              "line": 706,
+              "column": 1
+            },
+            "end": {
+              "line": 751,
+              "column": 2
+            }
+          }
+        },
+        "genre": "MatchArm",
+        "name": "crates/pancake-gui/src/session.rs:738:9: delete match arm 2_i32 in settings",
+        "package": "pancake-gui",
+        "replacement": "",
+        "span": {
+          "start": {
+            "line": 738,
+            "column": 9
+          },
+          "end": {
+            "line": 738,
+            "column": 41
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "3c8af40a9684daab82b37fc38b80cbe2e9bd7f8a44fe22b6f08e19ca8f8e69f3",
+      "canonical_native_log": "log/crates__pancake-gui__src__session.rs_line_738_col_9.log",
+      "semantic_effect": "Explicit Auto ordinal 2 falls through to invalid device selection.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/session.rs",
+        "function": {
+          "function_name": "crop_result",
+          "return_type": "-> UiResult",
+          "span": {
+            "start": {
+              "line": 905,
+              "column": 1
+            },
+            "end": {
+              "line": 933,
+              "column": 2
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "crates/pancake-gui/src/session.rs:924:21: replace > with < in crop_result",
+        "package": "pancake-gui",
+        "replacement": "<",
+        "span": {
+          "start": {
+            "line": 924,
+            "column": 21
+          },
+          "end": {
+            "line": 924,
+            "column": 22
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "71778c4e7dbadaedaabf0f7aa80ac3791a6f01b708b07f9fe4b86287f931bb14",
+      "canonical_native_log": "log/crates__pancake-gui__src__session.rs_line_924_col_21.log",
+      "semantic_effect": "Manual crop rejects ordinary retained-size results and loses the 2 GiB protective inequality.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/session.rs",
+        "function": {
+          "function_name": "transition",
+          "return_type": "-> UiResult",
+          "span": {
+            "start": {
+              "line": 999,
+              "column": 1
+            },
+            "end": {
+              "line": 1024,
+              "column": 2
+            }
+          }
+        },
+        "genre": "UnaryOperator",
+        "name": "crates/pancake-gui/src/session.rs:1015:46: delete ! in transition",
+        "package": "pancake-gui",
+        "replacement": "",
+        "span": {
+          "start": {
+            "line": 1015,
+            "column": 46
+          },
+          "end": {
+            "line": 1015,
+            "column": 47
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "460ce9a3e29659363a652a6448084a83239fdb17d727d0002e819d722348279c",
+      "canonical_native_log": "log/crates__pancake-gui__src__session.rs_line_1015_col_46.log",
+      "semantic_effect": "Replace confirmation condition flips for source-list emptiness.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/sources/mod.rs",
+        "function": {
+          "function_name": "Sources::clear",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 65,
+              "column": 5
+            },
+            "end": {
+              "line": 68,
+              "column": 6
+            }
+          }
+        },
+        "genre": "FnValue",
+        "name": "crates/pancake-gui/src/sources/mod.rs:67:9: replace Sources::clear with ()",
+        "package": "pancake-gui",
+        "replacement": "()",
+        "span": {
+          "start": {
+            "line": 67,
+            "column": 9
+          },
+          "end": {
+            "line": 67,
+            "column": 28
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "5b2829a003a1be1c523840484c39d7135356e7d54de2da686cd2ce5a5f66b2e2",
+      "canonical_native_log": "log/crates__pancake-gui__src__sources__mod.rs_line_67_col_9.log",
+      "semantic_effect": "Clearing the workspace leaves the original files retained.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/panel/linux.rs",
+        "function": {
+          "function_name": "set_native_owner",
+          "return_type": "",
+          "span": {
+            "start": {
+              "line": 116,
+              "column": 1
+            },
+            "end": {
+              "line": 128,
+              "column": 2
+            }
+          }
+        },
+        "genre": "FnValue",
+        "name": "crates/pancake-gui/src/panel/linux.rs:118:5: replace set_native_owner with ()",
+        "package": "pancake-gui",
+        "replacement": "()",
+        "span": {
+          "start": {
+            "line": 118,
+            "column": 5
+          },
+          "end": {
+            "line": 127,
+            "column": 6
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "b1515c9d5ea150d83f6b681e955ecc78a7700d76827d4e98f0591f2d941b6392",
+      "canonical_native_log": "log/crates__pancake-gui__src__panel__linux.rs_line_118_col_5.log",
+      "semantic_effect": "GTK file dialog never creates the actual X11 transient relation.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    },
+    {
+      "native_identity": {
+        "file": "crates/pancake-gui/src/panel/pointer.rs",
+        "function": {
+          "function_name": "PointerHandoff::install",
+          "return_type": "-> Self",
+          "span": {
+            "start": {
+              "line": 23,
+              "column": 5
+            },
+            "end": {
+              "line": 74,
+              "column": 6
+            }
+          }
+        },
+        "genre": "BinaryOperator",
+        "name": "crates/pancake-gui/src/panel/pointer.rs:54:70: replace == with != in PointerHandoff::install",
+        "package": "pancake-gui",
+        "replacement": "!=",
+        "span": {
+          "start": {
+            "line": 54,
+            "column": 70
+          },
+          "end": {
+            "line": 54,
+            "column": 72
+          }
+        }
+      },
+      "canonical_disposition": "MissedMutant",
+      "canonical_patch_sha256": "2ce9cebcaffeda15d51d64953bd37d974ac4b0f12d928b72118fbd489555dba9",
+      "canonical_native_log": "log/crates__pancake-gui__src__panel__pointer.rs_line_54_col_70.log",
+      "semantic_effect": "Repaired pointer release matches a different held button instead of the same button.",
+      "follow_up": {
+        "disposition": "no_qualified_exact_replay_found"
+      }
+    }
+  ]
+}

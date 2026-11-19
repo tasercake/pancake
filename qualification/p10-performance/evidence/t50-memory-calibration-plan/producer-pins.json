@@ -1,0 +1,47 @@
+{
+  "scope": "reference then direct standalone a49 then direct standalone 5f, one explicit CPU job each",
+  "collector": {
+    "commit": "df780846a4dcc40bf460bcaaba04f1538290e71c",
+    "tree": "e28deab7a1aa8c0eeb6bf9cc1e5c4d215cf3f97b",
+    "p10_sha256": "60546a00f4ebdea7f6dd28db156c8cc2c796288f9bc862cb5ec5e7bbcd4cf0ff",
+    "resources_sha256": "cddeb4364750fad211f0271d59531850859acff85fab290712f0d1b43d7eb78a",
+    "sample_interval_ns": 3000000,
+    "maximum_gap_ns": 20000000
+  },
+  "receiver": {
+    "commit": "45164b1a40aa196c095a3e64b16365dac65cc61d",
+    "weighted_receiver_sha256": "aeaf337e18931c25531b4def6b9d21e7d804f25937c793be9d62751f241eec08",
+    "owned_stage_loader_sha256": "5b7902c4bdd78e2a517720cbe4c60c8b940325321ef2d0412a14d830c14ab130",
+    "generated_truth_oracle_sha256": "bf13428284787c0fd7fde837dcdc97a03942419aa40cc71291e55d3169797ee4"
+  },
+  "pancake_cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "pancake_descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "stock": {
+    "commit": "a49ce692371558ff40f72b0af77f5249d00dcedb",
+    "tree": "965aa0c7dc33731d3aef94231afa3e59fc7bc330",
+    "binary_sha256": "43a05f9cfb6ac3f89c7153e6043cc9e79d33bfccd03054d20da54bd7d147c65e",
+    "bytes": 122173312,
+    "elf_build_id": "561328fa71c9ff497ce2040ebf619f24e1ec1f7e",
+    "retained_executable": "/home/krishna/Documents/focus-stacking/artifacts/pancake-linux-native/a49ce69/pancake-cli",
+    "producer_archive_revision": "80a5737",
+    "producer_archive_sha256": "dff85153d6384f7362e98e40e63d502768fa619811784bc5786c60b008731085"
+  },
+  "candidate": {
+    "commit": "5f2623ac85682233c20abe12fc691000568ad127",
+    "tree": "c6b8730d3d16506022316c68ae1322a5ac90e266",
+    "binary_sha256": "333ceb5c82c2b637d5ec57a7500a071949bc7921719abe181fadeb34996b3230",
+    "bytes": 122173696,
+    "elf_build_id": "27ea7e0c3a9d13d60bc6734966454bdeebde87f7",
+    "retained_executable": "/home/krishna/Documents/focus-stacking/artifacts/pancake-linux-native/5f2623a/pancake-cli",
+    "original_default_build_receipt": "/tmp/pancake-worktrees.t3paqgWM/a49-weighted-energy-reuse/artifacts/weighted-energy/default-release",
+    "build_receipt_digests": {
+      "cli.command": "ba92d89117dff280be1df096d31e5f8a2e1c5e42bb212271f054ae0ec020aee9",
+      "source.txt": "5f15336926d78889cbc96a22846e6d32472a692e22c1fc8c9a86d8b1acf73054",
+      "rustc.txt": "be69adad9137eaa0bdac1dd07e2fe286b1831fc8bad193ea27806ca0c7c8e7c6",
+      "cli.log": "5926b9a2cc2f0830b88d8d2dcdc99e8dea0d4e4aa4c71a835d8c17465de8cb87"
+    },
+    "retained_build_receipt_sha256": "17ca176c54e5310a639092b95e80ae00a5209d3065d0e83aa654a1eb5ca44bd3",
+    "producer_archive_revision": "b35b384d05f1ca6c990082e091dd89bf90077feb",
+    "producer_archive_sha256": "12fa7048d416a7b0a307b947a87c5a2b11fcae93720cf9307b5acfe157307aaf"
+  }
+}

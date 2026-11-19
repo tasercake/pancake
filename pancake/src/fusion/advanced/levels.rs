@@ -67,13 +67,9 @@ impl Level {
         method: AdvancedMethod,
         first: bool,
     ) {
-        let band = if method == AdvancedMethod::Exposure {
-            fine.clone()
-        } else {
-            self.band(client, fine, coarse)
-        };
         let (blocks, threads) = elementwise(client, self.grid.area);
         if method == AdvancedMethod::Laplacian {
+            let band = self.band(client, fine, coarse);
             select::launch(
                 client,
                 blocks,
@@ -87,20 +83,16 @@ impl Level {
             return;
         }
 
-        // Exposure has no coefficient-selection consumer. Its weighted kernel
-        // can compute the band directly, avoiding an intermediate RGB buffer.
-        let (lower, lower_width, lower_height) = if method == AdvancedMethod::Exposure {
-            coarse.map_or((&band, 0, 0), |(lower, grid)| {
-                (lower, grid.width, grid.height)
-            })
-        } else {
-            (&band, 0, 0)
-        };
+        // Weighted methods form the band inside accumulation. A Hybrid winner
+        // computes the coefficient again only where it replaces a previous one.
+        let (lower, lower_width, lower_height) = coarse.map_or((fine, 0, 0), |(lower, grid)| {
+            (lower, grid.width, grid.height)
+        });
         add_weighted::launch(
             client,
             blocks.clone(),
             threads,
-            band.clone().into_arg(),
+            fine.clone().into_arg(),
             lower.clone().into_arg(),
             weights.clone().into_arg(),
             self.primary.clone().into_arg(),
@@ -111,15 +103,19 @@ impl Level {
             lower_height,
         );
         if let Some(hybrid) = &self.hybrid {
-            select::launch(
+            select_hybrid::launch(
                 client,
                 blocks,
                 threads,
-                band.into_arg(),
+                fine.clone().into_arg(),
+                lower.clone().into_arg(),
                 weights.clone().into_arg(),
                 hybrid.coefficients.clone().into_arg(),
                 hybrid.scores.clone().into_arg(),
                 u32::from(first),
+                self.grid.width,
+                lower_width,
+                lower_height,
             );
         }
     }
@@ -228,7 +224,45 @@ fn select(
     }
 }
 
-/// Accumulate weighted coefficients, deriving an exposure band when requested.
+/// Derive a Hybrid band coefficient only for a new strict focus winner.
+#[cube(launch, expand_only)]
+fn select_hybrid(
+    fine: &Tensor<f32>,
+    lower: &Tensor<f32>,
+    weight: &Tensor<f32>,
+    selected: &mut Tensor<f32>,
+    scores: &mut Tensor<f32>,
+    first: u32,
+    width: usize,
+    lower_width: usize,
+    lower_height: usize,
+) {
+    let pixel = ABSOLUTE_POS;
+    if pixel >= scores.len() {
+        terminate!();
+    }
+    let score = weight[pixel];
+    let mut replaces_winner = true;
+    if first == 0 {
+        replaces_winner = score > scores[pixel];
+    }
+    if replaces_winner {
+        scores[pixel] = score;
+        let address = pixel * 3;
+        let x = pixel % width;
+        let y = pixel / width;
+        for channel in 0..3 {
+            let sample = address + channel;
+            let mut coefficient = fine[sample];
+            if lower_width != 0 {
+                coefficient -= expanded(lower, x, y, channel, lower_width, lower_height);
+            }
+            selected[sample] = coefficient;
+        }
+    }
+}
+
+/// Accumulate weighted coefficients, deriving a band when a lower grid exists.
 ///
 /// A zero lower width identifies a supplied coefficient or the top Gaussian
 /// level. Otherwise the lower level is expanded at the original pixel grid.

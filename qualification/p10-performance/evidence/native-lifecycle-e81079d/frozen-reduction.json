@@ -1,0 +1,55 @@
+{
+  "viewer": {
+    "idle": {
+      "status": "pending",
+      "count": 0
+    },
+    "loaded": {
+      "status": "pending",
+      "count": 0
+    }
+  },
+  "lifecycle": {
+    "pause": {
+      "status": "pass",
+      "acknowledgement_ns": {
+        "count": 60,
+        "min": 70670321,
+        "p50": 140950409.0,
+        "p95": 148417759,
+        "max": 211514639
+      },
+      "settled_ns": {
+        "count": 60,
+        "min": 70670321,
+        "p50": 140950409.0,
+        "p95": 148417759,
+        "max": 211514639
+      }
+    },
+    "cancel": {
+      "status": "pass",
+      "acknowledgement_ns": {
+        "count": 60,
+        "min": 69295859,
+        "p50": 146817570.5,
+        "p95": 210751338,
+        "max": 212889210
+      },
+      "settled_ns": {
+        "count": 60,
+        "min": 72480028,
+        "p50": 146817570.5,
+        "p95": 210751338,
+        "max": 212889210
+      }
+    }
+  },
+  "native_lifecycle_workloads": {
+    "status": "pass",
+    "workloads": [
+      "D150",
+      "lifecycle"
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+"""Reconcile both pinned layout executions and their exact CPU dev JUnit roster."""
+import collections
+import gzip
+from hashlib import sha256
+import json
+from pathlib import Path
+import re
+import sys
+import xml.etree.ElementTree as ET
+
+root = Path(sys.argv[1])
+revision = "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6"
+receipt = json.loads((root / "receipt.json").read_text())
+assert receipt["source_revision"] == revision
+scope = receipt["cpu_layouts"]
+assert scope["exit_status"] == 0 and set(scope["seeds"]) == {"1", "42"}
+assert scope["integration_targets"] == (root / "nextest-selected-targets.txt").read_text().splitlines()
+assert len(scope["integration_targets"]) == 17 and "cpu_gui_native" not in scope["integration_targets"]
+
+junit = ET.fromstring(gzip.decompress((root / "nextest-junit.xml.gz").read_bytes()))
+assert (junit.get("tests"), junit.get("failures"), junit.get("errors"), junit.get("skipped")) == ("164", "0", "0", "0")
+expected = {(suite.attrib["name"], case.attrib["name"]) for suite in junit.findall("testsuite") for case in suite.findall("testcase")}
+assert len(expected) == 164
+elfs = json.loads((root / "native-artifacts.json").read_text())
+header = re.compile(r"^\s*Running (.+) \(([^()]+)\)$")
+passed = re.compile(r"^test (.+) \.\.\. ok$")
+seeds = {}
+for seed in ("1", "42"):
+    gate = scope["seeds"][seed]
+    assert gate["groups"] == 20 and gate["runtime_passed"] is True and gate["cargo_exit_status"] == 0
+    assert not gate["diagnostics"] and gate["totals"]["passed"] == 164
+    assert all(gate["totals"][field] == 0 for field in ("failed", "ignored", "measured", "filtered"))
+    raw = (root / f"seed-{seed}.log").read_text()
+    observed = {}
+    groups = set()
+    current = None
+    for line in raw.splitlines():
+        if found := header.match(line):
+            source, elf = found.groups()
+            package = elf.split("/build/", 1)[1].split("/", 1)[0]
+            if source == "unittests src/lib.rs":
+                suite = package
+            elif source == "unittests src/main.rs":
+                suite = f"{package}::bin/{package}"
+            else:
+                assert source.startswith("tests/") and source.endswith(".rs"), source
+                suite = f"{package}::{Path(source).stem}"
+            assert suite not in groups and elf in elfs[seed], (suite, elf)
+            groups.add(suite)
+            current = (suite, elf)
+        elif result := passed.match(line):
+            assert current is not None, line
+            suite, elf = current
+            case = (suite, result[1])
+            assert case not in observed, case
+            observed[case] = elf
+        elif line.startswith("test result:"):
+            current = None
+    assert set(observed) == expected, (set(observed) - expected, expected - set(observed))
+    assert len(groups) == len(elfs[seed]) == 20
+    seeds[seed] = {
+        "roster_names": len(observed), "matched_groups": len(groups),
+        "counts": dict(sorted(collections.Counter(suite for suite, _ in observed).items())),
+        "raw_sha256": sha256((root / f"seed-{seed}.log").read_bytes()).hexdigest(),
+        "tests": [{"suite": suite, "name": name, "elf_path": elf, "status": "passed"} for (suite, name), elf in sorted(observed.items())],
+    }
+record = {
+    "source_revision": revision,
+    "matched_nextest_dev_names_per_seed": len(expected),
+    "nextest_junit_gzip_sha256": sha256((root / "nextest-junit.xml.gz").read_bytes()).hexdigest(),
+    "seeds": seeds,
+}
+(root / "test-rosters.json").write_text(json.dumps(record, indent=2) + "\n")
+print(json.dumps({key: value for key, value in record.items() if key != "seeds"}, indent=2))

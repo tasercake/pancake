@@ -1,0 +1,25 @@
+Outer invocation from pancake/:
+
+taskset -c 0,1 nice -n 5 env -u DISPLAY -u WAYLAND_DISPLAY -u WAYLAND_SOCKET -u DBUS_SESSION_BUS_ADDRESS -u DBUS_STARTER_ADDRESS -u AT_SPI_BUS_ADDRESS -u LLVM_PROFILE_FILE -u RUSTC_WRAPPER -u RUSTC_WORKSPACE_WRAPPER -u CARGO_BUILD_RUSTC_WRAPPER PATH="/tmp/pancake-tools/bin:$PATH" CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0 bash /tmp/pancake-assurance-7748045/run-assurance.sh
+
+Contents of run-assurance.sh:
+
+#!/usr/bin/env bash
+set -uo pipefail
+bundle=/tmp/pancake-assurance-7748045
+bash scripts/check.sh fast > "$bundle/fast.log" 2>&1
+fast_rc=$?
+printf '%s\n' "$fast_rc" > "$bundle/fast.status"
+cargo metadata --locked --no-deps --format-version 1 > "$bundle/metadata.json" &&
+    python3 scripts/assurance_targets.py "$bundle/metadata.json" cpu > "$bundle/selected-targets.txt" || exit "$?"
+assurance_args=(--lib --bins)
+while IFS= read -r target; do
+    assurance_args+=(--test "$target")
+done < "$bundle/selected-targets.txt"
+cargo nextest run --locked --workspace "${assurance_args[@]}" --all-features \
+    --cargo-profile dev --profile ci --no-tests=pass --run-ignored all \
+    > "$bundle/cpu-dev.log" 2>&1
+cpu_rc=$?
+printf '%s\n' "$cpu_rc" > "$bundle/cpu-dev.status"
+printf 'fast=%s cpu-dev=%s\n' "$fast_rc" "$cpu_rc"
+if (( fast_rc || cpu_rc )); then exit 1; fi

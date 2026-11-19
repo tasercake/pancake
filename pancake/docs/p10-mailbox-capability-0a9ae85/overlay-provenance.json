@@ -1,0 +1,26 @@
+{
+  "wgpu-core-30.0.2": {
+    "archive_sha256": "ad661da2ee99f208c30090b585284b2ab5b8bf2358ddf2d2215592808ec62f1a",
+    "patch_sha256": "fe186e1feaffbec500050fa56490e2ea9c14c3051aae7943de5af84d54920ed6",
+    "pinned_changed_files": {
+      "src/device/resource.rs": "a874a17eb91e7b26c86c11b1a95c76eb480d44bc3a3e07638d48669ac45a1735",
+      "src/lib.rs": "48e27172d140555527804802ac16400936f30d8bfdd74ed1753a1b88b58ac863",
+      "src/pancake_surface_witness.rs": "6cad5c78649f93010324ed1615f678c57cb07070e883b31e3766a0a4cdf70bd8"
+    }
+  },
+  "i-slint-renderer-femtovg-1.19.0": {
+    "archive_sha256": "af1892857762af5466d723f41febf4f80f92d1455de839ca9a76c955bf8793b9",
+    "patch_sha256": "d53eeb35ba5b8f1e7ef04e18545c33344b37146338b7c3acbc5dc0b8fa286152",
+    "pinned_changed_files": {
+      "pancake_mailbox_policy.rs": "f9eaabfaebe37d8adf67baa01d36d5b3f68ad69b2d50c804c24b30f48b934a88",
+      "wgpu.rs": "900e6738e4515b53989113c6de43bd24a13fd8abe6b4572ee805f651f159078b"
+    }
+  },
+  "candidate_selection_delta": {
+    "scope": "pancake_mailbox_policy.rs",
+    "patch_sha256": "9a9e3cb433640e46ba8a7be217abc40cdf391b1f4309230a6c8ca42cd9583da9",
+    "control_policy_sha256": "f9eaabfaebe37d8adf67baa01d36d5b3f68ad69b2d50c804c24b30f48b934a88",
+    "candidate_policy_sha256": "66e85e9f6807d70da71d80510b21bbffce66f102134caba88b942e2e8ab1705b",
+    "candidate_release": "held before live control contrast"
+  }
+}

@@ -1,0 +1,364 @@
+{
+  "original_revision": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "current_revision": "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb",
+  "original_list_sha256": "b2b1c29114e199902fa9ec35dbf4d4cc2d71c1c410547234f8969c4e5af02bde",
+  "current_full_list_sha256": "af16665064d5f43759dc9b34b9b753bbb41bc6167c4fb06cce6662c6c6dff7df",
+  "current_full_list_count": 2642,
+  "current_ordered_selection_sha256": "4d5d8fd7181d9867b2c4764d9cf541ba7a0b29e0f7fb923f364b80b5abb61e8b",
+  "matches": [
+    {
+      "original": "src/registration/mod.rs:54:47: replace != with == in ResidentRgb::into_tensor",
+      "current": "src/registration/mod.rs:54:47: replace != with == in ResidentRgb::into_tensor",
+      "full_roster_ordinal": 255,
+      "function_sha256": "005860d81d9c95451e8b17ab770401dbee7e7a0c054230142495437332917085",
+      "operation": {
+        "file": "src/registration/mod.rs",
+        "package": "pancake",
+        "function": "ResidentRgb::into_tensor",
+        "genre": "BinaryOperator",
+        "replacement": "==",
+        "named_operation": "replace != with == in ResidentRgb::into_tensor",
+        "relative_span": [
+          [
+            12,
+            47
+          ],
+          [
+            12,
+            49
+          ]
+        ],
+        "patch_lines": [
+          "-            || self.tensor.shape().as_slice() != [samples]",
+          "+            || self.tensor.shape().as_slice() == /* ~ changed by cargo-mutants ~ */ [samples]"
+        ]
+      },
+      "operation_sha256": "15921b6233fab6eae3442ec1db0580e6a128e31452c0e03e6be09f8d430e738c"
+    },
+    {
+      "original": "src/fusion/focus.rs:384:61: replace - with / in focus_energy",
+      "current": "src/fusion/focus.rs:384:61: replace - with / in focus_energy",
+      "full_roster_ordinal": 511,
+      "function_sha256": "566576fe85f94fa4ffb42450538bf422460cee9a3dd66a9cb44569c46f577f7e",
+      "operation": {
+        "file": "src/fusion/focus.rs",
+        "package": "pancake",
+        "function": "focus_energy",
+        "genre": "BinaryOperator",
+        "replacement": "/",
+        "named_operation": "replace - with / in focus_energy",
+        "relative_span": [
+          [
+            15,
+            61
+          ],
+          [
+            15,
+            62
+          ]
+        ],
+        "patch_lines": [
+          "-    let lap_x = (input[y * width + reflect(x, 0, 1, width)] - center)",
+          "+    let lap_x = (input[y * width + reflect(x, 0, 1, width)] / /* ~ changed by cargo-mutants ~ */ center)"
+        ]
+      },
+      "operation_sha256": "740062121d8378bb1db9c5043b91937905ab2c6749cd67e6bfb599072ea75dca"
+    },
+    {
+      "original": "src/image_io/npy.rs:121:15: replace == with != in decode",
+      "current": "src/image_io/npy.rs:121:15: replace == with != in decode",
+      "full_roster_ordinal": 767,
+      "function_sha256": "1c12527f6630e569cf1422af07c4173b5048a19870c8642cefc6006c3037f0ea",
+      "operation": {
+        "file": "src/image_io/npy.rs",
+        "package": "pancake",
+        "function": "decode",
+        "genre": "BinaryOperator",
+        "replacement": "!=",
+        "named_operation": "replace == with != in decode",
+        "relative_span": [
+          [
+            26,
+            15
+          ],
+          [
+            26,
+            17
+          ]
+        ],
+        "patch_lines": [
+          "-    if layout == ArrayLayout::GrayscaleArray {",
+          "+    if layout != /* ~ changed by cargo-mutants ~ */ ArrayLayout::GrayscaleArray {"
+        ]
+      },
+      "operation_sha256": "55b4fa120c163c53f01ba432ab5db39033773f84d179bd6d0cc1658fd4130fc4"
+    },
+    {
+      "original": "src/registration/estimate.rs:162:36: replace / with * in prepare_thumbnail",
+      "current": "src/registration/estimate.rs:162:36: replace / with * in prepare_thumbnail",
+      "full_roster_ordinal": 1070,
+      "function_sha256": "aba787d6ed019badf52c3f042964a9c1575043e7fadbc55956f416a035c024c4",
+      "operation": {
+        "file": "src/registration/estimate.rs",
+        "package": "pancake",
+        "function": "prepare_thumbnail",
+        "genre": "BinaryOperator",
+        "replacement": "*",
+        "named_operation": "replace / with * in prepare_thumbnail",
+        "relative_span": [
+          [
+            22,
+            36
+          ],
+          [
+            22,
+            37
+          ]
+        ],
+        "patch_lines": [
+          "-        .min(THUMBNAIL_PIXEL_LIMIT / detail);",
+          "+        .min(THUMBNAIL_PIXEL_LIMIT * /* ~ changed by cargo-mutants ~ */ detail);"
+        ]
+      },
+      "operation_sha256": "5b2eef61245890acceafb2035b2cf124cd7e73d8dd791681f767a4ffa09d24e1"
+    },
+    {
+      "original": "src/registration/kernels.rs:102:5: replace read -> Result<Vec<f32>, String> with Ok(vec![])",
+      "current": "src/registration/kernels.rs:103:5: replace read -> Result<Vec<f32>, String> with Ok(vec![])",
+      "full_roster_ordinal": 1323,
+      "function_sha256": "f58a8e5424065e89da69157d6247fecdbe22b89a0daa4f58eb90e68662920748",
+      "operation": {
+        "file": "src/registration/kernels.rs",
+        "package": "pancake",
+        "function": "read",
+        "genre": "FnValue",
+        "replacement": "Ok(vec![])",
+        "named_operation": "replace read -> Result<Vec<f32>, String> with Ok(vec![])",
+        "relative_span": [
+          [
+            10,
+            5
+          ],
+          [
+            21,
+            6
+          ]
+        ],
+        "patch_lines": [
+          "-    let buffers = client",
+          "-        .read_tensor(vec![handle.into_copy_descriptor()])",
+          "-        .map_err(|error| error.to_string())?;",
+          "-    let mut result = Vec::with_capacity(count);",
+          "-    for bytes in buffers {",
+          "-        result.extend(crate::decode_variance_values(&bytes)?);",
+          "-    }",
+          "-    if result.len() == count {",
+          "-        Ok(result)",
+          "-    } else {",
+          "-        Err(\"registration readback did not return the expected sample count\".to_owned())",
+          "-    }",
+          "+    Ok(vec![]) /* ~ changed by cargo-mutants ~ */"
+        ]
+      },
+      "operation_sha256": "c75172ba87ab8316d8c386badc5292f104fe32fb13c0a3f009b22c710fcd378d"
+    },
+    {
+      "original": "src/registration/kernels.rs:439:55: replace + with * in correlation_moments",
+      "current": "src/registration/kernels.rs:440:55: replace + with * in correlation_moments",
+      "full_roster_ordinal": 1579,
+      "function_sha256": "86bd3f742eacc5499df5f4586dada87b51f93cd67e26368144d9b6e381579fe1",
+      "operation": {
+        "file": "src/registration/kernels.rs",
+        "package": "pancake",
+        "function": "correlation_moments",
+        "genre": "BinaryOperator",
+        "replacement": "*",
+        "named_operation": "replace + with * in correlation_moments",
+        "relative_span": [
+          [
+            34,
+            55
+          ],
+          [
+            34,
+            56
+          ]
+        ],
+        "patch_lines": [
+          "-        let sx = maps[candidate] * x + maps[candidate + 1] * y + maps[candidate + 2];",
+          "+        let sx = maps[candidate] * x + maps[candidate * /* ~ changed by cargo-mutants ~ */ 1] * y + maps[candidate + 2];"
+        ]
+      },
+      "operation_sha256": "49a69627e960a39ad77962cb6d87687c5743dc00f63d0c47ba7a74fbe69dd183"
+    },
+    {
+      "original": "src/registration/spectral.rs:267:32: replace + with * in cross_phase",
+      "current": "src/registration/spectral.rs:267:32: replace + with * in cross_phase",
+      "full_roster_ordinal": 1835,
+      "function_sha256": "fbff4fe87793f340204f685322fa93025c4167e557413a06691e465e84ca41c7",
+      "operation": {
+        "file": "src/registration/spectral.rs",
+        "package": "pancake",
+        "function": "cross_phase",
+        "genre": "BinaryOperator",
+        "replacement": "*",
+        "named_operation": "replace + with * in cross_phase",
+        "relative_span": [
+          [
+            11,
+            32
+          ],
+          [
+            11,
+            33
+          ]
+        ],
+        "patch_lines": [
+          "-    let magnitude = (dot * dot + cross * cross).sqrt();",
+          "+    let magnitude = (dot * dot * /* ~ changed by cargo-mutants ~ */ cross * cross).sqrt();"
+        ]
+      },
+      "operation_sha256": "40ea93883a6dced9fe844122ad795625e0da32404cc19fd460195570c925ddd6"
+    },
+    {
+      "original": "src/fusion/advanced/pyramid.rs:153:5: replace clamp_before -> usize with 1",
+      "current": "src/fusion/advanced/pyramid.rs:153:5: replace clamp_before -> usize with 1",
+      "full_roster_ordinal": 2106,
+      "function_sha256": "1742c618708d777cb9856e2d21475620885d4238f9556882934061a40c37eb62",
+      "operation": {
+        "file": "src/fusion/advanced/pyramid.rs",
+        "package": "pancake",
+        "function": "clamp_before",
+        "genre": "FnValue",
+        "replacement": "1",
+        "named_operation": "replace clamp_before -> usize with 1",
+        "relative_span": [
+          [
+            3,
+            5
+          ],
+          [
+            3,
+            43
+          ]
+        ],
+        "patch_lines": [
+          "-    usize::max(index, distance) - distance",
+          "+    1 /* ~ changed by cargo-mutants ~ */"
+        ]
+      },
+      "operation_sha256": "263ffd9aa674c60724d754e77b1d91eb2215e32683ec8c88adde5ec8cbdc6c9e"
+    },
+    {
+      "original": "crates/pancake-gui/src/desktop_menu.rs:9:5: replace reveal -> Result<(), String> with Ok(())",
+      "current": "crates/pancake-gui/src/desktop_menu.rs:9:5: replace reveal -> Result<(), String> with Ok(())",
+      "full_roster_ordinal": 2362,
+      "function_sha256": "2807ff387648258433617531e2bcc75eae81e27c038e64b36525b5ac317c9241",
+      "operation": {
+        "file": "crates/pancake-gui/src/desktop_menu.rs",
+        "package": "pancake-gui",
+        "function": "reveal",
+        "genre": "FnValue",
+        "replacement": "Ok(())",
+        "named_operation": "replace reveal -> Result<(), String> with Ok(())",
+        "relative_span": [
+          [
+            6,
+            5
+          ],
+          [
+            9,
+            25
+          ]
+        ],
+        "patch_lines": [
+          "-    let full = path",
+          "-        .canonicalize()",
+          "-        .map_err(|error| format!(\"Could not locate {}: {error}\", path.display()))?;",
+          "-    reveal_native(&full)",
+          "+    Ok(()) /* ~ changed by cargo-mutants ~ */"
+        ]
+      },
+      "operation_sha256": "bce41a6ff712c844b8a6be71062562040f02dea4c78b76776011fc6f99e6fb31"
+    },
+    {
+      "original": "crates/pancake-gui/src/panel/linux.rs:65:5: replace build -> Result<(Dialog, FileChooserWidget, Entry), String> with Ok((Default::default(), Default::default(), Default::default()))",
+      "current": "crates/pancake-gui/src/panel/linux.rs:65:5: replace build -> Result<(Dialog, FileChooserWidget, Entry), String> with Ok((Default::default(), Default::default(), Default::default()))",
+      "full_roster_ordinal": 2618,
+      "function_sha256": "099d303b37a3f76bef1cbd84eaddce6bb59de2d8ee5b3139562756f455746fcf",
+      "operation": {
+        "file": "crates/pancake-gui/src/panel/linux.rs",
+        "package": "pancake-gui",
+        "function": "build",
+        "genre": "FnValue",
+        "replacement": "Ok((Default::default(), Default::default(), Default::default()))",
+        "named_operation": "replace build -> Result<(Dialog, FileChooserWidget, Entry), String> with Ok((Default::default(), Default::default(), Default::default()))",
+        "relative_span": [
+          [
+            6,
+            5
+          ],
+          [
+            54,
+            33
+          ]
+        ],
+        "patch_lines": [
+          "-    gtk::init()",
+          "-        .map_err(|error| format!(\"Could not initialize the desktop file dialog: {error}\"))?;",
+          "-    let (title, label, accept, action) = match kind {",
+          "-        Picker::Files => (\"Open images\", \"File name\", \"Open\", FileChooserAction::Open),",
+          "-        Picker::Folder => (",
+          "-            \"Choose folder\",",
+          "-            \"Directory:\",",
+          "-            \"Select Folder\",",
+          "-            FileChooserAction::SelectFolder,",
+          "-        ),",
+          "-        Picker::Save(_) => (",
+          "-            \"Save image\",",
+          "-            \"File name\",",
+          "-            \"Save\",",
+          "-            FileChooserAction::SelectFolder,",
+          "-        ),",
+          "-    };",
+          "-    let dialog = Dialog::builder()",
+          "-        .title(title)",
+          "-        .modal(true)",
+          "-        .default_width(730)",
+          "-        .default_height(490)",
+          "-        .build();",
+          "-    let _cancel = dialog.add_button(\"Cancel\", ResponseType::Cancel);",
+          "-    let _confirm = dialog.add_button(accept, ResponseType::Accept);",
+          "-    dialog.set_default_response(ResponseType::Accept);",
+          "-",
+          "-    let chooser = FileChooserWidget::new(action);",
+          "-    chooser.set_local_only(true);",
+          "-    chooser.set_select_multiple(matches!(kind, Picker::Files));",
+          "-",
+          "-    let entry = Entry::new();",
+          "-    entry",
+          "-        .accessible()",
+          "-        .ok_or(\"The file name entry was not available.\")?",
+          "-        .set_name(label);",
+          "-    entry.set_activates_default(true);",
+          "-    if let Picker::Save(name) = kind {",
+          "-        entry.set_text(name);",
+          "-    }",
+          "-    let row = gtk::Box::new(Orientation::Horizontal, 8);",
+          "-    row.pack_start(&Label::new(Some(label)), false, false, 0);",
+          "-    row.pack_start(&entry, true, true, 0);",
+          "-    let content = dialog.content_area();",
+          "-    content.set_spacing(8);",
+          "-    content.pack_start(&chooser, true, true, 0);",
+          "-    content.pack_start(&row, false, false, 6);",
+          "-",
+          "-    Ok((dialog, chooser, entry))",
+          "+    Ok((Default::default(), Default::default(), Default::default())) /* ~ changed by cargo-mutants ~ */"
+        ]
+      },
+      "operation_sha256": "a456f48c4917df115d3948046ed93aa62db962bc2fca80e94764cdf2de91026a"
+    }
+  ],
+  "mismatches": [],
+  "current_native_list_sha256": "98179368fa796fb1874f2809a9071bf0054b1b84e87bcd7aefd9ad044faca046"
+}

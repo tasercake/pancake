@@ -1,0 +1,87 @@
+"""Reconcile executed CPU results, planned Nextest inventory, and prior tests."""
+from hashlib import sha256
+from pathlib import Path
+import collections
+import gzip
+import json
+import re
+import sys
+import xml.etree.ElementTree as ET
+
+root = Path(sys.argv[1])
+expected_added = {
+    ("pancake::cpu_registration_contract", "cpu_registration_requires_detail_in_the_reference"),
+    ("pancake", "registration::spectral::tests::weak_spectral_peak_abstains_before_displacement"),
+}
+
+
+def roster(xml, expected):
+    tree = ET.fromstring(xml)
+    for field, value in (("tests", expected), ("failures", 0), ("errors", 0), ("skipped", 0)):
+        assert int(tree.attrib[field]) == value, tree.attrib
+    suites = tree.findall("testsuite")
+    cases = {}
+    for suite in suites:
+        children = suite.findall("testcase")
+        assert int(suite.attrib["tests"]) == len(children)
+        assert all(int(suite.attrib[field]) == 0 for field in ("failures", "errors", "skipped"))
+        for case in children:
+            name = (suite.attrib["name"], case.attrib["name"])
+            assert name not in cases and not any(case.find(key) is not None for key in ("failure", "error", "skipped")), name
+            cases[name] = float(case.attrib["time"])
+    assert len(cases) == expected
+    return cases, len(suites)
+
+
+fast_log = (root / "fast.log").read_text()
+cpu_log = (root / "cpu-dev.log").read_text()
+assert (root / "fast.status").read_text().strip() == (root / "cpu-dev.status").read_text().strip() == "0"
+assert re.search(r"^Ran 54 tests in", fast_log, re.MULTILINE)
+assert "Miri platform contract: reviewed production source and dependency closure match." in fast_log
+assert re.search(r"162 tests run:\s+162 passed, 0 skipped", cpu_log), cpu_log[-2000:]
+
+baseline, prior_count = roster(gzip.decompress((root / "baseline-junit.xml.gz").read_bytes()), 160)
+current, current_count = roster((root / "junit.xml").read_bytes(), 162)
+assert prior_count == current_count == 20
+assert set(baseline) <= set(current) and current.keys() - baseline.keys() == expected_added
+for _, name in expected_added:
+    assert any("PASS" in line and name in line for line in cpu_log.splitlines()), name
+selection = (root / "selected-targets.txt").read_text()
+assert selection == (root / "baseline-selected-targets.txt").read_text()
+selected = selection.splitlines()
+assert len(selected) == len(set(selected)) == 17
+
+planned = json.loads((root / "nextest-inventory.json").read_text())
+planned_cases = {}
+for suite in planned["rust-suites"].values():
+    for name, case in suite["testcases"].items():
+        suite_id = suite["binary-id"]
+        key = (suite_id, name)
+        assert key not in planned_cases, key
+        assert case["filter-match"]["status"] == "matches", (key, case)
+        planned_cases[key] = bool(case["ignored"])
+assert planned["test-count"] == len(planned_cases) == 162
+assert len(planned["rust-suites"]) == 20
+assert set(planned_cases) == set(current), (set(planned_cases) - set(current), set(current) - set(planned_cases))
+
+record = {
+    "source_revision": "54e3a8d60025cf77daa655e5e66781a82f515f7c",
+    "prior_revision": "5b98890d5e976d7287c354091671fff6f87d266c",
+    "started_sgt": (root / "start.sgt").read_text().strip(),
+    "fast_ended_sgt": (root / "fast-end.sgt").read_text().strip(),
+    "cpu_nextest_ended_sgt": (root / "end.sgt").read_text().strip(),
+    "fast": {"exit": 0, "python_policy_tests": 54},
+    "cpu_nextest_dev": {
+        "exit": 0, "passed": 162, "binaries": 20, "skipped": 0, "failures": 0, "errors": 0,
+        "selected_integration_targets": selected, "retained_prior_tests": len(baseline),
+        "added": [{"suite": suite, "test": name, "seconds": current[suite, name]} for suite, name in sorted(expected_added)],
+        "inventory_matches_junit": True, "inventory_declared_ignored_but_selected": sum(planned_cases.values()),
+        "test_count_per_binary": dict(sorted(collections.Counter(suite for suite, _ in current).items())),
+    },
+    "execution": {"nextest": "0.9.152", "rust": "1.100.0", "cpus": "0,1", "jobs": 2, "offline": True},
+    "raw_sha256": {name: sha256((root / name).read_bytes()).hexdigest() for name in (
+        "fast.log", "cpu-dev.log", "junit.xml", "nextest-inventory.json", "metadata.json", "selected-targets.txt", "baseline-junit.xml.gz",
+    )},
+}
+(root / "receipt.json").write_text(json.dumps(record, indent=2) + "\n")
+print(json.dumps(record, indent=2))

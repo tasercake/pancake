@@ -1,0 +1,16 @@
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e  rust-toolchain.toml
+26bdc6d3ffefd59bb330428a6f862eb4e3f63c9fe4130cbcc8ce3592ad6b63e9  assurance-platforms.json
+63ce2ccca53e1e4e73666b5bc72374d2ea5f8a25fe474e0c87ee41284d27eec7  scripts/check.sh
+449cefdecd38b95a76360f3fc74b1b92ccca4a7d7ab5db6b17d2a190ad57ec43  scripts/miri_host_policy.py
+119585a7f2da02dede75bc9e253540e409c4c14e2933e9c77d15ed2b88396c92  scripts/tool-versions.sh
+3493a442f853602b262eae302c3952b630a8aae7c5599c635bb101dadefe30a1  src/registration/spectral.rs
+rustc 1.102.0-nightly (5f4effd57 2026-11-13)
+binary: rustc
+commit-hash: 5f4effd579500175af844241eb179e756190f1e7
+commit-date: 2026-11-13
+host: x86_64-unknown-linux-gnu
+release: 1.102.0-nightly
+LLVM version: 23.1.5
+miri 0.1.0 (5f4effd579 2026-11-13)
+Linux 6.8.0-147-generic x86_64

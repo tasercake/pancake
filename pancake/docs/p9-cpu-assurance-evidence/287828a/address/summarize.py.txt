@@ -1,0 +1,94 @@
+"""Extract test accounting and ELF identities from the original CPU ASan log."""
+from hashlib import file_digest
+import json
+from pathlib import Path
+import re
+import subprocess
+
+root = Path.cwd()
+workspace = root / "pancake"
+proof = root / "artifacts/asan-287828a"
+target = workspace / "target/host-sanitizer-address"
+status = int((proof / "sanitizer-address.status").read_text())
+log = (proof / "sanitizer-address.log").read_text()
+diagnostics = [
+    line for line in log.splitlines()
+    if re.search(r"(AddressSanitizer|LeakSanitizer|ERROR: Leak|Sanitizer:DEADLYSIGNAL)", line)
+]
+current = None
+results = []
+artifacts = {}
+for line in log.splitlines():
+    header = re.fullmatch(r"\s*Running (.+) \(([^()]+)\)", line)
+    if header:
+        current = {"target": header[1], "elf_path": header[2], "summary": None}
+        results.append(current)
+    summary = re.fullmatch(
+        r"test result: (ok|FAILED)\. (\d+) passed; (\d+) failed; (\d+) ignored;"
+        r" (\d+) measured; (\d+) filtered out; finished in (\d+(?:\.\d+)?)s", line
+    )
+    if summary and current is not None:
+        current["summary"] = {
+            "status": summary[1], "passed": int(summary[2]), "failed": int(summary[3]),
+            "ignored": int(summary[4]), "measured": int(summary[5]),
+            "filtered_out": int(summary[6]), "elapsed_s": float(summary[7]),
+        }
+        current = None
+
+paths = {workspace / result["elf_path"] for result in results}
+paths.update(target.glob("x86_64-unknown-linux-gnu/debug/pancake-*"))
+for path in sorted(paths):
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    with path.open("rb") as binary:
+        if binary.read(4) != b"\x7fELF":
+            continue
+        binary.seek(0)
+        digest = file_digest(binary, "sha256").hexdigest()
+    notes = subprocess.run(
+        ["readelf", "-n", str(path)], capture_output=True, text=True, check=True
+    ).stdout
+    build_id = re.search(r"Build ID: ([0-9a-f]+)", notes)
+    relative = path.relative_to(workspace)
+    artifacts[relative.as_posix()] = {
+        "sha256": digest, "bytes": path.stat().st_size,
+        "elf_build_id": build_id[1] if build_id else None,
+    }
+
+totals = {
+    field: sum(row["summary"][field] for row in results if row["summary"] is not None)
+    for field in ("passed", "failed", "ignored", "measured", "filtered_out")
+}
+selected = (workspace / "target/assurance/selected-targets.txt").read_text().splitlines()
+completed = sum(row["summary"] is not None for row in results)
+fully_passed = (
+    status == 0 and completed == len(selected) + 3 and len(results) == completed
+    and not diagnostics and not any(totals[key] for key in ("failed", "ignored", "filtered_out"))
+)
+for result in results:
+    result["elf_path"] = (workspace / result["elf_path"]).relative_to(workspace).as_posix()
+    if result["elf_path"] not in artifacts:
+        raise ValueError(f"Missing test executable identity {result['elf_path']}")
+receipt = {
+    "source_revision": "287828aac07ffad2252785b73a52a59fc07b3409",
+    "gate": "bash scripts/check.sh sanitizer address",
+    "started_utc": (proof / "start").read_text().strip(),
+    "finished_utc": (proof / "end").read_text().strip(),
+    "gate_exit_status": status,
+    "pinned_toolchain": "nightly-2026-11-15",
+    "effective_cpus": "12-15,28-31",
+    "cargo_build_jobs": 2,
+    "external_sanitizer_options": False,
+    "classified_cpu_integration_targets": selected,
+    "expected_result_groups_for_this_workspace": len(selected) + 3,
+    "completed_result_groups": completed,
+    "totals": totals,
+    "diagnostic_lines": diagnostics,
+    "passing": fully_passed,
+    "test_results": results,
+    "tested_and_application_elfs": artifacts,
+}
+(proof / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
+print(json.dumps({k: v for k, v in receipt.items() if k not in (
+    "test_results", "tested_and_application_elfs", "classified_cpu_integration_targets",
+)}, indent=2))

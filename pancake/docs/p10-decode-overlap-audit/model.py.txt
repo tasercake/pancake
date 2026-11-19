@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+"""Compute best-case one-frame overlap from the retained physical T50 trace."""
+
+import csv
+import hashlib
+import json
+import sys
+import tarfile
+from pathlib import Path
+
+root = Path(sys.argv[1]).resolve()
+proof = root / 'pancake/docs/p10-t50-resident-input'
+reference = root / 'qualification/p10-performance/evidence/t50-12f2151-preflight/pair-001/summary.json'
+observer = json.loads((proof / 'receipt.json').read_text())['physical_report']['arms']['resident']
+reference_ns = json.loads(reference.read_text())['jobs']['reference']['elapsed_ns']
+with tarfile.open(proof / 'raw-records.tar.gz', 'r:gz') as archive:
+    path = 'run/diagnostic-02/candidate/phases.tsv'
+    with archive.extractfile(path) as entry:
+        trace = entry.read()
+
+trace_sha = hashlib.sha256(trace).hexdigest()
+assert trace_sha == observer['trace']['sha256']
+header, *records = trace.decode().splitlines()
+assert header == '# dropped_records=0'
+rows = list(csv.DictReader(records, delimiter='\t'))
+frame_numbers = sorted({int(row['frame']) for row in rows if row['frame'] != '-'})
+assert frame_numbers == list(range(50))
+
+
+def elapsed(frame, stage):
+    """Read exactly one timing record in a nonoverlapping group."""
+    matches = [row for row in rows if row['frame'] == str(frame) and row['stage'] == stage]
+    assert len(matches) == 1
+    return int(matches[0]['elapsed_ns'])
+
+
+decode = [elapsed(frame, 'decode') for frame in frame_numbers]
+wall = observer['job']['elapsed_ns']
+results = {}
+for name, group in (
+    ('registration_and_fusion', ('register', 'accumulate')),
+    ('proxy_only', ('proxy_upload', 'proxy_submit', 'proxy_readback')),
+    ('fusion_only', ('accumulate',)),
+):
+    owner = [sum(elapsed(frame, step) for step in group) for frame in frame_numbers]
+    maximum_saved = sum(min(owner[frame], decode[frame + 1]) for frame in frame_numbers[:-1])
+    results[name] = {
+        'nonoverlapping_owner_ns': sum(owner),
+        'maximum_overlap_ns_on_recorded_intervals': maximum_saved,
+        'best_case_wall_ns_on_recorded_intervals': wall - maximum_saved,
+    }
+
+print(json.dumps({
+    'trace_member': path,
+    'trace_sha256': trace_sha,
+    'recorded_candidate_wall_ns': wall,
+    'historical_reference_diagnostic_wall_ns': reference_ns,
+    'half_historical_reference_diagnostic_wall_ns': reference_ns / 2,
+    'decode_ns': {'total': sum(decode), 'min': min(decode), 'max': max(decode)},
+    'decodes_exceeding_250_ms': sum(elapsed_ns > 250_000_000 for elapsed_ns in decode),
+    'idealized_one_lookahead': results,
+}, indent=2))

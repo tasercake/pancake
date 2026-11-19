@@ -1,0 +1,22 @@
+======== /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/baseline.tiff
+[IFD0]          ImageWidth                      : 5086
+[IFD0]          ImageHeight                     : 3390
+[IFD0]          BitsPerSample                   : 16 16 16
+[IFD0]          SampleFormat                    : Unsigned; Unsigned; Unsigned
+[IFD0]          SamplesPerPixel                 : 3
+[IFD0]          PhotometricInterpretation       : RGB
+======== /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/reuse.tiff
+[IFD0]          ImageWidth                      : 5086
+[IFD0]          ImageHeight                     : 3390
+[IFD0]          BitsPerSample                   : 16 16 16
+[IFD0]          SampleFormat                    : Unsigned; Unsigned; Unsigned
+[IFD0]          SamplesPerPixel                 : 3
+[IFD0]          PhotometricInterpretation       : RGB
+======== /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/workers.tiff
+[IFD0]          ImageWidth                      : 5086
+[IFD0]          ImageHeight                     : 3390
+[IFD0]          BitsPerSample                   : 16 16 16
+[IFD0]          SampleFormat                    : Unsigned; Unsigned; Unsigned
+[IFD0]          SamplesPerPixel                 : 3
+[IFD0]          PhotometricInterpretation       : RGB
+    3 image files read

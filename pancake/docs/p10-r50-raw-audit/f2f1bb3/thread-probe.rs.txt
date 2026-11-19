@@ -1,0 +1,52 @@
+/// Measure the production RAW development stage on two originals with one explicit pool.
+///
+/// # Errors
+/// Returns missing inputs, invalid affinity, a decode failure or a recording error.
+#[test]
+fn real_r50_pool_width_diagnostic() -> Result<(), Box<dyn Error>> {
+    use std::fs::{self, File};
+    use std::io::{self, Write as _};
+    use std::path::PathBuf;
+    use std::sync::Arc;
+    use std::time::Instant;
+
+    use rawler::rawsource::RawSource;
+
+    let source = std::env::var_os("PANCAKE_RAW_PROBE_INPUTS")
+        .map(PathBuf::from)
+        .ok_or("expected the two verified R50 original files")?;
+    let affinity = std::thread::available_parallelism()?.get();
+    if affinity <= 2 {
+        return Err("RAW pool-width diagnosis requires at least three allowed CPUs".into());
+    }
+    let width = match std::env::var("PANCAKE_RAW_PROBE_POOL")?.as_str() {
+        "two" => 2,
+        "affinity" => affinity,
+        _ => return Err("expected pool width mode two or affinity".into()),
+    };
+    let dump = std::env::var_os("PANCAKE_RAW_PROBE_DUMP").map(PathBuf::from);
+    let pool = rayon::ThreadPoolBuilder::new().num_threads(width).build()?;
+    let mut log = io::stderr().lock();
+    for filename in ["frame_000.CR3", "frame_049.CR3"] {
+        let path = source.join(filename);
+        let encoded = fs::read(&path)?;
+        let raw = RawSource::new_from_shared_vec(Arc::new(encoded)).with_path(&path);
+        let start = Instant::now();
+        let frame = pool.install(|| super::develop(&raw))?;
+        let nanoseconds = start.elapsed().as_nanos();
+        writeln!(
+            log,
+            "{filename}\t{}\t{}\t{}\t{}\t{:?}\t{nanoseconds}",
+            affinity,
+            pool.current_num_threads(),
+            frame.width(),
+            frame.height(),
+            frame.sample_encoding()
+        )?;
+        if let Some(directory) = &dump {
+            let path = directory.join(format!("{filename}.rgbf32"));
+            File::create_new(path)?.write_all(bytemuck::cast_slice(frame.samples()))?;
+        }
+    }
+    Ok(())
+}

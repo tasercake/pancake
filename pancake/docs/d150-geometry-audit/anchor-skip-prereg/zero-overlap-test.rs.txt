@@ -1,0 +1,60 @@
+/// A valid three-map edge without common cells abstains and leaves its neighbor intact.
+/// # Errors
+/// Returns a device, diagnostic, parity or output error.
+#[test]
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "the bounded synthetic raster uses known small translations"
+)]
+fn packed_witness_zero_overlap_is_an_edge_abstention() -> Result<(), String> {
+    let device = cubecl::Device::cpu().map_err(|error| error.to_string())?;
+    let extent = Extent::new(PROXY[0], PROXY[1])?;
+    let mut reference = Vec::new();
+    let mut source = Vec::new();
+    for y in (0..extent.height).map(f32::from) {
+        for x in (0..extent.width).map(f32::from) {
+            reference.push(super::super::scene(x, y, false, false));
+            source
+                .push(0.84_f32.mul_add(super::super::scene(x - 2.0, y + 3.0, false, false), 0.07));
+        }
+    }
+    let pair = Pair::new(&device, &reference, &source, extent);
+    let identity = Affine::IDENTITY;
+    let direct = Affine::from_matrix([[1.0, 0.0, 2.0], [0.0, 1.0, -3.0]])?;
+    let neighbor_reverse = Affine::from_matrix([[1.0, 0.0, -2.0], [0.0, 1.0, 3.0]])?;
+    let nonempty = [direct, neighbor_reverse, identity];
+    let before = cells(&pair, nonempty)?;
+    if before["bit_identical_scalar_moments"] != 540 || before["packed_dispatches"] != 2 {
+        return Err("synthetic neighbor did not verify all 540 packed moment bits".to_owned());
+    }
+    let path =
+        std::env::var_os("PANCAKE_PACKED_NEIGHBOR_REPORT").ok_or("missing neighbor report path")?;
+    let report = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(path)
+        .map_err(|error| error.to_string())?;
+    serde_json::to_writer_pretty(report, &before).map_err(|error| error.to_string())?;
+
+    let measured_reverse = Affine::from_matrix([[0.953, 0.0, 0.0], [0.0, 0.953, -124.0]])?;
+    let empty = cells(&pair, [direct, measured_reverse.inverse()?, identity])?;
+    if empty["status"] != "unresolved"
+        || empty["reason"] != "no_common_bidirectional_cells"
+        || empty["cells"] != json!([])
+        || empty["serial_dispatches"] != 0
+        || empty["packed_dispatches"] != 0
+        || empty["bit_identical_scalar_moments"] != 0
+        || empty["support"].as_array().is_none_or(|rows| {
+            rows.len() != 3
+                || rows
+                    .iter()
+                    .any(|row| row["supporting_cells"] != 0 || row["rank_two_footprint"] != false)
+        })
+    {
+        return Err("unsupported edge did not record a zero-dispatch abstention".to_owned());
+    }
+    if cells(&pair, nonempty)? != before {
+        return Err("supported neighbor changed after the unsupported edge".to_owned());
+    }
+    Ok(())
+}

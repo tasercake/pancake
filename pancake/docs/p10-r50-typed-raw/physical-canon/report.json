@@ -1,0 +1,249 @@
+{
+  "partial_corpus": "two frozen originals only",
+  "settings": {
+    "device": "gpu",
+    "method": "hybrid",
+    "align": true,
+    "alignment_mode": "similarity",
+    "alignment_reference": "first",
+    "kernel_size": 6,
+    "pyramid_levels": 8,
+    "scale_factor": 6,
+    "slab_size": 0,
+    "slab_overlap": 0,
+    "bit_depth": 16,
+    "auto": false,
+    "auto_crop": true,
+    "quality_report": false,
+    "gpu_id": 0
+  },
+  "lease_sha256": "06554627e78873a8fff6fcef6f65de72b7445277fc769f051df336ebab8bf733",
+  "icd": "/usr/share/vulkan/icd.d/nvidia_icd.json",
+  "icd_sha256": "7bdb6f27d35b66fc848df6f94b8773bba30ea3a7f06f114100d14154a235a34b",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "arms": {
+    "stock": {
+      "returncode": 0,
+      "completion": {
+        "actual_backend": "gpu",
+        "alignment_transforms": {
+          "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/inputs/datasets/p0-d02/raw/frame_000.CR3": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ]
+          ],
+          "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/inputs/datasets/p0-d02/raw/frame_049.CR3": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ]
+          ]
+        },
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "spirv_4318_8708",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "wgpu-vulkan",
+        "sequential_transforms": [
+          [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ]
+          ],
+          [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ]
+          ]
+        ]
+      },
+      "transform_f32_le_hex": {
+        "alignment_transforms": "0000803f0000000000000000000000000000803f000000000000803f0000000000000000000000000000803f00000000",
+        "sequential_transforms": "0000803f0000000000000000000000000000803f000000000000803f0000000000000000000000000000803f00000000"
+      },
+      "progress": [
+        "progress 1/2",
+        "progress 2/2"
+      ],
+      "output": {
+        "shape": [
+          3390,
+          5086,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "b5d2a3c27f8170cbf013f8600752c1f249cd5f8ba42afaf2798ebb50d8fa1a1c",
+        "pixel_sha256": "0e9ecaa26ade7ff2cef12872db5654b7f4e4c763fb3def6c8fd120efaec6a7ce",
+        "bytes": 103450274,
+        "minimum": 0,
+        "maximum": 65535
+      }
+    },
+    "candidate": {
+      "returncode": 0,
+      "completion": {
+        "actual_backend": "gpu",
+        "alignment_transforms": {
+          "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/inputs/datasets/p0-d02/raw/frame_000.CR3": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ]
+          ],
+          "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/inputs/datasets/p0-d02/raw/frame_049.CR3": [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ]
+          ]
+        },
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "spirv_4318_8708",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "wgpu-vulkan",
+        "sequential_transforms": [
+          [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ]
+          ],
+          [
+            [
+              1.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              1.0,
+              0.0
+            ]
+          ]
+        ]
+      },
+      "transform_f32_le_hex": {
+        "alignment_transforms": "0000803f0000000000000000000000000000803f000000000000803f0000000000000000000000000000803f00000000",
+        "sequential_transforms": "0000803f0000000000000000000000000000803f000000000000803f0000000000000000000000000000803f00000000"
+      },
+      "progress": [
+        "progress 1/2",
+        "progress 2/2"
+      ],
+      "output": {
+        "shape": [
+          3390,
+          5086,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "b5d2a3c27f8170cbf013f8600752c1f249cd5f8ba42afaf2798ebb50d8fa1a1c",
+        "pixel_sha256": "0e9ecaa26ade7ff2cef12872db5654b7f4e4c763fb3def6c8fd120efaec6a7ce",
+        "bytes": 103450274,
+        "minimum": 0,
+        "maximum": 65535
+      }
+    }
+  },
+  "ordered_paths": [
+    "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/inputs/datasets/p0-d02/raw/frame_000.CR3",
+    "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/inputs/datasets/p0-d02/raw/frame_049.CR3"
+  ],
+  "products": {
+    "stock": {
+      "source_revision": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+      "sha256": "2d3ff9afaa17d73233fd2ef2ef635f999b53186b608f412dcf8ebd367d458c55",
+      "path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/r50-typed-raw-e810-c80d/stock/pancake-cli"
+    },
+    "candidate": {
+      "source_revision": "c80d59abe0b47a5e831a1e2b4ccad132d96106c7",
+      "sha256": "f17bc8241f776fafed9f01be42835a65293480eabb221adef6c21ae23322452d",
+      "path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/r50-typed-raw-e810-c80d/candidate/pancake-cli"
+    }
+  },
+  "inventory_before": [
+    "NVIDIA GeForce RTX 3090",
+    "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+    "00000000:01:00.0",
+    "580.178.04",
+    "23546 MiB"
+  ],
+  "exact_pixel_file_and_map_parity": true,
+  "inventory_after": [
+    "NVIDIA GeForce RTX 3090",
+    "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+    "00000000:01:00.0",
+    "580.178.04",
+    "23546 MiB"
+  ],
+  "inputs_unchanged": true,
+  "elf_identities_unchanged": true
+}

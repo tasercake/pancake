@@ -1,0 +1,19 @@
+2026-11-18T12:10:36Z
+Linux 6.8.0-147-generic x86_64
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+    PID PSR COMMAND         %CPU
+ 439250  25 java             275
+ 439317   1 ps               100
+  75494  20 sccache          2.9
+   6487   9 kube-apiserver   1.8
+   5842  30 kubelet          1.1
+   6467  29 etcd             1.0
+ 438961  25 start-setupServ  1.0
+ 438807  19 brave            0.9
+   6474  20 kube-controller  0.7
+   5547  13 steam            0.6
+ 104627  22 codex            0.5
+   4933  29 containerd       0.5
+ 104104  28 ChatGPT          0.4
+ 104712   7 brave            0.4
+   5644   9 bitwarden-app    0.4

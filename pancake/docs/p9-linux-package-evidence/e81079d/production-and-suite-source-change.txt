@@ -1,0 +1,5 @@
+M	pancake/assurance-platforms.json
+M	pancake/src/fusion/advanced/mod.rs
+M	pancake/src/image_io/tiled.rs
+M	pancake/src/registration/spectral.rs
+M	pancake/tests/cpu_advanced_fusion.rs

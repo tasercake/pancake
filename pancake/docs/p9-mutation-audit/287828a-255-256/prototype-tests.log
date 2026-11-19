@@ -1,0 +1,18 @@
+test_compiler_unviable_is_preserved_as_a_distinct_class (test_verify_mutation_shards.MutationShardTests.test_compiler_unviable_is_preserved_as_a_distinct_class) ... ok
+test_disjoint_complete_archived_schema (test_verify_mutation_shards.MutationShardTests.test_disjoint_complete_archived_schema) ... ok
+test_duplicate_full_identity_is_rejected (test_verify_mutation_shards.MutationShardTests.test_duplicate_full_identity_is_rejected) ... ok
+test_hosted_pilot_preserves_exact_native_results (test_verify_mutation_shards.MutationShardTests.test_hosted_pilot_preserves_exact_native_results) ... ok
+test_hosted_pilot_rejects_failed_or_missing_terminal_status (test_verify_mutation_shards.MutationShardTests.test_hosted_pilot_rejects_failed_or_missing_terminal_status) ... ok
+test_hosted_pilot_rejects_wrong_native_execution_list (test_verify_mutation_shards.MutationShardTests.test_hosted_pilot_rejects_wrong_native_execution_list) ... ok
+test_hosted_pilot_wrong_provenance_and_revision_are_rejected (test_verify_mutation_shards.MutationShardTests.test_hosted_pilot_wrong_provenance_and_revision_are_rejected) ... ok
+test_inconsistent_pinned_tool_versions_are_rejected (test_verify_mutation_shards.MutationShardTests.test_inconsistent_pinned_tool_versions_are_rejected) ... ok
+test_missing_and_duplicate_outcomes_are_rejected (test_verify_mutation_shards.MutationShardTests.test_missing_and_duplicate_outcomes_are_rejected) ... ok
+test_missing_or_failed_baseline_is_rejected (test_verify_mutation_shards.MutationShardTests.test_missing_or_failed_baseline_is_rejected) ... ok
+test_missing_shard_cannot_supply_full_roster (test_verify_mutation_shards.MutationShardTests.test_missing_shard_cannot_supply_full_roster) ... ok
+test_survivor_and_timeout_are_rejected (test_verify_mutation_shards.MutationShardTests.test_survivor_and_timeout_are_rejected) ... ok
+test_wrong_expected_partition_is_rejected (test_verify_mutation_shards.MutationShardTests.test_wrong_expected_partition_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.147s
+
+OK

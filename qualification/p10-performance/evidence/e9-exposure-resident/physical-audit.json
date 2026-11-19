@@ -1,0 +1,256 @@
+{
+  "wgpu-vulkan": {
+    "9-Translation-0-113-[0.0, 0.0]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "spirv_4318_8708",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "wgpu-vulkan"
+      },
+      "fusion_uploads": [
+        9,
+        0
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "be11776a636b8f0cea85d02364933849cb4291c2169d06d26ad85b91e219cff2"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "4beb75045580838ea25983035e00e408ba9ed98d226b7b79bf79db3939247501"
+      }
+    },
+    "5-Translation-0-113-[3.25, -1.5]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "spirv_4318_8708",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "wgpu-vulkan"
+      },
+      "fusion_uploads": [
+        5,
+        1
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "79d17b5c5755b4491985160d60d237dc47b469d1bda61ee1244b430c5be4dbd7"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "4df67560cc79785fc532a6e7ea9bbf07d260c319d0710e19dd3a45909cbac1ca"
+      }
+    },
+    "5-Translation-0-111-[0.0, 0.0]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "spirv_4318_8708",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "wgpu-vulkan"
+      },
+      "fusion_uploads": [
+        5,
+        1
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "08dc3c119f446ed63f33a71583de32981c3629881acdad92173669925815fdaa"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "476bef525a75fd7d3ecf76987bf29a13c2ebfad348e98d6c8b4b92e864b29517"
+      }
+    },
+    "5-Translation-3-113-[0.0, 0.0]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "spirv_4318_8708",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "wgpu-vulkan"
+      },
+      "fusion_uploads": [
+        5,
+        5
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "7d87dde13c8683044145a0962d12939dbd02c421fd63faadde8bdbec9181f4a1"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "4c7de845b29e73316d25e5ebd8ac00960b9bf4bacd7a5f464c5cc3afd15bcee8"
+      }
+    },
+    "5-Off-0-113-[0.0, 0.0]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "spirv_4318_8708",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "wgpu-vulkan"
+      },
+      "fusion_uploads": [
+        5,
+        5
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "7d87dde13c8683044145a0962d12939dbd02c421fd63faadde8bdbec9181f4a1"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "4c7de845b29e73316d25e5ebd8ac00960b9bf4bacd7a5f464c5cc3afd15bcee8"
+      }
+    }
+  },
+  "cuda": {
+    "9-Translation-0-113-[0.0, 0.0]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "ptx_sm86",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "cuda"
+      },
+      "fusion_uploads": [
+        9,
+        0
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "59c2a06a175175702976c967ec0a098423fd0f49c2fe21307a84884c7f675ceb"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "710c2e01711d58922618b7c9cf189c3af6ee10f8f8d15cde33b5716d4ddc4d0a"
+      }
+    },
+    "5-Translation-0-113-[3.25, -1.5]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "ptx_sm86",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "cuda"
+      },
+      "fusion_uploads": [
+        5,
+        1
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "dca50d3d4c9530fe1384503a53eefd72fb874ee3ed2f8281e645c1e9f922aa23"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "de9166c5c6ba92eb5299964d0561d8ff91009a667a6364a48c12fe6923923631"
+      }
+    },
+    "5-Translation-0-111-[0.0, 0.0]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "ptx_sm86",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "cuda"
+      },
+      "fusion_uploads": [
+        5,
+        1
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "4278155478848210279cfa58f73d6bb105ea679cde8dece13718621e02a5baff"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "289480dba6518833336ad7c6b79030ae1d8bf600f70232058493b8fa169097ef"
+      }
+    },
+    "5-Translation-3-113-[0.0, 0.0]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "ptx_sm86",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "cuda"
+      },
+      "fusion_uploads": [
+        5,
+        5
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "e124c606d02ffeb6215a657361b5adc0f4eb78a9b262d8347edd16f7e87d3763"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "830eb56751ee6e146bc1d4dea4b3adf2ed8a8cacc39be999e3bf179f5f694ca8"
+      }
+    },
+    "5-Off-0-113-[0.0, 0.0]": {
+      "actual_runtime": {
+        "actual_backend": "gpu",
+        "completed": true,
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_fingerprint": "ptx_sm86",
+        "device_pci_address": "0000:01:00.0",
+        "event": "stack_complete",
+        "fallback_reason": null,
+        "physical_gpu": true,
+        "runtime": "cuda"
+      },
+      "fusion_uploads": [
+        5,
+        5
+      ],
+      "f32le": {
+        "bytes": 128820,
+        "sha256": "e124c606d02ffeb6215a657361b5adc0f4eb78a9b262d8347edd16f7e87d3763"
+      },
+      "tif": {
+        "bytes": 64620,
+        "sha256": "830eb56751ee6e146bc1d4dea4b3adf2ed8a8cacc39be999e3bf179f5f694ca8"
+      }
+    }
+  }
+}

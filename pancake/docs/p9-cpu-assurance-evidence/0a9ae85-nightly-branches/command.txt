@@ -1,0 +1,3 @@
+Run from pancake/ in the clean measured checkout with pinned Cargo tools installed.
+
+taskset -c 0,1 nice -n 5 env -u DISPLAY -u WAYLAND_DISPLAY -u WAYLAND_SOCKET -u DBUS_SESSION_BUS_ADDRESS -u DBUS_STARTER_ADDRESS -u AT_SPI_BUS_ADDRESS -u LLVM_PROFILE_FILE -u RUSTC_WRAPPER -u RUSTC_WORKSPACE_WRAPPER -u CARGO_BUILD_RUSTC_WRAPPER PATH="/tmp/pancake-tools/bin:$PATH" CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0 CARGO_NET_OFFLINE=true bash scripts/check.sh branches-cpu

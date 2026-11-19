@@ -1,0 +1,88 @@
+{
+  "originals_removed": 50,
+  "original_bytes_removed": 442098996,
+  "original_manifest_sha256": "dd7a7e8a396d16e952d3d24d258afc1e05b77bb1664b179d3a43a7f66e413fab",
+  "all_originals_and_exports_reverified": true,
+  "removed_exports": {
+    "external-candidate-stage-probe/candidate/complete.tif": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    },
+    "matched-full-pair/candidate/complete.tif": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    },
+    "matched-full-pair/reference/complete.tif": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "6bceffbd485796996da6afaa7e1a13e29b941d9a02ddcee793b0e9729b776498",
+      "pixel_sha256": "2067f6550fcd34bf1149b76e26dd0290f89acfa1a75c08b5d51d8a9ae3de0e91",
+      "bytes": 92419730,
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "owned-upload-pair/owned/candidate/complete.tif": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    },
+    "owned-upload-pair/sealed/candidate/complete.tif": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    },
+    "owned-upload-phase/owned/candidate/complete.tif": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    }
+  },
+  "transferred_original_count": 0,
+  "removed_scratch_path": "/tmp/pancake-worktrees.t3paqgWM/r50-287828a-quiet/artifacts/r50-quality"
+}

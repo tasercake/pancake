@@ -1,0 +1,28 @@
+revision=b10fbec440069602ed16e6055c6bb5f1c4212757
+variant=reuse
+?? pancake/examples/
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+37cb9da0665066d4895dad9a33faa4ca9fc48ee88a8c2872b1d588988a9e7cb7  src/image_io/raw.rs
+ffbabd656b35f77a959b2f9631ceef3e960ae89c1acb1cb728b0a4679712c090  src/image_io/raw/tests.rs
+ce697ea6030c3615de2da1de3d2ab80f68d0112d513ba4fc5067df786e9e1924  examples/raw_decode_probe.rs
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+release: 1.100.0
+commit-hash: 3acc79c0c841844675bc53a605922dbfc441e750
+commit-date: 2026-11-05
+host: x86_64-unknown-linux-gnu
+libgit2: 1.9.6 (sys:0.21.0 vendored)
+libcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)
+ssl: OpenSSL 3.6.3 9 Jun 2026
+os: Ubuntu 24.4.0 (noble) [64-bit]
+2026-11-18T09:25:03Z
+CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 RUSTC_WRAPPER=/tmp/pancake-tools/bin/pancake-rust-cache cargo build --offline --locked --release -p pancake --example raw_decode_probe -p pancake-cli --bin pancake-cli
+ada3991e52e50816aa7c2e0911477f18df2215053919220101a34c286f607c65  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/reuse-probe
+0c14b3344742408a20e10258f66cfce7cb698303d32a794dbe0050f8ac711122  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/reuse-cli
+    Build ID: a4f0b3d04f0677d527cc986d5f2d6987786a6be1

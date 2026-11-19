@@ -1,0 +1,1 @@
+CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 RUSTC_WRAPPER=/tmp/pancake-tools/bin/pancake-rust-cache cargo build --release --locked -p pancake-cli --bin pancake-cli

@@ -1,0 +1,48 @@
+"""Fetch two frozen Canon sources under verified bounded byte lengths."""
+from hashlib import sha256
+from json import dumps, loads
+from pathlib import Path
+from urllib.request import urlopen
+
+repo = Path.cwd()
+evidence = repo / "artifacts/r50-workers"
+target = evidence / "inputs"
+pin = loads((repo / "pancake/docs/performance-targets.json").read_bytes())["corpus_evidence"]["R50"]
+manifest = (repo / pin["manifest_path"]).read_bytes()
+if sha256(manifest).hexdigest() != pin["manifest_sha256"]:
+    raise ValueError("R50 manifest mismatch")
+frames = loads(manifest)["frames"]
+selected = [
+    ("frame_000.CR3", 8_869_034, "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca"),
+    ("frame_049.CR3", 8_813_738, "98fe6e370fc2ab58ba7b45d242a8c2f2a1942404ee0e0524c5cb33048969dc36"),
+]
+if len(frames) != 50:
+    raise ValueError("R50 frame count differs")
+target.mkdir()
+verified = []
+for row, (name, size, digest) in zip((frames[0], frames[-1]), selected, strict=True):
+    if (Path(row["path"]).name, row["size_bytes"], row["sha256"]) != (name, size, digest):
+        raise ValueError("Selected R50 source differs from the frozen input")
+    path = target / name
+    partial = path.with_suffix(".part")
+    checksum = sha256()
+    remaining = size
+    try:
+        with urlopen(row["url"], timeout=45) as stream, partial.open("xb") as file:
+            while remaining:
+                block = stream.read(min(remaining, 1 << 20))
+                if not block:
+                    raise ValueError(f"Short source {name}")
+                file.write(block)
+                checksum.update(block)
+                remaining -= len(block)
+            if stream.read(1) or checksum.hexdigest() != digest:
+                raise ValueError(f"Wrong source bytes {name}")
+        partial.rename(path)
+    finally:
+        partial.unlink(missing_ok=True)
+    verified.append({"name": name, "bytes": path.stat().st_size, "sha256": digest, "url": row["url"]})
+receipt = {"owner": "r50-workers", "manifest_path": pin["manifest_path"],
+           "manifest_sha256": pin["manifest_sha256"], "verified": verified}
+(evidence / "acquisition.json").write_text(dumps(receipt, indent=2) + "\n")
+print("Verified two frozen R50 Canon sources")

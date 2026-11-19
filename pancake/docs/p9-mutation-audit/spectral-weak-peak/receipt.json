@@ -1,0 +1,151 @@
+{
+  "base_revision": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "test_revision": "94a50ed7fff4b1ee1b4bf2561e52ceada901f503",
+  "initial_fixture_revision": "e70e0cf67afddc23b3cdb864a8af39621f4279bc",
+  "exact_patch_sha256": "2d46d2a9bbce44821911e1215cdda9100055ceadfc573c0e946c7fd51582e279",
+  "stock_spectral_sha256": "3493a442f853602b262eae302c3952b630a8aae7c5599c635bb101dadefe30a1",
+  "mutated_spectral_sha256": "6508bc9004332b7bfdd885a58aaa5f4a4b32aac9f6320a1073b63281df1a0781",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "assurance_platforms_sha256": "8fdd154156ba18c73406c60bf0d5f08b5c131c7ff2a9c1c6ff996c7359f7e7e0",
+  "canonical_mutant": {
+    "shard": "9/16",
+    "name": "src/registration/spectral.rs:146:17: replace < with == in dominant_peak",
+    "historical_outcome": "MissedMutant",
+    "phases": [
+      {
+        "phase": "Build",
+        "duration": 21.067788373,
+        "process_status": "Success",
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--no-run",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features",
+          "--workspace"
+        ]
+      },
+      {
+        "phase": "Test",
+        "duration": 6.61887014,
+        "process_status": "Success",
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features",
+          "--workspace",
+          "--locked",
+          "--lib",
+          "--bins",
+          "--test",
+          "cpu_advanced_fusion",
+          "--test",
+          "cpu_array_layout",
+          "--test",
+          "cpu_cli",
+          "--test",
+          "cpu_config",
+          "--test",
+          "cpu_fusion_contract",
+          "--test",
+          "cpu_gray_array_export",
+          "--test",
+          "cpu_image_export",
+          "--test",
+          "cpu_image_io",
+          "--test",
+          "cpu_job",
+          "--test",
+          "cpu_kernel_contract",
+          "--test",
+          "cpu_npy",
+          "--test",
+          "cpu_numerical_contract",
+          "--test",
+          "cpu_registration_contract",
+          "--test",
+          "cpu_runtime_contract",
+          "--test",
+          "cpu_runtime_options",
+          "--test",
+          "cpu_stack_plan",
+          "--",
+          "--include-ignored"
+        ]
+      }
+    ]
+  },
+  "host": {
+    "os_arch": "Linux x86_64",
+    "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+    "logical_cpus": [
+      12,
+      13
+    ],
+    "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo": "1.100.0 (3acc79c0c 2026-11-05)",
+    "cargo_build_jobs": 2,
+    "cargo_incremental": false,
+    "cargo_profile_dev_debug": 0,
+    "rustc_wrapper": "/tmp/pancake-tools/bin/pancake-rust-cache"
+  },
+  "fixture": {
+    "extent": [
+      192,
+      80
+    ],
+    "side": 64,
+    "bin": [
+      61,
+      8
+    ],
+    "weak_strength": 204.75,
+    "strong_strength": 204.875,
+    "cutoff": 204.8,
+    "weak_expected": null,
+    "strong_expected": [
+      -9,
+      10
+    ]
+  },
+  "native_verification": {
+    "focused_command": "taskset --cpu-list 12\\,13 cargo +1.100.0 test --locked --offline -p pancake --lib registration::spectral::tests::weak_spectral_peak_abstains_before_displacement -- --exact --test-threads=1",
+    "library_command": "taskset --cpu-list 12\\,13 cargo +1.100.0 test --locked --offline -p pancake --lib -- --test-threads=1",
+    "initial_positive_red_exit": 101,
+    "initial_red_terminal": "2026-11-19T02:20:28+08:00",
+    "exact_final_mutant_exit": 101,
+    "final_red_terminal": "2026-11-19T02:22:20+08:00",
+    "stock_focused_exit": 0,
+    "stock_focused_cases_passed": 1,
+    "stock_library_exit": 0,
+    "stock_library_cases_passed": 24,
+    "final_stock_library_terminal": "2026-11-19T02:22:52+08:00"
+  },
+  "static_verification": {
+    "rustfmt": "passed",
+    "miri_reviewed_source_policy": "passed",
+    "preexisting_production_source_byte_match": true,
+    "miri_interpreter_executed": false
+  },
+  "adjacent_survivors_source_review_only": [
+    {
+      "name": "src/registration/spectral.rs:194:39: replace + with - in window_luma",
+      "patch_sha256": "88ed20190701de762fdacb09f041e8d6dcf0043e7ddca7952a2c7756968d449c",
+      "status": "unresolved"
+    },
+    {
+      "name": "src/registration/spectral.rs:199:45: replace * with + in window_luma",
+      "patch_sha256": "7f4725f50afb74de5ebcac37e60039e01ad1ad99689bebe7efb861030b965250",
+      "status": "unresolved"
+    },
+    {
+      "name": "src/registration/spectral.rs:223:23: replace + with - in cell",
+      "patch_sha256": "5b7a3e7cb0631b5cb9b2f781ffdcf9969213c95f2471344167fd2e7c7d9ed466",
+      "status": "unresolved"
+    }
+  ],
+  "raw_archive_sha256": "92d2c66ba29410119803284d14b68bb781fae8c5768c21e8a3345074731ed154"
+}

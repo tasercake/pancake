@@ -9,6 +9,7 @@ use pancake::job::{
     Generation, JobControl, JobError, JobState, Options, StackResult, StackWorker, run,
     run_controlled,
 };
+use pancake::registration::Affine;
 
 /// A completed weighted stack preserves identity, publishes and then logs.
 ///
@@ -94,6 +95,98 @@ fn identity_crop_applies_only_to_aligned_jobs() -> Result<(), String> {
     Ok(())
 }
 
+/// Repeated structure must leave an ambiguous source unwarped in a completed CPU stack.
+///
+/// # Errors
+///
+/// Returns fixture, stack or output errors, or reports an invented displacement.
+#[test]
+fn repeated_registration_keeps_unwarped_cpu_export() -> Result<(), String> {
+    const MOTIF: [u16; 12] = [16, 24, 40, 64, 106, 174, 218, 200, 144, 76, 36, 24];
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let root = directory.path();
+    let inputs = [root.join("repeated.png"), root.join("shifted.png")];
+    // A three-pixel phase shift leaves two equally good horizontal matches at
+    // +3 and -9. Both are inside the scoring margin at this native proxy size.
+    for (path, phase) in inputs.iter().zip([0_usize, 9]) {
+        let samples = (0_u16..96)
+            .flat_map(|row| {
+                let shade = row.min(95_u16.saturating_sub(row)) / 2_u16;
+                MOTIF
+                    .iter()
+                    .cycle()
+                    .skip(phase)
+                    .take(112)
+                    .flat_map(move |tone| {
+                        let sample = f32::from(tone.saturating_add(shade)) * (1.0_f32 / 255.0_f32);
+                        [sample; 3]
+                    })
+            })
+            .collect();
+        let frame = RgbImage::new(112, 96, samples)?;
+        export(path, &frame, BitDepth::Sixteen, 95, &[])?;
+    }
+    let originals = inputs
+        .iter()
+        .map(std::fs::read)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|error| error.to_string())?;
+    let stack = |alignment, output: &Path, options: &Options| {
+        let settings = JobSettings {
+            alignment,
+            auto_crop: false,
+            bit_depth: BitDepth::Sixteen,
+            device: DevicePreference::Cpu,
+            method: Method::WeightedAverage,
+            ..JobSettings::default()
+        };
+        let config = JobConfig::new(&inputs, Some(output.to_owned()), settings)?;
+        run(config, options, |_| {}).map_err(|error| error.to_string())
+    };
+    let control_output = root.join("unaligned.png");
+    let control = stack(AlignmentMode::Off, &control_output, &Options::default())?;
+    let registered_output = root.join("aligned.png");
+    let events = root.join("registration.jsonl");
+    let options = Options {
+        events_path: Some(events.clone()),
+        ..Options::default()
+    };
+    let result = stack(AlignmentMode::Translation, &registered_output, &options)?;
+    require(
+        control.source_transform(1) == Some(Affine::IDENTITY)
+            && result.source_transform(1) == Some(Affine::IDENTITY),
+        "repeated texture produced an unsupported transform",
+    )?;
+    let control_image = decode(&control_output)?;
+    let registered_image = decode(&registered_output)?;
+    require(
+        (registered_image.width(), registered_image.height()) == (112, 96)
+            && registered_image.samples() == control_image.samples(),
+        "ambiguous registration changed the unwarped CPU export",
+    )?;
+    let event = std::fs::read_to_string(events).map_err(|error| error.to_string())?;
+    let event: serde_json::Value =
+        serde_json::from_str(&event).map_err(|error| error.to_string())?;
+    let identity_transforms = [Affine::IDENTITY.matrix(); 2];
+    require(
+        event.get("event").and_then(serde_json::Value::as_str) == Some("stack_complete")
+            && event.get("completed").and_then(serde_json::Value::as_bool) == Some(true)
+            && event
+                .get("actual_backend")
+                .and_then(serde_json::Value::as_str)
+                == Some("cpu")
+            && event.get("sequential_transforms") == Some(&serde_json::json!(identity_transforms)),
+        "completion did not retain the actual CPU identity transforms",
+    )?;
+    for (path, before) in inputs.iter().zip(originals) {
+        require(
+            std::fs::read(path).map_err(|error| error.to_string())? == before,
+            "ambiguous registration modified its input",
+        )?;
+    }
+    Ok(())
+}
+
 /// Corruption and mid-job cancellation must preserve existing output bytes.
 ///
 /// # Errors
@@ -101,6 +194,21 @@ fn identity_crop_applies_only_to_aligned_jobs() -> Result<(), String> {
 /// Returns output, event or lifecycle invariant errors.
 #[test]
 fn interrupted_execution_retains_an_existing_export() -> Result<(), String> {
+    for (method, alignment) in [
+        (Method::WeightedAverage, AlignmentMode::Off),
+        (Method::WeightedAverage, AlignmentMode::Similarity),
+        (Method::Hybrid, AlignmentMode::Similarity),
+        (Method::ExposureFusion, AlignmentMode::Euclidean),
+    ] {
+        verify_interrupted_execution(method, alignment)?;
+    }
+    Ok(())
+}
+
+/// Exercise real publication boundaries for either CPU accumulation route.
+/// # Errors
+/// Returns output, event or lifecycle invariant errors.
+fn verify_interrupted_execution(method: Method, alignment: AlignmentMode) -> Result<(), String> {
     let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
     let inputs = sources(directory.path())?;
     let output = directory.path().join("previous.png");
@@ -110,9 +218,22 @@ fn interrupted_execution_retains_an_existing_export() -> Result<(), String> {
         events_path: Some(events.clone()),
         ..Options::default()
     };
+    let request = || {
+        JobConfig::new(
+            &inputs,
+            Some(output.clone()),
+            JobSettings {
+                bit_depth: BitDepth::Sixteen,
+                device: DevicePreference::Cpu,
+                method,
+                alignment,
+                ..JobSettings::default()
+            },
+        )
+    };
     let control = JobControl::new(Generation::from_counter(1), inputs.len())?;
     let mut accepted = false;
-    let outcome = run_controlled(request(&inputs, &output)?, &options, &control, |progress| {
+    let outcome = run_controlled(request()?, &options, &control, |progress| {
         if progress.completed == 1 {
             accepted = control.cancel() == Ok(true);
         }
@@ -131,7 +252,7 @@ fn interrupted_execution_retains_an_existing_export() -> Result<(), String> {
     )?;
     let damaged = inputs.last().ok_or("last source missing")?;
     std::fs::write(damaged, b"truncated image").map_err(|error| error.to_string())?;
-    let outcome = run(request(&inputs, &output)?, &options, |_| {});
+    let outcome = run(request()?, &options, |_| {});
     let failure = outcome
         .err()
         .ok_or("damaged source unexpectedly succeeded")?;
@@ -534,25 +655,82 @@ fn paused_stack_resumes_and_publishes_only_its_completed_generation() -> Result<
     )
 }
 
-/// Invalid observer metadata leaves the published export and source bytes intact.
+/// Report exact Unicode source geometry and preserve an export when its
+/// observer cannot encode a native byte path.
 ///
 /// # Errors
-/// Returns fixture, execution, I/O or observer-diagnostic errors.
+/// Returns fixture, execution, geometry, I/O or observer-diagnostic errors.
 #[cfg(unix)]
 #[test]
 fn observer_handles_non_unicode_paths_without_fabricating_geometry() -> Result<(), String> {
     use std::os::unix::ffi::OsStrExt;
+
+    // Darwin's EILSEQ is 92. APFS rejected the invalid UTF-8 rename in CI.
+    const DARWIN_EILSEQ: i32 = 92;
+
     let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
-    let originals = sources(directory.path())?;
-    let [first, second] = originals;
-    let opaque = directory
-        .path()
-        .join(std::ffi::OsStr::from_bytes(b"frame-\xff.png"));
-    std::fs::rename(&second, &opaque).map_err(|error| error.to_string())?;
-    let output = directory.path().join("retained.png");
-    let events = directory.path().join("events.jsonl");
+    let root = directory.path();
+    let [first, second] = sources(root)?;
+    let original = std::fs::read(&second).map_err(|error| error.to_string())?;
     let expected = decode(&first)?;
-    let original = std::fs::read(&opaque).map_err(|error| error.to_string())?;
+    let unicode = root.join("frame-雪-🥞.png");
+    std::fs::rename(&second, &unicode).map_err(|error| error.to_string())?;
+    let output = root.join("unicode.png");
+    let events = root.join("unicode-events.jsonl");
+    let options = Options {
+        events_path: Some(events.clone()),
+        ..Options::default()
+    };
+    let result = run(
+        request(&[first.clone(), unicode.clone()], &output)?,
+        &options,
+        |_| {},
+    )
+    .map_err(|error| error.to_string())?;
+    let observed = std::fs::read(events).map_err(|error| error.to_string())?;
+    let event: serde_json::Value =
+        serde_json::from_slice(&observed).map_err(|error| error.to_string())?;
+    let geometry = event
+        .get("alignment_transforms")
+        .and_then(serde_json::Value::as_object)
+        .ok_or("Unicode stack did not report source geometry")?;
+    require(
+        event.get("event").and_then(serde_json::Value::as_str) == Some("stack_complete")
+            && event
+                .get("actual_backend")
+                .and_then(serde_json::Value::as_str)
+                == Some("cpu")
+            && event.get("completed").and_then(serde_json::Value::as_bool) == Some(true)
+            && geometry.len() == 2
+            && result.warnings().is_empty()
+            && decode(&output)?.samples() == expected.samples(),
+        "Unicode paths changed the real CPU stack or its completion event",
+    )?;
+    let identity = serde_json::json!([[1.0_f32, 0.0_f32, 0.0_f32], [0.0_f32, 1.0_f32, 0.0_f32]]);
+    for source in [&first, &unicode] {
+        let canonical = source.canonicalize().map_err(|error| error.to_string())?;
+        let key = canonical
+            .to_str()
+            .ok_or("Unicode fixture path was not UTF-8")?;
+        require(
+            geometry.get(key) == Some(&identity),
+            "the observer did not report the exact Unicode source key and transform",
+        )?;
+    }
+
+    let opaque = root.join(std::ffi::OsStr::from_bytes(b"frame-\xff.png"));
+    match std::fs::rename(&unicode, &opaque) {
+        Ok(()) => {}
+        Err(error) if cfg!(target_os = "macos") && error.raw_os_error() == Some(DARWIN_EILSEQ) => {
+            return require(
+                std::fs::read(&unicode).map_err(|error| error.to_string())? == original,
+                "Darwin's rejected rename changed the original source",
+            );
+        }
+        Err(error) => return Err(format!("could not rename source to a byte path: {error}")),
+    }
+    let output = root.join("retained.png");
+    let events = root.join("events.jsonl");
     let options = Options {
         events_path: Some(events.clone()),
         ..Options::default()
@@ -572,5 +750,129 @@ fn observer_handles_non_unicode_paths_without_fabricating_geometry() -> Result<(
                 .any(|warning| warning.contains("UTF-8 source paths"))
             && std::fs::read(opaque).map_err(|error| error.to_string())? == original,
         "observer replaced undisplayable names or affected the real output or source",
+    )
+}
+
+/// A controller rejects the wrong input count without consuming its valid
+/// request. A completed controller cannot publish a second stack.
+///
+/// # Errors
+/// Returns invalid fixture, admission, lifecycle or publication errors.
+#[test]
+fn controller_rejects_mismatched_and_repeated_admission() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let root = directory.path();
+    let [first, second] = sources(root)?;
+    let third = root.join("third.png");
+    std::fs::hard_link(&first, &third).map_err(|error| error.to_string())?;
+    let output = root.join("prior.png");
+    let previous = b"prior export";
+    std::fs::write(&output, previous).map_err(|error| error.to_string())?;
+    let control = JobControl::new(Generation::from_counter(1), 2)?;
+    let options = Options::default();
+    let mismatched = run_controlled(
+        request(&[first.clone(), second.clone(), third], &output)?,
+        &options,
+        &control,
+        |_| {},
+    )
+    .err()
+    .ok_or("controller accepted a mismatched request")?;
+    require(
+        mismatched.to_string().contains("configured input count")
+            && control.snapshot()?.completed == 0
+            && std::fs::read(&output).map_err(|error| error.to_string())? == previous,
+        "mismatched admission consumed or published output",
+    )?;
+    let inputs = [first, second];
+    let complete = run_controlled(request(&inputs, &output)?, &options, &control, |_| {})
+        .map_err(|error| error.to_string())?;
+    let published = std::fs::read(&output).map_err(|error| error.to_string())?;
+    let duplicate = run_controlled(request(&inputs, &output)?, &options, &control, |_| {})
+        .err()
+        .ok_or("completed controller accepted a duplicate request")?;
+    require(
+        duplicate.to_string().contains("already owns an execution")
+            && control.snapshot()?.state == JobState::Completed
+            && decode(&output)?.samples() == complete.image().samples()
+            && std::fs::read(output).map_err(|error| error.to_string())? == published,
+        "repeated admission affected the completed CPU stack",
+    )
+}
+
+/// Moving an already consumed source leaves the actual stack usable. An
+/// existing observer cannot append a completion when identity inspection fails.
+///
+/// # Errors
+/// Returns fixture, execution, observation or publication errors.
+#[test]
+fn moved_source_blocks_observer_append_without_undoing_export() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let root = directory.path();
+    let inputs = sources(root)?;
+    let source = inputs.first().ok_or("fixture source missing")?;
+    let moved = root.join("moved.png");
+    let expected = decode(source)?;
+    let output = root.join("published.png");
+    let marker = b"{\"event\":\"prior\"}\n";
+    let observer = root.join("events.jsonl");
+    std::fs::write(&observer, marker).map_err(|error| error.to_string())?;
+    let options = Options {
+        events_path: Some(observer.clone()),
+        ..Options::default()
+    };
+    let mut movement = None;
+    let completed = run(request(&inputs, &output)?, &options, |progress| {
+        if progress.completed == inputs.len() {
+            movement = Some(std::fs::rename(source, &moved));
+        }
+    })
+    .map_err(|error| error.to_string())?;
+    movement
+        .ok_or("stack did not observe final accumulation")?
+        .map_err(|error| error.to_string())?;
+    let missing = std::fs::metadata(source)
+        .err()
+        .ok_or("source was not moved")?;
+    require(
+        completed.warnings() == [missing.to_string()]
+            && std::fs::read(observer).map_err(|error| error.to_string())? == marker
+            && decode(&moved)?.samples() == expected.samples()
+            && decode(&output)?.samples() == expected.samples(),
+        "observer identity failure affected the prior record or the published CPU stack",
+    )
+}
+
+/// A directory at the export destination is rejected without replacing its
+/// contents or claiming a completed stack.
+///
+/// # Errors
+/// Returns fixture, execution, lifecycle or publication errors.
+#[test]
+fn directory_export_destination_preserves_existing_data() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let root = directory.path();
+    let inputs = sources(root)?;
+    let destination = root.join("occupied.png");
+    std::fs::create_dir(&destination).map_err(|error| error.to_string())?;
+    let sentinel = destination.join("preserve");
+    let previous = b"directory contents";
+    std::fs::write(&sentinel, previous).map_err(|error| error.to_string())?;
+    let events = root.join("events.jsonl");
+    let options = Options {
+        events_path: Some(events.clone()),
+        ..Options::default()
+    };
+    let control = JobControl::new(Generation::from_counter(1), inputs.len())?;
+    let failure = run_controlled(request(&inputs, &destination)?, &options, &control, |_| {})
+        .err()
+        .ok_or("directory was accepted as an export file")?;
+    require(
+        failure.to_string().contains("occupied.png")
+            && failure.to_string().contains("not a regular file")
+            && control.snapshot()?.state == JobState::Failed
+            && !events.exists()
+            && std::fs::read(sentinel).map_err(|error| error.to_string())? == previous,
+        "failed export changed prior data or appeared completed",
     )
 }

@@ -1,0 +1,38 @@
+{
+  "owner": "p2_corpus",
+  "state": "Held for parent portable-witness decision.",
+  "input_root": "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/inputs",
+  "input_count": 50,
+  "input_bytes": 442098996,
+  "exports": {
+    "stock": {
+      "path": "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/full-pair/stock/complete.tif",
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    },
+    "candidate": {
+      "path": "/tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/full-pair/candidate/complete.tif",
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    }
+  },
+  "pending": "Rehash and remove both TIFFs and 50 originals after parent releases the lease."
+}

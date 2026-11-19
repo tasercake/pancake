@@ -1,0 +1,58 @@
+//! Capture actual DNG decoding and sixteen-bit export without a processing device.
+
+use std::error::Error;
+use std::path::PathBuf;
+use std::{env, fs};
+
+use bytemuck as _;
+use cubecl as _;
+use glob as _;
+use image as _;
+use png as _;
+use rawler as _;
+use rayon as _;
+use same_file as _;
+use serde_json as _;
+use tempfile as _;
+use tiff as _;
+use wgpu as _;
+
+use pancake::config::BitDepth;
+use pancake::image_io::{SampleEncoding, decode, export};
+
+/// Read two small authenticated fixture paths and write exact working bits and TIFFs.
+///
+/// # Errors
+///
+/// Returns argument, decode, geometry, source type, or export errors.
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut args = env::args_os().skip(1).map(PathBuf::from);
+    let fixtures = args.next().ok_or("missing DNG fixture directory")?;
+    let output = args.next().ok_or("missing owned output directory")?;
+    fs::create_dir(&output)?;
+    for label in ["normal", "mirrored"] {
+        let input = fixtures.join(format!("{label}.dng"));
+        let frame = decode(&input)?;
+        if (frame.width(), frame.height(), frame.sample_encoding())
+            != (160, 112, SampleEncoding::U16)
+            || frame.icc_profile().is_some()
+            || frame.is_grayscale_array()
+        {
+            return Err("unexpected developed RAW geometry, precision, or metadata".into());
+        }
+        let bits: Vec<_> = frame
+            .samples()
+            .iter()
+            .flat_map(|sample| sample.to_le_bytes())
+            .collect();
+        fs::write(output.join(format!("{label}.rgbf32")), bits)?;
+        export(
+            &output.join(format!("{label}.tiff")),
+            &frame,
+            BitDepth::Sixteen,
+            95,
+            &[input],
+        )?;
+    }
+    Ok(())
+}

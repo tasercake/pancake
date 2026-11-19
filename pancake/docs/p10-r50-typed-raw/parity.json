@@ -1,0 +1,11 @@
+{
+  "shape_hwc": [
+    112,
+    160,
+    3
+  ],
+  "working_f32_values_per_fixture": 53760,
+  "old_new_exact": true,
+  "mirror_layout_exact": true,
+  "encoded_rgb16_tiff_exact": true
+}

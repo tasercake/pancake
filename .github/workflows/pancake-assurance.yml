@@ -8,6 +8,7 @@ on:
         type: choice
         default: platform
         options:
+          - release
           - platform
           - coverage
           - nightly
@@ -29,7 +30,7 @@ defaults:
 
 jobs:
   platform:
-    if: inputs.gate == 'platform' || inputs.gate == 'all'
+    if: inputs.gate == 'platform' || inputs.gate == 'release' || inputs.gate == 'all'
     name: Platform (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
@@ -54,7 +55,7 @@ jobs:
       - run: bash scripts/check.sh test-release
 
   windows-build:
-    if: inputs.gate == 'platform' || inputs.gate == 'all'
+    if: inputs.gate == 'platform' || inputs.gate == 'release' || inputs.gate == 'all'
     name: Windows MSVC build and link
     runs-on: windows-2025
     timeout-minutes: 30
@@ -65,20 +66,41 @@ jobs:
       - name: Build and link every target without running Windows tests
         run: cargo test --locked --workspace --all-targets --all-features --target x86_64-pc-windows-msvc --no-run
 
+  macos-native-build:
+    if: inputs.gate == 'platform' || inputs.gate == 'release' || inputs.gate == 'all'
+    name: macOS ARM64 native Metal build
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Build the locked native Apple executables
+        run: |
+          if [[ $(uname -m) != arm64 ]]; then
+            printf 'Native Metal build requires a macOS ARM64 runner.\n' >&2
+            exit 1
+          fi
+          cargo build --locked --release --workspace --bins --target aarch64-apple-darwin --features cubecl/metal-native
+
   coverage:
     if: inputs.gate == 'coverage' || inputs.gate == 'all'
-    name: Coverage (${{ matrix.gate }})
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    name: Coverage (${{ matrix.os }}, ${{ matrix.gate }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        gate: [coverage-cpu, branches-cpu]
+        include:
+          - {os: ubuntu-24.04, gate: coverage-cpu}
+          - {os: ubuntu-24.04, gate: branches-cpu}
+          - {os: macos-15, gate: branches-cpu}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
       - name: Provision Linux native build dependencies
+        if: runner.os == 'Linux'
         run: bash scripts/ci-linux-native-deps.sh
       - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
         with:
@@ -89,9 +111,19 @@ jobs:
           source scripts/tool-versions.sh
           rustup toolchain install "$PANCAKE_NIGHTLY" --profile minimal --component llvm-tools-preview
       - run: bash scripts/check.sh "${{ matrix.gate }}"
+      - name: Retain available coverage diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pancake-${{ matrix.os }}-${{ matrix.gate }}
+          if-no-files-found: ignore
+          path: |
+            pancake/target/assurance/coverage-cpu.json
+            pancake/target/coverage/branches-cpu.json
+            pancake/target/llvm-cov-target/pancake.profdata
 
   policy:
-    if: inputs.gate == 'policy' || inputs.gate == 'all'
+    if: inputs.gate == 'policy' || inputs.gate == 'release' || inputs.gate == 'all'
     name: Dependency and assurance policy
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -111,7 +143,7 @@ jobs:
         if: '!cancelled()'
 
   layouts:
-    if: inputs.gate == 'nightly' || inputs.gate == 'all'
+    if: inputs.gate == 'nightly' || inputs.gate == 'release' || inputs.gate == 'all'
     name: Linux randomized layouts
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -128,8 +160,8 @@ jobs:
       - run: bash scripts/check.sh layouts-cpu
 
   nightly:
-    if: inputs.gate == 'nightly' || inputs.gate == 'all'
-    name: macOS Miri, randomized layouts, and branch coverage
+    if: inputs.gate == 'nightly' || inputs.gate == 'release' || inputs.gate == 'all'
+    name: macOS Miri and randomized layouts
     runs-on: macos-15
     timeout-minutes: 30
     steps:
@@ -139,15 +171,11 @@ jobs:
       - name: Install pinned nightly
         run: |
           source scripts/tool-versions.sh
-          rustup toolchain install "$PANCAKE_NIGHTLY" --profile minimal --component miri --component rust-src --component llvm-tools-preview
-      - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
-        with:
-          tool: cargo-llvm-cov@0.9.1
+          rustup toolchain install "$PANCAKE_NIGHTLY" --profile minimal --component miri --component rust-src
       - run: bash scripts/check.sh nightly-cpu
-      - run: bash scripts/check.sh branches-cpu
 
   sanitizer:
-    if: inputs.gate == 'sanitizers' || inputs.gate == 'all'
+    if: inputs.gate == 'sanitizers' || inputs.gate == 'release' || inputs.gate == 'all'
     name: Sanitizer (${{ matrix.kind }})
     runs-on: ubuntu-24.04
     timeout-minutes: 30

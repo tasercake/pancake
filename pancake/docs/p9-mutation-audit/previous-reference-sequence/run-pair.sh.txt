@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+proof=/tmp/pancake-previous-reference-oracle
+run_variant() {
+    local tag=$1 code=0
+    /usr/bin/time -v -o "$proof/$tag.time" cargo test --locked -p pancake --all-features \
+        --test cpu_stack_plan registration_preserves_all_reference_conventions_and_crop \
+        -- --exact --nocapture > "$proof/$tag.log" 2>&1 || code=$?
+    printf '%s\n' "$code" > "$proof/$tag.status"
+}
+run_variant mutant
+patch --reverse --force --fuzz=0 --no-backup-if-mismatch src/job/registration.rs < "$proof/native.diff" > "$proof/restored.log"
+sha256sum -c "$proof/original-source.sha" >> "$proof/restored.log"
+test -z "$(git status --porcelain=v1)"
+test "$(cat "$proof/mutant.status")" = 101
+rg -q '^Error:.*previous-reference sequential steps must track' "$proof/mutant.log"
+run_variant original
+printf 'mutant=%s original=%s\n' "$(cat "$proof/mutant.status")" "$(cat "$proof/original.status")"
+test "$(cat "$proof/original.status")" = 0

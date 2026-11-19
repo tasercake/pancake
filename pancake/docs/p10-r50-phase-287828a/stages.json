@@ -1,0 +1,61 @@
+{
+  "scope": "External GDB phase observation; instrumentation perturbation is reported. No official timing credit.",
+  "candidate_untraced_completed_ns": 50791981619,
+  "candidate_traced_completed_ns": 51833228600,
+  "reference_untraced_completed_ns": 47810985008,
+  "traced_untraced_candidate_pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+  "matched_pixel_metrics": {
+    "status": "decoded_pair",
+    "mean_absolute_u16": 506.42141972236817,
+    "maximum_absolute_u16": 52299,
+    "rms_u16": 669.3871171965342,
+    "changed_sample_fraction": 0.9993327935516975
+  },
+  "raw_return_callback_count": 4954,
+  "repeat_return_callbacks_excluded": 4753,
+  "total_ns_inside_observed_functions": 50573315459,
+  "stages": {
+    "decode": {
+      "visits": 50,
+      "wall_ns_total": 18087100546,
+      "wall_ns_median": 357749589.0,
+      "inferior_cpu_seconds_total": 79.6,
+      "average_busy_cores": 4.400926494412821
+    },
+    "registration_thumbnail": {
+      "visits": 50,
+      "wall_ns_total": 17205786785,
+      "wall_ns_median": 340406840.5,
+      "inferior_cpu_seconds_total": 24.07,
+      "average_busy_cores": 1.3989479412231365
+    },
+    "estimate_pair": {
+      "visits": 49,
+      "wall_ns_total": 420047469,
+      "wall_ns_median": 6561573,
+      "inferior_cpu_seconds_total": 3.89,
+      "average_busy_cores": 9.260858086494029
+    },
+    "fusion_add": {
+      "visits": 50,
+      "wall_ns_total": 14340322143,
+      "wall_ns_median": 280691799.0,
+      "inferior_cpu_seconds_total": 199.27,
+      "average_busy_cores": 13.895782675793688
+    },
+    "fusion_finish": {
+      "visits": 1,
+      "wall_ns_total": 294242721,
+      "wall_ns_median": 294242721,
+      "inferior_cpu_seconds_total": 2.32,
+      "average_busy_cores": 7.884647042806541
+    },
+    "prepare_export": {
+      "visits": 1,
+      "wall_ns_total": 225815795,
+      "wall_ns_median": 225815795,
+      "inferior_cpu_seconds_total": 0.21,
+      "average_busy_cores": 0.9299615201850694
+    }
+  }
+}

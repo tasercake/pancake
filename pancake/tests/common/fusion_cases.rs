@@ -98,6 +98,14 @@ fn sharpness_contract(device: &cubecl::Device) -> Result<(), String> {
     let impulse = [0.0_f32, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0];
     let measured = sharpness(device, 3, 1, &impulse, 4096)?;
     close(&[measured], &[4.0])?;
+
+    // Reflect-101 at both borders gives Laplacians [-4, 2, 2, 0].
+    // Their squared energies sum to 24 over the four pixels.
+    let corner = [1.0_f32, 0.0, 0.0, 0.0].map(|sample| [sample; 3]);
+    let measured = sharpness(device, 2, 2, corner.as_flattened(), 4096)?;
+    close(&[measured], &[6.0])
+        .map_err(|_| format!("2×2 corner impulse energy expected 6, got {measured}"))?;
+
     let flat = sharpness(device, 3, 1, &[0.27; 9], 4096)?;
     close(&[flat], &[0.0])
 }

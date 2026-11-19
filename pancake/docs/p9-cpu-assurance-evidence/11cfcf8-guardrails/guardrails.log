@@ -1,0 +1,10 @@
+PASS: rejected unsafe_code
+PASS: rejected clippy::unwrap_used
+PASS: rejected clippy::todo
+PASS: rejected missing_docs
+PASS: rejected unexpected_cfgs
+PASS: rejected unfulfilled_lint_expectations
+PASS: rejected uncovered CPU lines
+PASS: rejected missed
+PASS: rejected uncovered CPU branches
+PASS: accepted fully covered code with mutation-resistant tests

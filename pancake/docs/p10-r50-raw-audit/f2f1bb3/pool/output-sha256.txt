@@ -1,0 +1,4 @@
+688513e0fb134cea138c1c9bb5a59a8f9edeb712400c09ed3872e77344a5e2b8  /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/pool/two/frame_000.CR3.rgbf32
+93c44191dfbbbb69fe813bee5959b32f700909b45ece0dc761d23b46cda6a6ee  /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/pool/two/frame_049.CR3.rgbf32
+688513e0fb134cea138c1c9bb5a59a8f9edeb712400c09ed3872e77344a5e2b8  /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/pool/affinity/frame_000.CR3.rgbf32
+93c44191dfbbbb69fe813bee5959b32f700909b45ece0dc761d23b46cda6a6ee  /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/pool/affinity/frame_049.CR3.rgbf32

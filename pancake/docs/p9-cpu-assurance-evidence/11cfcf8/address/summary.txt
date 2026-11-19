@@ -1,0 +1,22 @@
+{
+  "source_revision": "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6",
+  "gate": "bash scripts/check.sh sanitizer address",
+  "started_utc": "2026-11-19T02:57:08Z",
+  "finished_utc": "2026-11-19T03:04:08Z",
+  "gate_exit_status": 0,
+  "pinned_toolchain": "nightly-2026-11-15",
+  "effective_cpus": "12-13",
+  "cargo_build_jobs": 2,
+  "external_sanitizer_options": false,
+  "expected_result_groups_for_this_workspace": 20,
+  "completed_result_groups": 20,
+  "totals": {
+    "passed": 164,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered_out": 0
+  },
+  "diagnostic_lines": [],
+  "passing": true
+}

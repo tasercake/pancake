@@ -1,0 +1,204 @@
+"""Compare two exact D150 CPU CLIs while holding the full geometry constant."""
+
+import argparse
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import runpy
+import subprocess
+
+import cv2
+import numpy as np
+import tifffile
+
+
+ROOT = Path.cwd()
+HELPERS = ROOT / "qualification/p10-performance/evidence/d150-hybrid-detail-prototype/run_fixed_d150.py.txt"
+FOCUS = ROOT / "qualification/p10-performance/evidence/integrated-d150-12f2151/focus-comparison.json"
+HOLDOUTS = ROOT / "pancake/docs/d150-geometry-audit/subpixel-diagnostic/raw-only-heldout-plan.json"
+BASELINE_SHA = "874c8683623131b5619858a9cba61cb6219bc2eae6d6bdb30ed1bc5d8634ce8e"
+
+
+def write(path, data):
+    with path.open("x") as stream:
+        json.dump(data, stream, indent=2, allow_nan=False)
+        stream.write("\n")
+
+
+def run(label, binary, target, paths, template, tools):
+    target.mkdir()
+    launch = template["argv"]
+    split = launch.index("--output")
+    assert launch[1] == "--input"
+    assert [Path(item).name for item in launch[2:split]] == [path.name for path in paths]
+    assert "--cpu" in launch[split:] and "--auto-crop" in launch[split:]
+    settings = template["environment"]
+    old_cache = settings["HOME"].removesuffix("/home")
+    owned = target / "cache"
+    for folder in ("home", "cache", "config", "tmp", "cuda", "nvidia", "numba", "mesa"):
+        (owned / folder).mkdir(parents=True)
+    env = {key: value.replace(old_cache, str(owned)) for key, value in settings.items()}
+    for key in ("OMP_NUM_THREADS", "RAYON_NUM_THREADS", "NUMBA_NUM_THREADS"):
+        env[key] = "4"
+    env["OPENBLAS_NUM_THREADS"] = "1"
+    trace = target / "events.jsonl"
+    env["CONFORMANCE_EVENTS_PATH"] = str(trace)
+    output = target / "complete.tif"
+    argv = [str(binary), "--input", *map(str, paths), "--output", str(output), *launch[split+2:]]
+    fields = {"argv": argv, "environment": env, "cwd": str(ROOT / "pancake"),
+              "binary_sha256": tools["sha"](binary), "affinity": sorted(os.sched_getaffinity(0))}
+    write(target / "launch.json", fields)
+    print(label, "started", flush=True)
+    with (target / "stdout.txt").open("x") as stdout, (target / "stderr.txt").open("x") as stderr:
+        subprocess.run(argv, env=env, cwd=fields["cwd"], stdout=stdout, stderr=stderr,
+                       check=True, timeout=600)
+    (event,) = [json.loads(line) for line in trace.read_text().splitlines()]
+    assert event["completed"] and event["actual_backend"] == event["runtime"] == "cpu"
+    assert not event["physical_gpu"] and event["fallback_reason"] is None
+    assert list(event["alignment_transforms"]) == list(map(str, paths)) and len(event["sequential_transforms"]) == 150
+    assert tools["sha"](binary) == fields["binary_sha256"]
+    print(label, "completed", flush=True)
+    return output, trace, event
+
+
+def extent(matrices):
+    corners = np.array([[0, 0, 1], [2303, 0, 1], [0, 1727, 1], [2303, 1727, 1]])
+    changed = corners @ matrices.swapaxes(-1, -2) - corners[:, :2]
+    x, y = [math.ceil(value) + 1 for value in np.abs(changed).max(axis=(0, 1))]
+    return x, y, 2304-x, 1728-y
+
+
+def rgb16(path, shape, tools):
+    with tifffile.TiffFile(path) as encoded:
+        assert len(encoded.pages) == 1 and encoded.pages[0].photometric == tifffile.PHOTOMETRIC.RGB
+        assert encoded.pages[0].bitspersample == 16
+        samples = encoded.asarray()
+    assert samples.shape == shape and samples.dtype == np.uint16
+    return samples, {"shape": list(shape), "encoded_sha256": tools["sha"](path),
+                     "pixel_sha256": hashlib.sha256(samples.astype("<u2", copy=False)).hexdigest()}
+
+
+def render_raw(path, matrix, roi, tools):
+    image = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+    assert image is not None and image.dtype == np.uint8 and image.shape == (1728, 2304, 3)
+    return raw_patch(image.astype(np.float32), matrix, roi, tools)
+
+
+def raw_patch(image, matrix, roi, tools):
+    x, y, width, height = roi
+    patch_map = matrix.copy()
+    patch_map[:, 2] += matrix[:, :2] @ [x, y]
+    warped = cv2.warpAffine(image, patch_map, (width, height),
+                            flags=cv2.INTER_LANCZOS4 | cv2.WARP_INVERSE_MAP,
+                            borderMode=cv2.BORDER_REPLICATE)
+    patch = np.around(np.clip(warped[..., ::-1], 0, 255) * 257).astype(np.uint16)
+    score, phase = tools["features"](patch)
+    return score, phase, patch
+
+
+def witnesses(paths, matrices, usable, tools):
+    plan = json.loads(HOLDOUTS.read_bytes())
+    original = []
+    for row in plan["selection"]:
+        roi = row["first_canvas_xywh"]
+        choices = [(render_raw(paths[index], matrices[index], roi, tools), index)
+                   for index in row["adjacent_indices"]]
+        data, index = max(choices, key=lambda value: value[0][0])
+        original.append(("previous_raw_holdout", roi, index, data))
+    # Use every published grid cell, with its highest raw eligible-frame detail
+    # witness. Output pixels are unavailable during this entire selection.
+    grid = plan["grid"]
+    peaks = [None] * len(grid)
+    for index in usable:
+        image = cv2.imread(str(paths[index]), cv2.IMREAD_UNCHANGED)
+        assert image is not None and image.dtype == np.uint8 and image.shape == (1728, 2304, 3)
+        image = image.astype(np.float32)
+        for cell, roi in enumerate(grid):
+            data = raw_patch(image, matrices[index], roi, tools)
+            previous = peaks[cell]
+            if previous is None or data[0] > previous[0][0]:
+                peaks[cell] = (data, index)
+    assert all(choice is not None for choice in peaks)
+    return original + [("eligible_raw_grid", roi, index, data)
+                       for roi, (data, index) in zip(grid, peaks, strict=True)]
+
+
+def details(images, cropped_bounds, raw_witnesses, paths, tools):
+    x, y, _, _ = cropped_bounds
+    regions = []
+    for tag, roi, index, (score, phase, patch) in raw_witnesses:
+        left, top, w, h = roi
+        witness = (score, index, paths[index].name, phase, patch)
+        samples = {label: tools["cropped"](image, [left-x, top-y, w, h]) for label, image in images.items()}
+        assert all(array.shape == (h, w, 3) for array in samples.values())
+        regions.append({"selection": tag, "first_canvas_xywh": roi, "raw_witness": paths[index].name,
+                        "raw_witness_sha256": tools["sha"](paths[index]), "raw_p90": score,
+                        **{label: tools["phase_comparison"](array, witness) for label, array in samples.items()}})
+    sealed = json.loads(FOCUS.read_bytes())["focus_regions"]
+    historical = []
+    for row in sealed:
+        left, top, w, h = row["source_xywh"]
+        expected = row["reference_luma_laplacian_absolute_p90"]
+        samples = {label: tools["cropped"](image, [left-x, top-y, w, h]) for label, image in images.items()}
+        historical.append({"first_canvas_xywh": row["source_xywh"],
+                           **{label: tools["features"](array)[0]/expected for label, array in samples.items()}})
+    return regions, historical
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ("baseline", "candidate", "source-root", "launch-template", "out"):
+        parser.add_argument(f"--{name}", type=Path, required=True)
+    parser.add_argument("--candidate-sha", required=True)
+    parser.add_argument("--candidate-revision", required=True)
+    args = parser.parse_args()
+    assert subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip() == args.candidate_revision
+    assert not subprocess.check_output(["git", "status", "--porcelain"])
+    assert len(os.sched_getaffinity(0)) == 4
+    cv2.setNumThreads(1)
+    cv2.ocl.setUseOpenCL(False)
+    tools = runpy.run_path(str(HELPERS))
+    assert tools["sha"](args.baseline) == BASELINE_SHA and tools["sha"](args.candidate) == args.candidate_sha
+    source_root = args.source_root.resolve(strict=True)
+    files = tools["authenticated_inputs"](source_root)
+    template = json.loads(args.launch_template.read_bytes())
+    out = args.out.resolve()
+    out.mkdir()
+    old_tiff, old_events, old_event = run("bilinear", args.baseline.resolve(), out / "bilinear", files, template, tools)
+    matrices = np.asarray(list(old_event["alignment_transforms"].values()), dtype=np.float64)
+    assert matrices.shape == (150, 2, 3) and np.isfinite(matrices).all()
+    usable = [index for index, matrix in enumerate(matrices.tolist())
+              if matrix != tools["IDENTITY"] and matrix[0][1] == matrix[1][0] == 0
+              and all(0.95 <= matrix[axis][axis] <= 1.05 for axis in (0, 1))]
+    assert usable
+    raw = witnesses(files, matrices, usable, tools)
+    write(out / "raw-selection.json", [{"group": tag, "roi": roi, "witness": files[index].name, "source_detail": data[0]}
+                                       for tag, roi, index, data in raw])
+    new_tiff, new_events, new_event = run("bounded-cubic", args.candidate.resolve(), out / "bounded-cubic", files, template, tools)
+    for geometry in ("alignment_transforms", "sequential_transforms"):
+        assert old_event[geometry] == new_event[geometry], geometry
+    crop = extent(matrices)
+    width, height = crop[2]-crop[0], crop[3]-crop[1]
+    images, receipts = {}, {}
+    for label, file in (("bilinear", old_tiff), ("bounded_cubic", new_tiff)):
+        images[label], receipts[label] = rgb16(file, (height, width, 3), tools)
+    regions, historical = details(images, crop, raw, files, tools)
+    delta = np.abs(np.subtract(images["bounded_cubic"], images["bilinear"], dtype=np.int32))
+    assert tools["authenticated_inputs"](source_root) == files
+    write(out / "review.json", {"scope": "One four-core full native D150 CPU quality diagnostic per executable",
+                                "baseline_revision": "287828a", "baseline_sha256": BASELINE_SHA,
+                                "candidate_revision": args.candidate_revision, "candidate_sha256": args.candidate_sha,
+                                "source_manifest_sha256": tools["MANIFEST_SHA"], "template_sha256": tools["sha"](args.launch_template),
+                                "all_originals_unchanged": True, "all_transforms_exactly_equal": True,
+                                "ordered_events_byte_identical": old_events.read_bytes() == new_events.read_bytes(),
+                                "event_sha256": [tools["sha"](old_events), tools["sha"](new_events)], "first_canvas_ltrb": crop,
+                                "bounded_cubic_eligible_frame_indices": usable,
+                                "outputs": receipts, "whole_rgb16_mae": float(delta.mean()),
+                                "whole_rgb16_max_abs": int(delta.max()), "changed_channel_fraction": float(np.count_nonzero(delta)/delta.size),
+                                "signed_heldout_detail": regions, "sealed_reference_p90_ratios": historical})
+
+
+if __name__ == "__main__":
+    main()

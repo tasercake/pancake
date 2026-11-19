@@ -11,7 +11,15 @@ from subprocess import CompletedProcess
 from unittest.mock import patch
 
 from package_linux import _dependency_report, build_package, file_sha256
+from package_native_llvm import NATIVE_DOCS
 from package_notices import _registry_notices, verify_notices
+
+
+NATIVE_BUNDLE = {
+    "target": "x86_64-unknown-linux-gnu", "wrapper_version": "23.1.0-4",
+    "archive_sha256": "a" * 64, "archive_sidecar_sha256": "b" * 64,
+    "installed_content_sha256": "c" * 64, "upstream_commit": "d" * 40,
+}
 
 
 def _workspace(root):
@@ -19,9 +27,23 @@ def _workspace(root):
     source = root / "source"
     source.mkdir()
     (source / "Cargo.toml").write_text(
+        '[package]\nname = "pancake"\nversion = "0.1.0"\n'
+        'edition = "2024"\nlicense = "GPL-3.0-or-later"\n'
         '[workspace]\nresolver = "3"\nmembers = ["crates/cli", "crates/gui"]\n'
         'exclude = ["vendor/*"]\n'
     )
+    (source / "src").mkdir()
+    (source / "src/lib.rs").touch()
+    (source / "LICENSE").write_text("Fixture first-party notice.\n")
+    native = source / "notices/llvm"
+    native.mkdir(parents=True)
+    native_license = native / "LICENSE.TXT"
+    native_license.write_text("Fixture native notice.\n")
+    (native / "manifest.json").write_text(json.dumps({
+        "schema_version": 1, **NATIVE_BUNDLE, "static_llvm_library_count": 1, "notices": {
+            "LICENSE.TXT": {"sha256": file_sha256(native_license), "bytes": native_license.stat().st_size},
+        },
+    }))
     for name in ("fixture-dep", "fixture-dev"):
         directory = source / "vendor" / f"{name}-1.0.0"
         library = directory / "src"
@@ -45,9 +67,10 @@ def _workspace(root):
         (directory / "src").mkdir(parents=True)
         (directory / "src/main.rs").write_text("fn main() {}\n")
         manifest = (f'[package]\nname = "pancake-{component}"\nversion = "0.1.0"\n'
-                    'edition = "2024"\nlicense = "MIT"\n')
+                    'edition = "2024"\nlicense = "GPL-3.0-or-later"\n'
+                    '[dependencies]\npancake = { path = "../.." }\n')
         if component == "cli":
-            manifest += ('[dependencies]\nfixture-dep = { path = "../../vendor/fixture-dep-1.0.0" }\n'
+            manifest += ('fixture-dep = { path = "../../vendor/fixture-dep-1.0.0" }\n'
                          '[dev-dependencies]\nfixture-dev = { path = "../../vendor/fixture-dev-1.0.0" }\n')
         (directory / "Cargo.toml").write_text(manifest)
     subprocess.run(["cargo", "generate-lockfile", "--offline", "--quiet"], cwd=source, check=True)
@@ -74,8 +97,18 @@ class LinuxPackageTests(unittest.TestCase):
             output = root / "package"
             source_root, revision = _workspace(root)
             lock_digest = file_sha256(source_root / "Cargo.lock")
+            native_receipt = root / "native-build.json"
+            native_receipt.write_text(json.dumps({
+                "schema_version": 1, **NATIVE_BUNDLE, "source_commit": revision, "cargo_lock_sha256": lock_digest,
+                "binaries": {path.name: {"sha256": file_sha256(path), "bytes": path.stat().st_size}
+                             for path in release.iterdir()},
+                "link_output_sha256": "e" * 64,
+                "static_llvm_inputs": [{"name": "libLLVMCore.a", "sha256": "f" * 64, "bytes": 12}],
+                "native_rlib": {"rlib_sha256": "a" * 64, "rlib_bytes": 30,
+                                "matched_native_objects": 2, "distinct_native_object_digests": 2},
+            }))
             build_package(release, output, "0.1.0", "Pancake fixture <test@localhost>", revision, lock_digest,
-                          source_root=source_root)
+                          source_root=source_root, native_llvm_receipt=native_receipt)
             receipt = json.loads((output / "package-receipt.json").read_text())
             self.assertEqual(receipt["source_commit"], revision)
             artifact = output / receipt["archive"]["file"]
@@ -83,6 +116,8 @@ class LinuxPackageTests(unittest.TestCase):
             subprocess.run(["dpkg-deb", "--extract", artifact, root / "unpack"], check=True)
             for name in ("pancake-cli", "pancake-gui"):
                 self.assertEqual(file_sha256(release / name), file_sha256(root / "unpack/usr/bin" / name))
+            launched = subprocess.check_output([root / "unpack/usr/bin/pancake-cli"], text=True, timeout=5)
+            self.assertEqual(launched, "package fixture\n")
             self.assertIn("libc6", receipt["depends"])
             self.assertIn("libvulkan1", receipt["depends"])
             inventory = root / "unpack/usr/share/doc/pancake/dependency-notices/inventory.json"
@@ -92,8 +127,24 @@ class LinuxPackageTests(unittest.TestCase):
             self.assertEqual(manifest["source_commit"], revision)
             self.assertEqual(manifest["cargo_lock_sha256"], lock_digest)
             items = {package["name"]: package for package in manifest["packages"]}
-            self.assertEqual(set(items), {"pancake-cli", "pancake-gui", "fixture-dep"})
-            self.assertEqual(items["pancake-gui"]["status"], "no_notice_in_source")
+            self.assertEqual(set(items), {"pancake", "pancake-cli", "pancake-gui", "fixture-dep"})
+            shared = items["pancake"]["notices"]
+            self.assertEqual(len(shared), 1)
+            self.assertEqual((inventory.parent / shared[0]["file"]).read_bytes(),
+                             (source_root / "LICENSE").read_bytes())
+            for component in ("pancake-cli", "pancake-gui"):
+                self.assertEqual(items[component]["status"], "covered_by_shared_project_notice")
+                self.assertEqual(items[component]["shared_project_license"], shared[0])
+                self.assertFalse(items[component]["notices"])
+            self.assertEqual(set(receipt["native_llvm"]), {
+                (NATIVE_DOCS / name).as_posix() for name in ("LICENSE.TXT", "manifest.json", "build-provenance.json")
+            })
+            for path, expected in receipt["native_llvm"].items():
+                extracted = root / "unpack" / path
+                self.assertEqual(file_sha256(extracted), expected["sha256"])
+                self.assertEqual(extracted.stat().st_size, expected["bytes"])
+            packed_native_receipt = root / "unpack" / NATIVE_DOCS / "build-provenance.json"
+            self.assertEqual(json.loads(packed_native_receipt.read_text()), json.loads(native_receipt.read_text()))
             self.assertEqual(items["fixture-dep"]["provenance"]["commit"], revision)
             self.assertEqual(items["fixture-dep"]["provenance"]["upstream_patch"]["archive_sha256"], "a" * 64)
             for name in ("NOTICE", "legal/terms.txt", "LICENSES/additional.txt"):

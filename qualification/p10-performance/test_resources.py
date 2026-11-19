@@ -14,6 +14,46 @@ import resources
 
 
 class ResourceCadence(unittest.TestCase):
+    def test_tighter_absolute_slots_keep_phase_and_skip_missed_slots(self):
+        self.assertEqual(
+            resources._next_sample_due_ns(3_000_000, 3_100_000, 3_000_000), 6_000_000,
+        )
+        self.assertEqual(
+            resources._next_sample_due_ns(3_000_000, 12_000_000, 3_000_000), 15_000_000,
+        )
+
+    def test_nominal_rss_interval_cannot_make_a_late_observation_eligible(self):
+        rows = [
+            {"scheduled_ns": 0, "rss_elapsed_ns": 2_000_000, "rss_bytes": 25},
+            {"scheduled_ns": 3_000_000, "rss_elapsed_ns": 22_000_001, "rss_bytes": 40},
+        ]
+        result = resources._summarize_samples(rows, 25_000_000, gpu=False, errors=[])
+        self.assertEqual(result["maximum_rss_sample_gap_ns"], 20_000_001)
+        self.assertEqual(result["observed_peak_rss_bytes"], 40)
+        self.assertIsNone(result["peak_rss_bytes"])
+        rows[-1]["rss_elapsed_ns"] -= 1
+        result = resources._summarize_samples(rows, 25_000_000, gpu=False, errors=[])
+        self.assertEqual(result["maximum_rss_sample_gap_ns"], 20_000_000)
+        self.assertEqual(result["peak_rss_bytes"], 40)
+
+    def test_invalid_cpu_interval_and_gpu_override_are_rejected_before_launch(self):
+        for interval, gpu in ((0, None), (1, None), (9, None), (2.5, None), (3, object())):
+            with (
+                self.subTest(interval=interval, gpu=gpu is not None),
+                patch("resources.subprocess.Popen") as launch,
+            ):
+                with self.assertRaisesRegex(ValueError, "interval"):
+                    resources.measure(
+                        [],
+                        cwd=Path("."),
+                        env={},
+                        directory=Path("."),
+                        timeout=3,
+                        gpu=gpu,
+                        rss_sample_interval_ms=interval,
+                    )
+                launch.assert_not_called()
+
     @unittest.skipUnless(sys.platform == "linux", "Linux per-thread affinity")
     def test_rss_sampler_uses_its_own_cpu_and_the_job_inherits_the_original_mask(self):
         original = os.sched_getaffinity(0)

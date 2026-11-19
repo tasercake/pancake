@@ -106,25 +106,27 @@ fn scene_pair(
     dy: f32,
     texture_scale: f32,
 ) -> (Vec<f32>, Vec<f32>) {
-    let sample = |x: f32, y: f32| {
-        let weight_x = (0.017 * y).mul_add(y, 0.11 * x).sin();
-        let weight_y = (0.011 * x).mul_add(x, 0.16 * y).cos();
-        let coarse = 0.27_f32.mul_add(y, 0.31 * x).cos();
-        let texture = 0.19_f32.mul_add(-y, 0.13 * x).sin();
-        (0.22 * weight_x).mul_add(
-            weight_y,
-            0.14_f32.mul_add(coarse, 0.06_f32.mul_add(texture, 0.5)),
-        )
-    };
     let mut reference = Vec::new();
     let mut source = Vec::new();
     for y in (0..height).map(f32::from) {
         for x in (0..width).map(f32::from) {
-            reference.extend([sample(x / texture_scale, y / texture_scale); 3]);
-            source.extend([sample((x - dx) / texture_scale, (y - dy) / texture_scale); 3]);
+            reference.extend([scene_sample(x / texture_scale, y / texture_scale); 3]);
+            source.extend([scene_sample((x - dx) / texture_scale, (y - dy) / texture_scale); 3]);
         }
     }
     (reference, source)
+}
+
+/// Provide continuous, nonperiodic texture with informative structure on both axes.
+fn scene_sample(x: f32, y: f32) -> f32 {
+    let weight_x = (0.017 * y).mul_add(y, 0.11 * x).sin();
+    let weight_y = (0.011 * x).mul_add(x, 0.16 * y).cos();
+    let coarse = 0.27_f32.mul_add(y, 0.31 * x).cos();
+    let texture = 0.19_f32.mul_add(-y, 0.13 * x).sin();
+    (0.22 * weight_x).mul_add(
+        weight_y,
+        0.14_f32.mul_add(coarse, 0.06_f32.mul_add(texture, 0.5)),
+    )
 }
 
 /// A textured source can move beyond the local search radius.

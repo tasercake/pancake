@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo=$(git rev-parse --show-toplevel)
+proof=$(realpath "$repo/artifacts/r50-raw-audit")
+source_dir=/home/krishna/Documents/focus-stacking/artifacts/pancake-corpus/r50-12f2151-cr3-parity
+output="$proof/verification"
+mkdir "$output"
+inputs=("$source_dir/frame_000.CR3" "$source_dir/frame_049.CR3")
+export RAYON_NUM_THREADS=15 OMP_NUM_THREADS=15 NUMBA_NUM_THREADS=15 OPENBLAS_NUM_THREADS=1
+export VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.json
+mask=0-14
+cd "$repo/pancake"
+
+original="$proof/sealed-baseline-cli"
+modified="$PWD/target/release/pancake-cli"
+options=(--input "${inputs[@]}" --cpu --method hybrid --align
+    --alignment-mode similarity --alignment-ref first --kernel-size 6
+    --pyramid-levels 8 --scale-factor 6 --slab-size 0 --auto-crop --bit-depth 16)
+
+for variant in baseline candidate; do
+    binary=$original
+    if [[ $variant == candidate ]]; then binary=$modified; fi
+    mkdir -p "$output/$variant-state"
+    export PANCAKE_STATE_DIR="$output/$variant-state"
+    export PANCAKE_COMPUTE_CACHE_DIR="$output/$variant-state/cache"
+    export CONFORMANCE_EVENTS_PATH="$output/$variant-events.jsonl"
+    command=(taskset -c "$mask" "$binary" "${options[@]}" --output "$output/$variant.tiff")
+    printf '%q ' "${command[@]}" >> "$output/commands.txt"
+    printf '\n' >> "$output/commands.txt"
+    "${command[@]}" > "$output/$variant-cli.log" 2>&1
+done
+
+cmp "$output/baseline.tiff" "$output/candidate.tiff"
+file "$output/baseline.tiff" | tee "$output/tiff-geometry.txt"
+sha256sum "$output/"{baseline,candidate}.tiff > "$output/tiff-sha256.txt"
+
+original="$proof/decode-baseline"
+modified="$PWD/target/release/examples/raw_decode_probe"
+for variant in baseline candidate; do
+    binary=$original
+    if [[ $variant == candidate ]]; then binary=$modified; fi
+    taskset -c "$mask" "$binary" bytes "${inputs[@]}" > "$output/$variant.rgbf32" \
+        2> "$output/$variant-decode-bytes.log"
+done
+cmp "$output/baseline.rgbf32" "$output/candidate.rgbf32"
+sha256sum "$output/"{baseline,candidate}.rgbf32 > "$output/working-sha256.txt"
+stat -c '%s %n' "$output/"{baseline,candidate}.rgbf32 > "$output/working-bytes.txt"
+
+for sequence in baseline:candidate candidate:baseline baseline:candidate candidate:baseline; do
+    IFS=: read -r first second <<< "$sequence"
+    for variant in "$first" "$second"; do
+        binary=$original
+        if [[ $variant == candidate ]]; then binary=$modified; fi
+        /usr/bin/time -f 'elapsed=%e peak_rss_kib=%M' taskset -c "$mask" \
+            "$binary" timing "${inputs[@]}" > /dev/null \
+            2>> "$output/$variant-decode-timing.log"
+    done
+done

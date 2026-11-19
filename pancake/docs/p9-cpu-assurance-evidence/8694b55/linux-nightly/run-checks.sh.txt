@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Run the pinned supplemental library command and unchanged CPU randomized-layout gate.
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+proof="$repo/artifacts/linux-layouts-8694b55"
+cd "$repo/pancake"
+test "$(git rev-parse HEAD)" = 8694b555666a1ddf4051e2839bbced4bcc625859
+test -z "$(git status --porcelain --untracked-files=all)"
+{
+    date -u +%FT%TZ
+    git rev-parse HEAD HEAD^{tree}
+    printf 'dirty=false\n'
+    sha256sum Cargo.lock assurance-platforms.json scripts/check.sh scripts/tool-versions.sh scripts/assurance_targets.py
+    uname -srm
+    lscpu
+    rustc +nightly-2026-11-15 --version --verbose
+    cargo +nightly-2026-11-15 --version --verbose
+    cargo +nightly-2026-11-15 miri --version
+    df -k "$repo"
+    awk '/^Cpus_allowed_list:/{print}' /proc/self/status
+    printf 'CARGO_BUILD_JOBS=%s\nCARGO_INCREMENTAL=%s\n' "$CARGO_BUILD_JOBS" "$CARGO_INCREMENTAL"
+    printf 'RUSTFLAGS=%s\nCARGO_ENCODED_RUSTFLAGS=%s\nRUSTC_WRAPPER=%s\nMIRIFLAGS=%s\nRUST_TEST_THREADS=%s\n' \
+        "${RUSTFLAGS-unset}" "${CARGO_ENCODED_RUSTFLAGS-unset}" "${RUSTC_WRAPPER-unset}" "${MIRIFLAGS-unset}" "${RUST_TEST_THREADS-unset}"
+} >"$proof/environment.txt"
+python3 scripts/miri_host_policy.py "$PWD" validate >"$proof/reviewed-source.log" 2>&1
+set +e
+date -u +%FT%TZ >"$proof/miri.start"
+CARGO_TARGET_DIR="$PWD/target/supplemental-miri-linux" \
+MIRIFLAGS="-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check" \
+  /usr/bin/time -v -o "$proof/miri.time" cargo +nightly-2026-11-15 miri test --locked \
+    --workspace --all-features --lib -- --include-ignored >"$proof/miri.log" 2>&1
+miri=$?
+printf '%d\n' "$miri" >"$proof/miri.status"
+date -u +%FT%TZ >"$proof/miri.end"
+date -u +%FT%TZ >"$proof/layouts.start"
+CARGO_TARGET_DIR="$PWD/target/layouts-cpu-linux" \
+  /usr/bin/time -v -o "$proof/layouts.time" bash -x scripts/check.sh layouts-cpu >"$proof/layouts.log" 2>&1
+layouts=$?
+printf '%d\n' "$layouts" >"$proof/layouts.status"
+date -u +%FT%TZ >"$proof/layouts.end"
+set -e
+test "$miri" = 0 && test "$layouts" = 0

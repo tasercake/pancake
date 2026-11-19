@@ -1,0 +1,1 @@
+CARGO_BUILD_JOBS=2 MIRIFLAGS="-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check" taskset -c 6,7 timeout --signal=TERM --kill-after=10s 220s cargo +nightly-2026-11-15 miri test --offline --locked -p pancake --all-features --lib -- --include-ignored

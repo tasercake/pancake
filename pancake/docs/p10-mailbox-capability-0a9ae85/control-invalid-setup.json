@@ -1,0 +1,9 @@
+{
+  "scope": "invalid setup; application and desktop never launched",
+  "start": "2026-11-19T01:23:02+08:00",
+  "terminal": "2026-11-19T01:23:03+08:00",
+  "collector_exit": 1,
+  "native_observations": 0,
+  "original_observer_log_sha256": "f45a413d9b0418a7e811695f49a8ca59c9fbe17ccdbf3de0f8d76fa405845080",
+  "correction": "compare both identities as the existing _pci_id normalized PCI tuple"
+}

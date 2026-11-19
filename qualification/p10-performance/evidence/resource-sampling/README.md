@@ -1,5 +1,14 @@
 # Linux memory collector cadence
 
+The [collector follow-up](collector-cadence-followup.md) retains the native
+RSS, delegated cgroup roster, and physical NVIDIA per-call tests.
+The [private procfs and lineage check](rss-pid-namespace.md) records exact RSS
+membership across cgroup movement and the launch-equivalence blocker.
+The [NVML overlap audit](nvml-overlap.md) records when two complete workers can
+cover a delayed acquisition and the remaining device-level evidence needed.
+The [E9 overlap diagnostic runner](nvml-overlap-runner.md) documents its
+device-free preflight and bounded physical invocation.
+
 ## Isolate the slow counter
 
 The retained smoke used the same immutable locked Linux CLI

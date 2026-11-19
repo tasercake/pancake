@@ -1,0 +1,567 @@
+{
+  "same_cpu_kernel_affinity_governor_clock": {
+    "cpu": true,
+    "kernel": true,
+    "cpu_affinity": true,
+    "frequency_policy": true,
+    "timer": true,
+    "validator": true
+  },
+  "reports": {
+    "8694b55": {
+      "same_selected_Vulkan_PCI": "00000000:01:00.0",
+      "before_snapshot": "|  0%   41C    P8             17W /  350W |     575MiB /  24576MiB |      0%      Default |",
+      "after_snapshot": "| 44%   49C    P5             46W /  350W |     575MiB /  24576MiB |      0%      Default |",
+      "groups": {
+        "by_action/comparison": {
+          "count": 40,
+          "p50_ns": 22856967.5,
+          "p95_ns": 48353911,
+          "max_ns": 96697528,
+          "over_33_ms": 9
+        },
+        "by_action/pan": {
+          "count": 40,
+          "p50_ns": 21748930.0,
+          "p95_ns": 44839199,
+          "max_ns": 90908571,
+          "over_33_ms": 6
+        },
+        "by_action/result": {
+          "count": 40,
+          "p50_ns": 22804219.5,
+          "p95_ns": 35631331,
+          "max_ns": 43781131,
+          "over_33_ms": 4
+        },
+        "by_action/source": {
+          "count": 40,
+          "p50_ns": 21800948.5,
+          "p95_ns": 24090740,
+          "max_ns": 25029372,
+          "over_33_ms": 0
+        },
+        "by_action/zoom": {
+          "count": 40,
+          "p50_ns": 27846872.5,
+          "p95_ns": 103891419,
+          "max_ns": 190434765,
+          "over_33_ms": 14
+        },
+        "by_pre_stage/Decode": {
+          "count": 54,
+          "p50_ns": 27002676.5,
+          "p95_ns": 44385722,
+          "max_ns": 45558726,
+          "over_33_ms": 14
+        },
+        "by_pre_stage/Fuse": {
+          "count": 146,
+          "p50_ns": 21831663.0,
+          "p95_ns": 89928248,
+          "max_ns": 190434765,
+          "over_33_ms": 19
+        },
+        "by_transition/Decode->Decode": {
+          "count": 14,
+          "p50_ns": 23900360.0,
+          "p95_ns": 35634917,
+          "max_ns": 35634917,
+          "over_33_ms": 1
+        },
+        "by_transition/Decode->Fuse": {
+          "count": 40,
+          "p50_ns": 28097066.0,
+          "p95_ns": 44385722,
+          "max_ns": 45558726,
+          "over_33_ms": 13
+        },
+        "by_transition/Fuse->Decode": {
+          "count": 19,
+          "p50_ns": 64977284,
+          "p95_ns": 190434765,
+          "max_ns": 190434765,
+          "over_33_ms": 16
+        },
+        "by_transition/Fuse->Fuse": {
+          "count": 127,
+          "p50_ns": 21726734,
+          "p95_ns": 29343105,
+          "max_ns": 44419077,
+          "over_33_ms": 3
+        }
+      },
+      "all_late": [
+        {
+          "step": 406,
+          "action": "result",
+          "stage_before": "Running \u00b7 Fuse \u00b7 0 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 1 of 50",
+          "latency_ns": 43781131,
+          "maximum_observation_gap_ns": 1109498
+        },
+        {
+          "step": 410,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 40951859,
+          "maximum_observation_gap_ns": 1112064
+        },
+        {
+          "step": 424,
+          "action": "comparison",
+          "stage_before": "Running \u00b7 Decode \u00b7 4 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 4 of 50",
+          "latency_ns": 34748657,
+          "maximum_observation_gap_ns": 1114438
+        },
+        {
+          "step": 430,
+          "action": "result",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "latency_ns": 35631331,
+          "maximum_observation_gap_ns": 1091174
+        },
+        {
+          "step": 434,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "latency_ns": 44419077,
+          "maximum_observation_gap_ns": 1124307
+        },
+        {
+          "step": 458,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 190434765,
+          "maximum_observation_gap_ns": 1121922
+        },
+        {
+          "step": 460,
+          "action": "comparison",
+          "stage_before": "Running \u00b7 Decode \u00b7 4 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 4 of 50",
+          "latency_ns": 41026391,
+          "maximum_observation_gap_ns": 1112784
+        },
+        {
+          "step": 492,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Decode \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "latency_ns": 43268733,
+          "maximum_observation_gap_ns": 1122924
+        },
+        {
+          "step": 530,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Decode \u00b7 3 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 3 of 50",
+          "latency_ns": 42242702,
+          "maximum_observation_gap_ns": 1099911
+        },
+        {
+          "step": 544,
+          "action": "comparison",
+          "stage_before": "Running \u00b7 Fuse \u00b7 3 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 4 of 50",
+          "latency_ns": 42937494,
+          "maximum_observation_gap_ns": 1092447
+        },
+        {
+          "step": 564,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Decode \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "latency_ns": 45558726,
+          "maximum_observation_gap_ns": 1105010
+        },
+        {
+          "step": 566,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 59597912,
+          "maximum_observation_gap_ns": 1130688
+        },
+        {
+          "step": 568,
+          "action": "comparison",
+          "stage_before": "Running \u00b7 Fuse \u00b7 3 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 4 of 50",
+          "latency_ns": 96697528,
+          "maximum_observation_gap_ns": 1089542
+        },
+        {
+          "step": 590,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 96055577,
+          "maximum_observation_gap_ns": 1136349
+        },
+        {
+          "step": 600,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Decode \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "latency_ns": 44839199,
+          "maximum_observation_gap_ns": 1129587
+        },
+        {
+          "step": 602,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 64977284,
+          "maximum_observation_gap_ns": 1111863
+        },
+        {
+          "step": 626,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 3 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 3 of 50",
+          "latency_ns": 34629810,
+          "maximum_observation_gap_ns": 1104670
+        },
+        {
+          "step": 638,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 89928248,
+          "maximum_observation_gap_ns": 1164802
+        },
+        {
+          "step": 640,
+          "action": "comparison",
+          "stage_before": "Running \u00b7 Fuse \u00b7 3 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 4 of 50",
+          "latency_ns": 94605062,
+          "maximum_observation_gap_ns": 1099210
+        },
+        {
+          "step": 662,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Decode \u00b7 3 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 3 of 50",
+          "latency_ns": 44385722,
+          "maximum_observation_gap_ns": 1118576
+        },
+        {
+          "step": 712,
+          "action": "comparison",
+          "stage_before": "Running \u00b7 Decode \u00b7 4 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 4 of 50",
+          "latency_ns": 39847920,
+          "maximum_observation_gap_ns": 1114729
+        },
+        {
+          "step": 730,
+          "action": "result",
+          "stage_before": "Running \u00b7 Decode \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "latency_ns": 33450582,
+          "maximum_observation_gap_ns": 1094712
+        },
+        {
+          "step": 732,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+          "latency_ns": 90908571,
+          "maximum_observation_gap_ns": 1096826
+        },
+        {
+          "step": 756,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Decode \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "latency_ns": 37136289,
+          "maximum_observation_gap_ns": 1118887
+        },
+        {
+          "step": 766,
+          "action": "result",
+          "stage_before": "Running \u00b7 Decode \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "latency_ns": 41327684,
+          "maximum_observation_gap_ns": 1125409
+        },
+        {
+          "step": 794,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 66941292,
+          "maximum_observation_gap_ns": 1105001
+        },
+        {
+          "step": 796,
+          "action": "comparison",
+          "stage_before": "Running \u00b7 Decode \u00b7 4 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 4 of 50",
+          "latency_ns": 35634917,
+          "maximum_observation_gap_ns": 1126581
+        },
+        {
+          "step": 808,
+          "action": "comparison",
+          "stage_before": "Running \u00b7 Fuse \u00b7 3 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 4 of 50",
+          "latency_ns": 48353911,
+          "maximum_observation_gap_ns": 1105802
+        },
+        {
+          "step": 842,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 108994249,
+          "maximum_observation_gap_ns": 1093619
+        },
+        {
+          "step": 864,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Decode \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "latency_ns": 41121200,
+          "maximum_observation_gap_ns": 1091836
+        },
+        {
+          "step": 866,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 55120413,
+          "maximum_observation_gap_ns": 1123686
+        },
+        {
+          "step": 878,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 2 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 3 of 50",
+          "latency_ns": 103891419,
+          "maximum_observation_gap_ns": 1129136
+        },
+        {
+          "step": 880,
+          "action": "comparison",
+          "stage_before": "Running \u00b7 Decode \u00b7 4 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 4 of 50",
+          "latency_ns": 35388416,
+          "maximum_observation_gap_ns": 1083971
+        }
+      ],
+      "over_33_by_action": {
+        "result": 4,
+        "zoom": 14,
+        "comparison": 9,
+        "pan": 6
+      },
+      "over_33_by_transition": {
+        "Fuse->Decode": 16,
+        "Decode->Fuse": 13,
+        "Fuse->Fuse": 3,
+        "Decode->Decode": 1
+      },
+      "max_late_observer_poll_gap_ns": 1164802
+    },
+    "287828a": {
+      "same_selected_Vulkan_PCI": "00000000:01:00.0",
+      "before_snapshot": "| 57%   69C    P2            125W /  350W |     655MiB /  24576MiB |      2%      Default |",
+      "after_snapshot": "| 57%   68C    P2            124W /  350W |     654MiB /  24576MiB |      2%      Default |",
+      "groups": {
+        "by_action/comparison": {
+          "count": 40,
+          "p50_ns": 20670012.0,
+          "p95_ns": 23183932,
+          "max_ns": 29461659,
+          "over_33_ms": 0
+        },
+        "by_action/pan": {
+          "count": 40,
+          "p50_ns": 21774197.5,
+          "p95_ns": 33817853,
+          "max_ns": 43510225,
+          "over_33_ms": 4
+        },
+        "by_action/result": {
+          "count": 40,
+          "p50_ns": 20782854.0,
+          "p95_ns": 25027312,
+          "max_ns": 27146502,
+          "over_33_ms": 0
+        },
+        "by_action/source": {
+          "count": 40,
+          "p50_ns": 20617413.0,
+          "p95_ns": 22713525,
+          "max_ns": 22831620,
+          "over_33_ms": 0
+        },
+        "by_action/zoom": {
+          "count": 40,
+          "p50_ns": 20674516.5,
+          "p95_ns": 41204861,
+          "max_ns": 43402286,
+          "over_33_ms": 8
+        },
+        "by_pre_stage/Decode": {
+          "count": 81,
+          "p50_ns": 20687608,
+          "p95_ns": 22831620,
+          "max_ns": 43510225,
+          "over_33_ms": 1
+        },
+        "by_pre_stage/Fuse": {
+          "count": 119,
+          "p50_ns": 21505688,
+          "p95_ns": 35866418,
+          "max_ns": 43402286,
+          "over_33_ms": 11
+        },
+        "by_transition/Decode->Decode": {
+          "count": 42,
+          "p50_ns": 20630413.0,
+          "p95_ns": 21801411,
+          "max_ns": 22794970,
+          "over_33_ms": 0
+        },
+        "by_transition/Decode->Fuse": {
+          "count": 39,
+          "p50_ns": 21666287,
+          "p95_ns": 23038576,
+          "max_ns": 43510225,
+          "over_33_ms": 1
+        },
+        "by_transition/Fuse->Decode": {
+          "count": 40,
+          "p50_ns": 20718259.0,
+          "p95_ns": 41204861,
+          "max_ns": 43402286,
+          "over_33_ms": 8
+        },
+        "by_transition/Fuse->Fuse": {
+          "count": 79,
+          "p50_ns": 21537546,
+          "p95_ns": 32539509,
+          "max_ns": 33859119,
+          "over_33_ms": 3
+        }
+      },
+      "all_late": [
+        {
+          "step": 432,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Decode \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "latency_ns": 43510225,
+          "maximum_observation_gap_ns": 1122028
+        },
+        {
+          "step": 552,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "latency_ns": 33725162,
+          "maximum_observation_gap_ns": 1130704
+        },
+        {
+          "step": 590,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+          "latency_ns": 41204861,
+          "maximum_observation_gap_ns": 1129452
+        },
+        {
+          "step": 650,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+          "latency_ns": 35339783,
+          "maximum_observation_gap_ns": 1137407
+        },
+        {
+          "step": 660,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "latency_ns": 33817853,
+          "maximum_observation_gap_ns": 1145192
+        },
+        {
+          "step": 698,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+          "latency_ns": 40037416,
+          "maximum_observation_gap_ns": 1101409
+        },
+        {
+          "step": 734,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+          "latency_ns": 43402286,
+          "maximum_observation_gap_ns": 1103933
+        },
+        {
+          "step": 744,
+          "action": "pan",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "latency_ns": 33859119,
+          "maximum_observation_gap_ns": 1159468
+        },
+        {
+          "step": 770,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+          "latency_ns": 41126901,
+          "maximum_observation_gap_ns": 1103372
+        },
+        {
+          "step": 806,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+          "latency_ns": 41265220,
+          "maximum_observation_gap_ns": 1108953
+        },
+        {
+          "step": 842,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+          "latency_ns": 34666806,
+          "maximum_observation_gap_ns": 1108572
+        },
+        {
+          "step": 878,
+          "action": "zoom",
+          "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+          "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+          "latency_ns": 35866418,
+          "maximum_observation_gap_ns": 1127688
+        }
+      ],
+      "over_33_by_action": {
+        "pan": 4,
+        "zoom": 8
+      },
+      "over_33_by_transition": {
+        "Decode->Fuse": 1,
+        "Fuse->Fuse": 3,
+        "Fuse->Decode": 8
+      },
+      "max_late_observer_poll_gap_ns": 1159468
+    }
+  }
+}

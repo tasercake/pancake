@@ -1,0 +1,178 @@
+[
+  {
+    "group": "previous_raw_holdout",
+    "roi": [
+      670,
+      675,
+      96,
+      96
+    ],
+    "witness": "P9160585_d2.jpg",
+    "source_detail": 0.032749019607843266
+  },
+  {
+    "group": "previous_raw_holdout",
+    "roi": [
+      670,
+      1045,
+      96,
+      96
+    ],
+    "witness": "P9160599_d2.jpg",
+    "source_detail": 0.02662196078431389
+  },
+  {
+    "group": "previous_raw_holdout",
+    "roi": [
+      1505,
+      345,
+      96,
+      96
+    ],
+    "witness": "P9160546_d2.jpg",
+    "source_detail": 0.024378823529411675
+  },
+  {
+    "group": "previous_raw_holdout",
+    "roi": [
+      1505,
+      1045,
+      96,
+      96
+    ],
+    "witness": "P9160563_d2.jpg",
+    "source_detail": 0.026318431372548967
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      670,
+      345,
+      96,
+      96
+    ],
+    "witness": "P9160656_d2.jpg",
+    "source_detail": 0.00988111390859836
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      880,
+      345,
+      96,
+      96
+    ],
+    "witness": "P9160656_d2.jpg",
+    "source_detail": 0.009377566186007602
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      1505,
+      345,
+      96,
+      96
+    ],
+    "witness": "P9160657_d2.jpg",
+    "source_detail": 0.009677926298923945
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      1735,
+      345,
+      96,
+      96
+    ],
+    "witness": "P9160657_d2.jpg",
+    "source_detail": 0.009042169832913505
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      670,
+      675,
+      96,
+      96
+    ],
+    "witness": "P9160656_d2.jpg",
+    "source_detail": 0.009709599450675177
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      880,
+      675,
+      96,
+      96
+    ],
+    "witness": "P9160658_d2.jpg",
+    "source_detail": 0.010319369802395673
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      1505,
+      675,
+      96,
+      96
+    ],
+    "witness": "P9160656_d2.jpg",
+    "source_detail": 0.010148258182650638
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      1735,
+      675,
+      96,
+      96
+    ],
+    "witness": "P9160660_d2.jpg",
+    "source_detail": 0.010912254520485276
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      670,
+      1045,
+      96,
+      96
+    ],
+    "witness": "P9160656_d2.jpg",
+    "source_detail": 0.010531157396810875
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      880,
+      1045,
+      96,
+      96
+    ],
+    "witness": "P9160655_d2.jpg",
+    "source_detail": 0.010159295033188354
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      1505,
+      1045,
+      96,
+      96
+    ],
+    "witness": "P9160656_d2.jpg",
+    "source_detail": 0.009686546120393658
+  },
+  {
+    "group": "eligible_raw_grid",
+    "roi": [
+      1735,
+      1045,
+      96,
+      96
+    ],
+    "witness": "P9160656_d2.jpg",
+    "source_detail": 0.01027551842526886
+  }
+]

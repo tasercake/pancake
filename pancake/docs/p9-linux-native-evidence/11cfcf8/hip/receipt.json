@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "source_commit": "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6",
+  "source_tree": "0ea17aeb65a346e3cb6b5593d8c8b4a02e827832",
+  "pancake_tree": "789e6bad6369cd8c33d59598f2a5fcf4c1c9f487",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "toolchain": "1.100.0-x86_64-unknown-linux-gnu",
+  "logical_cpus": [
+    12,
+    13
+  ],
+  "parallel_build_jobs": 2,
+  "offline": true,
+  "direct_compiler": true,
+  "build_command": "taskset -c 12,13 cargo +1.100.0 build --locked --offline --release -p pancake -p pancake-cli --bin pancake-cli -j 2 --features cubecl/hip",
+  "build_started_utc": "2026-11-19T03:07:01Z",
+  "build_ended_utc": "2026-11-19T03:11:20Z",
+  "verify_ended_utc": "2026-11-19T03:11:30Z",
+  "build_wall_seconds": 259.04,
+  "max_child_rss_kib": 2180568,
+  "target_bytes": 2052994166,
+  "binary_bytes": 164657400,
+  "binary_sha256": "7f3eb0977f522326b0ccbefcb5b1bcb0ac1d3e11c1344796dda8898c4da03d7e",
+  "elf_build_id": "f96fc289e6f8738018796548caa20cfa104a5d67",
+  "retained_executable": "artifacts/pancake-linux-native/11cfcf8/pancake-cli-hip",
+  "needed_libraries": [
+    "libm.so.6",
+    "libstdc++.so.6",
+    "libgcc_s.so.1",
+    "libc.so.6",
+    "ld-linux-x86-64.so.2"
+  ],
+  "requested_feature": "cubecl/hip",
+  "resolved_graph": {
+    "cubecl-hip": "0.11.4",
+    "cubecl-hip-sys": "7.14.6085001",
+    "cubecl-cpu": "0.11.4",
+    "cubecl-wgpu": "0.11.4",
+    "cuda": false,
+    "slint_frontend": false
+  },
+  "hip_abi_cfg": "hip_60850",
+  "compiled_backend_symbols": {
+    "hip": 270,
+    "hip_bindings": 78,
+    "cuda": 0,
+    "wgpu": 2034,
+    "cpu": 175,
+    "frontend": 0
+  },
+  "result": {
+    "compile": 0,
+    "static_link_verification": 0,
+    "app_executions": 0,
+    "gpu_executions": 0
+  }
+}

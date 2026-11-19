@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Two-frame same-host diagnostics. These are separate from the frozen R50 campaign.
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+proof="$repo/artifacts/r50-workers"
+inputs=("$proof/inputs/frame_000.CR3" "$proof/inputs/frame_049.CR3")
+output="$proof/canon"
+mkdir "$output"
+package="$proof/sealed-cli"
+mask=0-14
+export LC_ALL=C
+export RAYON_NUM_THREADS=15 OMP_NUM_THREADS=15 NUMBA_NUM_THREADS=15 OPENBLAS_NUM_THREADS=1
+export VK_DRIVER_FILES=/usr/share/vulkan/icd.d/nvidia_icd.json
+unset DISPLAY WAYLAND_DISPLAY DBUS_SESSION_BUS_ADDRESS PANCAKE_RUNTIME
+cd "$repo/pancake"
+options=(--input "${inputs[@]}" --cpu --method hybrid --align
+    --alignment-mode similarity --alignment-ref first --kernel-size 6
+    --pyramid-levels 8 --scale-factor 6 --slab-size 0 --auto-crop --bit-depth 16)
+{
+    uname -srmo
+    lscpu
+    taskset -c "$mask" awk '/^Cpus_allowed_list:/ {print}' /proc/self/status
+    taskset -c "$mask" nproc
+    cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+    /usr/bin/time --version
+    date -u +%FT%TZ
+} > "$output/hardware.txt"
+sha256sum "${inputs[@]}" > "$output/inputs-before.txt"
+variants=("$@")
+for variant in "${variants[@]}"; do
+    binary="$proof/$variant-cli"
+    if [[ $variant == baseline ]]; then binary=$package; fi
+    mkdir -p "$output/$variant-state"
+    export PANCAKE_STATE_DIR="$output/$variant-state"
+    export PANCAKE_COMPUTE_CACHE_DIR="$output/$variant-state/cache"
+    export CONFORMANCE_EVENTS_PATH="$output/$variant-events.jsonl"
+    command=(taskset -c "$mask" "$binary" "${options[@]}" --output "$output/$variant.tiff")
+    { printf '%q ' "${command[@]}"; printf '\n'; } >> "$output/commands.txt"
+    /usr/bin/time -f 'elapsed=%e peak_rss_kib=%M' "${command[@]}" > "$output/$variant-cli.log" 2>&1
+    taskset -c "$mask" "$proof/$variant-probe" bytes "${inputs[@]}" > "$output/$variant.rgbf32" \
+        2> "$output/$variant-decode-bytes.log"
+    if [[ $variant != baseline ]]; then
+        cmp "$output/baseline.tiff" "$output/$variant.tiff"
+        cmp "$output/baseline.rgbf32" "$output/$variant.rgbf32"
+    fi
+done
+for variant in "${variants[@]}"; do
+    sha256sum "$output/$variant.tiff" "$output/$variant.rgbf32"
+    stat -c '%s %n' "$output/$variant.rgbf32"
+done > "$output/products.txt"
+exiftool -G1 -s -ImageWidth -ImageHeight -BitsPerSample -SampleFormat -SamplesPerPixel \
+    -PhotometricInterpretation "$output/"*.tiff > "$output/tiff-metadata.txt"
+for round in 0 1 2 3; do
+    for index in "${!variants[@]}"; do
+        offset=$(( (round + index) % ${#variants[@]} ))
+        variant="${variants[offset]}"
+        command=(taskset -c "$mask" "$proof/$variant-probe" timing "${inputs[@]}")
+        { printf '%d %q ' "$round" "$variant"; printf '%q ' "${command[@]}"; printf '\n'; } >> "$output/diagnostic-order.txt"
+        /usr/bin/time -f 'elapsed=%e peak_rss_kib=%M' "${command[@]}" > /dev/null \
+            2>> "$output/$variant-decode-timing.log"
+    done
+done
+sha256sum -c "$output/inputs-before.txt" > "$output/inputs-after.txt"

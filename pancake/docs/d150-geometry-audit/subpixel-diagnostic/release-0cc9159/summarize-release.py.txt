@@ -1,0 +1,122 @@
+"""Summarize real D150 maps and compare fixed native focus regions on the release TIFF."""
+
+import argparse
+import gzip
+import hashlib
+import json
+import math
+from pathlib import Path
+
+import cv2
+import numpy as np
+
+
+def load(path):
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rt") as stream:
+        return json.load(stream)
+
+
+def completion(path):
+    records = [row for line in path.read_text().splitlines() if (row := json.loads(line)).get("event") == "stack_complete"]
+    assert len(records) == 1
+    return records[0]
+
+
+def maps(record, ordered):
+    available = {Path(path).name: np.vstack((value, [0, 0, 1])) for path, value in record["alignment_transforms"].items()}
+    assert len(available) == len(ordered) == 150 and set(available) == set(ordered)
+    stack = np.asarray([available[name] for name in ordered], dtype=np.float64)
+    assert np.isfinite(stack).all()
+    return stack
+
+
+def geometry(stack):
+    positions = np.asarray([[0, 0, 1], [2303, 0, 1], [0, 1727, 1], [2303, 1727, 1], [1151.5, 863.5, 1]])
+    shifts = positions @ (stack - np.eye(3)).swapaxes(-1, -2)
+    adjacent = np.linalg.norm(np.diff(shifts[:, :, :2], axis=0), axis=2).max(axis=1)
+    mx, my, _ = np.abs(shifts).max(axis=(0, 1))
+    expected_margin = (math.ceil(mx) + 1, math.ceil(my) + 1)
+    return {"identity_count": int((stack == np.eye(3)).all(axis=(1, 2)).sum()),
+            "max_adjacent_corner_or_center_change_px": float(adjacent.max()),
+            "median_adjacent_corner_or_center_change_px": float(np.median(adjacent)),
+            "max_adjacent_index": int(adjacent.argmax()), "expected_crop_xy_each_edge": expected_margin,
+            "final_map": stack[-1, :2].tolist()}
+
+
+def estimate_errors(stacks, ordered, heldout):
+    results = []
+    for path in heldout:
+        dataset = load(path)
+        for row in dataset.get("pairs", dataset.get("spans", [])):
+            if len(row["matches"]) < 3:
+                continue
+            before, after = row["before"], row["after"]
+            first, last = ordered.index(before), ordered.index(after)
+            inputs = np.asarray([[*point["before"], 1] for point in row["matches"]])
+            expected = np.asarray([point["after"] for point in row["matches"]])
+            errors = {}
+            for name, stack in stacks.items():
+                step = stack[last] @ np.linalg.inv(stack[first])
+                fitted = inputs @ step[:2].T
+                errors[name] = float(np.median(np.linalg.norm(fitted - expected, axis=1)))
+            results.append({"source": path.name, "before": before, "after": after, "patches": len(inputs),
+                            "median_residuals_px": errors})
+    return results
+
+
+def evaluate_focus(tiff, crop, sealed_focus):
+    pixels = cv2.imread(str(tiff), cv2.IMREAD_UNCHANGED)
+    assert pixels is not None and pixels.dtype == np.uint16 and pixels.ndim == 3 and pixels.shape[2] == 3
+    assert pixels.shape == (1728 - 2 * crop[1], 2304 - 2 * crop[0], 3)
+    results = []
+    for row in sealed_focus["focus_regions"]:
+        x, y, w, h = row["source_xywh"]
+        x, y = x - crop[0], y - crop[1]
+        assert x >= 0 and y >= 0
+        samples = pixels[y:y+h, x:x+w]
+        assert samples.shape == (h, w, 3)
+        luma = (0.2126 * samples[..., 2] + 0.7152 * samples[..., 1] + 0.0722 * samples[..., 0]) / 65535
+        laplace = luma[:-2, 1:-1] + luma[2:, 1:-1] + luma[1:-1, :-2] + luma[1:-1, 2:] - 4 * luma[1:-1, 1:-1]
+        detail = float(np.quantile(np.abs(laplace), 0.9))
+        results.append({"first_canvas_xywh": row["source_xywh"],
+                        "sealed_detail_ratio": row["candidate_reference_ratio"],
+                        "candidate_detail_ratio": detail / row["reference_luma_laplacian_absolute_p90"]})
+    return {"HWC": pixels.shape, "precision": str(pixels.dtype), "fixed_focus_regions": results}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--run", type=Path, required=True)
+    parser.add_argument("--tracking", type=Path, required=True)
+    parser.add_argument("--sealed-candidate", type=Path, required=True)
+    parser.add_argument("--sealed-reference", type=Path, required=True)
+    parser.add_argument("--sealed-focus", type=Path, required=True)
+    parser.add_argument("--held-out", type=Path, nargs="+", required=True)
+    args = parser.parse_args()
+    cv2.setNumThreads(1)
+    cv2.ocl.setUseOpenCL(False)
+    receipt = load(args.run / "receipt.json")
+    assert receipt.get("input_hashes_unchanged") and receipt["returncode"] == 0
+    tiff = args.run / "complete.tif"
+    with tiff.open("rb") as stream:
+        assert hashlib.file_digest(stream, "sha256").hexdigest() == receipt["export_sha256"]
+    event = completion(args.run / "events.jsonl")
+    assert event["completed"] and event["actual_backend"] == "cpu" and event["fallback_reason"] is None
+    tracker = load(args.tracking)
+    ordered = list(tracker["alignment_transforms"])
+    stacks = {"release_prototype": maps(event, ordered), "local_chain": maps(tracker, ordered),
+              "sealed_candidate": maps(completion(args.sealed_candidate), ordered),
+              "sealed_reference": maps(completion(args.sealed_reference), ordered)}
+    summaries = {name: geometry(matrix) for name, matrix in stacks.items()}
+    crop = summaries["release_prototype"]["expected_crop_xy_each_edge"]
+    result = {"scope": "One checked release CPU D150 diagnostic, no frozen timing or quality credit",
+              "source_revision": receipt["source_revision"], "binary_sha256": receipt["binary_sha256"],
+              "identity_sequential_count": sum(matrix == [[1, 0, 0], [0, 1, 0]] for matrix in event["sequential_transforms"][1:]),
+              "geometry": summaries, "heldout": estimate_errors(stacks, ordered, args.held_out),
+              "export": evaluate_focus(tiff, crop, load(args.sealed_focus))}
+    print(json.dumps(result, indent=2, allow_nan=False))
+
+
+if __name__ == "__main__":
+    main()

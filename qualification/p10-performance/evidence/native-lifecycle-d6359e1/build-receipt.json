@@ -1,0 +1,23 @@
+{
+  "component": "gui",
+  "commit": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/lifecycle-d6359e1/pancake/target/release/pancake-gui",
+  "binary_sha256": "eea214ed6c57477480b0f5897a12ae8b9c05a9595730dbfcedabfd15650f6f50",
+  "binary_size": 156209128,
+  "provenance": "Unmodified GUI extracted from the exact sealed Linux Debian package",
+  "package_receipt": {
+    "path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-d6359e1/package-receipt.json",
+    "sha256": "f7d98ebd83f6b4f9142a723d6ceee3104b2d8f50d3d13bacce9f0c9f9979cc6c"
+  },
+  "package_archive": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "e6b4d83e8100d04d1692fc8d2f0e276e249fa5a1d79e6e8f623801632c860758",
+    "bytes": 69478602
+  },
+  "p9_physical_lane_receipt": {
+    "path": "/home/krishna/Documents/focus-stacking/artifacts/p9-d6359e1/p/release-receipt.json",
+    "sha256": "f7fc78ea0631ae9b36506b4fb5c0b9ba263be41f3058750f074bc8e76848c2eb"
+  }
+}

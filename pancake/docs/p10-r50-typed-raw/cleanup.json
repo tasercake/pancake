@@ -1,0 +1,47 @@
+{
+  "removed_owned_scratch": "/tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw",
+  "removed_owned_media": {
+    "fixtures/mirrored.dng": {
+      "bytes": 36352,
+      "sha256": "0659eb34cfe00ff9def4ed0edbc05c86bd8c59e09d5fa659c07e7e0ef87249d3"
+    },
+    "fixtures/normal.dng": {
+      "bytes": 36352,
+      "sha256": "99051b2e08724bdf6aeb8c27a4c8aa495143d9ffa658d826c7ab089078c66817"
+    },
+    "stock/mirrored.rgbf32": {
+      "bytes": 215040,
+      "sha256": "e6a9399f121a60cea98d484779dc6e6722566b4d57033c6eed1c767ae3e6b082"
+    },
+    "stock/mirrored.tiff": {
+      "bytes": 107730,
+      "sha256": "ec1ec37a9de219cf3b4f1d9c536137e4e5f0e0af7370be37ece02731685097c0"
+    },
+    "stock/normal.rgbf32": {
+      "bytes": 215040,
+      "sha256": "34d0185e9e8a9195b59ed92f75b1798c485fe0fc007780ab1a14cf2937ec6417"
+    },
+    "stock/normal.tiff": {
+      "bytes": 107730,
+      "sha256": "190559c8e8526d4fb626afa762f9cdb3fdb77856a06d0e045c04a694e93567c3"
+    },
+    "candidate/mirrored.rgbf32": {
+      "bytes": 215040,
+      "sha256": "e6a9399f121a60cea98d484779dc6e6722566b4d57033c6eed1c767ae3e6b082"
+    },
+    "candidate/mirrored.tiff": {
+      "bytes": 107730,
+      "sha256": "ec1ec37a9de219cf3b4f1d9c536137e4e5f0e0af7370be37ece02731685097c0"
+    },
+    "candidate/normal.rgbf32": {
+      "bytes": 215040,
+      "sha256": "34d0185e9e8a9195b59ed92f75b1798c485fe0fc007780ab1a14cf2937ec6417"
+    },
+    "candidate/normal.tiff": {
+      "bytes": 107730,
+      "sha256": "190559c8e8526d4fb626afa762f9cdb3fdb77856a06d0e045c04a694e93567c3"
+    }
+  },
+  "media_hashed_before_removal": true,
+  "original_repo_fixture_unchanged": true
+}

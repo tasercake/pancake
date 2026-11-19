@@ -1,0 +1,47 @@
+{
+  "baseline": {
+    "two_frame_decode_seconds": [
+      2.082669999,
+      2.04410854,
+      2.034068836,
+      2.054577939
+    ],
+    "median_two_frame_decode_seconds": 2.0493432394999997,
+    "process_wall_seconds": [
+      2.11,
+      2.08,
+      2.07,
+      2.09
+    ],
+    "peak_rss_kib": [
+      655916,
+      656516,
+      655528,
+      656740
+    ],
+    "median_peak_rss_kib": 656216.0
+  },
+  "candidate": {
+    "two_frame_decode_seconds": [
+      1.896781482,
+      1.878791747,
+      1.869939161,
+      1.890975528
+    ],
+    "median_two_frame_decode_seconds": 1.8848836375,
+    "process_wall_seconds": [
+      1.93,
+      1.91,
+      1.9,
+      1.93
+    ],
+    "peak_rss_kib": [
+      630160,
+      597900,
+      595168,
+      630280
+    ],
+    "median_peak_rss_kib": 614030.0
+  },
+  "candidate_to_baseline_decode_median": 0.9197500941618132
+}

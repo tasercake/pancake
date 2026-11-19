@@ -1,0 +1,12 @@
+{
+  "verified_at_utc": "2026-11-18T11:17:08.266816+00:00",
+  "verified_original_count": 9,
+  "removed_original_bytes": 2989067,
+  "already_removed_archive_sha256": "311ca6aab7d3bff03c714fd2d81c741f3847de1d4d3f2f9cfa767b6eb62cf56a",
+  "probe_binary_sha256": "45cc38fab655c8bc57cafba0bb38e012b023a23c750cc9f5cda582036328f03f",
+  "probe_source_sha256": "e0396d71e5d2420f99b77740bfab41d009af56f8db3544e4a231ebcdcd1be8ad",
+  "estimates_sha256": "3e9893e303271fb2484b466be9f817ac34ca45842e21ac01b3610ebe346e2d73",
+  "bilateral_sha256": "06bfdbc1bfbdab5be6430e4057aff28cc2c32128d005716a26814332c4da7d8e",
+  "direction_replay_sha256": "cd731499f278851c0ee1ad57540f69e583ac7d74d483ee4104b234c177b00d25",
+  "remaining_owned_originals": 0
+}

@@ -1,0 +1,20 @@
+Parent granted sole RTX for two exact positive CR3 Vulkan correctness jobs. No performance sampling.
+2026-11-19T00:41:08,720018379+08:00
+Linux krishna-desktop 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+MemAvailable:   46376796 kB
+SwapFree:            672 kB
+0,0,0,0,Y
+1,1,0,0,Y
+2,2,0,0,Y
+3,3,0,0,Y
+4,4,0,0,Y
+5,5,0,0,Y
+6,6,0,0,Y
+7,7,0,0,Y
+8,8,0,0,Y
+9,9,0,0,Y
+10,10,0,0,Y
+11,11,0,0,Y
+12,12,0,0,Y
+13,13,0,0,Y
+14,14,0,0,Y

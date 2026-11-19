@@ -1,0 +1,235 @@
+{
+  "binary_bytes": 122161912,
+  "binary_sha256": "6abaabc3c39b2a6047356d38e79c2bc197dd786c4ca70519b1525f2b37365e33",
+  "mapped_replay": {
+    "binary_sha256": "6abaabc3c39b2a6047356d38e79c2bc197dd786c4ca70519b1525f2b37365e33",
+    "completion_counts": {
+      "cpu": 118,
+      "gpu": 19
+    },
+    "passed": 153,
+    "provenance_sha256": "14d15230787f0310de029851a17a7e29eab8bf4c3243d19b59dbea83b25c927f",
+    "report_sha256": "237609ad87929ae61ccfdcd61e6c003d380db7e197b6b545d50d22c2423ea9fd"
+  },
+  "native_tests": {
+    "CPU codecs": 28,
+    "advanced fusion": 4,
+    "jobs": 13
+  },
+  "raw_records": {
+    "bytes": 1224394,
+    "files": 237,
+    "sha256": "a6405eb62e3b2d5a82b7196457e3d56e14174281097e3e3b9482e47a76c41c6e"
+  },
+  "source_revision": "e5b62606cbdd9b41758ccee6efafec8b02fe4ad1",
+  "source_tree": "f4bc6dad842c49c60fd57e12fd4b9040afc180f0",
+  "t50_replay": {
+    "all_52_inputs_unchanged": true,
+    "authorization_sha256": "ef03b5e563f38b083996a5e179833633336e04ddc0ff157966a1c7f257fd59e7",
+    "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+    "headroom": {
+      "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/pancake-t50-dual-scan-e5b6260.scope",
+      "initial_device_free_mib": 23546,
+      "initial_host_available_bytes": 47125016576,
+      "memory_max_bytes": 30064771072,
+      "memory_swap_max_bytes": 0,
+      "per_job_timeout_seconds": 36,
+      "required_device_free_mib": 8192,
+      "required_host_available_bytes": 42949672960
+    },
+    "input_stage": "/tmp/pancake-worktrees.t3paqgWM/t50-shared-fb9c399/artifacts/p10-t50-shared-004",
+    "job_timeout_seconds": 36,
+    "logical_cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ],
+    "materialization_sha256": "71c81abc2af03edaf43373ee3957757dfd9b692a00af84e5e38381ceba3a92d1",
+    "measured_jobs_started_unix_ns": 1795012429175852446,
+    "median_dual_scan_minus_stock_ns": -2477274485.5,
+    "options": {
+      "align": true,
+      "alignment_mode": "similarity",
+      "alignment_reference": "first",
+      "auto": false,
+      "auto_crop": true,
+      "bit_depth": 16,
+      "device": "gpu",
+      "kernel_size": 6,
+      "method": "hybrid",
+      "pyramid_levels": 8,
+      "quality_report": false,
+      "scale_factor": 6,
+      "slab_overlap": 0,
+      "slab_size": 0
+    },
+    "order": [
+      "stock",
+      "dual_scan",
+      "dual_scan",
+      "stock"
+    ],
+    "output_cleanup": [
+      {
+        "bytes": 143881378,
+        "path": "diagnostic-01/candidate/complete.tif",
+        "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302"
+      },
+      {
+        "bytes": 143881378,
+        "path": "diagnostic-02/candidate/complete.tif",
+        "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302"
+      },
+      {
+        "bytes": 143881378,
+        "path": "diagnostic-03/candidate/complete.tif",
+        "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302"
+      },
+      {
+        "bytes": 143881378,
+        "path": "diagnostic-04/candidate/complete.tif",
+        "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302"
+      }
+    ],
+    "pair_diagnostics": {
+      "1": {
+        "dual_scan_minus_stock_ns": -2421700219,
+        "dual_scan_over_stock": 0.8897524453571324,
+        "elapsed_ns": {
+          "dual_scan": 19544321856,
+          "stock": 21966022075
+        }
+      },
+      "2": {
+        "dual_scan_minus_stock_ns": -2532848752,
+        "dual_scan_over_stock": 0.8851101905027138,
+        "elapsed_ns": {
+          "dual_scan": 19513046903,
+          "stock": 22045895655
+        }
+      }
+    },
+    "profile": "T50.hybrid.gpu",
+    "resource_wait4_source_sha256": "20fa18abed5d48a6b8fd6a9c2bd3b5b7f26c716b3e4bd1e80f63409a8239e231",
+    "runner_sha256": "a63d678cc437bd94d297ab9164c71d549de55dc74a4c4fc1ddd497c64b462e10",
+    "samples": [
+      {
+        "arm": "stock",
+        "elapsed_ns": 21966022075,
+        "gpu_gap_ns": 89360473,
+        "gpu_temp_after_c": "52",
+        "gpu_temp_before_c": "45",
+        "number": 1,
+        "observed_gpu_bytes": 2518323200,
+        "observed_rss_bytes": 968839168,
+        "pair": 1,
+        "rss_gap_ns": 10451790
+      },
+      {
+        "arm": "dual_scan",
+        "elapsed_ns": 19544321856,
+        "gpu_gap_ns": 84634310,
+        "gpu_temp_after_c": "52",
+        "gpu_temp_before_c": "52",
+        "number": 2,
+        "observed_gpu_bytes": 2518323200,
+        "observed_rss_bytes": 969273344,
+        "pair": 1,
+        "rss_gap_ns": 10854998
+      },
+      {
+        "arm": "dual_scan",
+        "elapsed_ns": 19513046903,
+        "gpu_gap_ns": 112380758,
+        "gpu_temp_after_c": "49",
+        "gpu_temp_before_c": "52",
+        "number": 3,
+        "observed_gpu_bytes": 2518323200,
+        "observed_rss_bytes": 970444800,
+        "pair": 2,
+        "rss_gap_ns": 9798685
+      },
+      {
+        "arm": "stock",
+        "elapsed_ns": 22045895655,
+        "gpu_gap_ns": 68043385,
+        "gpu_temp_after_c": "53",
+        "gpu_temp_before_c": "49",
+        "number": 4,
+        "observed_gpu_bytes": 2518323200,
+        "observed_rss_bytes": 968601600,
+        "pair": 2,
+        "rss_gap_ns": 11567475
+      }
+    ],
+    "scope": "diagnostic repetitions, no frozen warm/cold or quality acceptance credit",
+    "status": "completed_exact_identity",
+    "stock_package_sha256": "b8f707ca5812ce2137b49feee2888b50de53825e160aa9ccb0e30f55b02a62de",
+    "targets": {
+      "dual_scan": {
+        "binary_sha256": "6abaabc3c39b2a6047356d38e79c2bc197dd786c4ca70519b1525f2b37365e33",
+        "commit": "e5b62606cbdd9b41758ccee6efafec8b02fe4ad1",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/t50-dual-scan/pancake/target/release/pancake-cli"
+      },
+      "stock": {
+        "binary_sha256": "a69427103f9a1ef20ce576269feeceffab58aff7944f4b5cd08be2b11220af33",
+        "commit": "fb9c399a96658331cb76b843a1e565b503e94fdd",
+        "executable": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/t50-dual-scan-e5b6260/control-fb9c399-cli"
+      }
+    },
+    "targets_sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc",
+    "truth_review": {
+      "assumed_symmetric_crop_origin": [
+        1,
+        1
+      ],
+      "kind": "generated sharp-truth diagnostic; metrics are descriptive, not P10 equal-quality acceptance",
+      "regions": 50,
+      "sharp_truth_sha256": "a241647cd990536e498be314e72e1e1f9a3d8748dee3066c9b7f8c701255b985",
+      "whole_centered_overlap": {
+        "changed_sample_fraction": 0.9994509453237234,
+        "compared_samples": 71940012,
+        "maximum_absolute_error_u16": 17902,
+        "mean_absolute_error_u16": 843.3282649855549,
+        "rms_error_u16": 1093.2079815069662
+      }
+    },
+    "truth_review_script_sha256": "bf13428284787c0fd7fde837dcdc97a03942419aa40cc71291e55d3169797ee4",
+    "wrapper_sha256": "df49ef2d490b15d0e3d3624ab08f2a70fbf6da6fafcc77cafb2b1f9f7a60a4a7"
+  },
+  "timed_terminal": {
+    "arms_returned": 4,
+    "finished_unix_ns": 1795012513858388271,
+    "measurement_window_ns": 84682535686
+  }
+}

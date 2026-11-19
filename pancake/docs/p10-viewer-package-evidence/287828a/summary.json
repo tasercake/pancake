@@ -1,0 +1,83 @@
+{
+  "candidate": {
+    "commit": "287828aac07ffad2252785b73a52a59fc07b3409",
+    "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+    "component": "gui",
+    "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-package-287828a/pancake/target/release/pancake-gui",
+    "binary_sha256": "f27ead9db3b79429a1f924dd098ae2c253e7fd5bda28396238e21f9f72723961",
+    "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-287828a/pancake_0.1.0_amd64.deb",
+    "package_sha256": "34a63edea55c411a6082924c2fbe2c50094eea98753b1f75378459da78e4db99",
+    "package_verification_sha256": "096f88ea50620ad70edc86c53db0e2c79071a174cc863d741c82d21bae55e8b5",
+    "release_build_log_sha256": "5d514a08bdba728fe681d0555fb97281957155e835451d07e42bc3b75eacf325",
+    "extraction": "dpkg-deb --fsys-tarfile ARCHIVE | tar -xOf - ./usr/bin/pancake-gui"
+  },
+  "start": "2026-11-18T18:59:30+08:00",
+  "end": "2026-11-18T19:03:59+08:00",
+  "viewer": {
+    "idle": {
+      "status": "pass",
+      "input_to_present_ns": {
+        "count": 200,
+        "min": 18338199,
+        "p50": 19634686.5,
+        "p95": 21713240,
+        "max": 516468600
+      },
+      "over_deadline": 1
+    },
+    "loaded": {
+      "status": "fail",
+      "input_to_present_ns": {
+        "count": 200,
+        "min": 19434648,
+        "p50": 20732764.0,
+        "p95": 33817853,
+        "max": 43510225
+      },
+      "over_deadline": 12
+    }
+  },
+  "scores": {
+    "idle/comparison": 40,
+    "idle/pan": 40,
+    "idle/result": 40,
+    "idle/source": 40,
+    "idle/zoom": 40,
+    "loaded/comparison": 40,
+    "loaded/pan": 40,
+    "loaded/result": 40,
+    "loaded/source": 40,
+    "loaded/zoom": 40
+  },
+  "calibrated_pngs_verified": 19,
+  "presented_pngs_verified": 1120,
+  "maximum_rgb_channel_error": 1,
+  "maximum_observation_gap_ns": 2465521,
+  "loaded_worker_stages": {
+    "Decode": 81,
+    "Fuse": 119
+  },
+  "ordered_unchanged_t50_frames": 50,
+  "t50_materialization_sha256": "62200bca0567ae06e2b6d3eba406aea259e601904c756b64ea7b245ede2625a4",
+  "hardware": {
+    "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+    "gpu": {
+      "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+      "pci.bus_id": "00000000:01:00.0",
+      "name": "NVIDIA GeForce RTX 3090",
+      "driver_version": "580.178.04",
+      "pstate": "P2",
+      "temperature.gpu": "69",
+      "power.draw": "125.63",
+      "power.limit": "350.00",
+      "clocks.gr": "1725",
+      "clocks.mem": "9501"
+    }
+  },
+  "physical_gpu_completion_count": 1,
+  "gpu_residency_at_visible_launch_bytes": 117088256,
+  "collector_exit": 0,
+  "reducer_exit": 1,
+  "raw_sha256": "af69e6c6614333be149fccd04f941014e3949666a8e41edb9b0fa0889306fca9"
+}

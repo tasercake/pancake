@@ -1,0 +1,20 @@
+{
+  "hosted": {
+    "revision": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+    "run": 44277150143,
+    "job": 134708072584,
+    "full_log_sha256": "065eb9ced947aa78af448b6efacca3e89ce9dc52e6051591b8eeb0843a4fdd1f",
+    "failure": "Illegal byte sequence (os error 92)"
+  },
+  "local": {
+    "revision": "6d258365b0ed9422ee5b25f816fb59c83ef7faf6",
+    "platform": "Linux x86-64",
+    "binary_path": "target/debug/build/pancake/3ea765f372f30964/out/cpu_job-3ea765f372f30964",
+    "binary_sha256": "d736dacec9764a4f9c58a6d0be6b3e1cf80bfb4aa8e2dddad41d6b179e69fe85",
+    "passed": 1,
+    "failed": 0,
+    "filtered": 12,
+    "test_status": 0,
+    "clippy_status": 0
+  }
+}

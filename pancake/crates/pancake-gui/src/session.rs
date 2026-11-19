@@ -1202,7 +1202,7 @@ fn dispatch_file_menu(
     }
 }
 
-/// Open the in-window menu when a native MenuBar is unavailable.
+/// Open the in-window menu when a native `MenuBar` is unavailable.
 ///
 /// # Errors
 ///

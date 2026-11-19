@@ -1,0 +1,8 @@
+{
+  "generated_source_width": 384,
+  "generated_source_height": 256,
+  "warmed_rounds_per_arm": 12,
+  "baseline_ns_median": 13707331.0,
+  "lattice_ns_median": 6269963.5,
+  "lattice_to_direct_ratio": 0.45741680127225354
+}

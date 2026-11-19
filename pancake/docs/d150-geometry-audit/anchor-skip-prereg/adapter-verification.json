@@ -1,0 +1,32 @@
+{
+  "preregistration_revision": "aaa3057cfd9fd41d9698908be9f063e6281c972c",
+  "test_first_revision": "50170202f8ac172dd3a06b79b121bec63980c79a",
+  "plan_sha256": "23d8cbd8a6f38cac481516180e746b0d9486368409128dae0ba8c056fb3e65b4",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "scoped_files_sha256": {
+    "anchor_skip_trial.py": "87c74b268f3a59aec5462ba3c198c9d0308cab56e7ce9c18e6b7ce14a927b9dc",
+    "test_anchor_skip_trial.py": "b6708f2fe9356ef58c390f4b35ec4395e6d31deab8ea966c5d50a3fb5cf65218",
+    "product-main.rs.txt": "caa816926ae36885d476aaea650ffbb63af9954014e617a3b2a90141339dc008",
+    "packed-control.patch.gz": "ae70ac8d6d861bf35425b0ad3b6fc7d3ad275e26d842631af709a957988affff"
+  },
+  "host": {
+    "cpu_affinity": [
+      4,
+      5
+    ],
+    "build_jobs": 2,
+    "rust": "1.100.0",
+    "opencv": "4.14.0",
+    "numpy": "2.5.4"
+  },
+  "old_short_margin_red": "legacy synthetic preference admitted the 0.75 px rival; revised preregistration requires abstention",
+  "synthetic_and_metadata_tests_passed": 7,
+  "product_probe_check": "taskset --cpu-list 4,5 cargo +1.100.0 check --locked --offline -p pancake --example d150_anchor_skip_probe",
+  "packed_synthetic_test": "taskset --cpu-list 4,5 cargo +1.100.0 test --locked --offline -p pancake --lib packed_witness_exact_decisions -- --test-threads=1",
+  "packed_synthetic_passed": 1,
+  "data_scope": "synthetic raster and manifest controls only; eleven-original acquisition and real probe pending",
+  "archive": {
+    "file_count": 13,
+    "sha256": "2bc2794496ce30bc01d6ef124e5293efe64f7943648b3087fa972d6aa26ecd9e"
+  }
+}

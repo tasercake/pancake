@@ -1,0 +1,22 @@
+{
+  "commit": "6489af6ea4e9611d5ef26bbba6109dbf0fbe8947",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "component": "gui",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-input-cost/pancake/target/release/pancake-gui",
+  "binary_sha256": "ad97c445535aa822677f40afc59d48c21bf72cc9e9af7d521c9f2cf571296ac4",
+  "producer_build_command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--release",
+    "-p",
+    "pancake-gui"
+  ],
+  "producer_build_environment": {
+    "CARGO_BUILD_JOBS": "2",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+  },
+  "producer_log_sha256": "acd51de0c93043f0e6de183dc47c25845628ee6c9fee75ef4a2aa97540713b65"
+}

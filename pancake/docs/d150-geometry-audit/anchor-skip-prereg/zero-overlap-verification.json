@@ -1,0 +1,58 @@
+{
+  "baseline_revision": "c9a6aa1492ccf89b00ee22ceb852ea8cb717a7e2",
+  "test_first": "0bc3760184a4993a22b7e3fd8883883b08df35a7",
+  "patched_scoped_revision": "34533fbdb7ee6a0a3960dfb31c73a5f50d49d578",
+  "test_source_sha256": "8cc2e30af7467b8e8d687e93d05209f0f181e47f5e7b5d62839a6035feb16afc",
+  "patch_sha256": "508a6da9f420e2f85aec44a25e61d4d8ed9053fd997648626571c5f146cfb5ce",
+  "preregistration_sha256": "23d8cbd8a6f38cac481516180e746b0d9486368409128dae0ba8c056fb3e65b4",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "rust": "1.100.0",
+  "cpu_affinity": [
+    4,
+    5
+  ],
+  "build_jobs": 2,
+  "command": "taskset --cpu-list 4\\,5 cargo +1.100.0 test --locked --offline -p pancake --lib packed_witness_ -- --test-threads=1 --skip packed_witness_cpu_cost_diagnostic --skip packed_witness_real_d150_proxy_diagnostic",
+  "synthetic_fixture": {
+    "proxy_width_height": [
+      384,
+      288
+    ],
+    "reverse_map": [
+      [
+        0.953,
+        0,
+        0
+      ],
+      [
+        0,
+        0.953,
+        -124
+      ]
+    ],
+    "common_cells": 0,
+    "neighbor_common_cells": 9
+  },
+  "red": {
+    "exit": 101,
+    "failed": 1,
+    "passed": 1,
+    "error": "expected one to 54 bounded witness records per direction"
+  },
+  "green": {
+    "exit": 0,
+    "passed": 2,
+    "failed": 0,
+    "unresolved_edge_packed_dispatches": 0
+  },
+  "unchanged_neighbor": {
+    "sha256": "ae1a42a2badbdd3407d65b298f95073bdd19a1726ea2490154377644f5cd783e",
+    "bit_identical_scalar_moments": 540,
+    "prior_neighbor_matches_neighbor_after_abstention": true
+  },
+  "scope": "native synthetic CPU diagnostic; no camera original, acquisition, physical GPU or performance trial",
+  "archive": {
+    "file_count": 15,
+    "sha256": "5a139248ef25d85908345fcf22a705283dae89d6a9c0432400bb4bf1ee8cc495"
+  }
+}

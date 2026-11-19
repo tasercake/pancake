@@ -68,11 +68,9 @@ to the older executables.
 [Patched graph inventory](p9-package-notice-evidence/a270bd5-inventory.json.gz).
 [Patched oneshot witness](p9-package-notice-evidence/a270bd5-oneshot.json).
 
-The 27 missing entries include the three first-party Pancake packages and
-vendored `cubecl-std`. The receipt lists their exact versions and declarations.
-The local Tracel LLVM cache archive contains a short LLVM Support notice. Its
-complete notice set and exact association with the linked native LLVM bundle
-remain open. For any external distribution, the release owner also needs to
-decide which terms and source materials accompany the package, including the
-first-party license and the entries without matching source files. The current
-archive preserves discovered notices and license declarations for review.
+The 27 missing entries in these historical inventories include the three
+first-party Pancake packages and vendored `cubecl-std`. The current packager
+shares one committed first-party GPL-3.0 text across matching first-party
+entries. A separate native LLVM receipt binds a verified Tracel archive and
+source-pinned notices to exact Linux release binaries. [First-party and native
+LLVM proof](p9-native-package-provenance.md).

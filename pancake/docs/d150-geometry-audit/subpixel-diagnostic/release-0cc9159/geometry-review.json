@@ -1,0 +1,316 @@
+{
+  "scope": "One checked release CPU D150 diagnostic, no frozen timing or quality credit",
+  "source_revision": "0cc91592e77a1f6781369de5202a54dfbad4cda7",
+  "binary_sha256": "e0c3544dce5b8cf53396a0f5a1cc6c44e8d9f34a2da2a098e5f5db619a31f7ea",
+  "identity_sequential_count": 95,
+  "geometry": {
+    "release_prototype": {
+      "identity_count": 3,
+      "max_adjacent_corner_or_center_change_px": 2.607389904619841,
+      "median_adjacent_corner_or_center_change_px": 0.0,
+      "max_adjacent_index": 65,
+      "expected_crop_xy_each_edge": [
+        19,
+        34
+      ],
+      "final_map": [
+        [
+          1.0011589527130127,
+          0.0,
+          -17.990886688232422
+        ],
+        [
+          0.0,
+          1.0011589527130127,
+          30.6523380279541
+        ]
+      ]
+    },
+    "local_chain": {
+      "identity_count": 1,
+      "max_adjacent_corner_or_center_change_px": 8.678343883130456,
+      "median_adjacent_corner_or_center_change_px": 0.8295149813213233,
+      "max_adjacent_index": 64,
+      "expected_crop_xy_each_edge": [
+        40,
+        95
+      ],
+      "final_map": [
+        [
+          1.0155848889746062,
+          0.0,
+          -14.068171619547567
+        ],
+        [
+          0.0,
+          1.0155848889746062,
+          66.55924606902036
+        ]
+      ]
+    },
+    "sealed_candidate": {
+      "identity_count": 139,
+      "max_adjacent_corner_or_center_change_px": 129.79612106834466,
+      "median_adjacent_corner_or_center_change_px": 0.0,
+      "max_adjacent_index": 138,
+      "expected_crop_xy_each_edge": [
+        87,
+        99
+      ],
+      "final_map": [
+        [
+          1.0210589170455933,
+          0.0,
+          -69.97699737548828
+        ],
+        [
+          0.0,
+          1.0210589170455933,
+          50.956016540527344
+        ]
+      ]
+    },
+    "sealed_reference": {
+      "identity_count": 64,
+      "max_adjacent_corner_or_center_change_px": 8.492115481817901,
+      "median_adjacent_corner_or_center_change_px": 0.0,
+      "max_adjacent_index": 64,
+      "expected_crop_xy_each_edge": [
+        8,
+        16
+      ],
+      "final_map": [
+        [
+          1.0002913766363517,
+          -0.0006687264852814946,
+          5.335750568411601
+        ],
+        [
+          0.0006687264852814944,
+          1.000291376636352,
+          12.134767733793542
+        ]
+      ]
+    }
+  },
+  "heldout": [
+    {
+      "source": "landmarks-old.json.gz",
+      "before": "P9160576_d2.jpg",
+      "after": "P9160577_d2.jpg",
+      "patches": 16,
+      "median_residuals_px": {
+        "release_prototype": 0.7395789270705568,
+        "local_chain": 0.8298300650597832,
+        "sealed_candidate": 1.0,
+        "sealed_reference": 1.0
+      }
+    },
+    {
+      "source": "landmarks-old.json.gz",
+      "before": "P9160577_d2.jpg",
+      "after": "P9160578_d2.jpg",
+      "patches": 17,
+      "median_residuals_px": {
+        "release_prototype": 0.2963291120091359,
+        "local_chain": 0.25704088832901134,
+        "sealed_candidate": 1.0,
+        "sealed_reference": 1.0
+      }
+    },
+    {
+      "source": "landmarks-old.json.gz",
+      "before": "P9160578_d2.jpg",
+      "after": "P9160579_d2.jpg",
+      "patches": 16,
+      "median_residuals_px": {
+        "release_prototype": 0.7649865373473211,
+        "local_chain": 0.8256984433938936,
+        "sealed_candidate": 1.0,
+        "sealed_reference": 1.0
+      }
+    },
+    {
+      "source": "landmarks-dense.json.gz",
+      "before": "P9160653_d2.jpg",
+      "after": "P9160654_d2.jpg",
+      "patches": 9,
+      "median_residuals_px": {
+        "release_prototype": 1.0,
+        "local_chain": 1.0993373800411852,
+        "sealed_candidate": 1.0,
+        "sealed_reference": 1.0
+      }
+    },
+    {
+      "source": "landmarks-dense.json.gz",
+      "before": "P9160654_d2.jpg",
+      "after": "P9160655_d2.jpg",
+      "patches": 9,
+      "median_residuals_px": {
+        "release_prototype": 1.0,
+        "local_chain": 0.9640775464953846,
+        "sealed_candidate": 102.89303302889289,
+        "sealed_reference": 1.0
+      }
+    },
+    {
+      "source": "landmarks-dense.json.gz",
+      "before": "P9160655_d2.jpg",
+      "after": "P9160656_d2.jpg",
+      "patches": 7,
+      "median_residuals_px": {
+        "release_prototype": 1.0,
+        "local_chain": 0.7620176712722693,
+        "sealed_candidate": 0.9582263281990135,
+        "sealed_reference": 1.0
+      }
+    },
+    {
+      "source": "short-track-check.json",
+      "before": "P9160536_d2.jpg",
+      "after": "P9160540_d2.jpg",
+      "patches": 17,
+      "median_residuals_px": {
+        "release_prototype": 2.8980670363825736,
+        "local_chain": 2.7706437933950623,
+        "sealed_candidate": 3.1622776601683795,
+        "sealed_reference": 3.1622776601683795
+      }
+    },
+    {
+      "source": "short-track-check.json",
+      "before": "P9160556_d2.jpg",
+      "after": "P9160560_d2.jpg",
+      "patches": 17,
+      "median_residuals_px": {
+        "release_prototype": 2.8284271247461903,
+        "local_chain": 2.61468905402908,
+        "sealed_candidate": 2.8284271247461903,
+        "sealed_reference": 2.8284271247461903
+      }
+    },
+    {
+      "source": "short-track-check.json",
+      "before": "P9160576_d2.jpg",
+      "after": "P9160580_d2.jpg",
+      "patches": 13,
+      "median_residuals_px": {
+        "release_prototype": 1.9789787207234464,
+        "local_chain": 1.846034712211766,
+        "sealed_candidate": 4.123105625617661,
+        "sealed_reference": 2.5368367919627244
+      }
+    },
+    {
+      "source": "short-track-check.json",
+      "before": "P9160576_d2.jpg",
+      "after": "P9160584_d2.jpg",
+      "patches": 4,
+      "median_residuals_px": {
+        "release_prototype": 7.153483474111988,
+        "local_chain": 2.9953253224267167,
+        "sealed_candidate": 15.921303921361648,
+        "sealed_reference": 2.5840610006308125
+      }
+    },
+    {
+      "source": "short-track-check.json",
+      "before": "P9160596_d2.jpg",
+      "after": "P9160600_d2.jpg",
+      "patches": 16,
+      "median_residuals_px": {
+        "release_prototype": 3.297018746806029,
+        "local_chain": 3.277702017411144,
+        "sealed_candidate": 3.1622776601683795,
+        "sealed_reference": 3.1622776601683795
+      }
+    },
+    {
+      "source": "short-track-check.json",
+      "before": "P9160616_d2.jpg",
+      "after": "P9160620_d2.jpg",
+      "patches": 19,
+      "median_residuals_px": {
+        "release_prototype": 2.0,
+        "local_chain": 2.3563606783739504,
+        "sealed_candidate": 2.0,
+        "sealed_reference": 2.0
+      }
+    },
+    {
+      "source": "short-track-check.json",
+      "before": "P9160616_d2.jpg",
+      "after": "P9160624_d2.jpg",
+      "patches": 3,
+      "median_residuals_px": {
+        "release_prototype": 10.44030650891055,
+        "local_chain": 10.117979488600959,
+        "sealed_candidate": 10.44030650891055,
+        "sealed_reference": 10.44030650891055
+      }
+    },
+    {
+      "source": "short-track-check.json",
+      "before": "P9160636_d2.jpg",
+      "after": "P9160640_d2.jpg",
+      "patches": 4,
+      "median_residuals_px": {
+        "release_prototype": 4.123105625617661,
+        "local_chain": 3.206142690833994,
+        "sealed_candidate": 4.123105625617661,
+        "sealed_reference": 4.123105625617661
+      }
+    }
+  ],
+  "export": {
+    "HWC": [
+      1660,
+      2266,
+      3
+    ],
+    "precision": "uint16",
+    "fixed_focus_regions": [
+      {
+        "first_canvas_xywh": [
+          1271,
+          131,
+          192,
+          192
+        ],
+        "sealed_detail_ratio": 0.7056491868649284,
+        "candidate_detail_ratio": 0.6346416751261703
+      },
+      {
+        "first_canvas_xywh": [
+          1079,
+          515,
+          192,
+          192
+        ],
+        "sealed_detail_ratio": 0.6906239859933142,
+        "candidate_detail_ratio": 0.6189415498999592
+      },
+      {
+        "first_canvas_xywh": [
+          1271,
+          515,
+          192,
+          192
+        ],
+        "sealed_detail_ratio": 0.6858567564793039,
+        "candidate_detail_ratio": 0.6287492907086173
+      },
+      {
+        "first_canvas_xywh": [
+          1079,
+          899,
+          192,
+          192
+        ],
+        "sealed_detail_ratio": 0.6939490478550127,
+        "candidate_detail_ratio": 0.6212237793166369
+      }
+    ]
+  }
+}

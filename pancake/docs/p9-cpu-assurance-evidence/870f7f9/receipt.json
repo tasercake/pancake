@@ -1,0 +1,85 @@
+{
+  "source_commit": "870f7f923d70b1a7b0e7fe73d5f9a4987770fdc4",
+  "baseline_commit": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "status": "passed",
+  "fast": {
+    "exit": 0,
+    "python_policy_tests": 54
+  },
+  "cpu_nextest_dev": {
+    "exit": 0,
+    "passed": 151,
+    "binaries": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "selected_integration_targets": [
+      "cpu_advanced_fusion",
+      "cpu_array_layout",
+      "cpu_cli",
+      "cpu_config",
+      "cpu_fusion_contract",
+      "cpu_gray_array_export",
+      "cpu_image_export",
+      "cpu_image_io",
+      "cpu_job",
+      "cpu_kernel_contract",
+      "cpu_npy",
+      "cpu_numerical_contract",
+      "cpu_registration_contract",
+      "cpu_runtime_contract",
+      "cpu_runtime_options",
+      "cpu_stack_plan"
+    ],
+    "baseline_tests_retained": 148,
+    "added": [
+      {
+        "suite": "pancake::cpu_advanced_fusion",
+        "test": "cpu_hybrid_retains_selected_fine_detail_across_scales"
+      },
+      {
+        "suite": "pancake::cpu_fusion_contract",
+        "test": "depth_map_compares_normalized_focus_scales_in_both_axes"
+      },
+      {
+        "suite": "pancake::cpu_job",
+        "test": "repeated_registration_keeps_unwarped_cpu_export"
+      }
+    ]
+  },
+  "started_sgt": "2026-11-19T02:04:46+08:00",
+  "fast_ended_sgt": "2026-11-19T02:07:00+08:00",
+  "ended_sgt": "2026-11-19T02:09:27+08:00",
+  "runtime": {
+    "logical_cpus": [
+      0,
+      1
+    ],
+    "build_jobs": 2,
+    "offline": true,
+    "compiler_wrappers": "unset",
+    "rust": "1.100.0",
+    "nextest": "0.9.152"
+  },
+  "different_test_paths": [
+    "pancake/crates/pancake-cli/tests/cpu_runtime_options.rs",
+    "pancake/tests/common/fusion_cases.rs",
+    "pancake/tests/cpu_advanced_fusion.rs",
+    "pancake/tests/cpu_fusion_contract.rs",
+    "pancake/tests/cpu_job.rs"
+  ],
+  "original_receipt_sha256": {
+    "fast.log": "d0f98659d110b5f1e066da697aa73e47875e4586633883f600e0003c39a73a3d",
+    "cpu-dev.log": "4f5d65078dcd2f07bc5404401c3883af33866a494c1b0c54e6c5adda165c083f",
+    "junit.xml": "64eaee6deb8b1c0c3b9a36672bfb11244c3127304291f1497215236df17fc55d",
+    "metadata.json": "a553c2f800cd7b39f6e4d8a5193cfd725b7b58c0ec590d319fbd685c8f188457"
+  },
+  "policy_sha256": {
+    "pancake/Cargo.lock": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "pancake/rust-toolchain.toml": "ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e",
+    "pancake/scripts/check.sh": "63ce2ccca53e1e4e73666b5bc72374d2ea5f8a25fe474e0c87ee41284d27eec7",
+    "pancake/scripts/assurance_targets.py": "044dcaefaf20b04fda64f974d464c79298c54ee4bbac234661bb204809e27a3a",
+    "pancake/.config/nextest.toml": "c53b6c83d095bfb7551b98c232ca3591744c870d577921f40db952185fbd2fa2",
+    ".github/workflows/pancake.yml": "6cfe7f4b6d511e788a63d188a92b72b7d423785adc9b7d9d3b5405bad53ba3ab"
+  }
+}

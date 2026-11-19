@@ -1,0 +1,1 @@
+Registration upload rustc PIDs 4092317 and 4092319 were active on CPUs 20 and 21; isolated GUI PID 4095484 was active on 22. Used authorized separate physical cores 0-3 instead.

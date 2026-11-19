@@ -1,0 +1,535 @@
+{
+  "scope": "Exact stock-behavior physical diagnostic, no frozen timing credit",
+  "collector_exit": 0,
+  "native_start": "2026-11-19T00:54:38+08:00",
+  "application_terminal": "2026-11-19T00:57:34+08:00",
+  "graphics_records": 30648,
+  "winit_records": 22028,
+  "completed_draws": 2698,
+  "latency": {
+    "idle": {
+      "count": 200,
+      "p50_ns": 22696387.5,
+      "p95_ns": 23850773,
+      "max_ns": 186908366,
+      "above_33ms": 1
+    },
+    "loaded": {
+      "count": 80,
+      "p50_ns": 23700502.5,
+      "p95_ns": 75614926,
+      "max_ns": 89583265,
+      "above_33ms": 17
+    }
+  },
+  "primary_late_attribution": {
+    "older_draw": 8,
+    "new_present_same_lock": 4,
+    "ambiguous": 5
+  },
+  "primary_all_matches": {
+    "idle/unique": 120,
+    "idle/intervening-input": 80,
+    "loaded/unique": 48,
+    "loaded/intervening-input": 32
+  },
+  "primary_late_rows": [
+    {
+      "step": 406,
+      "action": "result",
+      "latency_ns": 37797650,
+      "classification": "older_draw",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 430,
+      "action": "result",
+      "latency_ns": 37977486,
+      "classification": "older_draw",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 434,
+      "action": "zoom",
+      "latency_ns": 84586832,
+      "classification": "new_present_same_lock",
+      "new_frame_overlap_ns": [
+        62966788
+      ]
+    },
+    {
+      "step": 466,
+      "action": "result",
+      "latency_ns": 36763872,
+      "classification": "older_draw",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 470,
+      "action": "zoom",
+      "latency_ns": 82506473,
+      "classification": "new_present_same_lock",
+      "new_frame_overlap_ns": [
+        61105193
+      ]
+    },
+    {
+      "step": 484,
+      "action": "comparison",
+      "latency_ns": 40941479,
+      "classification": "ambiguous",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 492,
+      "action": "pan",
+      "latency_ns": 33713641,
+      "classification": "ambiguous",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 494,
+      "action": "zoom",
+      "latency_ns": 52146607,
+      "classification": "older_draw",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 504,
+      "action": "pan",
+      "latency_ns": 44310726,
+      "classification": "ambiguous",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 518,
+      "action": "zoom",
+      "latency_ns": 50740510,
+      "classification": "older_draw",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 520,
+      "action": "comparison",
+      "latency_ns": 88180109,
+      "classification": "ambiguous",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 538,
+      "action": "result",
+      "latency_ns": 34697740,
+      "classification": "older_draw",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 542,
+      "action": "zoom",
+      "latency_ns": 89583265,
+      "classification": "new_present_same_lock",
+      "new_frame_overlap_ns": [
+        68719478
+      ]
+    },
+    {
+      "step": 554,
+      "action": "zoom",
+      "latency_ns": 33632436,
+      "classification": "older_draw",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 562,
+      "action": "result",
+      "latency_ns": 36885885,
+      "classification": "older_draw",
+      "new_frame_overlap_ns": []
+    },
+    {
+      "step": 566,
+      "action": "zoom",
+      "latency_ns": 75614926,
+      "classification": "new_present_same_lock",
+      "new_frame_overlap_ns": [
+        54706426
+      ]
+    },
+    {
+      "step": 588,
+      "action": "pan",
+      "latency_ns": 34795491,
+      "classification": "ambiguous",
+      "new_frame_overlap_ns": []
+    }
+  ],
+  "primary_older_draw_boundaries": [
+    {
+      "step": 406,
+      "action": "result",
+      "latency_ns": 37797650,
+      "older_draw_ordinal": 14472,
+      "updated_draw_ordinal": 14482,
+      "active_older_span_at_dispatch": "driver_present",
+      "older_draw": [
+        -6872199,
+        14658197
+      ],
+      "older_acquire": [
+        -6869735,
+        -6854606
+      ],
+      "older_rust_present": [
+        -5427431,
+        14652786
+      ],
+      "older_driver_present": [
+        -5406572,
+        14652075
+      ],
+      "older_write_attempt_ns": -5406762,
+      "older_write_acquired_ns": -5406732,
+      "older_write_read_overlap": {
+        "matching_poll_reads": 0
+      },
+      "old_draw_end_to_winit_arrival_ns": 481596,
+      "winit_handler_end_to_new_draw_ns": 5160,
+      "new_driver_present": [
+        16805687,
+        36526248
+      ],
+      "redraw_decisions_in_wait": []
+    },
+    {
+      "step": 430,
+      "action": "result",
+      "latency_ns": 37977486,
+      "older_draw_ordinal": 15393,
+      "updated_draw_ordinal": 15403,
+      "active_older_span_at_dispatch": "driver_present",
+      "older_draw": [
+        -7199154,
+        14752573
+      ],
+      "older_acquire": [
+        -7196589,
+        -7184316
+      ],
+      "older_rust_present": [
+        -5593103,
+        14747434
+      ],
+      "older_driver_present": [
+        -5583014,
+        14746402
+      ],
+      "older_write_attempt_ns": -5583184,
+      "older_write_acquired_ns": -5583164,
+      "older_write_read_overlap": {
+        "matching_poll_reads": 0
+      },
+      "old_draw_end_to_winit_arrival_ns": 450468,
+      "winit_handler_end_to_new_draw_ns": 4649,
+      "new_driver_present": [
+        16999390,
+        36835899
+      ],
+      "redraw_decisions_in_wait": []
+    },
+    {
+      "step": 466,
+      "action": "result",
+      "latency_ns": 36763872,
+      "older_draw_ordinal": 16811,
+      "updated_draw_ordinal": 16821,
+      "active_older_span_at_dispatch": "driver_present",
+      "older_draw": [
+        -7915210,
+        13826742
+      ],
+      "older_acquire": [
+        -7912525,
+        -7898439
+      ],
+      "older_rust_present": [
+        -6338875,
+        13822514
+      ],
+      "older_driver_present": [
+        -6328044,
+        13822133
+      ],
+      "older_write_attempt_ns": -6328225,
+      "older_write_acquired_ns": -6328195,
+      "older_write_read_overlap": {
+        "matching_poll_reads": 0
+      },
+      "old_draw_end_to_winit_arrival_ns": 472939,
+      "winit_handler_end_to_new_draw_ns": 4768,
+      "new_driver_present": [
+        16111169,
+        36220760
+      ],
+      "redraw_decisions_in_wait": []
+    },
+    {
+      "step": 494,
+      "action": "zoom",
+      "latency_ns": 52146607,
+      "older_draw_ordinal": 17902,
+      "updated_draw_ordinal": 17911,
+      "active_older_span_at_dispatch": "same_lock_write_wait",
+      "older_draw": [
+        -71580937,
+        26119525
+      ],
+      "older_acquire": [
+        -71578793,
+        -71569225
+      ],
+      "older_rust_present": [
+        -70027094,
+        26114716
+      ],
+      "older_driver_present": [
+        6457477,
+        26106471
+      ],
+      "older_write_attempt_ns": -70017887,
+      "older_write_acquired_ns": 6456405,
+      "older_write_read_overlap": {
+        "matching_poll_reads": 1,
+        "confirmed_overlap_ns": 76463672,
+        "reader_tid": 1926336,
+        "reader_interval_ns": [
+          -82974501,
+          6445785
+        ],
+        "writer_vs_release_bracket_ns": [
+          9037,
+          10620
+        ],
+        "nested_driver_waits_ns": [
+          [
+            -82974371,
+            2771984
+          ]
+        ]
+      },
+      "old_draw_end_to_winit_arrival_ns": 2268388,
+      "winit_handler_end_to_new_draw_ns": 5270,
+      "new_driver_present": [
+        30365653,
+        51072617
+      ],
+      "redraw_decisions_in_wait": []
+    },
+    {
+      "step": 518,
+      "action": "zoom",
+      "latency_ns": 50740510,
+      "older_draw_ordinal": 18868,
+      "updated_draw_ordinal": 18878,
+      "active_older_span_at_dispatch": "same_lock_write_wait",
+      "older_draw": [
+        -71551419,
+        27605269
+      ],
+      "older_acquire": [
+        -71550778,
+        -71546479
+      ],
+      "older_rust_present": [
+        -70605419,
+        27604347
+      ],
+      "older_driver_present": [
+        10398421,
+        27604237
+      ],
+      "older_write_attempt_ns": -70597184,
+      "older_write_acquired_ns": 10397739,
+      "older_write_read_overlap": {
+        "matching_poll_reads": 1,
+        "confirmed_overlap_ns": 80987379,
+        "reader_tid": 1926336,
+        "reader_interval_ns": [
+          -78189746,
+          10390195
+        ],
+        "writer_vs_release_bracket_ns": [
+          4999,
+          7544
+        ],
+        "nested_driver_waits_ns": [
+          [
+            -78189716,
+            7132918
+          ]
+        ]
+      },
+      "old_draw_end_to_winit_arrival_ns": 158819,
+      "winit_handler_end_to_new_draw_ns": 2745,
+      "new_driver_present": [
+        29026473,
+        48804929
+      ],
+      "redraw_decisions_in_wait": []
+    },
+    {
+      "step": 538,
+      "action": "result",
+      "latency_ns": 34697740,
+      "older_draw_ordinal": 19733,
+      "updated_draw_ordinal": 19743,
+      "active_older_span_at_dispatch": "driver_present",
+      "older_draw": [
+        -8998327,
+        12070916
+      ],
+      "older_acquire": [
+        -8997766,
+        -8993889
+      ],
+      "older_rust_present": [
+        -7704112,
+        12070225
+      ],
+      "older_driver_present": [
+        -7696698,
+        12069945
+      ],
+      "older_write_attempt_ns": -7696879,
+      "older_write_acquired_ns": -7696849,
+      "older_write_read_overlap": {
+        "matching_poll_reads": 0
+      },
+      "old_draw_end_to_winit_arrival_ns": 193745,
+      "winit_handler_end_to_new_draw_ns": 3026,
+      "new_driver_present": [
+        13375090,
+        32944192
+      ],
+      "redraw_decisions_in_wait": []
+    },
+    {
+      "step": 554,
+      "action": "zoom",
+      "latency_ns": 33632436,
+      "older_draw_ordinal": 20361,
+      "updated_draw_ordinal": 20371,
+      "active_older_span_at_dispatch": "driver_present",
+      "older_draw": [
+        -8475753,
+        12791823
+      ],
+      "older_acquire": [
+        -8474090,
+        -8461426
+      ],
+      "older_rust_present": [
+        -6256970,
+        12790791
+      ],
+      "older_driver_present": [
+        -6247812,
+        12790701
+      ],
+      "older_write_attempt_ns": -6248003,
+      "older_write_acquired_ns": -6247983,
+      "older_write_read_overlap": {
+        "matching_poll_reads": 0
+      },
+      "old_draw_end_to_winit_arrival_ns": 255170,
+      "winit_handler_end_to_new_draw_ns": 2815,
+      "new_driver_present": [
+        14432619,
+        32591978
+      ],
+      "redraw_decisions_in_wait": []
+    },
+    {
+      "step": 562,
+      "action": "result",
+      "latency_ns": 36885885,
+      "older_draw_ordinal": 20654,
+      "updated_draw_ordinal": 20664,
+      "active_older_span_at_dispatch": "driver_present",
+      "older_draw": [
+        -7667413,
+        14035752
+      ],
+      "older_acquire": [
+        -7664939,
+        -7649810
+      ],
+      "older_rust_present": [
+        -6208890,
+        14032195
+      ],
+      "older_driver_present": [
+        -6197629,
+        14031784
+      ],
+      "older_write_attempt_ns": -6197809,
+      "older_write_acquired_ns": -6197789,
+      "older_write_read_overlap": {
+        "matching_poll_reads": 0
+      },
+      "old_draw_end_to_winit_arrival_ns": 345780,
+      "winit_handler_end_to_new_draw_ns": 4859,
+      "new_driver_present": [
+        16154828,
+        35932902
+      ],
+      "redraw_decisions_in_wait": []
+    }
+  ],
+  "secondary_late_attribution": {
+    "older_draw": 12,
+    "new_present_same_lock": 5
+  },
+  "secondary_all_matches": {
+    "idle/unique": 200,
+    "loaded/unique": 80
+  },
+  "secondary_drag_changes": [
+    {
+      "step": 484,
+      "action": "comparison",
+      "latency_ns": 40941479,
+      "classification": "older_draw"
+    },
+    {
+      "step": 492,
+      "action": "pan",
+      "latency_ns": 33713641,
+      "classification": "older_draw"
+    },
+    {
+      "step": 504,
+      "action": "pan",
+      "latency_ns": 44310726,
+      "classification": "older_draw"
+    },
+    {
+      "step": 520,
+      "action": "comparison",
+      "latency_ns": 88180109,
+      "classification": "new_present_same_lock"
+    },
+    {
+      "step": 588,
+      "action": "pan",
+      "latency_ns": 34795491,
+      "classification": "older_draw"
+    }
+  ],
+  "witness_verification": {
+    "viewer_samples": 280,
+    "original_witnesses": 19,
+    "presented_patches": 784,
+    "maximum_rgb_channel_error": 1,
+    "physical_completion": 1,
+    "capture_sha256": "5a1f7cfe6ef0fb1283ad6162da1b9a9cb5af52d01385b5b308ef7270906b0771"
+  }
+}

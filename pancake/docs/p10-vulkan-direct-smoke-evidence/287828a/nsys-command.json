@@ -1,0 +1,16 @@
+[
+  "/usr/local/cuda-12.5/bin/nsys",
+  "profile",
+  "--trace=vulkan",
+  "--vulkan-gpu-workload=none",
+  "--sample=none",
+  "--cpuctxsw=none",
+  "--duration=18",
+  "--kill=sigterm",
+  "--wait=primary",
+  "--stop-on-exit=true",
+  "--export=none",
+  "--env-var=VK_LOADER_DEBUG=layer",
+  "--output=/tmp/pvqs.qZS5njnh/queue",
+  "/tmp/pancake-worktrees.t3paqgWM/viewer-queue-trace-preflight/pancake/target/release/pancake-gui"
+]

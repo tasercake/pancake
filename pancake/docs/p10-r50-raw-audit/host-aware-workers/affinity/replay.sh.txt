@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+proof="$repo/artifacts/r50-workers"
+mkdir "$proof/affinity"
+export RAYON_NUM_THREADS=128
+for spec in 0:1 0-1:1 0-7:7 0-14:14 0-31:15; do
+    IFS=: read -r mask expected <<< "$spec"
+    taskset -c "$mask" strace -f -qq -e trace=prctl -o "$proof/affinity/$mask.log" \
+      "$proof/reuse-probe" bytes "$proof/dng/original.dng" "$proof/dng/oriented.dng" \
+      >"$proof/affinity/$mask.rgbf32" 2>"$proof/affinity/$mask-decode.txt"
+    cmp "$proof/dng/baseline.rgbf32" "$proof/affinity/$mask.rgbf32"
+    actual=$(rg -o 'PR_SET_NAME, "pancake-raw-[0-9]+"' "$proof/affinity/$mask.log" | LC_ALL=C sort -u | wc -l)
+    printf '%s\t%s\t%s\n' "$mask" "$expected" "$actual" >> "$proof/affinity/summary.tsv"
+    test "$expected" = "$actual"
+done

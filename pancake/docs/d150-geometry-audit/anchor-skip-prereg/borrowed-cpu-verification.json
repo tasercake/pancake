@@ -1,0 +1,360 @@
+{
+  "source_revision": "914ec559fdfcea07465bd02e65dc8e2e3e5f977c",
+  "product_equivalent_to": "af964f5dab976a276e1b91cf4db0b2d63e8063c1",
+  "preregistration_sha256": "23d8cbd8a6f38cac481516180e746b0d9486368409128dae0ba8c056fb3e65b4",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "executable_sha256": "c1ff4ad3a19772f9c2a596cc3fcdf703ccbb80e2c92f001ef8c517910efd9378",
+  "owner_acquisition_sha256": "0fc4a4f4eb80a64e0faba1b50e2df57288941f6d8490f57670d34dd9cdd1e05e",
+  "owner_archive_removal_sha256": "4f108adf3498b500d4df8b99124f10b797fd3795798b8cbbe60be4e1ce2682ea",
+  "execution": {
+    "backend": "cpu",
+    "cpu_affinity": [
+      4,
+      5
+    ],
+    "build_jobs": 2,
+    "rust": "1.100.0",
+    "opencv": "4.14.0",
+    "fresh_directed_estimates": 12,
+    "fresh_confidences": [
+      0.0
+    ],
+    "exact_selected_edges": 12,
+    "real_probe_attempts": 1
+  },
+  "procedural_preflight": "lender keeps manifest-relative nested originals; flat-path preparation failed before reading a JPEG, then corrected before the first probe",
+  "controls": {
+    "genuine_nonidentity_supported": true,
+    "historical_direct_jump_rejected": false,
+    "status": "inconclusive"
+  },
+  "historical_jump": {
+    "native_witnesses": [
+      7,
+      7
+    ],
+    "full_medians_px": {
+      "identity_baseline": {
+        "matrix": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ]
+        ],
+        "forward_median_px": 0.958374108953573,
+        "reverse_median_px": 0.965718380647295
+      },
+      "direct": {
+        "matrix": [
+          [
+            1.0344460010528564,
+            0.0,
+            -85.19304656982422
+          ],
+          [
+            0.0,
+            1.0344460010528564,
+            38.43610382080078
+          ]
+        ],
+        "forward_median_px": 107.06205494214036,
+        "reverse_median_px": 103.57346118817252
+      },
+      "inverse_reverse": {
+        "matrix": [
+          [
+            0.9993599057197571,
+            0.0,
+            0.5594871044158936
+          ],
+          [
+            0.0,
+            0.9993599057197571,
+            0.7311496138572693
+          ]
+        ],
+        "forward_median_px": 0.8200989330963192,
+        "reverse_median_px": 0.8034140937488321
+      },
+      "independent_local": {
+        "matrix": [
+          [
+            0.9995150181570402,
+            0.0,
+            0.9391558960671891
+          ],
+          [
+            0.0,
+            0.9995150181570402,
+            0.8405544795149531
+          ]
+        ],
+        "forward_median_px": 0.9846350595522924,
+        "reverse_median_px": 1.023678801003041
+      },
+      "inverse_independent_reverse": {
+        "matrix": [
+          [
+            0.9997568302517649,
+            0.0,
+            0.5541371815775414
+          ],
+          [
+            0.0,
+            0.9997568302517649,
+            0.5034626878249305
+          ]
+        ],
+        "forward_median_px": 0.9826074848866856,
+        "reverse_median_px": 1.0712124730455825
+      }
+    },
+    "spatial_condition": "one macrocell column in each direction; omitting its densest cell leaves only two matches each"
+  },
+  "optional_packed": {
+    "state": "unrun",
+    "preregistered_reason": "native controls inconclusive",
+    "available_triples": 2
+  },
+  "records": [
+    {
+      "indices": [
+        0,
+        1
+      ],
+      "role": "fresh_bidirectional_fit",
+      "reciprocal_witnesses": [
+        1,
+        1
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "unavailable",
+        "inverse_reverse": "unavailable"
+      }
+    },
+    {
+      "indices": [
+        0,
+        2
+      ],
+      "role": "fresh_bidirectional_fit",
+      "reciprocal_witnesses": [
+        1,
+        1
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "unavailable",
+        "inverse_reverse": "unavailable"
+      }
+    },
+    {
+      "indices": [
+        1,
+        2
+      ],
+      "role": "fresh_bidirectional_fit",
+      "reciprocal_witnesses": [
+        4,
+        4
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "unavailable",
+        "inverse_reverse": "unavailable"
+      }
+    },
+    {
+      "indices": [
+        137,
+        139
+      ],
+      "role": "fresh_bidirectional_fit",
+      "reciprocal_witnesses": [
+        6,
+        5
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "unavailable",
+        "inverse_reverse": "unavailable"
+      }
+    },
+    {
+      "indices": [
+        137,
+        140
+      ],
+      "role": "fresh_bidirectional_fit",
+      "reciprocal_witnesses": [
+        2,
+        4
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "unavailable",
+        "inverse_reverse": "unavailable"
+      }
+    },
+    {
+      "indices": [
+        138,
+        140
+      ],
+      "role": "fresh_bidirectional_fit",
+      "reciprocal_witnesses": [
+        5,
+        5
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "unavailable",
+        "inverse_reverse": "unavailable"
+      }
+    },
+    {
+      "indices": [
+        63,
+        64
+      ],
+      "role": "fixed_archived_control",
+      "reciprocal_witnesses": [
+        49,
+        46
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "duplicate",
+        "inverse_reverse": "present"
+      }
+    },
+    {
+      "indices": [
+        64,
+        65
+      ],
+      "role": "fixed_archived_control",
+      "reciprocal_witnesses": [
+        47,
+        44
+      ],
+      "status": "native_supported_proposal",
+      "winner": "inverse_reverse",
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "duplicate",
+        "inverse_reverse": "present"
+      }
+    },
+    {
+      "indices": [
+        65,
+        66
+      ],
+      "role": "fixed_archived_control",
+      "reciprocal_witnesses": [
+        51,
+        53
+      ],
+      "status": "native_supported_proposal",
+      "winner": "inverse_reverse",
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "duplicate",
+        "inverse_reverse": "present"
+      }
+    },
+    {
+      "indices": [
+        137,
+        138
+      ],
+      "role": "fixed_archived_control",
+      "reciprocal_witnesses": [
+        8,
+        6
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "unavailable",
+      "proposals": {
+        "direct": "duplicate",
+        "inverse_reverse": "present"
+      }
+    },
+    {
+      "indices": [
+        138,
+        139
+      ],
+      "role": "fixed_archived_control",
+      "reciprocal_witnesses": [
+        7,
+        7
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "ready",
+      "proposals": {
+        "direct": "present",
+        "inverse_reverse": "present"
+      }
+    },
+    {
+      "indices": [
+        139,
+        140
+      ],
+      "role": "fixed_archived_control",
+      "reciprocal_witnesses": [
+        6,
+        6
+      ],
+      "status": "unresolved",
+      "winner": null,
+      "packed_input": "ready",
+      "proposals": {
+        "direct": "present",
+        "inverse_reverse": "present"
+      }
+    }
+  ],
+  "cleanup": {
+    "copied_inputs_rehashed_and_removed": 11,
+    "bytes": 3582818,
+    "remaining_owned_input_files": 0,
+    "lender_rehashed_unchanged_then_released": 11,
+    "lender_paths_written": 0
+  },
+  "raw_reports_sha256": {
+    "product-proposals.json": "3ec5114f0527f54a7c5aaf54a4b6f0e9c705a7f5fc5d97b47e4b0981f8d069b3",
+    "native-holdouts.json": "8fca4e8a3a886f60b7ab1cfd219cb7a71d5b2d7397637b71cb8b6cc6254a6f7c",
+    "packed-directions.json": "ecbdddcc78dd9a7ade504a19875d3a7e4f91a56ae3d417be532555cd9ccc494b"
+  },
+  "archive": {
+    "sha256": "4843b1ffb67e1627a9a79d9986f9020577b1a230f69096af0244bcd40487a723",
+    "file_count": 68,
+    "paths": "ephemeral paths in commands/logs and custody files replaced by named root placeholders; scored reports byte-identical"
+  }
+}

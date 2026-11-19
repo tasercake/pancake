@@ -1,0 +1,70 @@
+{
+  "removed_rehashed_media": [
+    {
+      "path": "stock/stack.tiff",
+      "bytes": 103450274,
+      "sha256": "d85703c50ccba5ae21303f93ba8eea590d5eb41554c82accd7e50605c04993e4"
+    },
+    {
+      "path": "stock/source/first.rgbf32",
+      "bytes": 207101952,
+      "sha256": "688513e0fb134cea138c1c9bb5a59a8f9edeb712400c09ed3872e77344a5e2b8"
+    },
+    {
+      "path": "stock/source/first.tiff",
+      "bytes": 103552010,
+      "sha256": "73f29eedc42787ddd8148ab313eb45e6d2f2a9707faa25da81385f6e8148771b"
+    },
+    {
+      "path": "stock/source/last.rgbf32",
+      "bytes": 207101952,
+      "sha256": "93c44191dfbbbb69fe813bee5959b32f700909b45ece0dc761d23b46cda6a6ee"
+    },
+    {
+      "path": "stock/source/last.tiff",
+      "bytes": 103552010,
+      "sha256": "bf62cb0251420758712af7c341a84f7d4cf4f5f5c1217c4212752ced27a32710"
+    },
+    {
+      "path": "candidate/stack.tiff",
+      "bytes": 103450274,
+      "sha256": "d85703c50ccba5ae21303f93ba8eea590d5eb41554c82accd7e50605c04993e4"
+    },
+    {
+      "path": "candidate/source/first.rgbf32",
+      "bytes": 207101952,
+      "sha256": "688513e0fb134cea138c1c9bb5a59a8f9edeb712400c09ed3872e77344a5e2b8"
+    },
+    {
+      "path": "candidate/source/first.tiff",
+      "bytes": 103552010,
+      "sha256": "73f29eedc42787ddd8148ab313eb45e6d2f2a9707faa25da81385f6e8148771b"
+    },
+    {
+      "path": "candidate/source/last.rgbf32",
+      "bytes": 207101952,
+      "sha256": "93c44191dfbbbb69fe813bee5959b32f700909b45ece0dc761d23b46cda6a6ee"
+    },
+    {
+      "path": "candidate/source/last.tiff",
+      "bytes": 103552010,
+      "sha256": "bf62cb0251420758712af7c341a84f7d4cf4f5f5c1217c4212752ced27a32710"
+    }
+  ],
+  "removed_private_build_and_duplicate_run_directories": [
+    "stock",
+    "candidate",
+    "build-stock",
+    "build-candidate",
+    "build-candidate-unqualified",
+    "candidate-unqualified",
+    "cargo-target",
+    "__pycache__"
+  ],
+  "continued_data_custody": "The two pinned originals remain in this owning stage as rows 0 and 49 of the authorized full R50 acquisition.",
+  "retired_source_worktrees": [
+    "r50-canon-e810-stock",
+    "r50-canon-c80d-candidate"
+  ],
+  "executable_custody": "The hash-verified stock and candidate CLIs remain in the two recorded read-only artifact directories."
+}

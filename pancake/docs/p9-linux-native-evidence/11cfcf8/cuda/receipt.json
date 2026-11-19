@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "scope": "release compile and link; CLI and device execution pending",
+  "tested_revision": "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6",
+  "source_tree": "0ea17aeb65a346e3cb6b5593d8c8b4a02e827832",
+  "source_pancake_tree": "789e6bad6369cd8c33d59598f2a5fcf4c1c9f487",
+  "source_clean_at_build": true,
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "cargo_inputs_sha256": {
+    "Cargo.lock": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "Cargo.toml": "245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043",
+    "crates/pancake-cli/Cargo.toml": "b161e3bf5f8a1bd2f8ef41cc0e447665c9ac521034230f2771d15fb766a8dffd",
+    "rust-toolchain.toml": "ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e"
+  },
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)\nrelease: 1.100.0\ncommit-hash: 3acc79c0c841844675bc53a605922dbfc441e750\ncommit-date: 2026-11-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]",
+  "logical_cpus": [
+    10,
+    11
+  ],
+  "parallel_build_jobs": 2,
+  "cargo_feature": "cubecl/cuda",
+  "cudarc_cuda_api": 12050,
+  "build_command": "taskset --cpu-list 10\\,11 cargo +1.100.0 build --locked --offline --release -p pancake -p pancake-cli --bin pancake-cli -j 2 --features cubecl/cuda",
+  "build_settings": "cwd=/tmp/pancake-worktrees.t3paqgWM/cuda-11cfcf8/pancake\nCARGO_TARGET_DIR=/tmp/pancake-worktrees.t3paqgWM/cuda-11cfcf8/pancake/target/native-cuda-11cfcf8\nCUDARC_CUDA_VERSION=12050\nLD_LIBRARY_PATH=/usr/local/cuda-12.5/lib64\nCARGO_INCREMENTAL=0\nCARGO_BUILD_JOBS=2\nCARGO_NET_OFFLINE=true\nRUSTC_WRAPPER=unset",
+  "build_start": "2026-11-19T10:58:21,654045118+08:00",
+  "build_end": "2026-11-19T11:03:21,221182888+08:00",
+  "build_exit": 0,
+  "build_log_sha256": "6f4f63aec2a5ee34c6afe9426b14cf8fce82a8ea5306648825738cb136281782",
+  "dependency_graph_sha256": "ebf97a526f247b24e7f0cd4d5208b34318d00c6add25d74ac6a7eb55dc154903",
+  "link_witness_sha256": "9c4982e762e344d29de905ff98fc09a6807e452d0117e2ffb51c35e8be224ab8",
+  "cuda_runtime_files_sha256": {
+    "/usr/local/cuda-12.5/lib64/libnvrtc.so.12.5.40": "fb37b3f5b0ed35bf6b24f31f1277d30f2fadb08f8562e90d1e6ce208817fc8ed",
+    "/usr/local/cuda-12.5/lib64/libnvrtc-builtins.so.12.5.40": "1237ef425d116b1faee57d924e099b877fd6548ce3b367e50a7e1ef912eeb08c",
+    "/usr/lib/x86_64-linux-gnu/libcuda.so.580.178.04": "dcdf334aeb177c95b3385b797c9b871d03a287895713c6d107f79096b0985aa9",
+    "/usr/local/cuda-12.5/nvvm/libdevice/libdevice.10.bc": "8c593e48547f85458b6bfbed93a2e6b05484644ccc6b429bb0d8424e06a68b6c"
+  },
+  "llvm_archive_sha256_matches_publisher": "c394bb1b10ac785f16d3d92d688a9343ba869f720e9cf9ca3f1abf2f401f165f",
+  "elf": {
+    "retained_local_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-linux-native/11cfcf8/pancake-cli",
+    "size_bytes": 130313160,
+    "sha256": "91beeb528af87c12950fa50d236af77ffa2f2c2394d8d10a8bc50938b3862b73",
+    "gnu_build_id": "ed4534bb572228362a31ec4dcf2bc46f66595709"
+  },
+  "physical_device_provenance": null
+}

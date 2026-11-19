@@ -1,0 +1,80 @@
+"""Verify exact traced output parity and summarize nonoverlapping stage visits."""
+
+import json
+import statistics
+import sys
+from pathlib import Path
+
+scratch = Path(sys.argv[1]).resolve(strict=True)
+matched = json.loads((scratch / "matched-full-pair/report.json").read_bytes())
+traced_root = scratch / "external-candidate-stage-probe"
+traced = json.loads((traced_root / "report.json").read_bytes())
+if any(report.get("diagnostic_failure") or not report.get("inputs_unchanged")
+       or not report.get("target_identities_unchanged")
+       for report in (matched, traced)):
+    raise ValueError("both diagnostics must succeed with reverified provenance")
+if (matched["identities"], matched["settings"]) != (traced["identities"], traced["settings"]):
+    raise ValueError("probe and untraced job used different inputs or product settings")
+untraced_case = matched["cases"]["candidate"]
+traced_case = traced["cases"]["candidate"]
+if untraced_case["output"]["pixel_sha256"] != traced_case["output"]["pixel_sha256"]:
+    raise ValueError("external probe changed the candidate's decoded TIFF pixels")
+trace = [
+    json.loads(line)
+    for line in (traced_root / "candidate/external-stages.jsonl").read_text().splitlines()
+]
+if trace[0]["kind"] != "probe_ready" or trace[-1] != {"kind": "inferior_exit", "exit_code": 0}:
+    raise ValueError("stage trace is incomplete")
+if trace[0]["debugger_affinity"] != [15] or trace[1] != {
+    "kind": "inferior_affinity", "cpus": list(range(15)),
+}:
+    raise ValueError("debugger or inferior affinity did not match the plan")
+# GDB 15 can keep a temporary breakpoint when stop() returns False.
+# Each repeated callback retains the original entry time. The first
+# return at its exact caller address is the duration for that entry.
+returns = trace[2:-1]
+first_returns = {}
+for event in returns:
+    if event["kind"] != "stage_return":
+        raise ValueError("unexpected kind in stage trace")
+    key = event["stage"], event["start_monotonic_ns"]
+    prior = first_returns.setdefault(key, event)
+    if event["end_monotonic_ns"] < prior["end_monotonic_ns"]:
+        raise ValueError("stage returns are not written in observation order")
+visits = sorted(first_returns.values(), key=lambda event: event["start_monotonic_ns"])
+if any(
+    left["end_monotonic_ns"] > right["start_monotonic_ns"]
+    for left, right in zip(visits, visits[1:])
+):
+    raise ValueError("individual stage durations overlap")
+expected_visits = {
+    "decode": 50, "registration_thumbnail": 50, "estimate_pair": 49,
+    "fusion_add": 50, "fusion_finish": 1, "prepare_export": 1,
+}
+stages = {}
+for name, expected in expected_visits.items():
+    selected = [event for event in visits if event["stage"] == name]
+    if len(selected) != expected:
+        raise ValueError(f"{name} recorded {len(selected)} of {expected} visits")
+    elapsed = [event["elapsed_ns"] for event in selected]
+    cpu_seconds = sum(event["inferior_process_cpu_ticks"] for event in selected) / trace[0]["cpu_ticks_per_second"]
+    stages[name] = {
+        "visits": len(selected),
+        "wall_ns_total": sum(elapsed),
+        "wall_ns_median": statistics.median(elapsed),
+        "inferior_cpu_seconds_total": cpu_seconds,
+        "average_busy_cores": cpu_seconds / (sum(elapsed) / 1e9),
+    }
+summary = {
+    "scope": "External GDB phase observation; instrumentation perturbation is reported. No official timing credit.",
+    "candidate_untraced_completed_ns": untraced_case["elapsed_ns"],
+    "candidate_traced_completed_ns": traced_case["elapsed_ns"],
+    "reference_untraced_completed_ns": matched["cases"]["reference"]["elapsed_ns"],
+    "traced_untraced_candidate_pixel_sha256": traced_case["output"]["pixel_sha256"],
+    "matched_pixel_metrics": matched["first_pair_pixel_metrics"],
+    "raw_return_callback_count": len(returns),
+    "repeat_return_callbacks_excluded": len(returns) - len(visits),
+    "total_ns_inside_observed_functions": sum(stage["wall_ns_total"] for stage in stages.values()),
+    "stages": stages,
+}
+print(json.dumps(summary, indent=2))

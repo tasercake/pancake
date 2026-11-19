@@ -1,0 +1,46 @@
+"""Exercise the independent exact 2 ms policy with synthetic acquisitions."""
+from pathlib import Path
+import runpy
+import unittest
+
+policy = runpy.run_path(str(Path(__file__).with_name("rss-pair-gate.py.txt")))
+audit = policy["audit"]
+gate = policy["gate"]
+
+
+class PairTests(unittest.TestCase):
+    def arm(self, peak):
+        sample = {
+            "valid": True, "rss_sampler_affinity": [15], "sample_interval_ns": 2_000_000,
+            "resource_errors": [], "elapsed_ns": 46_000_000,
+            "maximum_rss_sample_gap_ns": 20_000_000, "rss_sample_count": 3,
+            "observed_peak_rss_bytes": peak, "peak_rss_bytes": peak,
+        }
+        rows = [{"rss_elapsed_ns": ns, "rss_bytes": rss, "processes": [42]}
+                for ns, rss in ((6_000_000, 100), (26_000_000, peak), (44_000_000, 100))]
+        return sample, rows
+
+    def test_exact_inclusive_limit_and_raw_verification(self):
+        reference = audit(*self.arm(1000))
+        candidate = audit(*self.arm(550))
+        self.assertEqual(gate(reference, candidate)["status"], "pass")
+        self.assertEqual(gate(reference, audit(*self.arm(551)))["status"], "fail")
+
+    def test_actual_gap_disqualifies_peak_even_when_observed(self):
+        sample, rows = self.arm(1000)
+        rows[1]["rss_elapsed_ns"] += 1
+        sample.update(maximum_rss_sample_gap_ns=20_000_001, peak_rss_bytes=None)
+        audited = audit(sample, rows)
+        self.assertEqual(audited["observed_peak_rss_bytes"], 1000)
+        self.assertEqual(gate(audited, audit(*self.arm(550)))["status"], "pending")
+
+    def test_wrong_period_or_false_record_is_invalid(self):
+        sample, rows = self.arm(1000)
+        with self.assertRaises(ValueError):
+            audit(sample | {"sample_interval_ns": 3_000_000}, rows)
+        with self.assertRaises(ValueError):
+            audit(sample | {"peak_rss_bytes": 123}, rows)
+
+
+if __name__ == "__main__":
+    unittest.main()

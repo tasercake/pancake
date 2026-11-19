@@ -1,12 +1,13 @@
 //! Bounded subpixel registration with a conservative confidence decision.
 
 use super::{
+    ResidentRgb, frame_thumbnail,
     geometry::{Affine, Extent, Frame},
     kernels::{Pair, make_luma},
 };
 
 /// Longest side of an estimation thumbnail, independent of camera resolution.
-const THUMBNAIL_LIMIT: u16 = 384;
+pub(super) const THUMBNAIL_LIMIT: u16 = 384;
 /// Preserve enough detail on the narrow axis to estimate small displacements.
 const SHORT_AXIS_DETAIL: u32 = 160;
 /// Native thumbnail budget, including elongated canvases.
@@ -96,7 +97,15 @@ pub fn thumbnail(
     budget: usize,
 ) -> Result<Thumbnail, String> {
     let canvas = Extent::new(reference_width, reference_height)?;
-    prepare_thumbnail(device, frame, canvas, u32::from(THUMBNAIL_LIMIT), budget)
+    prepare_thumbnail(
+        device,
+        frame,
+        canvas,
+        u32::from(THUMBNAIL_LIMIT),
+        budget,
+        false,
+    )
+    .map(|(thumbnail, _)| thumbnail)
 }
 
 /// Prepare a luma proxy using an explicit reduction factor on large inputs.
@@ -117,13 +126,15 @@ pub fn thumbnail_with_scale(
     scale_factor: u32,
     budget: usize,
 ) -> Result<Thumbnail, String> {
-    let canvas = Extent::new(reference_width, reference_height)?;
-    let longest = u32::from(canvas.width.max(canvas.height));
-    let requested = longest
-        .checked_div(scale_factor)
-        .ok_or("alignment scale factor must be positive")?;
-    let side = requested.clamp(u32::from(THUMBNAIL_LIMIT), 768);
-    prepare_thumbnail(device, frame, canvas, side, budget)
+    frame_thumbnail(
+        device,
+        frame,
+        [reference_width, reference_height],
+        scale_factor,
+        budget,
+        false,
+    )
+    .map(|(thumbnail, _)| thumbnail)
 }
 
 /// Apply an aspect-preserving size limit and prepare the device luma proxy.
@@ -135,13 +146,14 @@ pub fn thumbnail_with_scale(
     clippy::arithmetic_side_effects,
     reason = "u16 dimensions bound the area, and the longest side is nonzero"
 )]
-fn prepare_thumbnail(
+pub(super) fn prepare_thumbnail(
     device: &cubecl::Device,
     frame: Frame<'_>,
     canvas: Extent,
     limit: u32,
     budget: usize,
-) -> Result<Thumbnail, String> {
+    retain_input: bool,
+) -> Result<(Thumbnail, Option<ResidentRgb>), String> {
     let longest = u32::from(canvas.width.max(canvas.height));
     let shortest = u32::from(canvas.width.min(canvas.height));
     let detail = shortest.min(SHORT_AXIS_DETAIL);
@@ -154,12 +166,15 @@ fn prepare_thumbnail(
         usize::try_from(size.max(1)).map_err(|error| error.to_string())
     };
     let extent = Extent::new(shrink(canvas.width)?, shrink(canvas.height)?)?;
-    let pixels = make_luma(device, frame, extent, budget)?;
-    Ok(Thumbnail {
-        extent,
-        canvas,
-        pixels,
-    })
+    let (pixels, resident) = make_luma(device, frame, extent, budget, retain_input)?;
+    Ok((
+        Thumbnail {
+            extent,
+            canvas,
+            pixels,
+        },
+        resident,
+    ))
 }
 
 /// Estimate the reference-to-source map from one independent pair of proxies.
@@ -490,3 +505,6 @@ fn one(scores: &[f32]) -> Result<f32, String> {
     };
     Ok(score)
 }
+
+#[cfg(test)]
+mod tests;

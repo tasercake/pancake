@@ -1,0 +1,31 @@
+{
+  "verified_utc": "2026-11-18T10:44:01.942705+00:00",
+  "removed_archive": {
+    "md5": "0ce63bd918fbda570df66731c2aa5880",
+    "path": "26E_dorsal_60x.zip",
+    "sha256": "311ca6aab7d3bff03c714fd2d81c741f3847de1d4d3f2f9cfa767b6eb62cf56a",
+    "size": 53459291,
+    "url": "https://ndownloader.figshare.com/files/28246182"
+  },
+  "source_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+  "removed_original_count": 150,
+  "removed_original_bytes": 52911148,
+  "removed_exports": {
+    "/tmp/pancake-worktrees.t3paqgWM/breathing-sampling/artifacts/d150/paired-sampling-59d0bcb/bilinear/complete.tif": {
+      "bytes": 19553770,
+      "sha256": "fee2530932c54dc6ab1468a1a1c0f65c0c88d90b4f4574c35c79072395406ab0"
+    },
+    "/tmp/pancake-worktrees.t3paqgWM/breathing-sampling/artifacts/d150/paired-sampling-59d0bcb/bounded-cubic/complete.tif": {
+      "bytes": 19553770,
+      "sha256": "64e46fd4f182eca334900b7a1bc0eaa819d4453ade75984edc1aa2eb658ea9be"
+    }
+  },
+  "retained_binary": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/d150-bounded-cubic-59d0bcb/pancake-cli",
+  "retained_binary_sha256": "06cc7cd775541281093ad4da427e590276fb743cecfea86b835d604171e172c6",
+  "retained_traces_sha256": [
+    "e5b11085f6586765d74d4311347437b57a67f24966d389800c92ae396a3b2f05",
+    "e5b11085f6586765d74d4311347437b57a67f24966d389800c92ae396a3b2f05"
+  ],
+  "total_removed_image_and_archive_bytes": 145477979,
+  "remaining_owned_originals_or_tiffs": 0
+}

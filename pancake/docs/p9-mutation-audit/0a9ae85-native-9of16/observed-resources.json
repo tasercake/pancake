@@ -1,0 +1,31 @@
+{
+  "baseline_phases_seconds": {
+    "Build": 169.589012335,
+    "Test": 6.525869854
+  },
+  "baseline_test_targets": 19,
+  "baseline_tests_passed": 148,
+  "by_package": {
+    "pancake": {
+      "CaughtMutant": 106,
+      "MissedMutant": 33,
+      "Timeout": 1,
+      "Unviable": 7
+    },
+    "pancake-cli": {
+      "Unviable": 1
+    },
+    "pancake-gui": {
+      "CaughtMutant": 2,
+      "MissedMutant": 12,
+      "Unviable": 5
+    }
+  },
+  "final_target_allocated_bytes": 7331684352,
+  "largest_sampled_target_allocated_bytes": 7339266048,
+  "native_completion_elapsed_seconds": 3821.104000444,
+  "native_diff_regular_files": 167,
+  "native_log_content_bytes": 170442947,
+  "native_log_regular_files": 168,
+  "smallest_sampled_free_bytes": 89446195200
+}

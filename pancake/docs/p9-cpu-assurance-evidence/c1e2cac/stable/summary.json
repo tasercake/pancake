@@ -1,0 +1,38 @@
+{
+  "revision": "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb",
+  "gate": "bash scripts/check.sh coverage-cpu",
+  "toolchain": "1.100.0",
+  "cargo_llvm_cov": "0.9.1",
+  "started_utc": "2026-11-18T12:57:01Z",
+  "finished_utc": "2026-11-18T13:00:32Z",
+  "exit_status": 1,
+  "gate_diagnostic": [
+    "CPU assurance: uncovered CPU lines"
+  ],
+  "test_groups": 19,
+  "tests": {
+    "passed": 146,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "filtered": 0
+  },
+  "metrics": {
+    "lines": {
+      "covered": 4658,
+      "count": 6475
+    },
+    "functions": {
+      "covered": 476,
+      "count": 756
+    },
+    "regions": {
+      "covered": 4776,
+      "count": 7288
+    },
+    "branches": {
+      "covered": 0,
+      "count": 0
+    }
+  }
+}

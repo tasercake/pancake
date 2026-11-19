@@ -1,0 +1,14 @@
+{
+  "tested_rev": "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6",
+  "observed_equivalent_main": "641d852b6248d9a5a1e8ddc1df152380f621931d",
+  "identical_product_pathspecs": [
+    "pancake",
+    ":(exclude)pancake/docs/**"
+  ],
+  "disjoint_case_counts": {
+    "host": 341,
+    "isolated-gui": 34,
+    "physical-gpu-gui": 1
+  },
+  "ledger_sha256": "d1e803f05e2a961b36795265c1fb28c253a93e60ef465aa14c28e70b4c9e0a4a"
+}

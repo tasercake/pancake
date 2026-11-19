@@ -1,0 +1,15 @@
+e81079dee4078d7a1149da0f5950aab8c89f8d44
+e9db47ff9704f3911fb2bbf6d1943d5226518e4e
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+5fe9d93e1378a7b1654607850472598d37772bc933c222ea15a2b3ca13b23b8f  examples/canon_native_probe.rs
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+RUSTC_WRAPPER='' RUSTC_WORKSPACE_WRAPPER='' CARGO_INCREMENTAL=0
+Linux krishna-desktop 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+2026-11-19T00:20:05+08:00
+2026-11-19T00:24:50+08:00

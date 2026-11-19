@@ -1,0 +1,219 @@
+{
+  "fixed_revision": "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb",
+  "native_measurement_scope": "Ten historical selected mutations, caught",
+  "current_full_universe": 2642,
+  "current_full_roster_sha256": "af16665064d5f43759dc9b34b9b753bbb41bc6167c4fb06cce6662c6c6dff7df",
+  "current_full_16_grid_cost_projection": [
+    {
+      "index": 0,
+      "candidates": 166,
+      "by_package": {
+        "pancake": 146,
+        "pancake-cli": 1,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4095.1327584960836,
+      "sample_max_scenario_seconds": 4396.973085325
+    },
+    {
+      "index": 1,
+      "candidates": 166,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 20
+      },
+      "mean_sample_projection_seconds": 4102.49374656625,
+      "sample_max_scenario_seconds": 4408.817373703
+    },
+    {
+      "index": 2,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4084.4742927057505,
+      "sample_max_scenario_seconds": 4381.533882562
+    },
+    {
+      "index": 3,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4084.4742927057505,
+      "sample_max_scenario_seconds": 4381.533882562
+    },
+    {
+      "index": 4,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4084.4742927057505,
+      "sample_max_scenario_seconds": 4381.533882562
+    },
+    {
+      "index": 5,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4084.4742927057505,
+      "sample_max_scenario_seconds": 4381.533882562
+    },
+    {
+      "index": 6,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4084.4742927057505,
+      "sample_max_scenario_seconds": 4381.533882562
+    },
+    {
+      "index": 7,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4084.4742927057505,
+      "sample_max_scenario_seconds": 4381.533882562
+    },
+    {
+      "index": 8,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4084.4742927057505,
+      "sample_max_scenario_seconds": 4381.533882562
+    },
+    {
+      "index": 9,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4084.4742927057505,
+      "sample_max_scenario_seconds": 4381.533882562
+    },
+    {
+      "index": 10,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 146,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4084.4742927057505,
+      "sample_max_scenario_seconds": 4381.533882562
+    },
+    {
+      "index": 11,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 145,
+        "pancake-cli": 1,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4072.2579375804585,
+      "sample_max_scenario_seconds": 4373.269203577
+    },
+    {
+      "index": 12,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 145,
+        "pancake-cli": 1,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4072.2579375804585,
+      "sample_max_scenario_seconds": 4373.269203577
+    },
+    {
+      "index": 13,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 145,
+        "pancake-cli": 1,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4072.2579375804585,
+      "sample_max_scenario_seconds": 4373.269203577
+    },
+    {
+      "index": 14,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 145,
+        "pancake-cli": 1,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4072.2579375804585,
+      "sample_max_scenario_seconds": 4373.269203577
+    },
+    {
+      "index": 15,
+      "candidates": 165,
+      "by_package": {
+        "pancake": 145,
+        "pancake-cli": 1,
+        "pancake-gui": 19
+      },
+      "mean_sample_projection_seconds": 4072.2579375804585,
+      "sample_max_scenario_seconds": 4373.269203577
+    }
+  ],
+  "projected_next": {
+    "index": 11,
+    "candidates": 165,
+    "by_package": {
+      "pancake": 145,
+      "pancake-cli": 1,
+      "pancake-gui": 19
+    },
+    "mean_sample_projection_seconds": 4072.2579375804585,
+    "sample_max_scenario_seconds": 4373.269203577
+  },
+  "projected_next_actual_list_sha256": "7162b6016661bc32f1393f1d14028a1e1836da8dc699322dbda8056757825341",
+  "cold_baseline_seconds": 402.380815675,
+  "native_measured_historical_subset_elapsed_seconds": 621.57,
+  "measured_historical_subset_target_allocated_bytes": 7331131392,
+  "per_package_observed_phase_seconds": {
+    "pancake": [
+      23.703881748,
+      22.176211221000003,
+      21.744271694000002,
+      23.58395018,
+      23.175363286,
+      23.577565659,
+      23.568013562,
+      21.469309975
+    ],
+    "pancake-gui": [
+      27.283491141,
+      8.75541658
+    ],
+    "pancake-cli": [
+      0.652572831,
+      15.439202762999999,
+      11.462738895,
+      12.392181591,
+      14.583615201,
+      9.420483461
+    ]
+  },
+  "cli_sample_revision": "f9af478d20d59b009b42945d5f9d903aaffa15b2",
+  "proposed_matrix_revision": "8a238913",
+  "proposed_matrix_max_parallel": 4,
+  "proposed_matrix_timeout_minutes": 75,
+  "candidate_executions_this_projection": 0,
+  "summed_16_job_estimate_seconds": 65319.18482731638
+}

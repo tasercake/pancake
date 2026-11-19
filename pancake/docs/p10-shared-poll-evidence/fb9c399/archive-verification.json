@@ -1,0 +1,26 @@
+{
+  "control": {
+    "archive": "control-verified-capture.tar.gz",
+    "sha256": "efa74366c12d966c66a057d4ce186b855f01ef3dde2c243b29763abf5da66153",
+    "verified_members": 2034,
+    "calibrated_witnesses": 19,
+    "actual_presented_patches": 1120,
+    "maximum_witness_dimensions": [
+      16,
+      16
+    ],
+    "checked_allowlisted_members_byte_for_byte": true
+  },
+  "nonblocking": {
+    "archive": "nonblocking-verified-capture.tar.gz",
+    "sha256": "5f9098f21951709359c45bd8a192eef4294bec4b6bddf00526229bce193a58a3",
+    "verified_members": 2034,
+    "calibrated_witnesses": 19,
+    "actual_presented_patches": 1120,
+    "maximum_witness_dimensions": [
+      16,
+      16
+    ],
+    "checked_allowlisted_members_byte_for_byte": true
+  }
+}

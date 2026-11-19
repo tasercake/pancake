@@ -1,0 +1,153 @@
+"""Check fast process-roster attribution in an owned cgroup v2 user scope."""
+
+import ctypes as c
+import json
+import os
+import select
+import signal
+import sys
+import time
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from resources import _session_memory
+
+CHILD = """
+import json
+import os
+import signal
+import sys
+from pathlib import Path
+
+initial_group = Path('/proc/self/cgroup').read_text().strip()
+worker = os.fork()
+if worker == 0:
+    signal.pause()
+    os._exit(0)
+try:
+    print(json.dumps({'main_pid': os.getpid(), 'worker_pid': worker,
+                      'session': os.getsid(0), 'initial_group': initial_group}), flush=True)
+    if sys.stdin.buffer.read(1) != b'M':
+        raise RuntimeError('worker migration command missing')
+    Path(sys.argv[1]).write_text(str(worker))
+    print(json.dumps({'worker_session_after_move': os.getsid(worker)}), flush=True)
+    sys.stdin.buffer.read(1)
+finally:
+    os.kill(worker, signal.SIGTERM)
+    os.waitpid(worker, 0)
+"""
+
+
+def roster(group, session):
+    pids = set()
+    pages = 0
+    for pid in {int(name) for name in (group / "cgroup.procs").read_text().split()}:
+        try:
+            if os.getsid(pid) != session:
+                continue
+            fields = Path(f"/proc/{pid}/stat").read_bytes().rsplit(b")", 1)[1].split()
+        except (FileNotFoundError, ProcessLookupError):
+            continue
+        if int(fields[3]) == session and fields[0] != b"Z":
+            pids.add(pid)
+            pages += max(0, int(fields[21]))
+    return sorted(pids), pages * os.sysconf("SC_PAGESIZE")
+
+
+def observation(snapshot):
+    begin = time.monotonic_ns()
+    members, rss = snapshot()
+    return {
+        "pids": sorted(members),
+        "rss_bytes": rss,
+        "wall_ns": time.monotonic_ns() - begin,
+    }
+
+
+def read_row(stream):
+    if not select.select([stream], [], [], 3)[0]:
+        raise ValueError(
+            "the cgroup probe child did not acknowledge within three seconds"
+        )
+    return json.loads(stream.readline())
+
+
+def run(launcher, work, adjacent):
+    child_in, parent_out = os.pipe2(os.O_CLOEXEC)
+    parent_in, child_out = os.pipe2(os.O_CLOEXEC)
+    command = [sys.executable, "-c", CHILD, str(adjacent / "cgroup.procs")]
+    argv = (c.c_char_p * (len(command) + 1))(
+        *(os.fsencode(arg) for arg in command), None
+    )
+    pid = launcher(os.fsencode(work), argv, child_in, child_out)
+    os.close(child_in)
+    os.close(child_out)
+    with (
+        os.fdopen(parent_in, "rb") as incoming,
+        os.fdopen(parent_out, "wb") as outgoing,
+    ):
+        if pid < 0:
+            raise OSError(-pid, os.strerror(-pid))
+        try:
+            child = read_row(incoming)
+            assert child["main_pid"] == child["session"] == pid
+            assert child["initial_group"].endswith(f"/{work.name}")
+            expected = sorted([pid, child["worker_pid"]])
+
+            def scoped():
+                return observation(lambda: roster(work, pid))
+
+            def full():
+                return observation(lambda: _session_memory(pid))
+
+            before = [(scoped(), full()) for _ in range(24)]
+            assert all(a["pids"] == b["pids"] == expected for a, b in before)
+            assert all(a["rss_bytes"] == b["rss_bytes"] for a, b in before)
+            outgoing.write(b"M")
+            outgoing.flush()
+            moved = read_row(incoming)
+            assert moved["worker_session_after_move"] == pid
+            after = [scoped(), full()]
+            assert after[0]["pids"] == [pid] and after[1]["pids"] == expected
+            outgoing.write(b"Q")
+            outgoing.flush()
+        except BaseException:
+            try:
+                os.killpg(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                os.kill(pid, signal.SIGKILL)
+            os.waitpid(pid, 0)
+            raise
+        _, status = os.waitpid(pid, 0)
+        assert os.waitstatus_to_exitcode(status) == 0
+    return {"child": child, "before": before, "after_same_uid_migration": after}
+
+
+def main():
+    parent = Path("/proc/self/cgroup").read_text().strip().split(":", 2)[2]
+    if not Path(parent).name.startswith("codex-pancake-cadence-roster-"):
+        raise ValueError("run only inside a new task-owned delegated user scope")
+    scope = Path("/sys/fs/cgroup") / parent.lstrip("/")
+    work = scope / "collect"
+    adjacent = scope / "adjacent"
+    work.mkdir()
+    adjacent.mkdir()
+    try:
+        (work / "cgroup.max.descendants").write_text("0")
+        launcher = c.CDLL(str(Path(sys.argv[1]).resolve())).pancake_cgroup_spawn
+        launcher.argtypes = [c.c_char_p, c.POINTER(c.c_char_p), c.c_int, c.c_int]
+        launcher.restype = c.c_int
+        print(
+            json.dumps(
+                {"harness_scope": parent, **run(launcher, work, adjacent)}, indent=2
+            )
+        )
+        assert not (work / "cgroup.procs").read_text().strip()
+        assert not (adjacent / "cgroup.procs").read_text().strip()
+    finally:
+        work.rmdir()
+        adjacent.rmdir()
+
+
+if __name__ == "__main__":
+    main()

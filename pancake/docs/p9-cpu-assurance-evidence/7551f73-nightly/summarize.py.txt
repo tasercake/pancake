@@ -1,0 +1,125 @@
+"""Compare the actual pinned CPU coverage export with its retained baseline."""
+from collections import defaultdict
+import gzip
+from hashlib import file_digest
+import json
+from pathlib import Path
+import re
+import subprocess
+
+repo = Path.cwd()
+workspace = repo / "pancake"
+proof = repo / "artifacts/cpu-coverage-7551f73"
+previous = workspace / "docs/p9-cpu-assurance-evidence/287828a-nightly"
+base_revision = "287828aac07ffad2252785b73a52a59fc07b3409"
+revision = "7551f73dbe5132f7e9723a9ac4b0c9144504a27a"
+kinds = ("lines", "functions", "regions", "branches")
+
+def data(path):
+    """Use the one actual workspace map exported by pinned LLVM."""
+    text = gzip.decompress(path.read_bytes()) if path.suffix == ".gz" else path.read_bytes()
+    report, = json.loads(text)["data"]
+    return report
+
+def relative(name):
+    """Map retained absolute paths into the same Pancake workspace shape."""
+    return name.rsplit("/pancake/", 1)[-1]
+
+def counts(summary):
+    """Keep the covered numerator and full denominator for each native metric."""
+    return {kind: {
+        "covered": summary[kind]["covered"], "total": summary[kind]["count"],
+        "uncovered": summary[kind]["count"] - summary[kind]["covered"],
+    } for kind in kinds}
+
+def difference(before, after):
+    """Describe both numerator and denominator shifts without combining source maps."""
+    return {kind: {metric: after[kind][metric] - before[kind][metric]
+                   for metric in ("covered", "total", "uncovered")} for kind in kinds}
+
+def files(report):
+    """Use each LLVM file summary once, preserving the exact report inventory."""
+    result = {}
+    for row in report["files"]:
+        path = relative(row["filename"])
+        if path in result:
+            raise ValueError(f"duplicate retained source path: {path}")
+        result[path] = counts(row["summary"])
+    return result
+
+def coordinates(report, unchanged):
+    """Record covered code coordinates in source files with identical bytes."""
+    output = defaultdict(set)
+    for function in report["functions"]:
+        for row in function["regions"]:
+            path = relative(function["filenames"][row[5]])
+            if row[7] == 0 and row[4] > 0 and path in unchanged:
+                output[path].add(tuple(row[:4]))
+    return output
+
+def sha(path):
+    """Stream the original file's content identity."""
+    with path.open("rb") as stream:
+        return file_digest(stream, "sha256").hexdigest()
+
+def file_at(pin, path):
+    """Use the exact Git object bytes for mapped local source identity."""
+    value = subprocess.run(["git", "rev-parse", f"{pin}:pancake/{path}"], cwd=repo,
+                           capture_output=True, text=True, check=False)
+    return value.stdout.strip() if value.returncode == 0 else None
+
+before_report = previous / "branches-cpu.json.gz"
+after_report = workspace / "target/coverage/branches-cpu.json"
+before, after = data(before_report), data(after_report)
+before_files, after_files = files(before), files(after)
+before_counts, after_counts = counts(before["totals"]), counts(after["totals"])
+files_comparison = []
+unchanged = set()
+for path in sorted(before_files.keys() | after_files.keys()):
+    source_before, source_after = (file_at(pin, path) for pin in (base_revision, revision))
+    if source_before is not None and source_before == source_after:
+        unchanged.add(path)
+    left, right = before_files.get(path), after_files.get(path)
+    files_comparison.append({"file": path, "before_git_blob": source_before,
+                             "after_git_blob": source_after,
+                             "source_byte_identical": path in unchanged,
+                             "before": left, "after": right,
+                             "delta": difference(left, right) if left and right else None})
+baseline_locations = coordinates(before, unchanged)
+current_locations = coordinates(after, unchanged)
+for row in files_comparison:
+    path = row["file"]
+    if path in unchanged:
+        row["code_coordinate_delta"] = {
+            "newly_covered": sorted(current_locations[path] - baseline_locations[path]),
+            "previously_covered": sorted(baseline_locations[path] - current_locations[path]),
+        }
+test_summaries = []
+gate_diagnostics = []
+for line in (proof / "branches-cpu.log").read_text().splitlines():
+    match = re.match(r"test result: (ok|FAILED)\. (\d+) passed; (\d+) failed; (\d+) ignored;"
+                     r" (\d+) measured; (\d+) filtered out;", line)
+    if match:
+        test_summaries.append(tuple(map(int, match.groups()[1:])))
+    if line.startswith(("CPU assurance:", "error:", "Uncovered ")):
+        gate_diagnostics.append(line)
+counts_keys = ("passed", "failed", "ignored", "measured", "filtered")
+selected_now = (workspace / "target/assurance/selected-targets.txt").read_text().splitlines()
+selected_before = (previous / "selected-targets.txt").read_text().splitlines()
+summary = {
+    "revision": revision, "baseline_revision": base_revision,
+    "strict_status": int((proof / "branches-cpu.status").read_text()),
+    "test_result_records": len(test_summaries),
+    "nonempty_test_groups": sum(sum(row[:3]) > 0 for row in test_summaries),
+    "tests": {key: sum(row[i] for row in test_summaries) for i, key in enumerate(counts_keys)},
+    "gate_diagnostics": gate_diagnostics,
+    "selected_integration_targets": selected_now,
+    "identical_cpu_selection": selected_now == selected_before,
+    "before": before_counts, "after": after_counts, "delta": difference(before_counts, after_counts),
+    "baseline_llvm_gzip_sha256": sha(before_report),
+    "current_llvm_json_sha256": sha(after_report),
+    "comparison_by_file": files_comparison,
+}
+(proof / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+print(json.dumps({key: summary[key] for key in ("strict_status", "test_result_records",
+                "tests", "before", "after", "delta", "gate_diagnostics")}, indent=2))

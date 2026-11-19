@@ -1,0 +1,75 @@
+{
+  "stock": {
+    "native": {
+      "first": {
+        "file_bytes": 103552010,
+        "file_sha256": "73f29eedc42787ddd8148ab313eb45e6d2f2a9707faa25da81385f6e8148771b",
+        "pixel_sha256": "14edea9fb2ecadeaf2569e93743358069bfdb1cb639c1ac8294829c7933276bd",
+        "shape_hwc": [
+          3392,
+          5088,
+          3
+        ],
+        "dtype": "uint16",
+        "working_sha256_f32_le": "688513e0fb134cea138c1c9bb5a59a8f9edeb712400c09ed3872e77344a5e2b8"
+      },
+      "last": {
+        "file_bytes": 103552010,
+        "file_sha256": "bf62cb0251420758712af7c341a84f7d4cf4f5f5c1217c4212752ced27a32710",
+        "pixel_sha256": "e74b108e8391379cc0d7520f3fce43542cf852f7dd312916fa9c6f2027479617",
+        "shape_hwc": [
+          3392,
+          5088,
+          3
+        ],
+        "dtype": "uint16",
+        "working_sha256_f32_le": "93c44191dfbbbb69fe813bee5959b32f700909b45ece0dc761d23b46cda6a6ee"
+      }
+    },
+    "combined_working_sha256_f32_le": "ed3351ff2b8f5f1f3b278c806258170d6a2b89b75da55014f5dc875535c8a0b2",
+    "historical_working_sha_match": true,
+    "stack": {
+      "file_bytes": 103450274,
+      "file_sha256": "d85703c50ccba5ae21303f93ba8eea590d5eb41554c82accd7e50605c04993e4",
+      "pixel_sha256": "e15d79fc1b6d5c7bd957139df9836944423ff670569463e0f208dbe7f0c14900",
+      "shape_hwc": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16"
+    },
+    "transforms": {
+      "alignment_transforms": {
+        "sha256_f32_le": "a44e047435e99d33e70ac69a4e62c5e1c373232479ddac2a454fe925467bba16",
+        "historical_identity": true
+      },
+      "sequential_transforms": {
+        "sha256_f32_le": "a44e047435e99d33e70ac69a4e62c5e1c373232479ddac2a454fe925467bba16",
+        "historical_identity": true
+      }
+    },
+    "actual_backend": "cpu"
+  },
+  "inputs": {
+    "owner": "r50-workers",
+    "manifest_sha256": "dd7a7e8a396d16e952d3d24d258afc1e05b77bb1664b179d3a43a7f66e413fab",
+    "verified": [
+      {
+        "name": "frame_000.CR3",
+        "bytes": 8869034,
+        "sha256": "4538bc75741cc16292b1838c52989050d084c4a51f0e005a554819190c379fca",
+        "url": "https://huggingface.co/datasets/jjjsood/focus-stack-sample/resolve/0f8256edf2d2e3f1f1ea162f78a8bca36eb6915c/raw/frame_000.CR3"
+      },
+      {
+        "name": "frame_049.CR3",
+        "bytes": 8813738,
+        "sha256": "98fe6e370fc2ab58ba7b45d242a8c2f2a1942404ee0e0524c5cb33048969dc36",
+        "url": "https://huggingface.co/datasets/jjjsood/focus-stack-sample/resolve/0f8256edf2d2e3f1f1ea162f78a8bca36eb6915c/raw/frame_049.CR3"
+      }
+    ]
+  },
+  "numpy": "2.5.4",
+  "tifffile": "2026.11.12",
+  "source_grid_and_rgb16_decoded": true
+}

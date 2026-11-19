@@ -1,0 +1,20 @@
+{
+  "source_revision": "c8f68cf79d143403ad9d5df906a5f8cfa2047526",
+  "scope": "supplemental Linux x86_64 exact unfiltered Pancake core library",
+  "toolchain": "nightly-2026-11-15",
+  "flags": [
+    "-Zmiri-strict-provenance",
+    "-Zmiri-symbolic-alignment-check"
+  ],
+  "test_filter": null,
+  "isolated": true,
+  "passed": 20,
+  "raw_passed": 4,
+  "exit_status": 0,
+  "actual_wrapper_wall_seconds": 208.0,
+  "timeout_seconds": 220,
+  "start_utc": "2026-11-18T12:26:18Z",
+  "end_utc": "2026-11-18T12:29:46Z",
+  "canonical_host": "Darwin",
+  "local_canonical_gate_exit": 1
+}

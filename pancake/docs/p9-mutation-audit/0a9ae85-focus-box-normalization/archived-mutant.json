@@ -1,0 +1,32 @@
+{
+  "diff": "--- src/fusion/focus.rs\n+++ replace != with == in aggregate\n@@ -420,17 +420,17 @@\n             reflect(y, tap, radius, height) * width + x\n         };\n         sum += if box_filter != 0 {\n             input[index]\n         } else {\n             input[index] * coefficients[tap]\n         };\n     }\n-    if box_filter != 0 {\n+    if box_filter == /* ~ changed by cargo-mutants ~ */ 0 {\n         sum /= f32::cast_from(kernel_width);\n     }\n     if accumulate != 0 {\n         sum += output[ABSOLUTE_POS];\n     }\n     output[ABSOLUTE_POS] = sum;\n }\n \n",
+  "file": "src/fusion/focus.rs",
+  "function": {
+    "function_name": "aggregate",
+    "return_type": "",
+    "span": {
+      "end": {
+        "column": 2,
+        "line": 435
+      },
+      "start": {
+        "column": 1,
+        "line": 396
+      }
+    }
+  },
+  "genre": "BinaryOperator",
+  "name": "src/fusion/focus.rs:428:19: replace != with == in aggregate",
+  "package": "pancake",
+  "replacement": "==",
+  "span": {
+    "end": {
+      "column": 21,
+      "line": 428
+    },
+    "start": {
+      "column": 19,
+      "line": 428
+    }
+  }
+}

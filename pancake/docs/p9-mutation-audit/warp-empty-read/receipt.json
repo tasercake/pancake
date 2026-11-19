@@ -1,0 +1,155 @@
+{
+  "scope": "native CPU registration tests and the single forced-empty readback mutation",
+  "base_revision": "8694b555666a1ddf4051e2839bbced4bcc625859",
+  "test_revision": "6497642c025d45220904b9cb409163798046ba9c",
+  "candidate_revision": "1ea0c4f394489aec9d77b253a81165c1554d32ad",
+  "candidate_tree": "13b017a996ebac5903bc8cbc4062af74804c13d8",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "registration_kernels_sha256": "4cd45398eefac5d8127d7e8ed25fcdee904035e60c20e553b827d7298d5e9636",
+  "reviewed_source_policy_sha256": "80a079d399ddd133c85bf7d179f6b652a21bec00f6f80b31ed1c251cfb6ff105",
+  "host": {
+    "cpu": "AMD Ryzen 9 7950X3D 16-Core Processor",
+    "kernel": "Linux 6.8.0-147-generic",
+    "architecture": "x86_64",
+    "build_cpu_affinity": [
+      20,
+      21
+    ],
+    "gpu_execution": false
+  },
+  "tools": {
+    "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo_mutants": "27.1.0"
+  },
+  "build_environment": {
+    "CARGO_BUILD_JOBS": "2",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_TARGET_DIR": "pancake/target/warp-readback-native",
+    "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+  },
+  "command_shell": "taskset --cpu-list 20\\,21 cargo +1.100.0 mutants --package pancake --test-workspace false --cap-lints true --all-features --in-place --timeout 60 --build-timeout 180 --jobserver-tasks 2 --no-shuffle --file src/registration/kernels.rs --re replace\\ read\\ -\\>\\ Result\\<Vec\\<f32\\>\\,\\ String\\>\\ with\\ Ok\\\\\\(vec\\!\\\\\\[\\\\\\]\\\\\\) --output /tmp/pancake-worktrees.t3paqgWM/warp-readback-review/artifacts/warp-readback-review -- --locked --offline --test cpu_registration_contract -- --test-threads=1",
+  "command_exit": 0,
+  "historical_red": {
+    "source_revision": "287828aac07ffad2252785b73a52a59fc07b3409",
+    "receipt_revision": "e4640932c28e9125b79c3f3d409e2f51d0b8f1d4",
+    "receipt_archive_path": "pancake/docs/p9-mutation-audit/287828a-255-256/raw-native.tar.gz",
+    "case": {
+      "name": "src/registration/kernels.rs:102:5: replace read -> Result<Vec<f32>, String> with Ok(vec![])",
+      "summary": "Timeout",
+      "phase_seconds": {
+        "Build": 31.86466005,
+        "Test": 60.058065057
+      },
+      "raw_log": "native-255-256/mutants.out/log/src__registration__kernels.rs_line_102_col_5.log"
+    },
+    "pre_fix_function_hashes": {
+      "warp": "d630fbe03821ec01499a5072ce2f1c096b34841509580ca0943e1107bf3f1e8b",
+      "read": "92abd5390971fcc5dc18d35e40da37d96c75171488160e74c94dd26773122ad9"
+    }
+  },
+  "partial_final_tile": {
+    "output_shape": [
+      293,
+      301,
+      3
+    ],
+    "first_tile_samples": 262144,
+    "last_tile_samples": 2435,
+    "total_samples": 264579,
+    "oracle": "complete returned F32 Vec equals input exactly under identity"
+  },
+  "native_baseline": {
+    "passed": [
+      "cpu_registration_geometry",
+      "cpu_registration_preserves_partial_final_tile"
+    ],
+    "failed": 0,
+    "ignored": 0,
+    "phases": [
+      {
+        "phase": "Build",
+        "duration": 232.386420484,
+        "process_status": "Success",
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--no-run",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features"
+        ]
+      },
+      {
+        "phase": "Test",
+        "duration": 0.704808604,
+        "process_status": "Success",
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features",
+          "--locked",
+          "--offline",
+          "--test",
+          "cpu_registration_contract",
+          "--",
+          "--test-threads=1"
+        ]
+      }
+    ]
+  },
+  "mutation": {
+    "selected": 1,
+    "caught": 1,
+    "missed": 0,
+    "timeout": 0,
+    "unviable": 0,
+    "case": "src/registration/kernels.rs:103:5: replace read -> Result<Vec<f32>, String> with Ok(vec![])",
+    "expected_error_from_both_native_tests": "registration frame does not match RGB dimensions",
+    "phases": [
+      {
+        "phase": "Build",
+        "duration": 20.483936409000002,
+        "process_status": "Success",
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--no-run",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features"
+        ]
+      },
+      {
+        "phase": "Test",
+        "duration": 0.254158823,
+        "process_status": {
+          "Failure": 101
+        },
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features",
+          "--locked",
+          "--offline",
+          "--test",
+          "cpu_registration_contract",
+          "--",
+          "--test-threads=1"
+        ]
+      }
+    ]
+  },
+  "validation": {
+    "source_restoration": "pass",
+    "rustfmt": "pass",
+    "reviewed_source_and_dependency_manifest": "pass",
+    "physical_cuda_vulkan": "pending",
+    "full_mutation_gate": "pending"
+  },
+  "raw_native_archive_sha256": "d6ff024ca31251ed28938af767c2394ce9a141d870d8382489e7b1d981285c2c"
+}

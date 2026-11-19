@@ -1,0 +1,153 @@
+{
+  "source": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+  "gui_sha256": "770ad910a8ac1f29a519504fd06dcd1051e593965813ce94665c986b57d16310",
+  "workloads": {
+    "fixture-64": {
+      "samples": 60,
+      "ordered_inputs": 64,
+      "inputs_unchanged": true,
+      "display_size": [
+        1440,
+        1000
+      ],
+      "physical_gpu_uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+      "visible_gpu_residency_bytes": 91922432,
+      "completion_runtime": [
+        "wgpu-vulkan"
+      ],
+      "timing": {
+        "pause": {
+          "status": "pass",
+          "acknowledgement_ns": {
+            "count": 30,
+            "min": 72475759,
+            "p50": 147089283.5,
+            "p95": 148561640,
+            "max": 148740125
+          },
+          "settled_ns": {
+            "count": 30,
+            "min": 72475759,
+            "p50": 147089283.5,
+            "p95": 148561640,
+            "max": 148740125
+          }
+        },
+        "cancel": {
+          "status": "pass",
+          "acknowledgement_ns": {
+            "count": 30,
+            "min": 72480028,
+            "p50": 147198309.5,
+            "p95": 148198856,
+            "max": 148702745
+          },
+          "settled_ns": {
+            "count": 30,
+            "min": 72480028,
+            "p50": 147198309.5,
+            "p95": 148198856,
+            "max": 148702745
+          }
+        }
+      }
+    },
+    "real-D150": {
+      "samples": 60,
+      "ordered_inputs": 150,
+      "inputs_unchanged": true,
+      "display_size": [
+        1440,
+        1000
+      ],
+      "physical_gpu_uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+      "visible_gpu_residency_bytes": 87728128,
+      "completion_runtime": [
+        "wgpu-vulkan"
+      ],
+      "timing": {
+        "pause": {
+          "status": "pass",
+          "acknowledgement_ns": {
+            "count": 30,
+            "min": 70670321,
+            "p50": 140667357.5,
+            "p95": 142239240,
+            "max": 211514639
+          },
+          "settled_ns": {
+            "count": 30,
+            "min": 70670321,
+            "p50": 140667357.5,
+            "p95": 142239240,
+            "max": 211514639
+          }
+        },
+        "cancel": {
+          "status": "pass",
+          "acknowledgement_ns": {
+            "count": 30,
+            "min": 69295859,
+            "p50": 141050476.5,
+            "p95": 211969935,
+            "max": 212889210
+          },
+          "settled_ns": {
+            "count": 30,
+            "min": 138338092,
+            "p50": 141050476.5,
+            "p95": 211969935,
+            "max": 212889210
+          }
+        }
+      }
+    }
+  },
+  "errors": {},
+  "receipt_sha256": {
+    "fixture-64": "6b99fb2f07d7c80246555931bfba100723bc80fba5faa3be1874faefdd988810",
+    "real-D150": "6ca10b6549de895b296e59392e42b04bf280262792f75a90e6cc1d4a1bc776bb"
+  },
+  "combined": {
+    "pause": {
+      "status": "pass",
+      "acknowledgement_ns": {
+        "count": 60,
+        "min": 70670321,
+        "p50": 140950409.0,
+        "p95": 148417759,
+        "max": 211514639
+      },
+      "settled_ns": {
+        "count": 60,
+        "min": 70670321,
+        "p50": 140950409.0,
+        "p95": 148417759,
+        "max": 211514639
+      }
+    },
+    "cancel": {
+      "status": "pass",
+      "acknowledgement_ns": {
+        "count": 60,
+        "min": 69295859,
+        "p50": 146817570.5,
+        "p95": 210751338,
+        "max": 212889210
+      },
+      "settled_ns": {
+        "count": 60,
+        "min": 72480028,
+        "p50": 146817570.5,
+        "p95": 210751338,
+        "max": 212889210
+      }
+    }
+  },
+  "qualified_lifecycle_workloads": [
+    "D150",
+    "lifecycle"
+  ],
+  "all_deadlines_passed": true,
+  "reducer_sha256": "40d6ecbdcae7699d50741661616a943759f4a64f5eea77deca69c78f11cf2100"
+}

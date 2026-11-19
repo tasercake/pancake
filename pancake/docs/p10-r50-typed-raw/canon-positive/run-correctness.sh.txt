@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+scope=$(realpath "$1")
+label=$2
+case="$scope/$label"
+bin="$scope/build-$label"
+first="$scope/inputs/frame_000.CR3"
+last="$scope/inputs/frame_049.CR3"
+(cd "$bin" && sha256sum -c sha256)
+sha256sum -c "$scope/inputs-before.sha256"
+mkdir "$case" "$case/home" "$case/cache" "$case/tmp"
+environment=(/usr/bin/env -i PATH=/usr/bin:/bin LANG=C.UTF-8 HOME="$case/home" XDG_CACHE_HOME="$case/cache" TMPDIR="$case/tmp" OMP_NUM_THREADS=2 RAYON_NUM_THREADS=2 OPENBLAS_NUM_THREADS=1)
+limits=(/usr/bin/prlimit --as=34359738368 -- /usr/bin/taskset -c 14,15)
+native=("${environment[@]}" "${limits[@]}" "$bin/canon_native_probe" output "$case/source" "$first" "$last")
+stack=("${environment[@]}" CONFORMANCE_EVENTS_PATH="$case/events.jsonl" "${limits[@]}"
+    "$bin/pancake-cli" --input "$first" "$last" --cpu --method hybrid --align
+    --alignment-mode similarity --alignment-ref first --kernel-size 6 --pyramid-levels 8
+    --scale-factor 6 --slab-size 0 --auto-crop --bit-depth 16 --output "$case/stack.tiff")
+printf '%q ' "${native[@]}" > "$case/native.command"
+printf '\n' >> "$case/native.command"
+printf '%q ' "${stack[@]}" > "$case/stack.command"
+printf '\n' >> "$case/stack.command"
+"${native[@]}" > "$case/native.stdout" 2> "$case/native.stderr"
+"${stack[@]}" > "$case/stack.stdout" 2> "$case/stack.stderr"
+(cd "$bin" && sha256sum -c sha256)
+sha256sum -c "$scope/inputs-before.sha256"

@@ -1,0 +1,489 @@
+{
+  "revision": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "exact_comparison_revision": "3644085723a4781712c113f6626ac3d2ade0cb0d",
+  "strict_status": 1,
+  "guard_message": "CPU assurance: uncovered CPU lines",
+  "test_result_records": 20,
+  "nonempty_test_targets": 19,
+  "tests": {
+    "passed": 137,
+    "failed": 0,
+    "ignored": 0
+  },
+  "before": {
+    "lines": {
+      "covered": 4206,
+      "total": 5932,
+      "uncovered": 1726
+    },
+    "functions": {
+      "covered": 429,
+      "total": 684,
+      "uncovered": 255
+    },
+    "regions": {
+      "covered": 4310,
+      "total": 6713,
+      "uncovered": 2403
+    },
+    "branches": {
+      "covered": 521,
+      "total": 640,
+      "uncovered": 119
+    }
+  },
+  "after": {
+    "lines": {
+      "covered": 4466,
+      "total": 6250,
+      "uncovered": 1784
+    },
+    "functions": {
+      "covered": 454,
+      "total": 728,
+      "uncovered": 274
+    },
+    "regions": {
+      "covered": 4551,
+      "total": 7025,
+      "uncovered": 2474
+    },
+    "branches": {
+      "covered": 552,
+      "total": 686,
+      "uncovered": 134
+    }
+  },
+  "delta": {
+    "lines": {
+      "covered": 260,
+      "total": 318,
+      "uncovered": 58
+    },
+    "functions": {
+      "covered": 25,
+      "total": 44,
+      "uncovered": 19
+    },
+    "regions": {
+      "covered": 241,
+      "total": 312,
+      "uncovered": 71
+    },
+    "branches": {
+      "covered": 31,
+      "total": 46,
+      "uncovered": 15
+    }
+  },
+  "changed_file_metrics": [
+    {
+      "file": "src/fusion/advanced/mod.rs",
+      "source_changed": true,
+      "before": {
+        "lines": {
+          "covered": 192,
+          "total": 212,
+          "uncovered": 20
+        },
+        "functions": {
+          "covered": 14,
+          "total": 16,
+          "uncovered": 2
+        },
+        "regions": {
+          "covered": 189,
+          "total": 221,
+          "uncovered": 32
+        },
+        "branches": {
+          "covered": 23,
+          "total": 30,
+          "uncovered": 7
+        }
+      },
+      "after": {
+        "lines": {
+          "covered": 201,
+          "total": 221,
+          "uncovered": 20
+        },
+        "functions": {
+          "covered": 15,
+          "total": 17,
+          "uncovered": 2
+        },
+        "regions": {
+          "covered": 197,
+          "total": 230,
+          "uncovered": 33
+        },
+        "branches": {
+          "covered": 23,
+          "total": 30,
+          "uncovered": 7
+        }
+      },
+      "metrics_with_fewer_covered": []
+    },
+    {
+      "file": "src/image_io/mod.rs",
+      "source_changed": true,
+      "before": {
+        "lines": {
+          "covered": 162,
+          "total": 182,
+          "uncovered": 20
+        },
+        "functions": {
+          "covered": 26,
+          "total": 39,
+          "uncovered": 13
+        },
+        "regions": {
+          "covered": 171,
+          "total": 200,
+          "uncovered": 29
+        },
+        "branches": {
+          "covered": 30,
+          "total": 30,
+          "uncovered": 0
+        }
+      },
+      "after": {
+        "lines": {
+          "covered": 173,
+          "total": 193,
+          "uncovered": 20
+        },
+        "functions": {
+          "covered": 27,
+          "total": 41,
+          "uncovered": 14
+        },
+        "regions": {
+          "covered": 185,
+          "total": 216,
+          "uncovered": 31
+        },
+        "branches": {
+          "covered": 34,
+          "total": 34,
+          "uncovered": 0
+        }
+      },
+      "metrics_with_fewer_covered": []
+    },
+    {
+      "file": "src/image_io/raw.rs",
+      "source_changed": true,
+      "before": {
+        "lines": {
+          "covered": 70,
+          "total": 111,
+          "uncovered": 41
+        },
+        "functions": {
+          "covered": 13,
+          "total": 29,
+          "uncovered": 16
+        },
+        "regions": {
+          "covered": 84,
+          "total": 134,
+          "uncovered": 50
+        },
+        "branches": {
+          "covered": 8,
+          "total": 10,
+          "uncovered": 2
+        }
+      },
+      "after": {
+        "lines": {
+          "covered": 96,
+          "total": 138,
+          "uncovered": 42
+        },
+        "functions": {
+          "covered": 17,
+          "total": 33,
+          "uncovered": 16
+        },
+        "regions": {
+          "covered": 117,
+          "total": 169,
+          "uncovered": 52
+        },
+        "branches": {
+          "covered": 7,
+          "total": 10,
+          "uncovered": 3
+        }
+      },
+      "metrics_with_fewer_covered": [
+        "branches"
+      ]
+    },
+    {
+      "file": "src/image_io/tiled.rs",
+      "source_changed": true,
+      "before": null,
+      "after": {
+        "lines": {
+          "covered": 142,
+          "total": 179,
+          "uncovered": 37
+        },
+        "functions": {
+          "covered": 16,
+          "total": 33,
+          "uncovered": 17
+        },
+        "regions": {
+          "covered": 143,
+          "total": 196,
+          "uncovered": 53
+        },
+        "branches": {
+          "covered": 18,
+          "total": 28,
+          "uncovered": 10
+        }
+      },
+      "metrics_with_fewer_covered": []
+    },
+    {
+      "file": "src/job/registration.rs",
+      "source_changed": true,
+      "before": {
+        "lines": {
+          "covered": 156,
+          "total": 157,
+          "uncovered": 1
+        },
+        "functions": {
+          "covered": 6,
+          "total": 6,
+          "uncovered": 0
+        },
+        "regions": {
+          "covered": 133,
+          "total": 156,
+          "uncovered": 23
+        },
+        "branches": {
+          "covered": 28,
+          "total": 32,
+          "uncovered": 4
+        }
+      },
+      "after": {
+        "lines": {
+          "covered": 181,
+          "total": 183,
+          "uncovered": 2
+        },
+        "functions": {
+          "covered": 6,
+          "total": 6,
+          "uncovered": 0
+        },
+        "regions": {
+          "covered": 145,
+          "total": 168,
+          "uncovered": 23
+        },
+        "branches": {
+          "covered": 31,
+          "total": 34,
+          "uncovered": 3
+        }
+      },
+      "metrics_with_fewer_covered": []
+    },
+    {
+      "file": "src/job/stream.rs",
+      "source_changed": true,
+      "before": {
+        "lines": {
+          "covered": 251,
+          "total": 262,
+          "uncovered": 11
+        },
+        "functions": {
+          "covered": 18,
+          "total": 23,
+          "uncovered": 5
+        },
+        "regions": {
+          "covered": 241,
+          "total": 305,
+          "uncovered": 64
+        },
+        "branches": {
+          "covered": 28,
+          "total": 32,
+          "uncovered": 4
+        }
+      },
+      "after": {
+        "lines": {
+          "covered": 259,
+          "total": 270,
+          "uncovered": 11
+        },
+        "functions": {
+          "covered": 18,
+          "total": 23,
+          "uncovered": 5
+        },
+        "regions": {
+          "covered": 247,
+          "total": 311,
+          "uncovered": 64
+        },
+        "branches": {
+          "covered": 30,
+          "total": 34,
+          "uncovered": 4
+        }
+      },
+      "metrics_with_fewer_covered": []
+    },
+    {
+      "file": "src/registration/estimate.rs",
+      "source_changed": true,
+      "before": {
+        "lines": {
+          "covered": 270,
+          "total": 283,
+          "uncovered": 13
+        },
+        "functions": {
+          "covered": 21,
+          "total": 22,
+          "uncovered": 1
+        },
+        "regions": {
+          "covered": 318,
+          "total": 359,
+          "uncovered": 41
+        },
+        "branches": {
+          "covered": 44,
+          "total": 64,
+          "uncovered": 20
+        }
+      },
+      "after": {
+        "lines": {
+          "covered": 265,
+          "total": 295,
+          "uncovered": 30
+        },
+        "functions": {
+          "covered": 20,
+          "total": 22,
+          "uncovered": 2
+        },
+        "regions": {
+          "covered": 306,
+          "total": 353,
+          "uncovered": 47
+        },
+        "branches": {
+          "covered": 44,
+          "total": 64,
+          "uncovered": 20
+        }
+      },
+      "metrics_with_fewer_covered": [
+        "lines",
+        "functions",
+        "regions"
+      ]
+    },
+    {
+      "file": "src/registration/kernels.rs",
+      "source_changed": true,
+      "before": {
+        "lines": {
+          "covered": 198,
+          "total": 204,
+          "uncovered": 6
+        },
+        "functions": {
+          "covered": 17,
+          "total": 20,
+          "uncovered": 3
+        },
+        "regions": {
+          "covered": 219,
+          "total": 239,
+          "uncovered": 20
+        },
+        "branches": {
+          "covered": 6,
+          "total": 8,
+          "uncovered": 2
+        }
+      },
+      "after": {
+        "lines": {
+          "covered": 202,
+          "total": 208,
+          "uncovered": 6
+        },
+        "functions": {
+          "covered": 18,
+          "total": 21,
+          "uncovered": 3
+        },
+        "regions": {
+          "covered": 224,
+          "total": 245,
+          "uncovered": 21
+        },
+        "branches": {
+          "covered": 6,
+          "total": 8,
+          "uncovered": 2
+        }
+      },
+      "metrics_with_fewer_covered": []
+    },
+    {
+      "file": "src/registration/mod.rs",
+      "source_changed": true,
+      "before": null,
+      "after": {
+        "lines": {
+          "covered": 40,
+          "total": 42,
+          "uncovered": 2
+        },
+        "functions": {
+          "covered": 3,
+          "total": 3,
+          "uncovered": 0
+        },
+        "regions": {
+          "covered": 32,
+          "total": 38,
+          "uncovered": 6
+        },
+        "branches": {
+          "covered": 5,
+          "total": 10,
+          "uncovered": 5
+        }
+      },
+      "metrics_with_fewer_covered": []
+    }
+  ],
+  "baseline_llvm_report_gzip_sha256": "d869e667c9bbd1c7efe2a52a353ed454436ca0020b21dcfa64c1c8b20577ddd8",
+  "identical_gate_and_lock": true,
+  "identical_target_selection": true
+}

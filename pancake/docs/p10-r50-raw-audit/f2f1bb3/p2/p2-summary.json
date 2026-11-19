@@ -1,0 +1,27 @@
+{
+  "revision": "f2f1bb3bdbdffa2ee360eb9fd3194aa26e87ec34",
+  "binary_sha256": "231b263a9ce0a9d00bffdd609ffd998489020e640573aad12bebf6a80b7174d5",
+  "actual_frozen_source_sha256": "485eaae7724d8706e991c6067af7739e370ed57e9e0e15cf5d9d6f5c57804a2a",
+  "passed": 84,
+  "failed": 0,
+  "unsupported": 0,
+  "unrun": 0,
+  "same_call_ids_and_backends_as_previous_pass": true,
+  "lanes": {
+    "cpu": {
+      "passed": 68,
+      "complete": true,
+      "events": {
+        "cpu": 27
+      }
+    },
+    "gpu": {
+      "passed": 16,
+      "complete": true,
+      "events": {
+        "gpu": 16,
+        "cpu": 16
+      }
+    }
+  }
+}

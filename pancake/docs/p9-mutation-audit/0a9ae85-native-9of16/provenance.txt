@@ -1,0 +1,33 @@
+2026-11-19T01:30:23+08:00
+Linux 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 GNU/Linux
+CPU(s):                                  32
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+Core(s) per socket:                      16
+6,6,0
+7,7,0
+Cpus_allowed_list:	6-7
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+cargo-mutants 27.1.0
+Filesystem         1B-blocks          Used    Available Use% Mounted on
+/dev/nvme0n1p2 1179879190528 1010334605312 114340806656  90% /
+245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043  Cargo.toml
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+ca2b40a7b204b6b8301215cdc543d13811ce1fb29575a70302f8482c01ab4c6e  rust-toolchain.toml
+044dcaefaf20b04fda64f974d464c79298c54ee4bbac234661bb204809e27a3a  scripts/assurance_targets.py
+d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e  /tmp/pancake-worktrees.t3paqgWM/native-mutation-0a9ae85-run-9of16/cpu-targets.txt
+368f6c57a083ed3b6c18dd9d35a696677278f1136555712f9cb413b5a56c93cc  /tmp/pancake-worktrees.t3paqgWM/native-mutation-0a9ae85-run-9of16/reviewed-guard.py
+c93c31704d95eaf7da949c401dc1328fef60e2353d5b69e2e4fcab9e210a1875  /tmp/pancake-worktrees.t3paqgWM/native-mutation-0a9ae85-run-9of16/check-local-shard.py
+f985f265ee3ea3e453aa98b04c52134953911f692f8ce8abf137f3873202a2d0  /tmp/pancake-tools/bin/cargo-mutants
+RUSTC_WRAPPER=unset
+RUSTC_WORKSPACE_WRAPPER=unset
+CARGO_BUILD_JOBS=2
+CARGO_INCREMENTAL=0
+CARGO_PROFILE_DEV_DEBUG=0
+CARGO_NET_OFFLINE=true

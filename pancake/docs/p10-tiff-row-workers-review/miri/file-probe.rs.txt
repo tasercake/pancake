@@ -1,0 +1,8 @@
+#[test]
+fn ordinary_same_file_reads_under_pinned_miri_isolation() -> std::io::Result<()> {
+    let tmp = tempfile::NamedTempFile::new()?;
+    std::fs::write(tmp.path(), b"same held file")?;
+    let descriptor = std::fs::File::open(tmp.path())?;
+    assert_eq!(descriptor.metadata()?.len(), 14);
+    Ok(())
+}

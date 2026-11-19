@@ -1,0 +1,13 @@
+F
+======================================================================
+FAIL: test_both_frozen_descriptors_keep_cpu_in_argv_out_of_runtime_override (__main__.CpuLaunchPolicy.test_both_frozen_descriptors_keep_cpu_in_argv_out_of_runtime_override) (role='candidate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/pancake-worktrees.t3paqgWM/weighted-11c-limited-prereg/qualification/p10-performance/evidence/t50-weighted-11c-limited-prereg/test-cpu-launch.py.txt", line 38, in test_both_frozen_descriptors_keep_cpu_in_argv_out_of_runtime_override
+    self.assertFalse("PANCAKE_RUNTIME" in check.call_args.kwargs["env"], "CPU job carried PANCAKE_RUNTIME")
+AssertionError: True is not false : CPU job carried PANCAKE_RUNTIME
+
+----------------------------------------------------------------------
+Ran 1 test in 0.013s
+
+FAILED (failures=1)

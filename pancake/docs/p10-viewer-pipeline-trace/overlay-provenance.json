@@ -1,0 +1,34 @@
+{
+  "cubecl-wgpu-0.11.4": {
+    "archive_sha256": "413caaf7eaf52cb5922f1e9e766fea404fd1dd549d10f3500e22b61c70b63a10",
+    "patch_sha256": "2247b8a02032d315860bcd66a488b5bdf2c3ab6a750c22fc4cee040800960df5",
+    "changed_files": {
+      "src/compute/poll.rs": "c57ef89c1e6a0f4ebc03415403763f8844f58ef0065237f7b1e4ab030f95aa65"
+    }
+  },
+  "i-slint-backend-winit-1.19.0": {
+    "archive_sha256": "ecb1104c0220c068772ff60912a3dac80b95e1d491d801836256c870245a2162",
+    "patch_sha256": "91b66bb040d88b02854913296c701cc88e4acabe5a59167500ea1c112f5da56d",
+    "changed_files": {
+      "Cargo.toml": "b16cf8279d4439224257e27e1ef7cdf8b876fcce474d88786646977ab6f484ee",
+      "event_loop.rs": "03e796b01e02dd551542b01e981ef2af9bd813d29ba6bc2a5c67dd6558641883",
+      "frame_throttle.rs": "79ff8e464ddc4dd286ecfc0f09ba6e6858998d69fa363508f2e0b860c8bd16ec",
+      "lib.rs": "0d7e4c445720e79f1448cb7f5f8079b5a71ed5636ef61a916c3ea8071dd4e30e",
+      "pancake_host_trace.rs": "e06ad0948874c3423ca4a56c6bd8d562ff408cb6fb1cb641e41f25c52ef8f082",
+      "winitwindowadapter.rs": "d3d2d8c0fc5623019b1eda59faaf069f781889c3b51d8b28c5f03465a224d4d8"
+    }
+  },
+  "wgpu-core-30.0.2": {
+    "archive_sha256": "ad661da2ee99f208c30090b585284b2ab5b8bf2358ddf2d2215592808ec62f1a",
+    "patch_sha256": "ce110b00d70f6b30a6d6a3cc095411dce7d222ae21597c0b54169b50f72b6944",
+    "changed_files": {
+      "Cargo.toml": "f55e149cd61750305edcc881afff0adb8ccd1db31c43d03bc62e0590dd693c10",
+      "src/device/global.rs": "f3131d21fe6884a21c879a608a3dd39b0c116383803455da72c9f514d1769677",
+      "src/device/queue.rs": "6ca39ec977511b2a622b62941b004ba996a35152a2c65a6ed232f432c18e92e5",
+      "src/device/resource.rs": "bfeb5fa3791a99eaea1c29ebce4dec85860202f6f7f625b051b3964b84145cf3",
+      "src/lib.rs": "3dd7807dbab96fa12e6eb02310406a4cc20d5f4564f42abe635ad3711b91d63f",
+      "src/pancake_lock_trace.rs": "e2653bfa4dbcdc3d7971f8bb9dca36ce31e9d5696764dcabec1af9795f155248",
+      "src/present.rs": "d254af16fb7ac8837f54986cff2135c75f8a4fda3c1f5a1d7d3a1c69a5d9c0ed"
+    }
+  }
+}

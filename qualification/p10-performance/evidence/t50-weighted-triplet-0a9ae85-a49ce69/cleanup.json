@@ -1,0 +1,48 @@
+{
+  "scope": "triplet-owned derived RGB16 export and case-cache cleanup after independent read release",
+  "cleaned_at": "2026-11-19T02:43:11.142269+08:00",
+  "independent_reviewer_read_released": true,
+  "archive_sha256": "fc5855a09a6407b4fccccdacac11172b2e31cbe8764161a6a133b10847008dd8",
+  "exports": [
+    {
+      "role": "reference",
+      "path": "reference/diagnostic-01/reference/complete.tif",
+      "bytes": 165542082,
+      "encoded_sha256_rechecked": "550e72982e03844c4a5d40575ab3c8b89ea067e5f38d07d0f0736445484922c2",
+      "validated_decoded_rgb16_sha256": "dc4e21deab6381c662de86a89c4f58385ccbe2b54d51a22addcd50db1f4f6d34",
+      "retired_owned_cache_relative_path": "reference/cache"
+    },
+    {
+      "role": "stock",
+      "path": "stock/diagnostic-01/candidate/complete.tif",
+      "bytes": 143881378,
+      "encoded_sha256_rechecked": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+      "validated_decoded_rgb16_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7",
+      "retired_owned_cache_relative_path": "stock/cache"
+    },
+    {
+      "role": "resident",
+      "path": "resident/diagnostic-01/candidate/complete.tif",
+      "bytes": 143881378,
+      "encoded_sha256_rechecked": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+      "validated_decoded_rgb16_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7",
+      "retired_owned_cache_relative_path": "resident/cache"
+    }
+  ],
+  "remaining_export_count": 0,
+  "remaining_case_cache_count": 0,
+  "shared_stage": "read-only borrower released after exact 52-file postflight; stage cleanup remains with P3",
+  "packaged_artifacts_retained": true,
+  "removed_clean_role_source_worktrees": [
+    {
+      "path": "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-triplet-stock-source",
+      "branch_retained": "codex/pancake-t50-triplet-stock-source",
+      "source_commit": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa"
+    },
+    {
+      "path": "/tmp/pancake-worktrees.t3paqgWM/t50-weighted-triplet-resident-source",
+      "branch_retained": "codex/pancake-t50-triplet-resident-source",
+      "source_commit": "a49ce692371558ff40f72b0af77f5249d00dcedb"
+    }
+  ]
+}

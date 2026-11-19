@@ -1,0 +1,82 @@
+{
+  "census-terminal.sgt": {
+    "bytes": 36,
+    "sha256": "37145034c26b2de2d9a4bc4e4d5c1cd696eba2faec78281497fc7cb3f0c73f66"
+  },
+  "launcher-terminal.sgt": {
+    "bytes": 36,
+    "sha256": "044a09e13d279447074a0360c648d194cb837b8ae70ddd854a47d99cf53bdae4"
+  },
+  "launcher.exit": {
+    "bytes": 2,
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  "launcher.log": {
+    "bytes": 338,
+    "sha256": "3c4a76d8139e3afd6ff949a7fb2e98ded94e376045fe819f463886292f1ab783"
+  },
+  "quiet-active-processes.txt": {
+    "bytes": 40,
+    "sha256": "7a1396f754facaec5af892da2e43806a79f125e6c11c1c1a4a3d0de8975ddf6c"
+  },
+  "quiet-cpu-idle-average.txt": {
+    "bytes": 301,
+    "sha256": "b4abb9929a3ee712a8b1bc97a25d1458ef60300203c279b658492cb844725545"
+  },
+  "quiet-lease.json": {
+    "bytes": 912,
+    "sha256": "0ac85c77c38efbe2474e93e1866a9b916c9176b93ab3abd1e24ee8109524e4e5"
+  },
+  "run/diagnostic-01/candidate/events.jsonl": {
+    "bytes": 8456,
+    "sha256": "24b36b7a650920e94c9d42ad351e2b7eb93edba8a6b68565036f0f530fb1b032"
+  },
+  "run/diagnostic-01/candidate/launch.json": {
+    "bytes": 7544,
+    "sha256": "2c0ebd617f14d5800184a5995697aa85314174315988269c2d81347941ed6ca0"
+  },
+  "run/diagnostic-01/candidate/resources.jsonl.gz": {
+    "bytes": 305232,
+    "sha256": "ec52b416dc4326ef1742d9fb0b9afe5dedbdcc3dfe47c0d92eb14fb329c0ae70"
+  },
+  "run/diagnostic-01/candidate/sample.json": {
+    "bytes": 29096,
+    "sha256": "0a99775c306d3246e4e2a490c4b4cc71ae36a553143c4d07a8cfe6f381b6e046"
+  },
+  "run/diagnostic-01/candidate/stderr.txt": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "run/diagnostic-01/candidate/stdout.txt": {
+    "bytes": 741,
+    "sha256": "900cf3b159b0f80a96e8102d0fa5f8bc37816ca711c0643544826955f7487018"
+  },
+  "run/diagnostic-01/reference/events.jsonl": {
+    "bytes": 19115,
+    "sha256": "c97ebcd0d22e9c63689baffdb6202c4c8df1ef5698310b5223d7f839c7e9af5d"
+  },
+  "run/diagnostic-01/reference/launch.json": {
+    "bytes": 7424,
+    "sha256": "75c8c4a823c34d7c58062f00a3b0fe1c217182ac29e297a5c61230aa0c07b194"
+  },
+  "run/diagnostic-01/reference/resources.jsonl.gz": {
+    "bytes": 716446,
+    "sha256": "f85445a1c5493fe555db6e643ca0bd429ba3bb09f6e41e56d0d0835730d26f34"
+  },
+  "run/diagnostic-01/reference/sample.json": {
+    "bytes": 27921,
+    "sha256": "156036b9feacf11d7e98eeb71a7f08c72b36912a3ba9cb0af6bab4b1fa940392"
+  },
+  "run/diagnostic-01/reference/stderr.txt": {
+    "bytes": 6392,
+    "sha256": "ad7aa6549e58a4cce1f25bb66bf7a497c1652ec2621a10a9f51ea9cd0443c097"
+  },
+  "run/diagnostic-01/reference/stdout.txt": {
+    "bytes": 637,
+    "sha256": "b9a3bcaa7ffbb07d2e971b614929e76c209fc68303c739bb88857c4e69e2efb2"
+  },
+  "run/report.json": {
+    "bytes": 104550,
+    "sha256": "1be85bc6ad6730cf04045ec5b3644d54e1064e4cba205df0e111d71fae2a3c3f"
+  }
+}

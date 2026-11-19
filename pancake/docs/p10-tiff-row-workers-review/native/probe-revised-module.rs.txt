@@ -1,0 +1,118 @@
+//! Exercise the exact tracked tiled decoder on independent valid legacy fixtures.
+use std::error::Error;
+use std::fs::{self, File};
+use std::io::{Read, Seek};
+use std::path::Path;
+
+use tiff::decoder::{Decoder, DecodingResult};
+
+mod tiled;
+
+#[derive(Debug)]
+enum SampleEncoding { Float, U16 }
+
+#[derive(Debug)]
+struct RgbImage {
+    width: usize,
+    height: usize,
+    samples: Vec<f32>,
+    sample_encoding: SampleEncoding,
+    icc_profile: Option<Vec<u8>>,
+}
+
+impl RgbImage {
+    fn new(width: usize, height: usize, samples: Vec<f32>) -> Result<Self, String> {
+        let count = checked_pixel_count(width, height)?;
+        if samples.len() != count * 3 || samples.iter().any(|value| !value.is_finite()) {
+            return Err("invalid finite RGB shape".to_owned());
+        }
+        Ok(Self { width, height, samples, sample_encoding: SampleEncoding::Float, icc_profile: None })
+    }
+}
+
+use tiff::tags::{Tag, Type, ValueBuffer};
+const MAX_AXIS: u32 = 32_768;
+const MAX_PIXELS: usize = 50_000_000;
+
+fn profile_from_tiff<R: Read + Seek>(decoder: Decoder<R>) -> Option<Vec<u8>> {
+    let mut limits = tiff::decoder::Limits::default();
+    // The pinned byte-buffer reader charges tag storage against the decoder's data cap.
+    limits.decoding_buffer_size = limits.ifd_value_size;
+    let mut decoder = decoder.with_limits(limits);
+    let mut payload = ValueBuffer::empty(Type::UNDEFINED);
+    let found = decoder
+        .image_ifd()
+        .find_tag_buf(Tag::IccProfile, &mut payload)
+        .ok()
+        .flatten()
+        .is_some();
+    (found && matches!(payload.data_type(), Type::BYTE | Type::UNDEFINED))
+        .then(|| payload.as_bytes().to_vec())
+}
+
+fn checked_pixel_count(width: usize, height: usize) -> Result<usize, String> {
+    let pixels = width
+        .checked_mul(height)
+        .ok_or_else(|| "image area overflowed".to_owned())?;
+    let axis_limit = usize::try_from(MAX_AXIS).map_err(|error| error.to_string())?;
+    if width > axis_limit || height > axis_limit || pixels > MAX_PIXELS {
+        return Err(format!(
+            "dimensions {width}×{height} exceed the image limit of {MAX_PIXELS} pixels and {MAX_AXIS} per axis"
+        ));
+    }
+    if pixels == 0 {
+        return Err("image dimensions must be nonzero".to_owned());
+    }
+    Ok(pixels)
+}
+
+fn verify(handle: &File, reference: &Path) -> Result<(), Box<dyn Error>> {
+    let actual = tiled::decode(handle)?.ok_or("eligible tiled file rejected")?;
+    if (actual.width, actual.height) != (1025, 1027)
+        || !matches!(actual.sample_encoding, SampleEncoding::U16)
+        || actual.icc_profile.as_deref() != Some(b"fixed-tiff-review-icc") {
+        return Err("shape, precision or profile mismatched".into());
+    }
+    let mut direct = Decoder::new(File::open(reference)?)?;
+    let DecodingResult::U16(independent) = direct.read_image()? else {
+        return Err("unexpected reference sample type".into());
+    };
+    let expected = (0..1027_u32).flat_map(|y| {
+        (0..1025_u32).flat_map(move |x| {
+            (0..3_u32).map(move |channel| (x * 71 + y * 337 + channel * 31_583) & 0xffff)
+        })
+    });
+    if !actual.samples.iter().map(|sample| sample.to_bits()).eq(
+        expected.map(|value| (value as f32 / f32::from(u16::MAX)).to_bits())
+    ) || !actual.samples.iter().map(|sample| sample.to_bits()).eq(
+        independent.iter().map(|code| (f32::from(*code) / f32::from(u16::MAX)).to_bits())
+    ) {
+        return Err("sample mismatch against coordinate and native decoder oracles".into());
+    }
+    println!("{} {} samples and ICC match", reference.display(), actual.samples.len());
+    Ok(())
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let arguments: Vec<_> = std::env::args_os().skip(1).collect();
+    let [directory] = arguments.as_slice() else {
+        return Err("supply fixture directory".into());
+    };
+    let directory = Path::new(directory);
+    let classic = directory.join("classic.tiff");
+    let legacy = directory.join("legacy-big.tiff");
+    let rotated = directory.join("rotated-big.tiff");
+    verify(&File::open(&classic)?, &classic)?;
+    verify(&File::open(&legacy)?, &legacy)?;
+    if tiled::decode(&File::open(&rotated)?)?.is_some() {
+        return Err("rotated image did not use orientation fallback".into());
+    }
+    println!("rotated legacy TIFF takes standard raster fallback");
+    let retained = directory.join("held.tiff");
+    let handle = File::open(&classic)?;
+    fs::rename(&classic, &retained)?;
+    fs::copy(&rotated, &classic)?;
+    verify(&handle, &retained)?;
+    println!("decoded original held file after its pathname was replaced");
+    Ok(())
+}

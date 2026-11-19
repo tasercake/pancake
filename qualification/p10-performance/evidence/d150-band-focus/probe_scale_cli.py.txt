@@ -1,0 +1,61 @@
+"""Compare the focused independent texture phase across exact executables."""
+from pathlib import Path
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import tempfile
+
+import cv2
+import numpy as np
+import tifffile
+
+
+def main():
+    destination, *binary_names = [Path(arg).resolve() for arg in sys.argv[1:]]
+    cv2.setNumThreads(1)
+    x = np.arange(257, dtype=np.float32)
+    fine = np.resize(np.asarray([1.,-1.], np.float32), 257)
+    mid = np.cos(x % 16 * np.float32(2 * np.pi / 16))
+    results = []
+    with tempfile.TemporaryDirectory(dir=destination) as path:
+        stage = Path(path)
+        inputs = [stage / "fine.png", stage / "mid.png"]
+        for (a,b), image in zip([(0.14,0.02),(0.02,0.16)], inputs, strict=True):
+            signal = np.floor((np.float32(.5) + np.float32(a)*fine + np.float32(b)*mid)*65535 + .5)
+            if not cv2.imwrite(str(image), np.broadcast_to(signal[None,:,None],(9,257,3)).astype(np.uint16)):
+                raise ValueError("could not write independent fixture")
+        input_hashes = [hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs]
+        for i, binary in enumerate(binary_names):
+            output = stage / f"{i}.tif"
+            events = stage / f"{i}.jsonl"
+            env = {**os.environ, "CONFORMANCE_EVENTS_PATH": str(events),
+                   "PANCAKE_COMPUTE_CACHE_DIR": str(stage/f"cache-{i}")}
+            for key in ("DISPLAY","WAYLAND_DISPLAY","PANCAKE_RUNTIME"):
+                env.pop(key,None)
+            args = [str(binary),"--input",*map(str,inputs),"--output",str(output),"--cpu",
+                    "--method","hybrid","--kernel-size","6","--pyramid-levels","4","--bit-depth","16"]
+            completed = subprocess.run(args,env=env,check=True,text=True,capture_output=True,timeout=15)
+            event = json.loads(events.read_text())
+            assert event["actual_backend"] == "cpu" and event["runtime"] == "cpu" and event["completed"]
+            assert event["physical_gpu"] is False and event["fallback_reason"] is None
+            pixels = tifffile.imread(output)
+            assert pixels.shape == (9,257,3) and pixels.dtype == np.uint16
+            measured = pixels[4,96:160,0].astype(np.float64)/65535-.5
+            amplitudes = [float(measured@wave[96:160]/(wave[96:160]@wave[96:160])) for wave in (fine,mid)]
+            with binary.open("rb") as stream:
+                digest = hashlib.file_digest(stream,"sha256").hexdigest()
+            results.append({
+                "binary_sha256":digest,"input_sha256":input_hashes,
+                "signed_phases":amplitudes,"argv":args,"completed_event":event,
+                "encoded_sha256":hashlib.sha256(output.read_bytes()).hexdigest(),
+                "stdout":completed.stdout,"stderr":completed.stderr,
+            })
+    (destination/"existing-scale-results.json").write_text(json.dumps(results,indent=2)+"\n")
+    for item in results:
+        print(item["binary_sha256"], item["signed_phases"])
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,78 @@
+2026-11-18T09:27:57Z
+    PID    PPID STAT COMMAND         %CPU
+3084303 3079875 Tl   pancake-cli     16.6
+2830225    2000 SNl  sccache          8.7
+3079875 3079863 T    python           8.6
+   6487    6259 Ssl  kube-apiserver   1.8
+2563638  104741 Sl   brave            1.6
+   5842    3784 Ssl  kubelet          1.1
+   6467    6227 Ssl  etcd             1.0
+   6474    6249 Ssl  kube-controller  0.7
+   5547    4553 Sl   steam            0.6
+   4933    3784 Ssl  containerd       0.5
+ 104627  104104 Sl   codex            0.5
+3091187 3091132 Sl   python           0.4
+ 104712  104704 Sl   brave            0.4
+   5644    5454 Sl   bitwarden-app    0.4
+ 104104    3516 Sl   ChatGPT          0.4
+   6464    6285 Ssl  kube-scheduler   0.3
+   8444    8373 Sl   steamwebhelper   0.3
+   2448    2284 Sl   dockerd          0.3
+3094261  104741 Sl   brave            0.3
+   8482    8455 Sl   steamwebhelper   0.3
+3093899  104741 Sl   brave            0.2
+2178206  104741 Sl   brave            0.2
+   2711    2448 Ssl  containerd       0.2
+2383785 2383755 Ssl  redis-server     0.2
+ 150883       1 Sl   zellij           0.2
+3091132  104627 Sl   uv               0.1
+  11746    2000 Ssl  sunshine         0.1
+1287338  104741 Sl   brave            0.1
+1285673  104741 Sl   brave            0.1
+3321780 3321778 Ssl  python3          0.1
+ 105149  104124 Sl   ChatGPT          0.1
+3788974  153267 Sl+  lazygit          0.1
+3063577 3063559 Sl   python           0.1
+1286945  104741 Sl   brave            0.1
+2677094 1276118 Sl+  lazygit          0.1
+   1983       1 Ssl  tailscaled       0.1
+  23843    2000 Sl   containerd-shim  0.1
+ 301217  104741 Sl   brave            0.1
+  33727    2000 Sl   containerd-shim  0.1
+3057365 3057339 Sl   python           0.1
+2383755    2000 Sl   containerd-shim  0.1
+1134057       2 I    kworker/u64:1-e  0.1
+   2690    2688 Sl+  Xorg             0.1
+  33758   33727 Ssl  minio            0.1
+{
+   "mt7921_phy0-pci-6000":{
+      "Adapter": "PCI adapter",
+      "temp1":{
+         "temp1_input": 54.000
+      }
+   },
+   "nvme-pci-0200":{
+      "Adapter": "PCI adapter",
+      "Composite":{
+         "temp1_input": 57.850,
+         "temp1_max": 89.850,
+         "temp1_min": -5.150,
+         "temp1_crit": 93.850,
+         "temp1_alarm": 0.000
+      }
+   },
+   "k10temp-pci-00c3":{
+      "Adapter": "PCI adapter",
+      "Tctl":{
+         "temp1_input": 71.625
+      },
+      "Tccd1":{
+         "temp3_input": 58.250
+      },
+      "Tccd2":{
+         "temp4_input": 55.000
+      }
+   }
+}
+8482, 9 MiB
+11746, 334 MiB

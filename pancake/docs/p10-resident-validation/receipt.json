@@ -1,0 +1,84 @@
+{
+  "base_revision": "fb9c399a96658331cb76b843a1e565b503e94fdd",
+  "red_test_revision": "acc32a94b8c6f9b5b0d9eddeb4350744aa388374",
+  "final_product_revision": "0b4aeb379c2f5c2be18b5f062cb2e90e94263482",
+  "final_product_tree": "4f7874d404ae604bb811b391b1f2c523ba5303f7",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "private_test_patch_sha256": "c2aac45b43bf7b4fdf8192b429c2c9dcb1ebeaeecd05ffd5dcf3db499d84afcc",
+  "tests": {
+    "native_private_red": {
+      "exit": 101,
+      "result": "sample count does not match packed RGB dimensions"
+    },
+    "native_private_green": {
+      "exit": 0,
+      "frames": 2,
+      "frame_shape": [
+        13,
+        19,
+        3
+      ],
+      "bit_exact_f32_comparisons": 741
+    },
+    "native_public_advanced": {
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0
+    },
+    "native_public_jobs": {
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0
+    },
+    "scoped_clippy": {
+      "exit": 0,
+      "uses_reviewed_dependency_policy": true
+    },
+    "reviewed_miri_source_manifest": {
+      "exit": 0,
+      "message": "Miri platform contract: reviewed production source and dependency closure match."
+    }
+  },
+  "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "host": {
+    "os": "Linux 6.8.0-147-generic",
+    "cpu": "AMD Ryzen 9 7950X3D",
+    "cpu_affinity": [
+      20,
+      21
+    ],
+    "build_jobs": 2
+  },
+  "commands": {
+    "red": "taskset --cpu-list 20\\,21 cargo +1.100.0 test --locked --offline -p pancake --lib fusion::advanced::tests::native_resident_hybrid_consumes_only_validated_device_input -- --exact --test-threads=1",
+    "green": "taskset --cpu-list 20\\,21 cargo +1.100.0 test --locked --offline -p pancake --lib fusion::advanced::tests::native_resident_hybrid_consumes_only_validated_device_input -- --exact --test-threads=1",
+    "integration": "taskset --cpu-list 20\\,21 cargo +1.100.0 test --locked --offline -p pancake --test cpu_advanced_fusion --test cpu_job -- --test-threads=1",
+    "clippy": "taskset --cpu-list 20\\,21 cargo +1.100.0 clippy --locked --offline -p pancake --lib --test cpu_advanced_fusion --test cpu_job -- -D warnings"
+  },
+  "historical_validation": {
+    "source_revision": "64fbdb6d500b185a161e33ae1d975e293cbc64cb",
+    "receipt": "pancake/docs/p10-t50-phase-trace/receipt.json",
+    "receipt_sha256": "5256aed97010513226b59a9c37fc597b52cc1d3afea7dee7686301c5c53c715f",
+    "measured_phase": {
+      "count": 50,
+      "total_ns": 942718406,
+      "median_ns": 18717883.0,
+      "maximum_ns": 20761950,
+      "logical_bytes": null
+    },
+    "logical_scan_bytes_current_path": 14400000000
+  },
+  "historical_t50_pair": {
+    "candidate_source": "8694b555666a1ddf4051e2839bbced4bcc625859",
+    "receipt": "qualification/p10-performance/evidence/t50-hybrid-pair-8694b55/verified-summary.json",
+    "receipt_sha256": "4944482cdcf5db78f900aff0ef7c500637d0d2d8c4eb5827324a62bc0b9075e2",
+    "candidate_elapsed_ns": 22171824618,
+    "reference_elapsed_ns": 26301475260,
+    "remaining_to_half_diagnostic_reference_ns": 9021086988
+  },
+  "physical_and_timing_verification": "pending",
+  "raw_archive": {
+    "sha256": "b84b1eb95821d730be9809e23ac68688d099f07e3ab8021fa1e854c7d59ac883",
+    "file_count": 46
+  }
+}

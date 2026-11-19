@@ -1,0 +1,23 @@
+{
+  "scope": "cross-receipt calendar bound for the single diagnostic pair",
+  "cleanup": {
+    "revision": "902b1f837775892b78f61e7212deb5ccfc52627a",
+    "source_archive": "qualification/p10-performance/evidence/e9-cold-kernel-diagnostic/raw-records.tar.gz",
+    "archive_sha256": "a947610d1369a103210bd3301b1cf2953f680ae2894136de18132d488be242dd",
+    "entry": "cleanup.log",
+    "archive_entry_mtime_utc": "2026-11-18T11:13:54.890793Z",
+    "archived_removed_files": 4005,
+    "command": "git show 902b1f837775892b78f61e7212deb5ccfc52627a:qualification/p10-performance/evidence/e9-cold-kernel-diagnostic/raw-records.tar.gz | TZ=UTC tar --full-time -tvzf - cleanup.log"
+  },
+  "physical_wrapper": {
+    "launch_record": "2026-11-18T11:13:46Z",
+    "exit_record": "2026-11-18T11:15:26Z",
+    "calendar_resolution": "one second",
+    "serial_elapsed_ns": 55539127118,
+    "rows_elapsed_ns": 38517179521,
+    "latest_serial_start_before_utc": "2026-11-18T11:13:52.943693361Z",
+    "minimum_overlap_with_serial_cleanup_window_ns": 1947099639,
+    "earliest_row_worker_start_utc": "2026-11-18T11:14:41.539127118Z"
+  },
+  "interpretation": "The cleanup receipt window overlapped the beginning of the sequential control. Compiler-cache contention and its wall-time effect were not decomposed. The measured worker arm started after the cleanup. Output hashes and completion evidence remain as recorded."
+}

@@ -1,0 +1,6 @@
+21695f320180bcc95294cb2cb94d54e826a060584dee899f388cf12ecb6a0a84  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/baseline.tiff
+21695f320180bcc95294cb2cb94d54e826a060584dee899f388cf12ecb6a0a84  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/reuse.tiff
+21695f320180bcc95294cb2cb94d54e826a060584dee899f388cf12ecb6a0a84  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/workers.tiff
+7ab91b3ebee46ffb1acf6f37de3536c50133907747ce0a28e885df00f633f9ce  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/baseline.rgbf32
+7ab91b3ebee46ffb1acf6f37de3536c50133907747ce0a28e885df00f633f9ce  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/reuse.rgbf32
+7ab91b3ebee46ffb1acf6f37de3536c50133907747ce0a28e885df00f633f9ce  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/workers.rgbf32

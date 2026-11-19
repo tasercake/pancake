@@ -1,0 +1,72 @@
+{
+  "scope": "independent synthetic bilateral measurement, selection and abstention",
+  "moving_witnesses": 81,
+  "moving_residuals": {
+    "identity": {
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "forward_median_px": 4.352758180061045,
+      "reverse_median_px": 4.350842208464375
+    },
+    "known": {
+      "matrix": [
+        [
+          1.00022,
+          0.0,
+          3.43
+        ],
+        [
+          0.0,
+          1.00022,
+          -2.63
+        ]
+      ],
+      "forward_median_px": 0.014038562169997042,
+      "reverse_median_px": 0.010749286758784431
+    },
+    "independent_local": {
+      "matrix": [
+        [
+          1.0002292516092943,
+          0.0,
+          3.4256733549522953
+        ],
+        [
+          0.0,
+          1.0002292516092943,
+          -2.6348339020097473
+        ]
+      ],
+      "forward_median_px": 0.014321839016103854,
+      "reverse_median_px": 0.011554650917374525
+    },
+    "inverse_independent_reverse": {
+      "matrix": [
+        [
+          1.0002267451326723,
+          0.0,
+          3.4278447687233937
+        ],
+        [
+          0.0,
+          1.0002267451326723,
+          -2.6333648062085913
+        ]
+      ],
+      "forward_median_px": 0.01415104912765219,
+      "reverse_median_px": 0.01101532463689383
+    }
+  },
+  "stationary_witnesses": 81,
+  "flat_status": "insufficient_witnesses"
+}

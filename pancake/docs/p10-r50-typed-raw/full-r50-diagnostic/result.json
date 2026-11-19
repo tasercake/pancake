@@ -1,0 +1,119 @@
+{
+  "profile": "R50.hybrid.cpu",
+  "profile_settings": {
+    "device": "cpu",
+    "method": "hybrid",
+    "align": true,
+    "alignment_mode": "similarity",
+    "alignment_reference": "first",
+    "kernel_size": 6,
+    "pyramid_levels": 8,
+    "scale_factor": 6,
+    "slab_size": 0,
+    "slab_overlap": 0,
+    "bit_depth": 16,
+    "auto": false,
+    "auto_crop": true,
+    "quality_report": false
+  },
+  "arm_order": [
+    "stock",
+    "candidate"
+  ],
+  "products": {
+    "stock": {
+      "source_revision": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+      "sha256": "2d3ff9afaa17d73233fd2ef2ef635f999b53186b608f412dcf8ebd367d458c55",
+      "path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/r50-typed-raw-e810-c80d/stock/pancake-cli"
+    },
+    "candidate": {
+      "source_revision": "c80d59abe0b47a5e831a1e2b4ccad132d96106c7",
+      "sha256": "f17bc8241f776fafed9f01be42835a65293480eabb221adef6c21ae23322452d",
+      "path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/r50-typed-raw-e810-c80d/candidate/pancake-cli"
+    }
+  },
+  "encoded_pixels_and_maps_exact": true,
+  "historical_geometry_matches": true,
+  "historical_pixels_match": true,
+  "historical_maps_match": true,
+  "inputs_unchanged": true,
+  "elf_identities_unchanged": true,
+  "candidate_to_stock_elapsed_ratio": 0.9804191986917483,
+  "verification_started_unix_ns": 1795019751053329094,
+  "timed_children_ended_unix_ns": 1795019822018349987,
+  "finished_unix_ns": 1795019822804844108,
+  "memory_metric": "Linux wait4 direct-child high-water RSS",
+  "cache_policy": "Fresh per-arm application caches; pre-read common OS file cache",
+  "arms": {
+    "stock": {
+      "elapsed_ns": 35642573305,
+      "child_peak_rss_bytes": 2236637184,
+      "child_user_seconds": 226.685227,
+      "child_system_seconds": 24.010913,
+      "returncode": 0,
+      "timed_out": false,
+      "public_progress_boundaries_ns": [
+        1376227500,
+        33619226127,
+        647119678
+      ],
+      "progress_count": 50,
+      "backend": "cpu",
+      "runtime": "cpu",
+      "physical_gpu": false,
+      "fallback_reason": null,
+      "output": {
+        "shape": [
+          3390,
+          5086,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+        "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+        "bytes": 103450274,
+        "minimum": 512,
+        "maximum": 65535
+      },
+      "transform_f32_sha256": {
+        "alignment_transforms": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b",
+        "sequential_transforms": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b"
+      }
+    },
+    "candidate": {
+      "elapsed_ns": 34944663159,
+      "child_peak_rss_bytes": 2255990784,
+      "child_user_seconds": 224.82752,
+      "child_system_seconds": 23.787335,
+      "returncode": 0,
+      "timed_out": false,
+      "public_progress_boundaries_ns": [
+        1301561937,
+        33008102760,
+        634998462
+      ],
+      "progress_count": 50,
+      "backend": "cpu",
+      "runtime": "cpu",
+      "physical_gpu": false,
+      "fallback_reason": null,
+      "output": {
+        "shape": [
+          3390,
+          5086,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+        "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+        "bytes": 103450274,
+        "minimum": 512,
+        "maximum": 65535
+      },
+      "transform_f32_sha256": {
+        "alignment_transforms": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b",
+        "sequential_transforms": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b"
+      }
+    }
+  }
+}

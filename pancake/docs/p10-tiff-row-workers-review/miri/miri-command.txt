@@ -1,0 +1,1 @@
+CARGO_BUILD_JOBS=2 MIRIFLAGS="-Zmiri-strict-provenance -Zmiri-symbolic-alignment-check" cargo +nightly-2026-11-15 miri test --offline --locked --lib -- --include-ignored

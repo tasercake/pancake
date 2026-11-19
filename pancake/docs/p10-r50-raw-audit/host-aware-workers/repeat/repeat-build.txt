@@ -1,0 +1,13 @@
+b10fbec440069602ed16e6055c6bb5f1c4212757
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+37cb9da0665066d4895dad9a33faa4ca9fc48ee88a8c2872b1d588988a9e7cb7  src/image_io/raw.rs
+76111f0fdc36f621106e43a72af12460db1a4a004475857f9ceaaa3ec08584da  examples/raw_repeat_probe.rs
+CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 RUSTC_WRAPPER=/tmp/pancake-tools/bin/pancake-rust-cache cargo build --offline --locked --release -p pancake --example raw_repeat_probe
+bc148784204c3326d74b8b3d17dcc706b7b50ac369a6066cc4ceef8b5788da18  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/repeat-probe

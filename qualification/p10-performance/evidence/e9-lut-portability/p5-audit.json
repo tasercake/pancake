@@ -1,0 +1,31 @@
+{
+  "candidate_revision": "a919045e8004e138df9fcc05650d9e87e50e0e36",
+  "frozen_contract_files": 90,
+  "distinct_cases_passed": 64,
+  "actual_runtimes": {
+    "cpu": 63,
+    "wgpu-vulkan": 1
+  },
+  "lanes": {
+    "host": {
+      "counts": {
+        "passed": 63,
+        "failed": 0,
+        "unsupported": 0
+      },
+      "actual_runtimes": {
+        "cpu": 63
+      }
+    },
+    "vulkan": {
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "unsupported": 0
+      },
+      "actual_runtimes": {
+        "wgpu-vulkan": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,2 @@
+    Checking pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/r50-hybrid-review/pancake)
+    Finished `dev` profile [unoptimized] target(s) in 2.99s

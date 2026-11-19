@@ -1,0 +1,4 @@
+info: cargo-llvm-cov currently setting cfg(coverage); you can opt-out it by passing --no-cfg-coverage
+   Compiling pancake-gui v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/native-about-proof-fb9c/pancake/crates/pancake-gui)
+    Finished `test` profile [unoptimized] target(s) in 2.33s
+  Executable tests/cpu_gui_native.rs (target/llvm-cov-target/debug/build/pancake-gui/78f4f9edf0d6997b/out/cpu_gui_native-78f4f9edf0d6997b)

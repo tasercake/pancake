@@ -1,0 +1,60 @@
+use std::io::{BufWriter, Write};
+
+use pancake::fusion::advanced::{AdvancedAccumulator, AdvancedMethod};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let path = std::env::args_os().nth(1).ok_or("output path missing")?;
+    let mut output = BufWriter::new(std::fs::File::create(path)?);
+    let device = cubecl::Device::Cpu(cubecl::cpu::CpuDevice);
+    let cases = [(129, 193, 8), (33, 19, 4), (33, 1, 1), (1, 33, 4), (33, 19, 0), (1, 1, 0)];
+
+    for (width, height, depth) in cases {
+        for variant in 0..3 {
+            let mut accumulator = AdvancedAccumulator::new(
+                &device,
+                width,
+                height,
+                AdvancedMethod::Hybrid,
+                6,
+                depth,
+                1 << 24,
+            )?;
+            let mut random = 8920_u32;
+            for frame in 0..5 {
+                let mut source = Vec::with_capacity(width * height * 3);
+                for pixel in 0..width * height {
+                    let x = pixel % width;
+                    let y = pixel / width;
+                    match variant {
+                        0 => {
+                            for _ in 0..3 {
+                                random = random.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+                                source.push((random >> 16) as f32 / 65535.0);
+                            }
+                        }
+                        1 => {
+                            // Distinct phase at equal, nonzero contrast.
+                            let sample = if (x + y + frame) % 2 == 0 { 0.0 } else { 1.0 };
+                            source.extend([sample; 3]);
+                        }
+                        _ => {
+                            // Distinct colors, all exactly zero focus.
+                            let r = if frame % 2 == 0 { 0.25 } else { 0.75 };
+                            source.extend([r, 0.5, 1.0 - r]);
+                        }
+                    }
+                }
+                accumulator.add_frame(&source)?;
+            }
+            let result = accumulator.finish()?;
+            if result.len() != width * height * 3 || result.iter().any(|v| !v.is_finite()) {
+                return Err("unexpected shape or invalid float".into());
+            }
+            for sample in result {
+                output.write_all(&sample.to_le_bytes())?;
+            }
+        }
+    }
+    output.flush()?;
+    Ok(())
+}

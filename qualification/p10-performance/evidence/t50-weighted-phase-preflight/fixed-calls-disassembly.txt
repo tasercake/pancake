@@ -1,0 +1,34 @@
+
+/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/pancake/target/release/pancake-cli:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000002b44260 <<pancake::fusion::focus::FocusAccumulator>::add_frame+0x910>:
+ 2b44260:	e8 02 00 00 48       	call   4ab44267 <compiler_builtins::math::libm_math::arch::x86::detect::get_cpu_features::CACHE+0x44a5e1a7>
+ 2b44265:	8d bc 24 68 06 00 00 	lea    0x668(%rsp),%edi
+ 2b4426c:	48 89 ee             	mov    %rbp,%rsi
+ 2b4426f:	e8 fc 61 02 00       	call   2b6a470 <pancake::fusion::buffers::upload>
+ 2b44274:	f3 0f 6f 03          	movdqu (%rbx),%xmm0
+ 2b44278:	f3 0f 6f 4b 10       	movdqu 0x10(%rbx),%xmm1
+ 2b4427d:	66                   	data16
+ 2b4427e:	0f                   	.byte 0xf
+ 2b4427f:	7f 8c                	jg     2b4420d <<pancake::fusion::focus::FocusAccumulator>::add_frame+0x8bd>
+ 2b44281:	24                   	.byte 0x24
+
+/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/pancake/target/release/pancake-cli:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000002b452ab <<pancake::fusion::focus::FocusAccumulator>::add_frame+0x195b>:
+ 2b452ab:	8b 2c 24             	mov    (%rsp),%ebp
+ 2b452ae:	48 8d bc 24 58 01 00 	lea    0x158(%rsp),%rdi
+ 2b452b5:	00
+ 2b452b6:	4c 89 fe             	mov    %r15,%rsi
+ 2b452b9:	4c 89 f2             	mov    %r14,%rdx
+ 2b452bc:	e8 6f 78 f1 ff       	call   2a5cb30 <futures_lite::future::block_on::<core::result::Result<(), cubecl_runtime::server::base::ServerError>, core::pin::Pin<alloc::boxed::Box<dyn core::future::future::Future<Output = core::result::Result<(), cubecl_runtime::server::base::ServerError>> + core::marker::Send>>>>
+ 2b452c1:	80 bc 24 58 01 00 00 	cmpb   $0xff,0x158(%rsp)
+ 2b452c8:	ff
+ 2b452c9:	0f                   	.byte 0xf
+ 2b452ca:	84                   	.byte 0x84

@@ -1,0 +1,48 @@
+//! Measure only the production image decoder on two unmodified camera inputs.
+
+use std::error::Error;
+use std::io::{self, Write as _};
+use std::path::Path;
+use std::time::Instant;
+
+use pancake::image_io::decode;
+
+/// Report decode durations and optionally stream untouched working sample bytes.
+///
+/// # Errors
+/// Returns invalid arguments, source decode failure, or inability to write evidence.
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut arguments = std::env::args_os().skip(1);
+    let mode = arguments.next().ok_or("expected bytes or timing")?;
+    let dump = match mode.to_str() {
+        Some("bytes") => true,
+        Some("timing") => false,
+        _ => return Err("expected bytes or timing".into()),
+    };
+    let inputs = arguments.collect::<Vec<_>>();
+    if inputs.len() != 2 || inputs.first() == inputs.last() {
+        return Err("supply two distinct verified originals".into());
+    }
+
+    let mut stdout = io::stdout().lock();
+    let mut stderr = io::stderr().lock();
+    for input in inputs {
+        let path = Path::new(&input);
+        let start = Instant::now();
+        let image = decode(path)?;
+        let elapsed = start.elapsed();
+        writeln!(
+            stderr,
+            "{}\t{}\t{}\t{:?}\t{}",
+            path.display(),
+            image.width(),
+            image.height(),
+            image.sample_encoding(),
+            elapsed.as_nanos()
+        )?;
+        if dump {
+            stdout.write_all(bytemuck::cast_slice(image.samples()))?;
+        }
+    }
+    Ok(())
+}

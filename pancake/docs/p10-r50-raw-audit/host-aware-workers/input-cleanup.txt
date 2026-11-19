@@ -1,0 +1,4 @@
+/tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/inputs/frame_000.CR3: OK
+/tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/inputs/frame_049.CR3: OK
+Verified both selected original files before removal and confirmed the owned input directory is absent.
+Retained exact workers-only and workers-plus-reuse CLI under /home/krishna/Documents/focus-stacking/artifacts/pancake-assurance/r50-host-aware-b10fbec.

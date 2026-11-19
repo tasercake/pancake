@@ -1,0 +1,248 @@
+//! Passive native D150 proxy comparison using archived product hypotheses.
+
+use std::path::{Path, PathBuf};
+use std::time::Instant;
+
+use super::{Affine, Extent, MOMENT_FLOOR, Pair, distributed, loss, moments};
+use crate::image_io::decode;
+use crate::registration::Frame;
+use serde_json::{Value, json};
+
+/// Existing D150 first canvas and its normal scale-six thumbnail extent.
+const CANVAS: [usize; 2] = [2304, 1728];
+/// Scale-six thumbnail coordinates used by the product on this native aspect.
+const PROXY: [usize; 2] = [384, 288];
+/// The two fitted directions and identity, in fixed report order.
+const NAMES: [&str; 3] = ["direct", "inverse_reverse", "no_step"];
+
+/// Authenticate an input list outside the application and parse its paths.
+///
+/// # Errors
+///
+/// Returns path, file or structured format errors.
+fn json_at(name: &str) -> Result<Value, String> {
+    let value = std::env::var_os(name).ok_or_else(|| format!("missing {name}"))?;
+    let source = std::fs::File::open(value).map_err(|error| error.to_string())?;
+    serde_json::from_reader(source).map_err(|error| error.to_string())
+}
+
+/// Decode a single frame and call normal registration prefiltering.
+///
+/// # Errors
+///
+/// Returns unsupported geometry, loader, or shared runtime errors.
+fn proxy(device: &cubecl::Device, path: &Path, extent: Extent) -> Result<Vec<f32>, String> {
+    let image = decode(path)?;
+    if [image.width(), image.height()] != CANVAS {
+        return Err("unexpected native D150 extent".to_owned());
+    }
+    let input = Frame::new(image.width(), image.height(), image.samples())?;
+    super::super::make_luma(device, input, extent, 268_435_456, false).map(|(luma, _)| luma)
+}
+
+/// Re-express an archived native map on the same sampled pixel centers.
+///
+/// # Errors
+///
+/// Returns malformed JSON, nonfinite or singular geometry errors.
+fn reduced(value: &Value) -> Result<Affine, String> {
+    let matrix: [[f32; 3]; 2] = serde_json::from_value(value.clone()).map_err(|e| e.to_string())?;
+    let native = Affine::from_matrix(matrix)?;
+    let to_proxy = Affine::IDENTITY.rescale_source(CANVAS, PROXY)?;
+    to_proxy.compose(native)?.compose(to_proxy.inverse()?)
+}
+
+/// Fixed fractional centers with complete 16×16 lattice footprints.
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "the checked D150 axes are 384 and 288 and every cell endpoint lies inside"
+)]
+fn origins(side: u16) -> [u32; 3] {
+    [1, 3, 5].map(|fraction| (u32::from(side) * fraction) / 6 - 8)
+}
+
+/// Every scored hypothesis must map all rectangle corners to supported taps.
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "only checked interior cell positions are expanded by a 15-pixel span"
+)]
+fn supported(map: Affine, x: u32, y: u32, extent: Extent) -> bool {
+    let [[a, b, horizontal], [c, d, vertical]] = map.matrix().map(|row| row.map(f64::from));
+    [x, x + 15].into_iter().all(|col| {
+        [y, y + 15].into_iter().all(|row| {
+            let sx = a.mul_add(f64::from(col), b.mul_add(f64::from(row), horizontal));
+            let sy = c.mul_add(f64::from(col), d.mul_add(f64::from(row), vertical));
+            (0.0..f64::from(extent.width.saturating_sub(1))).contains(&sx)
+                && (0.0..f64::from(extent.height.saturating_sub(1))).contains(&sy)
+        })
+    })
+}
+
+/// A region can prefer one candidate only when all four cross-fits agree.
+fn preference(errors: [[[Option<f64>; 2]; 3]; 2], candidate: usize) -> bool {
+    errors.into_iter().all(|direction| {
+        direction.iter().enumerate().all(|(index, other)| {
+            index == candidate
+                || direction.get(candidate).is_some_and(|chosen| {
+                    chosen.iter().zip(other).all(|(a, b)| match (a, b) {
+                        (Some(lhs), Some(rhs)) => lhs + MOMENT_FLOOR < *rhs,
+                        _ => false,
+                    })
+                })
+        })
+    })
+}
+
+/// Measure all three proposals in both directions on the same supported cells.
+///
+/// # Errors
+///
+/// Returns geometry, scope, or compute errors.
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "individual lattice offsets are small and the 3-by-3 grid bounds all dispatch counts"
+)]
+fn cells(pair: &Pair, maps: [Affine; 3]) -> Result<Value, String> {
+    let [direct, reverse, identity] = maps;
+    let backwards = [direct.inverse()?, reverse.inverse()?, identity.inverse()?];
+    let mut scores = Vec::new();
+    let mut footprints = [Vec::new(), Vec::new(), Vec::new()];
+    let start = Instant::now();
+    for y in origins(pair.extent.height) {
+        for x in origins(pair.extent.width) {
+            if maps
+                .into_iter()
+                .chain(backwards)
+                .any(|map| !supported(map, x, y, pair.extent))
+            {
+                continue;
+            }
+            let mut errors = [[[None; 2]; 3]; 2];
+            for ((reverse_order, candidates), slots) in [(false, maps), (true, backwards)]
+                .into_iter()
+                .zip(&mut errors)
+            {
+                for (map, slot) in candidates.into_iter().zip(slots) {
+                    let first = moments(pair, map, x, y, reverse_order)?;
+                    let second = moments(pair, map, x + 1, y + 1, reverse_order)?;
+                    *slot = [loss(first, second), loss(second, first)];
+                }
+            }
+            let winner = NAMES.iter().zip(&mut footprints).enumerate().find_map(
+                |(candidate, (&name, support))| {
+                    if preference(errors, candidate) {
+                        support.push((f64::from(x), f64::from(y)));
+                        Some(name)
+                    } else {
+                        None
+                    }
+                },
+            );
+            scores.push(json!({"origin_proxy": [x, y], "losses": errors, "strict_winner": winner}));
+        }
+    }
+    let elapsed = start.elapsed().as_nanos();
+    let support = NAMES
+        .iter()
+        .zip(footprints)
+        .map(|(name, support)| {
+            json!({"hypothesis": name, "supporting_cells": support.len(),
+               "rank_two_footprint": distributed(&support)})
+        })
+        .collect::<Vec<_>>();
+    Ok(
+        json!({"cells": scores, "support": support, "moment_dispatches": scores.len() * 12,
+        "diagnostic_unbatched_elapsed_ns": elapsed}),
+    )
+}
+
+/// Evaluate archived geometry on real exact inputs with no matcher or job edits.
+///
+/// # Errors
+///
+/// Returns parse, loading, geometry, CubeCL CPU or output errors.
+#[test]
+fn witness_real_d150_proxy_diagnostic() -> Result<(), String> {
+    let dataset = json_at("PANCAKE_WITNESS_ACQUISITION")?;
+    let authority = json_at("PANCAKE_WITNESS_DIRECTIONS")?;
+    let output =
+        std::env::var_os("PANCAKE_WITNESS_OUTPUT").ok_or("no witness diagnostic output path")?;
+    let original = dataset["records"]
+        .as_array()
+        .ok_or("D150 acquisition has no records")?;
+    if original.len() != 9 {
+        return Err("D150 witness uses only the authenticated nine originals".to_owned());
+    }
+    let paths = original
+        .iter()
+        .map(|row| {
+            let path = row["acquired_path"]
+                .as_str()
+                .ok_or("invalid original path")?;
+            let path = PathBuf::from(path);
+            let name = path
+                .file_name()
+                .and_then(std::ffi::OsStr::to_str)
+                .ok_or("invalid native basename")?
+                .to_owned();
+            Ok::<_, String>((name, path))
+        })
+        .collect::<Result<std::collections::BTreeMap<_, _>, _>>()?;
+    let rows = authority["results"]
+        .as_array()
+        .ok_or("D150 authority has no fitting intervals")?;
+    if rows.len() != 6 {
+        return Err("the D150 witness is scoped to the known six comparisons".to_owned());
+    }
+    let device = cubecl::Device::cpu().map_err(|e| e.to_string())?;
+    let extent = Extent::new(PROXY[0], PROXY[1])?;
+    let mut previous = (String::new(), Vec::new());
+    let mut results = Vec::new();
+    for row in rows {
+        let [before, after]: [String; 2] =
+            serde_json::from_value(row["interval"].clone()).map_err(|e| e.to_string())?;
+        let start = Instant::now();
+        if previous.0 != before {
+            previous = (
+                before.clone(),
+                proxy(
+                    &device,
+                    paths.get(&before).ok_or("missing interval start")?,
+                    extent,
+                )?,
+            );
+        }
+        let current = proxy(
+            &device,
+            paths.get(&after).ok_or("missing interval end")?,
+            extent,
+        )?;
+        let pair = Pair::new(&device, &previous.1, &current, extent);
+        let staged_ns = start.elapsed().as_nanos();
+        let evidence = cells(
+            &pair,
+            [
+                reduced(&row["direct_anchor_step"])?,
+                reduced(&row["reverse_anchor_step"])?,
+                Affine::IDENTITY,
+            ],
+        )?;
+        results.push(
+            json!({"interval": [&before, &after], "prepare_and_upload_ns": staged_ns,
+            "native_oracles": row["witnesses_forward_reverse"], "proxy": evidence}),
+        );
+        previous = (after, current);
+    }
+    let file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(output)
+        .map_err(|e| e.to_string())?;
+    serde_json::to_writer_pretty(
+        file,
+        &json!({"scope": "CPU-only diagnostic, six adjacent pairs, no frozen timing credit",
+        "runtime": "cpu", "proxy_extent": PROXY, "candidate_order": NAMES,
+        "loss_axes": ["direction", "candidate", "cross_fit"], "comparisons": results}),
+    )
+    .map_err(|e| e.to_string())
+}

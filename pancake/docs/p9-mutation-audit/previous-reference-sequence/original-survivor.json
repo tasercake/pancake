@@ -1,0 +1,141 @@
+{
+  "original_roster_sha256": "b5bdf8ee8bf796db18ce5cdcadb443bc230eb2e6116789310b846cf3f77d4492",
+  "original_outcomes_sha256": "480f5992c5fab17caed70443aaa0fb25d247cc266488570635959eeccb62ab60",
+  "diff_sha256": "c5ece2e76c3a9a1fa746d45a66b5076622d82a6836f9c072f9657472841f00d7",
+  "typed_mutant": {
+    "diff": "--- src/job/registration.rs\n+++ replace == with != in Alignment::estimate\n@@ -205,17 +205,17 @@\n                     device,\n                     reference,\n                     &source,\n                     model,\n                     self.max_scale_step,\n                     self.max_precision,\n                 )?\n                 .transform;\n-                if self.reference == AlignmentReference::Previous {\n+                if self.reference != /* ~ changed by cargo-mutants ~ */ AlignmentReference::Previous {\n                     sequential = relative;\n                     common = relative.compose(self.accumulated)?;\n                     self.proxy = Some(source);\n                 } else {\n                     common = relative;\n                 }\n             }\n         }\n",
+    "file": "src/job/registration.rs",
+    "function": {
+      "function_name": "Alignment::estimate",
+      "return_type": "-> Result<(SourceMap, Option<ResidentRgb>), JobError>",
+      "span": {
+        "end": {
+          "column": 6,
+          "line": 238
+        },
+        "start": {
+          "column": 5,
+          "line": 160
+        }
+      }
+    },
+    "genre": "BinaryOperator",
+    "name": "src/job/registration.rs:213:35: replace == with != in Alignment::estimate",
+    "package": "pancake",
+    "replacement": "!=",
+    "span": {
+      "end": {
+        "column": 37,
+        "line": 213
+      },
+      "start": {
+        "column": 35,
+        "line": 213
+      }
+    }
+  },
+  "outcome": {
+    "scenario": {
+      "Mutant": {
+        "name": "src/job/registration.rs:213:35: replace == with != in Alignment::estimate",
+        "package": "pancake",
+        "file": "src/job/registration.rs",
+        "function": {
+          "function_name": "Alignment::estimate",
+          "return_type": "-> Result<(SourceMap, Option<ResidentRgb>), JobError>",
+          "span": {
+            "start": {
+              "line": 160,
+              "column": 5
+            },
+            "end": {
+              "line": 238,
+              "column": 6
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 213,
+            "column": 35
+          },
+          "end": {
+            "line": 213,
+            "column": 37
+          }
+        },
+        "replacement": "!=",
+        "genre": "BinaryOperator"
+      }
+    },
+    "summary": "MissedMutant",
+    "log_path": "log/src__job__registration.rs_line_213_col_35.log",
+    "diff_path": "diff/src__job__registration.rs_line_213_col_35.diff",
+    "phase_results": [
+      {
+        "phase": "Build",
+        "duration": 21.46583798,
+        "process_status": "Success",
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--no-run",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features",
+          "--workspace"
+        ]
+      },
+      {
+        "phase": "Test",
+        "duration": 6.887137411,
+        "process_status": "Success",
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features",
+          "--workspace",
+          "--locked",
+          "--lib",
+          "--bins",
+          "--test",
+          "cpu_advanced_fusion",
+          "--test",
+          "cpu_array_layout",
+          "--test",
+          "cpu_cli",
+          "--test",
+          "cpu_config",
+          "--test",
+          "cpu_fusion_contract",
+          "--test",
+          "cpu_gray_array_export",
+          "--test",
+          "cpu_image_export",
+          "--test",
+          "cpu_image_io",
+          "--test",
+          "cpu_job",
+          "--test",
+          "cpu_kernel_contract",
+          "--test",
+          "cpu_npy",
+          "--test",
+          "cpu_numerical_contract",
+          "--test",
+          "cpu_registration_contract",
+          "--test",
+          "cpu_runtime_contract",
+          "--test",
+          "cpu_runtime_options",
+          "--test",
+          "cpu_stack_plan",
+          "--",
+          "--include-ignored"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "identity": {
+    "target_commit": "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb",
+    "pancake_tree": "9b3a0b85ab11544cfd5484402f57a3cc177c2dad",
+    "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+    "suite_source_sha256": "485eaae7724d8706e991c6067af7739e370ed57e9e0e15cf5d9d6f5c57804a2a",
+    "uv_lock_sha256": "30663059d83f2bb9d94bef743e9f74cf1a28c4bdd78073fc0342557fd76eb29b"
+  },
+  "platform": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "kernel": "6.8.0-147-generic",
+    "processor": "x86_64",
+    "os": "Linux-6.8.0-147-generic-x86_64-with-glibc2.39",
+    "distribution": "Ubuntu 24.04.5 LTS",
+    "cpu_model": "AMD Ryzen 9 7950X3D 16-Core Processor"
+  },
+  "nvidia_inventory": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac, NVIDIA GeForce RTX 3090, 00000000:01:00.0, 580.178.04",
+  "archive_path": "artifacts/pancake-packages/linux-c1e2cac/pancake_0.1.0_amd64.deb",
+  "archive": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "c6f39324ea4d9a29fb1a4f33253f6d988f44d1f150622bc94b728975a5f96b64",
+    "bytes": 69508790
+  },
+  "binaries": {
+    "pancake-cli": {
+      "sha256": "a69427103f9a1ef20ce576269feeceffab58aff7944f4b5cd08be2b11220af33",
+      "bytes": 122312488
+    },
+    "pancake-gui": {
+      "sha256": "b6f169340937281be06701715d4394c732495ef43a70f09bfdbe03319693bbbd",
+      "bytes": 156400184
+    }
+  },
+  "notice_inventory": {
+    "file": "usr/share/doc/pancake/dependency-notices/inventory.json",
+    "sha256": "2a194d421928f1844309fbbd4b4b571dd5582627cc2fe3d6ff890789a2ffbb55",
+    "packages": 583,
+    "status_counts": {
+      "present": 556,
+      "no_notice_in_source": 27
+    },
+    "files": 1036
+  },
+  "replay": {
+    "build": "CARGO_INCREMENTAL=0 cargo build --locked --workspace --release --jobs 2",
+    "fast": "bash scripts/check.sh fast",
+    "deps": "bash scripts/check.sh deps",
+    "package": "python3 pancake/scripts/package_linux.py --release-dir pancake/target/release --output artifacts/pancake-packages/linux-c1e2cac --maintainer 'Pancake <local@localhost>'",
+    "executable_scripts": "artifacts/p9-c1e2cac/replay"
+  },
+  "lanes": {
+    "host": {
+      "passed": 341,
+      "failed": 0,
+      "unsupported": 0
+    },
+    "isolated-gui": {
+      "passed": 34,
+      "failed": 0,
+      "unsupported": 0
+    },
+    "physical-gpu-gui": {
+      "passed": 1,
+      "failed": 0,
+      "unsupported": 0
+    }
+  },
+  "physical_gpu_execution": {
+    "actual_backend": "gpu",
+    "alignment_transforms": {},
+    "completed": true,
+    "device": "NVIDIA GeForce RTX 3090",
+    "device_fingerprint": "spirv_4318_8708",
+    "device_pci_address": "0000:01:00.0",
+    "event": "stack_complete",
+    "fallback_reason": null,
+    "physical_gpu": true,
+    "runtime": "wgpu-vulkan",
+    "sequential_transforms": [
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ]
+    ]
+  },
+  "aggregate_verification_exit": 0,
+  "aggregate_passed": 376,
+  "aggregate_ledger_sha256": "2e7163a32831d54699659af3d373fb4de391b0df62ad61d79107f755a0c67389",
+  "raw_capture_root": "artifacts/p9-c1e2cac",
+  "build_checks_and_capture_cpu_affinity": "24-27",
+  "release_build_exit": 0,
+  "fast_exit": 0,
+  "deps_exit": 0,
+  "package_verification_exit": 0,
+  "ancestry_receipt_sha256": "193ef96c8b652b9f2291933b72ec0096adaaa1c261db45d10500f78ce13391a8"
+}

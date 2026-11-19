@@ -1,0 +1,15 @@
+2026-11-19T00:24:27+08:00
+Linux krishna-desktop 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+Architecture:                            x86_64
+Byte Order:                              Little Endian
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+Thread(s) per core:                      2
+Core(s) per socket:                      16
+CPU CORE SOCKET NODE ONLINE
+ 14   14      0    0    yes
+ 15   15      0    0    yes
+Cpus_allowed_list:	14-15
+MemAvailable:   45602668 kB
+SwapFree:            640 kB
+12.76
+GNU gdb (Ubuntu 15.1-1ubuntu1~24.04.1) 15.1

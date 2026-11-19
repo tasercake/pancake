@@ -1,0 +1,9 @@
+d85703c50ccba5ae21303f93ba8eea590d5eb41554c82accd7e50605c04993e4  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/baseline.tiff
+ed3351ff2b8f5f1f3b278c806258170d6a2b89b75da55014f5dc875535c8a0b2  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/baseline.rgbf32
+414203904 /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/baseline.rgbf32
+d85703c50ccba5ae21303f93ba8eea590d5eb41554c82accd7e50605c04993e4  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/workers.tiff
+ed3351ff2b8f5f1f3b278c806258170d6a2b89b75da55014f5dc875535c8a0b2  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/workers.rgbf32
+414203904 /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/workers.rgbf32
+d85703c50ccba5ae21303f93ba8eea590d5eb41554c82accd7e50605c04993e4  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/reuse.tiff
+ed3351ff2b8f5f1f3b278c806258170d6a2b89b75da55014f5dc875535c8a0b2  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/reuse.rgbf32
+414203904 /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/canon/reuse.rgbf32

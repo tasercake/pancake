@@ -1,0 +1,16 @@
+287828aac07ffad2252785b73a52a59fc07b3409
+2026-11-18T18:27:13+08:00
+Linux 6.8.0-147-generic x86_64 GNU/Linux
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+rustc 1.102.0-nightly (5f4effd57 2026-11-13)
+binary: rustc
+commit-hash: 5f4effd579500175af844241eb179e756190f1e7
+commit-date: 2026-11-13
+host: x86_64-unknown-linux-gnu
+release: 1.102.0-nightly
+LLVM version: 23.1.5
+cargo-llvm-cov 0.9.1
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+63ce2ccca53e1e4e73666b5bc72374d2ea5f8a25fe474e0c87ee41284d27eec7  scripts/check.sh
+5035ec02411487a560f02dc1f6170d49762e79e1fd1fafc73ebfabca502b9019  scripts/compare_assurance_coverage.py
+044dcaefaf20b04fda64f974d464c79298c54ee4bbac234661bb204809e27a3a  scripts/assurance_targets.py

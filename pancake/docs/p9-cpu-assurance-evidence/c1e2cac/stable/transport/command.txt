@@ -1,0 +1,3 @@
+From the pinned pancake workspace, with scratch sources and binaries owned by the transport probe.
+llvm=$(dirname "$(rustc --print target-libdir)")/bin
+taskset -c 0 rustc --crate-name pancake_profile_transport_probe --edition 2024 -C instrument-coverage -C llvm-args=-runtime-counter-relocation "$pilot/probe.rs" -o "$pilot/probe"

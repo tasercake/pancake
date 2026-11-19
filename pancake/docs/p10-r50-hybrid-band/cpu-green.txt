@@ -1,0 +1,41 @@
+   Compiling pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/r50-hybrid-review/pancake)
+    Finished `test` profile [unoptimized] target(s) in 5.25s
+     Running tests/cpu_advanced_fusion.rs (target/debug/build/pancake/372e1cb24e224069/out/cpu_advanced_fusion-372e1cb24e224069)
+
+running 3 tests
+test cpu_fusion_resource_limits_precede_runtime_access ... ok
+test cpu_slab_geometry_and_scale_aware_parameters ... ok
+test cpu_advanced_fusion ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+     Running tests/cpu_job.rs (target/debug/build/pancake/3ea765f372f30964/out/cpu_job-3ea765f372f30964)
+
+running 13 tests
+test directory_export_destination_preserves_existing_data ... ok
+test controller_rejects_mismatched_and_repeated_admission ... ok
+test insufficient_runtime_budget_preserves_previous_output ... ok
+test identity_crop_applies_only_to_aligned_jobs ... ok
+test interrupted_execution_retains_an_existing_export ... ok
+test memory_result_appends_complete_geometry_to_an_existing_observer ... ok
+test moved_source_blocks_observer_append_without_undoing_export ... ok
+test observer_handles_non_unicode_paths_without_fabricating_geometry ... ok
+test observer_failures_leave_completed_exports_and_sources_intact ... ok
+test paused_stack_resumes_and_publishes_only_its_completed_generation ... ok
+test stack_completion_follows_atomic_export ... ok
+test worker_reports_a_failed_generation_and_accepts_recovery ... ok
+test worker_reuses_one_thread_without_replacing_retained_results ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+     Running tests/cpu_stack_plan.rs (target/debug/build/pancake/d6ec0a72a2257cc0/out/cpu_stack_plan-d6ec0a72a2257cc0)
+
+running 6 tests
+test manual_and_automatic_crop_preserve_the_same_pixels ... ok
+test every_method_preserves_a_textured_identity_stack ... ok
+test mixed_inputs_use_the_first_frame_canvas ... ok
+test shared_ticket_cannot_admit_a_second_stack ... ok
+test ticket_input_count_must_match_before_processing ... ok
+test registration_preserves_all_reference_conventions_and_crop ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.08s

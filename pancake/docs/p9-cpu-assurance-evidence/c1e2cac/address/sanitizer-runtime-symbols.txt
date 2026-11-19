@@ -1,0 +1,4 @@
+target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/build/pancake-gui/1fe5ddb7402ad0f4/out/pancake_gui-1fe5ddb7402ad0f4
+385062: 0000000004ff2660    71 FUNC    GLOBAL DEFAULT   24 __asan_init
+target/host-sanitizer-address/x86_64-unknown-linux-gnu/debug/pancake-cli
+300571: 00000000042e2520    71 FUNC    GLOBAL DEFAULT   24 __asan_init

@@ -1,0 +1,38 @@
+11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043  Cargo.toml
+3c796ee0d127da2ba2ecd5598d54d61dd6a1b1fff0fa601f526edc536ee20b92  deny.toml
+91d090dba5002cca17eb9e46f2c4d7967018f9c36a86a05dfa9f6e4cb16d48c4  dependency-policy.json
+63ce2ccca53e1e4e73666b5bc72374d2ea5f8a25fe474e0c87ee41284d27eec7  scripts/check.sh
+2e9c55438c90aff6594c675fa577c38d5a9ade620ce797016c404f2d29d4480f  scripts/test-guardrails.sh
+119585a7f2da02dede75bc9e253540e409c4c14e2933e9c77d15ed2b88396c92  scripts/tool-versions.sh
+6cfe7f4b6d511e788a63d188a92b72b7d423785adc9b7d9d3b5405bad53ba3ab  ../.github/workflows/pancake.yml
+b329e25933d01c36dd7c47d84ea5716694f9b7caf53a5003d45674703a8ed54a  /tmp/pancake-tools/bin/cargo-deny
+cargo-deny 0.20.2
+ba59ffd844b852cc98975fb0a6d184fd27a63b8ccef934b2d4f93e5fd69302cf  /tmp/pancake-tools/bin/cargo-machete
+0.9.2
+d8334c0e109a983ea8ecc25b6146cfebbd295a9a71b4f8027e20a68fa2f1dcd4  /tmp/pancake-tools/bin/cargo-llvm-cov
+cargo-llvm-cov 0.9.1
+f985f265ee3ea3e453aa98b04c52134953911f692f8ce8abf137f3873202a2d0  /tmp/pancake-tools/bin/cargo-mutants
+cargo-mutants 27.1.0
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+rustc 1.102.0-nightly (5f4effd57 2026-11-13)
+binary: rustc
+commit-hash: 5f4effd579500175af844241eb179e756190f1e7
+commit-date: 2026-11-13
+host: x86_64-unknown-linux-gnu
+release: 1.102.0-nightly
+LLVM version: 23.1.5
+Linux 6.8.0-147-generic x86_64 GNU/Linux
+Architecture:                            x86_64
+CPU(s):                                  32
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+Core(s) per socket:                      16
+rustsec before 472a4c9a785030434f15d7da84964d60fbe789ab 2026-11-18T10:14:42+01:00
+rustsec after 472a4c9a785030434f15d7da84964d60fbe789ab 2026-11-18T10:14:42+01:00

@@ -1,0 +1,66 @@
+"""Pure tests for full six-job coverage and live-affinity CPU guard decisions."""
+
+from copy import deepcopy
+import unittest
+
+from supplement_rules import ROSTER, evaluate_rss, overlap_busy
+
+
+def fixture():
+    return [
+        {
+            "kind": kind, "number": pair, "target": role, "valid": True,
+            "resource_errors": [], "returncode": 0, "timed_out": False,
+            "sample_interval_ns": 3_000_000, "maximum_rss_sample_gap_ns": 20_000_000,
+            "peak_rss_bytes": 100 + pair if role == "reference" else 50 + pair,
+        }
+        for kind, pair, role in ROSTER
+    ]
+
+
+class StrictSupplement(unittest.TestCase):
+    def test_maxima_across_all_three_pairs(self):
+        result = evaluate_rss(fixture())
+        self.assertEqual(result["ratio"], 53 / 103)
+        self.assertEqual(result["status"], "pass")
+        self.assertFalse(result["full_frozen_credit"])
+
+    def test_an_actual_gap_one_nanosecond_above_limit_never_counts(self):
+        jobs = fixture()
+        jobs[-1]["maximum_rss_sample_gap_ns"] += 1
+        result = evaluate_rss(jobs)
+        self.assertEqual(result["status"], "pending")
+        self.assertIsNone(result["ratio"])
+
+    def test_no_substitutions_or_pooled_partial_jobs(self):
+        jobs = fixture()
+        for bad in (jobs[1:], [*jobs,jobs[-1]], list(reversed(jobs))):
+            with self.assertRaisesRegex(ValueError, "roster"):
+                evaluate_rss(bad)
+
+    def test_separate_cap_exact_boundary(self):
+        jobs = fixture()
+        for row in jobs:
+            row["peak_rss_bytes"] = 100 if row["target"] == "reference" else 55
+        self.assertEqual(evaluate_rss(jobs)["status"], "pass")
+        jobs[-1]["peak_rss_bytes"] += 1
+        self.assertEqual(evaluate_rss(jobs)["status"], "fail")
+
+
+class LiveCpuGuard(unittest.TestCase):
+    def test_busy_mask_overlap_does_block_even_with_benign_other_cores(self):
+        before = {(100,1): 100, (200,1): 200, (300,2): 300}
+        after = {(100,1): 115, (200,1): 300, (300,2): 301}
+        observed = overlap_busy(before, after, {0,1}, 0.5, 100, lambda task: {1} if task==100 else {4})
+        self.assertFalse(observed["quiet"])
+        self.assertEqual(observed["largest_overlap_core_share"],0.3)
+
+    def test_live_busy_disjoint_affinity_ignores_lifetime_utilization(self):
+        before = {(100,1): 20_000, (200,1): 200}
+        after = {(100,1): 20_001, (200,1): 300, (400,2): 110}
+        observed = overlap_busy(before, after, {0,1}, 0.5, 100, lambda task: {1} if task==100 else {4})
+        self.assertTrue(observed["quiet"])
+
+
+if __name__ == "__main__":
+    unittest.main()

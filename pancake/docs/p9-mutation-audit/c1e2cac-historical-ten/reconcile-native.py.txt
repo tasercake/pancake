@@ -1,0 +1,85 @@
+"""Bind the native producer results to the verified historical operation selection."""
+from collections import Counter
+import hashlib
+import json
+from pathlib import Path
+import re
+import sys
+
+root = Path(sys.argv[1])
+scripts = Path(sys.argv[2])
+sys.path.insert(0, str(scripts))
+from verify_mutation_shards import mutation_id, verify_shards
+
+records = root / "native-exact"
+native = records / "mutants.out"
+
+def load(path):
+    return json.loads(path.read_bytes())
+
+before = (root / "source-before.txt").read_text().strip()
+after = (records / "source-after.txt").read_text().strip()
+match = load(root / "match-receipt.json")
+if before != match["current_revision"] or after != before:
+    raise ValueError("Run source does not match the selected revision")
+if any((records / f"source-status-{stage}.txt").stat().st_size for stage in ("before", "after")):
+    raise ValueError("Run source was dirty")
+selected = load(records / "list.json")
+if selected != load(root / "current-ordered-selection.json") or selected != load(native / "mutants.json"):
+    raise ValueError("Independent selection differs from native emitted roster")
+targets = [value for line in (root / "cpu-targets.txt").read_text().splitlines()
+           for value in ("--test", line)]
+suffix = ["--locked", "--lib", "--bins", *targets, "--", "--include-ignored"]
+report = load(records / "outcomes.json")
+expected = Counter(mutation_id(row) for row in selected)
+if report["cargo_mutants_version"] != "27.1.0" or len(expected) != 10:
+    raise ValueError("Recorded native tool or order differs from selected scope")
+actual = Counter()
+baseline = []
+variants = []
+for row in report["outcomes"]:
+    for phase in row["phase_results"]:
+        argv = phase["argv"]
+        if argv.count("--workspace") != 1 or "--all-features" not in argv:
+            raise ValueError("A native phase did not select the full workspace and all features")
+        if phase["phase"] == "Test" and argv[-len(suffix):] != suffix:
+            raise ValueError("A native test phase did not use the same locked CPU selectors")
+    if row["scenario"] == "Baseline":
+        baseline.append(row)
+        continue
+    mutant = row["scenario"]["Mutant"]
+    actual[mutation_id(mutant)] += 1
+    log = (native / row["log_path"]).read_text()
+    important_failures = [line for line in log.splitlines()
+                          if (line.startswith("test ") and line.endswith(" ... FAILED")) or line.startswith("Error: ")]
+    variants.append({
+        "mutant": mutant["name"], "summary": row["summary"],
+        "phases": row["phase_results"], "failure_lines": important_failures,
+        "log_path": f"native-exact/mutants.out/{row['log_path']}",
+    })
+if actual - expected or len(baseline) != 1:
+    raise ValueError("Native evidence has an unexpected variant, duplicate, or baseline mismatch")
+native_exit = int((records / "native-exit.status").read_text())
+if native_exit == 0:
+    verify_shards(records / "list.json", [records])
+base = baseline[0]
+passed = re.findall(r"test result: ok\. (\d+) passed;", (native / base["log_path"]).read_text())
+print(json.dumps({
+    "source_revision": before,
+    "native_exit": native_exit,
+    "baseline": base["summary"],
+    "baseline_passed_tests": sum(map(int, passed)),
+    "baseline_test_targets": len(passed),
+    "baseline_phases": base["phase_results"],
+    "scope": "Exact ten historical operations from 287828a 255/256",
+    "current_full_universe": match["current_full_list_count"],
+    "observed_candidates": sum(actual.values()),
+    "missing_selected_candidates": sum((expected - actual).values()),
+    "counts": Counter(row["summary"] for row in variants),
+    "target_allocated_bytes": int((records / "target-allocated-bytes.txt").read_text().split()[0]),
+    "start": (records / "start.txt").read_text().strip(),
+    "end": (records / "end.txt").read_text().strip(),
+    "actual_affinity": (records / "actual-mutator-affinity.txt").read_text().strip(),
+    "locked_cpu_targets_sha256": hashlib.sha256((root / "cpu-targets.txt").read_bytes()).hexdigest(),
+    "mutants_in_execution_order": variants,
+}, indent=2))

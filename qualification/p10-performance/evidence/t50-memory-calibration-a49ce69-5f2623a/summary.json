@@ -1,0 +1,254 @@
+{
+  "scope": "one exact standalone T50 Weighted CPU RSS calibration triplet",
+  "status": "three cadence-eligible diagnostic observations",
+  "frozen_or_release_credit": false,
+  "scratch_alias_selected_for_release": false,
+  "profile": "T50.weighted_average.cpu",
+  "settings": {
+    "device": "cpu",
+    "method": "weighted_average",
+    "align": true,
+    "alignment_mode": "similarity",
+    "alignment_reference": "first",
+    "kernel_size": 6,
+    "pyramid_levels": 8,
+    "scale_factor": 6,
+    "slab_size": 0,
+    "slab_overlap": 0,
+    "bit_depth": 16,
+    "auto": false,
+    "auto_crop": true,
+    "quality_report": false
+  },
+  "job_order": [
+    "reference",
+    "stock",
+    "candidate"
+  ],
+  "operator_head": "7115ce33e54982ce0a99adee33963c7ac1f53982",
+  "operator_sha256": "fbcc4673c6ccc50946d82ad4f994215793fa8eb2378f774801213b85f1a5f856",
+  "collector_commit": "df780846a4dcc40bf460bcaaba04f1538290e71c",
+  "collector_p10_sha256": "60546a00f4ebdea7f6dd28db156c8cc2c796288f9bc862cb5ec5e7bbcd4cf0ff",
+  "collector_resources_sha256": "cddeb4364750fad211f0271d59531850859acff85fab290712f0d1b43d7eb78a",
+  "actual_sample_interval_ns": 3000000,
+  "maximum_allowed_rss_gap_ns": 20000000,
+  "worker_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "sample_thread_affinity": [
+    15
+  ],
+  "lease_sha256": "29542f223a723ad42879c8f8efd5ef98f438b1ddc25176e7c08f48fce5f8cdd5",
+  "source_stage_materialization_sha256": "1d9be3f1cd20a01083b11c10c4d17ab75a4f3b6bb7e2ebef682824e345ba649d",
+  "all_52_encoded_input_hashes_ownership_and_producers_unchanged": true,
+  "stage6_custody": "read-only triplet and postflight loan returned to P3; owner retains cleanup",
+  "started_sgt": "2026-11-19T10:52:08.558902+08:00",
+  "children_terminal_sgt": "2026-11-19T10:54:08.479542+08:00",
+  "runner_and_lock_terminal_sgt": "2026-11-19T10:54:11.608953+08:00",
+  "target_identities": {
+    "reference": {
+      "descriptor_sha256": "e3e951b674bc0103f267575a99533cc33ead40e2af56671766f4fc71f3f12b76",
+      "runtime_lock_sha256": "fda57ac5eea063aebcc278eb57a90228e6da32fe2d8f67d7025ac367f4b51036",
+      "python_sha256": "3008abbb48c1e2b0fa3072ae72334b9b352e1346ea3a20d34126a455f0c7bc66",
+      "package_inventory_sha256": "365903c53fe992a011c815cf1b4fb34c09e8c0125c3abb7e5a0b45fbb933749d",
+      "package_count": 46,
+      "command": [
+        "-m",
+        "src.cli"
+      ]
+    },
+    "stock": {
+      "commit": "a49ce692371558ff40f72b0af77f5249d00dcedb",
+      "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+      "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+      "tree": "965aa0c7dc33731d3aef94231afa3e59fc7bc330",
+      "binary_sha256": "43a05f9cfb6ac3f89c7153e6043cc9e79d33bfccd03054d20da54bd7d147c65e",
+      "bytes": 122173312,
+      "elf_build_id": "561328fa71c9ff497ce2040ebf619f24e1ec1f7e",
+      "retained_executable": "/home/krishna/Documents/focus-stacking/artifacts/pancake-linux-native/a49ce69/pancake-cli",
+      "producer_archive_revision": "80a5737",
+      "producer_archive_sha256": "dff85153d6384f7362e98e40e63d502768fa619811784bc5786c60b008731085",
+      "executable": "/home/krishna/Documents/focus-stacking/artifacts/pancake-linux-native/a49ce69/pancake-cli"
+    },
+    "candidate": {
+      "commit": "5f2623ac85682233c20abe12fc691000568ad127",
+      "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+      "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+      "tree": "c6b8730d3d16506022316c68ae1322a5ac90e266",
+      "binary_sha256": "333ceb5c82c2b637d5ec57a7500a071949bc7921719abe181fadeb34996b3230",
+      "bytes": 122173696,
+      "elf_build_id": "27ea7e0c3a9d13d60bc6734966454bdeebde87f7",
+      "retained_executable": "/home/krishna/Documents/focus-stacking/artifacts/pancake-linux-native/5f2623a/pancake-cli",
+      "original_default_build_receipt": "/tmp/pancake-worktrees.t3paqgWM/a49-weighted-energy-reuse/artifacts/weighted-energy/default-release",
+      "build_receipt_digests": {
+        "cli.command": "ba92d89117dff280be1df096d31e5f8a2e1c5e42bb212271f054ae0ec020aee9",
+        "source.txt": "5f15336926d78889cbc96a22846e6d32472a692e22c1fc8c9a86d8b1acf73054",
+        "rustc.txt": "be69adad9137eaa0bdac1dd07e2fe286b1831fc8bad193ea27806ca0c7c8e7c6",
+        "cli.log": "5926b9a2cc2f0830b88d8d2dcdc99e8dea0d4e4aa4c71a835d8c17465de8cb87"
+      },
+      "retained_build_receipt_sha256": "17ca176c54e5310a639092b95e80ae00a5209d3065d0e83aa654a1eb5ca44bd3",
+      "producer_archive_revision": "b35b384d05f1ca6c990082e091dd89bf90077feb",
+      "producer_archive_sha256": "12fa7048d416a7b0a307b947a87c5a2b11fcae93720cf9307b5acfe157307aaf",
+      "executable": "/home/krishna/Documents/focus-stacking/artifacts/pancake-linux-native/5f2623a/pancake-cli"
+    }
+  },
+  "jobs": {
+    "reference": {
+      "elapsed_ns": 64701461622,
+      "observed_peak_rss_bytes": 3458846720,
+      "cadence_eligible_peak_rss_bytes": 3458846720,
+      "maximum_rss_gap_ns": 18299821,
+      "rss_sample_count": 19054,
+      "maximum_acquisition_ns": 15499246,
+      "sampler_cpu_ns": 32496319929,
+      "wait4_user_cpu_seconds": 117.829285,
+      "wait4_system_cpu_seconds": 67.364739,
+      "rgb16": {
+        "shape": [
+          3998,
+          5998,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "550e72982e03844c4a5d40575ab3c8b89ea067e5f38d07d0f0736445484922c2",
+        "pixel_sha256": "dc4e21deab6381c662de86a89c4f58385ccbe2b54d51a22addcd50db1f4f6d34",
+        "bytes": 165542082,
+        "minimum": 7096,
+        "maximum": 58532
+      },
+      "matches_historical_rgb16": true,
+      "first_reference_maps": 50,
+      "sequential_maps": null,
+      "sharp_truth_region_count": 50,
+      "whole_sharp_truth": {
+        "compared_samples": 71940012,
+        "mean_absolute_error_u16": 1083.9311529027823,
+        "rms_error_u16": 1632.477032573577,
+        "maximum_absolute_error_u16": 13781,
+        "changed_sample_fraction": 1.0
+      }
+    },
+    "stock": {
+      "elapsed_ns": 25987403132,
+      "observed_peak_rss_bytes": 1833377792,
+      "cadence_eligible_peak_rss_bytes": 1833377792,
+      "maximum_rss_gap_ns": 8791848,
+      "rss_sample_count": 8230,
+      "maximum_acquisition_ns": 5773194,
+      "sampler_cpu_ns": 12340663880,
+      "wait4_user_cpu_seconds": 137.025463,
+      "wait4_system_cpu_seconds": 13.12997,
+      "rgb16": {
+        "shape": [
+          3998,
+          5998,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+        "pixel_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7",
+        "bytes": 143881378,
+        "minimum": 7089,
+        "maximum": 58530
+      },
+      "matches_historical_rgb16": true,
+      "first_reference_maps": 50,
+      "sequential_maps": 50,
+      "sharp_truth_region_count": 50,
+      "whole_sharp_truth": {
+        "compared_samples": 71940012,
+        "mean_absolute_error_u16": 1080.73641245709,
+        "rms_error_u16": 1631.6155894278004,
+        "maximum_absolute_error_u16": 13879,
+        "changed_sample_fraction": 1.0
+      }
+    },
+    "candidate": {
+      "elapsed_ns": 26196895157,
+      "observed_peak_rss_bytes": 1830785024,
+      "cadence_eligible_peak_rss_bytes": 1830785024,
+      "maximum_rss_gap_ns": 11444256,
+      "rss_sample_count": 8267,
+      "maximum_acquisition_ns": 8908347,
+      "sampler_cpu_ns": 12480858095,
+      "wait4_user_cpu_seconds": 140.534526,
+      "wait4_system_cpu_seconds": 13.178746,
+      "rgb16": {
+        "shape": [
+          3998,
+          5998,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+        "pixel_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7",
+        "bytes": 143881378,
+        "minimum": 7089,
+        "maximum": 58530
+      },
+      "matches_historical_rgb16": true,
+      "first_reference_maps": 50,
+      "sequential_maps": 50,
+      "sharp_truth_region_count": 50,
+      "whole_sharp_truth": {
+        "compared_samples": 71940012,
+        "mean_absolute_error_u16": 1080.73641245709,
+        "rms_error_u16": 1631.6155894278004,
+        "maximum_absolute_error_u16": 13879,
+        "changed_sample_fraction": 1.0
+      }
+    }
+  },
+  "alias_vs_a49": {
+    "rss_bytes_lower": 2592768,
+    "elapsed_ns_higher": 209492025,
+    "elapsed_ratio": 1.0080612912315983,
+    "rss_ratio": 0.9985857972037658,
+    "encoded_pixels_and_affine_maps_exact_match": true
+  },
+  "alias_vs_reference": {
+    "elapsed_ratio": 0.4048887691293275,
+    "strict_diagnostic_rss_ratio": 0.5293050465098378,
+    "comparison_boundary": 0.5,
+    "above_boundary": true,
+    "rss_bytes_above_half_reference": 101361664,
+    "decoded_pixels": {
+      "status": "decoded_pair",
+      "mean_absolute_u16": 11.098988029081786,
+      "maximum_absolute_u16": 227,
+      "rms_u16": 20.702068199402884,
+      "changed_sample_fraction": 0.932154362164966
+    }
+  },
+  "separate_historical_8ms": {
+    "receipt_sha256": "31f27ed7da282b5515ef5b1db3193604607e0308c5b4aad48dec65a338156464",
+    "scope": "historic different fixed-order diagnostic with notice-bearing 0a and standalone a49; no cross-run attribution",
+    "reference_rss_gap_ns": 22476502,
+    "reference_rss_eligible": false,
+    "a49_elapsed_ns": 25506298157,
+    "a49_rss_gap_ns": 19693276
+  },
+  "raw_archive": {
+    "file": "raw-typed-calibration.tar.gz",
+    "sha256": "82bea26c1968f28aaec1846d1a56a0fa10378aa3eda8c0ed2866de87439c6633",
+    "bytes": 977584,
+    "verified_allowlisted_members": 16,
+    "original_or_generated_tiff_members": 0,
+    "ambient_env_records": 0,
+    "source_report_sha256": "a4452186f31857f1197383a6f34e0ea07334943b407e9603bb25907dec2ed93c"
+  }
+}

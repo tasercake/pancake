@@ -1,0 +1,104 @@
+{
+  "evidence_commit": "16852c7e1317d45066277b816c06c239f3cace03",
+  "authoritative_summary_path": "pancake/docs/p10-r50-component-comparison/summary.json",
+  "authoritative_summary_sha256": "ab9b1d7cdbc8fdd96562324e80e884fad4c92357c8128120a354b53ec0fc375a",
+  "matching_control": {
+    "path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/registration-owned-07816a2/pancake-cli",
+    "revision": "07816a24a62f96bc3d3252e95fcfd2b4b5950269",
+    "sha256": "aad46d08e71f1973ba4ffa1efa7d7fe0ee7747e02cf2a3834903af448587f9ed",
+    "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "changed_production_paths": [],
+    "elapsed_ns": 39928490465,
+    "child_peak_rss_bytes": 2445996032,
+    "child_user_seconds": 271.384825,
+    "child_system_seconds": 21.44398,
+    "boundaries_ns": [
+      1481465377,
+      37826674172,
+      620350916
+    ],
+    "output": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    },
+    "transform_f32_sha256": {
+      "alignment_transforms": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b",
+      "sequential_transforms": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b"
+    },
+    "elapsed_ratio": 1.0,
+    "child_rss_ratio": 1.0,
+    "actual_backend": "cpu",
+    "runtime": "cpu",
+    "fallback_reason": null,
+    "real_cpu_device": "AMD Ryzen 9 7950X3D 16-Core Processor"
+  },
+  "candidate": {
+    "path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/raw-packing-c8f68cf/pancake-cli",
+    "revision": "c8f68cf79d143403ad9d5df906a5f8cfa2047526",
+    "sha256": "bea745e2654042fd52499eccb634339a59ea493eeab8bb3e9582294a352fe4ca",
+    "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "changed_production_paths": [
+      "pancake/src/image_io/raw.rs",
+      "pancake/src/image_io/raw/tests.rs"
+    ],
+    "elapsed_ns": 38098155665,
+    "child_peak_rss_bytes": 2465042432,
+    "child_user_seconds": 271.654999,
+    "child_system_seconds": 21.781353,
+    "boundaries_ns": [
+      1439101053,
+      36047894785,
+      611159827
+    ],
+    "output": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    },
+    "transform_f32_sha256": {
+      "alignment_transforms": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b",
+      "sequential_transforms": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b"
+    },
+    "pixel_metrics": {
+      "status": "decoded_pair",
+      "mean_absolute_u16": 0.0,
+      "maximum_absolute_u16": 0,
+      "rms_u16": 0.0,
+      "changed_sample_fraction": 0.0
+    },
+    "elapsed_ratio": 0.9541596794999198,
+    "child_rss_ratio": 1.0077867665158993,
+    "actual_backend": "cpu",
+    "runtime": "cpu",
+    "fallback_reason": null,
+    "real_cpu_device": "AMD Ryzen 9 7950X3D 16-Core Processor"
+  },
+  "completed_arm_order": [
+    "baseline",
+    "hybrid",
+    "luma",
+    "raw"
+  ],
+  "whole_frame_extensions_verified": {
+    "inputs_unchanged": true,
+    "all_match_historical_output": true,
+    "binaries_unchanged": true
+  }
+}

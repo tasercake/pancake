@@ -1,0 +1,930 @@
+{
+  "schema_version": 1,
+  "scope": "M4 preview CI on the exact pushed revision",
+  "release_acceptance": false,
+  "evidence_base": "ae0b438984cb1ac65978a19df80d8b21f631159b",
+  "pushed_commit": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+  "runs": [
+    {
+      "id": 44277150143,
+      "name": "Pancake",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "failure",
+      "head_branch": "main",
+      "head_sha": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+      "run_attempt": 1,
+      "run_started_at": "2026-11-18T09:34:15Z",
+      "updated_at": "2026-11-18T09:54:41Z",
+      "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150143",
+      "jobs": [
+        {
+          "id": 134708072584,
+          "name": "macOS Miri, randomized layouts, and branch coverage",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-11-18T09:39:20Z",
+          "completed_at": "2026-11-18T09:50:52Z",
+          "labels": [
+            "macos-15"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150143/job/134708072584",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:39:21Z",
+              "completed_at": "2026-11-18T09:39:22Z"
+            },
+            {
+              "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-18T09:39:22Z",
+              "completed_at": "2026-11-18T09:39:27Z"
+            },
+            {
+              "name": "Install pinned nightly",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:39:27Z",
+              "completed_at": "2026-11-18T09:39:40Z"
+            },
+            {
+              "name": "Run taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-18T09:39:40Z",
+              "completed_at": "2026-11-18T09:39:41Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh nightly-cpu",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 5,
+              "started_at": "2026-11-18T09:39:41Z",
+              "completed_at": "2026-11-18T09:50:45Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh branches-cpu",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 6,
+              "started_at": "2026-11-18T09:50:45Z",
+              "completed_at": "2026-11-18T09:50:45Z"
+            },
+            {
+              "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-11-18T09:50:45Z",
+              "completed_at": "2026-11-18T09:50:47Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-11-18T09:50:47Z",
+              "completed_at": "2026-11-18T09:50:50Z"
+            }
+          ],
+          "log": {
+            "path": "macos-nightly.log.gz",
+            "bytes": 123500,
+            "sha256": "065eb9ced947aa78af448b6efacca3e89ce9dc52e6051591b8eeb0843a4fdd1f",
+            "gzip_sha256": "29bc1d5568782f40f67fca1907867904bcabe48199e25179491b05acf8855c0b"
+          }
+        },
+        {
+          "id": 134708072864,
+          "name": "Sanitizer (address)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-18T09:34:18Z",
+          "completed_at": "2026-11-18T09:47:02Z",
+          "labels": [
+            "ubuntu-24.04"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150143/job/134708072864",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:34:19Z",
+              "completed_at": "2026-11-18T09:34:22Z"
+            },
+            {
+              "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-18T09:34:22Z",
+              "completed_at": "2026-11-18T09:34:29Z"
+            },
+            {
+              "name": "Provision Linux native build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:34:29Z",
+              "completed_at": "2026-11-18T09:40:27Z"
+            },
+            {
+              "name": "Install pinned nightly",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-18T09:40:27Z",
+              "completed_at": "2026-11-18T09:40:35Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh sanitizer \"address\"",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-18T09:40:35Z",
+              "completed_at": "2026-11-18T09:46:58Z"
+            },
+            {
+              "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-18T09:46:58Z",
+              "completed_at": "2026-11-18T09:46:59Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-18T09:46:59Z",
+              "completed_at": "2026-11-18T09:46:59Z"
+            }
+          ],
+          "log": {
+            "path": "sanitizer-address.log.gz",
+            "bytes": 184495,
+            "sha256": "828360d10ee32cc4d0cc3c3cd20060a02a35a9de4a88d43785e5b85fee0956c7",
+            "gzip_sha256": "e27637ec02dbdc15d6957eed7eaef4c2da0c08620ca95c82ac51d30f2f432dff"
+          }
+        },
+        {
+          "id": 134708072873,
+          "name": "Windows MSVC build and link",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-18T09:34:18Z",
+          "completed_at": "2026-11-18T09:45:33Z",
+          "labels": [
+            "windows-2025"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150143/job/134708072873",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:34:19Z",
+              "completed_at": "2026-11-18T09:34:19Z"
+            },
+            {
+              "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-18T09:34:19Z",
+              "completed_at": "2026-11-18T09:34:29Z"
+            },
+            {
+              "name": "Build and link every target without running Windows tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:34:29Z",
+              "completed_at": "2026-11-18T09:45:28Z"
+            },
+            {
+              "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-18T09:45:28Z",
+              "completed_at": "2026-11-18T09:45:31Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-18T09:45:31Z",
+              "completed_at": "2026-11-18T09:45:31Z"
+            }
+          ],
+          "log": {
+            "path": "windows-build.log.gz",
+            "bytes": 89403,
+            "sha256": "82fae9a20d1457909e3daf1a168f7437f585bb092e267b0ed4b1a2ec7e67cf62",
+            "gzip_sha256": "36d92683a1408cd7423dad0003f301380729abecd9a4e4c5f90ee7ee0d413216"
+          }
+        },
+        {
+          "id": 134708072907,
+          "name": "Platform (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "started_at": "2026-11-18T09:34:19Z",
+          "completed_at": "2026-11-18T09:54:36Z",
+          "labels": [
+            "ubuntu-24.04"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150143/job/134708072907",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:34:20Z",
+              "completed_at": "2026-11-18T09:34:22Z"
+            },
+            {
+              "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-18T09:34:22Z",
+              "completed_at": "2026-11-18T09:34:30Z"
+            },
+            {
+              "name": "Run taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:34:30Z",
+              "completed_at": "2026-11-18T09:34:49Z"
+            },
+            {
+              "name": "Provision Linux native build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-18T09:34:49Z",
+              "completed_at": "2026-11-18T09:43:06Z"
+            },
+            {
+              "name": "Install checksum-pinned actionlint release",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-18T09:43:06Z",
+              "completed_at": "2026-11-18T09:43:06Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh fast",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-18T09:43:06Z",
+              "completed_at": "2026-11-18T09:45:27Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh test-cpu",
+              "status": "completed",
+              "conclusion": "cancelled",
+              "number": 7,
+              "started_at": "2026-11-18T09:45:27Z",
+              "completed_at": "2026-11-18T09:54:32Z"
+            },
+            {
+              "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-18T09:54:32Z",
+              "completed_at": "2026-11-18T09:54:33Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-18T09:54:33Z",
+              "completed_at": "2026-11-18T09:54:33Z"
+            }
+          ],
+          "log": {
+            "path": "ubuntu-platform.log.gz",
+            "bytes": 215104,
+            "sha256": "f83ed810fe2eee1a2f62767ccbeee6d9d19a3d6df932f12a26fab537d8d79cb9",
+            "gzip_sha256": "820c3d1d46448af7166077346e8ce5d94229fceb03e5f823a6234d3f6bd8bdfd"
+          }
+        },
+        {
+          "id": 134708073017,
+          "name": "Coverage, dependencies, mutation, and guardrails",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-11-18T09:34:18Z",
+          "completed_at": "2026-11-18T09:40:13Z",
+          "labels": [
+            "ubuntu-24.04"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150143/job/134708073017",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:34:18Z",
+              "completed_at": "2026-11-18T09:34:19Z"
+            },
+            {
+              "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-18T09:34:19Z",
+              "completed_at": "2026-11-18T09:34:21Z"
+            },
+            {
+              "name": "Provision Linux native build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:34:21Z",
+              "completed_at": "2026-11-18T09:34:38Z"
+            },
+            {
+              "name": "Run taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-18T09:34:38Z",
+              "completed_at": "2026-11-18T09:34:39Z"
+            },
+            {
+              "name": "Install nightly for branch guardrail fixture",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-18T09:34:39Z",
+              "completed_at": "2026-11-18T09:34:50Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh coverage-cpu",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 6,
+              "started_at": "2026-11-18T09:34:50Z",
+              "completed_at": "2026-11-18T09:40:11Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh deps",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-11-18T09:40:11Z",
+              "completed_at": "2026-11-18T09:40:11Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh mutants-cpu",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-11-18T09:40:11Z",
+              "completed_at": "2026-11-18T09:40:11Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh layouts-cpu",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 9,
+              "started_at": "2026-11-18T09:40:11Z",
+              "completed_at": "2026-11-18T09:40:11Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh branches-cpu",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 10,
+              "started_at": "2026-11-18T09:40:11Z",
+              "completed_at": "2026-11-18T09:40:11Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh guardrails",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 11,
+              "started_at": "2026-11-18T09:40:11Z",
+              "completed_at": "2026-11-18T09:40:11Z"
+            },
+            {
+              "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 22,
+              "started_at": "2026-11-18T09:40:11Z",
+              "completed_at": "2026-11-18T09:40:12Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 23,
+              "started_at": "2026-11-18T09:40:12Z",
+              "completed_at": "2026-11-18T09:40:12Z"
+            }
+          ],
+          "log": {
+            "path": "coverage.log.gz",
+            "bytes": 186952,
+            "sha256": "592d1764d3d153926cfd6c2eec65328e1a12cebf1e09f24ff7b0a3a72cb474ec",
+            "gzip_sha256": "c5b1e92fff87de214ae40bcdbe9753529b43433945205d3738d388c406c225f5"
+          }
+        },
+        {
+          "id": 134708073091,
+          "name": "Platform (macos-15)",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-11-18T09:34:19Z",
+          "completed_at": "2026-11-18T09:39:01Z",
+          "labels": [
+            "macos-15"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150143/job/134708073091",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:34:20Z",
+              "completed_at": "2026-11-18T09:34:22Z"
+            },
+            {
+              "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-18T09:34:22Z",
+              "completed_at": "2026-11-18T09:34:27Z"
+            },
+            {
+              "name": "Run taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:34:27Z",
+              "completed_at": "2026-11-18T09:34:30Z"
+            },
+            {
+              "name": "Provision Linux native build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4,
+              "started_at": "2026-11-18T09:34:30Z",
+              "completed_at": "2026-11-18T09:34:30Z"
+            },
+            {
+              "name": "Install checksum-pinned actionlint release",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-18T09:34:30Z",
+              "completed_at": "2026-11-18T09:34:31Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh fast",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 6,
+              "started_at": "2026-11-18T09:34:31Z",
+              "completed_at": "2026-11-18T09:38:54Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh test-cpu",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 7,
+              "started_at": "2026-11-18T09:38:54Z",
+              "completed_at": "2026-11-18T09:38:54Z"
+            },
+            {
+              "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-11-18T09:38:54Z",
+              "completed_at": "2026-11-18T09:38:56Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-11-18T09:38:56Z",
+              "completed_at": "2026-11-18T09:38:59Z"
+            }
+          ],
+          "log": {
+            "path": "macos-platform.log.gz",
+            "bytes": 58663,
+            "sha256": "166ffdcdb564947cadb06e462967846849129ccc34fc0bf818cd61fc5ecb6088",
+            "gzip_sha256": "7d27437e250d538d89689cc0677daac52d13df2b60d7720347d8ed0aee6e0be5"
+          }
+        },
+        {
+          "id": 134708073132,
+          "name": "Sanitizer (thread)",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-11-18T09:34:23Z",
+          "completed_at": "2026-11-18T09:46:09Z",
+          "labels": [
+            "ubuntu-24.04"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150143/job/134708073132",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:34:24Z",
+              "completed_at": "2026-11-18T09:34:25Z"
+            },
+            {
+              "name": "Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-18T09:34:25Z",
+              "completed_at": "2026-11-18T09:34:28Z"
+            },
+            {
+              "name": "Provision Linux native build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:34:28Z",
+              "completed_at": "2026-11-18T09:34:46Z"
+            },
+            {
+              "name": "Install pinned nightly",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-18T09:34:46Z",
+              "completed_at": "2026-11-18T09:34:57Z"
+            },
+            {
+              "name": "Run bash scripts/check.sh sanitizer \"thread\"",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 5,
+              "started_at": "2026-11-18T09:34:57Z",
+              "completed_at": "2026-11-18T09:46:06Z"
+            },
+            {
+              "name": "Post Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-11-18T09:46:06Z",
+              "completed_at": "2026-11-18T09:46:07Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-11-18T09:46:07Z",
+              "completed_at": "2026-11-18T09:46:07Z"
+            }
+          ],
+          "log": {
+            "path": "sanitizer-thread.log.gz",
+            "bytes": 306316,
+            "sha256": "b61e9270b1989238fb0d3f2491ec9f0dd18e1081714816c27984ef2aeff3b8ca",
+            "gzip_sha256": "64636f578c9c137a2ba3efb5ec338723ac8bcc2358b5c98e7481c2d909c61d76"
+          }
+        },
+        {
+          "id": 134718958824,
+          "name": "Pancake required",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-11-18T09:54:38Z",
+          "completed_at": "2026-11-18T09:54:40Z",
+          "labels": [
+            "ubuntu-24.04"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150143/job/134718958824",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:54:39Z",
+              "completed_at": "2026-11-18T09:54:39Z"
+            },
+            {
+              "name": "Require every gate",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 2,
+              "started_at": "2026-11-18T09:54:39Z",
+              "completed_at": "2026-11-18T09:54:39Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:54:39Z",
+              "completed_at": "2026-11-18T09:54:39Z"
+            }
+          ],
+          "log": {
+            "path": "required.log.gz",
+            "bytes": 2628,
+            "sha256": "e045ef6294c49931f6cf841f127329f28ce693b4b6aeb521178ce2ecd4218ff7",
+            "gzip_sha256": "fba0d7598cc9ceba912887b1ab1f3eb4fea97fa80b96d3167c033c0b05af318a"
+          }
+        }
+      ]
+    },
+    {
+      "id": 44277150146,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "head_branch": "main",
+      "head_sha": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+      "run_attempt": 1,
+      "run_started_at": "2026-11-18T09:34:15Z",
+      "updated_at": "2026-11-18T09:45:22Z",
+      "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150146",
+      "jobs": [
+        {
+          "id": 134708072595,
+          "name": "regression (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-18T09:34:18Z",
+          "completed_at": "2026-11-18T09:45:22Z",
+          "labels": [
+            "ubuntu-24.04"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150146/job/134708072595",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:34:18Z",
+              "completed_at": "2026-11-18T09:34:21Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-18T09:34:21Z",
+              "completed_at": "2026-11-18T09:34:26Z"
+            },
+            {
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:34:26Z",
+              "completed_at": "2026-11-18T09:34:28Z"
+            },
+            {
+              "name": "Run astral-sh/setup-uv@v6",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-18T09:34:28Z",
+              "completed_at": "2026-11-18T09:34:29Z"
+            },
+            {
+              "name": "Run sudo apt-get update && sudo apt-get install -y xvfb openbox xdotool x11-utils dbus-x11 python3-gi gir1.2-atspi-2.0 gir1.2-gtk-3.0 at-spi2-core ocl-icd-libopencl1 libegl1 libopengl0 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-11-18T09:34:29Z",
+              "completed_at": "2026-11-18T09:44:06Z"
+            },
+            {
+              "name": "Locked runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-18T09:44:06Z",
+              "completed_at": "2026-11-18T09:44:11Z"
+            },
+            {
+              "name": "Unit and adapter regressions",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-18T09:44:11Z",
+              "completed_at": "2026-11-18T09:44:22Z"
+            },
+            {
+              "name": "Lint",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-18T09:44:22Z",
+              "completed_at": "2026-11-18T09:44:22Z"
+            },
+            {
+              "name": "Linux native GUI smoke",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-11-18T09:44:22Z",
+              "completed_at": "2026-11-18T09:45:20Z"
+            },
+            {
+              "name": "Retain failure diagnostics",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 10,
+              "started_at": "2026-11-18T09:45:20Z",
+              "completed_at": "2026-11-18T09:45:20Z"
+            },
+            {
+              "name": "Post Run astral-sh/setup-uv@v6",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 19,
+              "started_at": "2026-11-18T09:45:20Z",
+              "completed_at": "2026-11-18T09:45:20Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 20,
+              "started_at": "2026-11-18T09:45:20Z",
+              "completed_at": "2026-11-18T09:45:20Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 21,
+              "started_at": "2026-11-18T09:45:20Z",
+              "completed_at": "2026-11-18T09:45:20Z"
+            }
+          ]
+        },
+        {
+          "id": 134708072742,
+          "name": "regression (macos-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-11-18T09:34:18Z",
+          "completed_at": "2026-11-18T09:35:20Z",
+          "labels": [
+            "macos-latest"
+          ],
+          "html_url": "https://github.com/tasercake/focus-stacking/actions/runs/44277150146/job/134708072742",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-11-18T09:34:19Z",
+              "completed_at": "2026-11-18T09:34:21Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-11-18T09:34:21Z",
+              "completed_at": "2026-11-18T09:34:28Z"
+            },
+            {
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-11-18T09:34:28Z",
+              "completed_at": "2026-11-18T09:34:32Z"
+            },
+            {
+              "name": "Run astral-sh/setup-uv@v6",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-11-18T09:34:32Z",
+              "completed_at": "2026-11-18T09:34:35Z"
+            },
+            {
+              "name": "Run sudo apt-get update && sudo apt-get install -y xvfb openbox xdotool x11-utils dbus-x11 python3-gi gir1.2-atspi-2.0 gir1.2-gtk-3.0 at-spi2-core ocl-icd-libopencl1 libegl1 libopengl0 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 5,
+              "started_at": "2026-11-18T09:34:35Z",
+              "completed_at": "2026-11-18T09:34:35Z"
+            },
+            {
+              "name": "Locked runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-11-18T09:34:35Z",
+              "completed_at": "2026-11-18T09:34:48Z"
+            },
+            {
+              "name": "Unit and adapter regressions",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-11-18T09:34:48Z",
+              "completed_at": "2026-11-18T09:35:13Z"
+            },
+            {
+              "name": "Lint",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-11-18T09:35:13Z",
+              "completed_at": "2026-11-18T09:35:14Z"
+            },
+            {
+              "name": "Linux native GUI smoke",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 9,
+              "started_at": "2026-11-18T09:35:14Z",
+              "completed_at": "2026-11-18T09:35:14Z"
+            },
+            {
+              "name": "Retain failure diagnostics",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 10,
+              "started_at": "2026-11-18T09:35:14Z",
+              "completed_at": "2026-11-18T09:35:14Z"
+            },
+            {
+              "name": "Post Run astral-sh/setup-uv@v6",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 19,
+              "started_at": "2026-11-18T09:35:14Z",
+              "completed_at": "2026-11-18T09:35:15Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 20,
+              "started_at": "2026-11-18T09:35:15Z",
+              "completed_at": "2026-11-18T09:35:16Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 21,
+              "started_at": "2026-11-18T09:35:16Z",
+              "completed_at": "2026-11-18T09:35:17Z"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ubuntu_platform_annotations": [
+    {
+      "annotation_level": "failure",
+      "message": "The job has exceeded the maximum execution time of 20m0s"
+    },
+    {
+      "annotation_level": "failure",
+      "message": "The operation was canceled."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+e6a9399f121a60cea98d484779dc6e6722566b4d57033c6eed1c767ae3e6b082  /tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/stock/mirrored.rgbf32
+ec1ec37a9de219cf3b4f1d9c536137e4e5f0e0af7370be37ece02731685097c0  /tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/stock/mirrored.tiff
+34d0185e9e8a9195b59ed92f75b1798c485fe0fc007780ab1a14cf2937ec6417  /tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/stock/normal.rgbf32
+190559c8e8526d4fb626afa762f9cdb3fdb77856a06d0e045c04a694e93567c3  /tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/stock/normal.tiff
+e6a9399f121a60cea98d484779dc6e6722566b4d57033c6eed1c767ae3e6b082  /tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/candidate/mirrored.rgbf32
+ec1ec37a9de219cf3b4f1d9c536137e4e5f0e0af7370be37ece02731685097c0  /tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/candidate/mirrored.tiff
+34d0185e9e8a9195b59ed92f75b1798c485fe0fc007780ab1a14cf2937ec6417  /tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/candidate/normal.rgbf32
+190559c8e8526d4fb626afa762f9cdb3fdb77856a06d0e045c04a694e93567c3  /tmp/pancake-worktrees.t3paqgWM/r50-e81079d-typed-raw/artifacts/typed-raw/candidate/normal.tiff

@@ -1,0 +1,161 @@
+{
+  "synthetic_two_worker_control": [
+    {
+      "driver_lock_shared": false,
+      "second_complete_before_release": true,
+      "complete_aggregates_in_dispatch_order": [
+        125,
+        120
+      ]
+    },
+    {
+      "driver_lock_shared": true,
+      "second_complete_before_release": false,
+      "complete_aggregates_in_dispatch_order": [
+        125,
+        120
+      ]
+    }
+  ],
+  "synthetic_clock_witnesses": {
+    "overtaken_old_pair": {
+      "rows_in_completion_order": [
+        {
+          "started_ns": 7000000,
+          "gpu_elapsed_ns": 8000000,
+          "gpu_bytes": 100
+        },
+        {
+          "started_ns": 23000000,
+          "gpu_elapsed_ns": 24000000,
+          "gpu_bytes": 100
+        },
+        {
+          "started_ns": 10000000,
+          "gpu_elapsed_ns": 42000000,
+          "gpu_bytes": 200
+        }
+      ],
+      "elapsed_ns": 58000000,
+      "completion_only": {
+        "maximum_gpu_sample_gap_ns": 18000000,
+        "gpu_sample_count": 3,
+        "observed_peak_gpu_bytes": 200,
+        "peak_gpu_bytes": 200
+      },
+      "coverage_without_unproven_old_pair": {
+        "maximum_gpu_sample_gap_ns": 34000000,
+        "gpu_sample_count": 2,
+        "observed_peak_gpu_bytes": 100,
+        "peak_gpu_bytes": null
+      }
+    },
+    "independent_fresh_pairs": {
+      "rows": [
+        {
+          "started_ns": 7000000,
+          "gpu_elapsed_ns": 8000000,
+          "gpu_bytes": 100
+        },
+        {
+          "started_ns": 23000000,
+          "gpu_elapsed_ns": 24000000,
+          "gpu_bytes": 100
+        },
+        {
+          "started_ns": 31000000,
+          "gpu_elapsed_ns": 32000000,
+          "gpu_bytes": 110
+        },
+        {
+          "started_ns": 39000000,
+          "gpu_elapsed_ns": 40000000,
+          "gpu_bytes": 130
+        },
+        {
+          "started_ns": 47000000,
+          "gpu_elapsed_ns": 48000000,
+          "gpu_bytes": 110
+        }
+      ],
+      "elapsed_ns": 58000000,
+      "verified_fresh_coverage": {
+        "maximum_gpu_sample_gap_ns": 16000000,
+        "gpu_sample_count": 5,
+        "observed_peak_gpu_bytes": 130,
+        "peak_gpu_bytes": 130
+      }
+    },
+    "cross_time_aggregate": {
+      "compute_read_bytes": {
+        "11": 100
+      },
+      "graphics_read_bytes": {
+        "12": 100
+      },
+      "free_then_allocate_between_queries": true,
+      "actual_maximum_simultaneously_resident_bytes": 100,
+      "mixed_aggregate_bytes": 200
+    },
+    "late_pair": {
+      "rows": [
+        {
+          "started_ns": 7000000,
+          "gpu_elapsed_ns": 8000000,
+          "gpu_bytes": 100
+        },
+        {
+          "started_ns": 21000000,
+          "gpu_elapsed_ns": 38000000,
+          "gpu_bytes": 999
+        }
+      ],
+      "elapsed_ns": 33000000,
+      "normal": {
+        "maximum_gpu_sample_gap_ns": 25000000,
+        "gpu_sample_count": 1,
+        "observed_peak_gpu_bytes": 100,
+        "peak_gpu_bytes": null
+      },
+      "incorrect_backdating_to_dispatch": {
+        "maximum_gpu_sample_gap_ns": 13000000,
+        "gpu_sample_count": 2,
+        "observed_peak_gpu_bytes": 999,
+        "peak_gpu_bytes": 999
+      }
+    },
+    "attributed_unavailable_value": {
+      "maximum_gpu_sample_gap_ns": 8000000,
+      "gpu_sample_count": 2,
+      "observed_peak_gpu_bytes": 100,
+      "peak_gpu_bytes": null
+    }
+  },
+  "physical_archive_read_only": {
+    "sha256": "6ccc41795ab580b7ce40fbd77088241b7d281ad17aff7a12bb524df3b696d104",
+    "profiles": {
+      "wgpu-vulkan": {
+        "prior_complete_ns": 680280880,
+        "compute_started_no_earlier_ns": 688066355,
+        "compute_started_no_later_ns": 688081192,
+        "compute_wall_ns": 26972127,
+        "split_graphics_wall_ns": 96722,
+        "archived_max_gap_ns": 34873970,
+        "observed_job_exit_ns": 733717713,
+        "conditional_shared_stall_inside_job_ns": 26972127,
+        "conditional_minimum_gap_if_second_query_waits_on_same_stall_ns": 34757602
+      },
+      "cuda": {
+        "prior_complete_ns": 579292286,
+        "compute_started_no_earlier_ns": 584071752,
+        "compute_started_no_later_ns": 584089576,
+        "compute_wall_ns": 30815106,
+        "split_graphics_wall_ns": 146314,
+        "archived_max_gap_ns": 35329033,
+        "observed_job_exit_ns": 614621319,
+        "conditional_shared_stall_inside_job_ns": 30531743,
+        "conditional_minimum_gap_if_second_query_waits_on_same_stall_ns": 35329033
+      }
+    }
+  }
+}

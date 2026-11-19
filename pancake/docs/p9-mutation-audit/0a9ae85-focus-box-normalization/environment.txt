@@ -1,0 +1,20 @@
+2026-11-18T17:56:44Z
+0a9ae85b88519a795e3b6ba90860c3b3e664bcaa
+fde57a0b461e3ea031ea969e1e841927bead17f9
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+11f12c186a426a8846f99b783f505ce2d346818e646fd1abb3560854ff5145d8  src/fusion/focus.rs
+b8cdad9172d2cb9efcf40916ba05d90149fe2970a8ad3cd9fdb60269666520b5  tests/cpu_fusion_contract.rs
+f3a44fb8f9c1e3efad8c5f24172251bbf5913270986d90b1dc43b1cc5472b826  /tmp/pancake-worktrees.t3paqgWM/focus-aggregate-audit/artifacts/focus-normalization-mutant/archived-mutant.diff
+Linux 6.8.0-147-generic x86_64
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+Cpus_allowed_list:	14-15
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+CARGO_BUILD_JOBS=2
+RUSTC_WRAPPER=unset
+RUSTFLAGS=unset

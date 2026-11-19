@@ -1,0 +1,34 @@
+{
+  "matching_cpu_os_and_clock_fields": {
+    "cpu": true,
+    "cpu_affinity": true,
+    "kernel": true,
+    "frequency_policy": true,
+    "timer": true,
+    "validator": true,
+    "os_release": true
+  },
+  "matching_gpu_identity_and_start_fields": {
+    "name": true,
+    "uuid": true,
+    "pci.bus_id": true,
+    "driver_version": true,
+    "pstate": true,
+    "temperature.gpu": true,
+    "clocks.gr": true,
+    "clocks.mem": true
+  },
+  "renderer_residency_at_visible_launch_bytes": {
+    "prior": 117088256,
+    "packaged": 117088256
+  },
+  "same_gpu_process_roster_in_all_snapshots": true,
+  "visible_gpu_process_count_in_all_snapshots": 9,
+  "gpu_state_snapshots": {
+    "prior_start": "| 57%   69C    P2            125W /  350W |     654MiB /  24576MiB |      2%      Default |",
+    "prior_end": "| 57%   68C    P2            125W /  350W |     654MiB /  24576MiB |      2%      Default |",
+    "package_start": "| 57%   69C    P2            125W /  350W |     655MiB /  24576MiB |      2%      Default |",
+    "package_end": "| 57%   68C    P2            124W /  350W |     654MiB /  24576MiB |      2%      Default |"
+  },
+  "scope": "Momentary pre/post snapshots leave transient background contention unmeasured."
+}

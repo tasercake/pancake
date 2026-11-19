@@ -1,0 +1,85 @@
+"""Generate valid partial-edge TIFFs without the Rust codecs under review."""
+from pathlib import Path
+from struct import pack
+import sys
+import zlib
+
+out = Path(sys.argv[1])
+width, height, tile = 1025, 1027, 256
+columns = (width + tile - 1) // tile
+rows = (height + tile - 1) // tile
+
+
+def write(name, order, big, compression, predictor, orientation):
+    def encode(fmt, *values):
+        return pack(order + fmt, *values)
+
+    def code(x, y, channel):
+        return (x * 71 + y * 337 + channel * 31_583) & 0xffff
+
+    chunks = []
+    for ty in range(rows):
+        for tx in range(columns):
+            raw = bytearray()
+            for y in range(ty * tile, (ty + 1) * tile):
+                previous = [0, 0, 0]
+                row = []
+                for x in range(tx * tile, (tx + 1) * tile):
+                    for channel in range(3):
+                        value = code(x, y, channel) if x < width and y < height else 0
+                        row.append((value - previous[channel]) & 0xffff if predictor == 2 else value)
+                        previous[channel] = value
+                raw.extend(encode("H" * len(row), *row))
+            chunks.append(zlib.compress(raw, level=3))
+
+    ordered_width = 8 if big else 4
+    offset_fmt = "Q" if big else "I"
+    count_fmt = "Q" if big else "H"
+    offset_type = 16 if big else 4
+    magic = b"MM" if order == ">" else b"II"
+    header = magic + (encode("HHHQ", 43, 8, 0, 16) if big else encode("HI", 42, 8))
+    fields = {
+        256: (4, 1, encode("I", width)), 257: (4, 1, encode("I", height)),
+        258: (3, 3, encode("HHH", 16, 16, 16)), 259: (3, 1, encode("H", compression)),
+        262: (3, 1, encode("H", 2)), 274: (3, 1, encode("H", orientation)),
+        277: (3, 1, encode("H", 3)), 284: (3, 1, encode("H", 1)),
+        317: (3, 1, encode("H", predictor)), 322: (4, 1, encode("I", tile)),
+        323: (4, 1, encode("I", tile)),
+        324: (offset_type, len(chunks), bytes(ordered_width * len(chunks))),
+        325: (offset_type, len(chunks), encode(offset_fmt * len(chunks), *map(len, chunks))),
+        339: (3, 3, encode("HHH", 1, 1, 1)),
+        34675: (7, len(b"fixed-tiff-review-icc"), b"fixed-tiff-review-icc"),
+    }
+    value_tags = [(tag, len(data)) for tag, (_, _, data) in sorted(fields.items())
+                  if len(data) > ordered_width]
+    directory_bytes = len(fields) * (20 if big else 12) + (16 if big else 6)
+    positions = {}
+    next_pos = len(header) + directory_bytes
+    for tag, size in value_tags:
+        positions[tag] = next_pos
+        next_pos += size
+    offsets = []
+    for data in chunks:
+        offsets.append(next_pos)
+        next_pos += len(data)
+    fields[324] = (offset_type, len(chunks), encode(offset_fmt * len(chunks), *offsets))
+    directory = bytearray(encode(count_fmt, len(fields)))
+    for tag, (kind, count, data) in sorted(fields.items()):
+        directory.extend(encode("HH" + offset_fmt, tag, kind, count))
+        directory.extend(encode(offset_fmt, positions[tag]) if tag in positions
+                         else data.ljust(ordered_width, b"\0"))
+    directory.extend(encode(offset_fmt, 0))
+    assert len(directory) == directory_bytes
+    output = out / name
+    with output.open("xb") as fh:
+        fh.write(header + directory)
+        for tag, _ in value_tags:
+            fh.write(fields[tag][2])
+        for data in chunks:
+            fh.write(data)
+    assert output.stat().st_size == next_pos
+
+
+write("classic.tiff", "<", False, 8, 1, 1)
+write("legacy-big.tiff", ">", True, 32946, 2, 1)
+write("rotated-big.tiff", ">", True, 32946, 2, 6)

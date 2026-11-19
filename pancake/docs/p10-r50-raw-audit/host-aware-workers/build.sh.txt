@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Build one exact source snapshot and preserve the versioned probe plus CLI.
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+output="$repo/artifacts/r50-workers"
+cd "$repo/pancake"
+revision=$(git rev-parse HEAD)
+variant=$1
+export CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 RUSTC_WRAPPER=/tmp/pancake-tools/bin/pancake-rust-cache
+{
+    printf 'revision=%s\nvariant=%s\n' "$revision" "$variant"
+    git status --porcelain
+    sha256sum Cargo.lock src/image_io/raw{.rs,/tests.rs} examples/raw_decode_probe.rs
+    rustc --version --verbose
+    cargo --version --verbose
+    date -u +%FT%TZ
+} >"$output/$variant-build.txt"
+args=(build --offline --locked --release -p pancake --example raw_decode_probe)
+if [[ $variant != baseline ]]; then
+    args+=(-p pancake-cli --bin pancake-cli)
+fi
+printf 'CARGO_BUILD_JOBS=%q CARGO_INCREMENTAL=%q RUSTC_WRAPPER=%q cargo ' \
+    "$CARGO_BUILD_JOBS" "$CARGO_INCREMENTAL" "$RUSTC_WRAPPER" >>"$output/$variant-build.txt"
+printf '%q ' "${args[@]}" >>"$output/$variant-build.txt"
+printf '\n' >>"$output/$variant-build.txt"
+set +e
+cargo "${args[@]}" >"$output/$variant-build.log" 2>&1
+status=$?
+set -e
+printf '%s\n' "$status" >"$output/$variant-build.status"
+[[ $status == 0 ]] || exit "$status"
+ln target/release/examples/raw_decode_probe "$output/$variant-probe"
+sha256sum "$output/$variant-probe" >>"$output/$variant-build.txt"
+if [[ $variant != baseline ]]; then
+    ln target/release/pancake-cli "$output/$variant-cli"
+    sha256sum "$output/$variant-cli" >>"$output/$variant-build.txt"
+    readelf -n "$output/$variant-cli" | awk '/Build ID/{print}' >>"$output/$variant-build.txt"
+fi

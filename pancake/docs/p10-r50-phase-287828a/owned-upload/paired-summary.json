@@ -1,0 +1,61 @@
+{
+  "sealed": {
+    "elapsed_ns": 51520890619,
+    "child_peak_rss_bytes": 2763558912,
+    "child_user_seconds": 277.359624,
+    "child_system_seconds": 32.32728,
+    "public_progress_boundaries": {
+      "dispatch_through_first_complete_frame_ns": 1556088617,
+      "second_through_last_frame_ns": 49303701411,
+      "last_frame_through_process_exit_ns": 661100591
+    },
+    "output": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    }
+  },
+  "owned": {
+    "elapsed_ns": 42072283228,
+    "child_peak_rss_bytes": 2465210368,
+    "child_user_seconds": 273.645068,
+    "child_system_seconds": 23.447882,
+    "public_progress_boundaries": {
+      "dispatch_through_first_complete_frame_ns": 1549575592,
+      "second_through_last_frame_ns": 39865556860,
+      "last_frame_through_process_exit_ns": 657150776
+    },
+    "output": {
+      "shape": [
+        3390,
+        5086,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "1a0927e1df4709c6953f70a993a52af56880711f2a093141ab2b8a5bfc6a4181",
+      "pixel_sha256": "9316387ed669f3e5cde04a009d2e7b12114ab3411e54448fee1447c07a689492",
+      "bytes": 103450274,
+      "minimum": 512,
+      "maximum": 65535
+    }
+  },
+  "owned_over_sealed_wall_time_ratio": 0.8166062877120467,
+  "owned_over_sealed_kernel_child_rss_ratio": 0.8920419091829369,
+  "pixel_metrics": {
+    "status": "decoded_pair",
+    "mean_absolute_u16": 0.0,
+    "maximum_absolute_u16": 0,
+    "rms_u16": 0.0,
+    "changed_sample_fraction": 0.0
+  },
+  "identical_finite_transform_count": 50,
+  "source_and_binary_hashes_reverified": true
+}

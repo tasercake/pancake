@@ -1,0 +1,67 @@
+"""Capture anonymous live Linux CPU activity, with no application launch."""
+
+import argparse
+import json
+import os
+from pathlib import Path
+import time
+
+from supplement_rules import overlap_busy
+
+
+def tasks():
+    """Read start and CPU ticks, without reading arguments, environments or names."""
+    result = {}
+    for process in Path("/proc").iterdir():
+        if not process.name.isdecimal() or int(process.name) == os.getpid():
+            continue
+        try:
+            threads = list((process / "task").iterdir())
+        except (FileNotFoundError, PermissionError, ProcessLookupError):
+            continue
+        for thread in threads:
+            try:
+                stat = (thread / "stat").read_bytes().rsplit(b")", 1)[1].split()
+            except (FileNotFoundError, PermissionError, ProcessLookupError):
+                continue
+            result[(int(thread.name), int(stat[19]))] = int(stat[11]) + int(stat[12])
+    return result
+
+
+def affinity(task):
+    try:
+        return os.sched_getaffinity(task)
+    except (ProcessLookupError, PermissionError):
+        return set()
+
+
+def census():
+    cpus = os.sched_getaffinity(0)
+    interval = 0.5
+    before_ns = time.monotonic_ns()
+    before = tasks()
+    time.sleep(interval)
+    after_ns = time.monotonic_ns()
+    after = tasks()
+    seconds = (after_ns - before_ns) / 1_000_000_000
+    stats = overlap_busy(before, after, cpus, seconds, os.sysconf("SC_CLK_TCK"), affinity)
+    return {
+        **stats, "sampled_cpus": sorted(cpus), "sample_window_ns": after_ns - before_ns,
+        "largest_allowed_overlap_core_share": 0.20, "sum_allowed_overlap_core_share": 0.75,
+        "recorded_at_unix_ns": time.time_ns(),
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("output", type=Path)
+    args = parser.parse_args()
+    result = census()
+    with args.output.open("x") as stream:
+        stream.write(json.dumps(result, indent=2) + "\n")
+    print(json.dumps(result, indent=2))
+    return 0 if result["quiet"] else 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

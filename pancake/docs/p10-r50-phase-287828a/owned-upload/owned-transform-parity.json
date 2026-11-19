@@ -1,0 +1,25 @@
+{
+  "layout": "50 source-order affines, 2x3 row-major IEEE 754 little-endian binary32 per matrix family",
+  "arms": {
+    "sealed": {
+      "alignment_transforms": {
+        "matrix_count": 50,
+        "f32_le_sha256": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b"
+      },
+      "sequential_transforms": {
+        "matrix_count": 50,
+        "f32_le_sha256": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b"
+      }
+    },
+    "owned": {
+      "alignment_transforms": {
+        "matrix_count": 50,
+        "f32_le_sha256": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b"
+      },
+      "sequential_transforms": {
+        "matrix_count": 50,
+        "f32_le_sha256": "510dcebedcee928da7a9bf16f8e23b046a2b1d4b8582ed4643c6b3e12554711b"
+      }
+    }
+  }
+}

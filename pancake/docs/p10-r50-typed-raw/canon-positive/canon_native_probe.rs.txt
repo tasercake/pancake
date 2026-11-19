@@ -1,0 +1,82 @@
+//! Independently capture native Canon RAW working bits and source-grid RGB16 exports.
+
+use std::error::Error;
+use std::io::{BufWriter, Write as _};
+use std::path::{Path, PathBuf};
+use std::{env, fs};
+
+use cubecl as _;
+use glob as _;
+use image as _;
+use png as _;
+use rawler as _;
+use rayon as _;
+use same_file as _;
+use serde_json as _;
+use tempfile as _;
+use tiff as _;
+use wgpu as _;
+
+use pancake::config::BitDepth;
+use pancake::image_io::{SampleEncoding, decode, export};
+
+/// Decode each original in order and record its exact working raster and TIFF16.
+///
+/// # Errors
+///
+/// Returns an argument, decode, geometry, metadata, or export error.
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut args = env::args_os().skip(1).map(PathBuf::from);
+    let mode = args.next().ok_or("missing probe mode")?;
+    let output = args.next().ok_or("missing output directory")?;
+    let first = args.next().ok_or("missing first verified original")?;
+    let last = args.next().ok_or("missing last verified original")?;
+    if first == last || args.next().is_some() {
+        return Err("expected two distinct verified originals".into());
+    }
+    let save = if mode == Path::new("output") {
+        true
+    } else if mode == Path::new("observe") {
+        false
+    } else {
+        return Err("expected output or observe mode".into());
+    };
+    if save {
+        fs::create_dir(&output)?;
+    }
+    for (label, input) in [("first", first), ("last", last)] {
+        let frame = decode(&input)?;
+        if (frame.width(), frame.height(), frame.sample_encoding())
+            != (5088, 3392, SampleEncoding::U16)
+            || frame.icc_profile().is_some()
+            || frame.is_grayscale_array()
+            || frame.samples().len() != 51_775_488
+        {
+            return Err("unexpected developed RAW geometry, precision, or metadata".into());
+        }
+        writeln!(
+            std::io::stdout().lock(),
+            "{}\t{}\t{}\t{:?}\t{}",
+            label,
+            frame.width(),
+            frame.height(),
+            frame.sample_encoding(),
+            frame.samples().len()
+        )?;
+        if save {
+            let mut working = BufWriter::new(fs::File::create_new(
+                output.join(format!("{label}.rgbf32")),
+            )?);
+            working.write_all(bytemuck::cast_slice(frame.samples()))?;
+            working.flush()?;
+            export(
+                &output.join(format!("{label}.tiff")),
+                &frame,
+                BitDepth::Sixteen,
+                95,
+                &[input],
+            )?;
+        }
+    }
+    Ok(())
+}

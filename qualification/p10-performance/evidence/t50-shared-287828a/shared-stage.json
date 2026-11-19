@@ -1,0 +1,33 @@
+{
+  "materializer_worktree_commit": "0f5942a71592bf472c0bf18eee6ae7dfd79fa338",
+  "equivalent_product_commit": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "source_scope": "All product files under pancake/ outside docs and the target adapter match the product commit; the recipe tree matches prior qualified materialization.",
+  "materialization": "/tmp/pancake-worktrees.t3paqgWM/t50-shared-287828a/artifacts/p10-t50-shared-001/materialization.json",
+  "materialization_sha256": "62200bca0567ae06e2b6d3eba406aea259e601904c756b64ea7b245ede2625a4",
+  "frozen_receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+  "input_root": "/tmp/pancake-worktrees.t3paqgWM/t50-shared-287828a/artifacts/p10-t50-shared-001/inputs",
+  "focus_count": 50,
+  "truth_count": 2,
+  "verified_bytes": 2775174405,
+  "all_52_records_match_frozen": true,
+  "generation_seconds": 248.61149665992707,
+  "resource_policy": {
+    "cpu_affinity": [
+      2
+    ],
+    "nice": 12,
+    "io": "idle",
+    "thread_limits": 1,
+    "decode_buffer_bytes": 8388608,
+    "full_frame_buffers": 0,
+    "full_set_preflight_bytes": 3067213930,
+    "max_generated_bytes": 3067213930,
+    "maximum_decode_workers": 1,
+    "reserve_bytes": 16106127360
+  },
+  "started_at": "2026-11-18T18:38:08+08:00",
+  "finished_at": "2026-11-18T18:42:16+08:00",
+  "benchmark_jobs_started": 0,
+  "borrowing": "read-only shared stage; root controls timing leases",
+  "cleanup": "pending explicit release by all registered consumers"
+}

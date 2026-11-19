@@ -1,0 +1,83 @@
+{
+  "status": "completed_exact_identity",
+  "input_hashes_unchanged": true,
+  "release_identities": {
+    "serial": {
+      "commit": "287828aac07ffad2252785b73a52a59fc07b3409",
+      "executable": "/tmp/pancake-worktrees.t3paqgWM/tiff-row-workers/artifacts/tiff-row-workers/serial-287828a/pancake-cli",
+      "binary_sha256": "874c8683623131b5619858a9cba61cb6219bc2eae6d6bdb30ed1bc5d8634ce8e"
+    },
+    "rows": {
+      "commit": "e228c68472767f6ddd71a1de5e585f200685812e",
+      "executable": "/tmp/pancake-worktrees.t3paqgWM/tiff-row-workers/pancake/target/release/pancake-cli",
+      "binary_sha256": "5dfc816274c2f8651d503c7a1a7bdacc7ae3664e98d61d0c1d9d2f2964e28dbb"
+    }
+  },
+  "arms": {
+    "serial": {
+      "elapsed_ns": 55539127118,
+      "returncode": 0,
+      "observed_peak_rss_bytes": 1549021184,
+      "maximum_rss_sample_gap_ns": 10671785,
+      "observed_peak_gpu_bytes": 2518323200,
+      "maximum_gpu_sample_gap_ns": 93134472,
+      "peak_gpu_bytes": null,
+      "output": {
+        "shape": [
+          3998,
+          5998,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302",
+        "pixel_sha256": "f54746784bcc278da2df734e9f034053a3b54105ddb2a30046baf6dab07a80a3",
+        "bytes": 143881378,
+        "minimum": 7663,
+        "maximum": 57895
+      },
+      "completed_backend": {
+        "completed": true,
+        "actual_backend": "gpu",
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_pci_address": "0000:01:00.0",
+        "runtime": "wgpu-vulkan",
+        "physical_gpu": true,
+        "fallback_reason": null
+      },
+      "identity_transforms": 50
+    },
+    "rows": {
+      "elapsed_ns": 38517179521,
+      "returncode": 0,
+      "observed_peak_rss_bytes": 1549971456,
+      "maximum_rss_sample_gap_ns": 9876115,
+      "observed_peak_gpu_bytes": 2518323200,
+      "maximum_gpu_sample_gap_ns": 116455955,
+      "peak_gpu_bytes": null,
+      "output": {
+        "shape": [
+          3998,
+          5998,
+          3
+        ],
+        "dtype": "uint16",
+        "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302",
+        "pixel_sha256": "f54746784bcc278da2df734e9f034053a3b54105ddb2a30046baf6dab07a80a3",
+        "bytes": 143881378,
+        "minimum": 7663,
+        "maximum": 57895
+      },
+      "completed_backend": {
+        "completed": true,
+        "actual_backend": "gpu",
+        "device": "NVIDIA GeForce RTX 3090",
+        "device_pci_address": "0000:01:00.0",
+        "runtime": "wgpu-vulkan",
+        "physical_gpu": true,
+        "fallback_reason": null
+      },
+      "identity_transforms": 50
+    }
+  },
+  "wall_reduction_fraction": 0.30648568820382593
+}

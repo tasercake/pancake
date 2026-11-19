@@ -1,0 +1,110 @@
+/// Run only the preregistered fresh bidirectional edges on the shared CPU path.
+/// # Errors
+/// Returns input identity, geometry, runtime or output errors.
+fn main() -> Result<(), String> {
+    let arguments = std::env::args_os()
+        .skip(1)
+        .map(PathBuf::from)
+        .collect::<Vec<_>>();
+    let [
+        plan_flag,
+        plan_path,
+        acquisition_flag,
+        acquisition_path,
+        output_flag,
+        destination,
+    ] = arguments.as_slice()
+    else {
+        return Err("expected --plan PLAN --acquisition RECEIPT --output REPORT".to_owned());
+    };
+    if plan_flag != Path::new("--plan")
+        || acquisition_flag != Path::new("--acquisition")
+        || output_flag != Path::new("--output")
+    {
+        return Err("diagnostic argument order differs".to_owned());
+    }
+    let plan = read_json(plan_path)?;
+    let acquired = read_json(acquisition_path)?;
+    let rows = acquired["records"]
+        .as_array()
+        .ok_or("missing original records")?;
+    let expected = plan["minimal_probe"]["records"]
+        .as_array()
+        .ok_or("missing roster")?;
+    if rows.len() != 11 || expected.len() != 11 {
+        return Err("expected eleven original records".to_owned());
+    }
+    let device = cubecl::Device::cpu().map_err(|error| error.to_string())?;
+    let mut inputs = Vec::new();
+    for (row, known) in rows.iter().zip(expected) {
+        let path = Path::new(
+            row["acquired_path"]
+                .as_str()
+                .ok_or("missing original path")?,
+        );
+        let frozen = Path::new(
+            known["path"]
+                .as_str()
+                .ok_or("missing frozen original path")?,
+        );
+        if path.file_name() != frozen.file_name()
+            || row["sha256"] != known["sha256"]
+            || row["bytes"] != known["bytes"]
+        {
+            return Err("original record differs from plan".to_owned());
+        }
+        let input = prepare(&device, path)?;
+        if input.size != [2304, 1728] {
+            return Err("D150 native source dimensions disagree".to_owned());
+        }
+        inputs.push(input);
+    }
+    let mut estimates = Vec::new();
+    let edges = plan["comparison_roster"]
+        .as_array()
+        .ok_or("missing edge roster")?;
+    if edges.len() != 12 {
+        return Err("expected twelve comparison rows".to_owned());
+    }
+    for edge in edges
+        .iter()
+        .filter(|row| row["role"] == "fresh_bidirectional_fit")
+    {
+        let [before, after]: [String; 2] =
+            serde_json::from_value(edge["files"].clone()).map_err(|error| error.to_string())?;
+        let find = |name: &str| {
+            inputs
+                .iter()
+                .find(|input| input.name == name)
+                .ok_or("missing edge endpoint")
+        };
+        compare_both(
+            &device,
+            "fresh_bidirectional_fit",
+            find(&before)?,
+            find(&after)?,
+            &mut estimates,
+        )?;
+    }
+    if estimates.len() != 12 {
+        return Err("expected twelve directed estimates".to_owned());
+    }
+    let result = serde_json::json!({
+        "runtime": "cpu", "scale_factor": 6, "max_scale_step": 0.05, "max_precision": false,
+        "source_order": inputs.iter().map(|input| &input.name).collect::<Vec<_>>(), "estimates": estimates,
+    });
+    let output = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(destination)
+        .map_err(|error| error.to_string())?;
+    serde_json::to_writer_pretty(output, &result).map_err(|error| error.to_string())
+}
+
+/// Read a prepared, Python-authenticated manifest or acquisition record.
+/// # Errors
+/// Returns path, file or structured data errors.
+fn read_json(path: &Path) -> Result<Value, String> {
+    let file = std::fs::File::open(path).map_err(|error| error.to_string())?;
+    serde_json::from_reader(file).map_err(|error| error.to_string())
+}

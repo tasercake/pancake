@@ -1,0 +1,185 @@
+{
+  "calibrated_pngs_verified": 19,
+  "scenario_sha256": "57435714e073366e62f1c926ad1c078663fc98541475b6fd9c0288e87f181358",
+  "t50_materialization_sha256": "8e4742b2480e041ca95cceeb023627a4c3c69c27f618e3bc13c64874a75ff468",
+  "limits": {
+    "p95_max_ms": 33,
+    "minimum_events": 200,
+    "event_set": "source/result selection, pan, zoom and comparison drag on generated native24MP T50 or qualified real24MP image; exposure preview if exposed; label input kind",
+    "endpoint": "Native input dispatch timestamp to first presented correct image/state, not compute submission, callback return or screenshot call duration.",
+    "concurrent_load": "Measure both idle and during real numerical processing."
+  },
+  "ordered_conditions_actions_and_witnesses_equal": true,
+  "t50_ordered_unchanged_frames_per_arm": 50,
+  "arms": {
+    "a": {
+      "candidate": {
+        "commit": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+        "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+        "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+        "component": "gui",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-command-control/pancake/target/release/pancake-gui",
+        "binary_sha256": "eea214ed6c57477480b0f5897a12ae8b9c05a9595730dbfcedabfd15650f6f50",
+        "workspace_refresh_receipt_sha256": "2c6c6e484a8e7eef7e6d844b12014635cc70d3125e5c9e3edbf04316d19cd872",
+        "package_refresh_receipt_source": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+        "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-d6359e1/pancake_0.1.0_amd64.deb"
+      },
+      "start": "2026-11-18T18:03:38+08:00",
+      "end": "2026-11-18T18:08:17+08:00",
+      "raw_sha256": "5cda6f6492577a72758d3a525a6b8e795c1323b6366389ba766064eb534e49ce",
+      "native_actions_sha256": "a46a945673900b44801d8c4b715eedf7613d11068382b5792df965311578fd07",
+      "native_events_sha256": "cd71e1c778223de45dadf781cb6d5c2bef68d9d93e8f679b85810fa1bd242567",
+      "scored_capture_count": 400,
+      "loaded_worker_stages": {
+        "Decode": 120,
+        "Fuse": 80
+      },
+      "maximum_observation_gap_ns": 1205373,
+      "scored_counts": {
+        "idle/comparison": 40,
+        "idle/pan": 40,
+        "idle/result": 40,
+        "idle/source": 40,
+        "idle/zoom": 40,
+        "loaded/comparison": 40,
+        "loaded/pan": 40,
+        "loaded/result": 40,
+        "loaded/source": 40,
+        "loaded/zoom": 40
+      },
+      "presented_patches_verified": 1120,
+      "max_channel_error": 1,
+      "gpu": {
+        "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+        "pci.bus_id": "00000000:01:00.0",
+        "name": "NVIDIA GeForce RTX 3090",
+        "driver_version": "580.178.04",
+        "pstate": "P2",
+        "temperature.gpu": "69",
+        "power.draw": "125.50",
+        "power.limit": "350.00",
+        "clocks.gr": "1725",
+        "clocks.mem": "9501",
+        "build_runtime": "wgpu-vulkan",
+        "stack_completion_pci": "0000:01:00.0",
+        "graphics_residency_at_launch_bytes": 117088256,
+        "display_backend": "default automatic shared wgpu"
+      },
+      "viewer": {
+        "idle": {
+          "status": "fail",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 19317406,
+            "p50": 27612735.0,
+            "p95": 36322812,
+            "max": 667520422
+          },
+          "over_deadline": 33
+        },
+        "loaded": {
+          "status": "fail",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 19428710,
+            "p50": 29350900.0,
+            "p95": 42458978,
+            "max": 44582629
+          },
+          "over_deadline": 82
+        }
+      },
+      "capture_reducer_exit": 1
+    },
+    "b": {
+      "candidate": {
+        "commit": "6489af6ea4e9611d5ef26bbba6109dbf0fbe8947",
+        "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+        "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+        "component": "gui",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-input-cost/pancake/target/release/pancake-gui",
+        "binary_sha256": "ad97c445535aa822677f40afc59d48c21bf72cc9e9af7d521c9f2cf571296ac4",
+        "producer_build_command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--release",
+          "-p",
+          "pancake-gui"
+        ],
+        "producer_build_environment": {
+          "CARGO_BUILD_JOBS": "2",
+          "CARGO_INCREMENTAL": "0",
+          "RUSTC_WRAPPER": "/tmp/pancake-tools/bin/pancake-rust-cache"
+        },
+        "producer_log_sha256": "acd51de0c93043f0e6de183dc47c25845628ee6c9fee75ef4a2aa97540713b65"
+      },
+      "start": "2026-11-18T18:08:17+08:00",
+      "end": "2026-11-18T18:12:34+08:00",
+      "raw_sha256": "d3c3e9e54308e5e52bf189a612092aad4f1e74d952f3de5fcc58f695e53dce96",
+      "native_actions_sha256": "ea75a8dd227d2dd31e91ef75d210d796416a4044f469b0daae7bb691213bcbba",
+      "native_events_sha256": "cd71e1c778223de45dadf781cb6d5c2bef68d9d93e8f679b85810fa1bd242567",
+      "scored_capture_count": 400,
+      "loaded_worker_stages": {
+        "Decode": 142,
+        "Fuse": 58
+      },
+      "maximum_observation_gap_ns": 1838259,
+      "scored_counts": {
+        "idle/comparison": 40,
+        "idle/pan": 40,
+        "idle/result": 40,
+        "idle/source": 40,
+        "idle/zoom": 40,
+        "loaded/comparison": 40,
+        "loaded/pan": 40,
+        "loaded/result": 40,
+        "loaded/source": 40,
+        "loaded/zoom": 40
+      },
+      "presented_patches_verified": 1120,
+      "max_channel_error": 1,
+      "gpu": {
+        "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+        "pci.bus_id": "00000000:01:00.0",
+        "name": "NVIDIA GeForce RTX 3090",
+        "driver_version": "580.178.04",
+        "pstate": "P2",
+        "temperature.gpu": "69",
+        "power.draw": "125.58",
+        "power.limit": "350.00",
+        "clocks.gr": "1725",
+        "clocks.mem": "9501",
+        "build_runtime": "wgpu-vulkan",
+        "stack_completion_pci": "0000:01:00.0",
+        "graphics_residency_at_launch_bytes": 117088256,
+        "display_backend": "default automatic shared wgpu"
+      },
+      "viewer": {
+        "idle": {
+          "status": "pass",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 18439853,
+            "p50": 19714482.5,
+            "p95": 20792753,
+            "max": 659484056
+          },
+          "over_deadline": 1
+        },
+        "loaded": {
+          "status": "pass",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 18437040,
+            "p50": 20667681.0,
+            "p95": 23826663,
+            "max": 43319367
+          },
+          "over_deadline": 5
+        }
+      },
+      "capture_reducer_exit": 1
+    }
+  }
+}

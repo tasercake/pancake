@@ -1,0 +1,11 @@
+Source d6359e129737f1a9077fb4abc2a8f783fa1f7b38
+Locked command CARGO_INCREMENTAL=0 cargo build --locked --workspace --release --jobs 4
+
+The cold Cargo build completed in 4m29s and emitted both executable hashes.
+The shell wrapper returned 2 after its script file was changed while the
+command was running. Bash reported an unexpected EOF after the build output.
+The original Cargo pipeline output is retained as release-build-initial-launch.log.
+
+The unmodified command then returned 0 from the corrected wrapper in 0.28s.
+Both executable hash lines matched the cold build's output byte for byte.
+That replay is retained as release-build.log and is bound to package verification.

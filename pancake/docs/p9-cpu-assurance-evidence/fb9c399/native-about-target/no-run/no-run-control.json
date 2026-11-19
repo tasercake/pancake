@@ -1,0 +1,90 @@
+{
+  "integration_executable": {
+    "path": "/tmp/pancake-worktrees.t3paqgWM/native-about-proof-fb9c/pancake/target/llvm-cov-target/debug/build/pancake-gui/78f4f9edf0d6997b/out/cpu_gui_native-78f4f9edf0d6997b",
+    "sha256": "ff3acea05f46526687785b008e67f9daafae7c35fa345cf20609a301c20c4617",
+    "build_id": "98e588c8033455aa4bf2981505b11b976baa9d5b"
+  },
+  "cargo_bin_exe": {
+    "path": "/tmp/pancake-worktrees.t3paqgWM/native-about-proof-fb9c/pancake/target/llvm-cov-target/debug/pancake-gui",
+    "sha256": "9f9748cae5ee299b1cd7952ff83325d8e1163d9646f594e3475b1dfc17964e5e",
+    "build_id": "8a9b8561610a77487aa9cb1e254d838987411c08"
+  },
+  "gui_literal_in_integration_binary": true,
+  "gui_automatically_in_pinned_export": true,
+  "integration_in_export": true,
+  "ordinary_export_matches_all_per_file_counts": true,
+  "ordinary_export_matches_covered_and_denominator": true,
+  "same_authored_coordinates": true,
+  "baseline_totals": {
+    "branches": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "functions": {
+      "count": 756,
+      "covered": 476,
+      "percent": 62.96296296296296
+    },
+    "instantiations": {
+      "count": 1432,
+      "covered": 644,
+      "percent": 44.97206703910614
+    },
+    "lines": {
+      "count": 6475,
+      "covered": 4658,
+      "percent": 71.93822393822393
+    },
+    "mcdc": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "regions": {
+      "count": 7288,
+      "covered": 4776,
+      "notcovered": 2512,
+      "percent": 65.5323819978046
+    }
+  },
+  "control_totals": {
+    "branches": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "functions": {
+      "count": 756,
+      "covered": 476,
+      "percent": 62.96296296296296
+    },
+    "instantiations": {
+      "count": 1657,
+      "covered": 644,
+      "percent": 38.86541943270972
+    },
+    "lines": {
+      "count": 6475,
+      "covered": 4658,
+      "percent": 71.93822393822393
+    },
+    "mcdc": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "regions": {
+      "count": 7288,
+      "covered": 4776,
+      "notcovered": 2512,
+      "percent": 65.5323819978046
+    }
+  },
+  "cpu_profile_sha256": "026d901b7010d670ae17ce45c95ade5512f5aa5211b5eea8b984c15744410dbb",
+  "object_count": 24
+}

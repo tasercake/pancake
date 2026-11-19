@@ -1,0 +1,19 @@
+{
+  "pre_removal_hashes_match": true,
+  "exports": [
+    {
+      "role": "reference",
+      "path": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/weighted-cpu-pair-001/diagnostic-01/reference/complete.tif",
+      "bytes": 165542082,
+      "file_sha256": "550e72982e03844c4a5d40575ab3c8b89ea067e5f38d07d0f0736445484922c2",
+      "decoded_pixels_sha256": "dc4e21deab6381c662de86a89c4f58385ccbe2b54d51a22addcd50db1f4f6d34"
+    },
+    {
+      "role": "candidate",
+      "path": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/weighted-cpu-pair-001/diagnostic-01/candidate/complete.tif",
+      "bytes": 143881378,
+      "file_sha256": "60a45fe42e665b16d365406ab222c6f99538cd0284b2256799affa98daebf75a",
+      "decoded_pixels_sha256": "f8a00c590aa9b7b9d24071348a46897c43d2fa07a98ec9a6204ada9e1838b6a7"
+    }
+  ]
+}

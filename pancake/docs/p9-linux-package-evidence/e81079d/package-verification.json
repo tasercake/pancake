@@ -1,0 +1,83 @@
+{
+  "source_commit": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "release_build_log_sha256": "d32c64d5371da05fccd4db6b475b48c6680ebb380ae442d03bdb999e66ae9273",
+  "archive": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "8ed6e70d7552140c0257520a07ac2b9fc5f97ff82a5fb3126864df821df4507e",
+    "bytes": 69568056
+  },
+  "binaries": {
+    "pancake-cli": {
+      "sha256": "9630572be5e637c38c604f2fcd6d7a44e31e171a5ccf17dadb1f59ba345c24f0",
+      "bytes": 122319448
+    },
+    "pancake-gui": {
+      "sha256": "770ad910a8ac1f29a519504fd06dcd1051e593965813ce94665c986b57d16310",
+      "bytes": 156407072
+    }
+  },
+  "notice_inventory": {
+    "file": "usr/share/doc/pancake/dependency-notices/inventory.json",
+    "sha256": "96685c229d5afdae733b84f53e1f486ad07d2d38e0185331892766a24a0c1aaf",
+    "packages": 583,
+    "status_counts": {
+      "present": 556,
+      "no_notice_in_source": 27
+    },
+    "files": 1036
+  },
+  "vendored_oneshot": {
+    "name": "oneshot",
+    "version": "0.2.1",
+    "source": null,
+    "declared_license": "MIT OR Apache-2.0",
+    "declared_license_file": null,
+    "status": "present",
+    "provenance": {
+      "commit": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+      "directory": "pancake/vendor/oneshot-0.2.1",
+      "upstream_patch": {
+        "name": "oneshot",
+        "version": "0.2.1",
+        "directory": "oneshot-0.2.1",
+        "archive_url": "https://static.crates.io/crates/oneshot/oneshot-0.2.1.crate",
+        "archive_sha256": "cfe21416a02c693fb9f980befcb230ecc70b0b3d1cc4abf88b9675c4c1457f0c",
+        "modified_files": [
+          {
+            "path": "src/receiver.rs",
+            "original_sha256": "5beb04d077c4cfd29747739f80ef9a3a58135c08db573bd9c269044f8e579188",
+            "patched_sha256": "065a10346822ee15a039a68565ff22c8d14df56b1513060edf54dc4117ad6ce5"
+          }
+        ],
+        "upstream_repository": {
+          "git": {
+            "sha1": "83fd0864be7289067ce96cc79cd96c0928742979"
+          },
+          "path_in_vcs": ""
+        }
+      }
+    },
+    "notices": [
+      {
+        "file": "oneshot-0.2.1/LICENSE-APACHE",
+        "bytes": 9723,
+        "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+      },
+      {
+        "file": "oneshot-0.2.1/LICENSE-MIT",
+        "bytes": 1023,
+        "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      }
+    ]
+  },
+  "passed_checks": [
+    "APT local installation simulation",
+    "Debian rootless extraction",
+    "desktop-file-validate",
+    "resolved ldd for both executables",
+    "notice inventory and each included file digest",
+    "exact packaged CLI and GUI bytes staged at descriptor command paths",
+    "packaged CLI help"
+  ]
+}

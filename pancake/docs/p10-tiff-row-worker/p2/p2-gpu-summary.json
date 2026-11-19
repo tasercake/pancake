@@ -1,0 +1,13 @@
+{
+  "lane": "gpu",
+  "revision": "e228c68472767f6ddd71a1de5e585f200685812e",
+  "suite_source_sha256": "485eaae7724d8706e991c6067af7739e370ed57e9e0e15cf5d9d6f5c57804a2a",
+  "passed": 16,
+  "failed": 0,
+  "unsupported": 0,
+  "unrun": 0,
+  "events": {
+    "gpu": 16,
+    "cpu": 16
+  }
+}

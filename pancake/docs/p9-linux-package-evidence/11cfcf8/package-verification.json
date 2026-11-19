@@ -1,0 +1,113 @@
+{
+  "source_commit": "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "release_build_log_sha256": "0818d364211dbe5a9389351861150121d0425da86c14079da7be80828aaf5211",
+  "archive": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "74a764f99ba72be40f02e6b3b9faf3981f19e35f0b46e0231f665b1ccbe8c729",
+    "bytes": 69507550
+  },
+  "binaries": {
+    "pancake-cli": {
+      "sha256": "d54c4aaa135c9d2bef0fcbfcdefab82915038afa09af3f48fd067714f1188fdd",
+      "bytes": 122323792
+    },
+    "pancake-gui": {
+      "sha256": "8c6c62c711b5fe1225dea52f0b8a6f3fd5da7817f323b1778409b8309dbc3ea5",
+      "bytes": 156411400
+    }
+  },
+  "notice_inventory": {
+    "file": "usr/share/doc/pancake/dependency-notices/inventory.json",
+    "sha256": "c84ff5bd0403ec5ff290dc763f73e47b2b77acaa6554710493d32e8c85573778",
+    "packages": 583,
+    "status_counts": {
+      "present": 557,
+      "no_notice_in_source": 24,
+      "covered_by_shared_project_notice": 2
+    },
+    "files": 1037
+  },
+  "vendored_oneshot": {
+    "name": "oneshot",
+    "version": "0.2.1",
+    "source": null,
+    "declared_license": "MIT OR Apache-2.0",
+    "declared_license_file": null,
+    "status": "present",
+    "provenance": {
+      "commit": "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6",
+      "directory": "pancake/vendor/oneshot-0.2.1",
+      "upstream_patch": {
+        "name": "oneshot",
+        "version": "0.2.1",
+        "directory": "oneshot-0.2.1",
+        "archive_url": "https://static.crates.io/crates/oneshot/oneshot-0.2.1.crate",
+        "archive_sha256": "cfe21416a02c693fb9f980befcb230ecc70b0b3d1cc4abf88b9675c4c1457f0c",
+        "modified_files": [
+          {
+            "path": "src/receiver.rs",
+            "original_sha256": "5beb04d077c4cfd29747739f80ef9a3a58135c08db573bd9c269044f8e579188",
+            "patched_sha256": "065a10346822ee15a039a68565ff22c8d14df56b1513060edf54dc4117ad6ce5"
+          }
+        ],
+        "upstream_repository": {
+          "git": {
+            "sha1": "83fd0864be7289067ce96cc79cd96c0928742979"
+          },
+          "path_in_vcs": ""
+        }
+      }
+    },
+    "notices": [
+      {
+        "file": "oneshot-0.2.1/LICENSE-APACHE",
+        "bytes": 9723,
+        "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+      },
+      {
+        "file": "oneshot-0.2.1/LICENSE-MIT",
+        "bytes": 1023,
+        "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      }
+    ]
+  },
+  "project_license": {
+    "file": "pancake-0.1.0/LICENSE",
+    "bytes": 35149,
+    "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+  },
+  "native_llvm": {
+    "usr/share/doc/pancake/native-llvm/BLAKE3-LICENSE": {
+      "sha256": "6a94bedb8b707ed97f6e310d0d015ab14e0683ffa0a612b02958581b9cc9fc0e",
+      "bytes": 18691
+    },
+    "usr/share/doc/pancake/native-llvm/LICENSE.TXT": {
+      "sha256": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+      "bytes": 15141
+    },
+    "usr/share/doc/pancake/native-llvm/Support-NOTICE.TXT": {
+      "sha256": "54cbc326a78b9400065bfc5830a57fdcdaf808286d4ac35d8a9e324aa77b7241",
+      "bytes": 303
+    },
+    "usr/share/doc/pancake/native-llvm/manifest.json": {
+      "sha256": "412776888a33bd9c83aa515ba114e92033defc6b282a6ed550c59ef78a655ce1",
+      "bytes": 1403
+    },
+    "usr/share/doc/pancake/native-llvm/build-provenance.json": {
+      "sha256": "99e9efc4c07362719c3d99f3910c44b3f5fe0f88ad0b4cfebc87ec9eb08564ce",
+      "bytes": 18774
+    }
+  },
+  "native_llvm_build_provenance_sha256": "99e9efc4c07362719c3d99f3910c44b3f5fe0f88ad0b4cfebc87ec9eb08564ce",
+  "passed_checks": [
+    "APT local installation simulation",
+    "Debian rootless extraction",
+    "desktop-file-validate",
+    "resolved ldd for both executables",
+    "notice inventory and each included file digest",
+    "exact packaged CLI and GUI bytes staged at descriptor command paths",
+    "packaged CLI help",
+    "shared Pancake GPL notice and archived five-file native LLVM notice and provenance inventory"
+  ]
+}

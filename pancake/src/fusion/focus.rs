@@ -4,6 +4,8 @@ use std::fmt;
 
 use cubecl::{prelude::*, std::tensor::TensorHandle};
 
+use crate::registration::ResidentRgb;
+
 use super::buffers::{ImageShape, elementwise, empty, read_image, upload};
 
 /// Focus algorithms with streaming, constant-frame-count memory requirements.
@@ -106,13 +108,36 @@ impl FocusAccumulator {
     /// Returns a sample validation or runtime error. A failed runtime
     /// submission invalidates the accumulator.
     pub fn add_frame(&mut self, samples: &[f32]) -> Result<(), String> {
-        self.shape.validate(samples)?;
+        self.add_normalized_frame(samples, None)
+    }
+
+    /// Use validated host samples or the current frame's existing registration input.
+    ///
+    /// # Errors
+    /// Returns a sample, layout, device ownership, or runtime completion error.
+    pub(crate) fn add_normalized_frame(
+        &mut self,
+        samples: &[f32],
+        resident: Option<ResidentRgb>,
+    ) -> Result<(), String> {
+        if resident.is_none() {
+            self.shape.validate(samples)?;
+        }
         let previous = self.state.as_mut().map_err(|error| error.clone())?;
         let first = previous.is_none();
+        // Reject incompatible input before allocating the state that marks the first frame.
+        let resident = resident
+            .map(|input| {
+                let client = previous
+                    .as_ref()
+                    .map_or_else(|| self.device.client(), |state| state.client.clone());
+                input.into_tensor(&client, self.shape.width, self.shape.height)
+            })
+            .transpose()?;
         let state = previous.get_or_insert_with(|| {
             FocusState::new(self.device.client(), self.shape, self.kernel_size | 1)
         });
-        let frame = upload(&state.client, samples);
+        let frame = resident.unwrap_or_else(|| upload(&state.client, samples));
         if let Err(error) = state.process(self.shape, &frame, self.method, self.kernel_size, first)
         {
             self.state = Err(error.clone());

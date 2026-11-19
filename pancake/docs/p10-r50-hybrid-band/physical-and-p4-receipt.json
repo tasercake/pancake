@@ -1,0 +1,53 @@
+{
+  "stock_source": "b820da05d3982a7912cb7c7c9d8aa926ece14a9c",
+  "candidate_source": "903836ca831ba1e92b7d4f006836320dd8cbe402",
+  "candidate_product_commit": "3d2782e8e30a66cef1b5248d62ff6f8042c30736",
+  "candidate_cli_sha256": "c4cf0e5f9ed65e4fd3b91835b27b28d1ff12e518d9dee57fb70f3cb3ed0fc6f6",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "locked_release_command": "taskset -c 12,13 cargo +1.100.0 build --offline --locked --release -p pancake-cli",
+  "physical_vulkan": {
+    "actual_backend": "gpu",
+    "runtime": "wgpu-vulkan",
+    "device": "NVIDIA GeForce RTX 3090",
+    "device_pci_address": "0000:01:00.0",
+    "device_fingerprint": "spirv_4318_8708",
+    "physical_gpu": true,
+    "fallback_reason": null
+  },
+  "gpu_uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+  "driver": "580.178.04",
+  "driver_hashes": {
+    "stock": "83d8a054525a54d73aab7042347fdb48794a9348af848e845f0ca4db0ec196a6",
+    "candidate": "2c4cc4377e9a88fed9333a45e66eddd62e6d1bece80d8fc8d574615c0ca92c89"
+  },
+  "f32_comparison": {
+    "cases": 18,
+    "samples": 235962,
+    "max_absolute": 0.0,
+    "identical": true,
+    "both_output_sha256": "697aec036d9827b6c2bd46d8330f06950db2026574009e9042420b7e0530b212"
+  },
+  "gpu_advanced_fusion": "1 passed on physical Vulkan",
+  "p4": {
+    "selected": 69,
+    "counts": {
+      "passed": 69,
+      "failed": 0,
+      "unsupported": 0
+    },
+    "source": "903836ca831ba1e92b7d4f006836320dd8cbe402",
+    "physical_completion": {
+      "actual_backend": "gpu",
+      "runtime": "wgpu-vulkan",
+      "device": "NVIDIA GeForce RTX 3090",
+      "device_pci_address": "0000:01:00.0",
+      "device_fingerprint": "spirv_4318_8708",
+      "physical_gpu": true,
+      "fallback_reason": null
+    }
+  },
+  "p4_started_local": "2026-11-18T20:05:30+08:00",
+  "p4_finished_local": "2026-11-18T20:05:58+08:00",
+  "p4_exit": 0,
+  "measurement_scope": "Functional verification. This run supplies no P10 timing or peak-memory evidence."
+}

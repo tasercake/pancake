@@ -1,0 +1,61 @@
+{
+  "scope": "only the nine SHA-256 verified files from the owned downloaded E9 stage and saved source-rights HTML",
+  "authority": "owner cleanup after all borrowers returned and root explicitly confirmed last use",
+  "cleanup_time": "2026-11-19T11:46:56.397978+08:00",
+  "removed_input_root": "/tmp/pancake-worktrees.t3paqgWM/e9-cuda-integrated-replay/artifacts/e9-cuda-integrated-replay/input-stage/input",
+  "removed_original_frame_count": 9,
+  "removed_original_frame_bytes": 1625492,
+  "ordered_removed_frame_hashes": [
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0163.png",
+      "sha256": "65bef59ae2cffaac5a0401780c884fc1f0cb87c3fb6ba7057213bbb03b775f9d",
+      "bytes": 112938
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0164.png",
+      "sha256": "37094f4247a7e5cac3af1876137f42c88263ace0d075d99daec7b1e796e33ad0",
+      "bytes": 133941
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0165.png",
+      "sha256": "8582dc34b2035c4daafc5784a9f7191a6aff3161a7fd54b4d493c45145d6a8e6",
+      "bytes": 154601
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0166.png",
+      "sha256": "5fc9ade7715c0110ec5b4d18777ce2718c2f70946fa23833222b98b425b2ca7c",
+      "bytes": 175787
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0167.png",
+      "sha256": "530a91ac82e4406acc23913088efb0ab0d056e686345088e41f60e4fc6176f60",
+      "bytes": 191648
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0168.png",
+      "sha256": "5c7ed4b5bba42b52c93eeaaf462b1531717d1abd43938445a1e6bea9c19c1ae3",
+      "bytes": 211350
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0169.png",
+      "sha256": "4f26850b1aee4fe40ab0f060fc24568f54e637d9b5158b74c4a99a865c991e35",
+      "bytes": 228010
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0170.png",
+      "sha256": "e20b37e52a492042647c15edb5e9f45990e5bd585f38d1fc14282e95752597da",
+      "bytes": 214462
+    },
+    {
+      "path": "datasets/.bokehforge/work/D28/MEFDatabase-02939e5eb63d/MEFDatabase/source image sequences/Balloons_Erik Reinhard/DSC_0171.png",
+      "sha256": "029ae94dfcc2d105a2ee2f91e5d535820c00e9e73c6b4bdf7b0ba690df670c32",
+      "bytes": 202755
+    }
+  ],
+  "remaining_original_frame_count": 0,
+  "removed_staged_rights_sha256": "cb7197b53835fc5d0f002e74e22548a36f275d60188ae874591aed678558be1f",
+  "removed_staged_rights_bytes": 5185,
+  "acquisition_manifest_sha256": "1cf097899bd0d88ed5c7a11632e5a4de215ac7977efbf2bbe4d7fb3d3cede6ac",
+  "reproducer_sha256": "8cf5ebe9fe3b94a0e8dbd2ae6f9046a153f18eca2d111b2b5a084d9c453085c6",
+  "authorized_unrelated_checkouts_or_corpora_modified": false
+}

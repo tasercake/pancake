@@ -1,0 +1,50 @@
+{
+  "scenario": {
+    "Mutant": {
+      "name": "src/registration/kernels.rs:309:26: replace * with / in pearson",
+      "package": "pancake",
+      "file": "src/registration/kernels.rs",
+      "function": {
+        "function_name": "pearson",
+        "return_type": "-> f32",
+        "span": {
+          "start": {
+            "line": 288,
+            "column": 1
+          },
+          "end": {
+            "line": 314,
+            "column": 2
+          }
+        }
+      },
+      "span": {
+        "start": {
+          "line": 309,
+          "column": 26
+        },
+        "end": {
+          "line": 309,
+          "column": 27
+        }
+      },
+      "replacement": "/",
+      "genre": "BinaryOperator"
+    }
+  },
+  "summary": "MissedMutant",
+  "log_path": "log/src__registration__kernels.rs_line_309_col_26.log",
+  "diff_path": "diff/src__registration__kernels.rs_line_309_col_26.diff",
+  "phase_results": [
+    {
+      "phase": "Build",
+      "duration": 23.127907256,
+      "process_status": "Success"
+    },
+    {
+      "phase": "Test",
+      "duration": 6.825265647,
+      "process_status": "Success"
+    }
+  ]
+}

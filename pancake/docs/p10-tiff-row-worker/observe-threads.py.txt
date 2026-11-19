@@ -1,0 +1,30 @@
+"""Sample named live workers in an actual release decode under specified affinity."""
+from pathlib import Path
+import json
+import subprocess
+import sys
+import time
+
+probe, cpus, mode, image = sys.argv[1:]
+launch=['taskset','-c',cpus,probe,mode,image]
+process=subprocess.Popen(launch, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+pid=Path('/proc')/str(process.pid)
+max_workers=0
+observations=0
+while process.poll() is None:
+    rows=list((pid/'task').glob('*/comm'))
+    masks=[]
+    for row in rows:
+        try:
+            masks.append(row.read_text().strip())
+        except FileNotFoundError:
+            pass
+    max_workers=max(max_workers,masks.count('pancake-tiff'))
+    observations+=1
+    time.sleep(0.002)
+stdout,stderr=process.communicate()
+print(json.dumps({'affinity':cpus,'mode':mode,'command':launch,
+                  'exit_status':process.returncode,
+                  'max_active_extra_tiff_workers':max_workers,
+                  'observations':observations,'stdout':stdout,'stderr':stderr}))
+sys.exit(process.returncode)

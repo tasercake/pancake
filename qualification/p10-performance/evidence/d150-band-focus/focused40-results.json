@@ -1,0 +1,154 @@
+{
+  "stock": {
+    "map_sha256": "b5b862bf0ffa3b9a630373082f606ad8a8912d8d71e642d1b667a7928f58133a",
+    "source_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+    "slice": [
+      36,
+      76
+    ],
+    "type": "fixed-input single slab diagnostic",
+    "regions": [
+      {
+        "first_canvas_xywh": [
+          670,
+          675,
+          96,
+          96
+        ],
+        "witness": "P9160589_d2.jpg",
+        "source_p90": 0.027893482871748088,
+        "luma_laplacian_absolute_p90": 0.04660082856488901,
+        "signed_projection_on_source": 0.30888820200829037,
+        "signed_phase_correlation": 0.1820795119972064
+      },
+      {
+        "first_canvas_xywh": [
+          1505,
+          1045,
+          96,
+          96
+        ],
+        "witness": "P9160566_d2.jpg",
+        "source_p90": 0.03087029983978018,
+        "luma_laplacian_absolute_p90": 0.052345069047074144,
+        "signed_projection_on_source": 0.23739285504653046,
+        "signed_phase_correlation": 0.1384802501027296
+      }
+    ],
+    "output_sha256": "c0df2617a85686ce550e50464bf152c090a274f15ac6d26ee7d9376e2f2a795f"
+  },
+  "rank-only": {
+    "map_sha256": "b5b862bf0ffa3b9a630373082f606ad8a8912d8d71e642d1b667a7928f58133a",
+    "source_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+    "slice": [
+      36,
+      76
+    ],
+    "type": "fixed-input single slab diagnostic",
+    "regions": [
+      {
+        "first_canvas_xywh": [
+          670,
+          675,
+          96,
+          96
+        ],
+        "witness": "P9160589_d2.jpg",
+        "source_p90": 0.027893482871748088,
+        "luma_laplacian_absolute_p90": 0.04732956130312038,
+        "signed_projection_on_source": 0.31445693044210843,
+        "signed_phase_correlation": 0.18180834745273794
+      },
+      {
+        "first_canvas_xywh": [
+          1505,
+          1045,
+          96,
+          96
+        ],
+        "witness": "P9160566_d2.jpg",
+        "source_p90": 0.03087029983978018,
+        "luma_laplacian_absolute_p90": 0.053344374761577606,
+        "signed_projection_on_source": 0.24497825598982093,
+        "signed_phase_correlation": 0.1399712314102879
+      }
+    ],
+    "output_sha256": "3aedc7d5d43f5cb1afef79ecc20dbe5dcf1843c18281ed203f331209df4be1cd"
+  },
+  "pinned-reference": {
+    "map_sha256": "b5b862bf0ffa3b9a630373082f606ad8a8912d8d71e642d1b667a7928f58133a",
+    "source_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+    "slice": [
+      36,
+      76
+    ],
+    "type": "fixed-input single slab diagnostic",
+    "regions": [
+      {
+        "first_canvas_xywh": [
+          670,
+          675,
+          96,
+          96
+        ],
+        "witness": "P9160589_d2.jpg",
+        "source_p90": 0.027893482871748088,
+        "luma_laplacian_absolute_p90": 0.0587709346150912,
+        "signed_projection_on_source": 0.3921576857728745,
+        "signed_phase_correlation": 0.1850350704338439
+      },
+      {
+        "first_canvas_xywh": [
+          1505,
+          1045,
+          96,
+          96
+        ],
+        "witness": "P9160566_d2.jpg",
+        "source_p90": 0.03087029983978018,
+        "luma_laplacian_absolute_p90": 0.06530626840619513,
+        "signed_projection_on_source": 0.2985398114169743,
+        "signed_phase_correlation": 0.13985742665352496
+      }
+    ],
+    "output_sha256": "833bc41a64c170275d84c60b898317a661bc2d8ba122edf7aef786b602ffef45"
+  },
+  "band-local": {
+    "map_sha256": "b5b862bf0ffa3b9a630373082f606ad8a8912d8d71e642d1b667a7928f58133a",
+    "source_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+    "slice": [
+      36,
+      76
+    ],
+    "type": "fixed-input single slab diagnostic",
+    "regions": [
+      {
+        "first_canvas_xywh": [
+          670,
+          675,
+          96,
+          96
+        ],
+        "witness": "P9160589_d2.jpg",
+        "source_p90": 0.027893482871748088,
+        "luma_laplacian_absolute_p90": 0.04855289692530729,
+        "signed_projection_on_source": 0.30029880681289767,
+        "signed_phase_correlation": 0.17037171226353848
+      },
+      {
+        "first_canvas_xywh": [
+          1505,
+          1045,
+          96,
+          96
+        ],
+        "witness": "P9160566_d2.jpg",
+        "source_p90": 0.03087029983978018,
+        "luma_laplacian_absolute_p90": 0.05276362401770052,
+        "signed_projection_on_source": 0.1893788410064351,
+        "signed_phase_correlation": 0.10967534748162129
+      }
+    ],
+    "output_sha256": "a11187afe65f8712d66e8d974c8d66b4a1b3e974e5c25798fccb193d920f613c"
+  }
+}

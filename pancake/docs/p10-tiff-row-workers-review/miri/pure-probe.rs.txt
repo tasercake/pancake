@@ -1,0 +1,67 @@
+//! Exercise the exact tracked tiled decoder on independent valid legacy fixtures.
+use std::error::Error;
+use std::fs::{self, File};
+use std::io::{Read, Seek};
+use std::path::Path;
+
+use tiff::decoder::{Decoder, DecodingResult};
+
+mod tiled;
+
+#[derive(Debug)]
+enum SampleEncoding { Float, U16 }
+
+#[derive(Debug)]
+struct RgbImage {
+    width: usize,
+    height: usize,
+    samples: Vec<f32>,
+    sample_encoding: SampleEncoding,
+    icc_profile: Option<Vec<u8>>,
+}
+
+impl RgbImage {
+    fn new(width: usize, height: usize, samples: Vec<f32>) -> Result<Self, String> {
+        let count = checked_pixel_count(width, height)?;
+        if samples.len() != count * 3 || samples.iter().any(|value| !value.is_finite()) {
+            return Err("invalid finite RGB shape".to_owned());
+        }
+        Ok(Self { width, height, samples, sample_encoding: SampleEncoding::Float, icc_profile: None })
+    }
+}
+
+use tiff::tags::{Tag, Type, ValueBuffer};
+const MAX_AXIS: u32 = 32_768;
+const MAX_PIXELS: usize = 50_000_000;
+
+fn profile_from_tiff<R: Read + Seek>(decoder: Decoder<R>) -> Option<Vec<u8>> {
+    let mut limits = tiff::decoder::Limits::default();
+    // The pinned byte-buffer reader charges tag storage against the decoder's data cap.
+    limits.decoding_buffer_size = limits.ifd_value_size;
+    let mut decoder = decoder.with_limits(limits);
+    let mut payload = ValueBuffer::empty(Type::UNDEFINED);
+    let found = decoder
+        .image_ifd()
+        .find_tag_buf(Tag::IccProfile, &mut payload)
+        .ok()
+        .flatten()
+        .is_some();
+    (found && matches!(payload.data_type(), Type::BYTE | Type::UNDEFINED))
+        .then(|| payload.as_bytes().to_vec())
+}
+
+fn checked_pixel_count(width: usize, height: usize) -> Result<usize, String> {
+    let pixels = width
+        .checked_mul(height)
+        .ok_or_else(|| "image area overflowed".to_owned())?;
+    let axis_limit = usize::try_from(MAX_AXIS).map_err(|error| error.to_string())?;
+    if width > axis_limit || height > axis_limit || pixels > MAX_PIXELS {
+        return Err(format!(
+            "dimensions {width}×{height} exceed the image limit of {MAX_PIXELS} pixels and {MAX_AXIS} per axis"
+        ));
+    }
+    if pixels == 0 {
+        return Err("image dimensions must be nonzero".to_owned());
+    }
+    Ok(pixels)
+}

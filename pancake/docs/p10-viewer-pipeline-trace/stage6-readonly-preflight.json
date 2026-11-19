@@ -1,0 +1,10 @@
+{
+  "owner_stage_sha256": "1d9be3f1cd20a01083b11c10c4d17ab75a4f3b6bb7e2ebef682824e345ba649d",
+  "frozen_receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+  "ordered_focus_frames": 50,
+  "truth_files": 2,
+  "size_checks": 52,
+  "sha256_rows_match_frozen": true,
+  "tiff_body_bytes_read_for_this_preflight": 0,
+  "native_collector_rehashes_focus_frames_at_entry_and_exit": true
+}

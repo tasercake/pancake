@@ -1,0 +1,1 @@
+/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/pancake/target/release/pancake-cli: OK

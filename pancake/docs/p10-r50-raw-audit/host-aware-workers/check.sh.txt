@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Focused release tests and lint for the exact image I/O code.
+set -euo pipefail
+repo=$(git rev-parse --show-toplevel)
+proof="$repo/artifacts/r50-workers"
+cd "$repo/pancake"
+export CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 RUSTC_WRAPPER=/tmp/pancake-tools/bin/pancake-rust-cache
+cargo fmt --all -- --check
+python3 scripts/miri_host_policy.py "$PWD" validate
+mkdir -p target/dependency-policy
+cargo metadata --offline --locked --format-version 1 --all-features >target/dependency-policy/metadata.json
+python3 scripts/dependency_policy.py \
+  --config deny.toml --ledger dependency-policy.json \
+  --metadata target/dependency-policy/metadata.json \
+  --effective-config target/dependency-policy/deny-effective.toml \
+  --license-inventory target/dependency-policy/licenses.json \
+  --clippy-config clippy.toml \
+  --effective-clippy-dir target/dependency-policy/clippy
+set +e
+CLIPPY_CONF_DIR="$PWD/target/dependency-policy/clippy" \
+  cargo clippy --offline --locked --release -p pancake --lib --test cpu_image_io -- -D warnings >"$proof/clippy.log" 2>&1
+clippy_status=$?
+printf '%d\n' "$clippy_status" >"$proof/clippy.status"
+cargo test --offline --locked --release -p pancake --lib --test cpu_image_io >"$proof/test.log" 2>&1
+test_status=$?
+printf '%d\n' "$test_status" >"$proof/test.status"
+set -e
+test "$clippy_status" = 0 && test "$test_status" = 0

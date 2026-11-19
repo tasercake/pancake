@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# Reproduce the exact previously survived panorama mutation with the new CPU oracle.
+set -euo pipefail
+stage=${1:?Supply prepare or run}
+out=$(realpath -m -- "${2:?Supply a fresh evidence directory}")
+repo=$(git rev-parse --show-toplevel)
+cd "$repo/pancake"
+source=26548131bd44d798816ebcfa7690d4eee03501eb
+[[ $stage == prepare || $stage == run ]]
+[[ $(git rev-parse HEAD) == "$source" && -z $(git status --porcelain=v1 --untracked-files=all) ]]
+export PATH="/tmp/pancake-tools/bin:$PATH"
+export CARGO_NET_OFFLINE=true CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0
+export RUSTC_WRAPPER=/tmp/pancake-tools/bin/pancake-rust-cache
+export CARGO_TARGET_DIR="$repo/pancake/target/panorama-mutation-2654813"
+unset DISPLAY WAYLAND_DISPLAY DBUS_SESSION_BUS_ADDRESS AT_SPI_BUS_ADDRESS
+unset PANCAKE_RUNTIME PANCAKE_TEST_GPU_RUNTIME CONFORMANCE_EVENTS_PATH
+[[ $(cargo mutants --version) == 'cargo-mutants 27.1.0' ]]
+[[ $(rustc --version) == 'rustc 1.100.0 (0ef1bc386 2026-11-09)' ]]
+taskset -pc "$$" | grep -Eq 'affinity list: 20[-,]21$'
+mkdir -- "$out"
+{
+    git rev-parse HEAD
+    taskset -pc "$$"
+    sha256sum Cargo.lock src/registration/estimate.rs tests/cpu_registration_contract.rs "$(command -v cargo-mutants)"
+    rustc -Vv
+    cargo -V
+    cargo mutants --version
+    uname -srmo
+} >"$out/provenance.txt"
+git status --porcelain=v1 --untracked-files=all >"$out/source-status-before.txt"
+cargo metadata --locked --no-deps --format-version 1 >"$out/metadata.json"
+python3 scripts/assurance_targets.py "$out/metadata.json" cpu >"$out/cpu-targets.txt"
+selectors=(--lib --bins)
+while IFS= read -r target; do selectors+=(--test "$target"); done <"$out/cpu-targets.txt"
+mutation=(cargo mutants --workspace --test-workspace false --cargo-arg=--workspace
+    --cap-lints true --all-features --in-place --timeout 60 --build-timeout 180 --jobserver-tasks 2
+    --no-shuffle --file src/registration/estimate.rs
+    --re '^src/registration/estimate\.rs:162:36: replace / with \* in prepare_thumbnail$')
+test_args=(--locked "${selectors[@]}" -- --include-ignored)
+"${mutation[@]}" --list --json -- "${test_args[@]}" >"$out/list.json"
+printf '%s  %s\n' \
+    f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc Cargo.lock \
+    eb759d5846c7136c7e3aab680a6bd9253a81b1ef0d4488007d05e56ed08c3ab6 src/registration/estimate.rs \
+    f985f265ee3ea3e453aa98b04c52134953911f692f8ce8abf137f3873202a2d0 "$(command -v cargo-mutants)" \
+    d1180f38b292c12c077049872a7c8ce68a7517a643fcaecd71b07acdc7878f9e "$out/cpu-targets.txt" \
+    a13eca449f2bf549ab27ee15300e12e9895af260efbc3fe330138b7a07dfb9f6 "$out/list.json" | sha256sum -c
+if [[ $stage == prepare ]]; then exit 0; fi
+argv=("${mutation[@]}" --output "$out" -- "${test_args[@]}")
+printf '%q ' "${argv[@]}" >"$out/run.argv"
+printf '\n' >>"$out/run.argv"
+date --iso-8601=seconds >"$out/start.txt"
+set +e
+/usr/bin/time -v -o "$out/run.time" "${argv[@]}" 2>&1 | tee "$out/terminal.log"
+status=("${PIPESTATUS[@]}")
+set -e
+printf '%s\n' "${status[0]}" >"$out/native-exit.status"
+printf '%s\n' "${status[1]}" >"$out/log-writer.status"
+date --iso-8601=seconds >"$out/end.txt"
+git status --porcelain=v1 --untracked-files=all >"$out/source-status-after.txt"
+test ! -s "$out/source-status-after.txt"
+[[ "$(git rev-parse HEAD)" == "$source" && "${status[1]}" == 0 ]]
+if [[ "${status[0]}" != 0 ]]; then exit "${status[0]}"; fi
+cp -- "$out/mutants.out/outcomes.json" "$out/outcomes.json"
+python3 - "$out" "$PWD/scripts" <<'PY' >"$out/scope-receipt.json"
+import json
+from pathlib import Path
+import re
+import sys
+
+out, scripts = map(Path, sys.argv[1:])
+sys.path.insert(0, str(scripts))
+from verify_mutation_shards import verify_shards
+
+native = out / "mutants.out"
+listing = out / "list.json"
+assert json.loads(listing.read_bytes()) == json.loads((native / "mutants.json").read_bytes())
+counts = verify_shards(listing, [out])
+assert counts == {"caught": 1, "unviable": 0}
+report = json.loads((out / "outcomes.json").read_bytes())
+baseline, variant = report["outcomes"]
+assert baseline["scenario"] == "Baseline"
+assert variant["summary"] == "CaughtMutant"
+assert [phase["phase"] for phase in baseline["phase_results"]] == ["Build", "Test"]
+assert [phase["phase"] for phase in variant["phase_results"]] == ["Build", "Test"]
+test_targets = [value for line in (out / "cpu-targets.txt").read_text().splitlines()
+                for value in ("--test", line)]
+test_argv_suffix = ["--locked", "--lib", "--bins", *test_targets, "--", "--include-ignored"]
+for row in (baseline, variant):
+    for phase in row["phase_results"]:
+        argv = phase["argv"]
+        assert argv.count("--workspace") == 1 and "--all-features" in argv
+        if phase["phase"] == "Test":
+            assert argv[-len(test_argv_suffix):] == test_argv_suffix
+baseline_log = (native / baseline["log_path"]).read_text()
+variant_log = (native / variant["log_path"]).read_text()
+test = "cpu_panorama_thumbnail_respects_proxy_budget"
+assert f"test {test} ... ok" in baseline_log
+assert f"test {test} ... FAILED" in variant_log
+assert "the bounded panorama proxy must fit 4246496 bytes: kernel working-data budget exceeded" in variant_log
+counts_per_target = re.findall(r"test result: ok\. (\d+) passed;", baseline_log)
+print(json.dumps({"actual_native_exit": 0, "baseline_passed": sum(map(int, counts_per_target)),
+                  "baseline_targets": len(counts_per_target), "mutant": variant["scenario"]["Mutant"]["name"],
+                  "specific_test": test, "baseline_test_outcome": "passed",
+                  "mutant_test_outcome": "failed with budget diagnostic", "counts": counts}, indent=2))
+PY

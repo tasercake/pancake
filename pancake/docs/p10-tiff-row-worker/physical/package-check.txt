@@ -1,0 +1,1 @@
+/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-287828a/pancake_0.1.0_amd64.deb: OK

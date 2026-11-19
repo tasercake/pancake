@@ -1,0 +1,65 @@
+{
+  "tested_source": "ad81502d1e9b92c3a0d9a188691e76f12a673db3",
+  "previous_native_shard": "287828a, 255/256, e464093 retained archive",
+  "selected_cases": {
+    "reveal": {
+      "name": "crates/pancake-gui/src/desktop_menu.rs:9:5: replace reveal -> Result<(), String> with Ok(())",
+      "native_diff_sha256": "a3a5b280c9101afc9ba4bfa656854fe8fe90eb156503aefd66b41f237c4b03ea",
+      "process_exit": 0,
+      "native_verdict": "CaughtMutant",
+      "mutated_test_process_exit": 101,
+      "intended_failing_test": "desktop_menu::tests::reveal_reports_a_missing_source",
+      "observed_diagnostic": "Revealing a missing source reported success.",
+      "baseline_cpu_tests_passed": 144,
+      "baseline_executable_targets": 19,
+      "baseline_gui_tests_passed": 18,
+      "baseline_log_sha256": "18abd7fd32edb16038e6de3c71bf199dc16c8611fdcd50f2b9e4230c373a8158",
+      "mutated_log_sha256": "66424bf6e6f28751f8e41718198679c8711b8b07e901c28a5f07836344a02a40",
+      "start": "2026-11-18T19:43:48+08:00",
+      "end": "2026-11-18T19:47:01+08:00"
+    },
+    "build": {
+      "name": "crates/pancake-gui/src/panel/linux.rs:65:5: replace build -> Result<(Dialog, FileChooserWidget, Entry), String> with Ok((Default::default(), Default::default(), Default::default()))",
+      "native_diff_sha256": "3227dd666662868a1cc86e592fa8ccfe73c01df69b5a5e138b8d9ce7de0cef8d",
+      "process_exit": 0,
+      "native_verdict": "CaughtMutant",
+      "mutated_test_process_exit": 101,
+      "intended_failing_test": "panel::linux::tests::unavailable_display_rejects_native_panel",
+      "observed_diagnostic": "GTK has not been initialized. Call `gtk::init` first.",
+      "baseline_cpu_tests_passed": 144,
+      "baseline_executable_targets": 19,
+      "baseline_gui_tests_passed": 18,
+      "baseline_log_sha256": "02600d5f977b45ff6fb8e3781bbc81bbeaed9a8336a8da7db00051e3979de9cf",
+      "mutated_log_sha256": "84ac8215a78b9bb5ea8ad845ca17d2da3023399f628499c0adbc73e4ca427bcf",
+      "start": "2026-11-18T19:47:01+08:00",
+      "end": "2026-11-18T19:47:20+08:00"
+    }
+  },
+  "cargo_mutants": "27.1.0",
+  "working_cpu_indices": [
+    0,
+    1
+  ],
+  "max_cargo_jobs": 2,
+  "cpu_integration_targets": [
+    "cpu_advanced_fusion",
+    "cpu_array_layout",
+    "cpu_cli",
+    "cpu_config",
+    "cpu_fusion_contract",
+    "cpu_gray_array_export",
+    "cpu_image_export",
+    "cpu_image_io",
+    "cpu_job",
+    "cpu_kernel_contract",
+    "cpu_npy",
+    "cpu_numerical_contract",
+    "cpu_registration_contract",
+    "cpu_runtime_contract",
+    "cpu_runtime_options",
+    "cpu_stack_plan"
+  ],
+  "clippy_exit": 0,
+  "source_and_dependency_policy_sha256": "99195c5de56e0157778eb3f723a27fd14dd2f15f2cb59baff77560e3876aecc1",
+  "raw_archive_sha256": "7b6d9554e883453caf896e997aef11962a839a205c4c20db82f856121bf3da3c"
+}

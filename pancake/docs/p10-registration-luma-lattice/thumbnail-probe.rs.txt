@@ -1,0 +1,57 @@
+//! Bounded two-path CPU diagnostic for the public registration thumbnail.
+
+use std::{env, fmt::Write as _, fs::File, hint::black_box, io::Write as _, time::Instant};
+
+use pancake::registration::{Frame, thumbnail};
+
+use bytemuck as _;
+use glob as _;
+use image as _;
+use png as _;
+use rawler as _;
+use rayon as _;
+use same_file as _;
+use serde_json as _;
+use tempfile as _;
+use tiff as _;
+use wgpu as _;
+
+/// Observe completed thumbnail creation against the two exact budget routes.
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    const WIDTH: usize = 384;
+    const HEIGHT: usize = 256;
+    const SAMPLES: u32 = 384 * 256 * 3;
+    const DIRECT: usize = (2 * 384 * 256 * 3 + 4 * 384 * 256 + 32) * 4;
+    let output = env::args_os()
+        .nth(1)
+        .ok_or("need a fresh CSV output path")?;
+    let source = (0..SAMPLES)
+        .map(|index| u16::try_from(index.wrapping_mul(257) % 65521))
+        .map(|value| value.map(|value| f32::from(value) / 65535.0))
+        .collect::<Result<Vec<_>, _>>()?;
+    let frame = Frame::new(WIDTH, HEIGHT, &source)?;
+    let device = cubecl::Device::cpu()?;
+    let mut report = String::from("round,route,budget_bytes,elapsed_ns\n");
+    for round in 0_u8..=12 {
+        let direct = ("direct", DIRECT);
+        let lattice = ("lattice", 8_388_608);
+        let arms = if round.is_multiple_of(2) {
+            [direct, lattice]
+        } else {
+            [lattice, direct]
+        };
+        for (name, budget) in arms {
+            let start = Instant::now();
+            let proxy = thumbnail(&device, black_box(frame), WIDTH, HEIGHT, budget)?;
+            let elapsed = start.elapsed().as_nanos();
+            drop(black_box(proxy));
+            writeln!(&mut report, "{round},{name},{budget},{elapsed}")?;
+        }
+    }
+    File::options()
+        .create_new(true)
+        .write(true)
+        .open(output)?
+        .write_all(report.as_bytes())?;
+    Ok(())
+}

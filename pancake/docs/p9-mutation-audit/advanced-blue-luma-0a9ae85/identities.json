@@ -1,0 +1,39 @@
+{
+  "base": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "test_revision": "1efc01a98de399572065ec0f0c31e577a90ef671",
+  "rust": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "platform": "Linux x86_64 6.8.0-147-generic",
+  "cpu": "AMD Ryzen 9 7950X3D",
+  "cpu_affinity": [
+    4,
+    5
+  ],
+  "cargo_jobs": 2,
+  "offline": true,
+  "compiler_wrappers_unset": true,
+  "status": {
+    "red": 101,
+    "green": 0,
+    "fmt": 0,
+    "source-policy": 0,
+    "dependency-policy": 0,
+    "clippy": 0
+  },
+  "stock_native_tests": {
+    "lib": 23,
+    "cpu_advanced_fusion": 5
+  },
+  "original_saved_diff_sha256": "529f05debae02dd93584195fe72f986cd1220a1e95b8519a3613bbd6c3db47b6",
+  "files_sha256": {
+    "README.md": "8b5c9e2ec16f588853c69c5e95a5a77b0a450fadb8138f6b9534a3e4cf6ba206",
+    "clippy.log.gz": "497797540df183fb8490b3393fab1c9d74e7a6313a423301b55336a51b6f2b74",
+    "green-inputs.sha256": "22e85c3d36f316a0919558c8d55536c28acd8aee28e5a331a6d5ad6ddc4e557c",
+    "green.log.gz": "a1eecd941e00fbd5da82e1d421f6c00ae7bedeb841cd5479610f419cc0984953",
+    "patch.log": "c37351659e32642a512bf757bd9b81164a8865ee93b17285e6b21fbff9fa75cd",
+    "red-inputs.sha256": "3ce357fb5d7b292ff20cded6c0e9ebc776e89f3d91c0684a8b90e2bb8ef405ce",
+    "red.log.gz": "6cdefb1e4840be2bbb8bbd296cfbfb22474a5571940291279d95bf2f3501f1d5",
+    "saved.diff.gz": "718486266995f5b9a83b637cb019fef29c4dbbe9b2f25b1366d1c0b618d33631",
+    "shard-outcome.json": "f14664f1a704e304f22797053536eb221b61d31b1abef13259b6f296fe3f806d",
+    "source-policy.log": "22e88bc8b11b052e64c7b4e1949a769853e31e3c521989d95067ff79b8b43b14"
+  }
+}

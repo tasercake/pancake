@@ -1,0 +1,16 @@
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+Linux krishna-desktop 6.8.0-147-generic #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+Architecture:                            x86_64
+CPU(s):                                  32
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+CPU(s) scaling MHz:                      52%
+base_commit=b820da05d3982a7912cb7c7c9d8aa926ece14a9c
+red_commit=2e2e7c26e8a843e85dae1cf3af0e2ef31c05f1df
+candidate_commit=7e29d6e5685f07c46a140e1185f9ec165fba269b
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  pancake/Cargo.lock

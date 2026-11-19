@@ -1,0 +1,51 @@
+{
+  "production_baseline": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "test_only_revision": "66271ed022b118988b6d9c9efc3e737f2c790d8b",
+  "stock_geometry_sha256": "6bbfc0ef0ee0b028f63cadcd6ab85183a9da2f370da2cf6ad9260793e27f3893",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "rust": "1.100.0",
+  "runtime_target": "cpu_registration_contract",
+  "cpu_affinity": [
+    8,
+    9
+  ],
+  "cargo_jobs": 2,
+  "locked": true,
+  "offline": true,
+  "compiler_wrappers_disabled": true,
+  "mutant_replays": [
+    {
+      "leg": "inverse",
+      "exit_code": 101,
+      "observed": "signed shear inverse did not recover coordinates",
+      "log": "inverse.log",
+      "original_mutant": "src/registration/geometry.rs:76:17: delete - in Affine::inverse",
+      "original_outcome": "MissedMutant",
+      "original_diff_sha256": "57e49debb2d580346bf0e45fae48cad1a10395577eca5ef15d379d4acb23ecf4"
+    },
+    {
+      "leg": "stock-after-inverse",
+      "exit_code": 0,
+      "observed": "5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out",
+      "log": "stock-after-inverse.log"
+    },
+    {
+      "leg": "crop",
+      "exit_code": 101,
+      "observed": "got Bounds { x: 3, y: 1, extent: Extent { width: 14, height: 8 } }",
+      "log": "crop.log",
+      "original_mutant": "src/registration/geometry.rs:265:41: replace - with / in symmetric_crop",
+      "original_outcome": "MissedMutant",
+      "original_diff_sha256": "b9752f19a9210106e2e97d7349d4bb4827e714343bf966025a891f3da7540f60"
+    },
+    {
+      "leg": "stock-after-crop",
+      "exit_code": 0,
+      "observed": "5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out",
+      "log": "stock-after-crop.log"
+    }
+  ],
+  "format_exit": 0,
+  "private_target_removed": true,
+  "capture_archive_sha256": "f5319604b3fd0c3e07121bbc373cd834c4ae307d754dfa2fd9290affb427ee71"
+}

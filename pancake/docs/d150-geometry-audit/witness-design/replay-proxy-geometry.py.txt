@@ -1,0 +1,85 @@
+"""Reproject archived native D150 holdouts to the actual scale-6 proxy grid."""
+
+from collections import Counter
+import gzip
+import hashlib
+import json
+import math
+from pathlib import Path
+import runpy
+import statistics
+
+
+ARCHIVE = Path(__file__).resolve().parent.parent / "motion-admission"
+
+
+def digest(payload):
+    return hashlib.sha256(payload).hexdigest()
+
+
+def into_proxy(matrix):
+    # Native x = 6 * proxy x + 2.5, including the same half-pixel convention as the product.
+    return [[a, b, (2.5 * (a + b - 1) + offset) / 6] for a, b, offset in matrix]
+
+
+def point_proxy(point):
+    return [(value - 2.5) / 6 for value in point]
+
+
+def replay(matrix, input_matches, definitions):
+    proxy = into_proxy(matrix)
+    apply = definitions["apply"]
+    native_error = statistics.median(math.dist(apply(matrix, row["query"]), row["match"])
+                                     for row in input_matches)
+    proxy_error = statistics.median(math.dist(apply(proxy, point_proxy(row["query"])), point_proxy(row["match"]))
+                                    for row in input_matches)
+    assert abs(proxy_error - native_error / 6) < 1e-9
+    return {"native_median_px": native_error, "proxy_median_px": proxy_error}
+
+
+def cells(holds):
+    counts = Counter((int(x / 768), int(y / 576)) for x, y in (row["query"] for row in holds))
+    return [{"row": y, "column": x, "count": count} for (x, y), count in sorted(counts.items())]
+
+
+def main():
+    definitions = runpy.run_path(str(ARCHIVE / "audit.py.txt"))
+    cleanup = json.loads((ARCHIVE / "cleanup.json").read_bytes())
+    observed = gzip.decompress((ARCHIVE / "estimates.json.gz").read_bytes())
+    bilateral = gzip.decompress((ARCHIVE / "bilateral.json.gz").read_bytes())
+    assert digest(observed) == cleanup["estimates_sha256"]
+    assert digest(bilateral) == cleanup["bilateral_sha256"]
+    product = json.loads(observed)
+    holds = json.loads(bilateral)
+    assert holds["product_trace_sha256"] == digest(observed)
+    assert product["first_canvas"] == [2304, 1728] and product["scale_factor"] == 6
+    anchor = product["source_order"][0]
+    estimates = {(row["reference"], row["source"]): row for row in product["estimates"] if row["role"] == "anchor"}
+    convert = definitions["inverse"]
+    relative = definitions["relative"]
+    report = []
+    for row in holds["comparisons"]:
+        before, after = row["before"], row["after"]
+        forward_before = estimates[(anchor, before)]["transform"]
+        forward_after = estimates[(anchor, after)]["transform"]
+        backward_before = estimates[(before, anchor)]["transform"]
+        backward_after = estimates[(after, anchor)]["transform"]
+        assert row["status"] == "witnesses_available"
+        maps = {"direct_history": relative(forward_before, forward_after),
+                "within_reverse_history": relative(convert(backward_before), convert(backward_after)),
+                "one_frame_absolute_switch": relative(forward_before, convert(backward_after)),
+                "no_step": definitions["IDENTITY"]}
+        outcomes = {}
+        for name, matrix in maps.items():
+            outcomes[name] = {"forward": replay(matrix, row["holds"]["forward"], definitions),
+                              "reverse": replay(convert(matrix), row["holds"]["reverse"], definitions),
+                              "native_max_canvas_step_px": definitions["change"](matrix)}
+        report.append({"interval": [before, after], "heldout": [len(row["holds"][key]) for key in ("forward", "reverse")],
+                       "query_cells": {key: cells(value) for key, value in row["holds"].items()}, "outcomes": outcomes})
+    print(json.dumps({"scope": "Coordinate-only replay of existing geometry. No luma proxy pixels were evaluated.",
+                      "source_trace_sha256": digest(observed), "bilateral_trace_sha256": digest(bilateral),
+                      "canvas": [2304, 1728], "proxy": [384, 288], "comparisons": report}, indent=2, allow_nan=False))
+
+
+if __name__ == "__main__":
+    main()

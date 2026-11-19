@@ -1,0 +1,172 @@
+{
+  "scope": "raw input and archived first-frame maps only, no test render, no reference output",
+  "grid": [
+    [
+      670,
+      345,
+      96,
+      96
+    ],
+    [
+      880,
+      345,
+      96,
+      96
+    ],
+    [
+      1505,
+      345,
+      96,
+      96
+    ],
+    [
+      1735,
+      345,
+      96,
+      96
+    ],
+    [
+      670,
+      675,
+      96,
+      96
+    ],
+    [
+      880,
+      675,
+      96,
+      96
+    ],
+    [
+      1505,
+      675,
+      96,
+      96
+    ],
+    [
+      1735,
+      675,
+      96,
+      96
+    ],
+    [
+      670,
+      1045,
+      96,
+      96
+    ],
+    [
+      880,
+      1045,
+      96,
+      96
+    ],
+    [
+      1505,
+      1045,
+      96,
+      96
+    ],
+    [
+      1735,
+      1045,
+      96,
+      96
+    ]
+  ],
+  "source_count": 150,
+  "selection": [
+    {
+      "first_canvas_xywh": [
+        670,
+        675,
+        96,
+        96
+      ],
+      "adjacent_indices": [
+        69,
+        70
+      ],
+      "adjacent_files": [
+        "P9160585_d2.jpg",
+        "P9160586_d2.jpg"
+      ],
+      "detail_p90": [
+        0.03132995345998313,
+        0.03050558480201404
+      ],
+      "signed_phase_correlation": 0.6423338062636834,
+      "support": 0.019594768398177254,
+      "witness_index": 69
+    },
+    {
+      "first_canvas_xywh": [
+        670,
+        1045,
+        96,
+        96
+      ],
+      "adjacent_indices": [
+        83,
+        84
+      ],
+      "adjacent_files": [
+        "P9160599_d2.jpg",
+        "P9160600_d2.jpg"
+      ],
+      "detail_p90": [
+        0.026731625848783303,
+        0.02620936293583609
+      ],
+      "signed_phase_correlation": 0.4719021673419029,
+      "support": 0.012368255174071589,
+      "witness_index": 83
+    },
+    {
+      "first_canvas_xywh": [
+        1505,
+        345,
+        96,
+        96
+      ],
+      "adjacent_indices": [
+        29,
+        30
+      ],
+      "adjacent_files": [
+        "P9160545_d2.jpg",
+        "P9160546_d2.jpg"
+      ],
+      "detail_p90": [
+        0.024363137254902245,
+        0.024378823529411675
+      ],
+      "signed_phase_correlation": 0.462352510284297,
+      "support": 0.01126435766820493,
+      "witness_index": 30
+    },
+    {
+      "first_canvas_xywh": [
+        1505,
+        1045,
+        96,
+        96
+      ],
+      "adjacent_indices": [
+        47,
+        48
+      ],
+      "adjacent_files": [
+        "P9160563_d2.jpg",
+        "P9160564_d2.jpg"
+      ],
+      "detail_p90": [
+        0.026318431372548967,
+        0.02603843137254902
+      ],
+      "signed_phase_correlation": 0.4537805584763766,
+      "support": 0.0118157339300841,
+      "witness_index": 47
+    }
+  ]
+}

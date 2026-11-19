@@ -1,0 +1,7 @@
+From pancake/ in a clean 870f7f9 checkout, apply native.diff as saved by cargo-mutants with zero fuzz. The paired script restores it before the green run and verifies both source hashes.
+
+patch --force --fuzz=0 --no-backup-if-mismatch src/registration/estimate.rs < native.diff
+
+taskset -c 10,11 nice -n 5 env -u DISPLAY -u WAYLAND_DISPLAY -u WAYLAND_SOCKET -u DBUS_SESSION_BUS_ADDRESS -u DBUS_STARTER_ADDRESS -u AT_SPI_BUS_ADDRESS -u LLVM_PROFILE_FILE -u RUSTC_WRAPPER -u RUSTC_WORKSPACE_WRAPPER -u CARGO_BUILD_RUSTC_WRAPPER PATH="/tmp/pancake-tools/bin:$PATH" CARGO_BUILD_JOBS=2 CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0 CARGO_NET_OFFLINE=true bash /tmp/pancake-near-equal-peak-replay/run-pair.sh
+
+Copy the accompanying run-pair.sh.txt and source-hash file to the allocated scratch directory along with the original saved diff decompressed from native.diff.gz, or substitute an owned scratch path in the exact command and script.

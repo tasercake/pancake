@@ -1,0 +1,155 @@
+"""Verify the package receipt, archived calibration and presented PNGs after capture."""
+
+import hashlib
+import json
+import statistics
+import sys
+from collections import Counter, defaultdict
+from pathlib import Path
+
+import numpy as np
+from PIL import Image
+
+
+def read_json(path):
+    return json.loads(path.read_text())
+
+
+def sha256(path):
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def rgb(path):
+    with Image.open(path) as image:
+        assert image.mode == "RGB"
+        return np.asarray(image, dtype=np.int16)
+
+
+def verify(root, targets):
+    capture = root / "capture"
+    calibration = root / "calibration"
+    evidence = read_json(root / "preflight.json")
+    original = calibration / "scenario.json"
+    bound = calibration / "scenario-package.json"
+    assert sha256(original) == evidence["original_scenario_sha256"]
+    assert sha256(bound) == evidence["bound_scenario_sha256"]
+    planned = read_json(original)
+    build = read_json(root / "build.json")
+    assert build == evidence["build"]
+    for key in ("commit", "binary_sha256"):
+        planned["physical_wgpu"][key] = build[key]
+    assert planned == read_json(bound)
+    witness_hashes = {
+        path.name: sha256(path) for path in calibration.glob("*-witness.png")
+    }
+    assert witness_hashes == evidence["original_witness_sha256"]
+    witnesses = {name: rgb(calibration / name) for name in witness_hashes}
+    assert sha256(root / "t50-materialization.json") == evidence["t50_materialization_sha256"]
+
+    raw_path = capture / "native-latency.json"
+    raw = read_json(raw_path)
+    assert raw["candidate"] == build
+    assert raw["status"] == "captured" and raw["inputs_unchanged"]
+    assert raw["performance_targets_sha256"] == sha256(targets)
+    assert raw["scenario_sha256"] == sha256(bound)
+    assert raw["workload"] == "T50" and len(raw["ordered_inputs"]) == 50
+    assert raw["size"] == [1440, 1000] and not raw["lifecycle"]
+    assert read_json(capture / "shutdown.json")["status"] == "clean"
+    assert (root / "collector.exit").read_text().strip() == "0"
+    gpu = raw["physical_wgpu_run"]
+    assert gpu["gpu_uuid"] == evidence["physical_gpu_uuid_required"]
+    assert gpu["process_gpu_residency_at_visible_launch_bytes"] > 0
+    completed = gpu["stack_completions"]
+    events = [json.loads(line) for line in (capture / "events.jsonl").read_text().splitlines()]
+    assert completed and completed == [event for event in events if event["event"] == "stack_complete"]
+    for event in completed:
+        assert event["physical_gpu"] and event["completed"] and event["actual_backend"] == "gpu"
+        assert event["runtime"] == "wgpu-vulkan" and event["device_pci_address"] == "0000:01:00.0"
+        assert not event.get("fallback_reason") and len(event["alignment_transforms"]) == 50
+
+    samples = dict(zip(
+        (index for index, step in enumerate(planned["steps"]) if step["kind"] == "viewer"),
+        raw["viewer"],
+        strict=True,
+    ))
+    counts = Counter()
+    loaded_stages = Counter()
+    latencies = defaultdict(list)
+    patch_count = max_error = max_gap = 0
+    for step, event in samples.items():
+        expected = planned["steps"][step]
+        assert event["valid"] and event["step"] == step
+        assert all(event[key] == expected[key] for key in ("condition", "action", "input"))
+        condition, action = event["condition"], event["action"]
+        counts[f"{condition}/{action}"] += 1
+        if condition == "loaded":
+            phase_before, stage_before, _ = event["worker_before"].split(" · ")
+            phase_after, stage_after, _ = event["worker_after"].split(" · ")
+            assert phase_before == phase_after == "Running"
+            assert stage_before in {"Decode", "Register", "Fuse"}
+            assert stage_after in {"Decode", "Register", "Fuse"}
+            loaded_stages[stage_before] += 1
+        max_gap = max(max_gap, event["maximum_observation_gap_ns"])
+        elapsed = event["presented_ns"] - event["dispatched_ns"]
+        assert event["dispatched_ns"] > 0 and elapsed >= 0
+        latencies[condition].append(elapsed)
+
+        for key in ("before", "after"):
+            for observed, planned_witness in zip(event[f"expected_{key}"], expected[key], strict=True):
+                assert all(observed[k] == value for k, value in planned_witness.items())
+                assert observed["sha256"] == witness_hashes[observed["png"]]
+        for observed, target in zip(event["actual_after"], event["expected_after"], strict=True):
+            retained_path = Path(observed["path"])
+            assert retained_path.parent.name == f"event-{step:04d}"
+            patch_path = capture / retained_path.parent.name / retained_path.name
+            assert sha256(patch_path) == observed["sha256"]
+            pixels, truth = rgb(patch_path), witnesses[target["png"]]
+            assert pixels.shape == truth.shape
+            assert pixels.shape[:2] == tuple(reversed(target["size"]))
+            error = int(np.max(np.abs(pixels - truth)))
+            assert error == observed["max_channel_error"] <= target["max_channel_error"] == 2
+            max_error = max(max_error, error)
+            patch_count += 1
+    assert counts == evidence["scores"]
+
+    reduction = read_json(root / "frozen-reduction.json")
+    gate = read_json(targets)["targets"]["viewer_event_to_present"]
+    limit = round(gate["p95_max_ms"] * 1_000_000)
+    for condition, changes in latencies.items():
+        changes.sort()
+        count = len(changes)
+        assert count == gate["minimum_events"]
+        p95 = changes[(count * 95 + 99) // 100 - 1]
+        verdict = reduction["viewer"][condition]
+        assert verdict["input_to_present_ns"] == {
+            "count": count, "min": changes[0], "max": changes[-1],
+            "p50": statistics.median(changes), "p95": p95,
+        }
+        assert verdict["status"] == ("pass" if p95 <= limit else "fail")
+        verdict["over_deadline"] = sum(elapsed > limit for elapsed in changes)
+    return {
+        "candidate": build,
+        "start": (root / "start").read_text().strip(),
+        "end": (root / "end").read_text().strip(),
+        "viewer": reduction["viewer"],
+        "scores": dict(sorted(counts.items())),
+        "calibrated_pngs_verified": len(witnesses),
+        "presented_pngs_verified": patch_count,
+        "maximum_rgb_channel_error": max_error,
+        "maximum_observation_gap_ns": max_gap,
+        "loaded_worker_stages": dict(sorted(loaded_stages.items())),
+        "ordered_unchanged_t50_frames": len(raw["ordered_inputs"]),
+        "t50_materialization_sha256": evidence["t50_materialization_sha256"],
+        "hardware": {"cpu": raw["hardware"]["cpu"], "gpu": raw["hardware"]["gpu"]},
+        "physical_gpu_completion_count": len(completed),
+        "gpu_residency_at_visible_launch_bytes": gpu["process_gpu_residency_at_visible_launch_bytes"],
+        "collector_exit": int((root / "collector.exit").read_text()),
+        "reducer_exit": int((root / "reducer.exit").read_text()),
+        "raw_sha256": sha256(raw_path),
+    }
+
+
+if __name__ == "__main__":
+    capture_root, gate_path = map(Path, sys.argv[1:])
+    print(json.dumps(verify(capture_root, gate_path), indent=2))

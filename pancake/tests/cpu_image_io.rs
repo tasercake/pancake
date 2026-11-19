@@ -19,6 +19,27 @@ const OVERSIZED_PNG: [u8; 33] = [
     0, 0, 0xe3, 0xe6, 0xa7, 0xb4,
 ];
 
+/// An 8192×8192 RGB8 PNG envelope with correct CRCs and one compressed pixel.
+const EXCESS_AREA_PNG: [u8; 69] = [
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+    0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x20, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0xfd, 0xc8, 0x5d,
+    0x0e, 0x00, 0x00, 0x00, 0x0c, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x60, 0x60, 0x60, 0x00,
+    0x00, 0x00, 0x04, 0x00, 0x01, 0xf6, 0x17, 0x38, 0x55, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e,
+    0x44, 0xae, 0x42, 0x60, 0x82,
+];
+
+/// Little-endian RGB16 tiles with horizontal predictor, DEFLATE and a known ICC profile.
+const TILED_RGB16: &[u8] = include_bytes!("data/tiled-rgb16-zip.tif");
+
+/// Independently encoded RGB16 tiles using the historical DEFLATE compression tag.
+const TILED_RGB16_OLD_DEFLATE: &[u8] = include_bytes!("data/tiled-rgb16-old-deflate.tif");
+
+/// The same encoded sample codes with big-endian storage and EXIF orientation 6.
+const TILED_RGB16_ROTATED: &[u8] = include_bytes!("data/tiled-rgb16-zip-rotated.tif");
+
+/// A profiled DEFLATE frame large enough for the production row-worker route.
+const TILED_RGB16_WORKER_BANDS: &[u8] = include_bytes!("data/tiled-rgb16-worker-bands.tif");
+
 /// Check actual test behavior without panicking in a fallible test.
 ///
 /// # Errors
@@ -32,6 +53,156 @@ fn require(condition: bool, diagnostic: &str) -> TestResult {
     }
 }
 
+/// Check every normalized 16-bit sample, partial edge tile and unchanged ICC payload.
+///
+/// # Errors
+///
+/// Returns a file, image decoding or raster and metadata mismatch error.
+#[test]
+fn tiled_tiff_keeps_rgb16_edge_pixels_and_orientation() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let mut big_endian = TILED_RGB16_ROTATED.to_vec();
+    // The Orientation entry contains an inline big-endian SHORT at byte 78.
+    big_endian
+        .get_mut(78..80)
+        .ok_or_else(|| io::Error::other("fixture orientation is missing"))?
+        .copy_from_slice(&1_u16.to_be_bytes());
+    for (bytes, rotated, width, height) in [
+        (TILED_RGB16, false, 257_usize, 259_usize),
+        (TILED_RGB16_OLD_DEFLATE, false, 257, 259),
+        (big_endian.as_slice(), false, 257, 259),
+        (TILED_RGB16_ROTATED, true, 259, 257),
+    ] {
+        let path = directory.path().join("profiled-tiles.tif");
+        fs::write(&path, bytes)?;
+        let frame = decode(&path)?;
+        require(
+            (frame.width(), frame.height()) == (width, height),
+            "TIFF bounds and orientation changed",
+        )?;
+        require(
+            frame.icc_profile() == Some(include_bytes!("data/srgb.png.icc").as_slice()),
+            "the source ICC profile changed",
+        )?;
+        require(
+            frame.sample_encoding() == SampleEncoding::U16,
+            "tiled RGB16 source precision changed",
+        )?;
+        let (pixels, remainder) = frame.samples().as_chunks::<3>();
+        require(remainder.is_empty(), "decoded an incomplete RGB triple")?;
+        for (output_index, pixel) in pixels.iter().enumerate() {
+            let x = output_index
+                .checked_rem(width)
+                .ok_or_else(|| io::Error::other("missing TIFF fixture width"))?;
+            let y = output_index
+                .checked_div(width)
+                .ok_or_else(|| io::Error::other("missing TIFF fixture width"))?;
+            let source_row = if rotated {
+                258_usize.checked_sub(x)
+            } else {
+                Some(y)
+            };
+            let source_column = if rotated { y } else { x };
+            let code = source_row
+                .and_then(|row| row.checked_mul(257))
+                .and_then(|row_start| row_start.checked_add(source_column))
+                .and_then(|source_index| source_index.checked_mul(3))
+                .ok_or_else(|| io::Error::other("invalid TIFF fixture pixel location"))?;
+            for (sample, delta) in pixel.iter().zip([0, 1, 2]) {
+                let code = code
+                    .checked_add(delta)
+                    .and_then(|value| u16::try_from(value % 65_536).ok())
+                    .ok_or_else(|| io::Error::other("invalid TIFF fixture code"))?;
+                if sample.to_bits() != (f32::from(code) / 65_535.0).to_bits() {
+                    return Err(io::Error::other(format!(
+                        "pixel {output_index} channel {delta} changed source code {code}"
+                    ))
+                    .into());
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Segments claiming one byte or reaching past EOF must fail whole-frame decode.
+///
+/// # Errors
+///
+/// Returns a fixture mutation error or an error if a malformed tile was accepted.
+#[test]
+fn tiled_tiff_rejects_invalid_compressed_spans() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    // Classic little-endian IFD with first TileOffset at 264 and TileByteCount at 364.
+    for (field, bytes, name) in [
+        (364..368, 0_u32.to_le_bytes(), "zero-count.tif"),
+        (364..368, 1_u32.to_le_bytes(), "short-count.tif"),
+        (264..268, u32::MAX.to_le_bytes(), "past-eof.tif"),
+        (364..368, 65_536_u32.to_le_bytes(), "range-overflow.tif"),
+    ] {
+        let path = directory.path().join(name);
+        let mut mutated = TILED_RGB16.to_vec();
+        mutated
+            .get_mut(field)
+            .ok_or_else(|| io::Error::other("tile directory field is missing"))?
+            .copy_from_slice(&bytes);
+        fs::write(&path, mutated)?;
+        let error = decode(&path).err().ok_or_else(|| {
+            io::Error::other(format!("malformed {name} supplied a complete frame"))
+        })?;
+        require(error.contains(name) && error.contains("tile"), &error)?;
+    }
+    Ok(())
+}
+
+/// Whole-frame imports preserve RGB and ICC and report corruption in the last tile row.
+///
+/// # Errors
+///
+/// Returns file, ICC, sample precision, or accepted corruption errors.
+#[test]
+fn large_tiled_tiff_preserves_profile_and_reports_later_tile_failure() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let valid = directory.path().join("many-tile-rows.tif");
+    fs::write(&valid, TILED_RGB16_WORKER_BANDS)?;
+    let frame = decode(&valid)?;
+    require(
+        (frame.width(), frame.height(), frame.samples().len()) == (1025, 1027, 3_158_025),
+        "tiled row output changed the RGB dimensions",
+    )?;
+    require(
+        frame.sample_encoding() == SampleEncoding::U16,
+        "tiled row output changed the source sample width",
+    )?;
+    require(
+        frame.icc_profile() == Some(include_bytes!("data/srgb.png.icc").as_slice()),
+        "tiled row output lost the original ICC profile",
+    )?;
+    for (index, value) in frame.samples().iter().enumerate() {
+        let code = u16::try_from(index % 65_536)?;
+        require(
+            value.to_bits() == (f32::from(code) / 65_535.0).to_bits(),
+            "tiled row output changed an encoded sample",
+        )?;
+    }
+
+    let mut corrupt = TILED_RGB16_WORKER_BANDS.to_vec();
+    // The final LONG in the TileByteCounts array describes tile 288.
+    corrupt
+        .get_mut(2560..2564)
+        .ok_or_else(|| io::Error::other("missing the last TIFF tile count"))?
+        .copy_from_slice(&1_u32.to_le_bytes());
+    let path = directory.path().join("short-last-tile.tif");
+    fs::write(&path, corrupt)?;
+    let diagnostic = decode(&path)
+        .err()
+        .ok_or_else(|| io::Error::other("a short tile produced a complete frame"))?;
+    require(
+        diagnostic.contains("short-last-tile.tif") && diagnostic.contains("TIFF tile 288"),
+        &diagnostic,
+    )
+}
+
 /// Corrupt paths are individually diagnosed without returning a decoded frame.
 ///
 /// # Errors
@@ -40,7 +211,7 @@ fn require(condition: bool, diagnostic: &str) -> TestResult {
 #[test]
 fn malformed_file_diagnostics_identify_each_input() -> TestResult {
     let directory = tempfile::tempdir()?;
-    for extension in ["png", "dng", "npy", "unknown"] {
+    for extension in ["png", "dng", "cr3", "npy", "unknown"] {
         let path = directory.path().join(format!("invalid‐frame.{extension}"));
         let content = b"not a valid encoded image\x00\xff";
         fs::write(&path, content)?;
@@ -77,6 +248,25 @@ fn oversized_png_is_rejected_before_pixels_are_read() -> TestResult {
     require(
         error.contains("limit") && error.contains("oversized.png"),
         &format!("must reject oversized dimensions before decoding compressed data: {error}"),
+    )
+}
+
+/// Reject the total pixel count of an image whose individual axes meet the limit.
+///
+/// # Errors
+/// Returns filesystem errors or reports acceptance or a misleading decode diagnostic.
+#[test]
+fn png_pixel_budget_is_checked_before_incomplete_raster() -> TestResult {
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("too-many-pixels.png");
+    fs::write(&path, EXCESS_AREA_PNG)?;
+    let error = decode(&path)
+        .err()
+        .ok_or_else(|| io::Error::other("over-budget PNG was decoded"))?;
+    require(
+        error.contains("too-many-pixels.png")
+            && error.contains("dimensions 8192×8192 exceed the image limit of 50000000 pixels"),
+        &format!("expected a pixel-budget diagnostic before a raster error: {error}"),
     )
 }
 
@@ -491,6 +681,44 @@ fn malformed_dng_sensor_metadata_fails_preflight() -> TestResult {
         )?;
     }
     Ok(())
+}
+
+/// The encoded RAW limit includes its last byte and preserves native Bayer RGB.
+///
+/// # Errors
+/// Returns file setup, decode, or native sample parity errors.
+#[test]
+fn encoded_raw_at_limit_develops_identically() -> TestResult {
+    const ENCODED_LIMIT: u64 = 268_435_456;
+    let directory = tempfile::tempdir()?;
+    let path = directory.path().join("encoded-at-limit.dng");
+    fs::write(&path, include_bytes!("data/bayer-pattern.dng"))?;
+    let unpadded = decode(&path)?;
+
+    // The original IFDs and Bayer strip precede the zero-filled trailer.
+    File::options()
+        .write(true)
+        .open(&path)?
+        .set_len(ENCODED_LIMIT)?;
+    require(
+        fs::metadata(&path)?.len() == ENCODED_LIMIT,
+        "could not stage the exact encoded RAW size limit",
+    )?;
+    let padded = decode(&path)?;
+    require(
+        (padded.width(), padded.height(), padded.sample_encoding())
+            == (160, 112, SampleEncoding::U16),
+        "exact-cap DNG lost native geometry or RGB16 precision",
+    )?;
+    require(
+        padded.samples().len() == unpadded.samples().len()
+            && padded
+                .samples()
+                .iter()
+                .zip(unpadded.samples())
+                .all(|(padded, unpadded)| padded.to_bits() == unpadded.to_bits()),
+        "the trailing zeros changed Bayer development at the exact encoded limit",
+    )
 }
 
 /// Reject an over-budget encoded RAW file by its actual byte count.

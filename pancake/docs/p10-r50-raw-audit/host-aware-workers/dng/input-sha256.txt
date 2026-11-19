@@ -1,0 +1,2 @@
+99051b2e08724bdf6aeb8c27a4c8aa495143d9ffa658d826c7ab089078c66817  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/original.dng
+0659eb34cfe00ff9def4ed0edbc05c86bd8c59e09d5fa659c07e7e0ef87249d3  /tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/dng/oriented.dng

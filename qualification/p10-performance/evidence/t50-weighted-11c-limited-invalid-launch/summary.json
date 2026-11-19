@@ -1,0 +1,103 @@
+{
+  "status": "invalid_due_to_bounded_launcher_cpu_runtime_environment",
+  "attempted_scope": "ten preregistered jobs, first two attempted",
+  "frozen_or_limited_credit": false,
+  "operator": "f0f1364f871a3935394e5cabd023a1a17ad4b8db",
+  "terminal_sgt": "2026-11-19T11:44:12,421189178+08:00",
+  "all_52_and_producers_unchanged": true,
+  "reference_warmup": {
+    "elapsed_ns": 65345992543,
+    "returncode": 0,
+    "peak_rss_bytes": 3463815168,
+    "maximum_rss_sample_gap_ns": 18027744,
+    "output": {
+      "shape": [
+        3998,
+        5998,
+        3
+      ],
+      "dtype": "uint16",
+      "sha256": "550e72982e03844c4a5d40575ab3c8b89ea067e5f38d07d0f0736445484922c2",
+      "pixel_sha256": "dc4e21deab6381c662de86a89c4f58385ccbe2b54d51a22addcd50db1f4f6d34",
+      "bytes": 165542082,
+      "minimum": 7096,
+      "maximum": 58532
+    }
+  },
+  "candidate_warmup": {
+    "elapsed_ns": 6699966,
+    "returncode": 1,
+    "timed_out": false,
+    "resource_errors": []
+  },
+  "candidate_stderr": "error: invalid PANCAKE_RUNTIME \"cpu\": expected wgpu, cuda, metal, or hip",
+  "later_scheduled_jobs_unrun": [
+    [
+      "warm",
+      1,
+      "candidate"
+    ],
+    [
+      "warm",
+      1,
+      "reference"
+    ],
+    [
+      "warm",
+      2,
+      "reference"
+    ],
+    [
+      "warm",
+      2,
+      "candidate"
+    ],
+    [
+      "warm",
+      3,
+      "candidate"
+    ],
+    [
+      "warm",
+      3,
+      "reference"
+    ],
+    [
+      "cold",
+      1,
+      "reference"
+    ],
+    [
+      "cold",
+      1,
+      "candidate"
+    ]
+  ],
+  "reference_export_retained_private": "/tmp/pancake-worktrees.t3paqgWM/weighted-11c-limited-prereg/artifacts/t50-limited-11c-attempt-001/run/warmup-01/reference/complete.tif",
+  "archive": {
+    "bytes": 519659,
+    "sha256": "fec0a70dd95841d070ac69bad1af4ba3d87567d61fd3614f2179ad6b08984110",
+    "member_sha256": {
+      "census-terminal.sgt": "5c6497e48f81b08388219cd926074983ab90b433f0819aa55c686cbcf3d66a76",
+      "launcher-terminal.sgt": "ebac19ebd3a2970301cca3f51e55952faa6f5bafd17df81ba56a82724a3ba468",
+      "launcher.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "launcher.log": "65babc95f6f3553ef0edb42f443fc9d02390c2bfe2bb8dc6eb45c83c5b4ec397",
+      "quiet-active-processes.txt": "70688c1a2f436b76c6337388110dc41f528f9d16f90ba438831f93372ef5a1aa",
+      "quiet-cpu-idle-average.txt": "2a19319f52b13f7ffb17d4539f37f9138dc54d20d499078eba167c52d13e001f",
+      "quiet-lease.json": "8e4902898b00aed4c11a8ac1179e4c7417d589ece8a7b967c9e4e56281b214d4",
+      "run/report.json": "8ab35ffd53d1a500cb5db36287f33671be74c1588d396acff738d0c1e04ff7e9",
+      "run/warmup-01/reference/events.jsonl": "f40fadb05626b84f3aae61601988f7e259cf8624372bab2b24d3659479d5cf32",
+      "run/warmup-01/reference/launch.json": "4248a650b38cafad00ac72e524c43ea2e468aab318882124b8605872e8c20cc5",
+      "run/warmup-01/reference/resources.jsonl.gz": "5f806280583e02fa6f9ac8d94fcec26b4853060281c0e02191e068b0390739f4",
+      "run/warmup-01/reference/sample.json": "139058904ae9dbab17f25ebdc5a01e4a4b85b01d384c1cb3afb0691ba45d2d7a",
+      "run/warmup-01/reference/stderr.txt": "063cf4dc683b02e7e57691499d6fe422aa8caf7b8ecbbb362634614e714cd7e8",
+      "run/warmup-01/reference/stdout.txt": "2efb6ad79bfd0a7a9a2d125b7d047be5783fad44f08f77fda1c6d54b8d51f2b4",
+      "run/warmup-01/candidate/launch.json": "4ad14dfa6f9748c16db67f21e61dbf74fe2035f4d9c46db40900a5153b9f6aba",
+      "run/warmup-01/candidate/resources.jsonl.gz": "99be512a8672b63750e56f2249f0b08b26c1cb62d6f7ba8206699dc02711adb9",
+      "run/warmup-01/candidate/sample.json": "013301a8b9a1f4b63c9e15aa150edff63eaf4ed70c19ef63a4f4c6d5184bea82",
+      "run/warmup-01/candidate/stderr.txt": "01313a8435735edbadd1e1973a568722f3afd34bc9b542622cbfffc1e1f19b8f",
+      "run/warmup-01/candidate/stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "contains_original_or_derived_tiff": false
+  }
+}

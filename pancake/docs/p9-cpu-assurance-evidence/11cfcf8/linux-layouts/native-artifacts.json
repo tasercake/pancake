@@ -1,0 +1,246 @@
+{
+  "1": {
+    "target/layouts-cpu-linux/debug/build/pancake/81a1fbc892ff9ee4/out/pancake-81a1fbc892ff9ee4": {
+      "target": "unittests src/lib.rs",
+      "sha256": "4403ae3e18b922f94013894ebee150ec4774d4208fff184f26133bdc059080e2",
+      "size_bytes": 538716072,
+      "elf_build_id": "384f64109d4306c5348f0fe8509df97317f213c2"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/a776d3ce08174cb2/out/cpu_advanced_fusion-a776d3ce08174cb2": {
+      "target": "tests/cpu_advanced_fusion.rs",
+      "sha256": "0cd5f1a3227e7203d1a32befc4531c1fd56ad01b1cdec5a62452302bfe725d3b",
+      "size_bytes": 656139512,
+      "elf_build_id": "5ac38136095e716c2f80558157e30c21a23aaf73"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/0389d7bcab201385/out/cpu_array_layout-0389d7bcab201385": {
+      "target": "tests/cpu_array_layout.rs",
+      "sha256": "d7ca8de8694a9cf32a4f19722a0d11c54a4fa294f2d284464e40ab1736da035e",
+      "size_bytes": 601638992,
+      "elf_build_id": "251a758830052b3201ec40e7fd0a7fb9a543256d"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/1317809c12f42569/out/cpu_fusion_contract-1317809c12f42569": {
+      "target": "tests/cpu_fusion_contract.rs",
+      "sha256": "1d7348fe01b8aca98adf8e2e084a6dfc56407d3d770116798fe703760caea223",
+      "size_bytes": 655041840,
+      "elf_build_id": "ac57f4094d4e5c8f9861190d2d068c17de38ace8"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/b7fa299c76ec9215/out/cpu_gray_array_export-b7fa299c76ec9215": {
+      "target": "tests/cpu_gray_array_export.rs",
+      "sha256": "44a1e1f084fc41702c13457d4b0dc0106e13854de93f6c9662904517e267e879",
+      "size_bytes": 601539368,
+      "elf_build_id": "da4534cf23c33ae415ab92c7a4a3f2bcc820ee64"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/c89537ab7e949a90/out/cpu_image_export-c89537ab7e949a90": {
+      "target": "tests/cpu_image_export.rs",
+      "sha256": "d295dc5a3540d91b761abad0dba0bd62ddc442383860842e7fbdd446ca3ca951",
+      "size_bytes": 600025744,
+      "elf_build_id": "7e0a1ef08bc2edb157a625c97c2d0782c123c8d5"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/1c73edf5a5ed5448/out/cpu_image_io-1c73edf5a5ed5448": {
+      "target": "tests/cpu_image_io.rs",
+      "sha256": "5b27bbd60147bb2137b485d56b18187ae6513047aedcabe0b3127f46cf77cb74",
+      "size_bytes": 598875384,
+      "elf_build_id": "2491b7fff3176ded12ac426c392084c4c76954f2"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/bac3d2fac9f40975/out/cpu_job-bac3d2fac9f40975": {
+      "target": "tests/cpu_job.rs",
+      "sha256": "c01b2a8391d9af8ff6390ddde654975ae65bb66a99d49dc0112966fa438a5e85",
+      "size_bytes": 702091232,
+      "elf_build_id": "1088b0569f03d72d9ba92a4e6d7c7cd43b3fdc3d"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/6ad89255f1e2da4b/out/cpu_kernel_contract-6ad89255f1e2da4b": {
+      "target": "tests/cpu_kernel_contract.rs",
+      "sha256": "e4094096e48bca6209ad6449a54c18b2574d9b1ec02071e9443e207a07fdb02b",
+      "size_bytes": 654204128,
+      "elf_build_id": "8c69715e5f89677c6d7248229f9bf829f9d91ca2"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/dc269218d7e92b45/out/cpu_npy-dc269218d7e92b45": {
+      "target": "tests/cpu_npy.rs",
+      "sha256": "0d5345ddf2b63a0fd78654bfb6226df8b98df82f3f78bd85b9b440462d472843",
+      "size_bytes": 592219728,
+      "elf_build_id": "5d54036f86585a0f2d5b62c9bf7a8de509f47194"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/b0ae7681eff81200/out/cpu_numerical_contract-b0ae7681eff81200": {
+      "target": "tests/cpu_numerical_contract.rs",
+      "sha256": "d9a6059eaf70522062aea14b7d3489b2b1e45d49bb3a5e961b2e59ac4f92503b",
+      "size_bytes": 654410832,
+      "elf_build_id": "bde2a8c5605ef66b36edb7704c83e942528b4a4f"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/93e023a4f3b6d36d/out/cpu_registration_contract-93e023a4f3b6d36d": {
+      "target": "tests/cpu_registration_contract.rs",
+      "sha256": "5d38259c3d303b0b45ef662e45c08ea563c5f7680e9ae2fe387242da0be91301",
+      "size_bytes": 655111496,
+      "elf_build_id": "c4d52ffcaaedf11dc4df61269a1d9dda4eee92a5"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/5005c5406712f603/out/cpu_resident_policy-5005c5406712f603": {
+      "target": "tests/cpu_resident_policy.rs",
+      "sha256": "38e2958e608582d5ed64e6d7d5163228ef46f94ceb8f40e08ddf85d988aa7fbf",
+      "size_bytes": 700089432,
+      "elf_build_id": "19da30b8b9a1ccc1c5d7cd5dd535403117a200a2"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/a47faee76d41a632/out/cpu_runtime_contract-a47faee76d41a632": {
+      "target": "tests/cpu_runtime_contract.rs",
+      "sha256": "9a0aeeeec40677a1baac78997c30c50a7c2336ea30982021f94eb7d976cb1952",
+      "size_bytes": 654804560,
+      "elf_build_id": "7db787a9465a92c3b5f33bcb75f5860ee846f745"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/80e78db1b73aa913/out/cpu_stack_plan-80e78db1b73aa913": {
+      "target": "tests/cpu_stack_plan.rs",
+      "sha256": "afca4684a18b792fe5a46d268bc20c3f02dba511bf139af08d4e90618fe46e52",
+      "size_bytes": 700892016,
+      "elf_build_id": "0b1e5b93897fd5ea403fa5730f5087ebf852e7f6"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-cli/4d64e16290bb9ece/out/pancake_cli-4d64e16290bb9ece": {
+      "target": "unittests src/main.rs",
+      "sha256": "7c7fc81796619a56841456c64ddf01b5d49baf7277dc0c4e71afd2ea11aa61e7",
+      "size_bytes": 562645624,
+      "elf_build_id": "126baf100e15c1e8ece408008ee049c565facc19"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-cli/cb3e079a4d149fa0/out/cpu_cli-cb3e079a4d149fa0": {
+      "target": "tests/cpu_cli.rs",
+      "sha256": "621baf8dc4e5f9ab4454010dbe2f857fec17badada0f4d30d32c4d2a3f8b0f57",
+      "size_bytes": 599020608,
+      "elf_build_id": "7d76d6d6851a658081cb69aa00a484591fa6bb1c"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-cli/4672c2d9642416f8/out/cpu_config-4672c2d9642416f8": {
+      "target": "tests/cpu_config.rs",
+      "sha256": "1a3a6bd3d175787c8c1a63005eff07767f4ea7b47d52b8dd5aac21470d0410ca",
+      "size_bytes": 559260472,
+      "elf_build_id": "20ac40d8f6d7385c59d3dc75cd3deead5b1772b4"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-cli/b22ecf3851f8f2c4/out/cpu_runtime_options-b22ecf3851f8f2c4": {
+      "target": "tests/cpu_runtime_options.rs",
+      "sha256": "c21173fdd3f8a365764b61487943a08d43c1d395beab456ec1cc589e7fd38ef7",
+      "size_bytes": 704569624,
+      "elf_build_id": "185866fe7aed23cc44d5868e69371ff964e617f4"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-gui/e20976f8323922e9/out/pancake_gui-e20976f8323922e9": {
+      "target": "unittests src/main.rs",
+      "sha256": "a41fd48ef5aceacdfd623b928849c8e540dcde83879b27740e3ef8adcbefa284",
+      "size_bytes": 1093740936,
+      "elf_build_id": "2b3f9c31d2fa588466b9aab8e29531efa69a32fb"
+    }
+  },
+  "42": {
+    "target/layouts-cpu-linux/debug/build/pancake/ef65310e88896c65/out/pancake-ef65310e88896c65": {
+      "target": "unittests src/lib.rs",
+      "sha256": "934a592421e07160dc91af87fe1d93bd8d01db922adb4cfeb819d1219efdd68b",
+      "size_bytes": 538559896,
+      "elf_build_id": "dabcb897405d20d1f9ea2c36f5c979a1cfd75faf"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/bb34f2ff2659631b/out/cpu_advanced_fusion-bb34f2ff2659631b": {
+      "target": "tests/cpu_advanced_fusion.rs",
+      "sha256": "bb67358033818e8708ea40671d12512773fdd0b2c621ca96da63202566491f1e",
+      "size_bytes": 655993992,
+      "elf_build_id": "bf92d16e651c5df62586cf4df5b81f93df64139c"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/78d28158d1ea28cf/out/cpu_array_layout-78d28158d1ea28cf": {
+      "target": "tests/cpu_array_layout.rs",
+      "sha256": "32f5a5ff6972faa27500e645a63417455a1e5998e0c6a95baaa01001346028e2",
+      "size_bytes": 601468416,
+      "elf_build_id": "58c05c8e86834b3a310c8c5665e8ffaf5b246880"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/cca6015380c42e84/out/cpu_fusion_contract-cca6015380c42e84": {
+      "target": "tests/cpu_fusion_contract.rs",
+      "sha256": "9642eeb79220b4ebe3107797760a38de8dabb92265a877a18854140c854ccb1e",
+      "size_bytes": 654896624,
+      "elf_build_id": "b66868243b6ffa39a047c20bea011642898c0804"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/9163a3c51d125057/out/cpu_gray_array_export-9163a3c51d125057": {
+      "target": "tests/cpu_gray_array_export.rs",
+      "sha256": "f73754172ac5494f079cefd51036b160645eaa75d291dcd7f804e45c0b8a41fa",
+      "size_bytes": 601368952,
+      "elf_build_id": "171ebb84f26559215637d3bdffaf0c4235ec4a93"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/ce54ea281736f476/out/cpu_image_export-ce54ea281736f476": {
+      "target": "tests/cpu_image_export.rs",
+      "sha256": "033f1cb9daaca9fa9538eb244dec905519d4418a0c7f3af1f3cc80a694e5c9c2",
+      "size_bytes": 599856080,
+      "elf_build_id": "523dbeb6725880f2fe0df5cfe9aa4b6152d1bf0a"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/c7a7789e780494e3/out/cpu_image_io-c7a7789e780494e3": {
+      "target": "tests/cpu_image_io.rs",
+      "sha256": "5275b15c38ceb8f33a1542128cce5f8e93f0542a353b2acdbfc3d042b6e07e7c",
+      "size_bytes": 598705112,
+      "elf_build_id": "f58a8e759c17d36c6864e57799f295f883476b50"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/bd8876420a6edd58/out/cpu_job-bd8876420a6edd58": {
+      "target": "tests/cpu_job.rs",
+      "sha256": "95539fde0244d2de4ca9fd71796006b04ef2a17f0d3e16e43d17e2b3e29736f4",
+      "size_bytes": 701928440,
+      "elf_build_id": "949370025e6a75e90088e34d5d8daf831c68533e"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/2c9375d3346ae881/out/cpu_kernel_contract-2c9375d3346ae881": {
+      "target": "tests/cpu_kernel_contract.rs",
+      "sha256": "ec1b73d9b7373f961deb55ddd0f896d0718e0d83714f82c8a2264d9dd1a24921",
+      "size_bytes": 654058992,
+      "elf_build_id": "238b55b58ac2519c4a48fe008b704afffbaee9e4"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/adc91c834c376551/out/cpu_npy-adc91c834c376551": {
+      "target": "tests/cpu_npy.rs",
+      "sha256": "ae9528d50c6e84c85b69ae9a740959f8d4f6b30d14289018e2ec56dd31331fc9",
+      "size_bytes": 592049144,
+      "elf_build_id": "89bb347de7e316c11ff2e7efae67fd986664d737"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/a12efe91469b4e2f/out/cpu_numerical_contract-a12efe91469b4e2f": {
+      "target": "tests/cpu_numerical_contract.rs",
+      "sha256": "5838226ce15943725c11aca96206b7afa89c91cd5fff9f8e3d2ff84b49e93f77",
+      "size_bytes": 654265680,
+      "elf_build_id": "132856b192f9700ed12ea1235dd8f9de8e8806b0"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/d32440b9bc630e7b/out/cpu_registration_contract-d32440b9bc630e7b": {
+      "target": "tests/cpu_registration_contract.rs",
+      "sha256": "2409bc349d38f96151ceb358b9d7a087bd538c684ff7216cc2b235c6f4e9442d",
+      "size_bytes": 654966416,
+      "elf_build_id": "521c5ef2fcd6bf7d737fc9d8e97cc30fb8214cee"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/d447ef61f9d248e1/out/cpu_resident_policy-d447ef61f9d248e1": {
+      "target": "tests/cpu_resident_policy.rs",
+      "sha256": "b471f1d4944f583644a4033d699255b1d063bfdaf2a795934c2fe38d739a9640",
+      "size_bytes": 699928744,
+      "elf_build_id": "aaddcc742113c526675b950087f759bffce6e1de"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/6173915078900f60/out/cpu_runtime_contract-6173915078900f60": {
+      "target": "tests/cpu_runtime_contract.rs",
+      "sha256": "0689833792389d0c2425f50462605064315c33323187cefa562a7edc3ae935cd",
+      "size_bytes": 654659264,
+      "elf_build_id": "7a8dc74aa13d9500a31acd73b2203ba94e1efd2b"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake/287725a0802eb763/out/cpu_stack_plan-287725a0802eb763": {
+      "target": "tests/cpu_stack_plan.rs",
+      "sha256": "12aadc6dba04874630ac76ca654f4446f89f221080fd615715f0e627945a5c80",
+      "size_bytes": 700730112,
+      "elf_build_id": "ea39196b0a7003350965db87775e063a73d7e8dc"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-cli/51d05443c5b88799/out/pancake_cli-51d05443c5b88799": {
+      "target": "unittests src/main.rs",
+      "sha256": "6451dc27e01a477df27432ce27156ce5a97a9a5cbc7dd3458ec412fefd87e5ee",
+      "size_bytes": 562487240,
+      "elf_build_id": "65eedd3341b9bf9dcae3b20e456d72d2c9798e95"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-cli/d406aacfe4c1c1cb/out/cpu_cli-d406aacfe4c1c1cb": {
+      "target": "tests/cpu_cli.rs",
+      "sha256": "74ee30744293cfb2676ad5bd9e9874d4c11a9c1062ffd3bbff1fe846f9f04189",
+      "size_bytes": 598850168,
+      "elf_build_id": "51a1661917b642cf9c41aa981f17e4198092bb8a"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-cli/52d0a3b644565b2c/out/cpu_config-52d0a3b644565b2c": {
+      "target": "tests/cpu_config.rs",
+      "sha256": "04aa2b26d9ab11806038c1fc426cc8ec5ddc6a9a2e2fdd4c5fe867925190648b",
+      "size_bytes": 559103592,
+      "elf_build_id": "29b69a7cbc055138d5a49bd7664312de8616aec1"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-cli/29a00e0b7679d22f/out/cpu_runtime_options-29a00e0b7679d22f": {
+      "target": "tests/cpu_runtime_options.rs",
+      "sha256": "28912b0a5fabfaeca1d385c47ee0d91f2ca512b7131ca061ba221445b3ac4f8e",
+      "size_bytes": 704410008,
+      "elf_build_id": "841eb3c38f337a0f119342ee092d429dedc4ab21"
+    },
+    "target/layouts-cpu-linux/debug/build/pancake-gui/a2eaf016bc12258f/out/pancake_gui-a2eaf016bc12258f": {
+      "target": "unittests src/main.rs",
+      "sha256": "3c94b44710160d7a00265995c69aa198952b2d82265c9243a3fd55f19a153c63",
+      "size_bytes": 1093562128,
+      "elf_build_id": "0f41a6db775c962fc839eafcdb3d6491a602e5ce"
+    }
+  }
+}

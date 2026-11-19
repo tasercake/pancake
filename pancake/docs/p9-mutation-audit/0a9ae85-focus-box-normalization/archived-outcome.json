@@ -1,0 +1,104 @@
+{
+  "scenario": {
+    "Mutant": {
+      "name": "src/fusion/focus.rs:428:19: replace != with == in aggregate",
+      "package": "pancake",
+      "file": "src/fusion/focus.rs",
+      "function": {
+        "function_name": "aggregate",
+        "return_type": "",
+        "span": {
+          "start": {
+            "line": 396,
+            "column": 1
+          },
+          "end": {
+            "line": 435,
+            "column": 2
+          }
+        }
+      },
+      "span": {
+        "start": {
+          "line": 428,
+          "column": 19
+        },
+        "end": {
+          "line": 428,
+          "column": 21
+        }
+      },
+      "replacement": "==",
+      "genre": "BinaryOperator"
+    }
+  },
+  "summary": "MissedMutant",
+  "log_path": "log/src__fusion__focus.rs_line_428_col_19.log",
+  "diff_path": "diff/src__fusion__focus.rs_line_428_col_19.diff",
+  "phase_results": [
+    {
+      "phase": "Build",
+      "duration": 22.780848848,
+      "process_status": "Success",
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--no-run",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--all-features",
+        "--workspace"
+      ]
+    },
+    {
+      "phase": "Test",
+      "duration": 6.874588035,
+      "process_status": "Success",
+      "argv": [
+        "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--verbose",
+        "--package=pancake@0.1.0",
+        "--all-features",
+        "--workspace",
+        "--locked",
+        "--lib",
+        "--bins",
+        "--test",
+        "cpu_advanced_fusion",
+        "--test",
+        "cpu_array_layout",
+        "--test",
+        "cpu_cli",
+        "--test",
+        "cpu_config",
+        "--test",
+        "cpu_fusion_contract",
+        "--test",
+        "cpu_gray_array_export",
+        "--test",
+        "cpu_image_export",
+        "--test",
+        "cpu_image_io",
+        "--test",
+        "cpu_job",
+        "--test",
+        "cpu_kernel_contract",
+        "--test",
+        "cpu_npy",
+        "--test",
+        "cpu_numerical_contract",
+        "--test",
+        "cpu_registration_contract",
+        "--test",
+        "cpu_runtime_contract",
+        "--test",
+        "cpu_runtime_options",
+        "--test",
+        "cpu_stack_plan",
+        "--",
+        "--include-ignored"
+      ]
+    }
+  ]
+}

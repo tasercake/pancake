@@ -13,6 +13,8 @@ from itertools import chain
 from pathlib import Path
 
 _SAMPLE_NS = 8_000_000
+DEFAULT_RSS_SAMPLE_INTERVAL_MS = _SAMPLE_NS // 1_000_000
+RSS_SAMPLE_INTERVALS_MS = range(2, DEFAULT_RSS_SAMPLE_INTERVAL_MS + 1)
 _MAX_SAMPLE_GAP_NS = 20_000_000
 _UNAVAILABLE_MEMORY = (1 << 64) - 1
 _INSUFFICIENT_SIZE = 7
@@ -173,10 +175,33 @@ def _summarize_samples(rows, elapsed, *, gpu, errors):
     return result
 
 
-def measure(argv, *, cwd, env, directory, timeout, gpu, rss_sampler_cpu=None):
+def _next_sample_due_ns(due, now, interval):
+    """Advance to an absolute slot without replaying missed acquisitions."""
+    return due + max(1, (now - due) // interval + 1) * interval
+
+
+def measure(
+    argv,
+    *,
+    cwd,
+    env,
+    directory,
+    timeout,
+    gpu,
+    rss_sampler_cpu=None,
+    rss_sample_interval_ms=DEFAULT_RSS_SAMPLE_INTERVAL_MS,
+):
     """Measure direct spawn-to-exit, record sampled process-tree and GPU peaks."""
     if timeout <= 0 or not Path("/proc/self/stat").is_file():
         raise ValueError("positive timeout and Linux procfs required")
+    if (
+        type(rss_sample_interval_ms) is not int
+        or rss_sample_interval_ms not in RSS_SAMPLE_INTERVALS_MS
+    ):
+        raise ValueError("RSS sample interval must be a whole number from 2 to 8 ms")
+    if gpu is not None and rss_sample_interval_ms != DEFAULT_RSS_SAMPLE_INTERVAL_MS:
+        raise ValueError("RSS sample interval overrides are for CPU profiles only")
+    sample_interval_ns = rss_sample_interval_ms * 1_000_000
     if rss_sampler_cpu is not None and (
         rss_sampler_cpu < 0 or rss_sampler_cpu in os.sched_getaffinity(0)
     ):
@@ -239,8 +264,7 @@ def measure(argv, *, cwd, env, directory, timeout, gpu, rss_sampler_cpu=None):
                         + "\n"
                     )
                     now = time.monotonic_ns()
-                    # Go to the next absolute slot after a late wake without a catch-up burst.
-                    due += max(1, (now - due) // _SAMPLE_NS + 1) * _SAMPLE_NS
+                    due = _next_sample_due_ns(due, now, sample_interval_ns)
                     stop.wait(max(0, due - now) / 1e9)
         except (IndexError, OSError, ValueError) as error:
             sample_failures.append(f"{metric}: {error}")
@@ -328,7 +352,7 @@ def measure(argv, *, cwd, env, directory, timeout, gpu, rss_sampler_cpu=None):
         "kernel_process_user_cpu_seconds": usage.ru_utime,
         "kernel_process_system_cpu_seconds": usage.ru_stime,
         "resource_errors": sample_failures,
-        "sample_interval_ns": _SAMPLE_NS,
+        "sample_interval_ns": sample_interval_ns,
         "rss_sampler_affinity": rss_sampler_affinity,
         "sampler_thread_cpu_ns": sum(sampler_cpu_ns.values()),
         "sampler_threads_cpu_ns": sampler_cpu_ns,

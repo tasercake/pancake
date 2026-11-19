@@ -1,0 +1,26 @@
+"""Copy the authenticated Bayer DNG and create an independent orientation variant."""
+
+import hashlib
+import struct
+import sys
+from pathlib import Path
+
+source = Path(sys.argv[1]).read_bytes()
+output = Path(sys.argv[2])
+assert hashlib.sha256(source).hexdigest() == "99051b2e08724bdf6aeb8c27a4c8aa495143d9ffa658d826c7ab089078c66817"
+assert source[:4] == b"II*\0"
+with (output / "normal.dng").open("xb") as stream:
+    stream.write(source)
+
+data = bytearray(source)
+directory, = struct.unpack_from("<I", data, 4)
+count, = struct.unpack_from("<H", data, directory)
+offset = directory + 2
+entries = [bytes(data[offset + i * 12:offset + (i + 1) * 12]) for i in range(count)]
+tags = [struct.unpack_from("<H", entry)[0] for entry in entries]
+assert tags.count(282) == 1 and 274 not in tags
+entries[tags.index(282)] = struct.pack("<HHII", 274, 3, 1, 2)
+entries.sort(key=lambda entry: struct.unpack_from("<H", entry)[0])
+data[offset:offset + count * 12] = b"".join(entries)
+with (output / "mirrored.dng").open("xb") as stream:
+    stream.write(data)

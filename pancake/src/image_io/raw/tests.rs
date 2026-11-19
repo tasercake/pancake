@@ -1,12 +1,15 @@
 //! Preserve the developed RAW RGB16 boundary across packing changes.
 
 use std::error::Error;
+use std::num::NonZeroUsize;
 
 use image::metadata::Orientation;
 use rawler::imgop::develop::Intermediate;
 use rawler::pixarray::Color2D;
 
-use super::{developed_raster, raster_to_rgb};
+use super::{
+    developed_raster, developed_rgb, normalize_raw_codes, raster_to_rgb, raw_worker_count,
+};
 
 /// Asymmetric RGB triples with explicit expected unsigned code values.
 const SAMPLE_CODES: [(f32, u16); 18] = [
@@ -29,6 +32,27 @@ const SAMPLE_CODES: [(f32, u16); 18] = [
     (0.625, 40_959),
     (0.875, 57_343),
 ];
+
+/// Reject partial and surplus code buffers before changing developed input.
+///
+/// # Errors
+///
+/// Returns an unexpected conversion or an altered sample.
+#[test]
+fn raw_normalization_requires_a_code_for_each_sample() -> Result<(), Box<dyn Error>> {
+    let original = [f32::NAN, -0.25, 10.0];
+    let mut samples = original;
+    let short = [0_u16, 2];
+    let long = [0_u16, 2, 3, 4];
+    for codes in [short.as_slice(), long.as_slice()] {
+        if normalize_raw_codes(&mut samples, codes).is_ok()
+            || samples.map(f32::to_bits) != original.map(f32::to_bits)
+        {
+            return Err("invalid RAW code buffer modified the developed samples".into());
+        }
+    }
+    Ok(())
+}
 
 /// Make the same fully developed pixels for both quantization paths.
 fn fixture() -> Intermediate {
@@ -70,12 +94,10 @@ fn packed_raw_preserves_oriented_working_samples() -> Result<(), Box<dyn Error>>
         let mut expected = fixture()
             .to_dynamic_image()
             .ok_or("missing Rawler raster")?;
-        let mut actual = developed_raster(fixture()).ok_or("missing packed raster")?;
         expected.apply_orientation(orientation);
-        actual.apply_orientation(orientation);
 
         let expected = raster_to_rgb(expected, None, None)?;
-        let actual = raster_to_rgb(actual, None, None)?;
+        let actual = developed_rgb(fixture(), Some(orientation), None)?;
         if (
             expected.width(),
             expected.height(),
@@ -90,6 +112,84 @@ fn packed_raw_preserves_oriented_working_samples() -> Result<(), Box<dyn Error>>
         {
             return Err(format!("working RAW samples differ for EXIF {code}").into());
         }
+    }
+    Ok(())
+}
+
+/// Leave one CPU for the job/UI caller while bounding the process-wide pool.
+///
+/// # Errors
+///
+/// Returns a violated CPU budget or fallback.
+#[test]
+fn raw_worker_count_respects_available_cpu_budget() -> Result<(), Box<dyn Error>> {
+    let cases = [
+        (0, 1),
+        (1, 1),
+        (2, 1),
+        (3, 2),
+        (8, 7),
+        (15, 14),
+        (16, 15),
+        (17, 15),
+        (128, 15),
+    ];
+    for (available, required) in cases {
+        let actual = raw_worker_count(NonZeroUsize::new(available));
+        if actual != required {
+            return Err(format!(
+                "RAW workers for {available} available CPUs: {actual}, expected {required}"
+            )
+            .into());
+        }
+    }
+    Ok(())
+}
+
+/// Preserve every normalized sixteen-bit code while retaining the developed allocation.
+///
+/// # Errors
+///
+/// Returns a failed conversion, lost allocation, precision change, or mismatched sample.
+#[test]
+fn normal_raw_preserves_u16_working_values_in_the_developed_allocation()
+-> Result<(), Box<dyn Error>> {
+    let width = 256;
+    let height = 128;
+    let white = f32::from(u16::MAX);
+    let values = (0..=u16::MAX)
+        .zip((0..=u16::MAX).rev())
+        .zip(SAMPLE_CODES.iter().cycle());
+    let mut pixels = Vec::with_capacity(65_536);
+    for ((low, high), (edge, _)) in values.take(32_768) {
+        pixels.push([
+            (f32::from(low) + 0.5) / white,
+            (f32::from(high) + 0.5) / white,
+            *edge,
+        ]);
+    }
+    let reference = Intermediate::ThreeColor(Color2D::new_with(pixels.clone(), width, height))
+        .to_dynamic_image()
+        .ok_or("missing Rawler raster")?;
+    let reference = raster_to_rgb(reference, None, None)?;
+    let allocation = pixels.as_ptr().cast::<f32>();
+    let working = developed_rgb(
+        Intermediate::ThreeColor(Color2D::new_with(pixels, width, height)),
+        Some(Orientation::NoTransforms),
+        None,
+    )?;
+    if working.sample_encoding() != reference.sample_encoding()
+        || !working
+            .samples()
+            .iter()
+            .copied()
+            .map(f32::to_bits)
+            .eq(reference.samples().iter().copied().map(f32::to_bits))
+    {
+        return Err("normal RAW working samples differ from the pinned RGB16 path".into());
+    }
+    if working.samples().as_ptr() != allocation {
+        return Err("normal RAW conversion did not retain the developed allocation".into());
     }
     Ok(())
 }

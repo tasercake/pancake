@@ -28,6 +28,8 @@ fn gpu_advanced_fusion() -> Result<(), String> {
     let device = cubecl::Device::Wgpu(selected);
     advanced_fusion_cases::check_constant(&device)?;
     advanced_fusion_cases::check_focus(&device)?;
+    advanced_fusion_cases::check_hybrid_level_bounds(&device)?;
+    advanced_fusion_cases::check_hybrid_frame_launches(&device)?;
     advanced_fusion_cases::check_exposure_batches(&device)?;
     advanced_fusion_cases::check_exposure_precision(&device)?;
     advanced_fusion_cases::check_exposure_specialization(&device)?;

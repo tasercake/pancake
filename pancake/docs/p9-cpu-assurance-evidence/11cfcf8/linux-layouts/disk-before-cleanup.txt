@@ -1,0 +1,4 @@
+Filesystem      1K-blocks       Used Available Use% Mounted on
+/dev/nvme0n1p2 1152225772 1052458320  45857512  96% /
+35G	pancake/target/layouts-cpu-linux
+CPU target list byte-identical to exact 11cfcf8 dev Nextest replay

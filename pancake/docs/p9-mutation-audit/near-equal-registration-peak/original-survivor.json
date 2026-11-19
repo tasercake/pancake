@@ -1,0 +1,141 @@
+{
+  "original_roster_sha256": "b5bdf8ee8bf796db18ce5cdcadb443bc230eb2e6116789310b846cf3f77d4492",
+  "original_outcomes_sha256": "23be753930e4d0e202e8c9a4b5288c0e9823f984146d69555652a0edef1bf83c",
+  "diff_sha256": "c8b2076ebebf79d3ab7bb30d14644db583ba40a2797d1e719365d8e52476ed5b",
+  "typed_mutant": {
+    "diff": "--- src/registration/estimate.rs\n+++ replace - with + in seed\n@@ -354,17 +354,17 @@\n         .max_by(|(_, a), (_, b)| a.total_cmp(b))\n         .ok_or(\"registration search returned no candidates\")?;\n     let Parameters([x, y, ..]) = chosen;\n     let ambiguous = score >= MIN_CORRELATION\n         && trials\n             .iter()\n             .zip(&scores)\n             .any(|(&Parameters([u, v, ..]), &other)| {\n-                ((x - u).abs() > 2.0 * step || (y - v).abs() > 2.0 * step) && score - other < 0.001\n+                ((x - u).abs() > 2.0 * step || (y - v).abs() > 2.0 * step) && score + /* ~ changed by cargo-mutants ~ */ other < 0.001\n             });\n     Ok((chosen, ambiguous))\n }\n \n /// Numeric context shared across refinement levels.\n struct Refiner<'a> {\n     /// Prepared device luma and scoring operations.\n     pair: &'a Pair,\n",
+    "file": "src/registration/estimate.rs",
+    "function": {
+      "function_name": "seed",
+      "return_type": "-> Result<(Parameters, bool), String>",
+      "span": {
+        "end": {
+          "column": 2,
+          "line": 365
+        },
+        "start": {
+          "column": 1,
+          "line": 323
+        }
+      }
+    },
+    "genre": "BinaryOperator",
+    "name": "src/registration/estimate.rs:362:85: replace - with + in seed",
+    "package": "pancake",
+    "replacement": "+",
+    "span": {
+      "end": {
+        "column": 86,
+        "line": 362
+      },
+      "start": {
+        "column": 85,
+        "line": 362
+      }
+    }
+  },
+  "outcome": {
+    "scenario": {
+      "Mutant": {
+        "name": "src/registration/estimate.rs:362:85: replace - with + in seed",
+        "package": "pancake",
+        "file": "src/registration/estimate.rs",
+        "function": {
+          "function_name": "seed",
+          "return_type": "-> Result<(Parameters, bool), String>",
+          "span": {
+            "start": {
+              "line": 323,
+              "column": 1
+            },
+            "end": {
+              "line": 365,
+              "column": 2
+            }
+          }
+        },
+        "span": {
+          "start": {
+            "line": 362,
+            "column": 85
+          },
+          "end": {
+            "line": 362,
+            "column": 86
+          }
+        },
+        "replacement": "+",
+        "genre": "BinaryOperator"
+      }
+    },
+    "summary": "MissedMutant",
+    "log_path": "log/src__registration__estimate.rs_line_362_col_85.log",
+    "diff_path": "diff/src__registration__estimate.rs_line_362_col_85.diff",
+    "phase_results": [
+      {
+        "phase": "Build",
+        "duration": 21.421752534,
+        "process_status": "Success",
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--no-run",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features",
+          "--workspace"
+        ]
+      },
+      {
+        "phase": "Test",
+        "duration": 6.523631535,
+        "process_status": "Success",
+        "argv": [
+          "/home/krishna/.rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo",
+          "test",
+          "--verbose",
+          "--package=pancake@0.1.0",
+          "--all-features",
+          "--workspace",
+          "--locked",
+          "--lib",
+          "--bins",
+          "--test",
+          "cpu_advanced_fusion",
+          "--test",
+          "cpu_array_layout",
+          "--test",
+          "cpu_cli",
+          "--test",
+          "cpu_config",
+          "--test",
+          "cpu_fusion_contract",
+          "--test",
+          "cpu_gray_array_export",
+          "--test",
+          "cpu_image_export",
+          "--test",
+          "cpu_image_io",
+          "--test",
+          "cpu_job",
+          "--test",
+          "cpu_kernel_contract",
+          "--test",
+          "cpu_npy",
+          "--test",
+          "cpu_numerical_contract",
+          "--test",
+          "cpu_registration_contract",
+          "--test",
+          "cpu_runtime_contract",
+          "--test",
+          "cpu_runtime_options",
+          "--test",
+          "cpu_stack_plan",
+          "--",
+          "--include-ignored"
+        ]
+      }
+    ]
+  }
+}

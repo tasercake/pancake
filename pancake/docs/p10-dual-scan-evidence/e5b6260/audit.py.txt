@@ -1,0 +1,145 @@
+"""Reduce exact physical timing, native events and observed resource streams."""
+
+from collections import Counter
+import gzip
+import hashlib
+import itertools
+import json
+from pathlib import Path
+import re
+import tarfile
+import xml.etree.ElementTree as ET
+
+HERE = Path(__file__).resolve().parent
+REV = "e5b62606cbdd9b41758ccee6efafec8b02fe4ad1"
+ELF = "6abaabc3c39b2a6047356d38e79c2bc197dd786c4ca70519b1525f2b37365e33"
+EXPECTED = ["stock", "dual_scan", "dual_scan", "stock"]
+DIGESTS = {
+    "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302",
+    "pixel_sha256": "f54746784bcc278da2df734e9f034053a3b54105ddb2a30046baf6dab07a80a3",
+}
+EVENT_FIELDS = ("event", "actual_backend", "physical_gpu", "runtime", "completed",
+                "device_pci_address", "fallback_reason")
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def samples(raw, metric, end):
+    rows = []
+    for line in gzip.decompress(raw).splitlines():
+        record = json.loads(line)
+        time = record[f"{metric}_elapsed_ns"]
+        if time is not None and 0 <= time <= end:
+            rows.append((time, record[f"{metric}_bytes"]))
+    times = sorted(time for time, _ in rows)
+    return (len(rows), max(b - a for a, b in itertools.pairwise([0, *times, end])),
+            max(value for _, value in rows))
+
+
+def read_archive():
+    with tarfile.open(HERE / "raw-records.tar.gz") as a:
+        return {member.name: a.extractfile(member).read() for member in a
+                if member.isfile()}
+
+
+def verify_mapped(data):
+    plan = json.loads(data["mapped-plan.json"])
+    report = json.loads(data["mapped-run/report.json"])
+    provenance = json.loads(data["mapped-run/provenance.json"])
+    result = json.loads(data["mapped-result.json"])
+    assert result["binary_sha256"] == ELF and result["passed"] == 153
+    assert plan["revision"] == provenance["suite_commit"] == provenance["target_commit"] == REV
+    assert provenance["suite_source_sha256"] == plan["suite_source_sha256"]
+    assert provenance["target_descriptor_sha256"] == plan["descriptor_sha256"]
+    assert plan["milestones"] == {"P2": 84, "P4": 69}
+    ids = [case["id"] for case in report["cases"]]
+    assert ids == provenance["cases"] == plan["case_ids"] and len(set(ids)) == 153
+    assert report["status"] == "passed" and report["complete"]
+    assert report["counts"] == {"passed": 153, "failed": 0, "unsupported": 0}
+    assert all(case["status"] == "passed" for case in report["cases"])
+    assert digest(data["mapped-run/report.json"]) == result["report_sha256"]
+    assert digest(data["mapped-run/provenance.json"]) == result["provenance_sha256"]
+    junit = ET.fromstring(data["mapped-run/junit.xml"])
+    assert [case.get("name") for case in junit.findall("testcase")] == ids
+    assert junit.get("failures") == junit.get("skipped") == "0"
+    prefix = "mapped-run/cases/"
+    expected = plan["expected_events"]
+    actual = {}
+    for name, raw in data.items():
+        if name.startswith(prefix) and name.endswith("/events.jsonl"):
+            rows = raw.splitlines()
+            assert len(rows) == 1
+            event = json.loads(rows[0])
+            fields = {key: event.get(key) for key in EVENT_FIELDS}
+            assert fields["completed"] and fields["fallback_reason"] is None
+            if fields["physical_gpu"]:
+                assert fields["runtime"] == "wgpu-vulkan"
+                assert fields["device_pci_address"] == "0000:01:00.0"
+                fields["device"] = event["device"]
+            actual[name.removeprefix(prefix)] = fields
+    assert actual == expected
+    assert Counter(row["actual_backend"] for row in actual.values()) == {"cpu": 118, "gpu": 19}
+
+
+def verify_timing(data):
+    report = json.loads(data["t50-pairs/report.json"])
+    terminal = json.loads(data["t50-pairs/drivers-terminal.json"])
+    prereg = json.loads(data["t50-paired-preregistration.json"])
+    assert terminal["arms_returned"] == 4 and terminal["measurement_window_ns"] < 180_000_000_000
+    assert prereg["order"] == EXPECTED == report["order"]
+    assert [row["arm"] for row in report["samples"]] == EXPECTED
+    assert report["status"] == "completed_exact_identity" and report["all_52_inputs_unchanged"]
+    assert report["targets"]["dual_scan"]["binary_sha256"] == ELF
+    assert report["targets"]["dual_scan"]["commit"] == REV
+    assert report["truth_review"]["assumed_symmetric_crop_origin"] == [1, 1]
+    assert len(report["truth_review"]["regions"]) == 50
+    assert len(report["output_cleanup"]) == 4
+    assert all(row["sha256"] == DIGESTS["sha256"] for row in report["output_cleanup"])
+    identity = [[1, 0, 0], [0, 1, 0]]
+    final = []
+    for record in report["samples"]:
+        prefix = f"t50-pairs/diagnostic-{record['number']:02d}/candidate"
+        sample = json.loads(data[prefix + "/sample.json"])
+        assert sample == record["sample"]
+        assert sample["valid"] and sample["returncode"] == 0 and not sample["timed_out"]
+        assert sample["cache_before"] == {"files": 0, "bytes": 0}
+        assert sample["kernel_process_peak_rss_bytes"] > 0
+        end = sample["elapsed_ns"]
+        for metric, file in (("rss", "resources"), ("gpu", "gpu-resources")):
+            count, gap, peak = samples(data[f"{prefix}/{file}.jsonl.gz"], metric, end)
+            assert (count, gap, peak) == (sample[f"{metric}_sample_count"],
+                                           sample[f"maximum_{metric}_sample_gap_ns"],
+                                           sample[f"observed_peak_{metric}_bytes"])
+            if metric == "rss":
+                assert gap <= 20_000_000 and sample["peak_rss_bytes"] == peak
+            else:
+                assert gap > 20_000_000 and sample["peak_gpu_bytes"] is None
+        event = sample["completion"]
+        assert event["completed"] and event["runtime"] == "wgpu-vulkan"
+        assert event["physical_gpu"] and event["fallback_reason"] is None
+        assert len(event["alignment_transforms"]) == 50
+        assert all(value == identity for value in event["alignment_transforms"].values())
+        assert event["sequential_transforms"] == [identity] * 50
+        assert all(sample["output"][key] == value for key, value in DIGESTS.items())
+        assert sample["output"]["shape"] == [3998, 5998, 3]
+        assert sample["output"]["dtype"] == "uint16"
+        final.append(end)
+    assert final == [21966022075, 19544321856, 19513046903, 22045895655]
+    assert report["median_dual_scan_minus_stock_ns"] == -2477274485.5
+
+
+def main():
+    data = read_archive()
+    assert data["release.status"] == data["tests.status"] == data["reviewed-source.status"] == b"0\n"
+    assert data["mapped.status"] == data["mapped-wrapper.status"] == data["t50-pair.status"] == b"0\n"
+    group = re.findall(rb"test result: ok\. (\d+) passed; 0 failed; 0 ignored", data["tests.log"])
+    assert group == [b"4", b"28", b"13"]
+    verify_mapped(data)
+    verify_timing(data)
+    print("45 native tests, 153 mapped cases, and four physical time/resource traces verified.")
+
+
+if __name__ == "__main__":
+    main()

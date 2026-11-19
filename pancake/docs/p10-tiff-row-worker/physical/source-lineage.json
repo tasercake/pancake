@@ -1,0 +1,57 @@
+{
+  "baseline_source": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "rows_candidate_source": "e228c68472767f6ddd71a1de5e585f200685812e",
+  "production_source": "1a887017c5a1d791cec7957ab21bf637545b1890",
+  "baseline_is_candidate_ancestor": true,
+  "bit_identical_shared_source_tree_git_objects": {
+    "pancake/Cargo.lock": {
+      "287828aac07ffad2252785b73a52a59fc07b3409": "91cd70baf3df3ebb330c0858c289d13961d88601",
+      "e228c68472767f6ddd71a1de5e585f200685812e": "91cd70baf3df3ebb330c0858c289d13961d88601"
+    },
+    "pancake/src/job": {
+      "287828aac07ffad2252785b73a52a59fc07b3409": "24688373f7a46525aa3f72ed19a9d73bca10d8ba",
+      "e228c68472767f6ddd71a1de5e585f200685812e": "24688373f7a46525aa3f72ed19a9d73bca10d8ba"
+    },
+    "pancake/src/registration": {
+      "287828aac07ffad2252785b73a52a59fc07b3409": "ddf6433fbd333e8277f330aedc1cc540de8436a4",
+      "e228c68472767f6ddd71a1de5e585f200685812e": "ddf6433fbd333e8277f330aedc1cc540de8436a4"
+    },
+    "pancake/src/fusion": {
+      "287828aac07ffad2252785b73a52a59fc07b3409": "729c879c6c64870d9876bb8ef205e533a6e8b0a3",
+      "e228c68472767f6ddd71a1de5e585f200685812e": "729c879c6c64870d9876bb8ef205e533a6e8b0a3"
+    },
+    "pancake/src/runtime": {
+      "287828aac07ffad2252785b73a52a59fc07b3409": "5ae4c597bff20c6ad2e5fbd09be44a4497380079",
+      "e228c68472767f6ddd71a1de5e585f200685812e": "5ae4c597bff20c6ad2e5fbd09be44a4497380079"
+    },
+    "pancake/src/image_io/export.rs": {
+      "287828aac07ffad2252785b73a52a59fc07b3409": "a93debadc7f7b8675b937831e88844d66dc7da38",
+      "e228c68472767f6ddd71a1de5e585f200685812e": "a93debadc7f7b8675b937831e88844d66dc7da38"
+    },
+    "pancake/crates/pancake-cli": {
+      "287828aac07ffad2252785b73a52a59fc07b3409": "3674943d74657975fc8aebed901b888d335b9faa",
+      "e228c68472767f6ddd71a1de5e585f200685812e": "3674943d74657975fc8aebed901b888d335b9faa"
+    }
+  },
+  "changed_first_party_src_files": [
+    "pancake/src/image_io/mod.rs",
+    "pancake/src/image_io/tiled.rs",
+    "pancake/src/image_io/tiled/tests.rs"
+  ],
+  "physical_output_layout_and_identity": {
+    "shape": [
+      3998,
+      5998,
+      3
+    ],
+    "dtype": "uint16",
+    "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302",
+    "pixel_sha256": "f54746784bcc278da2df734e9f034053a3b54105ddb2a30046baf6dab07a80a3",
+    "bytes": 143881378,
+    "minimum": 7663,
+    "maximum": 57895
+  },
+  "original_resident_rgb_path_code_unchanged": true,
+  "independent_review_commit": "a5cd3ce57516a0b80aa10fa26f521a1240539dfa",
+  "independent_review_path": "pancake/docs/p10-tiff-row-workers-review/README.md"
+}

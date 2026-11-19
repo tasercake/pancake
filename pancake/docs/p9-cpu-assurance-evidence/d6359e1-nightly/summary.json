@@ -1,0 +1,139 @@
+{
+  "revision": "d6359e129737f1a9077fb4abc2a8f783fa1f7b38",
+  "strict_status": 1,
+  "test_targets_with_results": 20,
+  "nonempty_test_targets": 19,
+  "tests": {
+    "passed": 127,
+    "failed": 0,
+    "ignored": 0
+  },
+  "coverage": {
+    "lines": {
+      "count": 5932,
+      "covered": 4202,
+      "uncovered": 1730
+    },
+    "functions": {
+      "count": 684,
+      "covered": 426,
+      "uncovered": 258
+    },
+    "regions": {
+      "count": 6713,
+      "covered": 4303,
+      "uncovered": 2410
+    },
+    "branches": {
+      "count": 640,
+      "covered": 520,
+      "uncovered": 120
+    }
+  },
+  "branch_gaps_by_file": [
+    {
+      "file": "crates/pancake-cli/src/main.rs",
+      "uncovered": 1
+    },
+    {
+      "file": "crates/pancake-gui/src/history.rs",
+      "uncovered": 6
+    },
+    {
+      "file": "crates/pancake-gui/src/main.rs",
+      "uncovered": 3
+    },
+    {
+      "file": "crates/pancake-gui/src/preferences/mod.rs",
+      "uncovered": 1
+    },
+    {
+      "file": "crates/pancake-gui/src/preview.rs",
+      "uncovered": 4
+    },
+    {
+      "file": "crates/pancake-gui/src/sources/mod.rs",
+      "uncovered": 6
+    },
+    {
+      "file": "src/fusion/advanced/levels.rs",
+      "uncovered": 1
+    },
+    {
+      "file": "src/fusion/advanced/mod.rs",
+      "uncovered": 7
+    },
+    {
+      "file": "src/fusion/advanced/plan.rs",
+      "uncovered": 6
+    },
+    {
+      "file": "src/fusion/advanced/pyramid.rs",
+      "uncovered": 1
+    },
+    {
+      "file": "src/fusion/buffers.rs",
+      "uncovered": 7
+    },
+    {
+      "file": "src/fusion/focus.rs",
+      "uncovered": 1
+    },
+    {
+      "file": "src/image_io/export.rs",
+      "uncovered": 3
+    },
+    {
+      "file": "src/image_io/raw.rs",
+      "uncovered": 2
+    },
+    {
+      "file": "src/job/events.rs",
+      "uncovered": 2
+    },
+    {
+      "file": "src/job/lifecycle.rs",
+      "uncovered": 1
+    },
+    {
+      "file": "src/job/mod.rs",
+      "uncovered": 9
+    },
+    {
+      "file": "src/job/registration.rs",
+      "uncovered": 4
+    },
+    {
+      "file": "src/job/stream.rs",
+      "uncovered": 4
+    },
+    {
+      "file": "src/job/worker.rs",
+      "uncovered": 5
+    },
+    {
+      "file": "src/registration/estimate.rs",
+      "uncovered": 20
+    },
+    {
+      "file": "src/registration/geometry.rs",
+      "uncovered": 8
+    },
+    {
+      "file": "src/registration/kernels.rs",
+      "uncovered": 2
+    },
+    {
+      "file": "src/registration/spectral.rs",
+      "uncovered": 2
+    },
+    {
+      "file": "src/runtime/mod.rs",
+      "uncovered": 7
+    },
+    {
+      "file": "src/runtime/portable.rs",
+      "uncovered": 7
+    }
+  ]
+}

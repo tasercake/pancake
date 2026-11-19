@@ -1,0 +1,454 @@
+{
+  "scope": "One four-core full native D150 CPU quality diagnostic per executable",
+  "baseline_revision": "287828a",
+  "baseline_sha256": "874c8683623131b5619858a9cba61cb6219bc2eae6d6bdb30ed1bc5d8634ce8e",
+  "candidate_revision": "59d0bcb579b8cbd7718df7867ef1fd0a87cb86f5",
+  "candidate_sha256": "06cc7cd775541281093ad4da427e590276fb743cecfea86b835d604171e172c6",
+  "source_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+  "template_sha256": "8af0534f442b8912e7cea17065b07de6ef65b0e3ea062a62fe0b6882bc57136b",
+  "all_originals_unchanged": true,
+  "all_transforms_exactly_equal": true,
+  "ordered_events_byte_identical": true,
+  "event_sha256": [
+    "e5b11085f6586765d74d4311347437b57a67f24966d389800c92ae396a3b2f05",
+    "e5b11085f6586765d74d4311347437b57a67f24966d389800c92ae396a3b2f05"
+  ],
+  "first_canvas_ltrb": [
+    87,
+    99,
+    2217,
+    1629
+  ],
+  "bounded_cubic_eligible_frame_indices": [
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149
+  ],
+  "outputs": {
+    "bilinear": {
+      "shape": [
+        1530,
+        2130,
+        3
+      ],
+      "encoded_sha256": "fee2530932c54dc6ab1468a1a1c0f65c0c88d90b4f4574c35c79072395406ab0",
+      "pixel_sha256": "7e1ba2a85156b3ca872972c95cd0cb51a09ce61b58a3ba6a9d5eec627b6695ab"
+    },
+    "bounded_cubic": {
+      "shape": [
+        1530,
+        2130,
+        3
+      ],
+      "encoded_sha256": "64e46fd4f182eca334900b7a1bc0eaa819d4453ade75984edc1aa2eb658ea9be",
+      "pixel_sha256": "9dbf30549ac122daa8fdc5a9c87b9bc97f20e3e29523e1903a0ca8f73c2114f8"
+    }
+  },
+  "whole_rgb16_mae": 39.680625364386756,
+  "whole_rgb16_max_abs": 8784,
+  "changed_channel_fraction": 0.9780868800310943,
+  "signed_heldout_detail": [
+    {
+      "selection": "previous_raw_holdout",
+      "first_canvas_xywh": [
+        670,
+        675,
+        96,
+        96
+      ],
+      "raw_witness": "P9160585_d2.jpg",
+      "raw_witness_sha256": "15eb4558cfbb88550c7f1e928e110177a023b112d391104ff91e2a8e2875aebc",
+      "raw_p90": 0.032749019607843266,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.051766598001068365,
+        "signed_projection_on_source": 0.3267064019718365,
+        "signed_phase_correlation": 0.20366191273039067
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.051736745250629435,
+        "signed_projection_on_source": 0.3264310244978022,
+        "signed_phase_correlation": 0.20359455370250315
+      }
+    },
+    {
+      "selection": "previous_raw_holdout",
+      "first_canvas_xywh": [
+        670,
+        1045,
+        96,
+        96
+      ],
+      "raw_witness": "P9160599_d2.jpg",
+      "raw_witness_sha256": "351fdea0a344ccae35ed7bd7cb96c8a9ce0186d0a2be5d44341fd58700f357f0",
+      "raw_p90": 0.02662196078431389,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.03921022049286649,
+        "signed_projection_on_source": 0.2483193924203438,
+        "signed_phase_correlation": 0.17522337475956554
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.039212175173571284,
+        "signed_projection_on_source": 0.24810631611959322,
+        "signed_phase_correlation": 0.17519308883842682
+      }
+    },
+    {
+      "selection": "previous_raw_holdout",
+      "first_canvas_xywh": [
+        1505,
+        345,
+        96,
+        96
+      ],
+      "raw_witness": "P9160546_d2.jpg",
+      "raw_witness_sha256": "cfd5d9c4c6a6e9759111b739c55fc7ba04453ffe1e73a01f0a67fff79c6f9d0c",
+      "raw_p90": 0.024378823529411675,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.04372800793469145,
+        "signed_projection_on_source": 0.18043089163342874,
+        "signed_phase_correlation": 0.09966560839220401
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.04373017929350764,
+        "signed_projection_on_source": 0.1802970301149922,
+        "signed_phase_correlation": 0.09966005313971794
+      }
+    },
+    {
+      "selection": "previous_raw_holdout",
+      "first_canvas_xywh": [
+        1505,
+        1045,
+        96,
+        96
+      ],
+      "raw_witness": "P9160563_d2.jpg",
+      "raw_witness_sha256": "137c3612f3a6ac8bc70de902d74609a05bdc66b7796ae0fb53db8e58f9d5cdc4",
+      "raw_p90": 0.026318431372548967,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.04519382619974044,
+        "signed_projection_on_source": 0.18733614391638445,
+        "signed_phase_correlation": 0.11007493495553068
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.04517795986877249,
+        "signed_projection_on_source": 0.18723499692289833,
+        "signed_phase_correlation": 0.11008134524678316
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        670,
+        345,
+        96,
+        96
+      ],
+      "raw_witness": "P9160656_d2.jpg",
+      "raw_witness_sha256": "5b5dfaec21e2956715a64bfdf1e61e4ec05d05a9fdbd135a4ce22e74e9f77b6e",
+      "raw_p90": 0.00988111390859836,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.05020527656977203,
+        "signed_projection_on_source": -0.10230471272818163,
+        "signed_phase_correlation": -0.019824866253533094
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.05016505378805203,
+        "signed_projection_on_source": -0.10441890242621257,
+        "signed_phase_correlation": -0.02024277369053366
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        880,
+        345,
+        96,
+        96
+      ],
+      "raw_witness": "P9160656_d2.jpg",
+      "raw_witness_sha256": "5b5dfaec21e2956715a64bfdf1e61e4ec05d05a9fdbd135a4ce22e74e9f77b6e",
+      "raw_p90": 0.009377566186007602,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.059619732967116645,
+        "signed_projection_on_source": 0.11311424326026884,
+        "signed_phase_correlation": 0.017806277685018634
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.05957639581902807,
+        "signed_projection_on_source": 0.11357809192323386,
+        "signed_phase_correlation": 0.017891109968339994
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        1505,
+        345,
+        96,
+        96
+      ],
+      "raw_witness": "P9160657_d2.jpg",
+      "raw_witness_sha256": "8c5350fa12ec89f69569f1f11fe31c8d2d5a68a362d85a58cef40a0f0832f667",
+      "raw_p90": 0.009677926298923945,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.04372800793469145,
+        "signed_projection_on_source": 0.030025595916094567,
+        "signed_phase_correlation": 0.006512674438331037
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.04373017929350764,
+        "signed_projection_on_source": 0.03005183649494075,
+        "signed_phase_correlation": 0.006522842091232149
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        1735,
+        345,
+        96,
+        96
+      ],
+      "raw_witness": "P9160657_d2.jpg",
+      "raw_witness_sha256": "8c5350fa12ec89f69569f1f11fe31c8d2d5a68a362d85a58cef40a0f0832f667",
+      "raw_p90": 0.009042169832913505,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.021693595788509823,
+        "signed_projection_on_source": 0.06623118563037186,
+        "signed_phase_correlation": 0.022595510992930716
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.021718820477607093,
+        "signed_projection_on_source": 0.06780747091725525,
+        "signed_phase_correlation": 0.023151836998750387
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        670,
+        675,
+        96,
+        96
+      ],
+      "raw_witness": "P9160656_d2.jpg",
+      "raw_witness_sha256": "5b5dfaec21e2956715a64bfdf1e61e4ec05d05a9fdbd135a4ce22e74e9f77b6e",
+      "raw_p90": 0.009709599450675177,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.051766598001068365,
+        "signed_projection_on_source": -0.09211357332164576,
+        "signed_phase_correlation": -0.016147137200205608
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.051736745250629435,
+        "signed_projection_on_source": -0.09214224636745484,
+        "signed_phase_correlation": -0.01616044278310995
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        880,
+        675,
+        96,
+        96
+      ],
+      "raw_witness": "P9160658_d2.jpg",
+      "raw_witness_sha256": "be0eb14375eb4f5819e145e04fdee9d73b84e56591f54139a53b537c4f5f5cef",
+      "raw_p90": 0.010319369802395673,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.05815256733043417,
+        "signed_projection_on_source": 0.05559426504194791,
+        "signed_phase_correlation": 0.009734207897747172
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.05817579156176078,
+        "signed_projection_on_source": 0.055617778568252486,
+        "signed_phase_correlation": 0.009744404448222086
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        1505,
+        675,
+        96,
+        96
+      ],
+      "raw_witness": "P9160656_d2.jpg",
+      "raw_witness_sha256": "5b5dfaec21e2956715a64bfdf1e61e4ec05d05a9fdbd135a4ce22e74e9f77b6e",
+      "raw_p90": 0.010148258182650638,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.02565856260013738,
+        "signed_projection_on_source": -0.022419008430400265,
+        "signed_phase_correlation": -0.008737386107167467
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.02563332112611577,
+        "signed_projection_on_source": -0.0217147957105108,
+        "signed_phase_correlation": -0.00846969159525585
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        1735,
+        675,
+        96,
+        96
+      ],
+      "raw_witness": "P9160660_d2.jpg",
+      "raw_witness_sha256": "6ced07c726d451ac02a231d7d31ab8397d0e05311bf8af5fbd169e55ca5d7267",
+      "raw_p90": 0.010912254520485276,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.036511834897383244,
+        "signed_projection_on_source": -0.009541516595204877,
+        "signed_phase_correlation": -0.002874910905727546
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.03648448004882887,
+        "signed_projection_on_source": -0.008015230124992822,
+        "signed_phase_correlation": -0.0024168485393563917
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        670,
+        1045,
+        96,
+        96
+      ],
+      "raw_witness": "P9160656_d2.jpg",
+      "raw_witness_sha256": "5b5dfaec21e2956715a64bfdf1e61e4ec05d05a9fdbd135a4ce22e74e9f77b6e",
+      "raw_p90": 0.010531157396810875,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.03921022049286649,
+        "signed_projection_on_source": 0.0187663515601431,
+        "signed_phase_correlation": 0.00510713182262153
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.039212175173571284,
+        "signed_projection_on_source": 0.019265479922583387,
+        "signed_phase_correlation": 0.0052465618610750865
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        880,
+        1045,
+        96,
+        96
+      ],
+      "raw_witness": "P9160655_d2.jpg",
+      "raw_witness_sha256": "6117cb6e01e3b2e9c5ecccd651a839035fb7e851f37ec9eaa91235147e95fd97",
+      "raw_p90": 0.010159295033188354,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.046605444419012654,
+        "signed_projection_on_source": -0.052836645170483754,
+        "signed_phase_correlation": -0.0112454192793079
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.046595140001525814,
+        "signed_projection_on_source": -0.052420045753128724,
+        "signed_phase_correlation": -0.011164019695728064
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        1505,
+        1045,
+        96,
+        96
+      ],
+      "raw_witness": "P9160656_d2.jpg",
+      "raw_witness_sha256": "5b5dfaec21e2956715a64bfdf1e61e4ec05d05a9fdbd135a4ce22e74e9f77b6e",
+      "raw_p90": 0.009686546120393658,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.04519382619974044,
+        "signed_projection_on_source": -0.10664947023519948,
+        "signed_phase_correlation": -0.022993079924706658
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.04517795986877249,
+        "signed_projection_on_source": -0.1064396338581587,
+        "signed_phase_correlation": -0.022961574129239937
+      }
+    },
+    {
+      "selection": "eligible_raw_grid",
+      "first_canvas_xywh": [
+        1735,
+        1045,
+        96,
+        96
+      ],
+      "raw_witness": "P9160656_d2.jpg",
+      "raw_witness_sha256": "5b5dfaec21e2956715a64bfdf1e61e4ec05d05a9fdbd135a4ce22e74e9f77b6e",
+      "raw_p90": 0.01027551842526886,
+      "bilinear": {
+        "luma_laplacian_absolute_p90": 0.04278190432593276,
+        "signed_projection_on_source": -0.016326258766222474,
+        "signed_phase_correlation": -0.003981314962189459
+      },
+      "bounded_cubic": {
+        "luma_laplacian_absolute_p90": 0.04276801709010436,
+        "signed_projection_on_source": -0.01587515013139845,
+        "signed_phase_correlation": -0.0038736555117629815
+      }
+    }
+  ],
+  "sealed_reference_p90_ratios": [
+    {
+      "first_canvas_xywh": [
+        1271,
+        131,
+        192,
+        192
+      ],
+      "bilinear": 0.7056491868649284,
+      "bounded_cubic": 0.7050292033911864
+    },
+    {
+      "first_canvas_xywh": [
+        1079,
+        515,
+        192,
+        192
+      ],
+      "bilinear": 0.6906239859933142,
+      "bounded_cubic": 0.6901338500914656
+    },
+    {
+      "first_canvas_xywh": [
+        1271,
+        515,
+        192,
+        192
+      ],
+      "bilinear": 0.6858567564793039,
+      "bounded_cubic": 0.6856066269488704
+    },
+    {
+      "first_canvas_xywh": [
+        1079,
+        899,
+        192,
+        192
+      ],
+      "bilinear": 0.6939490478550127,
+      "bounded_cubic": 0.6934281936559326
+    }
+  ]
+}

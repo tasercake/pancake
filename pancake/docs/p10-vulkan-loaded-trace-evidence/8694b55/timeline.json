@@ -1,0 +1,853 @@
+{
+  "scope": "direct exact-GUI source-only Vulkan diagnostic, no frozen credit",
+  "api_counts": {
+    "vkQueueSubmit": 422,
+    "vkAcquireNextImageKHR": 200,
+    "vkQueuePresentKHR": 200
+  },
+  "native_gui_exit": {
+    "gui_pid": 463285,
+    "normal_close_requested_ns": 549132430515372,
+    "exit_observed_by_pidfd": true,
+    "forced_after_native_close": false,
+    "exit_code_available_to_driver": false,
+    "close_exception": null
+  },
+  "gui_pid": 463285,
+  "timeline": [
+    {
+      "diagnostic_step": 3,
+      "input": {
+        "kind": "click",
+        "at": {
+          "control": "viewer.actual"
+        }
+      },
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatched_to_visible_ns": 20656783,
+      "clock_envelope_ns": 1412,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            638816,
+            640228
+          ],
+          "end_ns_from_dispatch_range": [
+            639698,
+            641110
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1856892,
+            1858304
+          ],
+          "end_ns_from_dispatch_range": [
+            1875186,
+            1876598
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1913368,
+            1914780
+          ],
+          "end_ns_from_dispatch_range": [
+            1916253,
+            1917665
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1918297,
+            1919709
+          ],
+          "end_ns_from_dispatch_range": [
+            19908958,
+            19910370
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 4,
+      "input": {
+        "kind": "drag",
+        "at": {
+          "control": "viewer",
+          "fraction": [
+            0.5,
+            0.5
+          ]
+        },
+        "to": {
+          "control": "viewer",
+          "fraction": [
+            0.59,
+            0.44
+          ]
+        }
+      },
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatched_to_visible_ns": 22722149,
+      "clock_envelope_ns": 932,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            394968,
+            395900
+          ],
+          "end_ns_from_dispatch_range": [
+            395760,
+            396692
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1611541,
+            1612473
+          ],
+          "end_ns_from_dispatch_range": [
+            1629254,
+            1630186
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1674429,
+            1675361
+          ],
+          "end_ns_from_dispatch_range": [
+            1677375,
+            1678307
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1679639,
+            1680571
+          ],
+          "end_ns_from_dispatch_range": [
+            21359900,
+            21360832
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 6,
+      "input": {
+        "kind": "click",
+        "at": {
+          "control": "viewer.actual"
+        }
+      },
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatched_to_visible_ns": 22786470,
+      "clock_envelope_ns": 671,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            657773,
+            658444
+          ],
+          "end_ns_from_dispatch_range": [
+            658674,
+            659345
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2109337,
+            2110008
+          ],
+          "end_ns_from_dispatch_range": [
+            2127020,
+            2127691
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2166664,
+            2167335
+          ],
+          "end_ns_from_dispatch_range": [
+            2169219,
+            2169890
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2170812,
+            2171483
+          ],
+          "end_ns_from_dispatch_range": [
+            22207582,
+            22208253
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 7,
+      "input": {
+        "kind": "drag",
+        "at": {
+          "control": "viewer",
+          "fraction": [
+            0.5,
+            0.5
+          ]
+        },
+        "to": {
+          "control": "viewer",
+          "fraction": [
+            0.59,
+            0.44
+          ]
+        }
+      },
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatched_to_visible_ns": 22899452,
+      "clock_envelope_ns": 933,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            446786,
+            447719
+          ],
+          "end_ns_from_dispatch_range": [
+            448549,
+            449482
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2010400,
+            2011333
+          ],
+          "end_ns_from_dispatch_range": [
+            2034826,
+            2035759
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2090501,
+            2091434
+          ],
+          "end_ns_from_dispatch_range": [
+            2093366,
+            2094299
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2095440,
+            2096373
+          ],
+          "end_ns_from_dispatch_range": [
+            22093918,
+            22094851
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 9,
+      "input": {
+        "kind": "click",
+        "at": {
+          "control": "viewer.actual"
+        }
+      },
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatched_to_visible_ns": 22846442,
+      "clock_envelope_ns": 832,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            809308,
+            810140
+          ],
+          "end_ns_from_dispatch_range": [
+            811161,
+            811993
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2386688,
+            2387520
+          ],
+          "end_ns_from_dispatch_range": [
+            2413037,
+            2413869
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2459655,
+            2460487
+          ],
+          "end_ns_from_dispatch_range": [
+            2462760,
+            2463592
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2464413,
+            2465245
+          ],
+          "end_ns_from_dispatch_range": [
+            22178518,
+            22179350
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 10,
+      "input": {
+        "kind": "drag",
+        "at": {
+          "control": "viewer",
+          "fraction": [
+            0.5,
+            0.5
+          ]
+        },
+        "to": {
+          "control": "viewer",
+          "fraction": [
+            0.59,
+            0.44
+          ]
+        }
+      },
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatched_to_visible_ns": 22707452,
+      "clock_envelope_ns": 671,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            412434,
+            413105
+          ],
+          "end_ns_from_dispatch_range": [
+            413847,
+            414518
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1967732,
+            1968403
+          ],
+          "end_ns_from_dispatch_range": [
+            1985796,
+            1986467
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2028196,
+            2028867
+          ],
+          "end_ns_from_dispatch_range": [
+            2030941,
+            2031612
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2033215,
+            2033886
+          ],
+          "end_ns_from_dispatch_range": [
+            21255767,
+            21256438
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 13,
+      "input": {
+        "kind": "click",
+        "at": {
+          "control": "viewer.actual"
+        }
+      },
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "dispatched_to_visible_ns": 23847100,
+      "clock_envelope_ns": 1032,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            707699,
+            708731
+          ],
+          "end_ns_from_dispatch_range": [
+            710093,
+            711125
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2373595,
+            2374627
+          ],
+          "end_ns_from_dispatch_range": [
+            2399283,
+            2400315
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2448516,
+            2449548
+          ],
+          "end_ns_from_dispatch_range": [
+            2451561,
+            2452593
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2453785,
+            2454817
+          ],
+          "end_ns_from_dispatch_range": [
+            23189547,
+            23190579
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 14,
+      "input": {
+        "kind": "drag",
+        "at": {
+          "control": "viewer",
+          "fraction": [
+            0.5,
+            0.5
+          ]
+        },
+        "to": {
+          "control": "viewer",
+          "fraction": [
+            0.59,
+            0.44
+          ]
+        }
+      },
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "dispatched_to_visible_ns": 23825109,
+      "clock_envelope_ns": 1042,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            571223,
+            572265
+          ],
+          "end_ns_from_dispatch_range": [
+            573367,
+            574409
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2704336,
+            2705378
+          ],
+          "end_ns_from_dispatch_range": [
+            2735304,
+            2736346
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2804143,
+            2805185
+          ],
+          "end_ns_from_dispatch_range": [
+            2808031,
+            2809073
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2810776,
+            2811818
+          ],
+          "end_ns_from_dispatch_range": [
+            22635959,
+            22637001
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 18,
+      "input": {
+        "kind": "click",
+        "at": {
+          "control": "viewer.actual"
+        }
+      },
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "dispatched_to_visible_ns": 21778048,
+      "clock_envelope_ns": 1142,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            710898,
+            712040
+          ],
+          "end_ns_from_dispatch_range": [
+            712712,
+            713854
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2307775,
+            2308917
+          ],
+          "end_ns_from_dispatch_range": [
+            2334275,
+            2335417
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2386262,
+            2387404
+          ],
+          "end_ns_from_dispatch_range": [
+            2389839,
+            2390981
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2392554,
+            2393696
+          ],
+          "end_ns_from_dispatch_range": [
+            21073069,
+            21074211
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 19,
+      "input": {
+        "kind": "drag",
+        "at": {
+          "control": "viewer",
+          "fraction": [
+            0.5,
+            0.5
+          ]
+        },
+        "to": {
+          "control": "viewer",
+          "fraction": [
+            0.59,
+            0.44
+          ]
+        }
+      },
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "dispatched_to_visible_ns": 21706513,
+      "clock_envelope_ns": 1082,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            483573,
+            484655
+          ],
+          "end_ns_from_dispatch_range": [
+            485206,
+            486288
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1888769,
+            1889851
+          ],
+          "end_ns_from_dispatch_range": [
+            1910310,
+            1911392
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1954843,
+            1955925
+          ],
+          "end_ns_from_dispatch_range": [
+            1957759,
+            1958841
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1959502,
+            1960584
+          ],
+          "end_ns_from_dispatch_range": [
+            19730711,
+            19731793
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 23,
+      "input": {
+        "kind": "click",
+        "at": {
+          "control": "viewer.actual"
+        }
+      },
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "dispatched_to_visible_ns": 22931972,
+      "clock_envelope_ns": 1061,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            548238,
+            549299
+          ],
+          "end_ns_from_dispatch_range": [
+            548718,
+            549779
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1831375,
+            1832436
+          ],
+          "end_ns_from_dispatch_range": [
+            1847536,
+            1848597
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1886008,
+            1887069
+          ],
+          "end_ns_from_dispatch_range": [
+            1888643,
+            1889704
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            1890496,
+            1891557
+          ],
+          "end_ns_from_dispatch_range": [
+            21629918,
+            21630979
+          ]
+        }
+      ]
+    },
+    {
+      "diagnostic_step": 24,
+      "input": {
+        "kind": "drag",
+        "at": {
+          "control": "viewer",
+          "fraction": [
+            0.5,
+            0.5
+          ]
+        },
+        "to": {
+          "control": "viewer",
+          "fraction": [
+            0.59,
+            0.44
+          ]
+        }
+      },
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "dispatched_to_visible_ns": 21768409,
+      "clock_envelope_ns": 1022,
+      "host_api_intervals_overlapping_transition": [
+        {
+          "name": "vkAcquireNextImageKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            546015,
+            547037
+          ],
+          "end_ns_from_dispatch_range": [
+            548079,
+            549101
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2057441,
+            2058463
+          ],
+          "end_ns_from_dispatch_range": [
+            2089281,
+            2090303
+          ]
+        },
+        {
+          "name": "vkQueueSubmit",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2141128,
+            2142150
+          ],
+          "end_ns_from_dispatch_range": [
+            2144084,
+            2145106
+          ]
+        },
+        {
+          "name": "vkQueuePresentKHR",
+          "tid": 463285,
+          "start_ns_from_dispatch_range": [
+            2146488,
+            2147510
+          ],
+          "end_ns_from_dispatch_range": [
+            21047437,
+            21048459
+          ]
+        }
+      ]
+    }
+  ]
+}

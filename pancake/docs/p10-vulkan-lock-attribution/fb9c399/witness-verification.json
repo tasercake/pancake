@@ -1,0 +1,8 @@
+{
+  "viewer_samples": 280,
+  "original_witnesses": 19,
+  "presented_patches": 784,
+  "maximum_rgb_channel_error": 1,
+  "physical_completion": 1,
+  "capture_sha256": "f55f67540d45a1edc03ec45f6ad75a5feb763b36536ccc9f14e418cb1c607371"
+}

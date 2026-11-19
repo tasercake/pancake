@@ -1,0 +1,120 @@
+{
+  "pair_terminal_at": "2026-11-18T23:28:01+08:00",
+  "borrower": "p7_ui",
+  "all_declared_roles_released": true,
+  "read_only_roles": [
+    {
+      "role": "packaged_stock_viewer",
+      "terminal_at": "2026-11-18T23:24:02+08:00",
+      "collector_end_at": "2026-11-18T23:24:01+08:00",
+      "terminal_receipt": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-poll-park-fb9c399/pair-control-terminal",
+      "candidate": {
+        "commit": "fb9c399a96658331cb76b843a1e565b503e94fdd",
+        "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+        "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+        "binary_sha256": "b6f169340937281be06701715d4394c732495ef43a70f09bfdbe03319693bbbd",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-poll-park-control-fb9c399/pancake/target/release/pancake-gui",
+        "component": "gui",
+        "diagnostic_arm": "control",
+        "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-fb9c399/pancake_0.1.0_amd64.deb",
+        "package_sha256": "b8f707ca5812ce2137b49feee2888b50de53825e160aa9ccb0e30f55b02a62de",
+        "package_verification_sha256": "2e9083b9f4473b12407fc5a065c7b6ce6419ea363625af79a19dc91e25f0fecf",
+        "release_build_log_sha256": "ec22c3dc2b5874ebed3aa4d32c3be733cad78404f028bd2a9fc25e9e77030c68"
+      },
+      "collector_exit": 0,
+      "reducer_exit": 1,
+      "shutdown": {
+        "pid": 1444122,
+        "returncode": 0,
+        "forced": false,
+        "status": "clean"
+      },
+      "materialization_sha256": "dd20ddfddf96aecccbf08e27d3d240a848efdfce927577ead0cf9c96261f78a4",
+      "ordered_inputs_unchanged": 50,
+      "native_capture": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-poll-park-fb9c399/control/first-capture/artifacts/capture/native-latency.json",
+      "native_capture_sha256": "e7ea2e553e18bf323767950ec6ebebc49fb09a97aa846087a79603b1593e27fc",
+      "measurement_summary": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-poll-park-fb9c399/control/first-capture/artifacts/summary.json",
+      "measurement_summary_sha256": "2ddd2f27a2af64e391cbd2abd585e07cba8d90d68e07497833818be7184fc2cd",
+      "reduction": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-poll-park-fb9c399/control/first-capture/artifacts/frozen-reduction.json",
+      "reduction_sha256": "8d062f6dd0d036e9cb2ca60a625cdd6d7805727754f2404fc2452c2da2bee43f",
+      "viewer": {
+        "idle": {
+          "status": "pass",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 19517642,
+            "p50": 22544632.0,
+            "p95": 23192439,
+            "max": 201256066
+          }
+        },
+        "loaded": {
+          "status": "fail",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 19466326,
+            "p50": 21935279.5,
+            "p95": 42208036,
+            "max": 49899262
+          }
+        }
+      }
+    },
+    {
+      "role": "experimental_nonblocking_poll_viewer",
+      "terminal_at": "2026-11-18T23:28:01+08:00",
+      "collector_end_at": "2026-11-18T23:28:01+08:00",
+      "terminal_receipt": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-poll-park-fb9c399/pair-nonblocking-terminal",
+      "candidate": {
+        "commit": "71ec40d36b972b447cfbe6e680c978a3ef41ded5",
+        "lock_sha256": "bc328dbe8185901d2ca1f21f82b0dc59201afb43997eed1c0fca53fbca1c590f",
+        "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+        "binary_sha256": "eb8c5afc7b0e6a0f775e342252a7257058796d25ba6d6063df288a414f6a439a",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-poll-park-fb9c399/pancake/target/release/pancake-gui",
+        "component": "gui",
+        "diagnostic_arm": "nonblocking",
+        "experimental_build_sha256": "e364eadfee346f3e94793f248122d5829d5f7d002649de9ba2ca8b24b4e9e588",
+        "vendor_patch_sha256": "34fcccd5175fe2052e24c58165965934848fdb6d3b25dd284ab900948111cb70",
+        "release_build_log_sha256": "8b32997ff6ac725d042ccb59ea0ab941b8a3f8c5a96917997ac5eab53e7ed6b2"
+      },
+      "collector_exit": 0,
+      "reducer_exit": 1,
+      "shutdown": {
+        "pid": 1463306,
+        "returncode": 0,
+        "forced": false,
+        "status": "clean"
+      },
+      "materialization_sha256": "dd20ddfddf96aecccbf08e27d3d240a848efdfce927577ead0cf9c96261f78a4",
+      "ordered_inputs_unchanged": 50,
+      "native_capture": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-poll-park-fb9c399/nonblocking/first-capture/artifacts/capture/native-latency.json",
+      "native_capture_sha256": "cc466f1416ecf22070087a76be11dace16b5d96e751dbec5f20ee61195e58ceb",
+      "measurement_summary": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-poll-park-fb9c399/nonblocking/first-capture/artifacts/summary.json",
+      "measurement_summary_sha256": "08735721c0fccdcd1c8e5a5191028edec1319d0a4968567eb2df59f2c0865d9b",
+      "reduction": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-poll-park-fb9c399/nonblocking/first-capture/artifacts/frozen-reduction.json",
+      "reduction_sha256": "059a129b9bf8b21b97d26fdcc94c7610b3c9fb9380ffdf1d381859c329a82020",
+      "viewer": {
+        "idle": {
+          "status": "pass",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 19614947,
+            "p50": 22355937.0,
+            "p95": 23794694,
+            "max": 200978102
+          }
+        },
+        "loaded": {
+          "status": "fail",
+          "input_to_present_ns": {
+            "count": 200,
+            "min": 19493369,
+            "p50": 22719197.0,
+            "p95": 68006819,
+            "max": 100389156
+          }
+        }
+      }
+    }
+  ]
+}

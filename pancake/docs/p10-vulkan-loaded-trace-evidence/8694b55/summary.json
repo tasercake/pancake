@@ -1,0 +1,195 @@
+{
+  "scope": "one source-only physical 12-frame Nsight host Vulkan diagnostic; no frozen qualification",
+  "candidate": {
+    "commit": "8694b555666a1ddf4051e2839bbced4bcc625859",
+    "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+    "component": "gui",
+    "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-queue-loaded-8694/pancake/target/release/pancake-gui",
+    "binary_sha256": "62e77cb6305514c2a1bbd1bcf3fc4e1518cbae572d48483e4e5e2f938daacf06",
+    "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-8694b55/pancake_0.1.0_amd64.deb",
+    "package_sha256": "7dbc969e1813bc62aa4df206bb77982e3f7705298f753e12b7a493ae89ce3784",
+    "package_verification_sha256": "7b9db7b7c92b0272cdce60000cdef309d42e77afc19eb56392418251c3c32b71",
+    "release_build_log_sha256": "bfc21d0b6414f4c39890808b24c1222374a04ae5685f6c03b0ac0bbfd7b7aa00"
+  },
+  "gui": {
+    "pid": 463285,
+    "gpu": {
+      "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+      "pci.bus_id": "00000000:01:00.0",
+      "name": "NVIDIA GeForce RTX 3090",
+      "driver_version": "580.178.04",
+      "pstate": "P8",
+      "temperature.gpu": "41",
+      "power.draw": "17.63",
+      "power.limit": "350.00",
+      "clocks.gr": "210",
+      "clocks.mem": "405"
+    },
+    "size": [
+      1440,
+      1000
+    ],
+    "resident_bytes": 117088256
+  },
+  "gui_exit": {
+    "gui_pid": 463285,
+    "normal_close_requested_ns": 549132430515372,
+    "exit_observed_by_pidfd": true,
+    "forced_after_native_close": false,
+    "exit_code_available_to_driver": false,
+    "close_exception": null
+  },
+  "observed_api_counts": {
+    "vkQueueSubmit": 422,
+    "vkAcquireNextImageKHR": 200,
+    "vkQueuePresentKHR": 200
+  },
+  "native_event_counts": {
+    "idle/zoom": 3,
+    "idle/pan": 3,
+    "loaded/zoom": 3,
+    "loaded/pan": 3
+  },
+  "max_utc_monotonic_envelope_ns": 1412,
+  "verified_pngs": 36,
+  "max_channel_error": 1,
+  "trace_start": "2026-11-18T20:15:23+08:00",
+  "trace_end": "2026-11-18T20:15:44+08:00",
+  "physical_stack": {
+    "runtime": "wgpu-vulkan",
+    "device": "NVIDIA GeForce RTX 3090",
+    "device_pci_address": "0000:01:00.0",
+    "physical_gpu": true,
+    "completed": true
+  },
+  "raw_hashes_sha256": {
+    "queue.nsys-rep": "175becfd3bd651d648e3ce2e719b681cc131f5bf70e22f42d06cbeae620dc838",
+    "queue-utc.sqlite": "849374e0fbf8ff9ed8ef0b0b68ca0391bb5cf0b02233d1a2b17333cf40340bfc",
+    "artifacts/capture/native-latency.json": "e597b84d319f947f90835c835c11d34d2f96e9a348117c8fb30161077478ec3b",
+    "timeline.json": "7cf029b4f013afa9c9c6c5311a238d6ef9cf371a9836737a1b02a7a69a3d0380"
+  },
+  "ordered_prefix_manifest_sha256": "2bf5080658823eec0e87eea358e5860d636ad5db31bca6e3627c065545c9ef27",
+  "events": [
+    {
+      "step": 3,
+      "action": "zoom",
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatch_to_visible_ns": 20656783,
+      "maximum_observation_gap_ns": 1155699,
+      "clock_envelope_ns": 1412
+    },
+    {
+      "step": 4,
+      "action": "pan",
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatch_to_visible_ns": 22722149,
+      "maximum_observation_gap_ns": 1143446,
+      "clock_envelope_ns": 932
+    },
+    {
+      "step": 6,
+      "action": "zoom",
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatch_to_visible_ns": 22786470,
+      "maximum_observation_gap_ns": 1120523,
+      "clock_envelope_ns": 671
+    },
+    {
+      "step": 7,
+      "action": "pan",
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatch_to_visible_ns": 22899452,
+      "maximum_observation_gap_ns": 1116856,
+      "clock_envelope_ns": 933
+    },
+    {
+      "step": 9,
+      "action": "zoom",
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatch_to_visible_ns": 22846442,
+      "maximum_observation_gap_ns": 1114692,
+      "clock_envelope_ns": 832
+    },
+    {
+      "step": 10,
+      "action": "pan",
+      "condition": "idle",
+      "worker_before": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "worker_after": "Completed \u00b7 Publish \u00b7 12 of 12",
+      "dispatch_to_visible_ns": 22707452,
+      "maximum_observation_gap_ns": 1093111,
+      "clock_envelope_ns": 671
+    },
+    {
+      "step": 13,
+      "action": "zoom",
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "dispatch_to_visible_ns": 23847100,
+      "maximum_observation_gap_ns": 1114671,
+      "clock_envelope_ns": 1032
+    },
+    {
+      "step": 14,
+      "action": "pan",
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "dispatch_to_visible_ns": 23825109,
+      "maximum_observation_gap_ns": 1117016,
+      "clock_envelope_ns": 1042
+    },
+    {
+      "step": 18,
+      "action": "zoom",
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "dispatch_to_visible_ns": 21778048,
+      "maximum_observation_gap_ns": 1120282,
+      "clock_envelope_ns": 1142
+    },
+    {
+      "step": 19,
+      "action": "pan",
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "dispatch_to_visible_ns": 21706513,
+      "maximum_observation_gap_ns": 1102609,
+      "clock_envelope_ns": 1082
+    },
+    {
+      "step": 23,
+      "action": "zoom",
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 0 of 12",
+      "dispatch_to_visible_ns": 22931972,
+      "maximum_observation_gap_ns": 1148084,
+      "clock_envelope_ns": 1061
+    },
+    {
+      "step": 24,
+      "action": "pan",
+      "condition": "loaded",
+      "worker_before": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "worker_after": "Running \u00b7 Fuse \u00b7 1 of 12",
+      "dispatch_to_visible_ns": 21768409,
+      "maximum_observation_gap_ns": 1094474,
+      "clock_envelope_ns": 1022
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "base": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+  "test_commit": "209207a5a74977ad3e5ff2e03248abecaa706393",
+  "mutation": "src/fusion/focus.rs:428:19: replace != with == in aggregate",
+  "archived_summary": "MissedMutant",
+  "patch_sha256": "f3a44fb8f9c1e3efad8c5f24172251bbf5913270986d90b1dc43b1cc5472b826",
+  "scope": "native CPU cpu_fusion_contract, both 13\u00d71 and 1\u00d713",
+  "mutant": {
+    "exit": 101,
+    "passed": 3,
+    "failed": 1,
+    "both_centers": [
+      0.125,
+      0.125,
+      0.125
+    ],
+    "elf_sha256": "99a7af6c63e5e7ca365ba4b106de93eb7d778cf97927be2d74044dba9a563df4",
+    "elf_build_id": "7b8d5c943588b9e53c8c60d160fb8c9311026c55"
+  },
+  "restored": {
+    "exit": 0,
+    "passed": 4,
+    "failed": 0,
+    "both_centers": [
+      0.375,
+      0.375,
+      0.375
+    ],
+    "elf_sha256": "004a0a920617ff3a987052a75ad0eff5ded0aa59c4848e322f8f8d97875def62",
+    "elf_build_id": "502258c60b72a731db19ff059682cd62293af0fa"
+  },
+  "clippy_and_frozen_policy": "pass"
+}

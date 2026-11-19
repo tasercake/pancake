@@ -1,0 +1,24 @@
+
+File: /tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/build-candidate/pancake-cli
+
+Displaying notes found in: .note.ABI-tag
+  Owner                Data size 	Description
+  GNU                  0x00000010	NT_GNU_ABI_TAG (ABI version tag)
+    OS: Linux, ABI: 3.2.0
+
+Displaying notes found in: .note.gnu.build-id
+  Owner                Data size 	Description
+  GNU                  0x00000014	NT_GNU_BUILD_ID (unique build ID bitstring)
+    Build ID: 09b3f911db2121feea9186ccfc3fe80a7ce68a51
+
+File: /tmp/pancake-worktrees.t3paqgWM/r50-canon-typed-proof/artifacts/r50-workers/build-candidate/canon_native_probe
+
+Displaying notes found in: .note.ABI-tag
+  Owner                Data size 	Description
+  GNU                  0x00000010	NT_GNU_ABI_TAG (ABI version tag)
+    OS: Linux, ABI: 3.2.0
+
+Displaying notes found in: .note.gnu.build-id
+  Owner                Data size 	Description
+  GNU                  0x00000014	NT_GNU_BUILD_ID (unique build ID bitstring)
+    Build ID: 3338eb6978d187044d54899f4a2048c81f396667

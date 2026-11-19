@@ -1,0 +1,23 @@
+{
+  "p2_codecs": {
+    "receipt_path": "/tmp/pancake-worktrees.t3paqgWM/tiff-row-workers/artifacts/tiff-row-workers/full-t50/report.json",
+    "receipt_sha256": "c65912c328d5040b42656cd34bc3f683cc89e45ecfcfa31e1253bf88452567f5",
+    "materialization_sha256": "62200bca0567ae06e2b6d3eba406aea259e601904c756b64ea7b245ede2625a4",
+    "state": "explicitly released by borrower after completed read",
+    "pair_status": "completed_exact_identity"
+  },
+  "p6_job": {
+    "receipt_path": "/home/krishna/Documents/focus-stacking/pancake/docs/p10-registration-owned-upload/receipt.json",
+    "receipt_sha256": "05da2e556724e15e86f7537884bd881d41684043f320d48db7e42f06422b1c5e",
+    "materialization_sha256": "62200bca0567ae06e2b6d3eba406aea259e601904c756b64ea7b245ede2625a4",
+    "state": "explicitly released by borrower after completed read",
+    "pair_status": "completed_exact_output"
+  },
+  "p7_ui": {
+    "receipt_path": "/home/krishna/Documents/focus-stacking/pancake/docs/p10-viewer-package-evidence/287828a/summary.json",
+    "receipt_sha256": "45f1515206606eb5ba05de39a6d1e39c54eb40bcbf53267cffa47c36c246ac09",
+    "materialization_sha256": "62200bca0567ae06e2b6d3eba406aea259e601904c756b64ea7b245ede2625a4",
+    "state": "explicitly released by borrower after completed read",
+    "ordered_unchanged_focus_frames": 50
+  }
+}

@@ -1,0 +1,25 @@
+"""Assert native decode skipped a repeated scan and arbitrary floats still validate."""
+
+import json
+import sys
+from pathlib import Path
+
+
+def trace(name):
+    events = [json.loads(line) for line in Path(name).read_text().splitlines()]
+    assert len(events) >= 2, f"missing native observer events: {name}"
+    assert events[0] == {"event": "probe_armed", "symbol": "pancake::image_io::validate_samples"}
+    assert events[-1] == {"event": "inferior_exit", "exit_code": 0}, events[-1]
+    return [item["frames"] for item in events[1:-1] if item["event"] == "validate_samples"]
+
+
+raw, float_source = map(trace, sys.argv[1:])
+if not float_source or not any(any("raster_to_rgb" in (name or "") for name in item) for item in float_source):
+    raise SystemExit("invalid measurement: the ordinary EXR control never hit real generic validation")
+if any(not any("normal_developed_rgb" in (name or "") for name in item) for item in raw):
+    raise SystemExit("invalid measurement: a reported RAW event did not come from the actual normal decode")
+print(f"native normal RAW generic validation calls={len(raw)}")
+print(f"native EXR generic validation calls={len(float_source)}")
+if raw:
+    raise SystemExit("RED: complete U16 RAW packing reached the generic finite-value traversal")
+print("PASS: native normal RAW avoids the repeated scan and ordinary EXR still validates")

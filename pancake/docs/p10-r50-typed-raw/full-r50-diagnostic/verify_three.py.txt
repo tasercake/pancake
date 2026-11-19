@@ -1,0 +1,24 @@
+"""Exact archived f32 matrix reducer for the matched diagnostic."""
+
+import hashlib
+import math
+import struct
+
+def matrices(value, frames):
+    """Hash 50 complete, finite source-order 2×3 transforms as little-endian f32."""
+    if isinstance(value, dict):
+        ordered = [str(frame) for frame in frames]
+        if set(value) != set(ordered):
+            raise ValueError("completion transforms have different input keys")
+        value = [value[name] for name in ordered]
+    if not isinstance(value, list) or len(value) != 50:
+        raise ValueError("expected 50 transforms")
+    digest = hashlib.sha256()
+    for matrix in value:
+        if len(matrix) != 2 or any(len(row) != 3 for row in matrix):
+            raise ValueError("expected 2×3 transform")
+        entries = [entry for row in matrix for entry in row]
+        if not all(math.isfinite(entry) for entry in entries):
+            raise ValueError("invalid transform value")
+        digest.update(struct.pack("<6f", *entries))
+    return digest.hexdigest()

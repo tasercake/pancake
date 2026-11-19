@@ -1,0 +1,85 @@
+//! Observe memory across repeated production RAW decodes in one Linux process.
+
+use std::error::Error;
+use std::fs;
+use std::hash::{DefaultHasher, Hasher as _};
+use std::io::{self, Write as _};
+use std::path::Path;
+
+use pancake::image_io::{SampleEncoding, decode};
+
+/// Read the Linux process counter in original KiB units.
+///
+/// # Errors
+///
+/// Returns a missing field or invalid integer.
+fn kib(text: &str, field: &str) -> Result<u64, Box<dyn Error>> {
+    let token = text
+        .lines()
+        .find_map(|line| line.strip_prefix(field))
+        .and_then(|value| value.split_whitespace().next())
+        .ok_or("Linux RSS counter missing")?;
+    Ok(token.parse()?)
+}
+
+/// Record the precise current RSS alongside the kernel high-water counter.
+///
+/// # Errors
+///
+/// Returns inaccessible or malformed Linux process counters.
+fn memory() -> Result<(u64, u64), Box<dyn Error>> {
+    let rss = fs::read_to_string("/proc/self/smaps_rollup")?;
+    let high = fs::read_to_string("/proc/self/status")?;
+    Ok((kib(&rss, "Rss:")?, kib(&high, "VmHWM:")?))
+}
+
+/// Repeatedly decode both originals and confirm their entire output stays equal.
+///
+/// # Errors
+///
+/// Returns invalid arguments, image data, process counters, or changed output.
+fn main() -> Result<(), Box<dyn Error>> {
+    let arguments: Vec<_> = std::env::args_os().skip(1).collect();
+    let [first, last] = arguments.as_slice() else {
+        return Err("expected two frozen Canon sources".into());
+    };
+    let paths = [Path::new(first), Path::new(last)];
+    if paths.first() == paths.last() {
+        return Err("expected distinct Canon sources".into());
+    }
+
+    let mut out = io::stdout().lock();
+    let (rss, high) = memory()?;
+    writeln!(out, "start\t{rss}\t{high}")?;
+    writeln!(
+        out,
+        "round\tinput\tfingerprint\tdecoded_rss_kib\tdecoded_hwm_kib\tdropped_rss_kib\tdropped_hwm_kib"
+    )?;
+    let mut previous = [None, None];
+    for round in 1..=8_i32 {
+        for (path, reference) in paths.iter().zip(&mut previous) {
+            let image = decode(path)?;
+            if (image.width(), image.height(), image.sample_encoding())
+                != (5088, 3392, SampleEncoding::U16)
+            {
+                return Err("unexpected developed frame layout".into());
+            }
+            let mut checksum = DefaultHasher::new();
+            checksum.write(bytemuck::cast_slice(image.samples()));
+            let checksum = checksum.finish();
+            if reference.is_some_and(|value| value != checksum) {
+                return Err("repeated working samples differ".into());
+            }
+            *reference = Some(checksum);
+            let (rss, high) = memory()?;
+            drop(image);
+            let (dropped_rss, dropped_high) = memory()?;
+            writeln!(
+                out,
+                "{round}\t{}\t{checksum:016x}\t{rss}\t{high}\t{dropped_rss}\t{dropped_high}",
+                path.display()
+            )?;
+        }
+    }
+    Ok(())
+}

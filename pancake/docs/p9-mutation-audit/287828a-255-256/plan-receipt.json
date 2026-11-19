@@ -1,0 +1,59 @@
+{
+  "source_revision": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "full_candidates": 2583,
+  "candidate_files": 41,
+  "shard_counts": [
+    162,
+    162,
+    162,
+    162,
+    162,
+    162,
+    162,
+    161,
+    161,
+    161,
+    161,
+    161,
+    161,
+    161,
+    161,
+    161
+  ],
+  "full_grid_equal": true,
+  "native_mutation_executions": 0,
+  "next_partition": {
+    "full_candidates": 2583,
+    "parent_index": "15/16",
+    "parent_candidates": 161,
+    "selected_index": "255/256",
+    "selected_candidates": 10,
+    "selected_full_roster_ordinals": [
+      255,
+      511,
+      767,
+      1023,
+      1279,
+      1535,
+      1791,
+      2047,
+      2303,
+      2559
+    ],
+    "listing_sha256": {
+      "full.json": "a97e2a6c014d47a908afc1a786576f9b49230724896d1f6ca3e62af1b42ebc64",
+      "parent.json": "09da8e48b30529f42100245fecf3615c483d7f79d944ef524a651c30f0b8f05b",
+      "list.json": "b2b1c29114e199902fa9ec35dbf4d4cc2d71c1c410547234f8969c4e5af02bde"
+    }
+  },
+  "prototype_guard_tests": 13,
+  "prototype_revision": "8a238913",
+  "estimated_native_target_reserve_gib": [
+    8,
+    12
+  ],
+  "estimated_native_wall_minutes": [
+    10,
+    20
+  ]
+}

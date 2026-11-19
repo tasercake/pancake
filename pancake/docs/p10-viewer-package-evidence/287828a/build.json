@@ -1,0 +1,13 @@
+{
+  "commit": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "component": "gui",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-package-287828a/pancake/target/release/pancake-gui",
+  "binary_sha256": "f27ead9db3b79429a1f924dd098ae2c253e7fd5bda28396238e21f9f72723961",
+  "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-287828a/pancake_0.1.0_amd64.deb",
+  "package_sha256": "34a63edea55c411a6082924c2fbe2c50094eea98753b1f75378459da78e4db99",
+  "package_verification_sha256": "096f88ea50620ad70edc86c53db0e2c79071a174cc863d741c82d21bae55e8b5",
+  "release_build_log_sha256": "5d514a08bdba728fe681d0555fb97281957155e835451d07e42bc3b75eacf325",
+  "extraction": "dpkg-deb --fsys-tarfile ARCHIVE | tar -xOf - ./usr/bin/pancake-gui"
+}

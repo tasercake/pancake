@@ -1,0 +1,2 @@
+d85703c50ccba5ae21303f93ba8eea590d5eb41554c82accd7e50605c04993e4  /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/verification/baseline.tiff
+d85703c50ccba5ae21303f93ba8eea590d5eb41554c82accd7e50605c04993e4  /tmp/pancake-worktrees.t3paqgWM/r50-static-audit/artifacts/r50-raw-audit/verification/candidate.tiff

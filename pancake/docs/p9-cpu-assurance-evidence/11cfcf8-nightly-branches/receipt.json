@@ -1,0 +1,409 @@
+{
+  "archive": {
+    "bytes": 310646,
+    "sha256": "4a700b0c08115ff6b16b13e5efd3401e8a6274bb3188a9191c04cb415a424fb4"
+  },
+  "archive_members": {
+    "affinity.csv": {
+      "bytes": 16,
+      "sha256": "808eff5f3b8ae671f7a7d2f837890f7cb769729bd6e2ebf86c18c10c82e9469e"
+    },
+    "branches-cpu.json": {
+      "bytes": 1577766,
+      "sha256": "e62f0dfd152ec66c021094be1af676fe137828d489f1a26700558e451589d143"
+    },
+    "branches-cpu.log": {
+      "bytes": 39772,
+      "sha256": "a03bd353f6e3a7bd42458e37a2ed78833563914ea7005dcfe849411fccfe70a7"
+    },
+    "branches-cpu.status": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "branches-cpu.time": {
+      "bytes": 829,
+      "sha256": "863c376c504adf75c54fe08610c77bdbc97527f97364b06a26b7256d973a88b2"
+    },
+    "cleanup.log": {
+      "bytes": 39,
+      "sha256": "33e0883b9f708d33b839c6a10a0e16c7b56306a40b02ca49e63f856687eac958"
+    },
+    "command.txt": {
+      "bytes": 800,
+      "sha256": "f67abc4802f793ffbf5fa18b4d2f7199e4e44a23c340349649004f978894ed81"
+    },
+    "end.txt": {
+      "bytes": 26,
+      "sha256": "ae04931168caf4c26f3c58fb43cbc03af355a6dd0f33bde56fe3587a0d2060a0"
+    },
+    "evidence-input-sha256.txt": {
+      "bytes": 337,
+      "sha256": "7376510452fb177308326a743aa61341e1956b54ee7a4954c692c367a0c8caf8"
+    },
+    "host.txt": {
+      "bytes": 431,
+      "sha256": "06f5adba202d8900b344f473c72e5f8c8e56812297a054ba6a1c18006e240d0c"
+    },
+    "pancake.profdata": {
+      "bytes": 222952,
+      "sha256": "0da52530ec9d00cf259442fea9ca187003f4e8e39dc4f4e88a8f0e5111058aad"
+    },
+    "post-source-status.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "selected-targets.txt": {
+      "bytes": 289,
+      "sha256": "3f22c81d0d34ec39679623009b0533e9c5be103579828cd8b05922c7c563c0ce"
+    },
+    "source-sha256.txt": {
+      "bytes": 490,
+      "sha256": "5d3074ba2839a9ad07fc5e4b30c86adeffd7fb9d1940187dddfef2623dd049ff"
+    },
+    "source.txt": {
+      "bytes": 123,
+      "sha256": "70eaa393a427ae9aba4c2eb69cedf781fc700d66e3b6ad3a26ba60a54c604628"
+    },
+    "start.txt": {
+      "bytes": 26,
+      "sha256": "5ee94b6b5b207b78379ef7d394dc2c51662e4ac0ad913834579d6f52be82a9cb"
+    },
+    "toolchain.txt": {
+      "bytes": 384,
+      "sha256": "c0754b5b40529225b5c0e64044e0177f01fc9fa2dd985ba3d615d45bc886fbb1"
+    }
+  },
+  "cargo_jobs": 2,
+  "command": [
+    "bash",
+    "pancake/scripts/check.sh",
+    "branches-cpu"
+  ],
+  "compiler_tool": [
+    "rustc 1.102.0-nightly (5f4effd57 2026-11-13)",
+    "binary: rustc",
+    "commit-hash: 5f4effd579500175af844241eb179e756190f1e7",
+    "commit-date: 2026-11-13",
+    "host: x86_64-unknown-linux-gnu",
+    "release: 1.102.0-nightly",
+    "LLVM version: 23.1.5",
+    "cargo 1.102.0-nightly (ede6cefea 2026-11-11)",
+    "d8334c0e109a983ea8ecc25b6146cfebbd295a9a71b4f8027e20a68fa2f1dcd4  /tmp/pancake-tools/bin/cargo-llvm-cov",
+    "cargo-llvm-cov 0.9.1"
+  ],
+  "cov_gate_passed": false,
+  "coverage": {
+    "branches": {
+      "count": 778,
+      "covered": 589,
+      "uncovered": 189
+    },
+    "functions": {
+      "count": 771,
+      "covered": 494,
+      "uncovered": 277
+    },
+    "lines": {
+      "count": 6596,
+      "covered": 4799,
+      "uncovered": 1797
+    },
+    "regions": {
+      "count": 7416,
+      "covered": 4923,
+      "uncovered": 2493
+    }
+  },
+  "cpu_affinity": [
+    2,
+    3
+  ],
+  "elapsed_seconds": 315.0,
+  "end": "2026-11-19T11:02:36+08:00",
+  "exec_test_targets": 20,
+  "exit": 1,
+  "integration_targets": [
+    "cpu_advanced_fusion",
+    "cpu_array_layout",
+    "cpu_cli",
+    "cpu_config",
+    "cpu_fusion_contract",
+    "cpu_gray_array_export",
+    "cpu_image_export",
+    "cpu_image_io",
+    "cpu_job",
+    "cpu_kernel_contract",
+    "cpu_npy",
+    "cpu_numerical_contract",
+    "cpu_registration_contract",
+    "cpu_resident_policy",
+    "cpu_runtime_contract",
+    "cpu_runtime_options",
+    "cpu_stack_plan"
+  ],
+  "product_tree": "789e6bad6369cd8c33d59598f2a5fcf4c1c9f487",
+  "source_revision": "11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6",
+  "source_tree": "0ea17aeb65a346e3cb6b5593d8c8b4a02e827832",
+  "start": "2026-11-19T10:57:21+08:00",
+  "terminal_comparator": "CPU assurance: uncovered CPU lines",
+  "test_results": [
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 27
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/5029fa86c5e24cbb/out/pancake-5029fa86c5e24cbb",
+      "status": "ok",
+      "target": "unittests src/lib.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 7
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/cb10df47d7e7fd6c/out/cpu_advanced_fusion-cb10df47d7e7fd6c",
+      "status": "ok",
+      "target": "tests/cpu_advanced_fusion.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 2
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/600b5b79048a0174/out/cpu_array_layout-600b5b79048a0174",
+      "status": "ok",
+      "target": "tests/cpu_array_layout.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 4
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/0ceeecf635bac782/out/cpu_fusion_contract-0ceeecf635bac782",
+      "status": "ok",
+      "target": "tests/cpu_fusion_contract.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 2
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/9b7b4a554797faa9/out/cpu_gray_array_export-9b7b4a554797faa9",
+      "status": "ok",
+      "target": "tests/cpu_gray_array_export.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 10
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/fbc3ef65716863b8/out/cpu_image_export-fbc3ef65716863b8",
+      "status": "ok",
+      "target": "tests/cpu_image_export.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 29
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/12a5cdd2cf5c831b/out/cpu_image_io-12a5cdd2cf5c831b",
+      "status": "ok",
+      "target": "tests/cpu_image_io.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 14
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/e093e5aa605a886b/out/cpu_job-e093e5aa605a886b",
+      "status": "ok",
+      "target": "tests/cpu_job.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 2
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/d75fb0314d43b3b2/out/cpu_kernel_contract-d75fb0314d43b3b2",
+      "status": "ok",
+      "target": "tests/cpu_kernel_contract.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 4
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/c87749b6497c08e7/out/cpu_npy-c87749b6497c08e7",
+      "status": "ok",
+      "target": "tests/cpu_npy.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 2
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/2bb4fe2db580f96d/out/cpu_numerical_contract-2bb4fe2db580f96d",
+      "status": "ok",
+      "target": "tests/cpu_numerical_contract.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 7
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/076acfe11eb3091f/out/cpu_registration_contract-076acfe11eb3091f",
+      "status": "ok",
+      "target": "tests/cpu_registration_contract.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 1
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/52dfbd8622690242/out/cpu_resident_policy-52dfbd8622690242",
+      "status": "ok",
+      "target": "tests/cpu_resident_policy.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 5
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/1de463543dd458b6/out/cpu_runtime_contract-1de463543dd458b6",
+      "status": "ok",
+      "target": "tests/cpu_runtime_contract.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 6
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake/116b85b7f6e88b03/out/cpu_stack_plan-116b85b7f6e88b03",
+      "status": "ok",
+      "target": "tests/cpu_stack_plan.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 2
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake-cli/b760c9cf0a72b577/out/pancake_cli-b760c9cf0a72b577",
+      "status": "ok",
+      "target": "unittests src/main.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 7
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake-cli/41b0722beba419ab/out/cpu_cli-41b0722beba419ab",
+      "status": "ok",
+      "target": "tests/cpu_cli.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 9
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake-cli/f1b89d8f83522e82/out/cpu_config-f1b89d8f83522e82",
+      "status": "ok",
+      "target": "tests/cpu_config.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 6
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake-cli/0e275b014a06522e/out/cpu_runtime_options-0e275b014a06522e",
+      "status": "ok",
+      "target": "tests/cpu_runtime_options.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 18
+      },
+      "path": "target/llvm-cov-target/debug/build/pancake-gui/8dba96e3a4fcc28c/out/pancake_gui-8dba96e3a4fcc28c",
+      "status": "ok",
+      "target": "unittests src/main.rs"
+    },
+    {
+      "counts": {
+        "failed": 0,
+        "filtered": 0,
+        "ignored": 0,
+        "measured": 0,
+        "passed": 0
+      },
+      "status": "ok",
+      "target": "Doc-tests pancake"
+    }
+  ],
+  "test_totals": {
+    "failed": 0,
+    "filtered": 0,
+    "ignored": 0,
+    "measured": 0,
+    "passed": 164
+  }
+}

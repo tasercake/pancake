@@ -1,0 +1,25 @@
+{
+  "borrowed_originals": 150,
+  "borrowed_originals_unchanged": true,
+  "borrowed_stage_owner": "p5_registration",
+  "borrowed_originals_deleted_by_this_task": 0,
+  "verified_and_removed_registered_tiffs": 40,
+  "verified_and_removed_combined_outputs": {
+    "stock": "c0df2617a85686ce550e50464bf152c090a274f15ac6d26ee7d9376e2f2a795f",
+    "rank-only": "3aedc7d5d43f5cb1afef79ecc20dbe5dcf1843c18281ed203f331209df4be1cd",
+    "pinned-reference": "833bc41a64c170275d84c60b898317a661bc2d8ba122edf7aef786b602ffef45",
+    "band-local": "a11187afe65f8712d66e8d974c8d66b4a1b3e974e5c25798fccb193d920f613c"
+  },
+  "removed_source_witness_tiffs": {
+    "witness-0.tif": "5f8a156a2b1fc7536769c04414589b6b49880599a24ae1c34e8b6533feb3dcad",
+    "witness-1.tif": "b5b8c295dc788b9df5e1740a5c6376dee0535d3d118e14a10a44f00021843292"
+  },
+  "interrupted_attempt_removed_with_preserved_timeout_log": true,
+  "raw_receipt_sha256": "a742cef8dc9e7baafebfe9b2542337e032ea3a2c5eeff30f569765d91dd9b427",
+  "exact_retained_cli": {
+    "path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/d150-band-focus-3afdc19/pancake-cli",
+    "sha256": "bc44db38c3cb9dead468c2bf6651db0b6db175c7ec325eabb188e00c7b33e69c"
+  },
+  "scratch_absent": true,
+  "completed_at_utc": "2026-11-18T09:36:53.979882+00:00"
+}

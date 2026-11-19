@@ -37,7 +37,7 @@ def _validate_source(source, revision, lock_digest):
     if actual != revision or file_sha256(source / "Cargo.lock") != lock_digest:
         raise ValueError("Notice source revision or Cargo.lock differs from the package identity")
     dirty = _command(source, "git", "status", "--porcelain=v1", "--untracked-files=all", "--",
-                     "Cargo.toml", "Cargo.lock", ".cargo", "rust-toolchain.toml", "crates", "vendor")
+                     "Cargo.toml", "Cargo.lock", ".cargo", "rust-toolchain.toml", "crates", "vendor", "LICENSE", "notices")
     if dirty:
         raise ValueError("Commit Cargo graph and vendored source changes before packaging notices")
     return Path(_command(source, "git", "rev-parse", "--show-toplevel").decode().strip())
@@ -132,6 +132,26 @@ def _local_notices(package, source, repository, revision, vendor_map):
     return provenance, "present" if files else "no_notice_in_source", files
 
 
+def bind_shared_project_license(entries):
+    """Reference one physical Pancake license from the matching launcher rows."""
+    project = next((entry for entry in entries
+                    if entry["name"] == "pancake" and entry["source"] is None
+                    and entry["declared_license"] == "GPL-3.0-or-later"), None)
+    if project is None:
+        return
+    shared = next((notice for notice in project["notices"]
+                   if len(PurePosixPath(notice["file"]).parts) == 2
+                   and PurePosixPath(notice["file"]).name == "LICENSE"), None)
+    if shared is None:
+        return
+    for entry in entries:
+        if (entry["name"] in ROOTS and entry["source"] is None
+                and entry["declared_license"] == project["declared_license"]):
+            entry["shared_project_license"] = shared
+            if entry["status"] == "no_notice_in_source":
+                entry["status"] = "covered_by_shared_project_notice"
+
+
 def stage_notices(payload, source, revision, lock_digest):
     """Copy all discovered notices and write an informational inventory."""
     source = source.resolve(strict=True)
@@ -172,6 +192,7 @@ def stage_notices(payload, source, revision, lock_digest):
                         "declared_license": package["license"], "declared_license_file": package["license_file"],
                         "status": status, "provenance": provenance, "notices": notices})
 
+    bind_shared_project_license(entries)
     inventory = destination / "inventory.json"
     counts = dict(Counter(entry["status"] for entry in entries))
     inventory.write_text(json.dumps({
@@ -197,7 +218,12 @@ def verify_notices(extracted, receipt):
     path = extracted / receipt["file"]
     if file_sha256(path) != receipt["sha256"]:
         raise ValueError("Packaged dependency notice inventory changed")
-    for package in json.loads(path.read_text())["packages"]:
+    packages = json.loads(path.read_text())["packages"]
+    physical = {notice["file"]: notice for package in packages for notice in package["notices"]}
+    for package in packages:
+        shared = package.get("shared_project_license")
+        if shared is not None and physical.get(shared["file"]) != shared:
+            raise ValueError("Packaged shared project license reference changed")
         for notice in package["notices"]:
             actual = path.parent / notice["file"]
             if actual.stat().st_size != notice["bytes"] or file_sha256(actual) != notice["sha256"]:

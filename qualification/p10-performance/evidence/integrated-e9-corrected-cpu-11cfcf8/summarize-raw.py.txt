@@ -1,0 +1,114 @@
+"""Recompute 36 CPU observations and original numeric gates without application launches."""
+
+import argparse
+import csv
+import gzip
+import json
+import runpy
+from pathlib import Path
+
+from protocol import Campaign, profile_result, sha256
+
+
+def summarize(stage, dest):
+    """Seal one run using that run's own observations and preregistration."""
+    preflight = json.loads((stage / "no-device-preflight.json").read_text())
+    report = json.loads((stage / "paired/report.json").read_text())
+    primary, witnesses = report["samples"], report["diagnostics"]
+    campaign = Campaign.load(Path("pancake/docs/performance-targets.json"))
+    ledger = json.loads((stage / "strict-ledger-prereq.json").read_text())
+    assert report["targets"] == preflight["targets"]
+    assert report["inputs_unchanged"] and ledger["total_passed"] == 376
+    observed_order = [
+        (job["kind"], job["number"], job["target"]) for job in primary
+    ]
+    assert observed_order == campaign.schedule()
+    assert [(row["target"], row["number"]) for row in witnesses] == [("reference", 1), ("candidate", 1)]
+    assert len(primary) == 34 and len(witnesses) == 2
+    assert all(row["valid"] and row["returncode"] == 0 and not row["timed_out"] for row in primary + witnesses)
+    assert all(row["completion"]["actual_backend"] == "cpu" and row["matching_warm_pixel_hashes"] == 10 for row in witnesses)
+    reduced = profile_result(campaign, "cpu", primary)
+    assert all(reduced[k] == report[k] for k in ("status", "gates", "elapsed_ns"))
+    picked, misses = [], []
+    for registered, job in zip(preflight["job_raw_index"], primary + witnesses, strict=True):
+        location = Path(registered["expected_raw_path"])
+        assert registered["kind"] == job["kind"] and registered["number"] == job["number"]
+        assert registered["role"] == job["target"]
+        raw_sample = json.loads((stage / location / "sample.json").read_text())
+        assert all(value == job[key] for key, value in raw_sample.items())
+        assert job["sample_interval_ns"] == preflight["rss_nominal_interval_ns"]
+        assert not job["resource_errors"] and job["gpu_sample_count"] == 0
+        with gzip.open(stage / location / "resources.jsonl.gz", "rt") as trace:
+            rows = [json.loads(line) for line in trace]
+        points = [
+            row for row in rows if row["rss_elapsed_ns"] <= job["elapsed_ns"]
+        ]
+        edges = [{"rss_elapsed_ns": 0}, *points, {"rss_elapsed_ns": job["elapsed_ns"]}]
+        gap, left, right = max(
+            [
+                (b["rss_elapsed_ns"] - a["rss_elapsed_ns"], a, b)
+                for a, b in zip(edges[:-1], edges[1:], strict=True)
+            ],
+            key=lambda interval: interval[0],
+        )
+        peak = max(p["rss_bytes"] for p in points)
+        assert job["rss_sample_count"] == len(points)
+        assert job["maximum_rss_sample_gap_ns"] == gap and job["observed_peak_rss_bytes"] == peak
+        assert job["peak_rss_bytes"] == (peak if gap <= 20_000_000 else None)
+        picked.append({
+            "index": registered["index"], "kind": job["kind"], "number": job["number"],
+            "role": job["target"], "raw_case": str(location), "elapsed_ns": job["elapsed_ns"],
+            "actual_rss_gap_ns": gap, "observed_peak_rss_bytes": peak,
+            "cadence_eligible_peak_rss_bytes": job["peak_rss_bytes"],
+            "rss_sample_count": len(points), "nominal_rss_period_ns": job["sample_interval_ns"],
+            "encoded_sha256": job["output"]["sha256"], "pixel_sha256": job["output"]["pixel_sha256"],
+        })
+        if gap > 20_000_000:
+            misses.append({
+                "scope": str(location), "gap_ns": gap, "from": left,
+                "to": right, "observed_peak_rss_bytes_retained": peak,
+            })
+    dest.mkdir(parents=True, exist_ok=True)
+    receipt_path = dest / "archive-audit.json"
+    if receipt_path.exists():
+        archive = json.loads(receipt_path.read_text())
+        assert archive["sha256"] == sha256(dest / "raw-paired-runs.tar.gz")
+        assert archive["raw_report_sha256"] == sha256(stage / "paired/report.json")
+    else:
+        archive = runpy.run_path(str(stage / "archive-replay.py"))["original_archive"](stage, dest, "cpu")
+        with receipt_path.open("x") as stream:
+            stream.write(json.dumps(archive, indent=2) + "\n")
+    with (dest / "samples.csv").open("x", newline="") as table:
+        writer = csv.DictWriter(table, fieldnames=picked[0].keys(), lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(picked)
+    output = {
+        "exact_linux_package": ledger, "profile": report["profile"],
+        "frozen_target_sha256": report["performance_targets_sha256"],
+        "candidate": report["targets"]["candidate"],
+        "tool_commit": preflight.get("qualification_tool_commit", report["targets"]["candidate"]["commit"]),
+        "collector_nominal_period_ns": preflight["rss_nominal_interval_ns"],
+        "exclusive_window_start": (stage / "window-start.txt").read_text().splitlines()[0],
+        "actual_window_terminal": (stage / "window-end.txt").read_text().splitlines()[0],
+        "inputs": report["frames"], "inputs_unchanged": report["inputs_unchanged"],
+        "primary_job_count": len(primary), "witness_count": len(witnesses),
+        "stock_reference_warm_pixel_hash_confirmations": {
+            row["target"]: row["matching_warm_pixel_hashes"] for row in witnesses
+        },
+        "warm_01_output_digests": {
+            r["target"]: r["output"] for r in primary if r["kind"] == "warm" and r["number"] == 1
+        },
+        "original_runner_status": reduced["status"], "original_gates": reduced["gates"],
+        "strict_rss_invalid_samples": misses, "archive": archive,
+    }
+    with (dest / "numeric-summary.json").open("x") as stream:
+        stream.write(json.dumps(output, indent=2, allow_nan=False) + "\n")
+    print(output["collector_nominal_period_ns"], reduced["status"], len(primary), len(witnesses), misses)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("stage", type=Path)
+    parser.add_argument("evidence_destination", type=Path)
+    args = parser.parse_args()
+    summarize(args.stage.resolve(), args.evidence_destination.resolve())

@@ -1,0 +1,15 @@
+{
+  "identity": {
+    "target_commit": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+    "pancake_tree": "bc64dc84971104a0b83c049bf3965c27bfafd151",
+    "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+    "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+    "suite_source_sha256": "ddc59d4d3c77bdfdb36e323020aaf678f41309fd11b0bde673268f05a230e351",
+    "uv_lock_sha256": "30663059d83f2bb9d94bef743e9f74cf1a28c4bdd78073fc0342557fd76eb29b"
+  },
+  "roster_counts": {
+    "host": 341,
+    "isolated-gui": 34,
+    "physical-gpu-gui": 1
+  }
+}

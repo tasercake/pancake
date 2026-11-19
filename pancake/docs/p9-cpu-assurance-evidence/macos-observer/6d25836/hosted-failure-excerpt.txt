@@ -1,0 +1,37 @@
+2026-11-18T09:43:52.0726080Z test job::lifecycle::tests::pause_acknowledgement_and_resume ... ok
+2026-11-18T09:43:52.2624510Z test job::stream::tests::copies_only_the_retained_absolute_crop ... ok
+2026-11-18T09:43:52.4303120Z test tests::readback_decoding_rejects_corrupt_values ... ok
+2026-11-18T09:43:52.6235110Z test tests::readback_failures_keep_the_runtime_error ... ok
+2026-11-18T09:43:52.8322940Z test tests::shape_validation_checks_all_boundaries ... ok
+2026-11-18T09:43:53.0672930Z test tests::variance_readback_errors_are_recoverable ... ok
+2026-11-18T09:43:53.2307930Z test tests::working_budget_checks_exact_boundaries ... ok
+2026-11-18T09:43:53.2739670Z
+2026-11-18T09:43:53.3305310Z test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.79s
+2026-11-18T09:43:53.3305900Z
+2026-11-18T09:50:42.9888870Z      Running tests/cpu_job.rs (target/debug/build/pancake/3e4ff77d69f093de/out/cpu_job-3e4ff77d69f093de)
+2026-11-18T09:50:43.4136250Z
+2026-11-18T09:50:43.4140140Z running 10 tests
+2026-11-18T09:50:43.5357690Z test insufficient_runtime_budget_preserves_previous_output ... ok
+2026-11-18T09:50:44.5701080Z test interrupted_execution_retains_an_existing_export ... ok
+2026-11-18T09:50:44.5702860Z test memory_result_appends_complete_geometry_to_an_existing_observer ... ok
+2026-11-18T09:50:44.5845350Z test observer_handles_non_unicode_paths_without_fabricating_geometry ... FAILED
+2026-11-18T09:50:44.8221000Z test identity_crop_applies_only_to_aligned_jobs ... ok
+2026-11-18T09:50:44.8236480Z test paused_stack_resumes_and_publishes_only_its_completed_generation ... ok
+2026-11-18T09:50:44.9357210Z test stack_completion_follows_atomic_export ... ok
+2026-11-18T09:50:45.0045520Z test worker_reports_a_failed_generation_and_accepts_recovery ... ok
+2026-11-18T09:50:45.0211050Z test observer_failures_leave_completed_exports_and_sources_intact ... ok
+2026-11-18T09:50:45.0280620Z test worker_reuses_one_thread_without_replacing_retained_results ... ok
+2026-11-18T09:50:45.0282170Z
+2026-11-18T09:50:45.0282830Z failures:
+2026-11-18T09:50:45.0283320Z
+2026-11-18T09:50:45.0283660Z ---- observer_handles_non_unicode_paths_without_fabricating_geometry stdout ----
+2026-11-18T09:50:45.0285100Z Error: "Illegal byte sequence (os error 92)"
+2026-11-18T09:50:45.0285570Z
+2026-11-18T09:50:45.0285650Z
+2026-11-18T09:50:45.0286340Z failures:
+2026-11-18T09:50:45.0288590Z     observer_handles_non_unicode_paths_without_fabricating_geometry
+2026-11-18T09:50:45.0289030Z
+2026-11-18T09:50:45.0289490Z test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.62s
+2026-11-18T09:50:45.0290150Z
+2026-11-18T09:50:45.0506480Z error: test failed, to rerun pass `-p pancake --test cpu_job`
+2026-11-18T09:50:45.0935830Z ##[error]Process completed with exit code 101.

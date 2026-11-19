@@ -1,0 +1,30 @@
+{
+  "trace_member": "run/diagnostic-02/candidate/phases.tsv",
+  "trace_sha256": "2adb503911538c4b69f70bcccccf90eba694b68a4c2a808dccd7b02ba110ec84",
+  "recorded_candidate_wall_ns": 57063727280,
+  "historical_reference_diagnostic_wall_ns": 26736526595,
+  "half_historical_reference_diagnostic_wall_ns": 13368263297.5,
+  "decode_ns": {
+    "total": 30211227844,
+    "min": 581549879,
+    "max": 661741227
+  },
+  "decodes_exceeding_250_ms": 50,
+  "idealized_one_lookahead": {
+    "registration_and_fusion": {
+      "nonoverlapping_owner_ns": 24663149745,
+      "maximum_overlap_ns_on_recorded_intervals": 24176198874,
+      "best_case_wall_ns_on_recorded_intervals": 32887528406
+    },
+    "proxy_only": {
+      "nonoverlapping_owner_ns": 23207184915,
+      "maximum_overlap_ns_on_recorded_intervals": 22747237475,
+      "best_case_wall_ns_on_recorded_intervals": 34316489805
+    },
+    "fusion_only": {
+      "nonoverlapping_owner_ns": 1134187822,
+      "maximum_overlap_ns_on_recorded_intervals": 1113181641,
+      "best_case_wall_ns_on_recorded_intervals": 55950545639
+    }
+  }
+}

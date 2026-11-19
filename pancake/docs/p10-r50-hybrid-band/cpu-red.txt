@@ -1,0 +1,19 @@
+   Compiling pancake v0.1.0 (/tmp/pancake-worktrees.t3paqgWM/r50-hybrid-review/pancake)
+    Finished `test` profile [unoptimized] target(s) in 3.45s
+     Running tests/cpu_advanced_fusion.rs (target/debug/build/pancake/372e1cb24e224069/out/cpu_advanced_fusion-372e1cb24e224069)
+
+running 1 test
+test cpu_advanced_fusion ... FAILED
+
+failures:
+
+---- cpu_advanced_fusion stdout ----
+Error: "two four-reduction Hybrid frames should need at most 42 launches, issued 50"
+
+
+failures:
+    cpu_advanced_fusion
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.44s
+
+error: test failed, to rerun pass `--test cpu_advanced_fusion`

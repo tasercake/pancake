@@ -1,0 +1,323 @@
+{
+  "scope": "Original 280-event physical Vulkan diagnostic, zero frozen credit",
+  "direct_clock": "Linux CLOCK_MONOTONIC for independent framebuffer and Rust recorder",
+  "loaded": [
+    {
+      "step": 406,
+      "action": "result",
+      "latency_ns": 49840842,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 2
+    },
+    {
+      "step": 408,
+      "action": "pan",
+      "latency_ns": 201828917,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 1,
+      "present_enter_from_dispatch_ns": 1388473,
+      "write_attempt_from_dispatch_ns": 1399103,
+      "write_acquisition_ns": 182437402,
+      "write_confirmed_hold_ns": 80,
+      "prepare_ns": 10590,
+      "prepare_read_acquisition_ns": 31,
+      "command_index_acquisition_ns": 30,
+      "driver_present_ns": 16814809,
+      "present_return_to_correct_xwd_ns": 1176812,
+      "overlapping_poll_reads": 1,
+      "overlapping_driver_waits": 1,
+      "longest_overlapping_confirmed_read_hold_ns": 182416434,
+      "longest_overlapping_driver_wait_ns": 179304793,
+      "poll_read_release_bracket_to_write_acquire_ns": [
+        18844,
+        20968
+      ],
+      "last_completed_rust_submit_end_from_dispatch_ns": 1386670
+    },
+    {
+      "step": 430,
+      "action": "result",
+      "latency_ns": 34886218,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 2
+    },
+    {
+      "step": 436,
+      "action": "comparison",
+      "latency_ns": 58001841,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 1,
+      "present_enter_from_dispatch_ns": 2200510,
+      "write_attempt_from_dispatch_ns": 2216168,
+      "write_acquisition_ns": 36434294,
+      "write_confirmed_hold_ns": 40,
+      "prepare_ns": 15538,
+      "prepare_read_acquisition_ns": 60,
+      "command_index_acquisition_ns": 20,
+      "driver_present_ns": 18258697,
+      "present_return_to_correct_xwd_ns": 1092221,
+      "overlapping_poll_reads": 1,
+      "overlapping_driver_waits": 1,
+      "longest_overlapping_confirmed_read_hold_ns": 36429115,
+      "longest_overlapping_driver_wait_ns": 32828650,
+      "poll_read_release_bracket_to_write_acquire_ns": [
+        3987,
+        5179
+      ],
+      "last_completed_rust_submit_end_from_dispatch_ns": 2197164
+    },
+    {
+      "step": 470,
+      "action": "zoom",
+      "latency_ns": 96482947,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 1,
+      "present_enter_from_dispatch_ns": 1695871,
+      "write_attempt_from_dispatch_ns": 1708504,
+      "write_acquisition_ns": 75474499,
+      "write_confirmed_hold_ns": 80,
+      "prepare_ns": 12583,
+      "prepare_read_acquisition_ns": 30,
+      "command_index_acquisition_ns": 40,
+      "driver_present_ns": 18265937,
+      "present_return_to_correct_xwd_ns": 1033235,
+      "overlapping_poll_reads": 1,
+      "overlapping_driver_waits": 1,
+      "longest_overlapping_confirmed_read_hold_ns": 75454183,
+      "longest_overlapping_driver_wait_ns": 72172470,
+      "poll_read_release_bracket_to_write_acquire_ns": [
+        18203,
+        20316
+      ],
+      "last_completed_rust_submit_end_from_dispatch_ns": 1693527
+    },
+    {
+      "step": 472,
+      "action": "comparison",
+      "latency_ns": 36489332,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 2
+    },
+    {
+      "step": 478,
+      "action": "result",
+      "latency_ns": 33635268,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 2
+    },
+    {
+      "step": 484,
+      "action": "comparison",
+      "latency_ns": 59555435,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 1,
+      "present_enter_from_dispatch_ns": 1766609,
+      "write_attempt_from_dispatch_ns": 1778791,
+      "write_acquisition_ns": 38671013,
+      "write_confirmed_hold_ns": 50,
+      "prepare_ns": 12132,
+      "prepare_read_acquisition_ns": 30,
+      "command_index_acquisition_ns": 20,
+      "driver_present_ns": 17683695,
+      "present_return_to_correct_xwd_ns": 1421285,
+      "overlapping_poll_reads": 1,
+      "overlapping_driver_waits": 1,
+      "longest_overlapping_confirmed_read_hold_ns": 38663109,
+      "longest_overlapping_driver_wait_ns": 35279901,
+      "poll_read_release_bracket_to_write_acquire_ns": [
+        5580,
+        7904
+      ],
+      "last_completed_rust_submit_end_from_dispatch_ns": 1764525
+    },
+    {
+      "step": 508,
+      "action": "comparison",
+      "latency_ns": 94627877,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 1,
+      "present_enter_from_dispatch_ns": 2059089,
+      "write_attempt_from_dispatch_ns": 2072664,
+      "write_acquisition_ns": 73645971,
+      "write_confirmed_hold_ns": 50,
+      "prepare_ns": 13445,
+      "prepare_read_acquisition_ns": 20,
+      "command_index_acquisition_ns": 20,
+      "driver_present_ns": 17939631,
+      "present_return_to_correct_xwd_ns": 968980,
+      "overlapping_poll_reads": 1,
+      "overlapping_driver_waits": 1,
+      "longest_overlapping_confirmed_read_hold_ns": 73638928,
+      "longest_overlapping_driver_wait_ns": 70064753,
+      "poll_read_release_bracket_to_write_acquire_ns": [
+        5570,
+        7043
+      ],
+      "last_completed_rust_submit_end_from_dispatch_ns": 2056054
+    },
+    {
+      "step": 514,
+      "action": "result",
+      "latency_ns": 36932838,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 2
+    },
+    {
+      "step": 520,
+      "action": "comparison",
+      "latency_ns": 65441535,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 1,
+      "present_enter_from_dispatch_ns": 2087761,
+      "write_attempt_from_dispatch_ns": 2101035,
+      "write_acquisition_ns": 44689258,
+      "write_confirmed_hold_ns": 50,
+      "prepare_ns": 13114,
+      "prepare_read_acquisition_ns": 20,
+      "command_index_acquisition_ns": 21,
+      "driver_present_ns": 17609179,
+      "present_return_to_correct_xwd_ns": 1041532,
+      "overlapping_poll_reads": 1,
+      "overlapping_driver_waits": 1,
+      "longest_overlapping_confirmed_read_hold_ns": 44674130,
+      "longest_overlapping_driver_wait_ns": 41393504,
+      "poll_read_release_bracket_to_write_acquire_ns": [
+        13665,
+        15128
+      ],
+      "last_completed_rust_submit_end_from_dispatch_ns": 2084255
+    },
+    {
+      "step": 538,
+      "action": "result",
+      "latency_ns": 34584303,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 2
+    },
+    {
+      "step": 556,
+      "action": "comparison",
+      "latency_ns": 60182965,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 1,
+      "present_enter_from_dispatch_ns": 2234889,
+      "write_attempt_from_dispatch_ns": 2248754,
+      "write_acquisition_ns": 39993245,
+      "write_confirmed_hold_ns": 60,
+      "prepare_ns": 13825,
+      "prepare_read_acquisition_ns": 30,
+      "command_index_acquisition_ns": 41,
+      "driver_present_ns": 17445721,
+      "present_return_to_correct_xwd_ns": 494744,
+      "overlapping_poll_reads": 1,
+      "overlapping_driver_waits": 1,
+      "longest_overlapping_confirmed_read_hold_ns": 39974160,
+      "longest_overlapping_driver_wait_ns": 36645584,
+      "poll_read_release_bracket_to_write_acquire_ns": [
+        17742,
+        19085
+      ],
+      "last_completed_rust_submit_end_from_dispatch_ns": 2231974
+    },
+    {
+      "step": 568,
+      "action": "comparison",
+      "latency_ns": 70047534,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 1,
+      "present_enter_from_dispatch_ns": 2137374,
+      "write_attempt_from_dispatch_ns": 2151400,
+      "write_acquisition_ns": 46840859,
+      "write_confirmed_hold_ns": 200,
+      "prepare_ns": 13915,
+      "prepare_read_acquisition_ns": 30,
+      "command_index_acquisition_ns": 20,
+      "driver_present_ns": 19484796,
+      "present_return_to_correct_xwd_ns": 1569818,
+      "overlapping_poll_reads": 1,
+      "overlapping_driver_waits": 1,
+      "longest_overlapping_confirmed_read_hold_ns": 46834277,
+      "longest_overlapping_driver_wait_ns": 43042452,
+      "poll_read_release_bracket_to_write_acquire_ns": [
+        4659,
+        6582
+      ],
+      "last_completed_rust_submit_end_from_dispatch_ns": 2133848
+    },
+    {
+      "step": 586,
+      "action": "result",
+      "latency_ns": 34569311,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 2
+    },
+    {
+      "step": 592,
+      "action": "comparison",
+      "latency_ns": 75310089,
+      "predispatch_stage": "Fuse",
+      "plausible_renderer_presents": 1,
+      "present_enter_from_dispatch_ns": 2174853,
+      "write_attempt_from_dispatch_ns": 2196963,
+      "write_acquisition_ns": 52367437,
+      "write_confirmed_hold_ns": 80,
+      "prepare_ns": 22069,
+      "prepare_read_acquisition_ns": 30,
+      "command_index_acquisition_ns": 30,
+      "driver_present_ns": 19491280,
+      "present_return_to_correct_xwd_ns": 1253597,
+      "overlapping_poll_reads": 1,
+      "overlapping_driver_waits": 1,
+      "longest_overlapping_confirmed_read_hold_ns": 52359733,
+      "longest_overlapping_driver_wait_ns": 48967118,
+      "poll_read_release_bracket_to_write_acquire_ns": [
+        5961,
+        7704
+      ],
+      "last_completed_rust_submit_end_from_dispatch_ns": 2171157
+    }
+  ],
+  "valid_lock_summary": {
+    "span_counts": {
+      "allocate_indices": 8301,
+      "binding": 141,
+      "deferred_free": 141,
+      "driver_present": 2722,
+      "driver_wait": 141,
+      "poll_read": 141,
+      "prepare_present": 2722,
+      "prepare_read": 2722,
+      "present": 2722,
+      "present_indices": 2722,
+      "present_write": 2722,
+      "queue_maintain": 141,
+      "submit": 2855
+    },
+    "shared_typed_device_count": 1,
+    "shared_poller_threads": 2,
+    "same_lock_overlap_counts": {
+      "single_recorded_read_hold": 30,
+      "also_overlaps_driver_wait": 30
+    },
+    "interpretation": "Host intervals are observations. Use independently matched delivered pixels and unique API frames before attributing any tail."
+  },
+  "api_ordinal_corroboration": {
+    "ordered_same_tid_present_pairs": 2722,
+    "all_rust_hal_durations_enclose_native_duration": true,
+    "rust_minus_native_duration_min_ns": 1339,
+    "rust_minus_native_duration_median_ns": 4516.0,
+    "rust_minus_native_duration_max_ns": 117797,
+    "range_of_implied_clock_center_offsets_ns": 526890,
+    "one_fixed_offset_can_enclose_every_event": false,
+    "actual_vk_wait_semaphore_counts_on_confirmed_poller_tids": [
+      {
+        "count": 4,
+        "maximum_ns": 6321
+      },
+      {
+        "count": 132,
+        "maximum_ns": 201756448
+      }
+    ]
+  }
+}

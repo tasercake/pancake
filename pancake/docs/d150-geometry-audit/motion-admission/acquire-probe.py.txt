@@ -1,0 +1,71 @@
+"""Authenticate the frozen D150 archive and extract only the nine audit originals."""
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+from urllib.request import urlopen
+from zipfile import ZipFile
+
+
+def copy_verified(source, destination, expected):
+    size = expected["bytes"] if "bytes" in expected else expected["size"]
+    digest = hashlib.sha256()
+    remaining = size
+    with destination.open("xb") as result:
+        while remaining:
+            block = source.read(min(remaining, 1_048_576))
+            if not block:
+                raise ValueError(f"short input for {destination}")
+            digest.update(block)
+            result.write(block)
+            remaining -= len(block)
+        if source.read(1) or digest.hexdigest() != expected["sha256"]:
+            raise ValueError(f"source digest or size mismatch for {destination}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--audit", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    plan = json.loads(args.audit.read_bytes())["minimal_probe"]
+    pinned = json.loads(Path("pancake/docs/performance-targets.json").read_bytes())["corpus_evidence"]
+    manifest = Path(pinned["manifest_path"]).read_bytes()
+    assert hashlib.sha256(manifest).hexdigest() == plan["frozen_manifest_sha256"] == pinned["manifest_sha256"]
+    corpus = json.loads(manifest)
+    workload = next(item for item in corpus["workloads"] if item["id"] == pinned["D150"]["selected_id"])
+    records = plan["records"]
+    assert len(records) == len({row["frame_index"] for row in records}) == 9
+    assert all(row == {"frame_index": row["frame_index"], **workload["frames"][row["frame_index"]]}
+               for row in records)
+    source = next(item for item in corpus["sources"] if item["id"] == workload["dataset_id"])
+    archive_id = Path(records[0]["path"]).parts[4]
+    archive = next(item for item in source["selected_downloads"]["files"]
+                   if f"{Path(item['path']).stem}-{item['sha256'][:12]}" == archive_id)
+    assert archive["size"] <= corpus["native_download_budget_bytes"]
+    destination = args.output.resolve()
+    destination.mkdir(exist_ok=False)
+    originals = destination / "inputs"
+    originals.mkdir()
+    downloaded = destination / Path(archive["path"]).name
+    with urlopen(archive["url"], timeout=45) as request:
+        copy_verified(request, downloaded, archive)
+    extracted = []
+    with ZipFile(downloaded) as container:
+        for entry in records:
+            suffix = Path(entry["path"])
+            assert suffix.parts[4] == archive_id and len(suffix.parts) > 6
+            member = Path(*suffix.parts[5:]).as_posix()
+            output = originals / suffix.name
+            with container.open(member) as request:
+                copy_verified(request, output, entry)
+            extracted.append({**entry, "acquired_path": str(output)})
+    downloaded.unlink()
+    receipt = {"archive": archive, "archive_verified_and_removed": True,
+               "manifest_sha256": pinned["manifest_sha256"], "original_count": len(extracted), "records": extracted}
+    (destination / "acquisition.json").write_text(json.dumps(receipt, indent=2) + "\n")
+
+
+if __name__ == "__main__":
+    main()

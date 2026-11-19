@@ -1,0 +1,27 @@
+{
+  "owner": "codex/pancake-d150-batched-witness",
+  "archive_verified_and_removed_by_acquisition": true,
+  "input_manifest_sha256": "6d417c9c00866755bdbc8e2fafc1421de8414e1ea9e75d2cfd7e96e2161a89ac",
+  "inputs_rehashed_before_removal": 9,
+  "original_input_suffixes_removed": [
+    "P9160516_d2.jpg",
+    "P9160579_d2.jpg",
+    "P9160580_d2.jpg",
+    "P9160581_d2.jpg",
+    "P9160582_d2.jpg",
+    "P9160653_d2.jpg",
+    "P9160654_d2.jpg",
+    "P9160655_d2.jpg",
+    "P9160656_d2.jpg"
+  ],
+  "staged_executable_sha256": "1cfb43281135b213c4a957adbfe34dc92e62b15c8e0e12edee4e49d1a8dcb30b",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "direction_map_receipt_sha256": "cd731499f278851c0ee1ad57540f69e583ac7d74d483ee4104b234c177b00d25",
+  "files": {
+    "real-acquisition.json.gz": "f041400004448731c386abdb6f657efa8c10836f01289efb76a02bebdbe5ed45",
+    "real-module-path.log.gz": "bfb562a152c5e2661515e4dd536039de1acf66436b7aa80f7833def2132a44e0",
+    "real-overlay.patch.gz": "c46252d0568bc50fe45c60c3a47898cb1d938078b6fa724f902c9b5921beb0bd",
+    "real-packed.json.gz": "fc7e180891c815acdbebdc5d1cbc7be4622d0bff7838ee19a01584b6c836ccad",
+    "real-summary.json": "c1086be830408f8b2409e7de4295e2e9913cb516cfa859a10f692e015fc52a32"
+  }
+}

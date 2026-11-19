@@ -1,0 +1,136 @@
+{
+  "scope": "one direct empty-GUI Vulkan API smoke, no TIFFs or worker",
+  "start": "2026-11-18T20:03:12+08:00",
+  "end": "2026-11-18T20:03:30+08:00",
+  "result": {
+    "physical_vulkan_api_transport": "proven",
+    "launcher_shutdown": "failed"
+  },
+  "launcher_exit": 1,
+  "native_profile_exit": 1,
+  "shutdown_detail": "13-second profile wait after native windowclose timed out; scoped cleanup ran; no clean application exit proven",
+  "direct_executable": {
+    "candidate": {
+      "commit": "287828aac07ffad2252785b73a52a59fc07b3409",
+      "lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+      "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+      "component": "gui",
+      "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-queue-trace-preflight/pancake/target/release/pancake-gui",
+      "binary_sha256": "f27ead9db3b79429a1f924dd098ae2c253e7fd5bda28396238e21f9f72723961",
+      "package_path": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-287828a/pancake_0.1.0_amd64.deb",
+      "package_sha256": "34a63edea55c411a6082924c2fbe2c50094eea98753b1f75378459da78e4db99",
+      "package_verification_sha256": "096f88ea50620ad70edc86c53db0e2c79071a174cc863d741c82d21bae55e8b5",
+      "release_build_log_sha256": "5d514a08bdba728fe681d0555fb97281957155e835451d07e42bc3b75eacf325",
+      "extraction": "dpkg-deb --fsys-tarfile ARCHIVE | tar -xOf - ./usr/bin/pancake-gui"
+    },
+    "gui_pid": 413946,
+    "window_id": "10485763",
+    "display": ":1",
+    "size": [
+      1440,
+      1000
+    ],
+    "gpu": {
+      "uuid": "GPU-c7900bb5-e779-c07b-a37d-4adff841c8ac",
+      "pci.bus_id": "00000000:01:00.0",
+      "name": "NVIDIA GeForce RTX 3090",
+      "driver_version": "580.178.04",
+      "pstate": "P8",
+      "temperature.gpu": "40",
+      "power.draw": "17.79",
+      "power.limit": "350.00",
+      "clocks.gr": "210",
+      "clocks.mem": "405"
+    },
+    "visible_gui_residency_bytes": 83533824,
+    "direct_profiler_pid": 413868,
+    "corpus_inputs": 0
+  },
+  "profile_process": {
+    "413946": "/tmp/pancake-worktrees.t3paqgWM/viewer-queue-trace-preflight/pancake/target/release/pancake-gui"
+  },
+  "api_counts": {
+    "vkQueueSubmit": 6,
+    "vkAcquireNextImageKHR": 2,
+    "vkQueuePresentKHR": 2
+  },
+  "api_rows": [
+    {
+      "name": "vkQueueSubmit",
+      "start_ns": 305375975,
+      "end_ns": 305399099,
+      "thread": 414085
+    },
+    {
+      "name": "vkQueueSubmit",
+      "start_ns": 306766456,
+      "end_ns": 306772046,
+      "thread": 414085
+    },
+    {
+      "name": "vkAcquireNextImageKHR",
+      "start_ns": 564177326,
+      "end_ns": 564177566,
+      "thread": 413946
+    },
+    {
+      "name": "vkQueueSubmit",
+      "start_ns": 887291145,
+      "end_ns": 887319909,
+      "thread": 413946
+    },
+    {
+      "name": "vkQueueSubmit",
+      "start_ns": 887339226,
+      "end_ns": 887341490,
+      "thread": 413946
+    },
+    {
+      "name": "vkQueuePresentKHR",
+      "start_ns": 887344365,
+      "end_ns": 904685361,
+      "thread": 413946
+    },
+    {
+      "name": "vkAcquireNextImageKHR",
+      "start_ns": 926538167,
+      "end_ns": 926538818,
+      "thread": 413946
+    },
+    {
+      "name": "vkQueueSubmit",
+      "start_ns": 927818721,
+      "end_ns": 927844119,
+      "thread": 413946
+    },
+    {
+      "name": "vkQueueSubmit",
+      "start_ns": 927860680,
+      "end_ns": 927863145,
+      "thread": 413946
+    },
+    {
+      "name": "vkQueuePresentKHR",
+      "start_ns": 927865299,
+      "end_ns": 945678070,
+      "thread": 413946
+    }
+  ],
+  "loader_insertion_lines": [
+    "INFO | LAYER:      Insert instance layer \"VK_LAYER_NV_nsight-sys\" (libToolsInjection64.so)",
+    "INFO | LAYER:      Insert instance layer \"VK_LAYER_NV_nsight-sys\" (libToolsInjection64.so)",
+    "INFO | LAYER:      Inserted device layer \"VK_LAYER_NV_nsight-sys\" (libToolsInjection64.so)"
+  ],
+  "trace_flags": {
+    "CAPTURE_EVENT_TYPE": "Vulkan",
+    "VULKAN_OPTIONS:COLLECT_GPU_WORKLOAD": "false",
+    "PROCESS_0:COLLECT_VULKAN_TRACE": "false"
+  },
+  "raw_contains_captured_environment_count": 41,
+  "private_artifact_sha256": {
+    "queue.nsys-rep": "8ca10a064a373e0d2f4f471c9bf012b5035d932adf41cea474a23f39976628ca",
+    "queue.sqlite": "8881c162b2b6ad2f78c019f98b89bae6833452394327628967cfc9ff1e91cb70",
+    "nsys.log": "8e0e51ae0c4002c650c0e2ba0c4e339a80bfb3239eae9bd72f885a94855ef9ef"
+  },
+  "xwd_display_sha256": "731da1b332a0c5909ed112f041eb2b3c6292038eb13b40037a9e2bed50a93c9d"
+}

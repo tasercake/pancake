@@ -1,0 +1,15 @@
+{
+  "report_root": "/tmp/pancake-worktrees.t3paqgWM/stable-coverage-c1e2cac/artifacts/stable-coverage-c1e2cac/transport/report",
+  "raw_root": "/tmp/pancake-worktrees.t3paqgWM/stable-coverage-c1e2cac/artifacts/stable-coverage-c1e2cac/transport/raw",
+  "elf": {
+    "path": "/tmp/pancake-worktrees.t3paqgWM/stable-coverage-c1e2cac/artifacts/stable-coverage-c1e2cac/transport/probe",
+    "build_id": "0ad61c6fbad8dac4a45d33d29eabdbfea9fd9bf3",
+    "sha256": "acfdbf4e056e43f5e1037de54005c782a53805070fdeb321e220f23bfebed51d",
+    "stat": [
+      66306,
+      6069870,
+      4701416,
+      1795006914442003529
+    ]
+  }
+}

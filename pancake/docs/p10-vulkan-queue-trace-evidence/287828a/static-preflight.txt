@@ -1,0 +1,20 @@
+NVIDIA Nsight Systems version 2024.2.3.38-242334140272v0
+
+usage: nsys profile [<args>] [application] [<application args>]
+
+	--vulkan-gpu-workload=
+
+	   Possible values are 'individual', 'batch', 'none', 'true' or 'false'.
+	   If individual or true, trace each Vulkan workload's GPU activity individually.
+	   If batch, trace Vulkan workloads' GPU activity in vkQueueSubmit call batches.
+	   If none or false, do not trace Vulkan workloads' GPU activity.
+	   Note that this switch is applicable only when --trace=vulkan is specified.
+	   Default is 'individual'. Application scope.
+
+0000000000308780 T NSYS_VK_vkAcquireNextImage2KHR
+00000000003086a0 T NSYS_VK_vkAcquireNextImageKHR
+0000000000308720 T NSYS_VK_vkQueuePresentKHR
+0000000000305cd0 T NSYS_VK_vkQueueSubmit
+0000000000308290 T NSYS_VK_vkQueueSubmit2
+00000000003094b0 T NSYS_VK_vkQueueSubmit2KHR
+Synthetic anchor, schema and PID checks passed. No runtime trace launched.

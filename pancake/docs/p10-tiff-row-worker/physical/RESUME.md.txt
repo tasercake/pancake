@@ -1,0 +1,9 @@
+# TIFF row-worker verification continuation
+
+Candidate branch `codex/pancake-tiff-row-workers` is at `e228c68472767f6ddd71a1de5e585f200685812e`. Production source `1a887017` has 42 focused checks and independent isolated Linux Miri coverage of its two pure TIFF tests. The earlier exact decode-only benchmark and the current native assurances are committed under `pancake/docs/p10-tiff-row-worker`.
+
+The local two-job release build on CPUs 24 and 25 has been paused for the measured T50, viewer and R50 windows. The recorded Cargo PID and process start time are in `p2/paused-processes.json`. Once the host timing windows release, running `python3 artifacts/tiff-row-workers/resume-paused-build.py` resumes the original build and automatically launches the 68-case CPU lane on success. The owning shell session is 3349. The build log is `p2/build.log`.
+
+For a fresh process, build the exact clean candidate with `cargo build --release --locked -p pancake-cli --bin pancake-cli` from `pancake`. The locally staged build/replay scripts are under `artifacts/tiff-row-workers/p2`. They derive from the retained `pancake/docs/p10-tiled-tiff-diagnostic/p2` scripts and use the same frozen CPU 68 and GPU 16 case lists. Bind verification to the built revision and the exact SHA-256 from its release binary. Preserve the temporary executable, real completion event roster and independent case-accounting result.
+
+The shared T50 stage is owned by the corpus agent. With the physical slot open after the CPU and GPU remaining cases, the staged `full-t50.py` runs one isolated diagnostic pair on the pinned release, driver, dataset and profile. Use the package-verified `287828a` CLI and exact verified TIFF release. The helper checks all 52 source file hashes before and afterward and compares each physical output and every registration transform. The P10 frozen timing campaign is a separate acceptance condition.

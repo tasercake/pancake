@@ -1,0 +1,12 @@
+f9af478d20d59b009b42945d5f9d903aaffa15b2
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+f985f265ee3ea3e453aa98b04c52134953911f692f8ce8abf137f3873202a2d0  /tmp/pancake-tools/bin/cargo-mutants
+cargo-mutants 27.1.0
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+cargo 1.100.0 (3acc79c0c 2026-11-05)

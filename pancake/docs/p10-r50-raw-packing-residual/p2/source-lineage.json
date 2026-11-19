@@ -1,0 +1,40 @@
+{
+  "control_revision": "07816a24a62f96bc3d3252e95fcfd2b4b5950269",
+  "control_cli_sha256": "aad46d08e71f1973ba4ffa1efa7d7fe0ee7747e02cf2a3834903af448587f9ed",
+  "control_artifact_provenance_commit": "9248cec",
+  "candidate_base": "b820da05d3982a7912cb7c7c9d8aa926ece14a9c",
+  "candidate_revision": "c8f68cf79d143403ad9d5df906a5f8cfa2047526",
+  "candidate_production_source": "4f7b73db8b25bc145e5ba6811ea1b0f7557b2cfd",
+  "compared_source_and_policy_inputs": [
+    "pancake/src",
+    "pancake/crates",
+    "pancake/Cargo.toml",
+    "pancake/Cargo.lock",
+    "pancake/build.rs",
+    "pancake/rust-toolchain.toml",
+    "pancake/.cargo",
+    "pancake/docs/performance-targets.json"
+  ],
+  "control_to_candidate_base_changed_paths": [],
+  "control_to_candidate_changed_paths": [
+    "pancake/src/image_io/raw.rs",
+    "pancake/src/image_io/raw/tests.rs"
+  ],
+  "control_to_candidate_production_rust_changes": [
+    "pancake/src/image_io/raw.rs"
+  ],
+  "invariant_git_objects": {
+    "pancake/src/job": "24688373f7a46525aa3f72ed19a9d73bca10d8ba",
+    "pancake/src/registration": "44705076ced056d1cba960ae8d3d6c098c8df9ba",
+    "pancake/src/fusion": "729c879c6c64870d9876bb8ef205e533a6e8b0a3",
+    "pancake/src/runtime": "5ae4c597bff20c6ad2e5fbd09be44a4497380079",
+    "pancake/src/image_io/export.rs": "a93debadc7f7b8675b937831e88844d66dc7da38",
+    "pancake/crates": "cb282abe45e6190594189c5e5ba190e73bf2c443",
+    "pancake/Cargo.toml": "e936314c839e17d643ee999f4adc3bf162369ab2",
+    "pancake/Cargo.lock": "91cd70baf3df3ebb330c0858c289d13961d88601"
+  },
+  "test_only_dependency_from_release_executable_excluded_by_cfg": [
+    "pancake/src/image_io/raw/tests.rs"
+  ],
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc"
+}

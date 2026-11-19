@@ -1,0 +1,108 @@
+{
+  "scope": "Linux CPU TIFF import diagnostic",
+  "baseline_revision": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "measured_candidate_revision": "3529ea4003dd7c5c8b41601291ad9e43c68a296e",
+  "candidate_source_sha256": {
+    "pancake/src/image_io/mod.rs": "7630226e19389b7e56d0c58456ee52685a41b16633e931c0d208cc63e58fbf95",
+    "pancake/src/image_io/tiled.rs": "68567dfd4587ed8a445944c37b185b6de5c90fed5bbfbcf9c159581dcbe101f6",
+    "pancake/src/image_io/tiled/tests.rs": "15c7ebce0c30ee2748f4d6831877f594c3820c0e7a6f798904f7675ab3dbb493"
+  },
+  "application_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "probe_binary_sha256": "25c9b25b32cc27084f3f655c51ad41935d48a24b6af3fd0eaac00269d4b32f9c",
+  "probe_source_archive_sha256": "b447a86fface8fc6de639aaba4e342abec314b2a85121dea5a4e5dacf6491a59",
+  "probe_lock_sha256": "f0db5d1a84bfe6a7451c03ab86f87e182c8002b429bbe73b6671f60d85c0add3",
+  "probe_profile": "Rust 1.100.0, release, thin LTO, 1 codegen unit, overflow checking enabled",
+  "hardware": {
+    "cpu": "AMD Ryzen 9 7950X3D",
+    "paired_affinity": "0-3",
+    "fallback_affinity": "0",
+    "os": "Linux 6.8.0-147-generic"
+  },
+  "start_utc": "2026-11-18T10:47:10Z",
+  "dataset": {
+    "materialization_receipt": "/tmp/pancake-worktrees.t3paqgWM/t50-shared-287828a/artifacts/p10-t50-shared-001/materialization.json",
+    "materialization_sha256": "62200bca0567ae06e2b6d3eba406aea259e601904c756b64ea7b245ede2625a4",
+    "reference_receipt_sha256": "8881a4968bb95f5a911b040a6ebc9635a9cbdc5a759ac0443605de33f700849c",
+    "target_shapes_and_file_hashes": [
+      {
+        "name": "focus_000.tif",
+        "shape": [
+          4000,
+          6000,
+          3
+        ],
+        "bytes": 52884845,
+        "file_sha256": "22321de901e18d3c655f96268b78e2c5fb7121d57d3734cff67d2bd761c1c78c",
+        "decoded_pixel_sha256": "542c86f2933852faeef135915d05ec087b793865562c19f1436f137148f62011"
+      },
+      {
+        "name": "focus_024.tif",
+        "shape": [
+          4000,
+          6000,
+          3
+        ],
+        "bytes": 62455395,
+        "file_sha256": "c0409b17c65c76564640c1db4078f15d2ee0bdba0d1e8762e15aba57b44ce5dc",
+        "decoded_pixel_sha256": "702b77ce61e63755df408090f3e529de773cbf5000ad71b078dec18ddcb8310b"
+      },
+      {
+        "name": "focus_049.tif",
+        "shape": [
+          4000,
+          6000,
+          3
+        ],
+        "bytes": 52931359,
+        "file_sha256": "c801b563c2059dd9202971aa300545c79b3e02734358b5e054c95edc55b47939",
+        "decoded_pixel_sha256": "ca30585fb6c52464f0302c55f62a79c95a628423df649b574f149f198853665a"
+      }
+    ],
+    "used_input_sha256_matched_before_and_after": true
+  },
+  "paired": {
+    "inputs": [
+      "focus_000.tif",
+      "focus_024.tif",
+      "focus_049.tif"
+    ],
+    "runs_per_arm": {
+      "serial": 9,
+      "rows": 9
+    },
+    "median_seconds": {
+      "serial": 0.471289233,
+      "rows": 0.140305483
+    },
+    "candidate_sample_bits_equal": 648000000
+  },
+  "serial_fallback": {
+    "inputs": [
+      "focus_024.tif"
+    ],
+    "runs_per_arm": {
+      "serial": 3,
+      "rows": 3
+    },
+    "median_seconds": {
+      "serial": 0.521138448,
+      "rows": 0.520236787
+    },
+    "candidate_sample_bits_equal": 216000000
+  },
+  "separate_peak_rss_kib": {
+    "serial": 285440,
+    "rows": 287664
+  },
+  "max_extra_workers_observed": {
+    "serial": 0,
+    "rows": 3,
+    "one-core": 0
+  },
+  "test_first": {
+    "baseline_existing_test_passes": 39,
+    "red_mutation": "omit the read offset seek inside the shared File lock",
+    "red_result": "left cursor began at the wrong tile",
+    "red_exit_status": 101
+  }
+}

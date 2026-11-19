@@ -1,0 +1,19 @@
+{
+  "commit": "1714fedab4296dc3bd83d7d245871761744dfe11",
+  "lock_sha256": "eeae96431784b9a2ae09ed8fbb9bc28cc7bee89e2185e2f08000b86f3e06e161",
+  "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+  "component": "gui",
+  "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-pipeline-e81079d/pancake/target/release/pancake-gui",
+  "binary_sha256": "1c19a16feadcfc6c8c38a53de53abbe53a4edb43d52b0aa27dbb5a331e431e28",
+  "release_build_log_sha256": "28486ddeb6fb65ba6b39c20d7a47a74d685eba1ccf3ae6ee44139a0fc932608b",
+  "build_started_at": "2026-11-19T00:42:52+08:00",
+  "build_terminal_at": "2026-11-19T00:50:26+08:00",
+  "source_preregistration": "4c318efb40b0f0a20f26035a1d61e9a6930934c3",
+  "overlay_provenance_sha256": "c0ccec6a4e90aea567288fa39a06115e20535896d5f99ef6a845f12c2617525d",
+  "stock_application_parent_commit": "e81079dee4078d7a1149da0f5950aab8c89f8d44",
+  "stock_package_sha256": "8ed6e70d7552140c0257520a07ac2b9fc5f97ff82a5fb3126864df821df4507e",
+  "stock_gui_sha256": "770ad910a8ac1f29a519504fd06dcd1051e593965813ce94665c986b57d16310",
+  "stock_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "frozen_targets_sha256": "58bb68533311c48696a3a844d80eef2f37a3c1f39649305948c838b7002663dc",
+  "scope": "instrumented stock product diagnostic, no qualification credit"
+}

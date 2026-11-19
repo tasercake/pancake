@@ -165,3 +165,83 @@ fn selected(
     let directory = directory.ok_or("Select a folder before entering a relative path.")?;
     Ok(vec![directory.join(path)])
 }
+
+#[cfg(test)]
+mod tests {
+    use std::cell::Cell;
+    use std::env;
+    use std::error::Error;
+    use std::ffi::OsStr;
+    use std::process::Command;
+    use std::rc::Rc;
+
+    use super::{Picker, open};
+
+    /// Select the assertion inside the isolated copy of the GUI test binary.
+    const CHILD: &str = "PANCAKE_TEST_GTK_UNAVAILABLE_CHILD";
+
+    /// Native panel setup failure leaves the caller responsible for recovery.
+    /// # Errors
+    /// Returns a launch error or the child test's native setup failure.
+    #[test]
+    fn unavailable_display_rejects_native_panel() -> Result<(), Box<dyn Error>> {
+        if env::var_os(CHILD).as_deref() == Some(OsStr::new("1")) {
+            return observe_unavailable_display();
+        }
+        let private = tempfile::tempdir()?;
+        let (_, test_name) = concat!(module_path!(), "::unavailable_display_rejects_native_panel")
+            .split_once("::")
+            .ok_or("The GTK test name did not include its module.")?;
+        let mut child = Command::new(env::current_exe()?);
+        let _configured = child
+            .env_clear()
+            .envs(env::var_os("LD_LIBRARY_PATH").map(|paths| ("LD_LIBRARY_PATH", paths)))
+            .envs(env::var_os("LLVM_PROFILE_FILE").map(|path| ("LLVM_PROFILE_FILE", path)))
+            .env(CHILD, "1")
+            .env("GDK_BACKEND", "x11")
+            .env("HOME", private.path())
+            .env("XDG_RUNTIME_DIR", private.path())
+            .current_dir(private.path())
+            .args(["--exact", test_name]);
+        let output = child.output()?;
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        if !output.status.success() || !stdout.contains("1 passed; 0 failed") {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!(
+                "Headless GTK test failed: {}\n{stdout}\n{stderr}",
+                output.status
+            )
+            .into());
+        }
+        Ok(())
+    }
+
+    /// Run the real GTK entry point with no display or desktop bus to contact.
+    /// # Errors
+    /// Returns an isolation failure or an unexpected panel setup outcome.
+    fn observe_unavailable_display() -> Result<(), Box<dyn Error>> {
+        if env::var_os("GDK_BACKEND").as_deref() != Some(OsStr::new("x11"))
+            || [
+                "DISPLAY",
+                "WAYLAND_DISPLAY",
+                "WAYLAND_SOCKET",
+                "DBUS_SESSION_BUS_ADDRESS",
+                "DBUS_STARTER_ADDRESS",
+                "AT_SPI_BUS_ADDRESS",
+            ]
+            .into_iter()
+            .any(|key| env::var_os(key).is_some())
+        {
+            return Err("The GTK child has a desktop endpoint or an unexpected backend.".into());
+        }
+        let completed = Rc::new(Cell::new(false));
+        let completion = Rc::clone(&completed);
+        let Err(error) = open(None, Picker::Files, move |_| completion.set(true)) else {
+            return Err("GTK accepted a file panel without a display.".into());
+        };
+        if completed.get() || !error.starts_with("Could not initialize the desktop file dialog:") {
+            return Err(format!("Unexpected headless GTK panel result: {error}").into());
+        }
+        Ok(())
+    }
+}

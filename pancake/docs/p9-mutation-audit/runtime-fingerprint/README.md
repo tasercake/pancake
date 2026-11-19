@@ -1,0 +1,7 @@
+# Native CPU completion fingerprint mutation
+
+The actual pinned 9/16 shard at `0a9ae85` built and tested the `SelectedRuntime::fingerprint` empty-string replacement and missed it. The production completion observer publishes this result as `device_fingerprint` in `stack_complete` after publication. The replacement erases the observable runtime compilation identity. CubeCL's cache machinery uses the original device properties. This mutation leaves those cache keys independent of the affected observer and public accessor.
+
+The existing explicit CPU CLI export test continues to check real JPEG depth, measured sharpness, progress and decoded geometry. It now also requests a case-owned completion file and compares its fingerprint to the independently acquired native CPU client's nonblank device property. The pinned CPU identity consists of the architecture, native load width and f16 evaluation mode, so the check uses the actual host identity and the existing event field format.
+
+The exact surviving diff was applied only in an isolated scratch state. It compiled and failed the focused test at the new completion identity assertion. The same locked native command passed after the original runtime source was restored byte for byte. Both arms used the same mutation-style warning cap. The tracked change is the existing CLI test plus this evidence. This focused replay does not amend the canonical shard result. [Exact receipts](receipt.json) · [Raw patch and logs](raw-native.tar.gz).

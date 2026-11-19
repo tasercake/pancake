@@ -1,0 +1,27 @@
+"""Deterministic real 704×640 RGGB DNG, with non-zero black and asymmetric crop."""
+from hashlib import file_digest
+from pathlib import Path
+import sys
+import numpy as np
+import tifffile
+out=Path(sys.argv[1])
+rows, cols=np.mgrid[:640, :704]
+mosaic=(2048+((rows*53 + cols*83 + (rows*cols)%127) % 48731)).astype(np.uint16)
+matrix=(10000,10000,0,10000,0,10000,0,10000,10000,10000,0,10000,0,10000,0,10000,10000,10000)
+tags=[(50706,'B',4,(1,4,0,0),False),(50707,'B',4,(1,3,0,0),False),
+      (50708,'s',0,'Pancake Native RAW Packing Proof',False),
+      (33421,'H',2,(2,2),False),(33422,'B',4,(0,1,1,2),False),
+      (50710,'B',3,(0,1,2),False),(50711,'H',1,1,False),
+      (50714,'I',1,2048,False),(50717,'I',1,65535,False),
+      (50721,'2i',9,matrix,False),(50728,'2I',3,(3,4,1,1,4,5),False),
+      (50778,'H',1,21,False),(50719,'I',2,(6,4),False),(50720,'I',2,(674,614),False)]
+for name,orientation in [('profiled.dng',1),('profiled-rotated.dng',6)]:
+    path=out/name
+    tifffile.imwrite(path,mosaic,photometric=32803,metadata=None,extratags=tags+[(274,'H',1,orientation,False)])
+    with tifffile.TiffFile(path) as verify:
+        page=verify.pages[0]
+        assert np.array_equal(page.asarray(),mosaic)
+        assert page.tags[274].value==orientation
+        assert page.tags[50719].value==(6,4) and page.tags[50720].value==(674,614)
+    with path.open('rb') as data:
+        print(file_digest(data,'sha256').hexdigest(),path)

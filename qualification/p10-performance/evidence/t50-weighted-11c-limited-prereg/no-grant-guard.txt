@@ -1,0 +1,4 @@
+usage: operator.py.txt [-h] [--execute-limited] [--lease LEASE]
+                       [--package-dir PACKAGE_DIR]
+                       [--producer-source PRODUCER_SOURCE] [--output OUTPUT]
+operator.py.txt: error: execution requires an explicit new quiet/custody lease, producers and fresh output

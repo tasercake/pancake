@@ -1,0 +1,17 @@
+//! Synthetic process identity and return-code witness for profile transport.
+
+use std::process::{ExitCode, id};
+
+fn main() -> ExitCode {
+    let arguments = std::env::args().skip(1).collect::<Vec<_>>();
+    println!("{}", id());
+    for argument in &arguments {
+        println!("{argument}");
+    }
+    if arguments.first().is_some_and(|arg| arg == "--reject") {
+        eprintln!("synthetic rejection");
+        ExitCode::from(17)
+    } else {
+        ExitCode::SUCCESS
+    }
+}

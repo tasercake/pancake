@@ -1,0 +1,83 @@
+"""Require one exact unchanged source operation for each historical selected mutation."""
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+OLD = "287828aac07ffad2252785b73a52a59fc07b3409"
+NEW = "c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb"
+ORIGINAL_LIST_SHA = "b2b1c29114e199902fa9ec35dbf4d4cc2d71c1c410547234f8969c4e5af02bde"
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def patch_lines(row):
+    return [line for line in row["diff"].splitlines()[2:] if line.startswith(("-", "+"))]
+
+def operation(row):
+    function = row.get("function")
+    if not function:
+        return None
+    anchor = function["span"]["start"]["line"]
+    location = tuple((row["span"][end]["line"] - anchor, row["span"][end]["column"])
+                     for end in ("start", "end"))
+    return {
+        "file": row["file"],
+        "package": row["package"],
+        "function": function["function_name"],
+        "genre": row["genre"],
+        "replacement": row["replacement"],
+        "named_operation": re.sub(r"^.*?:\d+:\d+: ", "", row["name"]),
+        "relative_span": location,
+        "patch_lines": patch_lines(row),
+    }
+
+def source_function(row, revision):
+    span = row["function"]["span"]
+    lines = subprocess.check_output(["git", "show", f"{revision}:pancake/{row['file']}"]).splitlines(keepends=True)
+    return b"".join(lines[span["start"]["line"] - 1:span["end"]["line"]])
+
+def main():
+    out = Path(sys.argv[1])
+    historical = (out / "original-list.json").read_bytes()
+    current = (out / "current-full-list.json").read_bytes()
+    assert sha(historical) == ORIGINAL_LIST_SHA
+    old_rows, new_rows = json.loads(historical), json.loads(current)
+    assert len(old_rows) == 10
+    candidates = [(index, row, operation(row)) for index, row in enumerate(new_rows)]
+    matches, mismatches = [], []
+    for old in old_rows:
+        key = operation(old)
+        rows = [(i, row) for i, row, operation_key in candidates if operation_key == key]
+        if len(rows) != 1:
+            mismatches.append({"original": old["name"], "current_matches": [row["name"] for _, row in rows]})
+            continue
+        i, new = rows[0]
+        original_function, current_function = source_function(old, OLD), source_function(new, NEW)
+        if original_function != current_function:
+            mismatches.append({"original": old["name"], "current": new["name"], "reason": "Different function bytes"})
+            continue
+        matches.append((i, new, {"original": old["name"], "current": new["name"],
+                               "full_roster_ordinal": i, "function_sha256": sha(current_function),
+                               "operation": key,
+                               "operation_sha256": sha(json.dumps(key, sort_keys=True).encode())}))
+    ordered = sorted(matches, key=lambda match: match[0])
+    ordered_data = [row for _, row, _ in ordered]
+    selection = (json.dumps(ordered_data, indent=2) + "\n").encode()
+    (out / "current-ordered-selection.json").write_bytes(selection)
+    (out / "match-receipt.json").write_text(json.dumps({
+        "original_revision": OLD, "current_revision": NEW,
+        "original_list_sha256": sha(historical), "current_full_list_sha256": sha(current),
+        "current_full_list_count": len(new_rows),
+        "current_ordered_selection_sha256": sha(selection),
+        "matches": [record for _, _, record in ordered],
+        "mismatches": mismatches,
+    }, indent=2) + "\n")
+    if mismatches or len(ordered_data) != 10 or len({i for i, _, _ in ordered}) != 10:
+        raise SystemExit("Historical operation mapping is incomplete or duplicated")
+    (out / "exact-mutant-names.re").write_text("^(" + "|".join(re.escape(row["name"]) for row in ordered_data) + ")$\n")
+
+if __name__ == "__main__":
+    main()

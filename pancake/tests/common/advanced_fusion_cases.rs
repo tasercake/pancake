@@ -190,6 +190,88 @@ impl LaunchObserver for LaunchCount {
     }
 }
 
+/// Keep the earlier RGB coefficient for zero and equal positive focus.
+///
+/// # Errors
+/// Returns a launch, layout, or numerical failure.
+pub fn check_hybrid_level_bounds(device: &cubecl::Device) -> Result<(), String> {
+    for (width, height, depth) in [(1_usize, 1, 0), (33, 1, 1), (1, 33, 1), (33, 19, 4)] {
+        let mut accumulator = AdvancedAccumulator::new(
+            device,
+            width,
+            height,
+            AdvancedMethod::Hybrid,
+            6,
+            depth,
+            BUDGET,
+        )?;
+        let area = width.checked_mul(height).ok_or("fixture area overflow")?;
+        let first = [0.25_f32, 0.5, 0.75].repeat(area);
+        let second = [0.75_f32, 0.5, 0.25].repeat(area);
+        accumulator.add_frame(&first)?;
+        accumulator.add_frame(&second)?;
+        let actual = accumulator.finish()?;
+        if actual.len() != first.len()
+            || actual
+                .iter()
+                .zip(first)
+                .any(|(sample, expected)| sample.to_bits() != expected.to_bits())
+        {
+            return Err(format!(
+                "Hybrid changed a zero-weight winner or the {width}×{height} depth-{depth} extent"
+            ));
+        }
+    }
+
+    let mut accumulator =
+        AdvancedAccumulator::new(device, WIDTH, 1, AdvancedMethod::Hybrid, 6, 0, BUDGET)?;
+    for parity in 0..2 {
+        let frame: Vec<_> = (0..WIDTH)
+            .flat_map(|x| [if x % 2 == parity { 0.0_f32 } else { 1.0 }; 3])
+            .collect();
+        accumulator.add_frame(&frame)?;
+    }
+    let actual = accumulator.finish()?;
+    let expected = (0..WIDTH).flat_map(|x| [if x % 2 == 0 { 0.3_f32 } else { 0.7 }; 3]);
+    // In the top level both inputs have equal positive contrast and their
+    // mean, 0.5, gets 60% of the final coefficient.
+    if actual.len() != WIDTH * 3
+        || actual
+            .iter()
+            .zip(expected)
+            .any(|(sample, expected)| sample.to_bits() != expected.to_bits())
+    {
+        return Err("Hybrid changed the earlier winner at equal positive focus".to_owned());
+    }
+    Ok(())
+}
+
+/// Avoid a separate band materialization pass for Hybrid coefficients.
+///
+/// # Errors
+/// Returns a launch, shape, or numerical failure.
+pub fn check_hybrid_frame_launches(device: &cubecl::Device) -> Result<(), String> {
+    let mut accumulator =
+        AdvancedAccumulator::new(device, WIDTH, HEIGHT, AdvancedMethod::Hybrid, 6, 4, BUDGET)?;
+    let launches = Arc::new(LaunchCount::default());
+    let observing = LaunchObservation::new(launches.clone());
+    accumulator.add_frame(&focus_frame(true))?;
+    accumulator.add_frame(&focus_frame(false))?;
+    drop(observing);
+    let output = accumulator.finish()?;
+    if output.len() != WIDTH * HEIGHT * 3 || output.iter().any(|sample| !sample.is_finite()) {
+        return Err("Hybrid launch witness did not complete a finite RGB output".to_owned());
+    }
+    // Per frame: three focus passes, two reductions per step, ten band updates.
+    let issued = launches.0.load(Ordering::Relaxed);
+    if issued > 42 {
+        return Err(format!(
+            "two four-reduction Hybrid frames should need at most 42 launches, issued {issued}"
+        ));
+    }
+    Ok(())
+}
+
 /// A change of raster size alone should reuse the same compiled exposure kernels.
 ///
 /// # Errors

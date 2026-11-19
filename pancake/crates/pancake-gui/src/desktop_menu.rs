@@ -382,3 +382,24 @@ mod linux {
         row
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::reveal;
+
+    /// Reject a missing source before dispatching to a desktop service.
+    /// # Errors
+    /// Returns a temporary-directory or source-path diagnostic failure.
+    #[test]
+    fn reveal_reports_a_missing_source() -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let path = directory.path().join("missing-source.tif");
+        let Err(error) = reveal(&path) else {
+            return Err("Revealing a missing source reported success.".into());
+        };
+        if !error.starts_with(&format!("Could not locate {}:", path.display())) {
+            return Err(format!("Reveal lost the failing source path: {error}").into());
+        }
+        Ok(())
+    }
+}

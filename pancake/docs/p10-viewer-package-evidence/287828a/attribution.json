@@ -1,0 +1,399 @@
+{
+  "same_event_input_and_witness_sequence": true,
+  "same_ordered_input_identities": true,
+  "packaged_287828a": {
+    "by_action": {
+      "idle/comparison": {
+        "count": 40,
+        "min": 18338199,
+        "p50": 19480155.5,
+        "p95": 21606341,
+        "max": 22851362,
+        "over_33_ms": 0
+      },
+      "idle/pan": {
+        "count": 40,
+        "min": 18480189,
+        "p50": 19578616.5,
+        "p95": 21210766,
+        "max": 22225334,
+        "over_33_ms": 0
+      },
+      "idle/result": {
+        "count": 40,
+        "min": 19438857,
+        "p50": 20573434.5,
+        "p95": 21793513,
+        "max": 21934298,
+        "over_33_ms": 0
+      },
+      "idle/source": {
+        "count": 40,
+        "min": 19489073,
+        "p50": 20633418.0,
+        "p95": 21754231,
+        "max": 516468600,
+        "over_33_ms": 1
+      },
+      "idle/zoom": {
+        "count": 40,
+        "min": 19450371,
+        "p50": 19580374.0,
+        "p95": 20751994,
+        "max": 21610049,
+        "over_33_ms": 0
+      },
+      "loaded/comparison": {
+        "count": 40,
+        "min": 19533383,
+        "p50": 20670012.0,
+        "p95": 23183932,
+        "max": 29461659,
+        "over_33_ms": 0
+      },
+      "loaded/pan": {
+        "count": 40,
+        "min": 20542026,
+        "p50": 21774197.5,
+        "p95": 33817853,
+        "max": 43510225,
+        "over_33_ms": 4
+      },
+      "loaded/result": {
+        "count": 40,
+        "min": 19484060,
+        "p50": 20782854.0,
+        "p95": 25027312,
+        "max": 27146502,
+        "over_33_ms": 0
+      },
+      "loaded/source": {
+        "count": 40,
+        "min": 19434648,
+        "p50": 20617413.0,
+        "p95": 22713525,
+        "max": 22831620,
+        "over_33_ms": 0
+      },
+      "loaded/zoom": {
+        "count": 40,
+        "min": 19507315,
+        "p50": 20674516.5,
+        "p95": 41204861,
+        "max": 43402286,
+        "over_33_ms": 8
+      }
+    },
+    "by_stage": {
+      "idle/Publish": {
+        "count": 200,
+        "min": 18338199,
+        "p50": 19634686.5,
+        "p95": 21713240,
+        "max": 516468600,
+        "over_33_ms": 1
+      },
+      "loaded/Decode": {
+        "count": 81,
+        "min": 19434648,
+        "p50": 20687608,
+        "p95": 22831620,
+        "max": 43510225,
+        "over_33_ms": 1
+      },
+      "loaded/Fuse": {
+        "count": 119,
+        "min": 19484060,
+        "p50": 21505688,
+        "p95": 35866418,
+        "max": 43402286,
+        "over_33_ms": 11
+      }
+    },
+    "over_33_ms": [
+      {
+        "step": 3,
+        "condition": "idle",
+        "action": "source",
+        "stage_before": "Completed \u00b7 Publish \u00b7 50 of 50",
+        "stage_after": "Completed \u00b7 Publish \u00b7 50 of 50",
+        "latency_ns": 516468600,
+        "maximum_observation_gap_ns": 1198542
+      },
+      {
+        "step": 432,
+        "condition": "loaded",
+        "action": "pan",
+        "stage_before": "Running \u00b7 Decode \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "latency_ns": 43510225,
+        "maximum_observation_gap_ns": 1122028
+      },
+      {
+        "step": 552,
+        "condition": "loaded",
+        "action": "pan",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "latency_ns": 33725162,
+        "maximum_observation_gap_ns": 1130704
+      },
+      {
+        "step": 590,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+        "latency_ns": 41204861,
+        "maximum_observation_gap_ns": 1129452
+      },
+      {
+        "step": 650,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+        "latency_ns": 35339783,
+        "maximum_observation_gap_ns": 1137407
+      },
+      {
+        "step": 660,
+        "condition": "loaded",
+        "action": "pan",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "latency_ns": 33817853,
+        "maximum_observation_gap_ns": 1145192
+      },
+      {
+        "step": 698,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+        "latency_ns": 40037416,
+        "maximum_observation_gap_ns": 1101409
+      },
+      {
+        "step": 734,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+        "latency_ns": 43402286,
+        "maximum_observation_gap_ns": 1103933
+      },
+      {
+        "step": 744,
+        "condition": "loaded",
+        "action": "pan",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "latency_ns": 33859119,
+        "maximum_observation_gap_ns": 1159468
+      },
+      {
+        "step": 770,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+        "latency_ns": 41126901,
+        "maximum_observation_gap_ns": 1103372
+      },
+      {
+        "step": 806,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+        "latency_ns": 41265220,
+        "maximum_observation_gap_ns": 1108953
+      },
+      {
+        "step": 842,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+        "latency_ns": 34666806,
+        "maximum_observation_gap_ns": 1108572
+      },
+      {
+        "step": 878,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Decode \u00b7 2 of 50",
+        "latency_ns": 35866418,
+        "maximum_observation_gap_ns": 1127688
+      }
+    ]
+  },
+  "prior_6489af6": {
+    "by_action": {
+      "idle/comparison": {
+        "count": 40,
+        "min": 19309153,
+        "p50": 19416750.5,
+        "p95": 20544420,
+        "max": 20877900,
+        "over_33_ms": 0
+      },
+      "idle/pan": {
+        "count": 40,
+        "min": 18448322,
+        "p50": 19557818.0,
+        "p95": 20735225,
+        "max": 21778744,
+        "over_33_ms": 0
+      },
+      "idle/result": {
+        "count": 40,
+        "min": 19448192,
+        "p50": 20569133.0,
+        "p95": 20792753,
+        "max": 21790510,
+        "over_33_ms": 0
+      },
+      "idle/source": {
+        "count": 40,
+        "min": 19483415,
+        "p50": 20637185.5,
+        "p95": 21719603,
+        "max": 659484056,
+        "over_33_ms": 1
+      },
+      "idle/zoom": {
+        "count": 40,
+        "min": 18439853,
+        "p50": 19618653.0,
+        "p95": 20725794,
+        "max": 21743609,
+        "over_33_ms": 0
+      },
+      "loaded/comparison": {
+        "count": 40,
+        "min": 19301317,
+        "p50": 20409010.5,
+        "p95": 21644593,
+        "max": 22223630,
+        "over_33_ms": 0
+      },
+      "loaded/pan": {
+        "count": 40,
+        "min": 18437040,
+        "p50": 19592374.5,
+        "p95": 21744661,
+        "max": 21795617,
+        "over_33_ms": 0
+      },
+      "loaded/result": {
+        "count": 40,
+        "min": 20592759,
+        "p50": 21672348.5,
+        "p95": 22885975,
+        "max": 22959336,
+        "over_33_ms": 0
+      },
+      "loaded/source": {
+        "count": 40,
+        "min": 19451942,
+        "p50": 20737636.0,
+        "p95": 22803933,
+        "max": 22820504,
+        "over_33_ms": 0
+      },
+      "loaded/zoom": {
+        "count": 40,
+        "min": 19517007,
+        "p50": 21736782.0,
+        "p95": 35764597,
+        "max": 43319367,
+        "over_33_ms": 5
+      }
+    },
+    "by_stage": {
+      "idle/Publish": {
+        "count": 200,
+        "min": 18439853,
+        "p50": 19714482.5,
+        "p95": 20792753,
+        "max": 659484056,
+        "over_33_ms": 1
+      },
+      "loaded/Decode": {
+        "count": 142,
+        "min": 18437040,
+        "p50": 20574461.0,
+        "p95": 30327872,
+        "max": 43319367,
+        "over_33_ms": 5
+      },
+      "loaded/Fuse": {
+        "count": 58,
+        "min": 20592759,
+        "p50": 21672348.5,
+        "p95": 22959336,
+        "max": 29315717,
+        "over_33_ms": 0
+      }
+    },
+    "over_33_ms": [
+      {
+        "step": 3,
+        "condition": "idle",
+        "action": "source",
+        "stage_before": "Completed \u00b7 Publish \u00b7 50 of 50",
+        "stage_after": "Completed \u00b7 Publish \u00b7 50 of 50",
+        "latency_ns": 659484056,
+        "maximum_observation_gap_ns": 1154308
+      },
+      {
+        "step": 422,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Decode \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "latency_ns": 35764597,
+        "maximum_observation_gap_ns": 1108614
+      },
+      {
+        "step": 494,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Decode \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "latency_ns": 36791213,
+        "maximum_observation_gap_ns": 1116729
+      },
+      {
+        "step": 518,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Decode \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "latency_ns": 43319367,
+        "maximum_observation_gap_ns": 1091181
+      },
+      {
+        "step": 590,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Decode \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "latency_ns": 33538755,
+        "maximum_observation_gap_ns": 1097213
+      },
+      {
+        "step": 662,
+        "condition": "loaded",
+        "action": "zoom",
+        "stage_before": "Running \u00b7 Decode \u00b7 1 of 50",
+        "stage_after": "Running \u00b7 Fuse \u00b7 1 of 50",
+        "latency_ns": 33756548,
+        "maximum_observation_gap_ns": 1204103
+      }
+    ]
+  }
+}

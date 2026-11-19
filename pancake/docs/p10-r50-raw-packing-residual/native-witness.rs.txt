@@ -1,0 +1,118 @@
+/// Observe chunk execution in the specified pool while applying the production quantizer.
+///
+/// # Errors
+///
+/// Returns an escaped pool, insufficient task parallelism or numerical parity error.
+#[test]
+fn native_raw_packing_uses_only_the_installed_pool() -> Result<(), Box<dyn Error>> {
+    use std::collections::BTreeSet;
+    use std::sync::{Condvar, Mutex};
+    use std::time::Duration;
+
+    let mut working: Vec<f32> = SAMPLE_CODES
+        .iter()
+        .cycle()
+        .take(1_273_809)
+        .map(|&(value, _)| value)
+        .collect();
+    let expected = rawler::imgop::convert_from_f32_scaled_u16(&working, 0, u16::MAX);
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(2)
+        .thread_name(|index| format!("raw-pack-proof-{index}"))
+        .build()?;
+    let observed = Mutex::new((BTreeSet::new(), true));
+    let other_task = Condvar::new();
+    pool.install(|| {
+        super::for_each_packing_chunk(&mut working, Some(&pool), |chunk| {
+            if let Ok(mut record) = observed.lock() {
+                if let Some(index) = pool.current_thread_index() {
+                    let first = record.0.insert(index) && record.0.len() == 1;
+                    if first {
+                        // This watchdog only releases the first task for the serial red control.
+                        let wait = other_task.wait_timeout_while(
+                            record, Duration::from_secs(2), |record| record.0.len() == 1,
+                        );
+                        drop(wait);
+                    } else {
+                        other_task.notify_all();
+                    }
+                } else {
+                    record.1 = false;
+                }
+            }
+            super::pack_raw_rgb16_chunk(chunk);
+        });
+    });
+    let (ids, in_scope) = observed.into_inner().map_err(|_| "worker observation lock failed")?;
+    if !in_scope {
+        return Err("a chunk task escaped the requested pool".into());
+    }
+    if ids.len() != 2 {
+        return Err(format!("expected two active workers in the original pool, observed {ids:?}").into());
+    }
+    if !working.iter().map(|value| value.to_bits()).eq(
+        expected.into_iter().map(|code| (f32::from(code) / f32::from(u16::MAX)).to_bits()),
+    ) {
+        return Err("parallel working samples changed pinned Rawler quantization".into());
+    }
+    Ok(())
+}
+
+/// Compare whole-frame native decode and both orientations through the exact Rawler path.
+///
+/// # Errors
+///
+/// Returns a file error, wrong crop, or working-pixel mismatch.
+#[test]
+fn native_large_dng_packing_matches_serial_and_preserves_source() -> Result<(), Box<dyn Error>> {
+    use std::{fs, path::Path, sync::Arc};
+    use rawler::rawsource::RawSource;
+
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../artifacts/raw-packing-audit/profiled.dng");
+    let rotated_path = path.with_file_name("profiled-rotated.dng");
+    let pool = rayon::ThreadPoolBuilder::new().num_threads(2).build()?;
+    for (path, shape) in [(&path, (674, 614)), (&rotated_path, (614, 674))] {
+        let original = fs::read(path)?;
+        let raw_source = RawSource::new_from_shared_vec(Arc::new(original.clone())).with_path(path);
+        let serial = pool.install(|| super::develop(&raw_source, None))?;
+        let parallel = pool.install(|| super::develop(&raw_source, Some(&pool)))?;
+        if (parallel.width(), parallel.height()) != shape
+            || serial.sample_encoding() != parallel.sample_encoding()
+            || serial.icc_profile() != parallel.icc_profile()
+            || !serial.samples().iter().map(|x|x.to_bits()).eq(parallel.samples().iter().map(|x|x.to_bits()))
+            || fs::read(path)? != original
+        {
+            return Err("native DNG geometry, color metadata, working bits or original bytes changed".into());
+        }
+    }
+    Ok(())
+}
+
+/// A matching pool passed from outside its workers must leave packing on the caller.
+///
+/// # Errors
+///
+/// Returns a pool initialization, unexpected worker or numerical mismatch.
+#[test]
+fn native_large_raw_pack_outside_scope_stays_on_the_caller() -> Result<(), Box<dyn Error>> {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::thread;
+
+    let pool = rayon::ThreadPoolBuilder::new().num_threads(2).build()?;
+    let mut working = vec![0.25_f32; super::RAW_PARALLEL_MIN_SAMPLES];
+    let caller = thread::current().id();
+    let unexpected_worker = AtomicBool::new(false);
+    super::for_each_packing_chunk(&mut working, Some(&pool), |chunk| {
+        if thread::current().id() != caller {
+            unexpected_worker.store(true, Ordering::Relaxed);
+        }
+        super::pack_raw_rgb16_chunk(chunk);
+    });
+    let expected = (f32::from(16_383_u16) / f32::from(u16::MAX)).to_bits();
+    if unexpected_worker.load(Ordering::Relaxed)
+        || !working.iter().all(|value| value.to_bits() == expected)
+    {
+        return Err("large packing outside the installed pool left the caller or changed a code".into());
+    }
+    Ok(())
+}

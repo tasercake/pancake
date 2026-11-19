@@ -1,5 +1,112 @@
 # Linux package evidence
 
+## Integrated Linux package candidate `11cfcf8`
+
+The locked default workspace release built both executables at
+`11cfcf8aac5921dfa843bfc5777eb4b2643a6ca6`. The fast and dependency checks and
+nine packaging tests passed. The exact local archive is
+`artifacts/pancake-packages/linux-11cfcf8/pancake_0.1.0_amd64.deb` (69,507,550 bytes), with SHA-256
+`74a764f99ba72be40f02e6b3b9faf3981f19e35f0b46e0231f665b1ccbe8c729`. The tested revision descends from the sanitized
+lineage. A complete Git object-membership check confirmed the excluded
+opaque object is unreachable from the tested revision.
+[Build, hardware and source receipts](11cfcf8/summary.json).
+[Ancestry verification](11cfcf8/clean-ancestry.json).
+[Rootless package verification](11cfcf8/package-verification.json).
+
+## Integrated Linux package candidate `0a9ae85`
+
+The locked default workspace release built both executables at
+`0a9ae85b88519a795e3b6ba90860c3b3e664bcaa`. The fast and dependency checks and
+nine packaging tests passed. The exact local archive is
+`artifacts/pancake-packages/linux-0a9ae85/pancake_0.1.0_amd64.deb` (69,494,276 bytes), with SHA-256
+`c3516a65762b58889858857c8163744e86e82c9427a953730c0450580c5cc4c4`. The tested revision descends from the sanitized
+lineage. A complete Git object-membership check confirmed the excluded
+opaque object is unreachable from the tested revision.
+[Build, hardware and source receipts](0a9ae85/summary.json).
+[Ancestry verification](0a9ae85/clean-ancestry.json).
+[Rootless package verification](0a9ae85/package-verification.json).
+
+## Integrated Linux package candidate `e81079d`
+
+The locked default workspace release built both executables at
+`e81079dee4078d7a1149da0f5950aab8c89f8d44`. The fast and dependency checks and
+four packaging tests passed. The exact local archive is
+`artifacts/pancake-packages/linux-e81079d/pancake_0.1.0_amd64.deb` (69,568,056 bytes), with SHA-256
+`8ed6e70d7552140c0257520a07ac2b9fc5f97ff82a5fb3126864df821df4507e`. The tested revision descends from the sanitized
+lineage. A complete Git object-membership check confirmed the excluded
+opaque object is unreachable from the tested revision.
+[Build, hardware and source receipts](e81079d/summary.json).
+[Ancestry verification](e81079d/clean-ancestry.json).
+[Rootless package verification](e81079d/package-verification.json).
+
+## Integrated Linux package candidate `fb9c399`
+
+The locked default workspace release built both executables at
+`fb9c399a96658331cb76b843a1e565b503e94fdd`. The fast and dependency checks and
+four packaging tests passed. The exact local archive is
+`artifacts/pancake-packages/linux-fb9c399/pancake_0.1.0_amd64.deb` (69,508,808 bytes), with SHA-256
+`b8f707ca5812ce2137b49feee2888b50de53825e160aa9ccb0e30f55b02a62de`. The tested revision descends from the sanitized
+lineage. A complete Git object-membership check confirmed the excluded
+opaque object is unreachable from the tested revision.
+[Build, hardware and source receipts](fb9c399/summary.json).
+[Ancestry verification](fb9c399/clean-ancestry.json).
+[Rootless package verification](fb9c399/package-verification.json).
+
+## Integrated Linux package candidate `c1e2cac`
+
+The locked default workspace release built both executables at
+`c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb`. The fast and dependency checks and
+four packaging tests passed. The exact local archive is
+`artifacts/pancake-packages/linux-c1e2cac/pancake_0.1.0_amd64.deb` (69,508,790 bytes), with SHA-256
+`c6f39324ea4d9a29fb1a4f33253f6d988f44d1f150622bc94b728975a5f96b64`. The tested revision descends from the sanitized
+lineage. A complete Git object-membership check confirmed the excluded
+opaque object is unreachable from the tested revision.
+[Build, hardware and source receipts](c1e2cac/summary.json).
+[Ancestry verification](c1e2cac/clean-ancestry.json).
+[Rootless package verification](c1e2cac/package-verification.json).
+
+## Integrated Linux package candidate `8694b55`
+
+The locked default workspace release built both executables at
+`8694b555666a1ddf4051e2839bbced4bcc625859`. The dependency gate and four
+packaging tests passed. The exact local archive is
+`artifacts/pancake-packages/linux-8694b55/pancake_0.1.0_amd64.deb` (69,494,350 bytes), with SHA-256
+`7dbc969e1813bc62aa4df206bb77982e3f7705298f753e12b7a493ae89ce3784`.
+[Build, hardware and source receipts](8694b55/summary.json).
+[Rootless package verification](8694b55/package-verification.json).
+
+The exact fast gate exited 101. Strict Clippy reported
+19 default numeric fallbacks and one constant-size `chunks_exact` in
+`pancake/tests/cpu_fusion_contract.rs`. The full fast gate remains open on
+this revision. [Original fast-gate log](8694b55/check-fast.log.gz).
+
+## Integrated Linux package candidate `287828a`
+
+The locked default workspace release built both executables at
+`287828aac07ffad2252785b73a52a59fc07b3409`. The fast and dependency gates and
+four packaging tests passed. The exact local archive is
+`artifacts/pancake-packages/linux-287828a/pancake_0.1.0_amd64.deb` (69,551,694 bytes), with SHA-256
+`34a63edea55c411a6082924c2fbe2c50094eea98753b1f75378459da78e4db99`.
+[Build, hardware and source receipts](287828a/summary.json).
+[Rootless package verification](287828a/package-verification.json).
+
+## Integrated Linux package candidate `d6359e1`
+
+The locked default-feature workspace release built both executables at
+`d6359e129737f1a9077fb4abc2a8f783fa1f7b38`. The fast and dependency gates and
+four package tests passed. The local Debian archive is
+`artifacts/pancake-packages/linux-d6359e1/pancake_0.1.0_amd64.deb`. It contains 69,478,602 bytes and has
+SHA-256 `e6b4d83e8100d04d1692fc8d2f0e276e249fa5a1d79e6e8f623801632c860758`.
+[Build, hardware and source receipts](d6359e1/summary.json).
+[Rootless package inspection](d6359e1/package-verification.json).
+
+The cold build finished and emitted both hashes before its command wrapper
+failed. A successful rerun of the locked build verified identical bytes.
+Both logs are retained. The prior Linux package and benchmark artifacts
+remain attributable to their recorded source revisions.
+[Cold build](d6359e1/release-build-initial-launch.log.gz).
+[Successful build attestation](d6359e1/release-build.log.gz).
+
 ## Integrated Linux package candidate `12f2151`
 
 The locked workspace release built both executables on Ubuntu 24.04.5 x86-64

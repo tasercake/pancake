@@ -1,0 +1,13 @@
+{
+  "source_commit": "287828aac07ffad2252785b73a52a59fc07b3409",
+  "cargo_lock_sha256": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
+  "archive": {
+    "file": "pancake_0.1.0_amd64.deb",
+    "sha256": "34a63edea55c411a6082924c2fbe2c50094eea98753b1f75378459da78e4db99",
+    "bytes": 69551694
+  },
+  "cli": {
+    "sha256": "874c8683623131b5619858a9cba61cb6219bc2eae6d6bdb30ed1bc5d8634ce8e",
+    "bytes": 122256352
+  }
+}

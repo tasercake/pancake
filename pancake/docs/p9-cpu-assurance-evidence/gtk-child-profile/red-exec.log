@@ -1,0 +1,3 @@
+1573008 execve("/tmp/pancake-worktrees.t3paqgWM/p9-gtk-child-profile/pancake/target/llvm-cov-target/debug/build/pancake-gui/c855531277e79884/out/pancake_gui-c855531277e79884", ["/tmp/pancake-worktrees.t3paqgWM/"..., "--exact", "panel::linux::tests::unavailable"...], 0x7ffe0a968090 /* 131 vars */) = 0
+1573010 execve("/tmp/pancake-worktrees.t3paqgWM/p9-gtk-child-profile/pancake/target/llvm-cov-target/debug/build/pancake-gui/c855531277e79884/out/pancake_gui-c855531277e79884", ["/tmp/pancake-worktrees.t3paqgWM/"..., "--exact", "panel::linux::tests::unavailable"...], 0x7a2d08001b70 /* 5 vars */) = 0
+1573008 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=1573010, si_uid=1000, si_status=0, si_utime=0, si_stime=1 /* 0.01 s */} ---

@@ -1,0 +1,21 @@
+--- src/registration/estimate.rs
++++ replace - with / in Coordinates::convert
+@@ -303,17 +303,17 @@
+     fn convert(self, model: Model, parameters: Parameters) -> Result<Affine, String> {
+         let Parameters([dx, dy, scale, second, third, fourth]) = parameters;
+         let increase = scale / self.span;
+         let slope = second / self.span;
+         let [[da, b], [c, dd]] = match model {
+             Model::Translation => [[0.0, 0.0], [0.0, 0.0]],
+             Model::Euclidean => {
+                 let (s, cos) = increase.sin_cos();
+-                [[cos - 1.0, -s], [s, cos - 1.0]]
++                [[cos / /* ~ changed by cargo-mutants ~ */ 1.0, -s], [s, cos - 1.0]]
+             }
+             Model::Similarity => [[increase, -slope], [slope, increase]],
+             Model::Breathing => [[increase, 0.0], [0.0, increase]],
+             Model::Affine => [[increase, slope], [third / self.span, fourth / self.span]],
+         };
+         let tx = (-da).mul_add(self.x, (-b).mul_add(self.y, dx));
+         let ty = (-c).mul_add(self.x, (-dd).mul_add(self.y, dy));
+         Affine::from_matrix([[1.0 + da, b, tx], [c, 1.0 + dd, ty]])

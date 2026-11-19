@@ -1,0 +1,29 @@
+{
+  "matched_hybrid_pair": {
+    "borrower": "p4_methods",
+    "receipt_revision": "65a3e0b19233cdf9f1f636183b6112e97c929c11",
+    "receipt_path": "qualification/p10-performance/evidence/t50-hybrid-pair-8694b55/verified-summary.json",
+    "receipt_sha256": "4944482cdcf5db78f900aff0ef7c500637d0d2d8c4eb5827324a62bc0b9075e2",
+    "state": "explicitly released after terminal reads",
+    "materialization_sha256": "317f4b0c9be5837cd7082227bf700ee232e7e995471ee44be8488cbf3511603c"
+  },
+  "frozen_400_event_viewer": {
+    "borrower": "p7_ui",
+    "receipt_revision": "2988c6c384ab37b6a56c61a8cad9f2947a6996fa",
+    "receipt_path": "pancake/docs/p10-viewer-package-evidence/8694b55/summary.json",
+    "receipt_sha256": "7f079cee75df41222a8aea4c4f27f556ea7ff8fe5ff820522763f0d9f18b87c4",
+    "state": "explicitly released after terminal reads",
+    "materialization_sha256": "317f4b0c9be5837cd7082227bf700ee232e7e995471ee44be8488cbf3511603c"
+  },
+  "full_stack_80_event_attribution_trace": {
+    "borrower": "p7_ui",
+    "observed_receipt_path": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-queue-trace-preflight/direct-full-8694/raw-first-full/artifacts/capture/native-latency.json",
+    "durable_receipt_path": "artifacts/p10-viewer-queue-trace-preflight/direct-full-8694/raw-first-full/artifacts/capture/native-latency.json",
+    "receipt_sha256": "492691da20cc9b05e7171e7002820facab285a0366c2e3239e5185e749d59c3c",
+    "materialization_sha256": "317f4b0c9be5837cd7082227bf700ee232e7e995471ee44be8488cbf3511603c",
+    "native_profile_exit": 0,
+    "ordered_unchanged_focus_frames": 50,
+    "loaded_events": 80,
+    "state": "explicitly released after terminal reads"
+  }
+}

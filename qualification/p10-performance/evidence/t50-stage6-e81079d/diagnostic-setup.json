@@ -1,0 +1,17 @@
+{
+  "status": "prepared_no_jobs_launched",
+  "prepared_at": "2026-11-19T00:20:59+08:00",
+  "package_archive": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-e81079d/pancake_0.1.0_amd64.deb",
+  "package_verification": "/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-e81079d/package-verification.json",
+  "build_receipt": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/build-receipt.json",
+  "build_receipt_sha256": "a6679a7e134bd403e931579296cacbd51dab884e010b421f93391943a87c6804",
+  "reference": {
+    "descriptor_sha256": "e3e951b674bc0103f267575a99533cc33ead40e2af56671766f4fc71f3f12b76",
+    "runtime_lock_sha256": "fda57ac5eea063aebcc278eb57a90228e6da32fe2d8f67d7025ac367f4b51036",
+    "python_sha256": "3008abbb48c1e2b0fa3072ae72334b9b352e1346ea3a20d34126a455f0c7bc66",
+    "package_inventory_sha256": "365903c53fe992a011c815cf1b4fb34c09e8c0125c3abb7e5a0b45fbb933749d",
+    "package_count": 46
+  },
+  "replay": "/tmp/pancake-worktrees.t3paqgWM/t50-stage6-e81079d/artifacts/p10-t50-shared-006/weighted-cpu-pair.py",
+  "replay_sha256": "5b7902c4bdd78e2a517720cbe4c60c8b940325321ef2d0412a14d830c14ab130"
+}

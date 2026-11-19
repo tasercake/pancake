@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Exact workspace CPU AddressSanitizer gate with no sanitizer options.
+set -euo pipefail
+root=$(git rev-parse --show-toplevel)
+proof="$root/artifacts/asan-c1e2cac"
+cd "$root/pancake"
+test "$(git rev-parse HEAD)" = c1e2cac93ad41c02b328d87bdd5d01e1ce2b46eb
+test -z "$(git status --porcelain --untracked-files=all)"
+{
+    date -u +%FT%TZ
+    printf 'revision=%s\n' "$(git rev-parse HEAD)"
+    printf 'tree=%s\n' "$(git rev-parse HEAD^{tree})"
+    printf 'dirty=false\n'
+    sha256sum Cargo.lock scripts/check.sh scripts/tool-versions.sh scripts/assurance_targets.py
+    uname -srm
+    lscpu
+    rustc +nightly-2026-11-15 --version --verbose
+    cargo +nightly-2026-11-15 --version --verbose
+    df -k "$root"
+    printf 'target_dir=%s\n' "$CARGO_TARGET_DIR"
+    awk '/^Cpus_allowed_list:/{print}' /proc/self/status
+    printf 'cargo_build_jobs=%s\ncargo_incremental=%s\n' "$CARGO_BUILD_JOBS" "$CARGO_INCREMENTAL"
+    printf 'ASAN_OPTIONS=%s\nLSAN_OPTIONS=%s\nTSAN_OPTIONS=%s\nUBSAN_OPTIONS=%s\nMSAN_OPTIONS=%s\n' \
+        "${ASAN_OPTIONS-unset}" "${LSAN_OPTIONS-unset}" "${TSAN_OPTIONS-unset}" "${UBSAN_OPTIONS-unset}" "${MSAN_OPTIONS-unset}"
+    printf 'RUSTC_WRAPPER=%s\nRUSTC_WORKSPACE_WRAPPER=%s\nRUSTFLAGS=%s\nCARGO_ENCODED_RUSTFLAGS=%s\nRUST_TEST_THREADS=%s\n' \
+        "${RUSTC_WRAPPER-unset}" "${RUSTC_WORKSPACE_WRAPPER-unset}" "${RUSTFLAGS-unset}" "${CARGO_ENCODED_RUSTFLAGS-unset}" "${RUST_TEST_THREADS-unset}"
+    printf 'DISPLAY=%s\nWAYLAND_DISPLAY=%s\nDBUS_SESSION_BUS_ADDRESS=%s\n' \
+        "${DISPLAY-unset}" "${WAYLAND_DISPLAY-unset}" "${DBUS_SESSION_BUS_ADDRESS-unset}"
+} >"$proof/environment.txt"
+date -u +%FT%TZ >"$proof/start"
+set +e
+/usr/bin/time -v -o "$proof/time.txt" bash scripts/check.sh sanitizer address >"$proof/sanitizer-address.log" 2>&1
+status=$?
+set -e
+printf '%s\n' "$status" >"$proof/sanitizer-address.status"
+date -u +%FT%TZ >"$proof/end"
+exit "$status"

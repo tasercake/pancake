@@ -1,0 +1,79 @@
+"""Summarize the unmodified pinned CPU layout gate."""
+from datetime import datetime
+from pathlib import Path
+import re
+import json
+
+repo = Path.cwd()
+proof = repo / "artifacts/linux-layouts-0a9ae85"
+workspace = repo / "pancake"
+
+def results(text):
+    """Account for every emitted test runner group."""
+    groups = []
+    runner = None
+    for line in text.splitlines():
+        header = re.fullmatch(r"\s*Running (.+) \(([^()]+)\)", line)
+        if header:
+            runner = (header[1], header[2])
+        summary = re.fullmatch(
+            r"test result: (ok|FAILED)\. (\d+) passed; (\d+) failed; (\d+) ignored; "
+            r"(\d+) measured; (\d+) filtered out; finished in ([0-9.]+)s", line
+        )
+        if summary:
+            if runner is None:
+                raise ValueError("missing original test executable header")
+            groups.append({"target": runner[0], "artifact": runner[1],
+                           "passed": int(summary[2]), "failed": int(summary[3]),
+                           "ignored": int(summary[4]), "measured": int(summary[5]),
+                           "filtered": int(summary[6]), "test_status": summary[1]})
+            runner = None
+    return groups
+
+def scope(text, expected=None):
+    """Measure the emitted test groups and exact recognized failures."""
+    groups = results(text)
+    totals = {key: sum(group[key] for group in groups)
+              for key in ("passed", "failed", "ignored", "measured", "filtered")}
+    assert all(group["test_status"] == "ok" for group in groups) or totals["failed"]
+    verified = all(not totals[key] for key in ("failed", "ignored", "filtered"))
+    return {"groups": len(groups), "expected_groups": expected, "totals": totals,
+            "runtime_passed": verified and bool(groups) and (expected is None or len(groups) == expected),
+            "test_results": groups, "diagnostics": [
+                line for line in text.splitlines()
+                if re.search(r"^(?:error(?::|\[)|error: unsupported operation|warning: Miri|FAILURES)", line)
+            ]}
+
+def meta(name):
+    """Read actual process exit and the external job interval."""
+    begin = (proof / f"{name}.start").read_text().strip()
+    end = (proof / f"{name}.end").read_text().strip()
+    return {"start_utc": begin, "end_utc": end,
+            "duration_seconds": (datetime.fromisoformat(end) - datetime.fromisoformat(begin)).total_seconds(),
+            "exit_status": int((proof / f"{name}.status").read_text())}
+
+layouts_text = (proof / "layouts.log").read_text()
+selected = (workspace / "target/assurance/selected-targets.txt").read_text().splitlines()
+seed_headers = list(re.finditer(r"^\+ RUSTFLAGS=.+-Zlayout-seed=(1|42)'$", layouts_text, re.MULTILINE))
+sections = {}
+for index, start in enumerate(seed_headers):
+    end = seed_headers[index+1].start() if index+1 < len(seed_headers) else len(layouts_text)
+    seed = start[1]
+    seed_log = layouts_text[start.start():end]
+    (proof / f"seed-{seed}.log").write_text(seed_log)
+    sections[seed] = scope(seed_log, len(selected) + 3)
+    sections[seed]["cargo_exit_status"] = 0 if index + 1 < len(seed_headers) else meta("layouts")["exit_status"]
+for seed in ("1", "42"):
+    sections.setdefault(seed, {"runtime_passed": False, "cargo_exit_status": None, "test_results": [], "totals": None})
+receipt = {
+    "source_revision": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+    "toolchain": "nightly-2026-11-15",
+    "effective_cpus": "14-15",
+    "cargo_build_jobs": 2,
+    "cpu_layouts": {**meta("layouts"), "integration_targets": selected, "seeds": sections},
+}
+(proof / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
+print(json.dumps({
+   "layout_exit_status": receipt["cpu_layouts"]["exit_status"],
+   "seeds": {tag: row["totals"] for tag, row in sections.items()},
+}, indent=2))

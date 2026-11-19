@@ -1,0 +1,13 @@
+6d258365b0ed9422ee5b25f816fb59c83ef7faf6
+2026-11-18T18:13:59+08:00
+Linux 6.8.0-147-generic x86_64 GNU/Linux
+Model name:                              AMD Ryzen 9 7950X3D 16-Core Processor
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc  Cargo.lock
+16aff336e956c95006c377cd26b840fdb0b0a9be583f847543881660c4fc9dec  tests/cpu_job.rs

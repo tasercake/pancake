@@ -1,0 +1,68 @@
+{
+  "materialization_sha256": "71c81abc2af03edaf43373ee3957757dfd9b692a00af84e5e38381ceba3a92d1",
+  "all_declared_roles_released": true,
+  "read_only_roles": [
+    {
+      "role": "isolated_dual_scan_cli_abba",
+      "borrower": "p1_boundary",
+      "input_release_sgt": "2026-11-18T22:35:15+08:00",
+      "terminal_receipt": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/t50-dual-scan-e5b6260/t50-pairs/drivers-terminal.json",
+      "terminal": {
+        "arms_returned": 4,
+        "measurement_window_ns": 84682535686,
+        "finished_unix_ns": 1795012513858388271
+      },
+      "report": "/home/krishna/Documents/focus-stacking/artifacts/pancake-performance/binaries/t50-dual-scan-e5b6260/t50-pairs/report.json",
+      "report_sha256": "d0150693b81ced2b80678b3f18a637ae3701572e85c65128c0ce8cb2a5e4f2e9",
+      "all_52_inputs_unchanged": true,
+      "order": [
+        "stock",
+        "dual_scan",
+        "dual_scan",
+        "stock"
+      ],
+      "elapsed_ns": [
+        21966022075,
+        19544321856,
+        19513046903,
+        22045895655
+      ],
+      "outputs_deleted": 4
+    },
+    {
+      "role": "experimental_same_lock_viewer_trace",
+      "borrower": "p7_ui",
+      "input_release_sgt": "2026-11-18T22:42:22+08:00",
+      "terminal_receipt": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-lock-trace-fb9c399/first-trace/application-terminal",
+      "native_profile_exit": 0,
+      "candidate": {
+        "component": "gui",
+        "commit": "a87e34fb38d50a0786dc5259702f4eb80e48e4ca",
+        "lock_sha256": "2b6b05105e6d98050ac62d73e81fd10e277edd3fe072167cae4104a485a58cdc",
+        "descriptor_sha256": "84e2bd96f121395051cc8d626a06ebece7367171d59018158439d9ca2aaa10ac",
+        "executable": "/tmp/pancake-worktrees.t3paqgWM/viewer-lock-trace-fb9c399/pancake/target/release/pancake-gui",
+        "binary_sha256": "8386c1da28d4907170939dca9d0aecfcb0cc23dada225c8eae1c2fd0fe73f817",
+        "base_product_commit": "fb9c399a96658331cb76b843a1e565b503e94fdd",
+        "build_command": "taskset -c 2,3 nice -n 10 cargo build --offline --locked --release -p pancake-gui --bin pancake-gui",
+        "build_log_sha256": "08c308bb43b8bad3a6ea02f70446f7ce826a4386e75baaca90d5afef9428eb72",
+        "wgpu_core_patch_sha256": "36aacbe5e147cab9d9bb7e005a4afa79416bd0b0fe77b4e635d5c8714f37af59",
+        "cubecl_poll_role_patch_sha256": "201803701cea78c86c2073264d20adab5e5069ab51b5ff5c093853c02fe93faa"
+      },
+      "gui_exit_receipt": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-lock-trace-fb9c399/first-trace/artifacts/capture/gui-exit.json",
+      "gui_exit": {
+        "gui_pid": 1245415,
+        "normal_close_requested_ns": 557927896996401,
+        "exit_observed_by_pidfd": true,
+        "forced_after_native_close": false,
+        "exit_code_available_to_driver": false,
+        "close_exception": null
+      },
+      "native_capture": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-lock-trace-fb9c399/first-trace/artifacts/capture/native-latency.json",
+      "native_capture_sha256": "f55f67540d45a1edc03ec45f6ad75a5feb763b36536ccc9f14e418cb1c607371",
+      "ordered_inputs_unchanged": 50,
+      "viewer_samples": 280,
+      "witness_receipt": "/home/krishna/Documents/focus-stacking/artifacts/p10-viewer-lock-trace-fb9c399/first-trace/witness-verification.json",
+      "witness_receipt_sha256": "df76ca97e52ea29c3d2a2e8d460660a9065568be0cf795f1d585f7eb7c01a6af"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "scenario": {
+    "Mutant": {
+      "name": "src/registration/estimate.rs:311:23: replace - with / in Coordinates::convert",
+      "package": "pancake",
+      "file": "src/registration/estimate.rs",
+      "function": {
+        "function_name": "Coordinates::convert",
+        "return_type": "-> Result<Affine, String>",
+        "span": {
+          "start": {
+            "line": 298,
+            "column": 5
+          },
+          "end": {
+            "line": 320,
+            "column": 6
+          }
+        }
+      },
+      "span": {
+        "start": {
+          "line": 311,
+          "column": 23
+        },
+        "end": {
+          "line": 311,
+          "column": 24
+        }
+      },
+      "replacement": "/",
+      "genre": "BinaryOperator"
+    }
+  },
+  "summary": "MissedMutant",
+  "log_path": "log/src__registration__estimate.rs_line_311_col_23.log",
+  "diff_path": "diff/src__registration__estimate.rs_line_311_col_23.diff",
+  "phase_results": [
+    {
+      "phase": "Build",
+      "duration": 21.031828491,
+      "process_status": "Success"
+    },
+    {
+      "phase": "Test",
+      "duration": 6.623848035,
+      "process_status": "Success"
+    }
+  ]
+}

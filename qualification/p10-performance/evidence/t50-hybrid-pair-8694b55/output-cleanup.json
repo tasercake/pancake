@@ -1,0 +1,22 @@
+{
+  "removed_outputs": [
+    {
+      "arm": "reference",
+      "bytes": 78347120,
+      "sha256": "476c42d7656104f8275f4188aa96cad1643337bc6f49a9913006731edceeba57",
+      "removed": true
+    },
+    {
+      "arm": "candidate",
+      "bytes": 143881378,
+      "sha256": "6160722086e2153b4dd3d8e3810dd22e156669fcafaa15fc72a3e88968b39302",
+      "removed": true
+    }
+  ],
+  "total_removed_export_bytes": 222228498,
+  "owner_input_count_postflight_verified_before_release": 52,
+  "shared_input_stage_removed_by_this_task": false,
+  "shared_owner_borrow_released": true,
+  "finished_unix_ns": 1795005757708325959,
+  "archive_retained": "raw-sanitized-8694b55.tar.gz"
+}

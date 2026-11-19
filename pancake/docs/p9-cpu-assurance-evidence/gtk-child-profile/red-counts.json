@@ -1,0 +1,83 @@
+{
+  "parent_pid": 1573008,
+  "child_pid": 1573010,
+  "profile_filename": "pancake-1573008-4703545343525015322_0.profraw",
+  "lines": {
+    "27": 0,
+    "64": 0,
+    "65": 0,
+    "66": 0,
+    "187": 1,
+    "221": 0
+  },
+  "panel_stats": {
+    "branches": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0.0
+    },
+    "mcdc": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0.0
+    },
+    "functions": {
+      "count": 14,
+      "covered": 2,
+      "percent": 14.285714285714285
+    },
+    "instantiations": {
+      "count": 14,
+      "covered": 2,
+      "percent": 14.285714285714285
+    },
+    "lines": {
+      "count": 174,
+      "covered": 24,
+      "percent": 13.79310344827586
+    },
+    "regions": {
+      "count": 194,
+      "covered": 29,
+      "notcovered": 165,
+      "percent": 14.948453608247425
+    }
+  },
+  "totals": {
+    "branches": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "functions": {
+      "count": 747,
+      "covered": 2,
+      "percent": 0.2677376171352075
+    },
+    "instantiations": {
+      "count": 774,
+      "covered": 2,
+      "percent": 0.2583979328165375
+    },
+    "lines": {
+      "count": 6388,
+      "covered": 24,
+      "percent": 0.3757044458359424
+    },
+    "mcdc": {
+      "count": 0,
+      "covered": 0,
+      "notcovered": 0,
+      "percent": 0
+    },
+    "regions": {
+      "count": 7196,
+      "covered": 29,
+      "notcovered": 7167,
+      "percent": 0.40300166759310735
+    }
+  }
+}

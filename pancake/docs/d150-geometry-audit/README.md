@@ -106,3 +106,34 @@ The [adjacent-pair prototype](prototype-ff2c037/README.md) includes the
 test-first results, full 150-frame CLI geometry trace, and comparison on the
 same four fixed specimen regions. The prototype removed the false jump but
 its full D150 output retained the soft detail observed in the sealed job.
+
+The [local-motion follow-up](subpixel-diagnostic/README.md) includes the
+independent native track, same-map interpolation controls and a second full
+CPU prototype. It recovered 54 consecutive motions and removed the false
+jump. The four fixed focus regions became softer, so the quality gap remains
+open and the production experiment stays separate.
+
+The [bounded-cubic sampling study](breathing-sampling/README.md) recovered
+subpixel signed detail in an independent analytic fixture. Its exact paired
+D150 RGB16 exports had byte-identical transforms and matching crop. The
+four historical focus regions became slightly softer, so the independent
+sampling change stays separate from the release.
+
+The [nine-original anchor-direction probe](motion-admission/README.md)
+reproduced the wrong direct jump and independently confirmed the genuine
+adjacent motion. Positive inverse reverse-anchor fits matched both nearby
+transitions more closely on held-out bilateral landmarks. Direction choice,
+the long-range trajectory and fused quality remain open.
+
+The [bounded witness design](witness-design/README.md) compares the same
+directional histories in scale-6 proxy coordinates. It identifies the
+invalid one-frame absolute switch, the false jump's narrow support, and
+what can be validated with existing CubeCL moments. A batched witness,
+reverse-estimation demand and fused output quality still need measurement.
+
+The [passive CPU pilot](witness-pilot/README.md) verified that the actual
+scale-6 luma retains evidence for the genuine step. It ranked the
+inverse-reverse hypothesis first in eight of nine cells. The wrong direct
+step lost wherever all models had comparable evidence, and the
+replacement global pose remained unresolved. The pilot also records the
+exact unbatched observation cost and authenticated input cleanup.

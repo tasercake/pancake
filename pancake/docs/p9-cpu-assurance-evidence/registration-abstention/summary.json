@@ -1,0 +1,111 @@
+{
+  "runs": [
+    {
+      "commit": "0a9ae85b88519a795e3b6ba90860c3b3e664bcaa",
+      "raw_map_sha256": "19f8a0866849b63f750cc3477e683345dae29554bb9d8eb0f0fa4df745ae7c11",
+      "metrics": {
+        "lines": {
+          "covered": 4730,
+          "total": 6516
+        },
+        "functions": {
+          "covered": 485,
+          "total": 760
+        },
+        "regions": {
+          "covered": 4849,
+          "total": 7328
+        },
+        "branches": {
+          "covered": 577,
+          "total": 764
+        }
+      },
+      "estimate_branch_summary": {
+        "count": 64,
+        "covered": 44,
+        "notcovered": 20,
+        "percent": 68.75
+      },
+      "line_220_raw_records": [
+        [
+          220,
+          8,
+          220,
+          22,
+          0,
+          14,
+          0,
+          0,
+          4
+        ],
+        [
+          220,
+          8,
+          220,
+          22,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ]
+    },
+    {
+      "commit": "d9ea867b4d1b126e576354efccbff3656d6150b0",
+      "raw_map_sha256": "5953166c77bd81ca60ba2da121f94a3cf4004ee307500a13f53bb8d144a42f98",
+      "metrics": {
+        "lines": {
+          "covered": 4731,
+          "total": 6516
+        },
+        "functions": {
+          "covered": 485,
+          "total": 760
+        },
+        "regions": {
+          "covered": 4850,
+          "total": 7328
+        },
+        "branches": {
+          "covered": 578,
+          "total": 764
+        }
+      },
+      "estimate_branch_summary": {
+        "count": 64,
+        "covered": 45,
+        "notcovered": 19,
+        "percent": 70.3125
+      },
+      "line_220_raw_records": [
+        [
+          220,
+          8,
+          220,
+          22,
+          1,
+          14,
+          0,
+          0,
+          4
+        ],
+        [
+          220,
+          8,
+          220,
+          22,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ]
+    }
+  ],
+  "tests_passed": 149,
+  "strict_gate_exit": 1,
+  "scoped_clippy_exit": 0
+}

@@ -1,0 +1,2 @@
+/home/krishna/Documents/focus-stacking/artifacts/pancake-packages/linux-d6359e1/pancake_0.1.0_amd64.deb: OK
+/tmp/pancake-worktrees.t3paqgWM/r50-workers/artifacts/r50-workers/sealed-cli: OK
