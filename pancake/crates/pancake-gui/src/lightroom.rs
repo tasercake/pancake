@@ -1,0 +1,89 @@
+//! Install the embedded Lightroom plug-in and connect it to the app bundle.
+
+use std::fs;
+use std::io::{self, Write as _};
+use std::path::{Path, PathBuf};
+
+/// Scripts copied to Lightroom's Modules folder. Publish the manifest last.
+const SCRIPTS: &[(&str, &[u8])] = &[
+    (
+        "Pancake.lua",
+        include_bytes!("../../../lightroom/Pancake.lrplugin/Pancake.lua"),
+    ),
+    (
+        "OpenOriginals.lua",
+        include_bytes!("../../../lightroom/Pancake.lrplugin/OpenOriginals.lua"),
+    ),
+    (
+        "OpenEdited.lua",
+        include_bytes!("../../../lightroom/Pancake.lrplugin/OpenEdited.lua"),
+    ),
+    (
+        "Info.lua",
+        include_bytes!("../../../lightroom/Pancake.lrplugin/Info.lua"),
+    ),
+];
+
+/// One user-level installation connected to an absolute app bundle path.
+#[derive(Debug)]
+pub(super) struct Installation {
+    /// App path read as literal data by Lua.
+    app: String,
+    /// Lightroom plug-in directory.
+    plugin: PathBuf,
+}
+
+impl Installation {
+    /// Resolve the real bundle path, even when launched through a symlink.
+    /// # Errors
+    /// Returns an error when the executable is outside a macOS bundle.
+    pub(super) fn new(executable: &Path, modules: &Path) -> io::Result<Self> {
+        let executable = executable.canonicalize()?;
+        let app = executable
+            .ancestors()
+            .nth(3)
+            .filter(|app| {
+                app.extension() == Some("app".as_ref())
+                    && executable == app.join("Contents/MacOS/pancake-gui")
+                    && app.join("Contents/Info.plist").is_file()
+            })
+            .and_then(Path::to_str)
+            .ok_or_else(|| {
+                io::Error::other("Open the Pancake.app bundle to install the plug-in.")
+            })?;
+        Ok(Self {
+            app: app.into(),
+            plugin: modules.join("Pancake.lrplugin"),
+        })
+    }
+
+    /// Check the complete installed payload and its connection to this app.
+    pub(super) fn is_current(&self) -> bool {
+        self.files().all(|(name, data)| {
+            fs::read(self.plugin.join(name)).is_ok_and(|installed| installed == data)
+        })
+    }
+
+    /// Write regular copies, replacing each destination only after its write succeeds.
+    /// # Errors
+    /// Returns a filesystem error when the plug-in cannot be written.
+    pub(super) fn write(&self) -> io::Result<()> {
+        fs::create_dir_all(&self.plugin)?;
+        if self.plugin.symlink_metadata()?.is_symlink() {
+            return Err(io::Error::other(
+                "The Lightroom plug-in folder is a symbolic link.",
+            ));
+        }
+        for (name, data) in self.files() {
+            let mut pending = tempfile::NamedTempFile::new_in(&self.plugin)?;
+            pending.write_all(data)?;
+            let _committed = pending.persist(self.plugin.join(name))?;
+        }
+        Ok(())
+    }
+
+    /// Emit the connection and Lua payload in publish order.
+    fn files(&self) -> impl Iterator<Item = (&str, &[u8])> {
+        std::iter::once(("Connection.txt", self.app.as_bytes())).chain(SCRIPTS.iter().copied())
+    }
+}

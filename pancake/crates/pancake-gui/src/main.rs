@@ -12,6 +12,8 @@ use preferences::{Preferences, Store};
 pub mod delivery;
 pub mod desktop_menu;
 pub mod history;
+#[cfg(any(target_os = "macos", test))]
+pub mod lightroom;
 pub mod panel;
 pub mod preferences;
 pub mod preview;
@@ -77,6 +79,59 @@ fn configure_preferences(window: &ComponentInstance, store: Store) -> Result<(),
     Ok(())
 }
 
+/// Bind the Lightroom installer to the current macOS app bundle.
+/// # Errors
+/// Returns executable resolution or UI binding errors.
+#[cfg(target_os = "macos")]
+fn configure_lightroom(window: &ComponentInstance) -> Result<(), Box<dyn Error>> {
+    let Some(home) = dirs::home_dir() else {
+        window.set_property(
+            "lightroom-status",
+            SharedString::from("Could not find your Lightroom Modules folder.").into(),
+        )?;
+        return Ok(());
+    };
+    let modules = home.join("Library/Application Support/Adobe/Lightroom/Modules");
+    let Ok(install) = lightroom::Installation::new(&std::env::current_exe()?, &modules) else {
+        window.set_property(
+            "lightroom-status",
+            SharedString::from("Open the Pancake.app bundle to install the plug-in.").into(),
+        )?;
+        return Ok(());
+    };
+    let update_status =
+        |window: &ComponentInstance, installed: bool| -> Result<(), Box<dyn Error>> {
+            let status = if installed {
+                "Plug-in installed. In Lightroom Classic, use File > Plug-in Extras."
+            } else {
+                "Install the plug-in to open selected Lightroom photos in Pancake."
+            };
+            window.set_property("lightroom-status", SharedString::from(status).into())?;
+            window.set_property("lightroom-installed", installed.into())?;
+            Ok(())
+        };
+    update_status(window, install.is_current())?;
+    window.set_property("lightroom-installable", true.into())?;
+    let weak = window.as_weak();
+    window.set_callback("install-lightroom", move |_| {
+        if let Some(window) = weak.upgrade() {
+            match install
+                .write()
+                .map_err(Into::into)
+                .and_then(|()| update_status(&window, true))
+            {
+                Ok(()) => show_error(&window, ""),
+                Err(error) => show_error(
+                    &window,
+                    &format!("Could not install Lightroom plug-in: {error}"),
+                ),
+            }
+        }
+        Value::Void
+    })?;
+    Ok(())
+}
+
 /// Create the native window from the embedded, reviewed UI source.
 ///
 /// # Errors
@@ -94,8 +149,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     let store = Store::current()?;
     let profile = store.directory().to_path_buf();
     configure_preferences(&window, store)?;
-    let paths: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
-    let _worker_poll = session::configure(&window, &paths, &profile, options)?;
+    #[cfg(target_os = "macos")]
+    configure_lightroom(&window)?;
+    let mut args = std::env::args_os().skip(1).peekable();
+    let edited_renders = args.next_if_eq("--lightroom-renders").is_some();
+    let paths: Vec<PathBuf> = args.map(PathBuf::from).collect();
+    let _worker_poll = session::configure(&window, &paths, &profile, options, !edited_renders)?;
     window.run()?;
     Ok(())
 }

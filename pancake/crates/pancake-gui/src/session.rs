@@ -488,6 +488,7 @@ fn render_status(window: &ComponentInstance, snapshot: JobSnapshot) -> UiResult 
 }
 
 /// Register native UI actions and import the paths delivered to the executable.
+/// Skip folder history for temporary Lightroom renders.
 ///
 /// # Errors
 ///
@@ -497,6 +498,7 @@ pub fn configure(
     paths: &[PathBuf],
     profile: &Path,
     options: Options,
+    remember_startup: bool,
 ) -> UiResult<Timer> {
     let previews = Cache::for_runtime(options.prepared_wgpu.as_ref());
     let mut session = Session {
@@ -523,7 +525,7 @@ pub fn configure(
     if !session.sources.paths().is_empty() {
         if let Err(error) = session.show_source(window, 0) {
             show_error(window, &error.to_string());
-        } else {
+        } else if remember_startup {
             remember_inputs(&mut session, window, paths)?;
         }
     }

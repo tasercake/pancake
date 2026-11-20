@@ -2,6 +2,7 @@
 
 use std::error::Error;
 use std::fs;
+use std::path::Path;
 use std::rc::{Rc, Weak};
 use std::sync::Mutex;
 use std::thread;
@@ -453,6 +454,47 @@ fn exercise_preference_recovery() -> Result<(), Box<dyn Error>> {
         return Err(
             "The repaired profile window retained its callback or platform adapter.".into(),
         );
+    }
+    Ok(())
+}
+
+/// The installed plug-in owns its scripts and points to the app bundle.
+/// # Errors
+/// Returns filesystem errors or a mismatch in the installed payload.
+#[test]
+fn lightroom_install_can_repair_an_installed_copy() -> Result<(), Box<dyn Error>> {
+    let sandbox = tempfile::tempdir()?;
+    let app = sandbox.path().join("Applications/Pancake's Copy.app");
+    let executable = app.join("Contents/MacOS/pancake-gui");
+    fs::create_dir_all(executable.parent().ok_or("Missing executable parent")?)?;
+    fs::write(app.join("Contents/Info.plist"), b"bundle")?;
+    fs::write(&executable, b"executable")?;
+    let modules = sandbox.path().join("Adobe/Lightroom/Modules");
+    let plugin = modules.join("Pancake.lrplugin");
+    let install = super::lightroom::Installation::new(&executable, &modules)?;
+    if install.is_current() {
+        return Err("The plug-in should be absent before installation".into());
+    }
+    install.write()?;
+    if !install.is_current() || plugin.join("Info.lua").symlink_metadata()?.is_symlink() {
+        return Err("Lightroom needs a real copy of the complete plug-in".into());
+    }
+    let connection = fs::read_to_string(plugin.join("Connection.txt"))?;
+    if Path::new(&connection) != app.canonicalize()? {
+        return Err("The plug-in must point to the installed app bundle".into());
+    }
+    fs::remove_file(plugin.join("OpenEdited.lua"))?;
+    if install.is_current() {
+        return Err("A missing script requires repair".into());
+    }
+    install.write()?;
+    if !install.is_current() {
+        return Err("Reinstall must restore the missing script".into());
+    }
+    let loose = sandbox.path().join("pancake-gui");
+    fs::write(&loose, b"executable")?;
+    if super::lightroom::Installation::new(&loose, &modules).is_ok() {
+        return Err("A loose build executable cannot install a Lightroom connection".into());
     }
     Ok(())
 }

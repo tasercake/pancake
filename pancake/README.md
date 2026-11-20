@@ -5,7 +5,18 @@ CubeCL 0.11.4 and wgpu 30 share one dependency graph. One safe CubeCL kernel
 applies a full-precision u16 horizontal blur; a second computes stable f32 row
 variance. Both use checked logical byte budgets on CPU LLVM JIT and GPU runtimes.
 
+## Lightroom Classic on macOS
+
+1. Move the packaged `Pancake.app` to Applications or your user's Applications folder.
+2. Open Pancake, go to **Preferences**, and click **Install Lightroom plug-in**. Restart Lightroom Classic if it was open.
+3. Select at least two photos in Lightroom Classic. In **File > Plug-in Extras**, use **Pancake (Originals)** for supported source files or **Pancake (With Lightroom Edits)** for full-size 16-bit sRGB TIFFs.
+4. Stack and export the result from Pancake. To add the result to Lightroom, use Lightroom's Import command.
+
+The installer copies the plug-in into Lightroom's user Modules folder and connects it to the installed app. If you move the app, open it from the new location and reinstall the plug-in from Preferences. Temporary TIFFs are removed when the Pancake instance that uses them closes.
+
 ## Tests and assurance
+
+Run the Lightroom plug-in contract checks from `pancake/` with `luajit lightroom/test_open_stack.lua` or Lua 5.1.
 
 From this directory, install the pinned tools once with `bash scripts/bootstrap.sh`.
 The script uses Bash, rustup, jq and Python 3.11 or newer. It places Cargo tools

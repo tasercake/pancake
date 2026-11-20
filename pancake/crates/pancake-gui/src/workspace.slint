@@ -261,6 +261,10 @@ export component Workspace inherits Window {
     background: Palette.background;
 
     in property <string> app-version;
+    in property <string> lightroom-status: "The Lightroom Classic plug-in requires macOS.";
+    in property <bool> lightroom-installable;
+    in property <bool> lightroom-installed;
+    callback install-lightroom();
     in property <bool> native-menu-bar: true;
     in-out property <int> theme-index: 0;
     in-out property <int> device-index: 0;
@@ -849,14 +853,16 @@ export component Workspace inherits Window {
             }
             SectionLabel { text: "Lightroom Classic"; }
             Text {
-                text: "Lightroom Classic integration is unavailable in this build.";
+                text: root.lightroom-status;
+                wrap: word-wrap;
                 color: Palette.foreground;
                 accessible-id: "settings.lightroom.status";
             }
             Button {
-                text: "Configure Lightroom integration";
+                text: root.lightroom-installed ? "Reinstall Lightroom plug-in" : "Install Lightroom plug-in";
                 accessible-id: "settings.lightroom.action";
-                enabled: false;
+                enabled: root.lightroom-installable;
+                clicked => { root.install-lightroom(); }
                 horizontal-stretch: 0;
             }
             Button {
