@@ -143,6 +143,11 @@ impl RgbImage {
         self.grayscale_array = true;
     }
 
+    /// Carry an existing profile through processing in the same RGB code space.
+    pub(crate) fn set_icc_profile(&mut self, profile: Option<Vec<u8>>) {
+        self.icc_profile = profile;
+    }
+
     /// The original embedded ICC profile when the format supplied one.
     #[must_use]
     pub fn icc_profile(&self) -> Option<&[u8]> {

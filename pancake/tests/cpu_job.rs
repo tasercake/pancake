@@ -95,6 +95,106 @@ fn identity_crop_applies_only_to_aligned_jobs() -> Result<(), String> {
     Ok(())
 }
 
+/// A common embedded profile survives fusion, either crop path, and TIFF export.
+/// # Errors
+/// Returns encoding, job, crop or ICC round-trip errors.
+#[test]
+fn tiff_stack_retains_a_shared_profile() -> Result<(), String> {
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    let inputs = write_profiled_pair(directory.path(), [Some(STACK_PROFILE), Some(STACK_PROFILE)])?;
+    let output = directory.path().join("uncropped.tiff");
+    for auto_crop in [false, true] {
+        let settings = JobSettings {
+            alignment: AlignmentMode::Euclidean,
+            auto_crop,
+            ..*request(&inputs, &output)?.settings()
+        };
+        let config = JobConfig::new(&inputs, Some(output.clone()), settings)?;
+        let result = run(config, &Options::default(), |_| {}).map_err(|error| error.to_string())?;
+        require(
+            result.image().icc_profile() == Some(STACK_PROFILE),
+            "stack dropped the common ICC profile",
+        )?;
+        require(
+            decode(&output)?.icc_profile() == Some(STACK_PROFILE),
+            "exported TIFF dropped the common ICC profile",
+        )?;
+        if !auto_crop {
+            let cropped = result.manually_cropped()?.ok_or("missing manual crop")?;
+            let cropped_path = directory.path().join("manual-crop.tiff");
+            export(&cropped_path, &cropped, BitDepth::Sixteen, 95, &inputs)?;
+            require(
+                decode(&cropped_path)?.icc_profile() == Some(STACK_PROFILE),
+                "manual crop or TIFF export dropped the common ICC profile",
+            )?;
+        }
+    }
+    Ok(())
+}
+
+/// Stacks with missing or different profiles must not acquire a source profile.
+/// # Errors
+/// Returns fixture, fusion or export errors, including a mislabeled result.
+#[test]
+fn tiff_stack_does_not_label_mixed_profiles() -> Result<(), String> {
+    let mut different = STACK_PROFILE.to_vec();
+    // Change the creation-month field. Both files retain valid RGB ICC data.
+    let month = different.get_mut(27).ok_or("missing ICC creation date")?;
+    *month = 1;
+    let directory = tempfile::tempdir().map_err(|error| error.to_string())?;
+    for profiles in [
+        [Some(STACK_PROFILE), Some(different.as_slice())],
+        [Some(STACK_PROFILE), None],
+        [None, Some(STACK_PROFILE)],
+    ] {
+        let inputs = write_profiled_pair(directory.path(), profiles)?;
+        let output = directory.path().join("mixed.tiff");
+        let result = run(request(&inputs, &output)?, &Options::default(), |_| {})
+            .map_err(|error| error.to_string())?;
+        require(
+            result.image().icc_profile().is_none() && decode(&output)?.icc_profile().is_none(),
+            "a mixed-profile stack was labeled with a source ICC profile",
+        )?;
+    }
+    Ok(())
+}
+
+/// Real sRGB profile fixture also used by the codec round-trip tests.
+const STACK_PROFILE: &[u8] = include_bytes!("data/srgb.png.icc");
+
+/// Encode two identical textured 16-bit RGB TIFFs with the requested ICC tags.
+/// # Errors
+/// Returns filesystem and TIFF encoder errors.
+fn write_profiled_pair(
+    directory: &Path,
+    profiles: [Option<&[u8]>; 2],
+) -> Result<[PathBuf; 2], String> {
+    use tiff::encoder::{TiffEncoder, colortype::RGB16};
+    use tiff::tags::Tag;
+
+    let inputs = [directory.join("frame-a.tif"), directory.join("frame-b.tif")];
+    let samples = (0_u16..216)
+        .map(|code| code.saturating_mul(299))
+        .collect::<Vec<_>>();
+    for (path, profile) in inputs.iter().zip(profiles) {
+        let file = std::fs::File::create(path).map_err(|error| error.to_string())?;
+        let mut encoder = TiffEncoder::new(file).map_err(|error| error.to_string())?;
+        let mut frame = encoder
+            .new_image::<RGB16>(9, 8)
+            .map_err(|error| error.to_string())?;
+        if let Some(profile) = profile {
+            frame
+                .encoder()
+                .write_tag(Tag::IccProfile, profile)
+                .map_err(|error| error.to_string())?;
+        }
+        frame
+            .write_data(&samples)
+            .map_err(|error| error.to_string())?;
+    }
+    Ok(inputs)
+}
+
 /// Repeated structure must leave an ambiguous source unwarped in a completed CPU stack.
 ///
 /// # Errors

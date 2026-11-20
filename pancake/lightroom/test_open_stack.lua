@@ -4,6 +4,7 @@ local info = assert(loadfile(plugin .. 'Info.lua'),
     'Pancake must register both Lightroom export commands')()
 local commands = assert(info.LrExportMenuItems)
 assert(#commands == 2, 'Expected originals and edited commands')
+local service = assert(info.LrExportServiceProvider, 'Pancake must register context-menu export presets')
 
 local photoPath = "/Photos/first's photo.dng"
 local renderPath = "/tmp/Pancake-UUID/00001-first's photo.tif"
@@ -86,6 +87,51 @@ MAC_ENV = true
 _PLUGIN = { path = '/Installed/Pancake.lrplugin' }
 package.path = plugin .. '?.lua;' .. package.path
 
+local function runPreset(menu)
+    events, failure = {}, nil
+    local env = {}
+    local preset = assert(loadfile(plugin .. service.builtInPresetsDir .. '/' .. commands[menu].title .. '.lrtemplate'))
+    setfenv(preset, env)()
+    assert(env.s.title == commands[menu].title)
+    local settings = env.s.value
+    assert(settings.exportServiceProvider == info.LrToolkitIdentifier)
+    local edited = menu == 2
+    assert(settings[info.LrToolkitIdentifier .. '_withEdits'] == edited)
+    local provider = dofile(plugin .. service.file)
+    local properties = { withEdits = edited }
+    provider.updateExportSettings(properties)
+    assert(properties.LR_export_destinationType == 'tempFolder')
+    assert(properties.LR_format == 'TIFF')
+    assert(properties.LR_export_colorSpace == 'sRGB')
+    assert(properties.LR_export_bitDepth == 16)
+    assert(not properties.LR_size_doConstrain)
+    local renditions = {}
+    for i, path in ipairs { renderPath, secondRenderPath } do
+        renditions[i] = {
+            photo = targetPhotos[i],
+            skipRender = function() record('skip') end,
+            waitForRender = function()
+                record('render')
+                if renderFailure then return false, 'Render failure' end
+                return true, path
+            end,
+        }
+    end
+    if partialRender then renditions[2] = nil end
+    provider.processRenderedPhotos(nil, {
+        propertyTable = properties,
+        exportSession = {
+            countRenditions = function() return #targetPhotos end,
+            renditions = function() assert(not edited); return ipairs(renditions) end,
+        },
+        configureProgress = function() return sdk.LrProgressScope() end,
+        renditions = function(_, args)
+            assert(edited and args.stopIfCanceled)
+            return ipairs(renditions)
+        end,
+    })
+end
+
 local function run(menu)
     events, failure = {}, nil
     dofile(plugin .. commands[menu].file)
@@ -149,5 +195,39 @@ targetPhotos = { targetPhotos[1] }
 run(1)
 assert(failure:find('at least two', 1, true))
 assert(#events == 0)
+
+targetPhotos = {
+    { getRawMetadata = function() return photoPath end },
+    { getRawMetadata = function() return secondPhotoPath end },
+}
+runPreset(1)
+assert(not failure, failure)
+assert(table.concat(events, '|') == 'skip|skip|' .. table.concat({
+    '/usr/bin/open', '-n', '-a', app, '--args', photoPath, secondPhotoPath, '',
+}, '\n'), 'Originals preset must pass originals directly')
+
+runPreset(2)
+assert(not failure, failure)
+assert(table.concat(events, '|') == 'render|render|done|' .. table.concat({
+    '/usr/bin/open', '-n', '-W', '-a', app, '--args', '--lightroom-renders',
+    renderPath, secondRenderPath, '',
+}, '\n'), 'Edited preset must keep Lightroom renditions until Pancake exits')
+
+renderFailure = true
+runPreset(2)
+assert(failure:find('Render failure', 1, true))
+assert(table.concat(events, '|') == 'render|done')
+renderFailure = false
+
+partialRender = true
+runPreset(2)
+assert(failure:find('full selection', 1, true))
+assert(table.concat(events, '|') == 'render|done')
+partialRender = false
+
+cancel = true
+runPreset(2)
+assert(not failure, failure)
+assert(table.concat(events, '|') == 'done')
 
 print('Lightroom export tests passed')

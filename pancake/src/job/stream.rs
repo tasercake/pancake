@@ -213,6 +213,9 @@ pub(super) fn process(
     } else {
         None
     };
+    // The stack combines code values directly. Only an identical profile on
+    // every source can describe the result without converting the inputs.
+    let mut common_profile = first.icc_profile().map(<[u8]>::to_vec);
     let mut unused_first = Some(first);
     let mut grayscale_array = true;
     let mut single_slab_result = None;
@@ -231,6 +234,9 @@ pub(super) fn process(
                         .ok_or("stack input index out of range")?,
                 )?
             };
+            if common_profile.as_deref() != image.icc_profile() {
+                common_profile = None;
+            }
             grayscale_array &= image.is_grayscale_array();
             let (pixels, resident) = alignment.normalize(
                 device,
@@ -271,6 +277,7 @@ pub(super) fn process(
         settings,
         control,
     )?;
+    product.image.set_icc_profile(common_profile);
     if grayscale_array {
         product.image.mark_grayscale_array();
     }
@@ -368,6 +375,7 @@ pub(super) fn copy_crop(image: &RgbImage, old: Bounds, crop: Bounds) -> Result<R
         samples.extend_from_slice(original.get(range?).ok_or("crop row exceeded its input")?);
     }
     let mut cropped = RgbImage::new(crop.width(), crop.height(), samples)?;
+    cropped.set_icc_profile(image.icc_profile().map(<[u8]>::to_vec));
     if image.is_grayscale_array() {
         cropped.mark_grayscale_array();
     }

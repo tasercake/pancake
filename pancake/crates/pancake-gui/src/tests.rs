@@ -483,13 +483,18 @@ fn lightroom_install_can_repair_an_installed_copy() -> Result<(), Box<dyn Error>
     if Path::new(&connection) != app.canonicalize()? {
         return Err("The plug-in must point to the installed app bundle".into());
     }
-    fs::remove_file(plugin.join("OpenEdited.lua"))?;
+    let presets = plugin.join("presets");
+    let edited = presets.join("Pancake (With Lightroom Edits).lrtemplate");
+    if !presets.join("Pancake (Originals).lrtemplate").is_file() || !edited.is_file() {
+        return Err("Lightroom needs both installed export presets".into());
+    }
+    fs::remove_file(&edited)?;
     if install.is_current() {
-        return Err("A missing script requires repair".into());
+        return Err("A missing preset requires repair".into());
     }
     install.write()?;
-    if !install.is_current() {
-        return Err("Reinstall must restore the missing script".into());
+    if !install.is_current() || !edited.is_file() {
+        return Err("Reinstall must restore the missing preset".into());
     }
     let loose = sandbox.path().join("pancake-gui");
     fs::write(&loose, b"executable")?;

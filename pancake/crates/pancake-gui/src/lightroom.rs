@@ -4,8 +4,8 @@ use std::fs;
 use std::io::{self, Write as _};
 use std::path::{Path, PathBuf};
 
-/// Scripts copied to Lightroom's Modules folder. Publish the manifest last.
-const SCRIPTS: &[(&str, &[u8])] = &[
+/// Files copied to Lightroom's Modules folder. Publish the manifest last.
+const PAYLOAD: &[(&str, &[u8])] = &[
     (
         "Pancake.lua",
         include_bytes!("../../../lightroom/Pancake.lrplugin/Pancake.lua"),
@@ -17,6 +17,22 @@ const SCRIPTS: &[(&str, &[u8])] = &[
     (
         "OpenEdited.lua",
         include_bytes!("../../../lightroom/Pancake.lrplugin/OpenEdited.lua"),
+    ),
+    (
+        "ExportServiceProvider.lua",
+        include_bytes!("../../../lightroom/Pancake.lrplugin/ExportServiceProvider.lua"),
+    ),
+    (
+        "presets/Pancake (Originals).lrtemplate",
+        include_bytes!(
+            "../../../lightroom/Pancake.lrplugin/presets/Pancake (Originals).lrtemplate"
+        ),
+    ),
+    (
+        "presets/Pancake (With Lightroom Edits).lrtemplate",
+        include_bytes!(
+            "../../../lightroom/Pancake.lrplugin/presets/Pancake (With Lightroom Edits).lrtemplate"
+        ),
     ),
     (
         "Info.lua",
@@ -68,22 +84,29 @@ impl Installation {
     /// # Errors
     /// Returns a filesystem error when the plug-in cannot be written.
     pub(super) fn write(&self) -> io::Result<()> {
-        fs::create_dir_all(&self.plugin)?;
-        if self.plugin.symlink_metadata()?.is_symlink() {
-            return Err(io::Error::other(
-                "The Lightroom plug-in folder is a symbolic link.",
-            ));
+        for directory in [&self.plugin, &self.plugin.join("presets")] {
+            fs::create_dir_all(directory)?;
+            if directory.symlink_metadata()?.is_symlink() {
+                return Err(io::Error::other(format!(
+                    "The Lightroom plug-in folder is a symbolic link: {}",
+                    directory.display(),
+                )));
+            }
         }
         for (name, data) in self.files() {
-            let mut pending = tempfile::NamedTempFile::new_in(&self.plugin)?;
+            let target = self.plugin.join(name);
+            let directory = target
+                .parent()
+                .ok_or_else(|| io::Error::other("Missing Lightroom plug-in destination folder"))?;
+            let mut pending = tempfile::NamedTempFile::new_in(directory)?;
             pending.write_all(data)?;
-            let _committed = pending.persist(self.plugin.join(name))?;
+            let _committed = pending.persist(target)?;
         }
         Ok(())
     }
 
-    /// Emit the connection and Lua payload in publish order.
+    /// Emit the connection and plug-in payload in publish order.
     fn files(&self) -> impl Iterator<Item = (&str, &[u8])> {
-        std::iter::once(("Connection.txt", self.app.as_bytes())).chain(SCRIPTS.iter().copied())
+        std::iter::once(("Connection.txt", self.app.as_bytes())).chain(PAYLOAD.iter().copied())
     }
 }
