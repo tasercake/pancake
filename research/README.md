@@ -33,3 +33,7 @@ Each review links primary sources and distinguishes full-text/code inspection fr
 [Source snapshots](sources/README.md), [repository pins](sources/repository-pins.json), the [research protocol](research-protocol.md), and phase-specific ledgers preserve provenance. The [independent metric audit](05-synthesis/metric-evidence-audit.md) explains why evaluator qualification and deliberate metric attacks are necessary.
 
 [Structural verification](05-synthesis/research-validation.json) passed registry, schema/example, join/hash, source-ID and local-link checks. These checks validate research artifacts, not stacking quality or detector accuracy.
+
+## Experiments
+
+[Unattended Zerene Stacker](experiments/zerene/README.md) documents how to run PMax and DMap and sweep DMap parameters on the macOS host. Scripts for research experiments live under `research/experiments/`.
