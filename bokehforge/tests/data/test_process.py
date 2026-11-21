@@ -214,12 +214,19 @@ def test_converter_uses_configured_default_root(tmp_path):
 
 
 def test_conversion_policy_can_change_without_repinning_source_bytes(tmp_path):
-    root,lock=fixture(tmp_path)
-    config=tmp_path/'config.json';config.write_text(json.dumps({'datasets':[{'id':'fixture','transfer':'linear'}]}))
-    result=run_convert(root,lock,'--config',str(config))
-    assert result.returncode==0,result.stdout+result.stderr
-    image=tifffile.imread(next((root/'standardized').rglob('*.tif')))
-    assert np.allclose(image,128/255,atol=1e-7)
+    root, lock = fixture(tmp_path)
+    original_lock = lock.read_bytes()
+    config = tmp_path / "config.json"
+    config.write_text(json.dumps({"datasets": [{"id": "fixture", "transfer": "linear"}]}))
+    result = run_convert(root, lock, "--config", str(config))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    manifest_path = next((root / "standardized/fixture").glob("*/scene.json"))
+    manifest = json.loads(manifest_path.read_text())
+    frame = next(frame for frame in manifest["frames"] if frame["source_path"] == "scene/frame2.png")
+    image = tifffile.imread(manifest_path.parent / frame["path"])
+    assert np.allclose(image, 128 / 255, atol=1e-7)
+    assert lock.read_bytes() == original_lock
 
 
 def test_removed_source_is_excluded_from_index(tmp_path):
