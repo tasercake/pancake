@@ -40,9 +40,9 @@ def test_commands_write_logs_and_reports_only_inside_hidden_directory(tmp_path, 
     assert not list(root.glob("*.log")) and not list(root.glob("*-report.json"))
     assert (root / ".bokehforge/locks/data.lock").is_file()
     if action == "download":
-        assert (root / ".bokehforge/state/download-plan.json").is_file()
         manifest = json.loads((root / "raw/demo/download-manifest.json").read_text())
-        assert manifest["selection"] == ".bokehforge/state/download-plan.json"
+        assert len(manifest["files"]) == 2
+        assert not (root / ".bokehforge/state").exists()
     else:
         assert (root / ".bokehforge/work/conversion-state").is_dir()
         assert (root / "standardized/index.json").is_file()
@@ -80,7 +80,7 @@ def test_shared_data_lock_prevents_concurrent_data_commands(tmp_path):
         result = run_data(root, "download")
     assert result.returncode == 2
     assert "Another process holds" in result.stderr
-    assert not (root / ".bokehforge/state/download-plan.json").exists()
+    assert not (root / ".bokehforge/reports/download-report.json").exists()
 
 
 def test_data_directory_can_be_reset_without_losing_source_policy(tmp_path):

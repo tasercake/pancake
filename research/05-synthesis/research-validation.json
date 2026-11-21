@@ -19,7 +19,7 @@
         },
         {
           "path": "04-datasets/dataset-catalogue.csv",
-          "records": 28,
+          "records": 8,
           "bad_rows": []
         },
         {
@@ -28,23 +28,8 @@
           "bad_rows": []
         },
         {
-          "path": "04-datasets/Cervix93-official-split.csv",
-          "records": 93,
-          "bad_rows": []
-        },
-        {
-          "path": "04-datasets/Lytro-MFIFB-exact-blob-overlap.csv",
-          "records": 40,
-          "bad_rows": []
-        },
-        {
           "path": "04-datasets/hf-999-file-manifest.csv",
           "records": 1998,
-          "bad_rows": []
-        },
-        {
-          "path": "04-datasets/source-snapshots/Cervix93-official-labels.csv",
-          "records": 93,
           "bad_rows": []
         }
       ]
@@ -134,7 +119,7 @@
     "dataset_registry_consistency": {
       "passed": true,
       "detail": {
-        "records": 28
+        "records": 8
       }
     },
     "algorithm_source_snapshot_hashes": {
@@ -166,29 +151,6 @@
         ]
       }
     },
-    "Cervix93_upstream_split_count": {
-      "passed": true,
-      "detail": {
-        "records": 93,
-        "columns": [
-          "upstream_FOV_id",
-          "grade",
-          "upstream_set",
-          "upstream_role",
-          "listed_source_frame_count",
-          "independent_slide_group_verified",
-          "new_macro_benchmark_assignment"
-        ]
-      }
-    },
-    "Lytro_MFIFB_overlap_count": {
-      "passed": true,
-      "detail": {
-        "matching_source_files": 40,
-        "pairs": 20,
-        "evidence": "Upstream Git blob identities, not decoded local images"
-      }
-    },
     "authored_markdown_local_links": {
       "passed": true,
       "detail": {
@@ -207,7 +169,7 @@
     "dataset_metadata_snapshot_hashes": {
       "passed": true,
       "detail": {
-        "files": 30,
+        "files": 13,
         "mismatches": [],
         "image_byte_hashes_verified": false
       }
@@ -218,7 +180,7 @@
         "artifact_classes": 20,
         "method_records": 29,
         "candidate_measurements": 27,
-        "dataset_records": 28
+        "dataset_records": 8
       }
     }
   },

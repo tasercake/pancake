@@ -9,7 +9,7 @@ def main(argv=None):
     groups = parser.add_subparsers(dest="group", required=True)
     data = groups.add_parser("data", help="Acquire and process evaluation datasets")
     actions = data.add_subparsers(dest="action", required=True)
-    actions.add_parser("download", add_help=False, help="Download verified originals within the data budget")
+    actions.add_parser("download", add_help=False, help="Download verified originals")
     actions.add_parser("process", add_help=False, help="Convert selected data to canonical linear-sRGB TIFFs")
     args, remaining = parser.parse_known_args(argv)
     try:

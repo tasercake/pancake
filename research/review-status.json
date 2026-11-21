@@ -19,7 +19,7 @@
     "artifact_classes": 20,
     "method_records": 29,
     "candidate_measurements": 27,
-    "dataset_records": 28
+    "dataset_records": 8
   },
   "structural_verification": "05-synthesis/research-validation.json"
 }

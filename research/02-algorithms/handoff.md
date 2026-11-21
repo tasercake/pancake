@@ -19,13 +19,9 @@ Completed **2026-11-15**, after phase 1. Files: `review.md`, `method-matrix.csv`
 
 These are constraints and proposed controls for phase 3, not a finished or validated measurement suite.
 
-## Dataset review leads and provenance risks
+## Dataset provenance risks
 
-- **LSFD / FocusDeep:** real raw 30-frame stacks and pseudo-targets. Original paper uses 84 training and 10 test bursts, with two lenses. Macro focal coverage is sometimes incomplete. Preserve scene/burst grouping before crops and audit reference flaws. No license file observed in code tree; dataset terms need independent verification.
-- **StackMFF series:** synthetic whole-stack data generated from images plus measured/estimated depth; benchmarks include Mobile Depth, Middlebury, FlyingThings3D and Road-MF. Check which are physically captured focus stacks versus synthetically refocused derivatives. Monocular depth predictions are not exact scene truth. Current V3 benchmark archives are author-produced outputs, not clean optical ground truth.
-- **UHD-MFF:** original 2026 paper and author repository supply synthetic and real 4K pair data links. Useful for resolution stress, not a substitute for long macro bursts. Full data access and terms remain for phase 4.
-- **PDRFuse HRMFF:** author README links a high-resolution test corpus; paired scope. **VAEEDOF MattingMFIF:** Blender-generated photographic cutout layers, up to seven inputs. “Blender” does not make such references exact for arbitrary 3D macro optics; retain asset identities and renderer/blur assumptions.
-- **MFFW, Lytro, Real-MFF, MFI-WHU, Road-MF:** common short-pair comparison sets. MFFW includes manually fused references; other reference types vary and require source-level audit. Preserve all source-image ancestry, repeated subjects, crops, masks and synthesis assets across a single split group. Check both dataset and pretrained-checkpoint contamination before calling a test unseen.
+Use the [active dataset catalogue](../04-datasets/dataset-catalogue.csv) for benchmark intake. Keep shared source images, specimens, crops, masks and synthesis assets in the same split group. Check pretrained-model exposure before declaring a test unseen.
 
 ## Code facts that affect benchmark adapters
 

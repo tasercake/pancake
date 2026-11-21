@@ -3,23 +3,9 @@
   "defaults": {
     "reserve_gib": 15,
     "standard_format": "float32_RGB_TIFF",
-    "data_root": "../../../datasets",
-    "max_download_bytes": 2147483648
+    "data_root": "../../../datasets"
   },
   "datasets": [
-    {
-      "id": "D01",
-      "name": "LSFD / FocusDeep",
-      "primary_url": "https://arxiv.org/html/2311.17846v1",
-      "reference_type": "software_pseudo_reference",
-      "reference_semantics": "Helicon pyramid output; not exact truth",
-      "original_split": "84 train / 10 test in original paper",
-      "rights_evidence": "No explicit dataset terms located",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "disabled",
-      "reason": "Excluded by user: LSFD is not a feasible acquisition source; never resolve or download."
-    },
     {
       "id": "D02",
       "name": "Sood 999-frame macro stack",
@@ -43,23 +29,6 @@
       "conversion_priority": 90
     },
     {
-      "id": "D03",
-      "name": "Amber mite optical focal stacks",
-      "primary_url": "https://doi.org/10.6084/m9.figshare.14707077.v1",
-      "reference_type": "software_pseudo_reference",
-      "reference_semantics": "Already fused JPEGs separate from source stacks",
-      "original_split": "none verified",
-      "rights_evidence": "CC BY 4.0 explicit Figshare record",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "figshare",
-      "article_id": 14707077,
-      "version": 1,
-      "include_pattern": "\\.zip$",
-      "layout": "archive_stacks",
-      "acquisition_max_bytes": 157286400
-    },
-    {
       "id": "D04",
       "name": "Amber spider optical focal stacks",
       "primary_url": "https://doi.org/10.6084/m9.figshare.30771638.v1",
@@ -74,72 +43,6 @@
       "version": 1,
       "include_pattern": "\\.zip$",
       "layout": "archive_stacks"
-    },
-    {
-      "id": "D05",
-      "name": "Lytro Multi-focus Dataset",
-      "primary_url": "https://doi.org/10.1016/j.inffus.2014.10.004",
-      "reference_type": "none",
-      "reference_semantics": "No exact all-focus reference provided",
-      "original_split": "legacy public evaluation set",
-      "rights_evidence": "No explicit image terms located in inspected author tree",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "github",
-      "repository": "mnnejati/LytroDataset",
-      "include_pattern": "^LytroDataset/|^README",
-      "layout": "lytro"
-    },
-    {
-      "id": "D06",
-      "name": "MFFW full release",
-      "primary_url": "https://arxiv.org/html/2002.04780",
-      "reference_type": "manual_composite_partial",
-      "reference_semantics": "13 pair references and focus polygons manually edited; not physical truth",
-      "original_split": "legacy public evaluation set",
-      "rights_evidence": "Online-image ancestry and redistribution terms unresolved",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "page_links",
-      "page_url": "https://www.researchgate.net/publication/350965471_MFFW",
-      "link_pattern": "(?i)\\.(zip|rar)(\\?|$)",
-      "layout": "directory_stacks"
-    },
-    {
-      "id": "D07",
-      "name": "Real-MFF",
-      "primary_url": "https://arxiv.org/html/2003.12779",
-      "reference_type": "light_field_derived_reference",
-      "reference_semantics": "Hyperfan/refocus all-focus construction, not direct macro radiance measurement",
-      "original_split": "Original independent scene split not confirmed here",
-      "rights_evidence": "MIT repo; external Stanford image ancestry unresolved",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "files",
-      "files": [
-        {
-          "path": "RealMFF.rar",
-          "drive_id": "1UgV_AFmAlzZunaXmyVvoskbhbudr_SQp",
-          "size": 908434597,
-          "sha256": null
-        }
-      ],
-      "layout": "realmff"
-    },
-    {
-      "id": "D08",
-      "name": "MFIFB",
-      "primary_url": "https://arxiv.org/abs/2005.01116",
-      "reference_type": "none",
-      "reference_semantics": "3150 fused comparator outputs are not truth",
-      "original_split": "Public legacy test corpus",
-      "rights_evidence": "No license located in inspected repository",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "github",
-      "repository": "xingchenzhang/MFIFB",
-      "include_pattern": "^input/|^README",
-      "layout": "mfifb"
     },
     {
       "id": "D09",
@@ -187,154 +90,6 @@
       "layout": "hrmff"
     },
     {
-      "id": "D12",
-      "name": "UHD-MFF-Syn",
-      "primary_url": "https://arxiv.org/html/2606.31242",
-      "reference_type": "synthetic_source_image_reference",
-      "reference_semantics": "Clear source image target under declared synthesis model",
-      "original_split": "1500 train / 300 test in original paper",
-      "rights_evidence": "Dataset-specific terms not verified; UHD-LL ancestry separate",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "drive_folder",
-      "folder_id": "1vcs_UAeagjR2Er4N0OXtXK-1BOBRTXws",
-      "layout": "near_far",
-      "conversion_priority": 80,
-      "acquisition_min_bytes": 2500000000
-    },
-    {
-      "id": "D13",
-      "name": "UHD-MFF-Real",
-      "primary_url": "https://arxiv.org/html/2606.31242",
-      "reference_type": "none",
-      "reference_semantics": "No all-focus GT reported",
-      "original_split": "Public real test corpus",
-      "rights_evidence": "Dataset-specific terms not verified",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "drive_folder",
-      "folder_id": "1dinWJjwt21YyxdFFwg8nKtPJIwjudMAa",
-      "layout": "near_far",
-      "acquisition_min_bytes": 2700000000
-    },
-    {
-      "id": "D14",
-      "name": "MattingMFIF",
-      "primary_url": "https://arxiv.org/html/2510.19581",
-      "reference_type": "renderer_DOF_off_target",
-      "reference_semantics": "Model-defined DOF-off layered render; numerical sampling uncertainty remains",
-      "original_split": "10000 train / 200 test in paper; asset leakage audit still needed",
-      "rights_evidence": "Corpus release and composite asset terms not verified",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "unavailable",
-      "reason": "No public corpus archive located; generator code is not an existing dataset."
-    },
-    {
-      "id": "D15",
-      "name": "StackMFF synthetic-stack recipes",
-      "primary_url": "https://github.com/Xinzhe99/StackMFF-V2",
-      "reference_type": "source_image_and_depth_proxy",
-      "reference_semantics": "Clean source RGB / estimated depth is model-dependent, not exact macro optics",
-      "original_split": "Per-source splits; no unified original split verified",
-      "rights_evidence": "Code/data/source-image licenses separate and incompletely audited",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "unavailable",
-      "reason": "Generation recipes and Baidu archives; no directly accessible evaluation archive verified."
-    },
-    {
-      "id": "D16",
-      "name": "HCI/Konstanz 4D light fields",
-      "primary_url": "https://lightfield-analysis.uni-konstanz.de/",
-      "reference_type": "pinhole_center_view_and_geometry",
-      "reference_semantics": "Center-view target only under declared discrete lightfield/refocus convention",
-      "original_split": "4 stratified / 4 train / 4 test / 16 additional current scene names",
-      "rights_evidence": "CC BY-NC-SA 4.0 explicit official page",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "unavailable",
-      "reason": "Email download form; light-field views also require a separate refocus contract."
-    },
-    {
-      "id": "D17",
-      "name": "LearnAF / Learning to Autofocus",
-      "primary_url": "https://learntoautofocus-google.github.io/",
-      "reference_type": "estimated_depth_and_confidence",
-      "reference_semantics": "Multi-view estimated depth; absolute metric scale explicitly not guaranteed; no exact AiF truth",
-      "original_split": "351 train / 47 test in release readme",
-      "rights_evidence": "Dataset-specific terms not verified",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "files",
-      "layout": "learnaf",
-      "files": [
-        {
-          "path": "test.tar.gz",
-          "url": "https://storage.googleapis.com/cvpr2020-af-data/test.tar.gz",
-          "size": null,
-          "sha256": null
-        },
-        {
-          "path": "train1.tar.gz",
-          "url": "https://storage.googleapis.com/cvpr2020-af-data/train1.tar.gz",
-          "size": null,
-          "sha256": null
-        },
-        {
-          "path": "train2.tar.gz",
-          "url": "https://storage.googleapis.com/cvpr2020-af-data/train2.tar.gz",
-          "size": null,
-          "sha256": null
-        },
-        {
-          "path": "train3.tar.gz",
-          "url": "https://storage.googleapis.com/cvpr2020-af-data/train3.tar.gz",
-          "size": null,
-          "sha256": null
-        },
-        {
-          "path": "train4.tar.gz",
-          "url": "https://storage.googleapis.com/cvpr2020-af-data/train4.tar.gz",
-          "size": null,
-          "sha256": null
-        },
-        {
-          "path": "train5.tar.gz",
-          "url": "https://storage.googleapis.com/cvpr2020-af-data/train5.tar.gz",
-          "size": null,
-          "sha256": null
-        },
-        {
-          "path": "train6.tar.gz",
-          "url": "https://storage.googleapis.com/cvpr2020-af-data/train6.tar.gz",
-          "size": null,
-          "sha256": null
-        },
-        {
-          "path": "train7.tar.gz",
-          "url": "https://storage.googleapis.com/cvpr2020-af-data/train7.tar.gz",
-          "size": null,
-          "sha256": null
-        }
-      ],
-      "conversion_priority": 100,
-      "acquisition_min_bytes": 100000000000
-    },
-    {
-      "id": "D18",
-      "name": "Learning to Refocus real focal stacks",
-      "primary_url": "https://arxiv.org/html/2512.19823",
-      "reference_type": "software_pseudo_reference",
-      "reference_semantics": "Helicon depth-mode AiF after ACR and calibrated transforms; not truth",
-      "original_split": "1474 train / 163 test; split PKL files listed",
-      "rights_evidence": "LICENSE-CODE separate; dataset terms not verified",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "unavailable",
-      "reason": "Sync did not expose a stable public binary URL; no account/access gate accepted."
-    },
-    {
       "id": "D19",
       "name": "Mobile Depth",
       "primary_url": "https://www.supasorn.com/dffdownload.html",
@@ -377,139 +132,24 @@
       "layout": "fod500"
     },
     {
-      "id": "D21",
-      "name": "DDFF 12-Scene",
-      "primary_url": "https://arxiv.org/abs/1704.01085",
-      "reference_type": "measured_depth_not_AiF_truth",
-      "reference_semantics": "Depth/disparity ground truth differs from all-focus color truth",
-      "original_split": "Original train/validation scene overlap explicitly documented by DFV authors",
-      "rights_evidence": "Current release/terms not verified",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "files",
-      "layout": "ddff_hdf5",
-      "files": [
-        {
-          "path": "DDFF12-DFV-preprocessed.h5",
-          "url": "https://pennstateoffice365-my.sharepoint.com/:u:/g/personal/fuy34_psu_edu/ERBeMZVm8UhNnQNIg1zXe6IBfLVpTxJtYuPymgU1TqjAbQ?e=g9u9kX&download=1",
-          "size": null,
-          "sha256": null
-        }
-      ]
-    },
-    {
-      "id": "D22",
-      "name": "Cervix93",
-      "primary_url": "https://github.com/parham-ap/cytology_dataset",
-      "reference_type": "existing_EDF_and_task_labels",
-      "reference_semantics": "EDF composite plus nuclear point/grade labels; not optical pixel truth",
-      "original_split": "69 train / 24 test exact source IDs exposed in labels.csv",
-      "rights_evidence": "No LICENSE located in inspected tree",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "github",
-      "repository": "parham-ap/cytology_dataset",
-      "include_pattern": "^dataset/|^README|^LICENSE",
-      "layout": "cervix93"
-    },
-    {
-      "id": "D23",
-      "name": "EPFL EDF optical example stacks",
-      "primary_url": "https://bigwww.epfl.ch/demo/edf/",
-      "reference_type": "software_demo_outputs",
-      "reference_semantics": "Example EDoF outputs are algorithm demonstrations, not truth",
-      "original_split": "none verified",
-      "rights_evidence": "Source images attributed; acquisition/redistribution terms not established",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "page_links",
-      "page_url": "https://bigwww.epfl.ch/demo/edf/",
-      "link_pattern": "(?i)\\.(zip|tif|tiff|stk)(\\?|$)",
-      "layout": "directory_stacks"
-    },
-    {
-      "id": "D24",
-      "name": "Insect microscopy multi-focus test set (HF)",
-      "primary_url": "https://huggingface.co/datasets/Data-set/microscopy-focus-testset",
-      "reference_type": "software_fused_reference_claimed",
-      "reference_semantics": "Creator says fused reference where available; generation not verified",
-      "original_split": "selected-pair/manifest CSV claimed but gate not accepted",
-      "rights_evidence": "Public card CC BY 4.0; manual access/contact-sharing gate",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "unavailable",
-      "reason": "Manual HF gate requires sharing contact details; gate not accepted."
-    },
-    {
-      "id": "D25",
-      "name": "LFSD",
-      "primary_url": "https://nianyi-li.github.io/LFSD/",
-      "reference_type": "derived_AiF_and_saliency_masks",
-      "reference_semantics": "Ground-truth claim on page is manual saliency segmentation, not exact fusion pixels",
-      "original_split": "No original independent split verified",
-      "rights_evidence": "Dataset terms not verified",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "page_links",
-      "page_url": "https://nianyi-li.github.io/LFSD/",
-      "link_pattern": "(?i)\\.(zip|rar|mat)(\\?|$)",
-      "layout": "lfsd",
-      "conversion_inputs": [
-        "focus_stack.rar"
+      "id": "D29",
+      "name": "InfinigenDefocus",
+      "provider": "huggingface",
+      "repository": "venkatsubra/InfinigenDefocus",
+      "revision": "79aadc918e7a96a1544f324fc675a4734649455e",
+      "include": [
+        "InfinigenDefocus.zip",
+        "LICENSE",
+        "README.md"
       ],
-      "conversion_priority": 10,
-      "acquisition_inputs": [
-        "focus_stack.rar"
-      ]
-    },
-    {
-      "id": "D26",
-      "name": "EPFL / Stanford optical light-field source imagery",
-      "primary_url": "https://www.epfl.ch/labs/mmspg/downloads/epfl-light-field-image-dataset/",
-      "reference_type": "none",
-      "reference_semantics": "Refocused reference convention must be defined; no macro all-focus guarantee",
-      "original_split": "Source-specific; not verified",
-      "rights_evidence": "EPFL research-only and no commercial distribution; Stanford route/terms not verified",
+      "layout": "infinigen_defocus",
       "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "unavailable",
-      "reason": "Generic light-field imagery; no focal-stack/refocus contract and download terms unresolved."
-    },
-    {
-      "id": "D27",
-      "name": "MEMF subjective fusion database",
-      "primary_url": "https://doi.org/10.1109/TIP.2015.2428051",
-      "reference_type": "human_subjective_scores_claimed",
-      "reference_semantics": "Subjective preference/quality ratings, not exact optical truth",
-      "original_split": "No source-scene split verified",
-      "rights_evidence": "Supplement/license not verified",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "unavailable",
-      "reason": "Standalone image/ratings supplement URL not located."
-    },
-    {
-      "id": "D28",
-      "name": "Waterloo MEF subjective database",
-      "primary_url": "https://ivc.uwaterloo.ca/database/MEF/MEF-Database.html",
-      "reference_type": "human_MOS",
-      "reference_semantics": "MOS 1 to 10; exposure quality only",
-      "original_split": "No original independent split verified",
-      "rights_evidence": "Explicit creator reuse/attribution terms",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "exposure_fusion_only",
-      "provider": "files",
-      "page_url": "https://ivc.uwaterloo.ca/database/MEF/MEF-Database.html",
-      "link_pattern": "(?i)\\.(zip|rar|mat)(\\?|$)",
-      "layout": "exposure_stacks",
-      "files": [
-        {
-          "path": "MEFDatabase.rar",
-          "url": "https://ivc.uwaterloo.ca/database/MEF/MEFDatabase.rar",
-          "size": null,
-          "sha256": null
-        }
-      ]
+      "evaluation_domain": "synthetic_indoor",
+      "primary_url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus",
+      "rights_evidence": "BSD-3-Clause in the pinned dataset release",
+      "original_split": "Hugging Face train split; no new split assigned",
+      "reference_type": "rendered_all_in_focus",
+      "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference"
     }
   ]
 }

@@ -87,17 +87,17 @@ def test_unknown_layout_fails_instead_of_guessing_frames(tmp_path):
     assert not list((root / "standardized").rglob("scene.json"))
 
 
-def test_converter_uses_only_native_files_in_download_plan(tmp_path):
+def test_converter_ignores_legacy_capped_download_plan(tmp_path):
     names = ("one/1.png", "one/2.png", "two/1.png", "two/2.png")
     root, lock = fixture(tmp_path, names=names)
     assert run_convert(root, lock).returncode == 0
+    (root / ".bokehforge/state").mkdir(parents=True, exist_ok=True)
     (root / ".bokehforge/state/download-plan.json").write_text(json.dumps({"schema_version": 1,
         "datasets": [{"id": "fixture", "selected_paths": list(names[:2])}]}))
     result = run_convert(root, lock)
     assert result.returncode == 0, result.stdout + result.stderr
     index = json.loads((root / "standardized/index.json").read_text())
-    assert len(index["scenes"]) == 1
-    assert len(list((root / ".bokehforge/work/retired").rglob("scene.json"))) == 1
+    assert len(index["scenes"]) == 2
 
 
 def test_disabled_source_retires_old_active_scenes(tmp_path):
@@ -111,19 +111,6 @@ def test_disabled_source_retires_old_active_scenes(tmp_path):
     report = json.loads((root / ".bokehforge/reports/process-report.json").read_text())["datasets"][0]
     assert report["status"] == "disabled"
     assert len(list((root / ".bokehforge/work/retired").rglob("scene.json"))) == 1
-
-
-def test_exposure_sequences_exclude_published_fused_outputs(tmp_path):
-    names = ("MEFDatabase/source image sequences/Lamp/1.png", "MEFDatabase/source image sequences/Lamp/2.png",
-             "MEFDatabase/fused images/Lamp_method1.png", "MEFDatabase/fused images/Lamp_method2.png")
-    root, lock = fixture(tmp_path, names=names, layout="exposure_stacks")
-    result = run_convert(root, lock)
-    assert result.returncode == 0, result.stdout + result.stderr
-    scenes = list((root / "standardized").rglob("scene.json"))
-    assert len(scenes) == 1
-    manifest = json.loads(scenes[0].read_text())
-    assert len(manifest["frames"]) == 2
-    assert all("source image sequences" in x["source_path"] for x in manifest["frames"])
 
 
 def test_archive_path_escape_is_rejected(tmp_path):
@@ -199,24 +186,6 @@ def test_parallel_conversion_matches_serial_pixel_files(tmp_path):
     assert before==after
 
 
-def test_lfsd_all_focus_images_do_not_become_stack_frames(tmp_path):
-    root, lock=fixture(tmp_path,names=('focus_stack.rar-scene/focus_stack/001/1.png','focus_stack.rar-scene/focus_stack/001/2.png',
-                                    'all_focus_images.rar-scene/all_focus_images/001.png','all_focus_images.rar-scene/all_focus_images/002.png'),layout='lfsd')
-    result=run_convert(root,lock)
-    assert result.returncode==0,result.stdout+result.stderr
-    scenes=list((root/'standardized/fixture').rglob('scene.json'))
-    assert len(scenes)==1
-    assert len(json.loads(scenes[0].read_text())['frames'])==2
-
-
-def test_lfsd_flat_archive_is_split_by_refocus_scene_prefix(tmp_path):
-    root,lock=fixture(tmp_path,names=('focus_stack/1__refocus_00.jpg','focus_stack/1__refocus_01.jpg',
-                                   'focus_stack/2__refocus_00.jpg','focus_stack/2__refocus_01.jpg'),layout='lfsd')
-    result=run_convert(root,lock)
-    assert result.returncode==0,result.stdout+result.stderr
-    assert len(list((root/'standardized/fixture').rglob('scene.json')))==2
-
-
 def test_metadata_change_reuses_bit_identical_encoded_pixels(tmp_path, monkeypatch):
     from bokehforge.data import process
     root, lock=fixture(tmp_path)
@@ -236,15 +205,6 @@ def test_fod_groups_each_sample_id_in_flat_directory(tmp_path):
     assert len(list((root/'standardized/fixture').rglob('scene.json')))==2
 
 
-def test_realmff_reference_is_not_a_source_frame(tmp_path):
-    root,lock=fixture(tmp_path,names=('RealMFF/imageA/001_A.png','RealMFF/imageB/001_B.png','RealMFF/Fusion/001_F.png'),layout='realmff')
-    result=run_convert(root,lock)
-    assert result.returncode==0,result.stdout+result.stderr
-    value=json.loads(next((root/'standardized/fixture').rglob('scene.json')).read_text())
-    assert len(value['frames'])==2
-    assert len(value['references'])==1
-
-
 def test_converter_uses_configured_default_root(tmp_path):
     root, lock=fixture(tmp_path)
     config=tmp_path/'config.json';config.write_text(json.dumps({'defaults':{'data_root':'data','reserve_gib':0}}))
@@ -262,21 +222,48 @@ def test_conversion_policy_can_change_without_repinning_source_bytes(tmp_path):
     assert np.allclose(image,128/255,atol=1e-7)
 
 
-def test_unselected_auxiliary_archive_is_not_required_for_focal_conversion(tmp_path):
-    root,lock=fixture(tmp_path)
-    value=json.loads(lock.read_text());value['datasets'][0]['conversion_inputs']=['scene/*.png']
-    value['datasets'][0]['files'].append({'path':'auxiliary.bin','sha256':'0'*64})
-    lock.write_text(json.dumps(value))
-    result=run_convert(root,lock)
-    assert result.returncode==0,result.stdout+result.stderr
+def test_removed_source_is_excluded_from_index(tmp_path):
+    root, lock = fixture(tmp_path)
+    assert run_convert(root, lock).returncode == 0
+    previous = root / "standardized/fixture/dataset.json"
+    assert previous.is_file()
+    lock.write_text(json.dumps({"datasets": []}))
+    result = subprocess.run([*COMMAND, "--root", str(root), "--lock", str(lock)], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert json.loads((root / "standardized/index.json").read_text())["scenes"] == []
+    assert previous.is_file()
 
 
-def test_revised_grouping_retires_obsolete_generated_scene(tmp_path):
-    root,lock=fixture(tmp_path,names=('focus_stack/1__refocus_00.jpg','focus_stack/1__refocus_01.jpg',
-                                   'focus_stack/2__refocus_00.jpg','focus_stack/2__refocus_01.jpg'))
-    assert run_convert(root,lock).returncode==0
-    config=tmp_path/'config.json';config.write_text(json.dumps({'datasets':[{'id':'fixture','layout':'lfsd'}]}))
-    result=run_convert(root,lock,'--config',str(config))
-    assert result.returncode==0,result.stdout+result.stderr
-    assert len(list((root/'standardized/fixture').rglob('scene.json')))==2
-    assert len(list((root/'.bokehforge/work/retired/fixture').rglob('scene.json')))==1
+def test_infinigen_archive_standardizes_one_stack_per_aperture(tmp_path):
+    import io
+
+    root = tmp_path / "data"
+    archive = root / "raw/fixture/InfinigenDefocus.zip"
+    archive.parent.mkdir(parents=True)
+    pixels = io.BytesIO()
+    Image.new("RGB", (9, 8), (128, 120, 100)).save(pixels, format="PNG")
+    with zipfile.ZipFile(archive, "w") as bundle:
+        for view in ("8aedf2_2", "8aedf2_3"):
+            folder = f"infinigen_defocus_copy/{view}"
+            for aperture in ("1.40", "2.00", "2.80", "4.00", "5.60"):
+                for distance in ("8.00", "0.80", "6.00", "1.20", "4.70", "1.70", "3.80", "2.30", "3.00"):
+                    bundle.writestr(f"{folder}/image_ap_{aperture}_fd_{distance}.png", pixels.getvalue())
+            bundle.writestr(f"{folder}/image_all_in_focus.png", pixels.getvalue())
+            bundle.writestr(f"{folder}/depth.npy", b"auxiliary")
+            bundle.writestr(f"{folder}/cam_all_in_focus.npz", b"auxiliary")
+    lock = tmp_path / "lock.json"
+    lock.write_text(json.dumps({"datasets": [{"id": "fixture", "status": "available",
+        "layout": "infinigen_defocus", "reference_type": "rendered_all_in_focus",
+        "files": [{"path": archive.name, "sha256": hashlib.sha256(archive.read_bytes()).hexdigest()}]}]}))
+    result = run_convert(root, lock)
+    assert result.returncode == 0, result.stderr
+    scenes = [json.loads(path.read_text()) for path in (root / "standardized/fixture").glob("*/scene.json")]
+    assert len(scenes) == 10
+    assert {s["source_family_id"] for s in scenes} == {"fixture/8aedf2"}
+    for scene in scenes:
+        assert len(scene["frames"]) == 9
+        assert [f["focus_distance_m"] for f in scene["frames"]] == [0.8, 1.2, 1.7, 2.3, 3.0, 3.8, 4.7, 6.0, 8.0]
+        assert len({f["aperture_f_number"] for f in scene["frames"]}) == 1
+        assert scene["reference_type"] == "rendered_all_in_focus"
+        assert len(scene["references"]) == 1
+        assert scene["references"][0]["source_path"].endswith("/image_all_in_focus.png")

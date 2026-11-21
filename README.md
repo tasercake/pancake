@@ -17,4 +17,4 @@ uv run --project bokehforge --frozen bokehforge data process
 uv run --project bokehforge --frozen pytest bokehforge/tests
 ```
 
-Source policy and exact source pins live in [bokehforge/config/data/](bokehforge/config/data/), outside the disposable data directory. Default native download budget remains 2 GiB; LSFD is disabled.
+Source policy and exact source pins live in [bokehforge/config/data/](bokehforge/config/data/), outside the disposable data directory. Pass `--dataset D29` to download only InfinigenDefocus.

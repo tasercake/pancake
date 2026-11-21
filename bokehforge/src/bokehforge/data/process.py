@@ -3,8 +3,6 @@
 
 import argparse
 import concurrent.futures
-import csv
-import fnmatch
 import hashlib
 import importlib.metadata
 import json
@@ -27,8 +25,10 @@ CAMERA_RAW = {".rw2", ".dng", ".nef", ".cr3", ".cr2", ".arw", ".raf", ".orf"}
 ARCHIVES = {".zip", ".rar", ".tar", ".tgz", ".gz", ".7z"}
 CONVERTER_SHA256 = digest(Path(__file__))
 HELPERS_SHA256 = digest(HERE / "download.py")
-SUPPORTED_LAYOUTS = {"explicit_frames", "sood_raw", "lytro", "hrmff", "edmf", "mfifb", "cervix93",
-                     "near_far", "realmff", "mfi_whu", "fod500", "lfsd", "directory_stacks", "archive_stacks", "exposure_stacks"}
+SUPPORTED_LAYOUTS = {"explicit_frames", "sood_raw", "hrmff", "edmf", "mfi_whu", "fod500",
+                     "infinigen_defocus", "directory_stacks", "archive_stacks"}
+INFINIGEN_APERTURES = (1.4, 2.0, 2.8, 4.0, 5.6)
+INFINIGEN_DISTANCES = (0.8, 1.2, 1.7, 2.3, 3.0, 3.8, 4.7, 6.0, 8.0)
 
 
 def runtime_recipe(source):
@@ -40,7 +40,6 @@ def runtime_recipe(source):
                               "libraw": list(rawpy.libraw_version), "lcms": imagecodecs.cms_version()},
                   "layout": source.get("layout"), "transfer": source.get("transfer", "srgb_assumed"),
                   "source_contract": {k: source.get(k) for k in ["reference_type", "reference_semantics", "original_split", "evaluation_domain", "primary_url", "rights_evidence"]},
-                  "conversion_inputs": source.get("conversion_inputs"),
                   "output": "float32_HWC_RGB_TIFF_deflate6_predictor3", "resize": False, "alignment": False,
                   "raw": {"gamma": [1, 1], "output_bps": 16, "use_camera_wb": True, "no_auto_bright": True,
                           "output_color": "sRGB", "demosaic": "AHD", "highlight_mode": "Clip", "adjust_maximum_thr": 0.0}}
@@ -108,8 +107,6 @@ def inventory_source(root, source, reserve):
     files = []
     raw_root = root / "raw" / source["id"]
     for item in source["files"]:
-        if source.get("conversion_inputs") and not any(fnmatch.fnmatch(item["path"], pattern) for pattern in source["conversion_inputs"]):
-            continue
         original = safe_path(raw_root, item["path"])
         if not original.is_file() or not item.get("sha256") or digest(original) != item["sha256"]:
             raise RuntimeError(f"Source checksum missing or mismatch: {source['id']}/{item['path']}; run bokehforge data download")
@@ -126,10 +123,45 @@ def inventory_source(root, source, reserve):
     return files
 
 
+def plan_infinigen_scenes(inventory):
+    views = {}
+    for item in inventory:
+        path = Path(item.get("member", item["source_path"]))
+        if path.suffix != ".png" or not re.fullmatch(r"[0-9a-f]+_\d+", path.parent.name):
+            continue
+        if path.name.startswith("image_"):
+            views.setdefault(path.parent.name, {})[path.name] = item
+
+    scenes, quarantine = [], []
+    for view, images in sorted(views.items()):
+        reference = images.get("image_all_in_focus.png")
+        for aperture in INFINIGEN_APERTURES:
+            name = f"{view}/ap-{aperture:.2f}"
+            frames = []
+            missing = []
+            for distance in INFINIGEN_DISTANCES:
+                filename = f"image_ap_{aperture:.2f}_fd_{distance:.2f}.png"
+                frame = images.get(filename)
+                if frame is None:
+                    missing.append(filename)
+                else:
+                    frames.append({**frame, "aperture_f_number": aperture, "focus_distance_m": distance})
+            if reference is None:
+                missing.append("image_all_in_focus.png")
+            if missing:
+                quarantine.append({"scene": name, "reason": "incomplete InfinigenDefocus stack", "missing": missing})
+                continue
+            scenes.append({"source_scene_id": name, "source_family": view.rsplit("_", 1)[0],
+                           "frames": frames, "references": [reference]})
+    return scenes, quarantine
+
+
 def plan_scenes(source, inventory):
     layout = source.get("layout", "directory_stacks")
     if layout not in SUPPORTED_LAYOUTS:
         raise RuntimeError(f"No conversion adapter for layout {layout}; original assets remain unchanged")
+    if layout == "infinigen_defocus":
+        return plan_infinigen_scenes(inventory)
     grouped, quarantine = {}, []
     for item in inventory:
         p = Path(item.get("member", item["source_path"]))
@@ -146,33 +178,21 @@ def plan_scenes(source, inventory):
             if p.suffix.lower() not in CAMERA_RAW:
                 continue
             scene = "macro-sweep"
-        elif layout in {"lytro", "hrmff"}:
-            match = re.match(r"(.+)[-_]([ABC])$", stem, re.I)
+        elif layout == "hrmff":
+            match = re.match(r"(.+)[-_]([AB])$", stem, re.I)
             if match:
-                prefix = "triple-" if "Triple Series" in str(p) else ""
-                scene = prefix + match[1]
+                scene = match[1]
         elif layout == "edmf":
             match = re.fullmatch(r"bg-[AB]-(\d+)", stem, re.I)
             scene = f"pair-{int(match[1]):04d}" if match else None
-        elif layout == "mfifb":
-            scene = p.parent.name
-        elif layout == "cervix93":
-            match = re.search(r"(frame\d+)_stack", str(p))
-            if match:
-                scene = match[1]
-            elif "EDF" in p.parts:
-                scene, role = stem, "reference"
-            else:
-                continue
-        elif layout in {"near_far", "realmff", "mfi_whu"}:
+        elif layout == "mfi_whu":
             parts = list(p.parts)
             labels = {"near", "far", "a", "b", "source_a", "source_b", "source_1", "source_2", "sourcea", "sourceb", "imagea", "imageb", "inputa", "inputb", "gt", "groundtruth", "ground_truth", "reference", "full_clear", "fusion", "focus1", "focus2"}
             indices = [i for i, x in enumerate(parts[:-1]) if x.lower() in labels]
             if indices:
                 idx = indices[-1]
                 role = "reference" if parts[idx].lower() in {"gt", "groundtruth", "ground_truth", "reference", "full_clear", "fusion"} else "frame"
-                normalized = re.sub(r"_[ABF]$", "", stem, flags=re.I) if layout == "realmff" else stem
-                scene = "/".join(parts[:idx] + parts[idx + 1:-1] + [normalized])
+                scene = "/".join(parts[:idx] + parts[idx + 1:-1] + [stem])
             else:
                 match = re.match(r"(.+?)[-_]([AB12])$", stem, re.I)
                 if match:
@@ -181,15 +201,6 @@ def plan_scenes(source, inventory):
             match = re.fullmatch(r"(\d+)_(\d+)All", stem, re.I)
             if match:
                 scene = "sample-" + match[1]
-        elif layout == "lfsd":
-            if "focus_stack" not in item["source_path"].lower():
-                continue
-            match = re.fullmatch(r"(.+?)__refocus_(\d+)", stem, re.I)
-            scene = "scene-" + match[1] if match else str(p.parent)
-        elif layout == "exposure_stacks":
-            if "source image sequences" not in p.parts:
-                continue
-            scene = str(p.parent)
         else:
             scene = str(p.parent)
             if item.get("archive"):
@@ -204,8 +215,7 @@ def plan_scenes(source, inventory):
         record["frames"].sort(key=lambda x: natural_key(x["source_path"]))
         record["references"].sort(key=lambda x: natural_key(x["source_path"]))
         count = len(record["frames"])
-        required = 3 if layout == "lytro" and name.startswith("triple-") else 2
-        if count < required or (layout in {"edmf", "hrmff", "mfifb"} and count != 2):
+        if count < 2 or (layout in {"edmf", "hrmff"} and count != 2):
             # A multi-page optical TIFF can contain an entire stack.
             if count != 1 or Path(record["frames"][0]["path"]).suffix.lower() not in {".tif", ".tiff", ".stk"}:
                 quarantine.append({"scene": name, "reason": f"incomplete stack ({count} source files)", "source_paths": [x["source_path"] for x in record["frames"]]})
@@ -347,6 +357,9 @@ def convert_original(source, original, kind, start, directory, state_dir, recipe
         output = write_frame(directory / relative, rgb, identity, state_dir / kind, recipe_hash, reserve, reuse_pixels)
         record = {"path": relative, "sha256": output["sha256"], "source_path": original["source_path"],
                   "source_sha256": original_hash, "page": page, "ordinal": ordinal, "shape": output["shape"], "decode": decode_metadata}
+        for key in ("aperture_f_number", "focus_distance_m"):
+            if key in original:
+                record[key] = original[key]
         if alpha is not None:
             alpha_path = f"alpha/{kind}-{ordinal:06d}.tif"
             alpha_record = write_frame(directory / alpha_path, alpha, {**identity, "alpha": True}, state_dir / "alpha", recipe_hash, reserve, reuse_pixels)
@@ -395,18 +408,22 @@ def convert_scene(root, source, scene, recipe, recipe_hash, reserve, workers=2):
     if len(frames) < 2:
         raise RuntimeError("Optical stack contains fewer than two decoded focal frames")
     # Shared specimen/slide ancestry is conservative; public data stay external.
-    family = source["id"] if source["id"] in {"D02", "D03", "D04", "D22"} else source["id"] + "/" + scene["source_scene_id"]
+    family = source["id"]
+    if source["id"] not in {"D02", "D04"}:
+        family += "/" + scene.get("source_family", scene["source_scene_id"])
+    focus_order = ("increasing focus distance in meters" if source.get("layout") == "infinigen_defocus"
+                   else "natural source filename order; physical order requires capture metadata")
     record = {"schema_version": 1, "dataset_id": source["id"], "scene_id": source["id"] + "/" + scene_name,
               "scene_directory": scene_name, "source_scene_id": scene["source_scene_id"], "leakage_group_id": family, "source_family_id": family,
-              "split_role": "external_stress" if source["id"] in {"D02", "D03", "D04"} else "external_regression",
+              "split_role": "external_stress" if source["id"] in {"D02", "D04"} else "external_regression",
               "original_split": source.get("original_split", "unknown"), "new_train_val_test_assigned": False,
               "reference_type": source.get("reference_type", "none") if references else "none",
               "dataset_reference_type": source.get("reference_type", "none"), "reference_available": bool(references),
               "reference_semantics": source.get("reference_semantics", "unknown"),
               "evaluation_domain": source.get("evaluation_domain", "focus_stacking"),
-              "frame_role": "exposure" if source.get("layout") == "exposure_stacks" else "focal",
+              "frame_role": "focal",
               "format": {"container": "TIFF", "dtype": "float32", "channels": "RGB", "layout": "HWC", "color_space": "linear-sRGB",
-                         "compression": "lossless deflate", "registration": "none", "resize": "none", "focus_order": "natural source filename order; physical order requires capture metadata"},
+                         "compression": "lossless deflate", "registration": "none", "resize": "none", "focus_order": focus_order},
               "target_contract_status": "not_calibrated", "reference_independence": "not_verified", "recipe": recipe,
               "recipe_sha256": recipe_hash, "frames": frames, "references": references,
               "source_primary_url": source.get("primary_url"), "rights_evidence": source.get("rights_evidence", "unknown")}
@@ -414,9 +431,11 @@ def convert_scene(root, source, scene, recipe, recipe_hash, reserve, workers=2):
     return record
 
 
-def update_index(root):
+def update_index(root, source_ids):
     manifests = []
     for dataset_path in sorted((root / "standardized").glob("*/dataset.json")):
+        if dataset_path.parent.name not in source_ids:
+            continue
         dataset = json.loads(dataset_path.read_text())
         manifests.extend(dataset_path.parent / name / "scene.json" for name in dataset["active_scene_directories"])
     scenes = [json.loads(p.read_text()) for p in manifests]
@@ -498,38 +517,18 @@ def main(argv=None):
         for source in lock["datasets"]:
             if overrides.get(source["id"], {}).get("provider") == "disabled":
                 source.update(status="disabled", files=[], reason=overrides[source["id"]].get("reason", "Disabled by configuration"))
-            for key in ["layout", "transfer", "conversion_inputs", "conversion_priority", "evaluation_domain"]:
+            for key in ["layout", "transfer", "conversion_priority", "evaluation_domain"]:
                 if key in overrides.get(source["id"], {}):
                     source[key] = overrides[source["id"]][key]
         reserve = int(args.reserve_gib * 1024**3)
         if selected - {x["id"] for x in lock["datasets"]}:
             parser.error("Unknown dataset IDs")
         reports = []
-        plan_path = args.root / METADATA / "state/download-plan.json"
-        planned = None
-        if plan_path.exists():
-            planned = {d["id"]: set(d["selected_paths"]) for d in json.loads(plan_path.read_text())["datasets"]}
-        elif defaults.get("max_download_bytes") is not None and any(d["id"] in overrides for d in lock["datasets"]):
-            raise RuntimeError("Download plan missing; run bokehforge data download before bokehforge data process")
         for source in sorted(lock["datasets"], key=lambda x: (x.get("conversion_priority", 10), x["id"])):
             if selected and source["id"] not in selected:
                 continue
             record = {"id": source["id"], "status": source["status"], "scenes": 0, "frames": 0, "quarantined": 0, "errors": []}
             active_scenes = []
-            if planned is not None and source["status"] == "available":
-                paths = planned.get(source["id"], set())
-                if paths - {x["path"] for x in source["files"]}:
-                    raise RuntimeError(f"Download plan contains unlocked paths for {source['id']}")
-                source = {**source, "files": [x for x in source["files"] if x["path"] in paths]}
-                if not source["files"]:
-                    record.update(status="budget_excluded", reason="No complete source unit selected within configured budget")
-                    reports.append(record)
-                    if not args.inventory_only:
-                        retire_obsolete(args.root, source["id"], [])
-                        save_json(args.root / "standardized" / source["id"] / "dataset.json", {"schema_version": 1,
-                                  "dataset_id": source["id"], "status": "budget_excluded", "active_scene_directories": [],
-                                  "scene_count": 0, "frame_count": 0, "quarantined": 0})
-                    continue
             if source["status"] != "available":
                 record["reason"] = source.get("reason", "Source unavailable")
                 if source["status"] == "disabled" and not args.inventory_only:
@@ -572,9 +571,9 @@ def main(argv=None):
                           "scene_count": record["scenes"], "frame_count": record["frames"], "quarantined": record["quarantined"]})
             save_json(args.root / METADATA / "reports/process-report.json", {"schema_version": 1, "datasets": reports})
         if not args.inventory_only:
-            update_index(args.root)
+            update_index(args.root, {d["id"] for d in lock["datasets"]})
         save_json(args.root / METADATA / "reports/process-report.json", {"schema_version": 1, "datasets": reports})
-        return 0 if all(x["status"] in {"complete", "inventoried", "budget_excluded", "disabled"} for x in reports) else 2
+        return 0 if all(x["status"] in {"complete", "inventoried", "disabled"} for x in reports) else 2
 
 
 if __name__ == "__main__":

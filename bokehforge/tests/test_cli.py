@@ -10,7 +10,7 @@ import pytest
 @pytest.mark.parametrize("arguments,expected", [
     (["--help"], ["bokehforge", "data"]),
     (["data", "--help"], ["download", "process"]),
-    (["data", "download", "--help"], ["bokehforge data download", "--max-download-gib", "--dataset"]),
+    (["data", "download", "--help"], ["bokehforge data download", "--dataset"]),
     (["data", "process", "--help"], ["bokehforge data process", "--inventory-only", "--dataset"]),
 ])
 def test_cli_exposes_data_commands(arguments, expected):
@@ -41,12 +41,14 @@ def test_default_source_config_works_outside_repository(tmp_path):
     executable = Path(sys.executable).with_name("bokehforge")
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
-    lock = tmp_path / "sources.lock.json"
-    result = subprocess.run([str(executable), "data", "download", "--dataset", "D01", "--resolve-only",
-        "--root", str(tmp_path / "data"), "--lock", str(lock)], cwd=tmp_path, env=environment,
+    lock = Path(__file__).resolve().parents[1] / "config/data/sources.lock.json"
+    result = subprocess.run([str(executable), "data", "download", "--dataset", "D29", "--resolve-only",
+        "--root", str(tmp_path / "data")], cwd=tmp_path, env=environment,
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
-    assert json.loads(lock.read_text())["datasets"][0]["status"] == "disabled"
+    source = next(d for d in json.loads(lock.read_text())["datasets"] if d["id"] == "D29")
+    assert source["status"] == "available"
+    assert source["layout"] == "infinigen_defocus"
 
 
 def test_nested_project_runs_from_repository_root():

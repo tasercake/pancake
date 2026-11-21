@@ -62,20 +62,20 @@ The [dataset review](../04-datasets/dataset-review.md) audits existing sources a
 - Real long photographic stacks for natural blur, geometry, sensor behavior and long-stack scaling.
 - Controlled physical targets for hairs/lines, depth edges, color, highlights, noise and coverage tests.
 - Analytic and physically rendered scenes for explicit target geometry and localized error truth.
-- Short-pair/light-field and existing quality datasets for compatibility and supplementary qualification.
+- Short-pair datasets for compatibility and supplementary qualification.
 - A separate representative field test and deliberately difficult challenge suite.
 
 The initial acquisition shortlist is:
 
 | Role | Candidate | Intake conditions |
 |---|---|---|
-| Real photographic RAW development | [LSFD / FocusDeep](https://github.com/araujoalexandre/FocusStackingDataset): 94 reported 30-frame bursts | Clarify dataset terms, inspect archive and related scenes, preserve original test role, audit incomplete focal coverage and Helicon pseudo-targets. |
 | Long-stack scaling and alignment | [Sood macro sweep](https://huggingface.co/datasets/jjjsood/focus-stack-sample): 999 listed CR3 files plus TIFF derivatives, one scene | Creator states CC BY 4.0; verify acquired bytes and decode. TIFFs are 8-bit sRGB. Prefix subsets change focal range and are not matched-coverage length tests. |
-| High-magnification/material challenge | [Amber mite](https://doi.org/10.6084/m9.figshare.14707077.v1) and [amber spider](https://doi.org/10.6084/m9.figshare.30771638.v1) optical stacks | CC BY 4.0 metadata; inspect ZIP interiors, duplicate uploads, specimen ancestry and prior processing. Do not use confocal data or existing fused JPEGs as exact optical references. |
-| Exposure and high-resolution regression | EDMF, HRMFF and UHD-MFF, audited in the catalogue | Retain paired scope and terms. EDMF currently lists 950 matched IDs, with missing A counterparts for IDs 543–592; these are not yet decoded quality-approved pairs. |
+| High-magnification/material challenge | [Amber spider](https://doi.org/10.6084/m9.figshare.30771638.v1) optical stacks | CC BY 4.0 metadata; inspect ZIP interiors, duplicate uploads, specimen ancestry and prior processing. Do not use confocal data or existing fused JPEGs as exact optical references. |
+| Exposure and high-resolution regression | EDMF and HRMFF, audited in the catalogue | Retain paired scope and terms. EDMF currently lists 950 matched IDs, with missing A counterparts for IDs 543–592; these are not yet decoded quality-approved pairs. |
+| Synthetic reference regression | InfinigenDefocus | Keep five apertures separate and group related views by scene seed. Compare to the provider all-in-focus render. |
 | Measurement truth and missing cases | Newly generated analytic/physical-render scenes and newly captured controlled targets | Proposed acquisition, not existing data. Supply known geometry, visibility, coded detail, radiometric calibration, repeated captures and fresh held-out families. |
 
-The [28-record catalogue](../04-datasets/dataset-catalogue.csv) includes additional phone, light-field, microscopy, synthetic and subjective-rating leads. Its access and rights evidence is per source. No image archive was acquired during this review; remote file listings and creator checksums have not been verified against image bytes.
+The [eight-source catalogue](../04-datasets/dataset-catalogue.csv) records access, rights, and reference limits for each active source.
 
 Short pairs do not replace 100-frame macro scenes. One 999-frame sweep is one scene group. A software-computed reference does not become exact because the input is RAW. Microscopy image formation and real transparent layers require their own applicability labels.
 

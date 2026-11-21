@@ -4,11 +4,11 @@ Status: **proposed**. No images or archives were acquired here; small source met
 
 ## 1. First intake tranche
 
-Start with Sood's explicitly licensed CR3 stack and the two explicitly licensed Figshare optical-stack releases. Fetch immutable revisions/files, verify provider hashes, decode representative endpoints/middle frames, then inventory all images. The complete Sood RAW sweep is creator-estimated 8.4 GB; TIFFs about 25 GB, so its RAW data is the useful precision source. Use the [remote file manifest](hf-999-file-manifest.csv) to select paths; it is not proof that image bytes were already verified.
+Start with Sood's explicitly licensed CR3 stack and the licensed amber spider optical stacks. Fetch immutable revisions/files, verify provider hashes, decode representative endpoints/middle frames, then inventory all images. The complete Sood RAW sweep is creator-estimated 8.4 GB; TIFFs about 25 GB, so its RAW data is the useful precision source. Use the [remote file manifest](hf-999-file-manifest.csv) to select paths; it is not proof that image bytes were already verified.
 
 Confirm focal order, actual focal coverage, clipping, motion and optical/material mode. Retain RAW, original JPEG/TIFF, all EXIF and untouched provider archives. Identify duplicated spider ZIPs before extraction. Keep confocal CZI separate from ordinary optical focus stacks. Record amber-piece/specimen links and distinguish existing fused outputs from independent references.
 
-Next, resolve LSFD's image-use terms and acquire its original archive when storage is available. Preserve original train/test IDs, reference provenance, native RAW and registered derivatives. Do not train against the pseudo-target as though it were exact. Then intake EDMF and high-resolution pairs for targeted regression, applying the saved missing-pair audit. Learn2Refocus and LearnAF are optional expansion tranches after access/terms/size checks.
+Intake EDMF and HRMFF for targeted regression. Apply the saved EDMF missing-pair audit. Add InfinigenDefocus for controlled synthetic RGB-reference tests. Preserve the source archive and group all apertures and views derived from each scene seed.
 
 No author contact, access-gate agreement, image publication or license acceptance was performed by this review. Unresolved terms are acquisition tasks, not a reason to fabricate a cleared dataset.
 

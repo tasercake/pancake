@@ -96,42 +96,7 @@ def natural_key(value):
     return [int(x) if x.isdigit() else x.casefold() for x in re.split(r"(\d+)", value)]
 
 
-def parse_drive_listing(html):
-    from bs4 import BeautifulSoup
-    soup = BeautifulSoup(html, "html.parser")
-    records = []
-    for node in soup.select(".flip-entry"):
-        anchor, title = node.find("a", href=True), node.select_one(".flip-entry-title")
-        if not anchor or not title:
-            raise RuntimeError("Incomplete public Drive folder entry")
-        records.append({"id": node["id"].removeprefix("entry-"), "name": title.get_text(),
-                        "folder": "/folders/" in anchor["href"]})
-    return records
-
-
-def drive_listing(client, folder_id, prefix="", seen=None):
-    seen = set() if seen is None else seen
-    if folder_id in seen:
-        raise RuntimeError("Drive folder cycle or repeated folder identity")
-    seen.add(folder_id)
-    response = client.get(f"https://drive.google.com/embeddedfolderview?id={folder_id}", timeout=(20, 90))
-    response.raise_for_status()
-    if len(response.content) > 16 * 1024 * 1024 or "</html>" not in response.text.lower():
-        raise RuntimeError("Public Drive folder response is incomplete or too large")
-    entries = parse_drive_listing(response.text)
-    if not entries:
-        raise RuntimeError("Public Drive folder is empty or requires access")
-    files = []
-    for item in entries:
-        path = prefix + item["name"]
-        if item["folder"]:
-            files.extend(drive_listing(client, item["id"], path + "/", seen))
-        else:
-            files.append({"path": path, "drive_id": item["id"], "size": None, "sha256": None})
-    return files
-
-
-def resolve_source(client, source, config_dir):
+def resolve_source(client, source):
     result = dict(source)
     provider = source.get("provider", "unavailable")
     if provider in {"unavailable", "disabled"}:
@@ -175,18 +140,6 @@ def resolve_source(client, source, config_dir):
         result["revision"] = str(metadata["version"])
     elif provider == "files":
         files = source["files"]
-    elif provider == "drive_folder":
-        files = drive_listing(client, source["folder_id"])
-    elif provider == "page_links":
-        from bs4 import BeautifulSoup
-        from urllib.parse import urljoin
-        response = client.get(source["page_url"], timeout=(20, 90)); response.raise_for_status()
-        links = sorted({urljoin(response.url, a["href"]) for a in BeautifulSoup(response.text, "html.parser").find_all("a", href=True)
-                        if re.search(source["link_pattern"], a["href"], re.I)})
-        if not links:
-            raise RuntimeError("No public source archive links found on provider page")
-        for url in links:
-            files.append({"path": Path(urlparse(url).path).name, "url": url, "size": None, "sha256": None})
     else:
         raise ValueError(f"Unknown provider {provider}")
     if not files:
@@ -214,85 +167,6 @@ def check_space(path, needed, reserve):
     free = shutil.disk_usage(path).free
     if free < needed + reserve:
         raise RuntimeError(f"Insufficient disk space: need {needed + reserve:,} bytes including reserve; {free:,} free")
-
-
-def build_download_plan(lock, configured, cap):
-    """Select complete source units before downloading any payload bytes."""
-    policies = {x["id"]: x for x in configured.get("datasets", [])}
-    remaining = cap
-    records = []
-    ordered = sorted(lock["datasets"], key=lambda d: policies.get(d["id"], {}).get("acquisition_priority", 10))
-    for source in ordered:
-        policy = policies.get(source["id"], {})
-        record = {"id": source["id"], "selected_paths": [], "selected_bytes": 0, "excluded_groups": []}
-        inputs = [x for x in source["files"] if not policy.get("acquisition_inputs")
-                  or any(fnmatch.fnmatch(x["path"], p) for p in policy["acquisition_inputs"])]
-        groups = [[x] for x in inputs] if source.get("provider") == "figshare" else ([inputs] if inputs else [])
-        local_remaining = policy.get("acquisition_max_bytes", cap)
-        if source["status"] != "available":
-            record["reason"] = source.get("reason", "Source unavailable")
-        for group in groups:
-            allowance = min(remaining, local_remaining)
-            known_size = sum(x.get("size") or 0 for x in group)
-            reason = None
-            if max(known_size, policy.get("acquisition_min_bytes", 0)) > allowance:
-                reason = "Complete source unit exceeds remaining download budget"
-            else:
-                try:
-                    for item in group:
-                        if item.get("size") is None:
-                            with session() as client:
-                                url = drive_url(client, item["drive_id"]) if item.get("drive_id") else item["url"]
-                                with client.get(url, stream=True, headers={"Accept-Encoding": "identity"}, timeout=(20, 60)) as response:
-                                    response.raise_for_status()
-                                    if "text/html" in response.headers.get("Content-Type", "") or not response.headers.get("Content-Length"):
-                                        raise RuntimeError("Cannot establish source byte size without downloading payload")
-                                    item["size"] = int(response.headers["Content-Length"])
-                            known_size = sum(x.get("size") or 0 for x in group)
-                            if known_size > allowance:
-                                break
-                    if any(x.get("size") is None for x in group) or known_size > allowance:
-                        reason = "Complete source unit exceeds remaining download budget"
-                except Exception as exc:
-                    reason = "Source size unresolved: " + str(exc)
-            if reason:
-                record["excluded_groups"].append({"file_count": len(group), "known_bytes": known_size, "reason": reason})
-                continue
-            record["selected_paths"].extend(x["path"] for x in group)
-            record["selected_bytes"] += known_size
-            remaining -= known_size
-            local_remaining -= known_size
-        records.append(record)
-    return {"schema_version": 1, "max_download_bytes": cap, "selected_bytes": cap - remaining,
-            "budget_semantics": "Unique native payload bytes; archives stay intact; metadata and retry traffic are additional",
-            "datasets": records}
-
-
-def reconcile_cache(root, lock, plan):
-    """Move previous out-of-plan artifacts to reversible cache; never delete data."""
-    chosen = {d["id"]: set(d["selected_paths"]) for d in plan["datasets"]}
-    for source in lock["datasets"]:
-        for item in source["files"]:
-            active = safe_path(root / "raw" / source["id"], item["path"])
-            cached = safe_path(root / METADATA / "cache/raw" / source["id"], item["path"])
-            selected = item["path"] in chosen[source["id"]]
-            for suffix in ["", ".part"]:
-                origin, destination = ((cached, active) if selected else (active, cached))
-                origin, destination = origin.with_name(origin.name + suffix), destination.with_name(destination.name + suffix)
-                if origin.is_file() and not destination.exists():
-                    destination.parent.mkdir(parents=True, exist_ok=True)
-                    origin.rename(destination)
-                elif not selected and origin.is_file():
-                    alternate = destination.with_name(destination.name + "-" + digest(origin)[:16])
-                    if not alternate.exists():
-                        origin.rename(alternate)
-        if not chosen[source["id"]]:
-            manifest = root / "raw" / source["id"] / "download-manifest.json"
-            if manifest.is_file():
-                target = root / METADATA / "cache/manifests" / (source["id"] + "-" + digest(manifest)[:16] + ".json")
-                target.parent.mkdir(parents=True, exist_ok=True)
-                if not target.exists():
-                    manifest.rename(target)
 
 
 def acquire(client, target, item, reserve, retries):
@@ -370,7 +244,6 @@ def main(argv=None):
     parser.add_argument("--resolve-only", action="store_true")
     parser.add_argument("--refresh-lock", action="store_true", help="Explicitly resolve a new upstream snapshot")
     parser.add_argument("--reserve-gib", type=float)
-    parser.add_argument("--max-download-gib", type=float, help="Override total unique native payload budget")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--retries", type=int, default=3)
     parser.add_argument("--probe-url", help="Record a public endpoint response for source discovery; never download a full binary body")
@@ -381,8 +254,7 @@ def main(argv=None):
     defaults = configured.get("defaults", {})
     args.root = args.root or (args.config.parent / defaults.get("data_root", "."))
     args.reserve_gib = args.reserve_gib if args.reserve_gib is not None else defaults.get("reserve_gib", 15)
-    cap = int(args.max_download_gib * 1024**3) if args.max_download_gib is not None else defaults.get("max_download_bytes", 2**63 - 1)
-    if args.workers < 1 or args.retries < 1 or args.reserve_gib < 0 or cap < 0:
+    if args.workers < 1 or args.retries < 1 or args.reserve_gib < 0:
         parser.error("workers/retries must be positive and reserve must be nonnegative")
     selected = set(args.dataset or [])
     args.root = args.root.resolve()
@@ -414,7 +286,7 @@ def main(argv=None):
                 continue
             try:
                 with session() as client:
-                    resolved = resolve_source(client, source, args.config.parent)
+                    resolved = resolve_source(client, source)
             except Exception as exc:
                 reason = re.sub(r"&uuid=[^&\s:]+", "&uuid=<ephemeral>", str(exc))
                 resolved = {**source, "status": "resolve_failed", "reason": reason, "files": []}
@@ -426,11 +298,6 @@ def main(argv=None):
             parser.error(f"Unknown dataset IDs: {sorted(selected - available_ids)}")
         if args.resolve_only:
             return 0 if all(d["status"] in {"available", "disabled"} for d in lock["datasets"] if not selected or d["id"] in selected) else 2
-        plan = build_download_plan(lock, configured, cap)
-        save_json(args.lock, lock)
-        save_json(args.root / METADATA / "state/download-plan.json", plan)
-        reconcile_cache(args.root, lock, plan)
-        planned = {d["id"]: set(d["selected_paths"]) for d in plan["datasets"]}
         reports = []
         for dataset in lock["datasets"]:
             if selected and dataset["id"] not in selected:
@@ -439,12 +306,7 @@ def main(argv=None):
             if dataset["status"] != "available":
                 record["reason"] = dataset.get("reason", "No public source download route")
                 reports.append(record); continue
-            inputs = [x for x in dataset["files"] if x["path"] in planned[dataset["id"]]]
-            record["source_files"] = len(dataset["files"])
-            record["files"] = len(inputs)
-            if not inputs:
-                record.update(status="budget_excluded", reason="No complete source unit selected within configured budget")
-                reports.append(record); continue
+            inputs = dataset["files"]
             errors = []
             def task(item):
                 target = safe_path(args.root / "raw" / dataset["id"], item["path"])
@@ -465,10 +327,10 @@ def main(argv=None):
             record.update(status="complete" if not errors else "incomplete", verified=len(inputs) - len(errors), errors=sorted(errors, key=lambda x: x["path"]))
             reports.append(record)
             if not errors:
-                save_json(args.root / "raw" / dataset["id"] / "download-manifest.json", {**dataset, "files": inputs, "selection": f"{METADATA}/state/download-plan.json"})
+                save_json(args.root / "raw" / dataset["id"] / "download-manifest.json", dataset)
             save_json(args.root / METADATA / "reports/download-report.json", {"schema_version": 1, "datasets": reports})
         save_json(args.root / METADATA / "reports/download-report.json", {"schema_version": 1, "datasets": reports})
-        return 0 if all(d["status"] in {"complete", "budget_excluded", "disabled"} for d in reports) else 2
+        return 0 if all(d["status"] in {"complete", "disabled"} for d in reports) else 2
 
 
 if __name__ == "__main__":

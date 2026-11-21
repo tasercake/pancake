@@ -41,7 +41,7 @@ class _Tee:
 def data_run(root, action):
     private = root / METADATA
     with exclusive(private / "locks", "data.lock"):
-        for directory in ["logs", "reports", "state", "probes", "work", "cache"]:
+        for directory in ["logs", "reports", "probes", "work"]:
             (private / directory).mkdir(parents=True, exist_ok=True)
         with (private / "logs" / f"{action}.log").open("a", encoding="utf-8", buffering=1) as log:
             log.write(f"\n=== bokehforge data {action} ===\n")

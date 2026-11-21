@@ -108,8 +108,8 @@ def test_disabled_source_never_contacts_old_download_route(tmp_path, origin, fla
     assert source["files"] == []
     assert "url" not in source
     if not flags or "--resolve-only" not in flags:
-        plan = json.loads((tmp_path / "data/.bokehforge/state/download-plan.json").read_text())
-        assert plan["datasets"][0]["selected_paths"] == []
+        report = json.loads((tmp_path / "data/.bokehforge/reports/download-report.json").read_text())
+        assert report["datasets"][0]["status"] == "disabled"
 
 
 def test_verified_rerun_performs_no_network_or_rewrite(tmp_path, origin):
@@ -203,17 +203,6 @@ def test_gzip_drive_confirmation_is_decoded_before_parsing():
         server.shutdown(); thread.join()
 
 
-def test_public_drive_listing_keeps_more_than_fifty_entries():
-    from bokehforge.data import download
-    assert hasattr(download, 'parse_drive_listing'), 'Public Drive listing parser is missing'
-    html='<html><title>near</title>'+''.join(
-        f'<div class="flip-entry" id="entry-file{i}"><a href="https://drive.google.com/file/d/file{i}/view"><div class="flip-entry-title">{i:05d}.png</div></a></div>'
-        for i in range(150))+'</html>'
-    entries=download.parse_drive_listing(html)
-    assert len(entries)==150
-    assert entries[-1]=={'id':'file149','name':'00149.png','folder':False}
-
-
 def test_html_error_page_is_not_accepted_as_archive(tmp_path, origin):
     origin[1]['content_type']='text/html'
     lock=locked_source(tmp_path,origin)
@@ -254,49 +243,6 @@ def test_configuration_controls_default_storage_root(tmp_path,origin):
     result=subprocess.run([*COMMAND,'--config',str(config),'--lock',str(lock),'--resolve-only'],capture_output=True,text=True)
     assert result.returncode==0,result.stdout+result.stderr
     assert (tmp_path/'configured-data/.bokehforge/locks/data.lock').exists()
-
-
-def test_global_budget_excludes_whole_source_and_preserves_cached_originals(tmp_path, origin):
-    lock = locked_source(tmp_path, origin)
-    value = json.loads(lock.read_text())
-    first = value["datasets"][0]
-    other = {**first, "id": "other", "files": [{**first["files"][0]}]}
-    value["datasets"].append(other)
-    lock.write_text(json.dumps(value))
-    size = len(origin[1]["body"])
-    config = tmp_path / "config.json"
-    config.write_text(json.dumps({"defaults": {"max_download_bytes": size}, "datasets": [first, other]}))
-    cached = tmp_path / "data/raw/other/source.bin"
-    cached.parent.mkdir(parents=True)
-    cached.write_bytes(origin[1]["body"])
-    result = subprocess.run([*COMMAND, "--root", str(tmp_path / "data"), "--lock", str(lock),
-                             "--config", str(config), "--reserve-gib", "0"], capture_output=True, text=True)
-    assert result.returncode == 0, result.stdout + result.stderr
-    plan = json.loads((tmp_path / "data/.bokehforge/state/download-plan.json").read_text())
-    assert plan["selected_bytes"] == size
-    assert plan["datasets"][0]["selected_paths"] == ["source.bin"]
-    assert plan["datasets"][1]["selected_paths"] == []
-    assert not cached.exists()
-    assert (tmp_path / "data/.bokehforge/cache/raw/other/source.bin").read_bytes() == origin[1]["body"]
-    assert len(origin[1]["requests"]) == 1
-    configuration = json.loads(config.read_text())
-    configuration["defaults"]["max_download_bytes"] = size * 2
-    config.write_text(json.dumps(configuration))
-    again = subprocess.run([*COMMAND, "--root", str(tmp_path / "data"), "--lock", str(lock),
-                            "--config", str(config), "--reserve-gib", "0"], capture_output=True, text=True)
-    assert again.returncode == 0, again.stdout + again.stderr
-    assert cached.read_bytes() == origin[1]["body"]
-    assert len(origin[1]["requests"]) == 1
-
-
-def test_archive_budget_never_thins_an_archive(tmp_path):
-    from bokehforge.data import download
-    source = {"id": "fixture", "provider": "figshare", "status": "available",
-              "files": [{"path": f"stack-{i}.zip", "size": 60} for i in range(3)]}
-    config = {"datasets": [{"id": "fixture", "acquisition_max_bytes": 100}]}
-    plan = download.build_download_plan({"datasets": [source]}, config, 500)
-    assert plan["selected_bytes"] == 60
-    assert plan["datasets"][0]["selected_paths"] == ["stack-0.zip"]
 
 
 def test_temporary_resolution_failure_is_retried_on_rerun(tmp_path,origin):

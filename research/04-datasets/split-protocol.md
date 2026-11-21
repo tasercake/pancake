@@ -1,6 +1,6 @@
 # Train, validation and test protocol
 
-Status: **proposed design**. No new final corpus or split has been created. Preserve exact retrieved official IDs in [Cervix93-official-split.csv](Cervix93-official-split.csv); this is upstream provenance, not a new macro benchmark split.
+Status: **proposed design**. No new final corpus or split has been created.
 
 ## 1. Unit of assignment
 
@@ -41,17 +41,12 @@ Reserve separate domain holdouts where feasible: a camera/lens family, magnifica
 
 | Dataset | Existing evidence | Proposed handling |
 |---|---|---|
-| LSFD | Original 84 training / 10 test bursts; individual archive IDs not inspected. | Preserve 10 original test bursts for public regression. Derive train/validation from the 84 only after scene/specimen grouping; a nominal 67/17 is illustrative and may be impossible after grouping. Do not invent IDs from paper counts. |
 | Sood 999-frame stack | One scene; HF labels all frame rows `train`. | All frames, CR3/TIFF variants and thinned subsets remain one `external_stress` group. Random-frame splitting is invalid. |
-| Amber microscopy | Repeated specimen views and a duplicate spider ZIP upload. | Group shared specimens/amber piece; remove duplicate content by provider/hash/intake audit. Number of archives is not number of independent specimens. |
-| Lytro/MFFW/MFIFB/HRMFF | Long-used public evaluation scenes, some repackaged. | External regression/challenge. Match ancestry across datasets. Never use one copy for detector tuning and its renamed copy as final test. |
+| Amber spider | Repeated specimen views and a duplicate spider ZIP upload. | Group shared specimens/amber piece; remove duplicate content by provider/hash/intake audit. Number of archives is not number of independent specimens. |
 | EDMF | Paper first 500 train / remaining 500 test; current release missing Source_A IDs 543–592. | Preserve the source's published partition rule. Quarantine missing pairs. Mapping paper row order to numeric filename IDs must be confirmed before claiming exact official assignment. Do not refill missing test cases with training cases. |
-| UHD-MFF-Syn | Paper 1,500 train / 300 test; Drive folder structure verified. | Keep test untouched. Form validation only inside training after UHD-LL source-image ancestry audit. Real subset remains an external generalization panel unless independently allocated before use. |
-| LearnAF / Learn2Refocus | Released readme 351/47 sweeps for LearnAF; paper 1,474/163 for Learn2Refocus. | Preserve source versions/split files. Group all phone views and repeated captures/objects. Resolve count/access/terms differences before intake. |
 | FoD500 | Author first 400/remaining 100 split. | Preserve original split, then audit mesh/texture/HDRI sharing. An official sample split is not proof of asset-disjointness. |
-| DDFF12 | DFV authors explicitly report physical-scene overlap in original train/validation. | Preserve original labels as provenance but use a separately named scene-disjoint partition. Do not present both protocols as interchangeable. |
-| Cervix93 | Exact source labels supply 69 training / 24 test FOVs. | Preserve IDs, then audit patient/slide independence. Any validation comes only from source training groups. Pixel/point labels do not resolve patient ancestry. |
-| HCI/Konstanz | Official stratified/train/test/additional scene classes. | Preserve hidden official test data. Refocus variants and reused assets remain grouped. Pin post-fix dataset release. |
+| HRMFF | 20 high-resolution pairs in the author tree. | Use for external regression. Audit capture ancestry before reassigning paired images. |
+| InfinigenDefocus | Five apertures per rendered view. The release is labeled train. | Keep views and apertures that share a scene seed together. Audit shared assets before assigning new splits. |
 
 ## 5. Pretrained-model exposure and test access
 
