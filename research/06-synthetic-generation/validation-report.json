@@ -1,0 +1,43 @@
+{
+  "checked_on": "2026-11-17",
+  "scope": "Structural research-artifact validation only; not scientific, optical or runtime validation",
+  "status": "passed",
+  "source_ledger_counts": {
+    "motion-sources.json": 12,
+    "optics-sources.json": 16,
+    "prior-art-sources.json": 23,
+    "procedural-sources.json": 20,
+    "validation-sources.json": 4
+  },
+  "source_records": 75,
+  "unique_primary_urls": 73,
+  "source_ids_unique": true,
+  "undated_living_documentation_records": [
+    "O02",
+    "O04"
+  ],
+  "source_index_rows": 75,
+  "local_links_checked": 36,
+  "markdown_anchors_checked": 6,
+  "external_links_distinct": 82,
+  "external_link_check": "Not batch re-fetched; individual source inspection and access limits are recorded in ledgers",
+  "cross_review": "Optics and motion agents reviewed pipeline and validation proposals; continuous-domain ambiguity, CFA order, alignment limits and ideal-camera assumptions corrected",
+  "experiments_run": [],
+  "errors": [],
+  "artifact_sha256": {
+    "README.md": "cd0db1e3dd922d38f3c465f384ba86b2cf28f23103064fd8f07094790112ac57",
+    "datasets-and-prior-art.md": "d5f26aff13e315b91cdd878bcfc27712758a2f5702d311e626d6640aee946fa1",
+    "motion-and-imperfections.md": "8d5748c3b7000d3bb77bf8abf9bf93386c8ba24cb699d58d3addb40fe7cbea72",
+    "motion-sources.json": "ff9b93fbfa4848ec7102ca94a2f5b0293a9e6a8a7e0167fc781e37d87d990712",
+    "optics-and-renderers.md": "14c888544a37f08b6050e5f86e11d6bf236093a5572e5372976ea7b73d901062",
+    "optics-sources.json": "43609682fda81ba98eccd237351ef21a81e43108bdecb98ec90c4dedc2b9d7b8",
+    "pipeline-design.md": "b490adbfaf37e96ac8855d70df6593fe910924a1b7269c8c15c236ef23fc8fd8",
+    "prior-art-sources.json": "6f6da1b869eea50ee0be0b883ea6d624064a95cd1092f22ac3dc6cfb4119b9eb",
+    "procedural-scenes-and-sensors.md": "f8a879696ca441ac276cd6a4f9cc35b54ed6125c9276df91a4b222bacc28cd02",
+    "procedural-sources.json": "ea752ac05b658315f2582a2950fd6cee06cfd3e3befc5be3781a547c6cbd5ae8",
+    "review-method.md": "5cb65204822c23ff7484a3b72d5dcac3ae9213f466d4dbd575b7eb1bece6e730",
+    "source-index.csv": "446b4547bd5255c2fb31a65f9b33b74ab71aab1f4153cf355f816023852ff89c",
+    "validation-and-evaluation.md": "170bc808e861038f6ccc6a99fc2500dd67567bb8279d20fb540ae343c52d972a",
+    "validation-sources.json": "809ef5af82b4caf3c02f7ce214635dead32f37c121a444da84a2d678ee70684e"
+  }
+}

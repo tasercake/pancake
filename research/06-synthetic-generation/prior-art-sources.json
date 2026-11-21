@@ -1,0 +1,250 @@
+{
+  "research_date": "2026-11-17",
+  "scope": "Synthetic focus-stack generation and adjacent prior art",
+  "status": "literature/static source review only; no renderer or datasets executed",
+  "sources": [
+    {
+      "id": "PA01",
+      "title": "Zero-Shot Depth from Defocus",
+      "year": 2026,
+      "publication_status": "published repository labels ECCV 2026 Spotlight; arXiv v2 inspected",
+      "url": "https://arxiv.org/html/2603.26658v2",
+      "evidence_inspected": "Full HTML: training synthesis, A2, A4, limitations",
+      "limits": "No images decoded; macro validity and radiometric bounds not established."
+    },
+    {
+      "id": "PA02",
+      "title": "Infinigen Defocus author release",
+      "year": 2026,
+      "publication_status": "dataset",
+      "url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus/tree/79aadc918e7a96a1544f324fc675a4734649455e",
+      "evidence_inspected": "README, LICENSE and remote file listing",
+      "limits": "ZIP content not inspected; HF auto-viewer row count is not a scene count."
+    },
+    {
+      "id": "PA03",
+      "title": "FOSSA official code",
+      "year": 2026,
+      "publication_status": "code",
+      "url": "https://github.com/princeton-vl/FOSSA/tree/97ed839fd74c1d785fa7855fb7c2cedc4d0e6182",
+      "evidence_inspected": "README, LICENSE, recursive tree, util/render.py, dataset/base.py",
+      "limits": "Static inspection only; modified Infinigen generator not established."
+    },
+    {
+      "id": "PA04",
+      "title": "Focus on Defocus official release",
+      "year": 2020,
+      "publication_status": "CVPR 2020 code/data page",
+      "url": "https://github.com/dvl-tum/defocus-net/tree/418601f5f8f9cb37477e5d71923b68bcaf744edd",
+      "evidence_inspected": "README, repository metadata/tree",
+      "limits": "Linked Blender file and image archive not downloaded; asset terms unverified."
+    },
+    {
+      "id": "PA05",
+      "title": "Fully Self-Supervised Depth Estimation from Defocus Clue / DEReD",
+      "year": 2023,
+      "publication_status": "author project page",
+      "url": "https://sihaozhe.work/DEReD/",
+      "evidence_inspected": "Dataset and experimental descriptions",
+      "limits": "Page redirect changes displayed title; regenerated version differs from original FoD500."
+    },
+    {
+      "id": "PA06",
+      "title": "Addressing the Depth-of-Field Constraint: A New Paradigm for High Resolution Multi-Focus Image Fusion",
+      "year": 2025,
+      "publication_status": "arXiv preprint v1",
+      "url": "https://arxiv.org/html/2510.19581v1",
+      "evidence_inspected": "Full HTML generation algorithm and dataset paragraphs",
+      "limits": "No complete generator/asset release verified."
+    },
+    {
+      "id": "PA07",
+      "title": "Hybrid All-in-Focus Imaging From Neuromorphic Focal Stack",
+      "year": 2024,
+      "publication_status": "TPAMI 46(12), DOI 10.1109/TPAMI.2024.3433607",
+      "url": "https://www.jdl.link/doc/2011/20241219_Hybrid_All-in-Focus_Imaging_From_Neuromorphic_Focal_Stack.pdf",
+      "evidence_inspected": "Author-hosted PDF implementation section; PubMed bibliographic record",
+      "limits": "Not a verified licensed generator release; temporal scene motion not established."
+    },
+    {
+      "id": "PA08",
+      "title": "Finite Aperture Stereo",
+      "year": 2022,
+      "publication_status": "IJCV",
+      "url": "https://doi.org/10.1007/s11263-022-01658-w",
+      "evidence_inspected": "Primary indexed paper dataset-generation section; official download terms",
+      "limits": "No archive or generation scene inspected."
+    },
+    {
+      "id": "PA09",
+      "title": "Finite Aperture Stereo dataset release",
+      "year": 2022,
+      "publication_status": "author institution dataset page",
+      "url": "https://www.cvssp.org/data/fas_data/",
+      "evidence_inspected": "Download landing page and explicit noncommercial research terms",
+      "limits": "No acceptance/download performed."
+    },
+    {
+      "id": "PA10",
+      "title": "Realistic Compound-Lens Defocus Blur Synthesis",
+      "year": 2026,
+      "publication_status": "arXiv preprint v1",
+      "url": "https://arxiv.org/html/2607.05837v1",
+      "evidence_inspected": "Full HTML, scene synthesis, limitations and supplementary ISP sections",
+      "limits": "No experimental reproduction; estimated/inpainted scene data."
+    },
+    {
+      "id": "PA11",
+      "title": "CLDefocus official code and synthesis instructions",
+      "year": 2026,
+      "publication_status": "code",
+      "url": "https://github.com/lykelee/CLDefocus/tree/06713044b693bc34fe635d26965916e447ee7ce1",
+      "evidence_inspected": "README, datasyn/README.md, recursive tree, layered/scene.py",
+      "limits": "Image release withheld by current README pending redistribution clarification; not executed."
+    },
+    {
+      "id": "PA12",
+      "title": "BokehMe: When Neural Rendering Meets Classical Rendering",
+      "year": 2022,
+      "publication_status": "CVPR 2022",
+      "url": "https://openaccess.thecvf.com/content/CVPR2022/papers/Peng_BokehMe_When_Neural_Rendering_Meets_Classical_Rendering_CVPR_2022_paper.pdf",
+      "evidence_inspected": "Original PDF implementation and training/test descriptions",
+      "limits": "Paper claims not reproduced."
+    },
+    {
+      "id": "PA13",
+      "title": "BokehMe official repository and BLB instructions",
+      "year": 2022,
+      "publication_status": "code/data page",
+      "url": "https://github.com/JuewenPeng/BokehMe/tree/8b3ed556dc146207c9bb39fccd078a113f8d1bd8",
+      "evidence_inspected": "README, license metadata",
+      "limits": "BLB image archive and upstream asset terms not inspected."
+    },
+    {
+      "id": "PA14",
+      "title": "MPIB: An MPI-Based Bokeh Rendering Framework for Realistic Partial Occlusion Effects",
+      "year": 2022,
+      "publication_status": "arXiv abstract",
+      "url": "https://arxiv.org/abs/2207.08403",
+      "evidence_inspected": "Primary abstract only",
+      "limits": "Full method/code not audited."
+    },
+    {
+      "id": "PA15",
+      "title": "Dr.Bokeh: DiffeRentiable Occlusion-aware Bokeh Rendering",
+      "year": 2024,
+      "publication_status": "CVPR 2024; project retains 2023 preprint citation",
+      "url": "https://shengcn.github.io/DrBokeh/",
+      "evidence_inspected": "Author project abstract and repo tree/metadata",
+      "limits": "No full methods audit; no recognized license in checked repo metadata."
+    },
+    {
+      "id": "PA16",
+      "title": "SYNDOF official generator",
+      "year": 2019,
+      "publication_status": "CVPR 2019 code",
+      "url": "https://github.com/codeslake/SYNDOF/tree/7215b1faa5282ea9bc370357ca40b2109d6976ee",
+      "evidence_inspected": "README and license metadata",
+      "limits": "No MATLAB execution; upstream data rights separate."
+    },
+    {
+      "id": "PA17",
+      "title": "Simulating Dual-Pixel Images From Ray Tracing For Depth Estimation",
+      "year": 2025,
+      "publication_status": "arXiv full HTML",
+      "url": "https://arxiv.org/html/2503.11213",
+      "evidence_inspected": "Methods, experiments and supplementary DP119 acquisition details",
+      "limits": "No simulator execution or dataset intake; full-scene visibility not established."
+    },
+    {
+      "id": "PA18",
+      "title": "AnyBokeh: Physics-Guided Any-to-Any Bokeh Editing with Optical Fingerprint Transfer",
+      "year": 2026,
+      "publication_status": "arXiv v1; author repo labels NeurIPS 2026",
+      "url": "https://arxiv.org/html/2606.31959v1",
+      "evidence_inspected": "Full HTML, dataset section and CoC assumptions",
+      "limits": "Renderer internals and macro fidelity unverified."
+    },
+    {
+      "id": "PA19",
+      "title": "UnrealBokeh author dataset release",
+      "year": 2026,
+      "publication_status": "dataset",
+      "url": "https://huggingface.co/datasets/itsmag11/UnrealBokeh/tree/ec1d6d66337be006c9de1f57cb4b8d32551860ac",
+      "evidence_inspected": "README file layout, counts and academic-research terms",
+      "limits": "Archives not decoded; current 78-view release differs from paper 71-setup description."
+    },
+    {
+      "id": "PA20",
+      "title": "AnyBokeh official repository",
+      "year": 2026,
+      "publication_status": "code",
+      "url": "https://github.com/itsmag11/AnyBokeh/tree/1a38ec9beeee1bfdd47f4cab40b07ec2d2ebd94a",
+      "evidence_inspected": "README, LICENSE, metadata",
+      "limits": "S-Lab noncommercial terms; model dependencies separate; not executed."
+    },
+    {
+      "id": "PA21",
+      "title": "The RealDefocus Benchmark for Defocus Deblurring",
+      "year": 2026,
+      "publication_status": "arXiv v1",
+      "url": "https://arxiv.org/html/2607.21078v1",
+      "evidence_inspected": "Full HTML dataset construction and protocol",
+      "limits": "Actual release resolution and image rights not audited."
+    },
+    {
+      "id": "PA22",
+      "title": "RealDefocus Benchmark official repository",
+      "year": 2026,
+      "publication_status": "code placeholder",
+      "url": "https://github.com/TimSeizinger/RealDefocus-Benchmark/tree/b3e948be700dc56831a7940ea2b980850201af91",
+      "evidence_inspected": "README and metadata",
+      "limits": "Minimal README at inspected revision; no complete execution pipeline verified."
+    },
+    {
+      "id": "PA23",
+      "title": "BokehDiff: Neural Lens Blur with One-Step Diffusion official code",
+      "year": 2025,
+      "publication_status": "ICCV 2025",
+      "url": "https://github.com/FreeButUselessSoul/bokehdiff/tree/38ff9372ab146ab20468832a0424fa0b2888dffd",
+      "evidence_inspected": "README, recursive tree; proceedings abstract indexed",
+      "limits": "Model/data licenses need full downstream audit; not a factual truth oracle."
+    }
+  ],
+  "release_audits": {
+    "infinigen_defocus": {
+      "hf_revision": "79aadc918e7a96a1544f324fc675a4734649455e",
+      "archive": "InfinigenDefocus.zip",
+      "listed_bytes": 9092311161,
+      "license_inspected": "BSD-3-Clause",
+      "archive_downloaded": false
+    },
+    "unrealbokeh": {
+      "hf_revision": "ec1d6d66337be006c9de1f57cb4b8d32551860ac",
+      "terms": "academic research; environment assets remain creator property",
+      "archive_downloaded": false
+    },
+    "cldefocus": {
+      "code_revision": "06713044b693bc34fe635d26965916e447ee7ce1",
+      "code_license": "MIT",
+      "image_release_status": "README says withheld pending redistribution terms",
+      "executed": false
+    }
+  },
+  "search_topics": [
+    "synthetic focal stack all-in-focus Blender 2025 2026",
+    "multi-focus fusion procedural datasets",
+    "depth from focus defocus RGBD synthetic generation",
+    "compound lens defocus dataset occlusion",
+    "bokeh rendering partial occlusion layered MPI",
+    "ray traced dual pixel simulator dataset",
+    "real defocus deblurring reference quality"
+  ],
+  "not_deeply_reviewed_leads": [
+    {
+      "title": "InFlux++: Real and Synthetic Data for Estimating Dynamic Camera Intrinsics",
+      "url": "https://arxiv.org/abs/2607.05389",
+      "reason": "Routed to parent for dynamic-camera/procedural review."
+    }
+  ]
+}

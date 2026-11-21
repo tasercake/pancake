@@ -1,0 +1,159 @@
+{
+  "research_date": "2026-11-17",
+  "scope": "Dynamic focus stacking, temporal ground-truth contracts, acquisition motion and stretch-goal degradations",
+  "experimental_status": "Literature/code inspection only; no renders, archive intake, algorithms or metrics executed",
+  "sources": [
+    {
+      "id": "M01",
+      "title": "A defocus and similarity attention-based cascaded network for multi-focus and misaligned image fusion / WHU-MFM",
+      "authors": "Peiming Chen, Jiaqin Jiang, Li Li, Jian Yao",
+      "year": 2024,
+      "status": "Published, Information Fusion 103, 102125",
+      "url": "https://doi.org/10.1016/j.inffus.2023.102125",
+      "additional_urls": [
+        "https://www.sciencedirect.com/science/article/pii/S1566253523004414",
+        "https://github.com/PeimingCHEN/WHU-MFM-Dataset/tree/818992fdc05896768eeb6012aa9b74e00eb4a27a",
+        "https://github.com/PeimingCHEN/WHU-MFM-Dataset/blob/818992fdc05896768eeb6012aa9b74e00eb4a27a/dataset_create.py"
+      ],
+      "evidence_inspected": "Indexed publisher abstract/introduction/section excerpts; author README; recursive Git tree; full dataset_create.py via raw GitHub at listed revision. Particularly lines 32-36, 301-334, 477-558.",
+      "revision": "818992fdc05896768eeb6012aa9b74e00eb4a27a",
+      "limitations": "No Blender file opened or code run; README corpus counts not verified by archive intake. No license file in repository tree. Collected Sketchfab asset terms not audited. Python alone does not establish all background.blend settings.",
+      "access_note": "Direct publisher open failed with 403; indexed primary publisher text and source code were available."
+    },
+    {
+      "id": "M02",
+      "title": "AiDiF: a computational imaging scheme for all-in-focus dynamic image fusion / DYN-MVMF",
+      "authors": "Zhilong Li, Qiong Liu, Jun Gong",
+      "year": 2026,
+      "status": "Published, Journal of Electronic Imaging 35(4), 041407",
+      "url": "https://doi.org/10.1117/1.JEI.35.4.041407",
+      "additional_urls": [
+        "https://github.com/North-Li/DYN-MVMF/tree/098217d98d11165931498781fb45299449c243cb"
+      ],
+      "evidence_inspected": "Primary publisher issue-index abstract, repository README and recursive tree at listed revision.",
+      "revision": "098217d98d11165931498781fb45299449c243cb",
+      "limitations": "Full paper and Baidu archive not inspected; exact target construction/counts/generation code unverified. Repository contains only README. README prohibits commercial use and requests author permission for research/education; no contact sent.",
+      "access_note": "DOI tool open failed; the AiDiF abstract was available in indexed primary-publisher issue content. The discovery URL included an unrelated article identifier (043009), so it is deliberately not retained as an AiDiF source link; correct article DOI and author repository are above."
+    },
+    {
+      "id": "M03",
+      "title": "Deep High Dynamic Range Imaging of Dynamic Scenes",
+      "authors": "Nima Khademi Kalantari, Ravi Ramamoorthi",
+      "year": 2017,
+      "status": "Published, ACM TOG / SIGGRAPH",
+      "url": "https://cseweb.ucsd.edu/~viscomp/projects/SIG17HDR/PaperData/SIGGRAPH17_HDR_LoRes.pdf",
+      "doi": "10.1145/3072959.3073609",
+      "evidence_inspected": "Author-hosted original PDF, reference-image convention and section 4 capture/ground-truth construction.",
+      "limitations": "HDR task; posed static/dynamic capture construction is not exact continuous-motion focus truth. Dataset/code not run."
+    },
+    {
+      "id": "M04",
+      "title": "Deep Multi-Exposure Image Fusion for Dynamic Scenes",
+      "authors": "Xiao Tan, Huaian Chen, Rui Zhang, Qihan Wang, Yan Kan, Jinjin Zheng, Yi Jin, Enhong Chen",
+      "year": 2023,
+      "status": "Published, IEEE TIP 32, 5310-5325",
+      "url": "https://doi.org/10.1109/TIP.2023.3315123",
+      "additional_urls": [
+        "https://pubmed.ncbi.nlm.nih.gov/37725730/",
+        "https://github.com/Tx000/Deep_dynamicMEF"
+      ],
+      "evidence_inspected": "Original indexed abstract and author repository README.",
+      "limitations": "Abstract/README only; full static-for-dynamic procedure and reference error not audited. Baidu archive not downloaded."
+    },
+    {
+      "id": "M05",
+      "title": "Realistic Blur Synthesis for Learning Image Deblurring / RSBlur",
+      "authors": "Jaesung Rim, Geonung Kim, Jungeon Kim, Junyong Lee, Seungyong Lee, Sunghyun Cho",
+      "year": 2022,
+      "status": "Published, ECCV 2022; arXiv v3",
+      "url": "https://arxiv.org/html/2202.08771v3",
+      "additional_urls": [
+        "https://cg.postech.ac.kr/researches/RSBlur/"
+      ],
+      "evidence_inspected": "Original full HTML; sections 3-5 acquisition and real-vs-synthetic factors, author dataset page.",
+      "limitations": "Deblurring study; center short exposure still has integration/noise and physical reference uncertainties. No corpus or synthesis code executed. RSBlur is a dataset name, not a claim that this paper models rolling shutter."
+    },
+    {
+      "id": "M06",
+      "title": "Rolling Shutter Motion Deblurring",
+      "authors": "Shuochen Su, Wolfgang Heidrich",
+      "year": 2015,
+      "status": "Published, CVPR 2015",
+      "url": "https://www.cs.ubc.ca/labs/imager/tr/2015/RollingShutterMotionDeblurring/",
+      "evidence_inspected": "Author project abstract and linked resource listing.",
+      "limitations": "Project/abstract evidence only; attempted guessed PDF URL failed and no full methods/code claim is made."
+    },
+    {
+      "id": "M07",
+      "title": "A Naturalistic Open Source Movie for Optical Flow Evaluation / MPI-Sintel",
+      "authors": "Daniel J. Butler, Jonas Wulff, Garrett B. Stanley, Michael J. Black",
+      "year": 2012,
+      "status": "Published, ECCV 2012",
+      "url": "https://files.is.tue.mpg.de/black/papers/ButlerECCV2012.pdf",
+      "evidence_inspected": "Original PDF; dataset design, rendering passes, unmatched/occluded/invalid regions and cinematic physics caveat.",
+      "limitations": "Motion benchmark, not calibrated macro focus dataset; assets/data not downloaded."
+    },
+    {
+      "id": "M08",
+      "title": "TAP-Vid: A Benchmark for Tracking Any Point in a Video",
+      "authors": "Carl Doersch et al.",
+      "year": 2022,
+      "status": "Published, NeurIPS Datasets and Benchmarks",
+      "url": "https://papers.nips.cc/paper_files/paper/2022/file/58168e8a92994655d6da3939e7cc0918-Paper-Datasets_and_Benchmarks.pdf",
+      "additional_urls": [
+        "https://arxiv.org/abs/2211.03726"
+      ],
+      "evidence_inspected": "Original PDF abstract/dataset and evaluation material; visibility and synthetic-vs-human annotation distinctions.",
+      "limitations": "Point geometry/occlusion does not label every optical mixture in a finite-aperture exposure. No tracker or benchmark run."
+    },
+    {
+      "id": "M09",
+      "title": "SynFog: A Photo-realistic Synthetic Fog Dataset based on End-to-end Imaging Simulation for Advancing Real-World Defogging in Autonomous Driving",
+      "authors": "Yiming Xie, Henglu Wei, Zhenyi Liu, Xiaoyu Wang, Xiangyang Ji",
+      "year": 2024,
+      "status": "Published, CVPR 2024; inspected arXiv v1",
+      "url": "https://arxiv.org/html/2403.17094v1",
+      "additional_urls": [
+        "https://yiming-xie.github.io/SynFog/"
+      ],
+      "evidence_inspected": "Original full HTML, particularly section 3 volume transport and ISETCam optics/sensor/ISP, section 4 simulation scale; author project page.",
+      "limitations": "Driving/fog regime; paper's optics are diffraction-limited, not a general multi-element macro lens. Project page still says dataset coming soon; no archive/code intake. Reported transfer results not independently reproduced.",
+      "access_note": "CVF PDF returned 403; arXiv original HTML available."
+    },
+    {
+      "id": "M10",
+      "title": "Removal of Image Artifacts Due to Sensor Dust",
+      "authors": "Changyin Zhou, Stephen Lin",
+      "year": 2007,
+      "status": "Published, CVPR 2007",
+      "url": "https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/dust_cvpr2007.pdf",
+      "additional_urls": [
+        "https://www.microsoft.com/en-us/research/publication/removal-of-image-artifacts-due-to-sensor-dust/"
+      ],
+      "evidence_inspected": "Original PDF sections 3.1-3.2, filter-to-sensor offset, camera-settings-dependent attenuation projection and simplified scattering assumption.",
+      "limitations": "Simplified geometric dust model; not a calibrated model for every modern sensor cover, microlens or contaminant."
+    },
+    {
+      "id": "M11",
+      "title": "Removing Image Artifacts Due to Dirty Camera Lenses and Thin Occluders",
+      "authors": "Jinwei Gu, Ravi Ramamoorthi, Peter Belhumeur, Shree Nayar",
+      "year": 2009,
+      "status": "Published, ACM TOG / SIGGRAPH Asia 2009",
+      "url": "https://cave.cs.columbia.edu/Statics/publications/pdfs/Gu_SIGGRAPH_Asia_09.pdf",
+      "doi": "10.1145/1618452.1618490",
+      "evidence_inspected": "Original author PDF, attenuation/intensification formation model and calibration limitations.",
+      "limitations": "Optically thin/low-frequency approximations under stated illumination assumptions; not universal lens-flare/dust simulation."
+    },
+    {
+      "id": "M12",
+      "title": "Blender Cycles camera kernel fields",
+      "authors": "Blender contributors",
+      "year": 2026,
+      "status": "Current implementation source inspected 2026-11-17; mutable main URL",
+      "url": "https://github.com/blender/blender/blob/main/intern/cycles/kernel/types.h",
+      "evidence_inspected": "Indexed original source containing KernelCamera shuttertime, motion transforms, rolling_shutter_type and rolling_shutter_duration.",
+      "limitations": "Field existence only, no runtime/API/version fidelity or calibration verified. Use an immutable tested Blender build in any implementation.",
+      "access_note": "Official manual URL returned 402 in web tool; original implementation source used as narrow capability evidence."
+    }
+  ]
+}

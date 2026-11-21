@@ -1,0 +1,43 @@
+{
+  "research_date": "2026-11-17",
+  "scope": "Coordinating review: reference validation and evaluation",
+  "experimental_status": "Literature and design only; no render or experiments",
+  "sources": [
+    {
+      "id": "V01",
+      "title": "PBRT 4e: Sampling Theory",
+      "year": 2023,
+      "publication_status": "official book",
+      "url": "https://pbr-book.org/4ed/Sampling_and_Reconstruction/Sampling_Theory",
+      "evidence_inspected": "Sampling, reconstruction and aliasing sections",
+      "limits": "General rendering reference, not an experimental validation of focus stacking."
+    },
+    {
+      "id": "V02",
+      "title": "Spatially-Varying Autofocus",
+      "year": 2025,
+      "publication_status": "ICCV 2025",
+      "url": "https://imaging.cs.cmu.edu/svaf/",
+      "evidence_inspected": "Author project methods, optical construction and dynamic demonstrations",
+      "limits": "No hardware reproduction; target appearance is not a universal AiF definition."
+    },
+    {
+      "id": "V03",
+      "title": "Focal Stack Compositing for Depth of Field Control",
+      "year": 2012,
+      "publication_status": "Stanford technical report 2012-1",
+      "url": "https://graphics.stanford.edu/papers/focalstack/focalstack.pdf",
+      "evidence_inspected": "Original PDF: model, compositing and halo discussion",
+      "limits": "Not a new macro benchmark or a proof that arbitrary ideal targets are recoverable."
+    },
+    {
+      "id": "V04",
+      "title": "Loss Functions for Image Restoration with Neural Networks",
+      "year": 2017,
+      "publication_status": "IEEE Transactions on Computational Imaging",
+      "url": "https://research.nvidia.com/sites/default/files/publications/NN_ImgProc.pdf",
+      "evidence_inspected": "Original PDF, especially discussion of inverse crime",
+      "limits": "Motivates transfer controls; does not validate the proposed generator suite."
+    }
+  ]
+}

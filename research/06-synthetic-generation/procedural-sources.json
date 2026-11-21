@@ -1,0 +1,252 @@
+{
+  "review_date": "2026-11-17",
+  "scope": "Procedural content, synthetic camera sensor/ISP formation and transfer for focus stacks",
+  "status": "Research only; no renderer, sensor simulation, dataset generation or training run",
+  "sources": [
+    {
+      "id": "P01",
+      "title": "Infinite Photorealistic Worlds using Procedural Generation",
+      "year": 2023,
+      "url": "https://arxiv.org/html/2306.09310v1",
+      "evidence_inspected": "Peer-reviewed CVPR 2023; original arXiv full HTML method and Appendix C/G inspected",
+      "relevance": "Procedural natural content; geometry labels distinct from blurred observations; camera-dependent resolution scaling.",
+      "limits": "No generator run; no validation of macro fidelity; paper hardware/runtime not a current forecast."
+    },
+    {
+      "id": "P02",
+      "title": "Infinigen current repository, license, submodules and 2.0 documentation",
+      "year": 2026,
+      "url": "https://github.com/princeton-vl/infinigen",
+      "evidence_inspected": "Official README, LICENSE and .gitmodules at immutable revision; official docs search-indexed content inspected",
+      "relevance": "Core BSD-3-Clause; optional GPL submodule; 2.0 alpha has limited indoor coverage.",
+      "limits": "Docs direct fetch 403; version statement comes from official indexed page, not executed installation."
+    },
+    {
+      "id": "P03",
+      "title": "BlenderProc2: A Procedural Pipeline for Photorealistic Rendering",
+      "year": 2023,
+      "url": "https://joss.theoj.org/papers/10.21105/joss.04901",
+      "evidence_inspected": "JOSS article metadata and official repository README inspected",
+      "relevance": "General scene orchestration and render-label outputs; repository GPL-3.0 label.",
+      "limits": "No end-to-end runtime or dependency audit."
+    },
+    {
+      "id": "P04",
+      "title": "BlenderProc DefaultConfig.py",
+      "year": 2026,
+      "url": "https://github.com/DLR-RM/BlenderProc/blob/76bd8b82ee19489843578ff045298642197bf883/blenderproc/python/utility/DefaultConfig.py",
+      "evidence_inspected": "Full source file inspected at immutable revision",
+      "relevance": "8-bit PNG, Filmic, Intel denoiser, bounce and geometry simplification defaults.",
+      "limits": "Defaults only; runtime overrides and output data paths not audited."
+    },
+    {
+      "id": "P05",
+      "title": "BlenderProc renderer documentation/source",
+      "year": 2026,
+      "url": "https://dlr-rm.github.io/BlenderProc/_modules/blenderproc/python/renderer/RendererUtility.html",
+      "evidence_inspected": "Official source documentation and renderer tutorial inspected",
+      "relevance": "Depth/range differences; denoiser settings; motion blur and rolling shutter entry points.",
+      "limits": "API presence is not numerical or physical validation."
+    },
+    {
+      "id": "P06",
+      "title": "BlenderProc camera utility documentation",
+      "year": 2026,
+      "url": "https://dlr-rm.github.io/BlenderProc/blenderproc.python.camera.CameraUtility.html",
+      "evidence_inspected": "Official API documentation inspected",
+      "relevance": "DOF API has focal distance, f-stop, blade, rotation and ratio parameters.",
+      "limits": "No multi-element optical model established."
+    },
+    {
+      "id": "P07",
+      "title": "Kubric: A scalable dataset generator",
+      "year": 2022,
+      "url": "https://arxiv.org/html/2203.03570v1",
+      "evidence_inspected": "Original paper full HTML infrastructure and limitations sections inspected",
+      "relevance": "Blender/PyBullet modular dataset infrastructure; historical limitations recorded.",
+      "limits": "Historical unsupported-feature list is not current capability inventory."
+    },
+    {
+      "id": "P08",
+      "title": "Kubric current repository and camera/renderer source",
+      "year": 2026,
+      "url": "https://github.com/google-research/kubric",
+      "evidence_inspected": "Official README/license label, pinned blender.py and core/cameras.py inspected",
+      "relevance": "Apache-2.0 repository; renderer now takes motion_blur; camera file no focus/aperture parameters found.",
+      "limits": "No exhaustive repository feature audit or runtime experiment."
+    },
+    {
+      "id": "P09",
+      "title": "ISET3d current repository",
+      "year": 2026,
+      "url": "https://github.com/ISET/iset3d",
+      "evidence_inspected": "Official README/license label inspected; API revision fetched",
+      "relevance": "MATLAB toolbox using PBRT and ISETCam; MIT repository label.",
+      "limits": "No installation or spectral backend validation; assets are separately managed."
+    },
+    {
+      "id": "P10",
+      "title": "ISETCam current repository",
+      "year": 2026,
+      "url": "https://github.com/ISET/isetcam",
+      "evidence_inspected": "Official README/license label inspected",
+      "relevance": "MIT MATLAB camera imaging infrastructure; wavefront aperture/dust/scratch notes.",
+      "limits": "No general lens-contamination model or full dependency audit."
+    },
+    {
+      "id": "P11",
+      "title": "ISETCam Sensor documentation",
+      "year": 2026,
+      "url": "https://github.com/ISET/isetcam/wiki/Sensor",
+      "evidence_inspected": "Official wiki main sensor explanation inspected (edited Aug 25, 2026)",
+      "relevance": "CFA, spatial sampling, well capacity and sensor-response stages.",
+      "limits": "Documentation evidence only; profile accuracy is device-specific."
+    },
+    {
+      "id": "P12",
+      "title": "ISETCam Sensor noise model",
+      "year": 2026,
+      "url": "https://github.com/ISET/isetcam/wiki/Sensor-noise-model",
+      "evidence_inspected": "Official wiki main text inspected (edited Aug 24, 2026)",
+      "relevance": "Poisson shot noise, read/dark noise and fixed DSNU/PRNU.",
+      "limits": "No source implementation or correlation model audited."
+    },
+    {
+      "id": "P13",
+      "title": "Unprocessing Images for Learned Raw Denoising",
+      "year": 2019,
+      "url": "https://arxiv.org/html/1811.11127v1",
+      "evidence_inspected": "Original paper HTML RAW pipeline/method sections; CVPR metadata inspected",
+      "relevance": "ISP-aware noise synthesis motivates explicit gain/color/tone/demosaic contract.",
+      "limits": "Photograph unprocessing does not recover exact latent RAW or spectra; no results replicated."
+    },
+    {
+      "id": "P14",
+      "title": "A Physics-based Noise Formation Model for Extreme Low-light Raw Denoising",
+      "year": 2020,
+      "url": "https://arxiv.org/html/2003.12751v2",
+      "evidence_inspected": "Original paper full HTML sensor formation and calibration sections inspected",
+      "relevance": "Shot, Tukey-lambda read, row and quantization components; bias/flat characterization.",
+      "limits": "Macro transfer untested; camera-specific fitted parameters."
+    },
+    {
+      "id": "P15",
+      "title": "ELD official implementation and release caveats",
+      "year": 2026,
+      "url": "https://github.com/Vandermode/ELD",
+      "evidence_inspected": "Official README inspected including Quick Start and 2022 update",
+      "relevance": "Full model/calibration restriction remains stated; baseline models and parameters released.",
+      "limits": "MIT repository label does not establish release of withheld components or dataset rights."
+    },
+    {
+      "id": "P16",
+      "title": "Noise Modeling in One Hour: Minimizing Preparation Efforts for Self-supervised Low-Light RAW Image Denoising",
+      "year": 2025,
+      "url": "https://arxiv.org/html/2505.00045v1",
+      "evidence_inspected": "Original full HTML sections 3.1-3.3 inspected; CVPR metadata verified",
+      "relevance": "Dark-frame sampling and hypothesized shot gain as practical training synthesis.",
+      "limits": "Not exact measured-camera calibration; no independent reproduction; direct CVF fetch failed 403."
+    },
+    {
+      "id": "P17",
+      "title": "SNIC: Synthesized Noisy Images using Calibration",
+      "year": 2025,
+      "url": "https://arxiv.org/html/2512.15905v1",
+      "evidence_inspected": "Preprint full HTML methods/calibration/RAW synthesis inspected",
+      "relevance": "Calibrated channel noise and dark-frame options, with reported phone RAW processing effects.",
+      "limits": "Author-reported results; not peer-review/independent validation claim; check mathematical implementation independently."
+    },
+    {
+      "id": "P18",
+      "title": "EMVA 1288 Release 4.0 Linear",
+      "year": 2021,
+      "url": "https://www.emva.org/wp-content/uploads/EMVA1288Linear_4.0Release.pdf",
+      "evidence_inspected": "Official PDF scope/model/exposure/noise/nonuniformity text inspected; current official standard page verified",
+      "relevance": "Linear sensor characterization and assumptions; current official page identifies Release 4.0.",
+      "limits": "No compliance claim; restrictions include temporal independence and preprocessing assumptions."
+    },
+    {
+      "id": "P19",
+      "title": "Domain Randomization for Transferring Deep Neural Networks from Simulation to the Real World",
+      "year": 2017,
+      "url": "https://arxiv.org/abs/1703.06907",
+      "evidence_inspected": "Original abstract and metadata inspected",
+      "relevance": "Foundational transfer result in object localization using randomized render appearance.",
+      "limits": "Abstract-only; cannot establish exact-pixel macro-fusion transfer."
+    },
+    {
+      "id": "P20",
+      "title": "Poly Haven asset license and terms",
+      "year": 2026,
+      "url": "https://polyhaven.com/license",
+      "evidence_inspected": "Official asset license and website/API terms inspected",
+      "relevance": "CC0 assets; website and API access governed separately.",
+      "limits": "No asset acquisition, individual fidelity inspection or entire service legal audit."
+    }
+  ],
+  "repository_revisions": [
+    {
+      "repository": "https://github.com/princeton-vl/infinigen",
+      "commit": "53033dd55c7191cbc436be6ffbb63c026935a509",
+      "commit_date": "2026-11-11T00:39:56Z",
+      "inspected": [
+        "README",
+        "LICENSE",
+        ".gitmodules"
+      ],
+      "additional_url": "https://infinigen.cs.princeton.edu/docs/latest/"
+    },
+    {
+      "repository": "https://github.com/DLR-RM/BlenderProc",
+      "commit": "76bd8b82ee19489843578ff045298642197bf883",
+      "commit_date": "2026-01-07T10:32:58Z",
+      "inspected": [
+        "README",
+        "blenderproc/python/utility/DefaultConfig.py"
+      ]
+    },
+    {
+      "repository": "https://github.com/google-research/kubric",
+      "commit": "61f2422c84bab75006df33c6989e0b483db3ccfe",
+      "commit_date": "2026-05-21T14:58:48Z",
+      "inspected": [
+        "README",
+        "kubric/renderer/blender.py (motion_blur contexts)",
+        "kubric/core/cameras.py (focus/aperture search)"
+      ]
+    },
+    {
+      "repository": "https://github.com/ISET/iset3d",
+      "commit": "b26f00533eb9351f61adc2164c52d9ef9575e48e",
+      "commit_date": "2026-11-03T17:03:06Z",
+      "inspected": [
+        "README and license label"
+      ]
+    },
+    {
+      "repository": "https://github.com/ISET/isetcam",
+      "commit": "3e0253421752eb72f2d1353327dffd0d433abdaf",
+      "commit_date": "2026-11-09T15:14:48Z",
+      "inspected": [
+        "README and license label"
+      ]
+    }
+  ],
+  "retrieval_notes": [
+    "Revision identities obtained from GitHub commits API on review date; pins identify inspected state, not tested dependencies.",
+    "Infinigen 2.0 official documentation indexed content obtained, but direct page requests returned HTTP 403.",
+    "CVF ELD and Noise Modeling in One Hour direct retrieval failed HTTP 403; original arXiv full text was used.",
+    "Large Cornell-box ISET validation PDF exceeded browser tool limit and was not used as evidence."
+  ],
+  "search_topics": [
+    "Infinigen current Nature versus V2 preview and annotations",
+    "BlenderProc rendering camera defaults and output precision",
+    "Kubric current camera effects versus original paper limitations",
+    "ISET spectral rendering sensor pipeline",
+    "RAW unprocessing shot/read/fixed-pattern noise calibration",
+    "2025-2026 synthetic noise models",
+    "EMVA1288 characterization",
+    "domain randomization transfer scope",
+    "seed-asset licensing"
+  ]
+}

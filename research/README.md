@@ -1,5 +1,7 @@
 # Macro focus-stacking research
 
+**New review, 2026-11-17:** [Synthetic focus-stack generation](06-synthetic-generation/README.md) covers procedural datasets, optical/rendering and sensor models, motion/degradations, and a proposed generator with validation gates. Start there for the synthetic-pipeline work. The sections below retain the earlier benchmark review and its 2026-11-15 cutoff.
+
 Research cutoff: **2026-11-15**. All four reviews and final integration are complete. Scope: design a defensible quality benchmark and dataset strategy before choosing or changing the stacking algorithm.
 
 **Start with the [integrated benchmark plan](05-synthesis/benchmark-plan.md).** Recommendation: artifact-specific severity/extent measurements, explicit coverage and failure accounting, and blinded expert comparison. Qualify the measurements before optimizing an algorithm against them.
