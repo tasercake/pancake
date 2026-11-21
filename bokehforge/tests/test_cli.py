@@ -41,9 +41,11 @@ def test_default_source_config_works_outside_repository(tmp_path):
     executable = Path(sys.executable).with_name("bokehforge")
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
-    lock = Path(__file__).resolve().parents[1] / "config/data/sources.lock.json"
+    lock = tmp_path / "sources.lock.json"
+    lock.write_text(json.dumps({"datasets": [{"id": "D29", "status": "available",
+                                              "layout": "infinigen_defocus", "files": []}]}))
     result = subprocess.run([str(executable), "data", "download", "--dataset", "D29", "--resolve-only",
-        "--root", str(tmp_path / "data")], cwd=tmp_path, env=environment,
+        "--root", str(tmp_path / "data"), "--lock", str(lock)], cwd=tmp_path, env=environment,
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     source = next(d for d in json.loads(lock.read_text())["datasets"] if d["id"] == "D29")

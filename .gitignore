@@ -10,3 +10,4 @@ artifacts/
 .DS_Store
 .worktrees/
 datasets/
+/bokehforge/config/data/sources.lock.json

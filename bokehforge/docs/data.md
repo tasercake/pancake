@@ -8,7 +8,7 @@ uv run --frozen bokehforge data download
 uv run --frozen bokehforge data process
 ```
 
-Run from the `bokehforge/` project directory. Commands are provided by the Bokehforge project in [../pyproject.toml](../pyproject.toml). Python is pinned to 3.12.12 by the project `.python-version`; the project `uv.lock` pins Python dependencies and wheel hashes. `config/data/sources.json` describes the eight dataset sources. `config/data/sources.lock.json` freezes resolved source revisions, original file paths, available provider hashes, and SHA-256 hashes acquired on first successful download. Keep the lockfile with the code.
+Run from the `bokehforge/` project directory. Commands are provided by the Bokehforge project in [../pyproject.toml](../pyproject.toml). Python is pinned to 3.12.12 by the project `.python-version`; the project `uv.lock` pins Python dependencies and wheel hashes. `config/data/sources.json` describes the eight dataset sources. `config/data/sources.lock.json` freezes resolved source revisions, original file paths, available provider hashes, and SHA-256 hashes acquired on first successful download. The downloader generates this local file. Run download before processing in a fresh checkout.
 
 ## Configuration
 
@@ -68,7 +68,7 @@ config/data/                    # durable policy and pins inside bokehforge/
     locks/data.lock             # shared acquisition/processing lock
 ```
 
-The entire generated `datasets/` directory is Git-ignored. Keep the project's `config/data/` and `uv.lock` with the code. Downloaded data are not implicitly licensed for redistribution; source rights evidence is retained in config and manifests.
+The entire generated `datasets/` directory is Git-ignored. Keep the source policy and dependency lock with the code. Downloaded data are not implicitly licensed for redistribution; source rights evidence is retained in config and manifests.
 
 ## Logs and reports
 
