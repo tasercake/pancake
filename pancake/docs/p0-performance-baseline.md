@@ -81,7 +81,8 @@ genuine 16-bit evidence to fill those gaps.
 
 ## Reproduction
 
-From this worktree's root, using the unchanged 2 GiB policy:
+Run the recorded commands from a checkout of `e40788d`, which contains the
+historical BokehForge CLI and the 2 GiB source policy used for this baseline.
 
 Verification: local scaffold `scripts/check.sh all`, staged whitespace checks,
 manifest/log/archive hashes, unique native input hashes, output decoding, and

@@ -4,7 +4,8 @@ import subprocess
 import sys
 
 from PIL import Image
-import pytest
+
+from bokehforge import FrameWindowDataset, SceneCatalog
 
 
 def source_fixture(tmp_path):
@@ -23,61 +24,50 @@ def source_fixture(tmp_path):
     return root
 
 
-def run_data(root, action, *extra):
-    return subprocess.run([sys.executable, "-m", "bokehforge", "data", action,
-        "--root", str(root), "--config", str(root / "sources.json"), "--lock", str(root / "sources.lock.json"),
-        *extra], capture_output=True, text=True)
+def run_download(root):
+    return subprocess.run([sys.executable, "-m", "bokehforge", "data", "download",
+        "--root", str(root), "--config", str(root / "sources.json"), "--lock", str(root / "sources.lock.json")],
+        capture_output=True, text=True)
 
 
-@pytest.mark.parametrize("action,report", [("download", "download-report.json"), ("process", "process-report.json")])
-def test_commands_write_logs_and_reports_only_inside_hidden_directory(tmp_path, action, report):
+def test_download_outputs_feed_the_library_directly(tmp_path):
     root = source_fixture(tmp_path)
-    result = run_data(root, action)
+    result = run_download(root)
     assert result.returncode == 0, result.stdout + result.stderr
-    assert (root / ".bokehforge/reports" / report).is_file()
-    log = (root / ".bokehforge/logs" / f"{action}.log").read_text()
+    assert (root / ".bokehforge/reports/download-report.json").is_file()
+    log = (root / ".bokehforge/logs/download.log").read_text()
     assert result.stdout.strip() in log
     assert not list(root.glob("*.log")) and not list(root.glob("*-report.json"))
     assert (root / ".bokehforge/locks/data.lock").is_file()
-    if action == "download":
-        manifest = json.loads((root / "raw/demo/download-manifest.json").read_text())
-        assert len(manifest["files"]) == 2
-        assert not (root / ".bokehforge/state").exists()
-    else:
-        assert (root / ".bokehforge/work/conversion-state").is_dir()
-        assert (root / "standardized/index.json").is_file()
+    manifest = json.loads((root / "raw/demo/download-manifest.json").read_text())
+    assert len(manifest["files"]) == 2
+    before = set(root.rglob("*"))
+    catalog = SceneCatalog(root)
+    frames = FrameWindowDataset(catalog, window_size=2)[0]["frames"]
+    assert len(frames) == 2 and frames[0].shape == (8, 8, 3)
+    assert set(root.rglob("*")) == before
 
 
 def test_logs_append_and_reports_remain_idempotent(tmp_path):
     root = source_fixture(tmp_path)
-    assert run_data(root, "download").returncode == 0
+    assert run_download(root).returncode == 0
     report = root / ".bokehforge/reports/download-report.json"
     first = (report.read_bytes(), report.stat().st_mtime_ns)
     log = root / ".bokehforge/logs/download.log"
     initial = log.read_bytes()
-    assert run_data(root, "download").returncode == 0
+    assert run_download(root).returncode == 0
     assert (report.read_bytes(), report.stat().st_mtime_ns) == first
     assert log.read_bytes().startswith(initial) and log.stat().st_size > len(initial)
 
 
-def test_fatal_processing_error_is_saved_in_log(tmp_path):
-    root = source_fixture(tmp_path)
-    (root / "sources.lock.json").unlink()
-    result = run_data(root, "process")
-    assert result.returncode == 2
-    assert "ERROR:" in result.stderr
-    log = (root / ".bokehforge/logs/process.log").read_text()
-    assert "ERROR:" in log and "sources.lock.json" in log
-
-
-def test_shared_data_lock_prevents_concurrent_data_commands(tmp_path):
+def test_data_lock_prevents_concurrent_downloads(tmp_path):
     import fcntl
     root = source_fixture(tmp_path)
     lock = root / ".bokehforge/locks/data.lock"
     lock.parent.mkdir(parents=True)
     with lock.open("a") as handle:
         fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        result = run_data(root, "download")
+        result = run_download(root)
     assert result.returncode == 2
     assert "Another process holds" in result.stderr
     assert not (root / ".bokehforge/reports/download-report.json").exists()

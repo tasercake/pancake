@@ -7,7 +7,7 @@ import fnmatch
 import hashlib
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import re
 import shutil
 import sys
@@ -17,6 +17,7 @@ from urllib.parse import quote, urlparse
 
 import requests
 
+from ._files import digest, natural_key, safe_path
 from .layout import METADATA, data_run
 
 HERE = Path(__file__).resolve().parent
@@ -33,26 +34,6 @@ def save_json(path, value):
     temporary = path.with_name(path.name + ".tmp")
     temporary.write_bytes(payload)
     temporary.replace(path)
-
-
-def digest(path, algorithm="sha256"):
-    h = hashlib.new(algorithm)
-    if algorithm == "sha1":
-        h.update(f"blob {path.stat().st_size}\0".encode())
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(4 * 1024 * 1024), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def safe_path(root, relative):
-    name = PurePosixPath(relative.replace("\\", "/"))
-    if name.is_absolute() or not name.parts or any(p in {"..", ""} for p in name.parts):
-        raise ValueError(f"Unsafe source path: {relative}")
-    path = root.joinpath(*name.parts)
-    if not path.resolve().is_relative_to(root.resolve()):
-        raise ValueError(f"Source path escapes root: {relative}")
-    return path
 
 
 def session():
@@ -90,10 +71,6 @@ def drive_url(client, file_id):
         params = [(tag.get("name"), tag.get("value", "")) for tag in form.find_all("input") if tag.get("name")]
         url = urljoin(response.url, form.get("action", "")) + "?" + urlencode(params)
     raise RuntimeError("Google Drive download form did not resolve after three requests")
-
-
-def natural_key(value):
-    return [int(x) if x.isdigit() else x.casefold() for x in re.split(r"(\d+)", value)]
 
 
 def resolve_source(client, source):

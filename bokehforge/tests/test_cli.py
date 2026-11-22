@@ -9,9 +9,8 @@ import pytest
 
 @pytest.mark.parametrize("arguments,expected", [
     (["--help"], ["bokehforge", "data"]),
-    (["data", "--help"], ["download", "process"]),
+    (["data", "--help"], ["download"]),
     (["data", "download", "--help"], ["bokehforge data download", "--dataset"]),
-    (["data", "process", "--help"], ["bokehforge data process", "--inventory-only", "--dataset"]),
 ])
 def test_cli_exposes_data_commands(arguments, expected):
     result = subprocess.run([sys.executable, "-m", "bokehforge", *arguments], capture_output=True, text=True)
@@ -19,7 +18,7 @@ def test_cli_exposes_data_commands(arguments, expected):
     assert all(value in result.stdout for value in expected)
 
 
-@pytest.mark.parametrize("arguments", [["unknown"], ["data", "unknown"]])
+@pytest.mark.parametrize("arguments", [["unknown"], ["data", "unknown"], ["data", "process"]])
 def test_unknown_command_fails(arguments):
     result = subprocess.run([sys.executable, "-m", "bokehforge", *arguments], capture_output=True, text=True)
     assert result.returncode == 2
@@ -34,7 +33,7 @@ def test_installed_entry_point_works_outside_repository(tmp_path):
     result = subprocess.run([str(executable), "data", "--help"], cwd=tmp_path, env=environment,
                             capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
-    assert "download" in result.stdout and "process" in result.stdout
+    assert "download" in result.stdout and "process" not in result.stdout
 
 
 def test_default_source_config_works_outside_repository(tmp_path):
@@ -59,7 +58,7 @@ def test_nested_project_runs_from_repository_root():
     result = subprocess.run(["uv", "run", "--project", str(project), "--frozen", "--offline",
                              "bokehforge", "data", "--help"], cwd=repository, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
-    assert "download" in result.stdout and "process" in result.stdout
+    assert "download" in result.stdout and "process" not in result.stdout
     config = project / "config/data/sources.json"
     default_root = json.loads(config.read_text())["defaults"]["data_root"]
     assert (config.parent / default_root).resolve() == repository / "datasets"

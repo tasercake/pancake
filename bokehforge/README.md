@@ -1,53 +1,32 @@
-# Bokehforge
+# BokehForge
 
-A measurement-first workbench for building better focus stacks.
+BokehForge downloads verified focus-stacking datasets and loads their frames on demand from Python. It provides full-resolution float32 linear-sRGB pixels, optional TIFF bytes, and source provenance.
 
-## Run
+## Download data
 
-Python 3.12.12 and dependency versions are pinned in this project directory.
-
-From the repository root:
+From this directory, use the pinned project environment to download the sources you need.
 
 ```sh
-cd bokehforge
 uv sync --frozen
-uv run --frozen bokehforge data download
-uv run --frozen bokehforge data process
+uv run --frozen bokehforge data download --dataset D29
 ```
 
-Run the two data commands in order. Downloads fetch the full pinned inventory for each selected source. Processing writes full-resolution float32 linear-sRGB TIFFs with provenance and separate references.
+Repeat `--dataset` to select multiple sources. Omitting it downloads the full configured inventory. `--root` selects the dataset directory, which defaults to `datasets/` at the repository root. From a wheel installation, pass `--config /path/to/sources.json` to select the source policy.
 
-```sh
-uv run --frozen bokehforge data --help
-uv run --frozen bokehforge data download --dataset D04 --dataset D20
-uv run --frozen bokehforge data process --dataset D04 --dataset D20 --workers 2
-uv run --frozen pytest
+## Use from Python
+
+In a larger Python 3.12 project, install BokehForge as a dependency from its project directory or wheel. For example, run `python -m pip install /path/to/focus-stacking/bokehforge` in your project's environment. Point the catalog at the same dataset directory used by the downloader.
+
+```python
+from bokehforge import FrameWindowDataset, FusionPairDataset, SceneCatalog
+
+catalog = SceneCatalog("/path/to/datasets", datasets="D29")
+scene = catalog.scene(catalog.scene_ids[0])
+frame = catalog.decode(scene.frame_ids[0])  # .data, .alpha, .provenance
+window = FrameWindowDataset(catalog, window_size=8, scene_ids=[scene.id])[0]
+pair = FusionPairDataset(catalog, scene_ids=[scene.id], output="tiff")[0]
 ```
 
-## Layout
+Reuse a catalog across views. It checks native inputs when it opens and decodes pixels when you request a frame or sample. The views work with PyTorch's `DataLoader` when PyTorch is installed in your application.
 
-```text
-src/bokehforge/
-  cli.py                 # bokehforge data download / process
-  data/download.py       # acquisition, verification and resume
-  data/process.py        # extraction and canonical conversion
-tests/
-  test_cli.py
-  data/
-config/data/
-  sources.json           # editable source policy and storage defaults
-  sources.lock.json      # pinned source identities and byte hashes
-../datasets/             # generated data at repository root; may be rebuilt
-  raw/                   # original provider files
-  standardized/          # canonical TIFFs and manifests
-  .bokehforge/           # logs, reports and conversion state
-../research/             # literature reviews and benchmark design
-```
-
-Raw and processed paths remain at repository-root `datasets/raw/` and `datasets/standardized/`. Commands automatically save logs and reports beneath repository-root `datasets/.bokehforge/`; no shell redirection is needed.
-
-Source policy and exact source pins live in [config/data/](config/data/), outside the disposable data directory. Configure storage there, or pass `--root`, `--config`, or `--lock`. Removing `datasets/` does not remove source policy or pins; its generated layout is recreated on the next data command.
-
-See [dataset contracts and reproducibility](docs/data.md) and [research findings](../research/README.md).
-
-An all-source command can exit with code 2 when catalogue sources are inaccessible or incomplete. Completed selected sources remain usable; reports identify each status. Run processing separately even when another source is inaccessible.
+See the [data guide](docs/data.md) for sample fields, color and provenance contracts, and source configuration. Run the project tests with `uv run --frozen pytest`.
