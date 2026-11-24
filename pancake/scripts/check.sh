@@ -97,6 +97,7 @@ case $gate in
         python3 -m unittest scripts/test_dependency_policy.py scripts/test_guardrail_manifest.py \
             scripts/test_assurance_targets.py scripts/test_assurance_coverage.py scripts/test_miri_host_policy.py scripts/test_pre_commit.py \
             scripts/test_headless_dependencies.py
+        python3 -B -m unittest discover -s scripts -p test_release_support.py
         python3 scripts/miri_host_policy.py "$root" validate
         dependency_policy
         cargo fmt --all -- --check
@@ -110,7 +111,8 @@ case $gate in
         shellcheck --source-path=SCRIPTDIR --external-sources \
             scripts/bootstrap.sh scripts/check.sh scripts/test-guardrails.sh \
             scripts/install-actionlint.sh scripts/ci-linux-native-deps.sh .githooks/*
-        actionlint "$root/../.github/workflows/pancake.yml" "$root/../.github/workflows/pancake-assurance.yml"
+        actionlint "$root/../.github/workflows/pancake.yml" "$root/../.github/workflows/pancake-assurance.yml" \
+            "$root/../.github/workflows/pancake-release.yml"
         ;;
     test | test-cpu | test-gui | test-release | test-full | gpu)
         require_tool cargo-nextest

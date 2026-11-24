@@ -1,4 +1,4 @@
-"""Archive original notices and source provenance for the locked Linux release graph."""
+"""Archive original notices and source provenance for locked Pancake release graphs."""
 
 import hashlib
 import json
@@ -43,12 +43,16 @@ def _validate_source(source, revision, lock_digest):
     return Path(_command(source, "git", "rev-parse", "--show-toplevel").decode().strip())
 
 
-def _production_packages(source):
-    """Select exact default-feature Linux CLI/GUI packages using Cargo's build graph."""
-    tree = ["cargo", "tree", "--locked", "--offline", "--target", TARGET,
+def _production_packages(source, target, features):
+    """Select the packages used to build the CLI and GUI using Cargo's build graph."""
+    tree = ["cargo", "tree", "--locked", "--offline", "--target", target,
             "--edges", "normal,build", "--prefix", "none", "--format", "{p}"]
-    for name in ROOTS:
-        tree.extend(("-p", name))
+    feature_args = ("--features", features) if features else ()
+    if features:
+        tree.extend(("--workspace", *feature_args))
+    else:
+        for name in ROOTS:
+            tree.extend(("-p", name))
     selected = set()
     for line in _command(source, *tree).decode().splitlines():
         if not line:
@@ -58,7 +62,7 @@ def _production_packages(source):
             raise ValueError(f"Unrecognized Cargo package in release graph: {line}")
         selected.add(match.groups())
     metadata = _command(source, "cargo", "metadata", "--locked", "--offline", "--format-version", "1",
-                        "--filter-platform", TARGET)
+                        "--filter-platform", target, *feature_args)
     by_id = {}
     for package in json.loads(metadata)["packages"]:
         key = package["name"], package["version"]
@@ -67,7 +71,7 @@ def _production_packages(source):
                 raise ValueError(f"Ambiguous Cargo source record for {key[0]} {key[1]}")
             by_id[key] = package
     if by_id.keys() != selected or not all(any(name == root for name, _ in selected) for root in ROOTS):
-        raise ValueError("Locked Cargo metadata differs from the Linux release package graph")
+        raise ValueError("Locked Cargo metadata differs from the release package graph")
     return tree, [by_id[key] for key in sorted(selected)]
 
 
@@ -152,11 +156,12 @@ def bind_shared_project_license(entries):
                 entry["status"] = "covered_by_shared_project_notice"
 
 
-def stage_notices(payload, source, revision, lock_digest):
+def stage_notices(payload, source, revision, lock_digest, *, target=TARGET, features=None,
+                  directory=DOC_DIRECTORY):
     """Copy all discovered notices and write an informational inventory."""
     source = source.resolve(strict=True)
     repository = _validate_source(source, revision, lock_digest)
-    graph_command, packages = _production_packages(source)
+    graph_command, packages = _production_packages(source, target, features)
     locked = {(entry["name"], entry["version"]): entry
               for entry in tomllib.loads((source / "Cargo.lock").read_text())["package"]}
     vendor_path = source / "vendor/upstream-sources.json"
@@ -164,7 +169,7 @@ def stage_notices(payload, source, revision, lock_digest):
     if vendor_path.is_file():
         pinned = json.loads(vendor_path.read_text())["packages"]
         vendor_map = {(entry["name"], entry["version"], entry["directory"]): entry for entry in pinned}
-    destination = payload / DOC_DIRECTORY
+    destination = payload / directory
     destination.mkdir(parents=True)
     entries = []
     for package in packages:
@@ -199,9 +204,9 @@ def stage_notices(payload, source, revision, lock_digest):
         "schema_version": 1,
         "source_commit": revision,
         "cargo_lock_sha256": lock_digest,
-        "target": TARGET,
+        "target": target,
         "roots": ROOTS,
-        "features": "workspace defaults",
+        "features": features or "workspace defaults",
         "cargo_version": _command(source, "cargo", "--version").decode().strip(),
         "graph_command": graph_command,
         "selected_packages": len(entries),
@@ -214,7 +219,7 @@ def stage_notices(payload, source, revision, lock_digest):
 
 
 def verify_notices(extracted, receipt):
-    """Confirm the inventory and every archived notice survived Debian extraction."""
+    """Confirm the inventory and every archived notice survived staging or extraction."""
     path = extracted / receipt["file"]
     if file_sha256(path) != receipt["sha256"]:
         raise ValueError("Packaged dependency notice inventory changed")

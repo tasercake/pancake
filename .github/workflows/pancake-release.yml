@@ -1,0 +1,197 @@
+name: Pancake packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the verified packages to GitHub Releases
+        type: boolean
+        default: false
+      prerelease:
+        description: Mark the release as a prerelease when publishing
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pancake-packages
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+    working-directory: pancake
+
+jobs:
+  version:
+    name: Check source and version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate the Cargo release version
+        id: version
+        env:
+          PUBLISH: ${{ inputs.publish }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [[ "$PUBLISH" == true && "$GITHUB_REF" != "refs/heads/$DEFAULT_BRANCH" ]]; then
+            printf 'Publish from the default branch.\n' >&2
+            exit 1
+          fi
+          version=$(python3 -B scripts/release_support.py version)
+          if [[ "$PUBLISH" == true ]]; then
+            existing=$(git ls-remote origin "refs/tags/v$version")
+            if [[ -n "$existing" ]]; then
+              printf 'Tag v%s already exists. Set a new version before publishing.\n' "$version" >&2
+              exit 1
+            fi
+          fi
+          printf 'version=%s\n' "$version" >> "$GITHUB_OUTPUT"
+
+  package:
+    name: Package and smoke-test (${{ matrix.platform }})
+    needs: version
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {platform: linux-amd64, os: ubuntu-24.04, target: x86_64-unknown-linux-gnu}
+          - {platform: macos-arm64, os: macos-15, target: aarch64-apple-darwin}
+          - {platform: windows-x64, os: windows-2025, target: x86_64-pc-windows-msvc}
+    env:
+      RELEASE_VERSION: ${{ needs.version.outputs.version }}
+      RUST_TARGET: ${{ matrix.target }}
+      CARGO_BUILD_JOBS: "2"
+      CARGO_INCREMENTAL: "0"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Prepare the platform toolchain
+        run: |
+          cargo --version
+          cargo fetch --locked --target "$RUST_TARGET"
+          mkdir -p "$RUNNER_TEMP/pancake-dist"
+          printf 'CARGO_TARGET_DIR=%s/pancake-target\nDIST=%s/pancake-dist\n' "$RUNNER_TEMP" "$RUNNER_TEMP" >> "$GITHUB_ENV"
+
+      - name: Build and verify the Ubuntu Debian package
+        if: runner.os == 'Linux'
+        run: |
+          bash scripts/ci-linux-native-deps.sh
+          sudo apt-get install --yes --no-install-recommends dpkg-dev binutils
+          cargo build --locked --release --workspace --bins
+          release="$CARGO_TARGET_DIR/release"
+          llvm_build="$release/build/cubecl-llvm"
+          shopt -s nullglob
+          link_outputs=("$llvm_build"/*/run/stdout)
+          rlibs=("$llvm_build"/*/out/libcubecl_llvm-*.rlib)
+          if [[ ${#link_outputs[@]} != 1 || ${#rlibs[@]} != 1 ]]; then
+            printf 'Expected one CubeCL LLVM link output and one rlib.\n' >&2
+            exit 1
+          fi
+          llvm_version=$(python -c 'import json; print(json.load(open("notices/llvm/manifest.json"))["wrapper_version"])')
+          archive="$HOME/.cache/tracel/tracel-llvm-${llvm_version}-linux-x64"
+          installed="${XDG_DATA_HOME:-$HOME/.local/share}/tracel/tracel-llvm-$llvm_version"
+          python -B scripts/package_native_llvm.py --source "$PWD" --release "$release" \
+            --build-output "${link_outputs[0]}" --rlib "${rlibs[0]}" \
+            --archive "$archive.tar.xz" --sidecar "$archive.checksums.json" \
+            --installed "$installed" > "$RUNNER_TEMP/native-llvm.json"
+          python -B scripts/package_linux.py --release-dir "$release" --output "$RUNNER_TEMP/deb" \
+            --maintainer 'Pancake Stacker <13855549+tasercake@users.noreply.github.com>' \
+            --native-llvm-receipt "$RUNNER_TEMP/native-llvm.json"
+          package="$RUNNER_TEMP/deb/pancake_${RELEASE_VERSION}_amd64.deb"
+          sudo apt-get install --yes "$package"
+          python -B scripts/release_support.py smoke /usr/bin/pancake-cli
+          cp "$package" "$DIST/"
+          cp "$RUNNER_TEMP/deb/package-receipt.json" "$DIST/pancake-linux-amd64-receipt.json"
+
+      - name: Build and verify the Apple Silicon app archive
+        if: runner.os == 'macOS'
+        run: |
+          payload="$RUNNER_TEMP/macos"
+          python -B scripts/package_macos.py --output "$payload" \
+            --bundle-identifier com.github.tasercake.pancake --build-number "$GITHUB_RUN_NUMBER"
+          python -B scripts/release_support.py notices "$payload" "$RUST_TARGET" --features cubecl/metal-native
+          mv "$payload/build.log" "$payload/package-receipt.json" "$RUNNER_TEMP/"
+          package="$DIST/pancake-$RELEASE_VERSION-macos-arm64.zip"
+          ditto -c -k --sequesterRsrc "$payload" "$package"
+          ditto -x -k "$package" "$RUNNER_TEMP/macos-unpacked"
+          codesign --verify --strict "$RUNNER_TEMP/macos-unpacked/Pancake.app"
+          test -x "$RUNNER_TEMP/macos-unpacked/Pancake.app/Contents/MacOS/pancake-gui"
+          python -B scripts/release_support.py smoke "$RUNNER_TEMP/macos-unpacked/pancake-cli"
+          cp "$RUNNER_TEMP/package-receipt.json" "$DIST/pancake-macos-arm64-receipt.json"
+
+      - name: Build and verify the Windows ZIP
+        if: runner.os == 'Windows'
+        run: |
+          cargo build --locked --release --workspace --bins --target "$RUST_TARGET"
+          payload="$RUNNER_TEMP/windows"
+          package="$DIST/pancake-$RELEASE_VERSION-windows-x64.zip"
+          python -B scripts/release_support.py notices "$payload" "$RUST_TARGET"
+          python -B scripts/release_support.py windows-zip "$CARGO_TARGET_DIR/$RUST_TARGET/release" "$payload" "$package"
+          python -m zipfile -e "$package" "$RUNNER_TEMP/windows-unpacked"
+          test -f "$RUNNER_TEMP/windows-unpacked/pancake-gui.exe"
+          python -B scripts/release_support.py smoke "$RUNNER_TEMP/windows-unpacked/pancake-cli.exe"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pancake-${{ matrix.platform }}
+          path: ${{ runner.temp }}/pancake-dist/*
+          if-no-files-found: error
+          compression-level: 0
+
+  publish:
+    name: Publish to GitHub Releases
+    if: inputs.publish && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    needs: [version, package]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: pancake-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/pancake-dist
+      - name: Publish the tag and all three verified packages
+        working-directory: ${{ runner.temp }}/pancake-dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_VERSION: ${{ needs.version.outputs.version }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          tag="v$RELEASE_VERSION"
+          packages=(
+            "pancake_${RELEASE_VERSION}_amd64.deb"
+            "pancake-$RELEASE_VERSION-macos-arm64.zip"
+            "pancake-$RELEASE_VERSION-windows-x64.zip"
+          )
+          sha256sum "${packages[@]}" > SHA256SUMS.txt
+          notes="$RUNNER_TEMP/pancake-release-notes.md"
+          cat > "$notes" <<NOTES
+          - **macOS Apple Silicon** — Extract the ZIP and open Pancake.app. The app is ad-hoc signed and has no Apple notarization.
+          - **Ubuntu 24.04 x86-64** — Install the DEB with \`sudo apt install ./${packages[0]}\`.
+          - **Windows x64** — Extract the ZIP and run pancake-gui.exe. The executables are unsigned.
+
+          Each package includes the desktop app and CLI. Use SHA256SUMS.txt to verify the downloads.
+
+          [Source and build instructions](https://github.com/$GH_REPO/tree/$GITHUB_SHA#build-from-source).
+          NOTES
+          flags=()
+          if [[ "$PRERELEASE" == true ]]; then flags+=(--prerelease); fi
+          gh release create "$tag" "${packages[@]}" SHA256SUMS.txt \
+            --target "$GITHUB_SHA" --title "Pancake Stacker $tag" --notes-file "$notes" "${flags[@]}"
