@@ -110,7 +110,8 @@ case $gate in
         fi
         shellcheck --source-path=SCRIPTDIR --external-sources \
             scripts/bootstrap.sh scripts/check.sh scripts/test-guardrails.sh \
-            scripts/install-actionlint.sh scripts/ci-linux-native-deps.sh .githooks/*
+            scripts/install-actionlint.sh scripts/ci-linux-native-deps.sh \
+            scripts/macos-release-linker.sh .githooks/*
         actionlint "$root/../.github/workflows/pancake.yml" "$root/../.github/workflows/pancake-assurance.yml" \
             "$root/../.github/workflows/pancake-release.yml"
         ;;

@@ -18,7 +18,7 @@ Install [Rust with rustup](https://rustup.rs/). The checkout selects the pinned 
 
 | Platform | Desktop build prerequisites |
 | --- | --- |
-| macOS | Apple Silicon and Xcode with its command-line tools selected |
+| macOS | Apple Silicon, Xcode with its command-line tools selected, and Zstandard (`brew install zstd`) |
 | Ubuntu 24.04 | A C/C++ toolchain, `pkg-config`, and the development packages listed in [the Linux build setup](pancake/scripts/ci-linux-native-deps.sh) |
 | Windows | Visual Studio Build Tools with **Desktop development with C++**, the Windows SDK, and the x64 MSVC Rust host toolchain |
 

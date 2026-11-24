@@ -8,7 +8,7 @@ In GitHub, open [Actions → Pancake packages](https://github.com/tasercake/panc
 | Ubuntu 24.04 x86-64 | `pancake_<version>_amd64.deb` | Install with `sudo apt install ./pancake_<version>_amd64.deb`. Launch Pancake from the application menu or run `pancake-cli` in a terminal. |
 | Windows x64 | Portable ZIP with `pancake-gui.exe` and `pancake-cli.exe` | Extract both executables before launching. The executables are unsigned and use the x64 Microsoft Visual C++ runtime. |
 
-Each builder uses the committed Rust toolchain and Cargo lockfile. Before it uploads its package, it runs a two-frame CPU stack with the packaged CLI. The Linux and macOS jobs retain package receipts on the Actions run. Desktop and accelerator verification is covered separately in the [developer guide](../DEVELOPING.md).
+Each builder uses the committed Rust toolchain and Cargo lockfile. The macOS release build also links a pinned static copy of Zstandard. Before it uploads its package, it runs a two-frame CPU stack with the packaged CLI. The Linux and macOS jobs retain package receipts on the Actions run. Desktop and accelerator verification is covered separately in the [developer guide](../DEVELOPING.md).
 
 ## Publish on GitHub
 
