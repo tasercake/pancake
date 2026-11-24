@@ -53,27 +53,6 @@
       "recommended_role": "priority_challenge_after_intake"
     },
     {
-      "id": "D09",
-      "name": "MFI-WHU",
-      "data_class": "image_blur_synthetic_pairs",
-      "scene_count_and_status": "120 pairs claimed by author",
-      "source_frames_per_scene": "2",
-      "resolution_and_status": "variable",
-      "signal_and_RAW_status": "Derived from full-clear public images; archive not decoded",
-      "reference_type": "synthetic_source_image_reference",
-      "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
-      "original_split": "No official split verified",
-      "rights_evidence": "MIT repo; underlying public-image terms unresolved",
-      "primary_url": "https://doi.org/10.1016/j.inffus.2020.08.022",
-      "download_url": "https://github.com/HaoZhang1018/MFI-WHU/blob/master/MFI-WHU.rar",
-      "license_evidence_url": "https://github.com/HaoZhang1018/MFI-WHU/blob/master/LICENSE",
-      "access_evidence": "18,169,332-byte RAR listed; README/license read",
-      "measurement_roles": "blur_controls;legacy_full_reference",
-      "limitations": "Public original images unspecified; hard-mask blur may omit optical occlusion; subsets vary",
-      "split_group": "Original full-clear source image and derivatives grouped",
-      "recommended_role": "secondary_synthetic_control"
-    },
-    {
       "id": "D10",
       "name": "EDMF",
       "data_class": "real_smartphone_pairs",

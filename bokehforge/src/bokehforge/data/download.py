@@ -17,6 +17,7 @@ from urllib.parse import quote, urlparse
 
 import requests
 
+from ._canonical import RETIRED_LAYOUTS
 from ._files import digest, natural_key, safe_path
 from .layout import METADATA, data_run
 
@@ -246,17 +247,19 @@ def main(argv=None):
                 save_json(args.root / METADATA / "probes" / (hashlib.sha256(args.probe_url.encode()).hexdigest()[:16] + ".json"), record)
                 print(json.dumps(record, indent=2))
                 return 0
+        sources = [d for d in configured["datasets"] if d.get("layout") not in RETIRED_LAYOUTS]
         lock = json.loads(args.lock.read_text()) if args.lock.exists() else {"schema_version": 1, "datasets": []}
+        lock["datasets"] = [d for d in lock["datasets"] if d.get("layout") not in RETIRED_LAYOUTS]
         if args.refresh_lock:
             lock["datasets"] = [d for d in lock["datasets"] if selected and d["id"] not in selected]
-        disabled = {d["id"]: d for d in configured["datasets"] if d.get("provider") == "disabled"}
+        disabled = {d["id"]: d for d in sources if d.get("provider") == "disabled"}
         lock["datasets"] = [{**disabled[d["id"]], "status": "disabled", "files": []}
                             if d["id"] in disabled else d for d in lock["datasets"]]
         save_json(args.lock, lock)
-        configured_ids = {d["id"] for d in configured["datasets"]}
+        configured_ids = {d["id"] for d in sources}
         lock["datasets"] = [d for d in lock["datasets"] if not (d["status"] == "resolve_failed" and d["id"] in configured_ids and (not selected or d["id"] in selected))]
         ids = {d["id"] for d in lock["datasets"]}
-        for source in configured["datasets"]:
+        for source in sources:
             if selected and source["id"] not in selected:
                 continue
             if source["id"] in ids:

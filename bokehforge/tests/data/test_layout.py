@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 from PIL import Image
+import pytest
 
 from bokehforge import FrameWindowDataset, SceneCatalog
 
@@ -24,9 +25,9 @@ def source_fixture(tmp_path):
     return root
 
 
-def run_download(root):
+def run_download(root, *args):
     return subprocess.run([sys.executable, "-m", "bokehforge", "data", "download",
-        "--root", str(root), "--config", str(root / "sources.json"), "--lock", str(root / "sources.lock.json")],
+        "--root", str(root), "--config", str(root / "sources.json"), "--lock", str(root / "sources.lock.json"), *args],
         capture_output=True, text=True)
 
 
@@ -58,6 +59,44 @@ def test_logs_append_and_reports_remain_idempotent(tmp_path):
     assert run_download(root).returncode == 0
     assert (report.read_bytes(), report.stat().st_mtime_ns) == first
     assert log.read_bytes().startswith(initial) and log.stat().st_size > len(initial)
+
+
+def test_removed_source_is_not_downloaded_from_an_old_lock(tmp_path):
+    root = source_fixture(tmp_path)
+    lock = root / "sources.lock.json"
+    pinned = json.loads(lock.read_text())
+    retired = {"id": "D09", "status": "available", "layout": "mfi_whu", "files": []}
+    old_lock = json.dumps({"datasets": [*pinned["datasets"], retired]})
+    lock.write_text(old_lock)
+
+    result = run_download(root, "--dataset", "D09")
+    assert result.returncode == 2
+    assert "Unknown dataset IDs: ['D09']" in result.stderr
+    assert not (root / "raw/D09").exists()
+    lock.write_text(old_lock)
+    result = run_download(root)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert json.loads(lock.read_text()) == pinned
+    assert not (root / "raw/D09").exists()
+
+
+def test_catalog_ignores_retired_source_from_old_manifests_and_locks(tmp_path):
+    root = source_fixture(tmp_path)
+    assert run_download(root).returncode == 0
+    expected_scenes = SceneCatalog(root).scene_ids
+    retired = {"id": "D09", "status": "available", "layout": "mfi_whu",
+               "files": [{"path": "MFI-WHU.rar"}]}
+    manifest = root / "raw/D09/download-manifest.json"
+    manifest.parent.mkdir()
+    manifest.write_text(json.dumps(retired))
+    lock = root / "sources.lock.json"
+    pinned = json.loads(lock.read_text())
+    lock.write_text(json.dumps({"datasets": [*pinned["datasets"], retired]}))
+
+    for source_lock in (None, lock):
+        assert SceneCatalog(root, lock=source_lock).scene_ids == expected_scenes
+        with pytest.raises(ValueError, match="Unknown or undownloaded datasets"):
+            SceneCatalog(root, datasets="D09", lock=source_lock)
 
 
 def test_data_lock_prevents_concurrent_downloads(tmp_path):

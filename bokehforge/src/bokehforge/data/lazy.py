@@ -15,7 +15,7 @@ import numpy as np
 import tifffile
 
 from ._canonical import (
-    ARCHIVES, CAMERA_RAW, IMAGES, TIFF_IMAGES, decode, encode_tiff,
+    ARCHIVES, CAMERA_RAW, IMAGES, RETIRED_LAYOUTS, TIFF_IMAGES, decode, encode_tiff,
     leakage_groups, plan_scenes, runtime_recipe, scene_metadata,
 )
 from ._files import digest, safe_path
@@ -170,6 +170,8 @@ class SceneCatalog:
                        if not selected or path.parent.name in selected]
         else:
             sources = json.loads(Path(lock).read_text())["datasets"]
+        # Older locks and download manifests may still list the retired MFI-WHU source.
+        sources = [source for source in sources if source.get("layout") not in RETIRED_LAYOUTS]
         missing = selected - {source["id"] for source in sources}
         if missing:
             raise ValueError(f"Unknown or undownloaded datasets: {sorted(missing)}")

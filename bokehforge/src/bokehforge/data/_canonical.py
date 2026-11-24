@@ -21,8 +21,9 @@ TIFF_IMAGES = {".tif", ".tiff", ".stk"}
 ARCHIVES = {".zip", ".rar", ".tar", ".tgz", ".gz", ".7z"}
 CONVERTER_SHA256 = digest(Path(__file__))
 HELPERS_SHA256 = digest(Path(_files.__file__))
-SUPPORTED_LAYOUTS = {"explicit_frames", "sood_raw", "hrmff", "edmf", "mfi_whu", "fod500",
+SUPPORTED_LAYOUTS = {"explicit_frames", "sood_raw", "hrmff", "edmf", "fod500",
                      "infinigen_defocus", "directory_stacks", "archive_stacks"}
+RETIRED_LAYOUTS = frozenset({"mfi_whu"})
 INFINIGEN_APERTURES = (1.4, 2.0, 2.8, 4.0, 5.6)
 INFINIGEN_DISTANCES = (0.8, 1.2, 1.7, 2.3, 3.0, 3.8, 4.7, 6.0, 8.0)
 
@@ -105,18 +106,6 @@ def plan_scenes(source, inventory):
         elif layout == "edmf":
             match = re.fullmatch(r"bg-[AB]-(\d+)", stem, re.I)
             scene = f"pair-{int(match[1]):04d}" if match else None
-        elif layout == "mfi_whu":
-            parts = list(p.parts)
-            labels = {"near", "far", "a", "b", "source_a", "source_b", "source_1", "source_2", "sourcea", "sourceb", "imagea", "imageb", "inputa", "inputb", "gt", "groundtruth", "ground_truth", "reference", "full_clear", "fusion", "focus1", "focus2"}
-            indices = [i for i, x in enumerate(parts[:-1]) if x.lower() in labels]
-            if indices:
-                idx = indices[-1]
-                role = "reference" if parts[idx].lower() in {"gt", "groundtruth", "ground_truth", "reference", "full_clear", "fusion"} else "frame"
-                scene = "/".join(parts[:idx] + parts[idx + 1:-1] + [stem])
-            else:
-                match = re.match(r"(.+?)[-_]([AB12])$", stem, re.I)
-                if match:
-                    scene = str(p.parent / match[1])
         elif layout == "fod500":
             match = re.fullmatch(r"(\d+)_(\d+)All", stem, re.I)
             if match:

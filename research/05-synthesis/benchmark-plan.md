@@ -75,7 +75,7 @@ The initial acquisition shortlist is:
 | Synthetic reference regression | InfinigenDefocus | Keep five apertures separate and group related views by scene seed. Compare to the provider all-in-focus render. |
 | Measurement truth and missing cases | Newly generated analytic/physical-render scenes and newly captured controlled targets | Proposed acquisition, not existing data. Supply known geometry, visibility, coded detail, radiometric calibration, repeated captures and fresh held-out families. |
 
-The [eight-source catalogue](../04-datasets/dataset-catalogue.csv) records access, rights, and reference limits for each active source.
+The [dataset catalogue](../04-datasets/dataset-catalogue.csv) records access, rights, and reference limits for each active source.
 
 Short pairs do not replace 100-frame macro scenes. One 999-frame sweep is one scene group. A software-computed reference does not become exact because the input is RAW. Microscopy image formation and real transparent layers require their own applicability labels.
 

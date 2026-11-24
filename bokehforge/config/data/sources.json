@@ -45,21 +45,6 @@
       "layout": "archive_stacks"
     },
     {
-      "id": "D09",
-      "name": "MFI-WHU",
-      "primary_url": "https://doi.org/10.1016/j.inffus.2020.08.022",
-      "reference_type": "synthetic_source_image_reference",
-      "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
-      "original_split": "No official split verified",
-      "rights_evidence": "MIT repo; underlying public-image terms unresolved",
-      "transfer": "srgb_assumed",
-      "evaluation_domain": "focus_stacking",
-      "provider": "github",
-      "repository": "HaoZhang1018/MFI-WHU",
-      "include_pattern": "^MFI-WHU\\.rar$|^LICENSE$|^README",
-      "layout": "mfi_whu"
-    },
-    {
       "id": "D10",
       "name": "EDMF",
       "primary_url": "https://www.mdpi.com/1424-8220/24/22/7287",

@@ -2,7 +2,7 @@
 
 ## Download verified originals
 
-Run from the `bokehforge/` project directory. The project pins Python 3.12.12 and dependency wheel hashes. The default command downloads every configured source, about 18.98 GB in native files.
+Run from the `bokehforge/` project directory. The project pins Python 3.12.12 and dependency wheel hashes. The default command downloads every configured source, about 18.96 GB in native files.
 
 ```sh
 uv sync --frozen
@@ -73,7 +73,6 @@ Leakage groups join exact source and reference byte overlaps and known specimen 
 |---|---|---:|
 | D02 | Sood 999-frame macro sweep | 8.96 GB |
 | D04 | Amber spider optical stacks | 262.35 MB |
-| D09 | MFI-WHU | 18.17 MB |
 | D10 | EDMF | 128.61 MB |
 | D11 | HRMFF | 225.12 MB |
 | D19 | Mobile Depth | 56.66 MB |
