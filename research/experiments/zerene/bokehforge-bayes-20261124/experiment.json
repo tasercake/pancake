@@ -1,0 +1,3432 @@
+{
+  "config": {
+    "seed": 20261124,
+    "optimization_trials": 100,
+    "stacks_per_dataset_per_split": 50,
+    "checkpoint_interval": 10,
+    "search_space": {
+      "dmap_percentile": [
+        0,
+        100
+      ],
+      "dmap_estimation_radius": [
+        1,
+        32
+      ],
+      "dmap_smoothing_radius": [
+        0,
+        24
+      ]
+    },
+    "dmap_trial_zero": {
+      "dmap_percentile": 50,
+      "dmap_estimation_radius": 10,
+      "dmap_smoothing_radius": 5
+    },
+    "optimizer": "Optuna multivariate TPE with 10 startup observations",
+    "alignment": "pre-aligned fixed-coordinate inputs",
+    "color": "native resolution, 16-bit tagged sRGB input, Zerene CopyInput output, linear-sRGB scoring",
+    "objective": "mean per-stack linear RGB PSNR (unit peak; 120 dB cap), equal weight for each dataset",
+    "source_manifests": {
+      "D09": {
+        "evaluation_domain": "focus_stacking",
+        "files": [
+          {
+            "git_blob_sha1": "e33a297498bdb4332f06b8206f8c60149b2b8d94",
+            "path": "LICENSE",
+            "sha256": "c48965dd4456d4f93d6a9926f262cf08ff75ce3e6e0b26562111d27871bcf386",
+            "size": 1066,
+            "url": "https://raw.githubusercontent.com/HaoZhang1018/MFI-WHU/6071f2909f5563ccb9bcd71317f5102eefe13e6f/LICENSE"
+          },
+          {
+            "git_blob_sha1": "0a2068f533492a8ee0831e24b9a0e81aa91c3df5",
+            "path": "MFI-WHU.rar",
+            "sha256": "ec6bb595a56ca1b4a36d4ac2081cadb915a9e4718d54391d05c9dbcb419ea413",
+            "size": 18169332,
+            "url": "https://raw.githubusercontent.com/HaoZhang1018/MFI-WHU/6071f2909f5563ccb9bcd71317f5102eefe13e6f/MFI-WHU.rar"
+          },
+          {
+            "git_blob_sha1": "83cd81a2dd3013a9301998943b1d997f0ab35839",
+            "path": "README.md",
+            "sha256": "adcb8ddd66f885b3130ebbcb2c437ba55b2ad5dd3e8e04a52274459eca7f8634",
+            "size": 629,
+            "url": "https://raw.githubusercontent.com/HaoZhang1018/MFI-WHU/6071f2909f5563ccb9bcd71317f5102eefe13e6f/README.md"
+          }
+        ],
+        "id": "D09",
+        "include_pattern": "^MFI-WHU\\.rar$|^LICENSE$|^README",
+        "layout": "mfi_whu",
+        "name": "MFI-WHU",
+        "original_split": "No official split verified",
+        "primary_url": "https://doi.org/10.1016/j.inffus.2020.08.022",
+        "provider": "github",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "reference_type": "synthetic_source_image_reference",
+        "repository": "HaoZhang1018/MFI-WHU",
+        "revision": "6071f2909f5563ccb9bcd71317f5102eefe13e6f",
+        "rights_evidence": "MIT repo; underlying public-image terms unresolved",
+        "status": "available",
+        "transfer": "srgb_assumed"
+      },
+      "D29": {
+        "evaluation_domain": "synthetic_indoor",
+        "files": [
+          {
+            "path": "InfinigenDefocus.zip",
+            "sha256": "b38d7749d519385ed907836cc1d1f7f8bc1f0775e0df47d767a28a081dff29f8",
+            "size": 9092311161,
+            "url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus/resolve/79aadc918e7a96a1544f324fc675a4734649455e/InfinigenDefocus.zip"
+          },
+          {
+            "git_blob_sha1": "9645f09fff91f8a367aa2103392246dd391aff89",
+            "path": "LICENSE",
+            "sha256": "5d0e29e3fb749d71ecdf9316e422b68861d6ebadbacd2e88fa37960fdf5b9991",
+            "size": 1506,
+            "url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus/resolve/79aadc918e7a96a1544f324fc675a4734649455e/LICENSE"
+          },
+          {
+            "git_blob_sha1": "55677736a01dc7823db2278089df6dbcbb30e124",
+            "path": "README.md",
+            "sha256": "ad5d1deac6a97972d8faf5018559bea256d40321afa67664a80e1e4523adfa25",
+            "size": 3739,
+            "url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus/resolve/79aadc918e7a96a1544f324fc675a4734649455e/README.md"
+          }
+        ],
+        "id": "D29",
+        "include": [
+          "InfinigenDefocus.zip",
+          "LICENSE",
+          "README.md"
+        ],
+        "layout": "infinigen_defocus",
+        "name": "InfinigenDefocus",
+        "original_split": "Hugging Face train split; no new split assigned",
+        "primary_url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus",
+        "provider": "huggingface",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "reference_type": "rendered_all_in_focus",
+        "repository": "venkatsubra/InfinigenDefocus",
+        "revision": "79aadc918e7a96a1544f324fc675a4734649455e",
+        "rights_evidence": "BSD-3-Clause in the pinned dataset release",
+        "status": "available",
+        "transfer": "srgb_assumed"
+      }
+    },
+    "zerene_preferences_sha256": "067f2ae2e4206a02bba2c694c420b41d595cdba1f197af281b3b064a6bf9ed1a",
+    "sweep_sha256": "c38a5b7dfda9507806f7c8d96e47f310af23e48541619312ad8ae586e0cfff21",
+    "runner_sha256": "533b603b0950272a48183aaef14b62dba451af474c26228593a6ba333d10ae3c",
+    "packages": {
+      "optuna": "4.6.0",
+      "numpy": "2.5.4",
+      "tifffile": "2026.11.12",
+      "bokehforge": "0.1.0",
+      "matplotlib": "3.10.8"
+    }
+  },
+  "splits": {
+    "tuning": [
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-14-e589193a",
+        "group_id": "group-e84ce9dfa562a66a458a",
+        "source_scene_id": "MFI-WHU/14",
+        "frame_ids": [
+          "D09/MFI-WHU-14-e589193a/frames/000000.tif",
+          "D09/MFI-WHU-14-e589193a/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-14-e589193a/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-66-a98ddf88",
+        "group_id": "group-1d5788e95124b255fa1f",
+        "source_scene_id": "MFI-WHU/66",
+        "frame_ids": [
+          "D09/MFI-WHU-66-a98ddf88/frames/000000.tif",
+          "D09/MFI-WHU-66-a98ddf88/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-66-a98ddf88/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-6-58d0fd3e",
+        "group_id": "group-c4558e10ed7ab79ca189",
+        "source_scene_id": "MFI-WHU/6",
+        "frame_ids": [
+          "D09/MFI-WHU-6-58d0fd3e/frames/000000.tif",
+          "D09/MFI-WHU-6-58d0fd3e/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-6-58d0fd3e/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-46-707449dd",
+        "group_id": "group-001a3d78177b102d3323",
+        "source_scene_id": "MFI-WHU/46",
+        "frame_ids": [
+          "D09/MFI-WHU-46-707449dd/frames/000000.tif",
+          "D09/MFI-WHU-46-707449dd/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-46-707449dd/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-93-2dc50fea",
+        "group_id": "group-048355a5e29b706a2ad7",
+        "source_scene_id": "MFI-WHU/93",
+        "frame_ids": [
+          "D09/MFI-WHU-93-2dc50fea/frames/000000.tif",
+          "D09/MFI-WHU-93-2dc50fea/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-93-2dc50fea/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-33-f7edab7e",
+        "group_id": "group-fb6524235767249b4391",
+        "source_scene_id": "MFI-WHU/33",
+        "frame_ids": [
+          "D09/MFI-WHU-33-f7edab7e/frames/000000.tif",
+          "D09/MFI-WHU-33-f7edab7e/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-33-f7edab7e/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-63-2322f231",
+        "group_id": "group-e4c259e446395cc78d11",
+        "source_scene_id": "MFI-WHU/63",
+        "frame_ids": [
+          "D09/MFI-WHU-63-2322f231/frames/000000.tif",
+          "D09/MFI-WHU-63-2322f231/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-63-2322f231/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-48-2f24ff06",
+        "group_id": "group-c8da68276ca752995f5c",
+        "source_scene_id": "MFI-WHU/48",
+        "frame_ids": [
+          "D09/MFI-WHU-48-2f24ff06/frames/000000.tif",
+          "D09/MFI-WHU-48-2f24ff06/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-48-2f24ff06/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-18-c2e2aac4",
+        "group_id": "group-14b5ec8f56b2320b582c",
+        "source_scene_id": "MFI-WHU/18",
+        "frame_ids": [
+          "D09/MFI-WHU-18-c2e2aac4/frames/000000.tif",
+          "D09/MFI-WHU-18-c2e2aac4/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-18-c2e2aac4/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-105-88893301",
+        "group_id": "group-af30d6734f5add2ce89c",
+        "source_scene_id": "MFI-WHU/105",
+        "frame_ids": [
+          "D09/MFI-WHU-105-88893301/frames/000000.tif",
+          "D09/MFI-WHU-105-88893301/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-105-88893301/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-53-eb791e1a",
+        "group_id": "group-84bd5f19eee4e825e3b5",
+        "source_scene_id": "MFI-WHU/53",
+        "frame_ids": [
+          "D09/MFI-WHU-53-eb791e1a/frames/000000.tif",
+          "D09/MFI-WHU-53-eb791e1a/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-53-eb791e1a/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-115-a74d5578",
+        "group_id": "group-8a841646e4f4fe3a7d8b",
+        "source_scene_id": "MFI-WHU/115",
+        "frame_ids": [
+          "D09/MFI-WHU-115-a74d5578/frames/000000.tif",
+          "D09/MFI-WHU-115-a74d5578/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-115-a74d5578/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-35-26a8ffcc",
+        "group_id": "group-16f777905ecbca098b1e",
+        "source_scene_id": "MFI-WHU/35",
+        "frame_ids": [
+          "D09/MFI-WHU-35-26a8ffcc/frames/000000.tif",
+          "D09/MFI-WHU-35-26a8ffcc/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-35-26a8ffcc/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-40-605a88d4",
+        "group_id": "group-dddbf620525d8d91099b",
+        "source_scene_id": "MFI-WHU/40",
+        "frame_ids": [
+          "D09/MFI-WHU-40-605a88d4/frames/000000.tif",
+          "D09/MFI-WHU-40-605a88d4/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-40-605a88d4/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-28-a51be648",
+        "group_id": "group-832c2fa5d74674fb9161",
+        "source_scene_id": "MFI-WHU/28",
+        "frame_ids": [
+          "D09/MFI-WHU-28-a51be648/frames/000000.tif",
+          "D09/MFI-WHU-28-a51be648/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-28-a51be648/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-109-5ff7cbee",
+        "group_id": "group-8185b6190a34b67d5ebf",
+        "source_scene_id": "MFI-WHU/109",
+        "frame_ids": [
+          "D09/MFI-WHU-109-5ff7cbee/frames/000000.tif",
+          "D09/MFI-WHU-109-5ff7cbee/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-109-5ff7cbee/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-84-322f7275",
+        "group_id": "group-e21c5954e1c6337d98a8",
+        "source_scene_id": "MFI-WHU/84",
+        "frame_ids": [
+          "D09/MFI-WHU-84-322f7275/frames/000000.tif",
+          "D09/MFI-WHU-84-322f7275/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-84-322f7275/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-94-05384fc8",
+        "group_id": "group-a3644cb872f62e5b37d9",
+        "source_scene_id": "MFI-WHU/94",
+        "frame_ids": [
+          "D09/MFI-WHU-94-05384fc8/frames/000000.tif",
+          "D09/MFI-WHU-94-05384fc8/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-94-05384fc8/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-64-8c30b514",
+        "group_id": "group-3f5321f1f314c490144e",
+        "source_scene_id": "MFI-WHU/64",
+        "frame_ids": [
+          "D09/MFI-WHU-64-8c30b514/frames/000000.tif",
+          "D09/MFI-WHU-64-8c30b514/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-64-8c30b514/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-27-2f8d99e8",
+        "group_id": "group-0806534460615b19b238",
+        "source_scene_id": "MFI-WHU/27",
+        "frame_ids": [
+          "D09/MFI-WHU-27-2f8d99e8/frames/000000.tif",
+          "D09/MFI-WHU-27-2f8d99e8/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-27-2f8d99e8/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-77-300e9f89",
+        "group_id": "group-d34cbc5763ecfd8f250a",
+        "source_scene_id": "MFI-WHU/77",
+        "frame_ids": [
+          "D09/MFI-WHU-77-300e9f89/frames/000000.tif",
+          "D09/MFI-WHU-77-300e9f89/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-77-300e9f89/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-37-9f1dc3d6",
+        "group_id": "group-f9bccfb25fb36d5bf328",
+        "source_scene_id": "MFI-WHU/37",
+        "frame_ids": [
+          "D09/MFI-WHU-37-9f1dc3d6/frames/000000.tif",
+          "D09/MFI-WHU-37-9f1dc3d6/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-37-9f1dc3d6/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-111-fdf56cb0",
+        "group_id": "group-a6f9d80a4a452b310a4b",
+        "source_scene_id": "MFI-WHU/111",
+        "frame_ids": [
+          "D09/MFI-WHU-111-fdf56cb0/frames/000000.tif",
+          "D09/MFI-WHU-111-fdf56cb0/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-111-fdf56cb0/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-112-2a179d3b",
+        "group_id": "group-a01f659b2d5331db2f0d",
+        "source_scene_id": "MFI-WHU/112",
+        "frame_ids": [
+          "D09/MFI-WHU-112-2a179d3b/frames/000000.tif",
+          "D09/MFI-WHU-112-2a179d3b/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-112-2a179d3b/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-85-3db220d1",
+        "group_id": "group-053e5a33a5d416883e72",
+        "source_scene_id": "MFI-WHU/85",
+        "frame_ids": [
+          "D09/MFI-WHU-85-3db220d1/frames/000000.tif",
+          "D09/MFI-WHU-85-3db220d1/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-85-3db220d1/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-82-0509caf3",
+        "group_id": "group-15cede747d0a9ada75dd",
+        "source_scene_id": "MFI-WHU/82",
+        "frame_ids": [
+          "D09/MFI-WHU-82-0509caf3/frames/000000.tif",
+          "D09/MFI-WHU-82-0509caf3/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-82-0509caf3/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-74-d536c534",
+        "group_id": "group-b91b9dfbf11997207e12",
+        "source_scene_id": "MFI-WHU/74",
+        "frame_ids": [
+          "D09/MFI-WHU-74-d536c534/frames/000000.tif",
+          "D09/MFI-WHU-74-d536c534/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-74-d536c534/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-36-fc8d7c84",
+        "group_id": "group-8399a59c59495ce0dff2",
+        "source_scene_id": "MFI-WHU/36",
+        "frame_ids": [
+          "D09/MFI-WHU-36-fc8d7c84/frames/000000.tif",
+          "D09/MFI-WHU-36-fc8d7c84/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-36-fc8d7c84/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-39-7ae85b35",
+        "group_id": "group-4dda3e950ab9fd494d12",
+        "source_scene_id": "MFI-WHU/39",
+        "frame_ids": [
+          "D09/MFI-WHU-39-7ae85b35/frames/000000.tif",
+          "D09/MFI-WHU-39-7ae85b35/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-39-7ae85b35/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-70-f016a7b7",
+        "group_id": "group-019f107a263bf2703f2a",
+        "source_scene_id": "MFI-WHU/70",
+        "frame_ids": [
+          "D09/MFI-WHU-70-f016a7b7/frames/000000.tif",
+          "D09/MFI-WHU-70-f016a7b7/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-70-f016a7b7/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-8-2f6606c0",
+        "group_id": "group-9d402c5af8ff322df6cf",
+        "source_scene_id": "MFI-WHU/8",
+        "frame_ids": [
+          "D09/MFI-WHU-8-2f6606c0/frames/000000.tif",
+          "D09/MFI-WHU-8-2f6606c0/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-8-2f6606c0/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-26-9dfb2197",
+        "group_id": "group-698328c40423c60f7752",
+        "source_scene_id": "MFI-WHU/26",
+        "frame_ids": [
+          "D09/MFI-WHU-26-9dfb2197/frames/000000.tif",
+          "D09/MFI-WHU-26-9dfb2197/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-26-9dfb2197/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-61-280e0b10",
+        "group_id": "group-ac3b5ce74eff4c459b64",
+        "source_scene_id": "MFI-WHU/61",
+        "frame_ids": [
+          "D09/MFI-WHU-61-280e0b10/frames/000000.tif",
+          "D09/MFI-WHU-61-280e0b10/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-61-280e0b10/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-81-14496729",
+        "group_id": "group-425d0b58501d494d7351",
+        "source_scene_id": "MFI-WHU/81",
+        "frame_ids": [
+          "D09/MFI-WHU-81-14496729/frames/000000.tif",
+          "D09/MFI-WHU-81-14496729/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-81-14496729/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-68-4c7e1d75",
+        "group_id": "group-e325a02446f62be41a59",
+        "source_scene_id": "MFI-WHU/68",
+        "frame_ids": [
+          "D09/MFI-WHU-68-4c7e1d75/frames/000000.tif",
+          "D09/MFI-WHU-68-4c7e1d75/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-68-4c7e1d75/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-38-acb801f3",
+        "group_id": "group-c1c8bb10ed30ced1925c",
+        "source_scene_id": "MFI-WHU/38",
+        "frame_ids": [
+          "D09/MFI-WHU-38-acb801f3/frames/000000.tif",
+          "D09/MFI-WHU-38-acb801f3/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-38-acb801f3/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-60-d73f1e7b",
+        "group_id": "group-96e222771b3079c66ae5",
+        "source_scene_id": "MFI-WHU/60",
+        "frame_ids": [
+          "D09/MFI-WHU-60-d73f1e7b/frames/000000.tif",
+          "D09/MFI-WHU-60-d73f1e7b/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-60-d73f1e7b/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-67-aa4f83e5",
+        "group_id": "group-f778ccd5c15fb2a7c2ed",
+        "source_scene_id": "MFI-WHU/67",
+        "frame_ids": [
+          "D09/MFI-WHU-67-aa4f83e5/frames/000000.tif",
+          "D09/MFI-WHU-67-aa4f83e5/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-67-aa4f83e5/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-3-eb1ddf34",
+        "group_id": "group-ed236cfe75c983c2c19c",
+        "source_scene_id": "MFI-WHU/3",
+        "frame_ids": [
+          "D09/MFI-WHU-3-eb1ddf34/frames/000000.tif",
+          "D09/MFI-WHU-3-eb1ddf34/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-3-eb1ddf34/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-76-688164d4",
+        "group_id": "group-e7687b3a446facbce77a",
+        "source_scene_id": "MFI-WHU/76",
+        "frame_ids": [
+          "D09/MFI-WHU-76-688164d4/frames/000000.tif",
+          "D09/MFI-WHU-76-688164d4/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-76-688164d4/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-91-59d5fe4d",
+        "group_id": "group-9d784f9140657827cf5f",
+        "source_scene_id": "MFI-WHU/91",
+        "frame_ids": [
+          "D09/MFI-WHU-91-59d5fe4d/frames/000000.tif",
+          "D09/MFI-WHU-91-59d5fe4d/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-91-59d5fe4d/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-29-08814204",
+        "group_id": "group-57f71734dbc8a0a3eb98",
+        "source_scene_id": "MFI-WHU/29",
+        "frame_ids": [
+          "D09/MFI-WHU-29-08814204/frames/000000.tif",
+          "D09/MFI-WHU-29-08814204/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-29-08814204/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-83-0050bcdb",
+        "group_id": "group-3b337719b3899cad05c1",
+        "source_scene_id": "MFI-WHU/83",
+        "frame_ids": [
+          "D09/MFI-WHU-83-0050bcdb/frames/000000.tif",
+          "D09/MFI-WHU-83-0050bcdb/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-83-0050bcdb/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-5-a047ea7a",
+        "group_id": "group-469f3bbea861ac66ec67",
+        "source_scene_id": "MFI-WHU/5",
+        "frame_ids": [
+          "D09/MFI-WHU-5-a047ea7a/frames/000000.tif",
+          "D09/MFI-WHU-5-a047ea7a/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-5-a047ea7a/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-57-92066ac2",
+        "group_id": "group-c8d0f78ba6cccd614e00",
+        "source_scene_id": "MFI-WHU/57",
+        "frame_ids": [
+          "D09/MFI-WHU-57-92066ac2/frames/000000.tif",
+          "D09/MFI-WHU-57-92066ac2/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-57-92066ac2/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-113-d74a536b",
+        "group_id": "group-ac7e26e757715f8a2bdf",
+        "source_scene_id": "MFI-WHU/113",
+        "frame_ids": [
+          "D09/MFI-WHU-113-d74a536b/frames/000000.tif",
+          "D09/MFI-WHU-113-d74a536b/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-113-d74a536b/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-23-50605022",
+        "group_id": "group-49a88beaeca3eb7f882c",
+        "source_scene_id": "MFI-WHU/23",
+        "frame_ids": [
+          "D09/MFI-WHU-23-50605022/frames/000000.tif",
+          "D09/MFI-WHU-23-50605022/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-23-50605022/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-114-a7916f55",
+        "group_id": "group-6a0ec0bd0f0dee73df2f",
+        "source_scene_id": "MFI-WHU/114",
+        "frame_ids": [
+          "D09/MFI-WHU-114-a7916f55/frames/000000.tif",
+          "D09/MFI-WHU-114-a7916f55/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-114-a7916f55/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-78-632a65e7",
+        "group_id": "group-f2677291e7c7d67e34a7",
+        "source_scene_id": "MFI-WHU/78",
+        "frame_ids": [
+          "D09/MFI-WHU-78-632a65e7/frames/000000.tif",
+          "D09/MFI-WHU-78-632a65e7/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-78-632a65e7/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-118-7caa5530",
+        "group_id": "group-906916bede177d89d4a6",
+        "source_scene_id": "MFI-WHU/118",
+        "frame_ids": [
+          "D09/MFI-WHU-118-7caa5530/frames/000000.tif",
+          "D09/MFI-WHU-118-7caa5530/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-118-7caa5530/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/20fcdab6_4-ap-2.00-c96385c1",
+        "group_id": "group-881a18ce7c061fcc9482",
+        "source_scene_id": "20fcdab6_4/ap-2.00",
+        "frame_ids": [
+          "D29/20fcdab6_4-ap-2.00-c96385c1/frames/000000.tif",
+          "D29/20fcdab6_4-ap-2.00-c96385c1/frames/000001.tif",
+          "D29/20fcdab6_4-ap-2.00-c96385c1/frames/000002.tif",
+          "D29/20fcdab6_4-ap-2.00-c96385c1/frames/000003.tif",
+          "D29/20fcdab6_4-ap-2.00-c96385c1/frames/000004.tif",
+          "D29/20fcdab6_4-ap-2.00-c96385c1/frames/000005.tif",
+          "D29/20fcdab6_4-ap-2.00-c96385c1/frames/000006.tif",
+          "D29/20fcdab6_4-ap-2.00-c96385c1/frames/000007.tif",
+          "D29/20fcdab6_4-ap-2.00-c96385c1/frames/000008.tif"
+        ],
+        "reference_id": "D29/20fcdab6_4-ap-2.00-c96385c1/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/3239944d_1-ap-5.60-edb387c1",
+        "group_id": "group-f5a42461c1b269eed7dc",
+        "source_scene_id": "3239944d_1/ap-5.60",
+        "frame_ids": [
+          "D29/3239944d_1-ap-5.60-edb387c1/frames/000000.tif",
+          "D29/3239944d_1-ap-5.60-edb387c1/frames/000001.tif",
+          "D29/3239944d_1-ap-5.60-edb387c1/frames/000002.tif",
+          "D29/3239944d_1-ap-5.60-edb387c1/frames/000003.tif",
+          "D29/3239944d_1-ap-5.60-edb387c1/frames/000004.tif",
+          "D29/3239944d_1-ap-5.60-edb387c1/frames/000005.tif",
+          "D29/3239944d_1-ap-5.60-edb387c1/frames/000006.tif",
+          "D29/3239944d_1-ap-5.60-edb387c1/frames/000007.tif",
+          "D29/3239944d_1-ap-5.60-edb387c1/frames/000008.tif"
+        ],
+        "reference_id": "D29/3239944d_1-ap-5.60-edb387c1/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/41ab17ed_2-ap-2.00-56e604cc",
+        "group_id": "group-fe6c09c78d4eb2b36402",
+        "source_scene_id": "41ab17ed_2/ap-2.00",
+        "frame_ids": [
+          "D29/41ab17ed_2-ap-2.00-56e604cc/frames/000000.tif",
+          "D29/41ab17ed_2-ap-2.00-56e604cc/frames/000001.tif",
+          "D29/41ab17ed_2-ap-2.00-56e604cc/frames/000002.tif",
+          "D29/41ab17ed_2-ap-2.00-56e604cc/frames/000003.tif",
+          "D29/41ab17ed_2-ap-2.00-56e604cc/frames/000004.tif",
+          "D29/41ab17ed_2-ap-2.00-56e604cc/frames/000005.tif",
+          "D29/41ab17ed_2-ap-2.00-56e604cc/frames/000006.tif",
+          "D29/41ab17ed_2-ap-2.00-56e604cc/frames/000007.tif",
+          "D29/41ab17ed_2-ap-2.00-56e604cc/frames/000008.tif"
+        ],
+        "reference_id": "D29/41ab17ed_2-ap-2.00-56e604cc/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/1fdf02eb_4-ap-2.80-b0eabbbb",
+        "group_id": "group-3875450fc24d3a521f01",
+        "source_scene_id": "1fdf02eb_4/ap-2.80",
+        "frame_ids": [
+          "D29/1fdf02eb_4-ap-2.80-b0eabbbb/frames/000000.tif",
+          "D29/1fdf02eb_4-ap-2.80-b0eabbbb/frames/000001.tif",
+          "D29/1fdf02eb_4-ap-2.80-b0eabbbb/frames/000002.tif",
+          "D29/1fdf02eb_4-ap-2.80-b0eabbbb/frames/000003.tif",
+          "D29/1fdf02eb_4-ap-2.80-b0eabbbb/frames/000004.tif",
+          "D29/1fdf02eb_4-ap-2.80-b0eabbbb/frames/000005.tif",
+          "D29/1fdf02eb_4-ap-2.80-b0eabbbb/frames/000006.tif",
+          "D29/1fdf02eb_4-ap-2.80-b0eabbbb/frames/000007.tif",
+          "D29/1fdf02eb_4-ap-2.80-b0eabbbb/frames/000008.tif"
+        ],
+        "reference_id": "D29/1fdf02eb_4-ap-2.80-b0eabbbb/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/2cd5aaf0_2-ap-2.80-edc4eb17",
+        "group_id": "group-71b47be573042ae7ec6b",
+        "source_scene_id": "2cd5aaf0_2/ap-2.80",
+        "frame_ids": [
+          "D29/2cd5aaf0_2-ap-2.80-edc4eb17/frames/000000.tif",
+          "D29/2cd5aaf0_2-ap-2.80-edc4eb17/frames/000001.tif",
+          "D29/2cd5aaf0_2-ap-2.80-edc4eb17/frames/000002.tif",
+          "D29/2cd5aaf0_2-ap-2.80-edc4eb17/frames/000003.tif",
+          "D29/2cd5aaf0_2-ap-2.80-edc4eb17/frames/000004.tif",
+          "D29/2cd5aaf0_2-ap-2.80-edc4eb17/frames/000005.tif",
+          "D29/2cd5aaf0_2-ap-2.80-edc4eb17/frames/000006.tif",
+          "D29/2cd5aaf0_2-ap-2.80-edc4eb17/frames/000007.tif",
+          "D29/2cd5aaf0_2-ap-2.80-edc4eb17/frames/000008.tif"
+        ],
+        "reference_id": "D29/2cd5aaf0_2-ap-2.80-edc4eb17/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/3b427c8f_2-ap-1.40-aa83d84a",
+        "group_id": "group-890db2473931cf905a1c",
+        "source_scene_id": "3b427c8f_2/ap-1.40",
+        "frame_ids": [
+          "D29/3b427c8f_2-ap-1.40-aa83d84a/frames/000000.tif",
+          "D29/3b427c8f_2-ap-1.40-aa83d84a/frames/000001.tif",
+          "D29/3b427c8f_2-ap-1.40-aa83d84a/frames/000002.tif",
+          "D29/3b427c8f_2-ap-1.40-aa83d84a/frames/000003.tif",
+          "D29/3b427c8f_2-ap-1.40-aa83d84a/frames/000004.tif",
+          "D29/3b427c8f_2-ap-1.40-aa83d84a/frames/000005.tif",
+          "D29/3b427c8f_2-ap-1.40-aa83d84a/frames/000006.tif",
+          "D29/3b427c8f_2-ap-1.40-aa83d84a/frames/000007.tif",
+          "D29/3b427c8f_2-ap-1.40-aa83d84a/frames/000008.tif"
+        ],
+        "reference_id": "D29/3b427c8f_2-ap-1.40-aa83d84a/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/3d1c71f5_3-ap-2.80-973c83b1",
+        "group_id": "group-cd655fd34aeb9aa6234d",
+        "source_scene_id": "3d1c71f5_3/ap-2.80",
+        "frame_ids": [
+          "D29/3d1c71f5_3-ap-2.80-973c83b1/frames/000000.tif",
+          "D29/3d1c71f5_3-ap-2.80-973c83b1/frames/000001.tif",
+          "D29/3d1c71f5_3-ap-2.80-973c83b1/frames/000002.tif",
+          "D29/3d1c71f5_3-ap-2.80-973c83b1/frames/000003.tif",
+          "D29/3d1c71f5_3-ap-2.80-973c83b1/frames/000004.tif",
+          "D29/3d1c71f5_3-ap-2.80-973c83b1/frames/000005.tif",
+          "D29/3d1c71f5_3-ap-2.80-973c83b1/frames/000006.tif",
+          "D29/3d1c71f5_3-ap-2.80-973c83b1/frames/000007.tif",
+          "D29/3d1c71f5_3-ap-2.80-973c83b1/frames/000008.tif"
+        ],
+        "reference_id": "D29/3d1c71f5_3-ap-2.80-973c83b1/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/8ee271a_4-ap-2.80-0712a8b9",
+        "group_id": "group-1b5c17408e2f25b5bb2d",
+        "source_scene_id": "8ee271a_4/ap-2.80",
+        "frame_ids": [
+          "D29/8ee271a_4-ap-2.80-0712a8b9/frames/000000.tif",
+          "D29/8ee271a_4-ap-2.80-0712a8b9/frames/000001.tif",
+          "D29/8ee271a_4-ap-2.80-0712a8b9/frames/000002.tif",
+          "D29/8ee271a_4-ap-2.80-0712a8b9/frames/000003.tif",
+          "D29/8ee271a_4-ap-2.80-0712a8b9/frames/000004.tif",
+          "D29/8ee271a_4-ap-2.80-0712a8b9/frames/000005.tif",
+          "D29/8ee271a_4-ap-2.80-0712a8b9/frames/000006.tif",
+          "D29/8ee271a_4-ap-2.80-0712a8b9/frames/000007.tif",
+          "D29/8ee271a_4-ap-2.80-0712a8b9/frames/000008.tif"
+        ],
+        "reference_id": "D29/8ee271a_4-ap-2.80-0712a8b9/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/6b629f9c_0-ap-5.60-fca5c864",
+        "group_id": "group-8eca5a9bea91c31710c1",
+        "source_scene_id": "6b629f9c_0/ap-5.60",
+        "frame_ids": [
+          "D29/6b629f9c_0-ap-5.60-fca5c864/frames/000000.tif",
+          "D29/6b629f9c_0-ap-5.60-fca5c864/frames/000001.tif",
+          "D29/6b629f9c_0-ap-5.60-fca5c864/frames/000002.tif",
+          "D29/6b629f9c_0-ap-5.60-fca5c864/frames/000003.tif",
+          "D29/6b629f9c_0-ap-5.60-fca5c864/frames/000004.tif",
+          "D29/6b629f9c_0-ap-5.60-fca5c864/frames/000005.tif",
+          "D29/6b629f9c_0-ap-5.60-fca5c864/frames/000006.tif",
+          "D29/6b629f9c_0-ap-5.60-fca5c864/frames/000007.tif",
+          "D29/6b629f9c_0-ap-5.60-fca5c864/frames/000008.tif"
+        ],
+        "reference_id": "D29/6b629f9c_0-ap-5.60-fca5c864/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/34026f3a_0-ap-5.60-d675ada9",
+        "group_id": "group-ad8469d439256489cb31",
+        "source_scene_id": "34026f3a_0/ap-5.60",
+        "frame_ids": [
+          "D29/34026f3a_0-ap-5.60-d675ada9/frames/000000.tif",
+          "D29/34026f3a_0-ap-5.60-d675ada9/frames/000001.tif",
+          "D29/34026f3a_0-ap-5.60-d675ada9/frames/000002.tif",
+          "D29/34026f3a_0-ap-5.60-d675ada9/frames/000003.tif",
+          "D29/34026f3a_0-ap-5.60-d675ada9/frames/000004.tif",
+          "D29/34026f3a_0-ap-5.60-d675ada9/frames/000005.tif",
+          "D29/34026f3a_0-ap-5.60-d675ada9/frames/000006.tif",
+          "D29/34026f3a_0-ap-5.60-d675ada9/frames/000007.tif",
+          "D29/34026f3a_0-ap-5.60-d675ada9/frames/000008.tif"
+        ],
+        "reference_id": "D29/34026f3a_0-ap-5.60-d675ada9/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/14482b0e_2-ap-1.40-06eb0ce7",
+        "group_id": "group-5b5cdfd22c5d1d69d4a0",
+        "source_scene_id": "14482b0e_2/ap-1.40",
+        "frame_ids": [
+          "D29/14482b0e_2-ap-1.40-06eb0ce7/frames/000000.tif",
+          "D29/14482b0e_2-ap-1.40-06eb0ce7/frames/000001.tif",
+          "D29/14482b0e_2-ap-1.40-06eb0ce7/frames/000002.tif",
+          "D29/14482b0e_2-ap-1.40-06eb0ce7/frames/000003.tif",
+          "D29/14482b0e_2-ap-1.40-06eb0ce7/frames/000004.tif",
+          "D29/14482b0e_2-ap-1.40-06eb0ce7/frames/000005.tif",
+          "D29/14482b0e_2-ap-1.40-06eb0ce7/frames/000006.tif",
+          "D29/14482b0e_2-ap-1.40-06eb0ce7/frames/000007.tif",
+          "D29/14482b0e_2-ap-1.40-06eb0ce7/frames/000008.tif"
+        ],
+        "reference_id": "D29/14482b0e_2-ap-1.40-06eb0ce7/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/74fe9e3_3-ap-4.00-3b85d94d",
+        "group_id": "group-caa3abbeea0ce08e9902",
+        "source_scene_id": "74fe9e3_3/ap-4.00",
+        "frame_ids": [
+          "D29/74fe9e3_3-ap-4.00-3b85d94d/frames/000000.tif",
+          "D29/74fe9e3_3-ap-4.00-3b85d94d/frames/000001.tif",
+          "D29/74fe9e3_3-ap-4.00-3b85d94d/frames/000002.tif",
+          "D29/74fe9e3_3-ap-4.00-3b85d94d/frames/000003.tif",
+          "D29/74fe9e3_3-ap-4.00-3b85d94d/frames/000004.tif",
+          "D29/74fe9e3_3-ap-4.00-3b85d94d/frames/000005.tif",
+          "D29/74fe9e3_3-ap-4.00-3b85d94d/frames/000006.tif",
+          "D29/74fe9e3_3-ap-4.00-3b85d94d/frames/000007.tif",
+          "D29/74fe9e3_3-ap-4.00-3b85d94d/frames/000008.tif"
+        ],
+        "reference_id": "D29/74fe9e3_3-ap-4.00-3b85d94d/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/26184e7d_3-ap-1.40-35ab271a",
+        "group_id": "group-1bb8e341bf2cdc4e3811",
+        "source_scene_id": "26184e7d_3/ap-1.40",
+        "frame_ids": [
+          "D29/26184e7d_3-ap-1.40-35ab271a/frames/000000.tif",
+          "D29/26184e7d_3-ap-1.40-35ab271a/frames/000001.tif",
+          "D29/26184e7d_3-ap-1.40-35ab271a/frames/000002.tif",
+          "D29/26184e7d_3-ap-1.40-35ab271a/frames/000003.tif",
+          "D29/26184e7d_3-ap-1.40-35ab271a/frames/000004.tif",
+          "D29/26184e7d_3-ap-1.40-35ab271a/frames/000005.tif",
+          "D29/26184e7d_3-ap-1.40-35ab271a/frames/000006.tif",
+          "D29/26184e7d_3-ap-1.40-35ab271a/frames/000007.tif",
+          "D29/26184e7d_3-ap-1.40-35ab271a/frames/000008.tif"
+        ],
+        "reference_id": "D29/26184e7d_3-ap-1.40-35ab271a/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/23cced82_3-ap-1.40-a885c9f4",
+        "group_id": "group-5bbb87bb2886bbaabf5b",
+        "source_scene_id": "23cced82_3/ap-1.40",
+        "frame_ids": [
+          "D29/23cced82_3-ap-1.40-a885c9f4/frames/000000.tif",
+          "D29/23cced82_3-ap-1.40-a885c9f4/frames/000001.tif",
+          "D29/23cced82_3-ap-1.40-a885c9f4/frames/000002.tif",
+          "D29/23cced82_3-ap-1.40-a885c9f4/frames/000003.tif",
+          "D29/23cced82_3-ap-1.40-a885c9f4/frames/000004.tif",
+          "D29/23cced82_3-ap-1.40-a885c9f4/frames/000005.tif",
+          "D29/23cced82_3-ap-1.40-a885c9f4/frames/000006.tif",
+          "D29/23cced82_3-ap-1.40-a885c9f4/frames/000007.tif",
+          "D29/23cced82_3-ap-1.40-a885c9f4/frames/000008.tif"
+        ],
+        "reference_id": "D29/23cced82_3-ap-1.40-a885c9f4/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/6a557126_1-ap-5.60-807848fd",
+        "group_id": "group-45b53f7f5bd8313a75fb",
+        "source_scene_id": "6a557126_1/ap-5.60",
+        "frame_ids": [
+          "D29/6a557126_1-ap-5.60-807848fd/frames/000000.tif",
+          "D29/6a557126_1-ap-5.60-807848fd/frames/000001.tif",
+          "D29/6a557126_1-ap-5.60-807848fd/frames/000002.tif",
+          "D29/6a557126_1-ap-5.60-807848fd/frames/000003.tif",
+          "D29/6a557126_1-ap-5.60-807848fd/frames/000004.tif",
+          "D29/6a557126_1-ap-5.60-807848fd/frames/000005.tif",
+          "D29/6a557126_1-ap-5.60-807848fd/frames/000006.tif",
+          "D29/6a557126_1-ap-5.60-807848fd/frames/000007.tif",
+          "D29/6a557126_1-ap-5.60-807848fd/frames/000008.tif"
+        ],
+        "reference_id": "D29/6a557126_1-ap-5.60-807848fd/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/651fdf95_1-ap-4.00-6ba4d10a",
+        "group_id": "group-c49956aa7631a3f41492",
+        "source_scene_id": "651fdf95_1/ap-4.00",
+        "frame_ids": [
+          "D29/651fdf95_1-ap-4.00-6ba4d10a/frames/000000.tif",
+          "D29/651fdf95_1-ap-4.00-6ba4d10a/frames/000001.tif",
+          "D29/651fdf95_1-ap-4.00-6ba4d10a/frames/000002.tif",
+          "D29/651fdf95_1-ap-4.00-6ba4d10a/frames/000003.tif",
+          "D29/651fdf95_1-ap-4.00-6ba4d10a/frames/000004.tif",
+          "D29/651fdf95_1-ap-4.00-6ba4d10a/frames/000005.tif",
+          "D29/651fdf95_1-ap-4.00-6ba4d10a/frames/000006.tif",
+          "D29/651fdf95_1-ap-4.00-6ba4d10a/frames/000007.tif",
+          "D29/651fdf95_1-ap-4.00-6ba4d10a/frames/000008.tif"
+        ],
+        "reference_id": "D29/651fdf95_1-ap-4.00-6ba4d10a/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/7908bf0b_2-ap-5.60-31bdb2f5",
+        "group_id": "group-f74befe04de8e962d7e4",
+        "source_scene_id": "7908bf0b_2/ap-5.60",
+        "frame_ids": [
+          "D29/7908bf0b_2-ap-5.60-31bdb2f5/frames/000000.tif",
+          "D29/7908bf0b_2-ap-5.60-31bdb2f5/frames/000001.tif",
+          "D29/7908bf0b_2-ap-5.60-31bdb2f5/frames/000002.tif",
+          "D29/7908bf0b_2-ap-5.60-31bdb2f5/frames/000003.tif",
+          "D29/7908bf0b_2-ap-5.60-31bdb2f5/frames/000004.tif",
+          "D29/7908bf0b_2-ap-5.60-31bdb2f5/frames/000005.tif",
+          "D29/7908bf0b_2-ap-5.60-31bdb2f5/frames/000006.tif",
+          "D29/7908bf0b_2-ap-5.60-31bdb2f5/frames/000007.tif",
+          "D29/7908bf0b_2-ap-5.60-31bdb2f5/frames/000008.tif"
+        ],
+        "reference_id": "D29/7908bf0b_2-ap-5.60-31bdb2f5/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/2351e18a_4-ap-4.00-ee325fab",
+        "group_id": "group-b41be744e7795f03ba25",
+        "source_scene_id": "2351e18a_4/ap-4.00",
+        "frame_ids": [
+          "D29/2351e18a_4-ap-4.00-ee325fab/frames/000000.tif",
+          "D29/2351e18a_4-ap-4.00-ee325fab/frames/000001.tif",
+          "D29/2351e18a_4-ap-4.00-ee325fab/frames/000002.tif",
+          "D29/2351e18a_4-ap-4.00-ee325fab/frames/000003.tif",
+          "D29/2351e18a_4-ap-4.00-ee325fab/frames/000004.tif",
+          "D29/2351e18a_4-ap-4.00-ee325fab/frames/000005.tif",
+          "D29/2351e18a_4-ap-4.00-ee325fab/frames/000006.tif",
+          "D29/2351e18a_4-ap-4.00-ee325fab/frames/000007.tif",
+          "D29/2351e18a_4-ap-4.00-ee325fab/frames/000008.tif"
+        ],
+        "reference_id": "D29/2351e18a_4-ap-4.00-ee325fab/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/2c5c449c_2-ap-2.80-3789983a",
+        "group_id": "group-0fdb6a87fa14fdd6369a",
+        "source_scene_id": "2c5c449c_2/ap-2.80",
+        "frame_ids": [
+          "D29/2c5c449c_2-ap-2.80-3789983a/frames/000000.tif",
+          "D29/2c5c449c_2-ap-2.80-3789983a/frames/000001.tif",
+          "D29/2c5c449c_2-ap-2.80-3789983a/frames/000002.tif",
+          "D29/2c5c449c_2-ap-2.80-3789983a/frames/000003.tif",
+          "D29/2c5c449c_2-ap-2.80-3789983a/frames/000004.tif",
+          "D29/2c5c449c_2-ap-2.80-3789983a/frames/000005.tif",
+          "D29/2c5c449c_2-ap-2.80-3789983a/frames/000006.tif",
+          "D29/2c5c449c_2-ap-2.80-3789983a/frames/000007.tif",
+          "D29/2c5c449c_2-ap-2.80-3789983a/frames/000008.tif"
+        ],
+        "reference_id": "D29/2c5c449c_2-ap-2.80-3789983a/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/313f25f9_0-ap-2.00-5fc0920c",
+        "group_id": "group-8338f48685a1747a5b47",
+        "source_scene_id": "313f25f9_0/ap-2.00",
+        "frame_ids": [
+          "D29/313f25f9_0-ap-2.00-5fc0920c/frames/000000.tif",
+          "D29/313f25f9_0-ap-2.00-5fc0920c/frames/000001.tif",
+          "D29/313f25f9_0-ap-2.00-5fc0920c/frames/000002.tif",
+          "D29/313f25f9_0-ap-2.00-5fc0920c/frames/000003.tif",
+          "D29/313f25f9_0-ap-2.00-5fc0920c/frames/000004.tif",
+          "D29/313f25f9_0-ap-2.00-5fc0920c/frames/000005.tif",
+          "D29/313f25f9_0-ap-2.00-5fc0920c/frames/000006.tif",
+          "D29/313f25f9_0-ap-2.00-5fc0920c/frames/000007.tif",
+          "D29/313f25f9_0-ap-2.00-5fc0920c/frames/000008.tif"
+        ],
+        "reference_id": "D29/313f25f9_0-ap-2.00-5fc0920c/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/6bd3c850_0-ap-2.80-1a93796e",
+        "group_id": "group-f7c3535641af5b674e34",
+        "source_scene_id": "6bd3c850_0/ap-2.80",
+        "frame_ids": [
+          "D29/6bd3c850_0-ap-2.80-1a93796e/frames/000000.tif",
+          "D29/6bd3c850_0-ap-2.80-1a93796e/frames/000001.tif",
+          "D29/6bd3c850_0-ap-2.80-1a93796e/frames/000002.tif",
+          "D29/6bd3c850_0-ap-2.80-1a93796e/frames/000003.tif",
+          "D29/6bd3c850_0-ap-2.80-1a93796e/frames/000004.tif",
+          "D29/6bd3c850_0-ap-2.80-1a93796e/frames/000005.tif",
+          "D29/6bd3c850_0-ap-2.80-1a93796e/frames/000006.tif",
+          "D29/6bd3c850_0-ap-2.80-1a93796e/frames/000007.tif",
+          "D29/6bd3c850_0-ap-2.80-1a93796e/frames/000008.tif"
+        ],
+        "reference_id": "D29/6bd3c850_0-ap-2.80-1a93796e/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/79881dc3_4-ap-2.00-502d2e4c",
+        "group_id": "group-71e24eb42765df8ecf1b",
+        "source_scene_id": "79881dc3_4/ap-2.00",
+        "frame_ids": [
+          "D29/79881dc3_4-ap-2.00-502d2e4c/frames/000000.tif",
+          "D29/79881dc3_4-ap-2.00-502d2e4c/frames/000001.tif",
+          "D29/79881dc3_4-ap-2.00-502d2e4c/frames/000002.tif",
+          "D29/79881dc3_4-ap-2.00-502d2e4c/frames/000003.tif",
+          "D29/79881dc3_4-ap-2.00-502d2e4c/frames/000004.tif",
+          "D29/79881dc3_4-ap-2.00-502d2e4c/frames/000005.tif",
+          "D29/79881dc3_4-ap-2.00-502d2e4c/frames/000006.tif",
+          "D29/79881dc3_4-ap-2.00-502d2e4c/frames/000007.tif",
+          "D29/79881dc3_4-ap-2.00-502d2e4c/frames/000008.tif"
+        ],
+        "reference_id": "D29/79881dc3_4-ap-2.00-502d2e4c/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/38e9f1f2_0-ap-5.60-d499e0a7",
+        "group_id": "group-55715614313ddf60372a",
+        "source_scene_id": "38e9f1f2_0/ap-5.60",
+        "frame_ids": [
+          "D29/38e9f1f2_0-ap-5.60-d499e0a7/frames/000000.tif",
+          "D29/38e9f1f2_0-ap-5.60-d499e0a7/frames/000001.tif",
+          "D29/38e9f1f2_0-ap-5.60-d499e0a7/frames/000002.tif",
+          "D29/38e9f1f2_0-ap-5.60-d499e0a7/frames/000003.tif",
+          "D29/38e9f1f2_0-ap-5.60-d499e0a7/frames/000004.tif",
+          "D29/38e9f1f2_0-ap-5.60-d499e0a7/frames/000005.tif",
+          "D29/38e9f1f2_0-ap-5.60-d499e0a7/frames/000006.tif",
+          "D29/38e9f1f2_0-ap-5.60-d499e0a7/frames/000007.tif",
+          "D29/38e9f1f2_0-ap-5.60-d499e0a7/frames/000008.tif"
+        ],
+        "reference_id": "D29/38e9f1f2_0-ap-5.60-d499e0a7/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/255463cb_2-ap-5.60-b5ba2c51",
+        "group_id": "group-7a8eddde122366488d25",
+        "source_scene_id": "255463cb_2/ap-5.60",
+        "frame_ids": [
+          "D29/255463cb_2-ap-5.60-b5ba2c51/frames/000000.tif",
+          "D29/255463cb_2-ap-5.60-b5ba2c51/frames/000001.tif",
+          "D29/255463cb_2-ap-5.60-b5ba2c51/frames/000002.tif",
+          "D29/255463cb_2-ap-5.60-b5ba2c51/frames/000003.tif",
+          "D29/255463cb_2-ap-5.60-b5ba2c51/frames/000004.tif",
+          "D29/255463cb_2-ap-5.60-b5ba2c51/frames/000005.tif",
+          "D29/255463cb_2-ap-5.60-b5ba2c51/frames/000006.tif",
+          "D29/255463cb_2-ap-5.60-b5ba2c51/frames/000007.tif",
+          "D29/255463cb_2-ap-5.60-b5ba2c51/frames/000008.tif"
+        ],
+        "reference_id": "D29/255463cb_2-ap-5.60-b5ba2c51/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/319a689d_3-ap-1.40-e2c662b5",
+        "group_id": "group-bf6c48f87345ff29e220",
+        "source_scene_id": "319a689d_3/ap-1.40",
+        "frame_ids": [
+          "D29/319a689d_3-ap-1.40-e2c662b5/frames/000000.tif",
+          "D29/319a689d_3-ap-1.40-e2c662b5/frames/000001.tif",
+          "D29/319a689d_3-ap-1.40-e2c662b5/frames/000002.tif",
+          "D29/319a689d_3-ap-1.40-e2c662b5/frames/000003.tif",
+          "D29/319a689d_3-ap-1.40-e2c662b5/frames/000004.tif",
+          "D29/319a689d_3-ap-1.40-e2c662b5/frames/000005.tif",
+          "D29/319a689d_3-ap-1.40-e2c662b5/frames/000006.tif",
+          "D29/319a689d_3-ap-1.40-e2c662b5/frames/000007.tif",
+          "D29/319a689d_3-ap-1.40-e2c662b5/frames/000008.tif"
+        ],
+        "reference_id": "D29/319a689d_3-ap-1.40-e2c662b5/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/240665d7_3-ap-1.40-244af494",
+        "group_id": "group-9ded33fbde7d3d9824bb",
+        "source_scene_id": "240665d7_3/ap-1.40",
+        "frame_ids": [
+          "D29/240665d7_3-ap-1.40-244af494/frames/000000.tif",
+          "D29/240665d7_3-ap-1.40-244af494/frames/000001.tif",
+          "D29/240665d7_3-ap-1.40-244af494/frames/000002.tif",
+          "D29/240665d7_3-ap-1.40-244af494/frames/000003.tif",
+          "D29/240665d7_3-ap-1.40-244af494/frames/000004.tif",
+          "D29/240665d7_3-ap-1.40-244af494/frames/000005.tif",
+          "D29/240665d7_3-ap-1.40-244af494/frames/000006.tif",
+          "D29/240665d7_3-ap-1.40-244af494/frames/000007.tif",
+          "D29/240665d7_3-ap-1.40-244af494/frames/000008.tif"
+        ],
+        "reference_id": "D29/240665d7_3-ap-1.40-244af494/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/3a449af1_0-ap-4.00-1843ac41",
+        "group_id": "group-4b171e2131442d1d5ba8",
+        "source_scene_id": "3a449af1_0/ap-4.00",
+        "frame_ids": [
+          "D29/3a449af1_0-ap-4.00-1843ac41/frames/000000.tif",
+          "D29/3a449af1_0-ap-4.00-1843ac41/frames/000001.tif",
+          "D29/3a449af1_0-ap-4.00-1843ac41/frames/000002.tif",
+          "D29/3a449af1_0-ap-4.00-1843ac41/frames/000003.tif",
+          "D29/3a449af1_0-ap-4.00-1843ac41/frames/000004.tif",
+          "D29/3a449af1_0-ap-4.00-1843ac41/frames/000005.tif",
+          "D29/3a449af1_0-ap-4.00-1843ac41/frames/000006.tif",
+          "D29/3a449af1_0-ap-4.00-1843ac41/frames/000007.tif",
+          "D29/3a449af1_0-ap-4.00-1843ac41/frames/000008.tif"
+        ],
+        "reference_id": "D29/3a449af1_0-ap-4.00-1843ac41/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/703ba9b8_4-ap-4.00-2519c680",
+        "group_id": "group-bdc1de1a4ecc177d2893",
+        "source_scene_id": "703ba9b8_4/ap-4.00",
+        "frame_ids": [
+          "D29/703ba9b8_4-ap-4.00-2519c680/frames/000000.tif",
+          "D29/703ba9b8_4-ap-4.00-2519c680/frames/000001.tif",
+          "D29/703ba9b8_4-ap-4.00-2519c680/frames/000002.tif",
+          "D29/703ba9b8_4-ap-4.00-2519c680/frames/000003.tif",
+          "D29/703ba9b8_4-ap-4.00-2519c680/frames/000004.tif",
+          "D29/703ba9b8_4-ap-4.00-2519c680/frames/000005.tif",
+          "D29/703ba9b8_4-ap-4.00-2519c680/frames/000006.tif",
+          "D29/703ba9b8_4-ap-4.00-2519c680/frames/000007.tif",
+          "D29/703ba9b8_4-ap-4.00-2519c680/frames/000008.tif"
+        ],
+        "reference_id": "D29/703ba9b8_4-ap-4.00-2519c680/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/39e0876a_4-ap-5.60-23633901",
+        "group_id": "group-8e7345d36f3f77193163",
+        "source_scene_id": "39e0876a_4/ap-5.60",
+        "frame_ids": [
+          "D29/39e0876a_4-ap-5.60-23633901/frames/000000.tif",
+          "D29/39e0876a_4-ap-5.60-23633901/frames/000001.tif",
+          "D29/39e0876a_4-ap-5.60-23633901/frames/000002.tif",
+          "D29/39e0876a_4-ap-5.60-23633901/frames/000003.tif",
+          "D29/39e0876a_4-ap-5.60-23633901/frames/000004.tif",
+          "D29/39e0876a_4-ap-5.60-23633901/frames/000005.tif",
+          "D29/39e0876a_4-ap-5.60-23633901/frames/000006.tif",
+          "D29/39e0876a_4-ap-5.60-23633901/frames/000007.tif",
+          "D29/39e0876a_4-ap-5.60-23633901/frames/000008.tif"
+        ],
+        "reference_id": "D29/39e0876a_4-ap-5.60-23633901/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/47544530_1-ap-1.40-86066c7c",
+        "group_id": "group-7369025f5b35c850fd0b",
+        "source_scene_id": "47544530_1/ap-1.40",
+        "frame_ids": [
+          "D29/47544530_1-ap-1.40-86066c7c/frames/000000.tif",
+          "D29/47544530_1-ap-1.40-86066c7c/frames/000001.tif",
+          "D29/47544530_1-ap-1.40-86066c7c/frames/000002.tif",
+          "D29/47544530_1-ap-1.40-86066c7c/frames/000003.tif",
+          "D29/47544530_1-ap-1.40-86066c7c/frames/000004.tif",
+          "D29/47544530_1-ap-1.40-86066c7c/frames/000005.tif",
+          "D29/47544530_1-ap-1.40-86066c7c/frames/000006.tif",
+          "D29/47544530_1-ap-1.40-86066c7c/frames/000007.tif",
+          "D29/47544530_1-ap-1.40-86066c7c/frames/000008.tif"
+        ],
+        "reference_id": "D29/47544530_1-ap-1.40-86066c7c/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/57bcb1c7_2-ap-2.80-160943a6",
+        "group_id": "group-03b0483ea4e4042dc19e",
+        "source_scene_id": "57bcb1c7_2/ap-2.80",
+        "frame_ids": [
+          "D29/57bcb1c7_2-ap-2.80-160943a6/frames/000000.tif",
+          "D29/57bcb1c7_2-ap-2.80-160943a6/frames/000001.tif",
+          "D29/57bcb1c7_2-ap-2.80-160943a6/frames/000002.tif",
+          "D29/57bcb1c7_2-ap-2.80-160943a6/frames/000003.tif",
+          "D29/57bcb1c7_2-ap-2.80-160943a6/frames/000004.tif",
+          "D29/57bcb1c7_2-ap-2.80-160943a6/frames/000005.tif",
+          "D29/57bcb1c7_2-ap-2.80-160943a6/frames/000006.tif",
+          "D29/57bcb1c7_2-ap-2.80-160943a6/frames/000007.tif",
+          "D29/57bcb1c7_2-ap-2.80-160943a6/frames/000008.tif"
+        ],
+        "reference_id": "D29/57bcb1c7_2-ap-2.80-160943a6/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/21c3442_2-ap-5.60-ce8bd44b",
+        "group_id": "group-7e1518009952f8356a99",
+        "source_scene_id": "21c3442_2/ap-5.60",
+        "frame_ids": [
+          "D29/21c3442_2-ap-5.60-ce8bd44b/frames/000000.tif",
+          "D29/21c3442_2-ap-5.60-ce8bd44b/frames/000001.tif",
+          "D29/21c3442_2-ap-5.60-ce8bd44b/frames/000002.tif",
+          "D29/21c3442_2-ap-5.60-ce8bd44b/frames/000003.tif",
+          "D29/21c3442_2-ap-5.60-ce8bd44b/frames/000004.tif",
+          "D29/21c3442_2-ap-5.60-ce8bd44b/frames/000005.tif",
+          "D29/21c3442_2-ap-5.60-ce8bd44b/frames/000006.tif",
+          "D29/21c3442_2-ap-5.60-ce8bd44b/frames/000007.tif",
+          "D29/21c3442_2-ap-5.60-ce8bd44b/frames/000008.tif"
+        ],
+        "reference_id": "D29/21c3442_2-ap-5.60-ce8bd44b/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/7237c52e_2-ap-5.60-056182c0",
+        "group_id": "group-43da18770191b69d3db7",
+        "source_scene_id": "7237c52e_2/ap-5.60",
+        "frame_ids": [
+          "D29/7237c52e_2-ap-5.60-056182c0/frames/000000.tif",
+          "D29/7237c52e_2-ap-5.60-056182c0/frames/000001.tif",
+          "D29/7237c52e_2-ap-5.60-056182c0/frames/000002.tif",
+          "D29/7237c52e_2-ap-5.60-056182c0/frames/000003.tif",
+          "D29/7237c52e_2-ap-5.60-056182c0/frames/000004.tif",
+          "D29/7237c52e_2-ap-5.60-056182c0/frames/000005.tif",
+          "D29/7237c52e_2-ap-5.60-056182c0/frames/000006.tif",
+          "D29/7237c52e_2-ap-5.60-056182c0/frames/000007.tif",
+          "D29/7237c52e_2-ap-5.60-056182c0/frames/000008.tif"
+        ],
+        "reference_id": "D29/7237c52e_2-ap-5.60-056182c0/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/75f7cb97_4-ap-1.40-59ee32e0",
+        "group_id": "group-9bfe0420f784e24d0cc0",
+        "source_scene_id": "75f7cb97_4/ap-1.40",
+        "frame_ids": [
+          "D29/75f7cb97_4-ap-1.40-59ee32e0/frames/000000.tif",
+          "D29/75f7cb97_4-ap-1.40-59ee32e0/frames/000001.tif",
+          "D29/75f7cb97_4-ap-1.40-59ee32e0/frames/000002.tif",
+          "D29/75f7cb97_4-ap-1.40-59ee32e0/frames/000003.tif",
+          "D29/75f7cb97_4-ap-1.40-59ee32e0/frames/000004.tif",
+          "D29/75f7cb97_4-ap-1.40-59ee32e0/frames/000005.tif",
+          "D29/75f7cb97_4-ap-1.40-59ee32e0/frames/000006.tif",
+          "D29/75f7cb97_4-ap-1.40-59ee32e0/frames/000007.tif",
+          "D29/75f7cb97_4-ap-1.40-59ee32e0/frames/000008.tif"
+        ],
+        "reference_id": "D29/75f7cb97_4-ap-1.40-59ee32e0/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/a255c0f_3-ap-4.00-72d34912",
+        "group_id": "group-1c12820b7792ce30eb04",
+        "source_scene_id": "a255c0f_3/ap-4.00",
+        "frame_ids": [
+          "D29/a255c0f_3-ap-4.00-72d34912/frames/000000.tif",
+          "D29/a255c0f_3-ap-4.00-72d34912/frames/000001.tif",
+          "D29/a255c0f_3-ap-4.00-72d34912/frames/000002.tif",
+          "D29/a255c0f_3-ap-4.00-72d34912/frames/000003.tif",
+          "D29/a255c0f_3-ap-4.00-72d34912/frames/000004.tif",
+          "D29/a255c0f_3-ap-4.00-72d34912/frames/000005.tif",
+          "D29/a255c0f_3-ap-4.00-72d34912/frames/000006.tif",
+          "D29/a255c0f_3-ap-4.00-72d34912/frames/000007.tif",
+          "D29/a255c0f_3-ap-4.00-72d34912/frames/000008.tif"
+        ],
+        "reference_id": "D29/a255c0f_3-ap-4.00-72d34912/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/11a3789d_2-ap-2.80-76485dd7",
+        "group_id": "group-ccf899e2e720549f1d11",
+        "source_scene_id": "11a3789d_2/ap-2.80",
+        "frame_ids": [
+          "D29/11a3789d_2-ap-2.80-76485dd7/frames/000000.tif",
+          "D29/11a3789d_2-ap-2.80-76485dd7/frames/000001.tif",
+          "D29/11a3789d_2-ap-2.80-76485dd7/frames/000002.tif",
+          "D29/11a3789d_2-ap-2.80-76485dd7/frames/000003.tif",
+          "D29/11a3789d_2-ap-2.80-76485dd7/frames/000004.tif",
+          "D29/11a3789d_2-ap-2.80-76485dd7/frames/000005.tif",
+          "D29/11a3789d_2-ap-2.80-76485dd7/frames/000006.tif",
+          "D29/11a3789d_2-ap-2.80-76485dd7/frames/000007.tif",
+          "D29/11a3789d_2-ap-2.80-76485dd7/frames/000008.tif"
+        ],
+        "reference_id": "D29/11a3789d_2-ap-2.80-76485dd7/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/ab41311_1-ap-2.80-bda371bd",
+        "group_id": "group-a8bcd7dcfda5606ce7df",
+        "source_scene_id": "ab41311_1/ap-2.80",
+        "frame_ids": [
+          "D29/ab41311_1-ap-2.80-bda371bd/frames/000000.tif",
+          "D29/ab41311_1-ap-2.80-bda371bd/frames/000001.tif",
+          "D29/ab41311_1-ap-2.80-bda371bd/frames/000002.tif",
+          "D29/ab41311_1-ap-2.80-bda371bd/frames/000003.tif",
+          "D29/ab41311_1-ap-2.80-bda371bd/frames/000004.tif",
+          "D29/ab41311_1-ap-2.80-bda371bd/frames/000005.tif",
+          "D29/ab41311_1-ap-2.80-bda371bd/frames/000006.tif",
+          "D29/ab41311_1-ap-2.80-bda371bd/frames/000007.tif",
+          "D29/ab41311_1-ap-2.80-bda371bd/frames/000008.tif"
+        ],
+        "reference_id": "D29/ab41311_1-ap-2.80-bda371bd/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/9103927_1-ap-2.00-7a27974d",
+        "group_id": "group-51c23af99ef1585979c3",
+        "source_scene_id": "9103927_1/ap-2.00",
+        "frame_ids": [
+          "D29/9103927_1-ap-2.00-7a27974d/frames/000000.tif",
+          "D29/9103927_1-ap-2.00-7a27974d/frames/000001.tif",
+          "D29/9103927_1-ap-2.00-7a27974d/frames/000002.tif",
+          "D29/9103927_1-ap-2.00-7a27974d/frames/000003.tif",
+          "D29/9103927_1-ap-2.00-7a27974d/frames/000004.tif",
+          "D29/9103927_1-ap-2.00-7a27974d/frames/000005.tif",
+          "D29/9103927_1-ap-2.00-7a27974d/frames/000006.tif",
+          "D29/9103927_1-ap-2.00-7a27974d/frames/000007.tif",
+          "D29/9103927_1-ap-2.00-7a27974d/frames/000008.tif"
+        ],
+        "reference_id": "D29/9103927_1-ap-2.00-7a27974d/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/7bd97c11_4-ap-5.60-8b62d6ff",
+        "group_id": "group-3aabddcfe23f1e14204c",
+        "source_scene_id": "7bd97c11_4/ap-5.60",
+        "frame_ids": [
+          "D29/7bd97c11_4-ap-5.60-8b62d6ff/frames/000000.tif",
+          "D29/7bd97c11_4-ap-5.60-8b62d6ff/frames/000001.tif",
+          "D29/7bd97c11_4-ap-5.60-8b62d6ff/frames/000002.tif",
+          "D29/7bd97c11_4-ap-5.60-8b62d6ff/frames/000003.tif",
+          "D29/7bd97c11_4-ap-5.60-8b62d6ff/frames/000004.tif",
+          "D29/7bd97c11_4-ap-5.60-8b62d6ff/frames/000005.tif",
+          "D29/7bd97c11_4-ap-5.60-8b62d6ff/frames/000006.tif",
+          "D29/7bd97c11_4-ap-5.60-8b62d6ff/frames/000007.tif",
+          "D29/7bd97c11_4-ap-5.60-8b62d6ff/frames/000008.tif"
+        ],
+        "reference_id": "D29/7bd97c11_4-ap-5.60-8b62d6ff/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/37c6835a_2-ap-2.80-d7b73b6e",
+        "group_id": "group-44064712d9dbb74d680c",
+        "source_scene_id": "37c6835a_2/ap-2.80",
+        "frame_ids": [
+          "D29/37c6835a_2-ap-2.80-d7b73b6e/frames/000000.tif",
+          "D29/37c6835a_2-ap-2.80-d7b73b6e/frames/000001.tif",
+          "D29/37c6835a_2-ap-2.80-d7b73b6e/frames/000002.tif",
+          "D29/37c6835a_2-ap-2.80-d7b73b6e/frames/000003.tif",
+          "D29/37c6835a_2-ap-2.80-d7b73b6e/frames/000004.tif",
+          "D29/37c6835a_2-ap-2.80-d7b73b6e/frames/000005.tif",
+          "D29/37c6835a_2-ap-2.80-d7b73b6e/frames/000006.tif",
+          "D29/37c6835a_2-ap-2.80-d7b73b6e/frames/000007.tif",
+          "D29/37c6835a_2-ap-2.80-d7b73b6e/frames/000008.tif"
+        ],
+        "reference_id": "D29/37c6835a_2-ap-2.80-d7b73b6e/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/4bea76bd_1-ap-5.60-68c6f16b",
+        "group_id": "group-5c6d74e07109af0f0e0f",
+        "source_scene_id": "4bea76bd_1/ap-5.60",
+        "frame_ids": [
+          "D29/4bea76bd_1-ap-5.60-68c6f16b/frames/000000.tif",
+          "D29/4bea76bd_1-ap-5.60-68c6f16b/frames/000001.tif",
+          "D29/4bea76bd_1-ap-5.60-68c6f16b/frames/000002.tif",
+          "D29/4bea76bd_1-ap-5.60-68c6f16b/frames/000003.tif",
+          "D29/4bea76bd_1-ap-5.60-68c6f16b/frames/000004.tif",
+          "D29/4bea76bd_1-ap-5.60-68c6f16b/frames/000005.tif",
+          "D29/4bea76bd_1-ap-5.60-68c6f16b/frames/000006.tif",
+          "D29/4bea76bd_1-ap-5.60-68c6f16b/frames/000007.tif",
+          "D29/4bea76bd_1-ap-5.60-68c6f16b/frames/000008.tif"
+        ],
+        "reference_id": "D29/4bea76bd_1-ap-5.60-68c6f16b/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/1ce15fe4_1-ap-2.00-215005b9",
+        "group_id": "group-3ad02251cb210702cc8a",
+        "source_scene_id": "1ce15fe4_1/ap-2.00",
+        "frame_ids": [
+          "D29/1ce15fe4_1-ap-2.00-215005b9/frames/000000.tif",
+          "D29/1ce15fe4_1-ap-2.00-215005b9/frames/000001.tif",
+          "D29/1ce15fe4_1-ap-2.00-215005b9/frames/000002.tif",
+          "D29/1ce15fe4_1-ap-2.00-215005b9/frames/000003.tif",
+          "D29/1ce15fe4_1-ap-2.00-215005b9/frames/000004.tif",
+          "D29/1ce15fe4_1-ap-2.00-215005b9/frames/000005.tif",
+          "D29/1ce15fe4_1-ap-2.00-215005b9/frames/000006.tif",
+          "D29/1ce15fe4_1-ap-2.00-215005b9/frames/000007.tif",
+          "D29/1ce15fe4_1-ap-2.00-215005b9/frames/000008.tif"
+        ],
+        "reference_id": "D29/1ce15fe4_1-ap-2.00-215005b9/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/570267e9_3-ap-2.00-b607a4e4",
+        "group_id": "group-00a6ab3d528c5df1e12a",
+        "source_scene_id": "570267e9_3/ap-2.00",
+        "frame_ids": [
+          "D29/570267e9_3-ap-2.00-b607a4e4/frames/000000.tif",
+          "D29/570267e9_3-ap-2.00-b607a4e4/frames/000001.tif",
+          "D29/570267e9_3-ap-2.00-b607a4e4/frames/000002.tif",
+          "D29/570267e9_3-ap-2.00-b607a4e4/frames/000003.tif",
+          "D29/570267e9_3-ap-2.00-b607a4e4/frames/000004.tif",
+          "D29/570267e9_3-ap-2.00-b607a4e4/frames/000005.tif",
+          "D29/570267e9_3-ap-2.00-b607a4e4/frames/000006.tif",
+          "D29/570267e9_3-ap-2.00-b607a4e4/frames/000007.tif",
+          "D29/570267e9_3-ap-2.00-b607a4e4/frames/000008.tif"
+        ],
+        "reference_id": "D29/570267e9_3-ap-2.00-b607a4e4/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/6bc6eec_0-ap-2.80-3a2aaee4",
+        "group_id": "group-3b814582033760e6819d",
+        "source_scene_id": "6bc6eec_0/ap-2.80",
+        "frame_ids": [
+          "D29/6bc6eec_0-ap-2.80-3a2aaee4/frames/000000.tif",
+          "D29/6bc6eec_0-ap-2.80-3a2aaee4/frames/000001.tif",
+          "D29/6bc6eec_0-ap-2.80-3a2aaee4/frames/000002.tif",
+          "D29/6bc6eec_0-ap-2.80-3a2aaee4/frames/000003.tif",
+          "D29/6bc6eec_0-ap-2.80-3a2aaee4/frames/000004.tif",
+          "D29/6bc6eec_0-ap-2.80-3a2aaee4/frames/000005.tif",
+          "D29/6bc6eec_0-ap-2.80-3a2aaee4/frames/000006.tif",
+          "D29/6bc6eec_0-ap-2.80-3a2aaee4/frames/000007.tif",
+          "D29/6bc6eec_0-ap-2.80-3a2aaee4/frames/000008.tif"
+        ],
+        "reference_id": "D29/6bc6eec_0-ap-2.80-3a2aaee4/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/14c38f01_1-ap-2.80-a7b07fc7",
+        "group_id": "group-20b4294ffb067f789a26",
+        "source_scene_id": "14c38f01_1/ap-2.80",
+        "frame_ids": [
+          "D29/14c38f01_1-ap-2.80-a7b07fc7/frames/000000.tif",
+          "D29/14c38f01_1-ap-2.80-a7b07fc7/frames/000001.tif",
+          "D29/14c38f01_1-ap-2.80-a7b07fc7/frames/000002.tif",
+          "D29/14c38f01_1-ap-2.80-a7b07fc7/frames/000003.tif",
+          "D29/14c38f01_1-ap-2.80-a7b07fc7/frames/000004.tif",
+          "D29/14c38f01_1-ap-2.80-a7b07fc7/frames/000005.tif",
+          "D29/14c38f01_1-ap-2.80-a7b07fc7/frames/000006.tif",
+          "D29/14c38f01_1-ap-2.80-a7b07fc7/frames/000007.tif",
+          "D29/14c38f01_1-ap-2.80-a7b07fc7/frames/000008.tif"
+        ],
+        "reference_id": "D29/14c38f01_1-ap-2.80-a7b07fc7/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/1c5e72aa_0-ap-2.00-0f6c2a14",
+        "group_id": "group-a957a17e20ebcc54ebf0",
+        "source_scene_id": "1c5e72aa_0/ap-2.00",
+        "frame_ids": [
+          "D29/1c5e72aa_0-ap-2.00-0f6c2a14/frames/000000.tif",
+          "D29/1c5e72aa_0-ap-2.00-0f6c2a14/frames/000001.tif",
+          "D29/1c5e72aa_0-ap-2.00-0f6c2a14/frames/000002.tif",
+          "D29/1c5e72aa_0-ap-2.00-0f6c2a14/frames/000003.tif",
+          "D29/1c5e72aa_0-ap-2.00-0f6c2a14/frames/000004.tif",
+          "D29/1c5e72aa_0-ap-2.00-0f6c2a14/frames/000005.tif",
+          "D29/1c5e72aa_0-ap-2.00-0f6c2a14/frames/000006.tif",
+          "D29/1c5e72aa_0-ap-2.00-0f6c2a14/frames/000007.tif",
+          "D29/1c5e72aa_0-ap-2.00-0f6c2a14/frames/000008.tif"
+        ],
+        "reference_id": "D29/1c5e72aa_0-ap-2.00-0f6c2a14/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/31d89caf_2-ap-2.80-659602b5",
+        "group_id": "group-e7c31d3431c97a8cfbb2",
+        "source_scene_id": "31d89caf_2/ap-2.80",
+        "frame_ids": [
+          "D29/31d89caf_2-ap-2.80-659602b5/frames/000000.tif",
+          "D29/31d89caf_2-ap-2.80-659602b5/frames/000001.tif",
+          "D29/31d89caf_2-ap-2.80-659602b5/frames/000002.tif",
+          "D29/31d89caf_2-ap-2.80-659602b5/frames/000003.tif",
+          "D29/31d89caf_2-ap-2.80-659602b5/frames/000004.tif",
+          "D29/31d89caf_2-ap-2.80-659602b5/frames/000005.tif",
+          "D29/31d89caf_2-ap-2.80-659602b5/frames/000006.tif",
+          "D29/31d89caf_2-ap-2.80-659602b5/frames/000007.tif",
+          "D29/31d89caf_2-ap-2.80-659602b5/frames/000008.tif"
+        ],
+        "reference_id": "D29/31d89caf_2-ap-2.80-659602b5/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/192ecd02_1-ap-5.60-4cbc1898",
+        "group_id": "group-f77e1e13d9a131e83a2c",
+        "source_scene_id": "192ecd02_1/ap-5.60",
+        "frame_ids": [
+          "D29/192ecd02_1-ap-5.60-4cbc1898/frames/000000.tif",
+          "D29/192ecd02_1-ap-5.60-4cbc1898/frames/000001.tif",
+          "D29/192ecd02_1-ap-5.60-4cbc1898/frames/000002.tif",
+          "D29/192ecd02_1-ap-5.60-4cbc1898/frames/000003.tif",
+          "D29/192ecd02_1-ap-5.60-4cbc1898/frames/000004.tif",
+          "D29/192ecd02_1-ap-5.60-4cbc1898/frames/000005.tif",
+          "D29/192ecd02_1-ap-5.60-4cbc1898/frames/000006.tif",
+          "D29/192ecd02_1-ap-5.60-4cbc1898/frames/000007.tif",
+          "D29/192ecd02_1-ap-5.60-4cbc1898/frames/000008.tif"
+        ],
+        "reference_id": "D29/192ecd02_1-ap-5.60-4cbc1898/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/679cc842_3-ap-2.00-3650bb65",
+        "group_id": "group-51bf04b9b4e6fe7f8b70",
+        "source_scene_id": "679cc842_3/ap-2.00",
+        "frame_ids": [
+          "D29/679cc842_3-ap-2.00-3650bb65/frames/000000.tif",
+          "D29/679cc842_3-ap-2.00-3650bb65/frames/000001.tif",
+          "D29/679cc842_3-ap-2.00-3650bb65/frames/000002.tif",
+          "D29/679cc842_3-ap-2.00-3650bb65/frames/000003.tif",
+          "D29/679cc842_3-ap-2.00-3650bb65/frames/000004.tif",
+          "D29/679cc842_3-ap-2.00-3650bb65/frames/000005.tif",
+          "D29/679cc842_3-ap-2.00-3650bb65/frames/000006.tif",
+          "D29/679cc842_3-ap-2.00-3650bb65/frames/000007.tif",
+          "D29/679cc842_3-ap-2.00-3650bb65/frames/000008.tif"
+        ],
+        "reference_id": "D29/679cc842_3-ap-2.00-3650bb65/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/1bfed3f0_2-ap-2.00-bf93f937",
+        "group_id": "group-94b816822255db11c481",
+        "source_scene_id": "1bfed3f0_2/ap-2.00",
+        "frame_ids": [
+          "D29/1bfed3f0_2-ap-2.00-bf93f937/frames/000000.tif",
+          "D29/1bfed3f0_2-ap-2.00-bf93f937/frames/000001.tif",
+          "D29/1bfed3f0_2-ap-2.00-bf93f937/frames/000002.tif",
+          "D29/1bfed3f0_2-ap-2.00-bf93f937/frames/000003.tif",
+          "D29/1bfed3f0_2-ap-2.00-bf93f937/frames/000004.tif",
+          "D29/1bfed3f0_2-ap-2.00-bf93f937/frames/000005.tif",
+          "D29/1bfed3f0_2-ap-2.00-bf93f937/frames/000006.tif",
+          "D29/1bfed3f0_2-ap-2.00-bf93f937/frames/000007.tif",
+          "D29/1bfed3f0_2-ap-2.00-bf93f937/frames/000008.tif"
+        ],
+        "reference_id": "D29/1bfed3f0_2-ap-2.00-bf93f937/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      }
+    ],
+    "validation": [
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-117-2f3a2101",
+        "group_id": "group-67a9802883803e5a816d",
+        "source_scene_id": "MFI-WHU/117",
+        "frame_ids": [
+          "D09/MFI-WHU-117-2f3a2101/frames/000000.tif",
+          "D09/MFI-WHU-117-2f3a2101/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-117-2f3a2101/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-2-a9ad2fc9",
+        "group_id": "group-cbcf8a5c19a1e8ccf43f",
+        "source_scene_id": "MFI-WHU/2",
+        "frame_ids": [
+          "D09/MFI-WHU-2-a9ad2fc9/frames/000000.tif",
+          "D09/MFI-WHU-2-a9ad2fc9/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-2-a9ad2fc9/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-13-03e078eb",
+        "group_id": "group-518a61e20e6cb6267bfc",
+        "source_scene_id": "MFI-WHU/13",
+        "frame_ids": [
+          "D09/MFI-WHU-13-03e078eb/frames/000000.tif",
+          "D09/MFI-WHU-13-03e078eb/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-13-03e078eb/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-75-ed2eff9e",
+        "group_id": "group-f7b0872ca696c8fb6cb0",
+        "source_scene_id": "MFI-WHU/75",
+        "frame_ids": [
+          "D09/MFI-WHU-75-ed2eff9e/frames/000000.tif",
+          "D09/MFI-WHU-75-ed2eff9e/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-75-ed2eff9e/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-41-6e95f82c",
+        "group_id": "group-168c355015e5a360727d",
+        "source_scene_id": "MFI-WHU/41",
+        "frame_ids": [
+          "D09/MFI-WHU-41-6e95f82c/frames/000000.tif",
+          "D09/MFI-WHU-41-6e95f82c/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-41-6e95f82c/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-107-81a6e644",
+        "group_id": "group-9a81700f8b1a15c36928",
+        "source_scene_id": "MFI-WHU/107",
+        "frame_ids": [
+          "D09/MFI-WHU-107-81a6e644/frames/000000.tif",
+          "D09/MFI-WHU-107-81a6e644/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-107-81a6e644/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-55-3b41bdbe",
+        "group_id": "group-4d0a9c7f276dce0eb8e8",
+        "source_scene_id": "MFI-WHU/55",
+        "frame_ids": [
+          "D09/MFI-WHU-55-3b41bdbe/frames/000000.tif",
+          "D09/MFI-WHU-55-3b41bdbe/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-55-3b41bdbe/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-16-8c9aa911",
+        "group_id": "group-ead07e60e635ffff1b3b",
+        "source_scene_id": "MFI-WHU/16",
+        "frame_ids": [
+          "D09/MFI-WHU-16-8c9aa911/frames/000000.tif",
+          "D09/MFI-WHU-16-8c9aa911/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-16-8c9aa911/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-9-9b6e8fa6",
+        "group_id": "group-7307c95a133f039c83a8",
+        "source_scene_id": "MFI-WHU/9",
+        "frame_ids": [
+          "D09/MFI-WHU-9-9b6e8fa6/frames/000000.tif",
+          "D09/MFI-WHU-9-9b6e8fa6/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-9-9b6e8fa6/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-43-32d57f5b",
+        "group_id": "group-f1afe3ba6527dd2c9536",
+        "source_scene_id": "MFI-WHU/43",
+        "frame_ids": [
+          "D09/MFI-WHU-43-32d57f5b/frames/000000.tif",
+          "D09/MFI-WHU-43-32d57f5b/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-43-32d57f5b/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-119-252161d1",
+        "group_id": "group-738be5e21f6a461258c9",
+        "source_scene_id": "MFI-WHU/119",
+        "frame_ids": [
+          "D09/MFI-WHU-119-252161d1/frames/000000.tif",
+          "D09/MFI-WHU-119-252161d1/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-119-252161d1/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-90-a6956662",
+        "group_id": "group-2824f3b59f773d755ff7",
+        "source_scene_id": "MFI-WHU/90",
+        "frame_ids": [
+          "D09/MFI-WHU-90-a6956662/frames/000000.tif",
+          "D09/MFI-WHU-90-a6956662/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-90-a6956662/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-108-3e93ee50",
+        "group_id": "group-3b9fb8b08c49910b1438",
+        "source_scene_id": "MFI-WHU/108",
+        "frame_ids": [
+          "D09/MFI-WHU-108-3e93ee50/frames/000000.tif",
+          "D09/MFI-WHU-108-3e93ee50/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-108-3e93ee50/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-95-0fd4130a",
+        "group_id": "group-8426b5057c51f422c336",
+        "source_scene_id": "MFI-WHU/95",
+        "frame_ids": [
+          "D09/MFI-WHU-95-0fd4130a/frames/000000.tif",
+          "D09/MFI-WHU-95-0fd4130a/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-95-0fd4130a/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-102-7c620e0c",
+        "group_id": "group-7116a8bfce8973916663",
+        "source_scene_id": "MFI-WHU/102",
+        "frame_ids": [
+          "D09/MFI-WHU-102-7c620e0c/frames/000000.tif",
+          "D09/MFI-WHU-102-7c620e0c/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-102-7c620e0c/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-30-68306d4a",
+        "group_id": "group-ba77cd2f7265426205e9",
+        "source_scene_id": "MFI-WHU/30",
+        "frame_ids": [
+          "D09/MFI-WHU-30-68306d4a/frames/000000.tif",
+          "D09/MFI-WHU-30-68306d4a/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-30-68306d4a/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-31-68c7d637",
+        "group_id": "group-b9bb23f1702148b7f210",
+        "source_scene_id": "MFI-WHU/31",
+        "frame_ids": [
+          "D09/MFI-WHU-31-68c7d637/frames/000000.tif",
+          "D09/MFI-WHU-31-68c7d637/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-31-68c7d637/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-59-b2acc912",
+        "group_id": "group-b28235dc4d527b87f518",
+        "source_scene_id": "MFI-WHU/59",
+        "frame_ids": [
+          "D09/MFI-WHU-59-b2acc912/frames/000000.tif",
+          "D09/MFI-WHU-59-b2acc912/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-59-b2acc912/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-1-612df454",
+        "group_id": "group-3605d59c5df9aeaafc3e",
+        "source_scene_id": "MFI-WHU/1",
+        "frame_ids": [
+          "D09/MFI-WHU-1-612df454/frames/000000.tif",
+          "D09/MFI-WHU-1-612df454/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-1-612df454/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-19-667f9787",
+        "group_id": "group-10d76cf5ac04ca94807b",
+        "source_scene_id": "MFI-WHU/19",
+        "frame_ids": [
+          "D09/MFI-WHU-19-667f9787/frames/000000.tif",
+          "D09/MFI-WHU-19-667f9787/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-19-667f9787/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-52-a4c82ab0",
+        "group_id": "group-d359c6872741af683f51",
+        "source_scene_id": "MFI-WHU/52",
+        "frame_ids": [
+          "D09/MFI-WHU-52-a4c82ab0/frames/000000.tif",
+          "D09/MFI-WHU-52-a4c82ab0/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-52-a4c82ab0/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-24-e31a881a",
+        "group_id": "group-0de021825e5e5ef9aa2d",
+        "source_scene_id": "MFI-WHU/24",
+        "frame_ids": [
+          "D09/MFI-WHU-24-e31a881a/frames/000000.tif",
+          "D09/MFI-WHU-24-e31a881a/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-24-e31a881a/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-25-9adafa18",
+        "group_id": "group-0a89bd9e3747061db3b8",
+        "source_scene_id": "MFI-WHU/25",
+        "frame_ids": [
+          "D09/MFI-WHU-25-9adafa18/frames/000000.tif",
+          "D09/MFI-WHU-25-9adafa18/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-25-9adafa18/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-89-62376555",
+        "group_id": "group-d79619b79f2d00a5e6a2",
+        "source_scene_id": "MFI-WHU/89",
+        "frame_ids": [
+          "D09/MFI-WHU-89-62376555/frames/000000.tif",
+          "D09/MFI-WHU-89-62376555/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-89-62376555/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-32-346e9607",
+        "group_id": "group-72298d09d4248cbc294e",
+        "source_scene_id": "MFI-WHU/32",
+        "frame_ids": [
+          "D09/MFI-WHU-32-346e9607/frames/000000.tif",
+          "D09/MFI-WHU-32-346e9607/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-32-346e9607/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-47-f5cb4b21",
+        "group_id": "group-f56d99ee069e656b1ce0",
+        "source_scene_id": "MFI-WHU/47",
+        "frame_ids": [
+          "D09/MFI-WHU-47-f5cb4b21/frames/000000.tif",
+          "D09/MFI-WHU-47-f5cb4b21/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-47-f5cb4b21/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-120-36858e92",
+        "group_id": "group-764dbc7d16f1320979de",
+        "source_scene_id": "MFI-WHU/120",
+        "frame_ids": [
+          "D09/MFI-WHU-120-36858e92/frames/000000.tif",
+          "D09/MFI-WHU-120-36858e92/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-120-36858e92/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-69-036e8248",
+        "group_id": "group-fda157996fd9dc273c6d",
+        "source_scene_id": "MFI-WHU/69",
+        "frame_ids": [
+          "D09/MFI-WHU-69-036e8248/frames/000000.tif",
+          "D09/MFI-WHU-69-036e8248/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-69-036e8248/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-72-dede5d0b",
+        "group_id": "group-f370c135cc25c95d9bf4",
+        "source_scene_id": "MFI-WHU/72",
+        "frame_ids": [
+          "D09/MFI-WHU-72-dede5d0b/frames/000000.tif",
+          "D09/MFI-WHU-72-dede5d0b/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-72-dede5d0b/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-86-0cbb23d1",
+        "group_id": "group-04220c550a0b6032b775",
+        "source_scene_id": "MFI-WHU/86",
+        "frame_ids": [
+          "D09/MFI-WHU-86-0cbb23d1/frames/000000.tif",
+          "D09/MFI-WHU-86-0cbb23d1/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-86-0cbb23d1/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-54-af293312",
+        "group_id": "group-2d57ed52aa15ad707b8d",
+        "source_scene_id": "MFI-WHU/54",
+        "frame_ids": [
+          "D09/MFI-WHU-54-af293312/frames/000000.tif",
+          "D09/MFI-WHU-54-af293312/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-54-af293312/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-21-be3b172d",
+        "group_id": "group-0a3ac033948c522479eb",
+        "source_scene_id": "MFI-WHU/21",
+        "frame_ids": [
+          "D09/MFI-WHU-21-be3b172d/frames/000000.tif",
+          "D09/MFI-WHU-21-be3b172d/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-21-be3b172d/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-100-6d233cf5",
+        "group_id": "group-73c7a34a55cc7c10eb50",
+        "source_scene_id": "MFI-WHU/100",
+        "frame_ids": [
+          "D09/MFI-WHU-100-6d233cf5/frames/000000.tif",
+          "D09/MFI-WHU-100-6d233cf5/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-100-6d233cf5/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-7-cb3a4587",
+        "group_id": "group-21c54534df85e4dd74e8",
+        "source_scene_id": "MFI-WHU/7",
+        "frame_ids": [
+          "D09/MFI-WHU-7-cb3a4587/frames/000000.tif",
+          "D09/MFI-WHU-7-cb3a4587/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-7-cb3a4587/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-73-46fd28f0",
+        "group_id": "group-68e427b71ffa2e29a969",
+        "source_scene_id": "MFI-WHU/73",
+        "frame_ids": [
+          "D09/MFI-WHU-73-46fd28f0/frames/000000.tif",
+          "D09/MFI-WHU-73-46fd28f0/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-73-46fd28f0/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-15-06009c12",
+        "group_id": "group-04b2c78b7700453f210b",
+        "source_scene_id": "MFI-WHU/15",
+        "frame_ids": [
+          "D09/MFI-WHU-15-06009c12/frames/000000.tif",
+          "D09/MFI-WHU-15-06009c12/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-15-06009c12/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-50-b333c472",
+        "group_id": "group-85943f13bd74458a25f7",
+        "source_scene_id": "MFI-WHU/50",
+        "frame_ids": [
+          "D09/MFI-WHU-50-b333c472/frames/000000.tif",
+          "D09/MFI-WHU-50-b333c472/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-50-b333c472/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-34-ab97c913",
+        "group_id": "group-019edb3c1786094d7069",
+        "source_scene_id": "MFI-WHU/34",
+        "frame_ids": [
+          "D09/MFI-WHU-34-ab97c913/frames/000000.tif",
+          "D09/MFI-WHU-34-ab97c913/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-34-ab97c913/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-97-340e28b7",
+        "group_id": "group-b8cfd824fd647ff1c1dd",
+        "source_scene_id": "MFI-WHU/97",
+        "frame_ids": [
+          "D09/MFI-WHU-97-340e28b7/frames/000000.tif",
+          "D09/MFI-WHU-97-340e28b7/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-97-340e28b7/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-87-b917ae64",
+        "group_id": "group-8b47187ff97378cff6a0",
+        "source_scene_id": "MFI-WHU/87",
+        "frame_ids": [
+          "D09/MFI-WHU-87-b917ae64/frames/000000.tif",
+          "D09/MFI-WHU-87-b917ae64/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-87-b917ae64/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-44-23c5d1db",
+        "group_id": "group-ed5cdfea25a1115f4d97",
+        "source_scene_id": "MFI-WHU/44",
+        "frame_ids": [
+          "D09/MFI-WHU-44-23c5d1db/frames/000000.tif",
+          "D09/MFI-WHU-44-23c5d1db/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-44-23c5d1db/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-58-1c17f50e",
+        "group_id": "group-f11156424b7bc2928ff3",
+        "source_scene_id": "MFI-WHU/58",
+        "frame_ids": [
+          "D09/MFI-WHU-58-1c17f50e/frames/000000.tif",
+          "D09/MFI-WHU-58-1c17f50e/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-58-1c17f50e/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-20-13464ef6",
+        "group_id": "group-d6318de8e5181dcba748",
+        "source_scene_id": "MFI-WHU/20",
+        "frame_ids": [
+          "D09/MFI-WHU-20-13464ef6/frames/000000.tif",
+          "D09/MFI-WHU-20-13464ef6/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-20-13464ef6/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-65-9e90d99c",
+        "group_id": "group-4ac231b144f1c6e9efae",
+        "source_scene_id": "MFI-WHU/65",
+        "frame_ids": [
+          "D09/MFI-WHU-65-9e90d99c/frames/000000.tif",
+          "D09/MFI-WHU-65-9e90d99c/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-65-9e90d99c/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-49-1ee5b922",
+        "group_id": "group-b7a6f53ec5a21a62e9f5",
+        "source_scene_id": "MFI-WHU/49",
+        "frame_ids": [
+          "D09/MFI-WHU-49-1ee5b922/frames/000000.tif",
+          "D09/MFI-WHU-49-1ee5b922/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-49-1ee5b922/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-62-a0d9dc11",
+        "group_id": "group-014b974fb5a2cde1719d",
+        "source_scene_id": "MFI-WHU/62",
+        "frame_ids": [
+          "D09/MFI-WHU-62-a0d9dc11/frames/000000.tif",
+          "D09/MFI-WHU-62-a0d9dc11/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-62-a0d9dc11/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-88-9df51398",
+        "group_id": "group-11af45f67befb02c5017",
+        "source_scene_id": "MFI-WHU/88",
+        "frame_ids": [
+          "D09/MFI-WHU-88-9df51398/frames/000000.tif",
+          "D09/MFI-WHU-88-9df51398/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-88-9df51398/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-10-c7eb026f",
+        "group_id": "group-a5f69c752ba66111275a",
+        "source_scene_id": "MFI-WHU/10",
+        "frame_ids": [
+          "D09/MFI-WHU-10-c7eb026f/frames/000000.tif",
+          "D09/MFI-WHU-10-c7eb026f/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-10-c7eb026f/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-116-bf9000fb",
+        "group_id": "group-da123edc8a495c9a4c65",
+        "source_scene_id": "MFI-WHU/116",
+        "frame_ids": [
+          "D09/MFI-WHU-116-bf9000fb/frames/000000.tif",
+          "D09/MFI-WHU-116-bf9000fb/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-116-bf9000fb/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D09",
+        "scene_id": "D09/MFI-WHU-45-df723cba",
+        "group_id": "group-81c51bc8c2757f3bc145",
+        "source_scene_id": "MFI-WHU/45",
+        "frame_ids": [
+          "D09/MFI-WHU-45-df723cba/frames/000000.tif",
+          "D09/MFI-WHU-45-df723cba/frames/000001.tif"
+        ],
+        "reference_id": "D09/MFI-WHU-45-df723cba/references/000000.tif",
+        "reference_semantics": "Original clear image under synthetic blur convention; not optical macro truth",
+        "color_recipe_sha256": "cf992ae3a3c4fc5755c6efe2a407bb4732880bd8f62a9ea45480f5e82e335dbd"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/67bac9b3_0-ap-1.40-cbdede78",
+        "group_id": "group-d896595835439f323844",
+        "source_scene_id": "67bac9b3_0/ap-1.40",
+        "frame_ids": [
+          "D29/67bac9b3_0-ap-1.40-cbdede78/frames/000000.tif",
+          "D29/67bac9b3_0-ap-1.40-cbdede78/frames/000001.tif",
+          "D29/67bac9b3_0-ap-1.40-cbdede78/frames/000002.tif",
+          "D29/67bac9b3_0-ap-1.40-cbdede78/frames/000003.tif",
+          "D29/67bac9b3_0-ap-1.40-cbdede78/frames/000004.tif",
+          "D29/67bac9b3_0-ap-1.40-cbdede78/frames/000005.tif",
+          "D29/67bac9b3_0-ap-1.40-cbdede78/frames/000006.tif",
+          "D29/67bac9b3_0-ap-1.40-cbdede78/frames/000007.tif",
+          "D29/67bac9b3_0-ap-1.40-cbdede78/frames/000008.tif"
+        ],
+        "reference_id": "D29/67bac9b3_0-ap-1.40-cbdede78/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/2d26ac59_2-ap-5.60-0b2a4c95",
+        "group_id": "group-ad68baa33ec722286a4f",
+        "source_scene_id": "2d26ac59_2/ap-5.60",
+        "frame_ids": [
+          "D29/2d26ac59_2-ap-5.60-0b2a4c95/frames/000000.tif",
+          "D29/2d26ac59_2-ap-5.60-0b2a4c95/frames/000001.tif",
+          "D29/2d26ac59_2-ap-5.60-0b2a4c95/frames/000002.tif",
+          "D29/2d26ac59_2-ap-5.60-0b2a4c95/frames/000003.tif",
+          "D29/2d26ac59_2-ap-5.60-0b2a4c95/frames/000004.tif",
+          "D29/2d26ac59_2-ap-5.60-0b2a4c95/frames/000005.tif",
+          "D29/2d26ac59_2-ap-5.60-0b2a4c95/frames/000006.tif",
+          "D29/2d26ac59_2-ap-5.60-0b2a4c95/frames/000007.tif",
+          "D29/2d26ac59_2-ap-5.60-0b2a4c95/frames/000008.tif"
+        ],
+        "reference_id": "D29/2d26ac59_2-ap-5.60-0b2a4c95/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/2d7bdb2e_4-ap-2.80-b4af48b8",
+        "group_id": "group-9571efed2811cac75a96",
+        "source_scene_id": "2d7bdb2e_4/ap-2.80",
+        "frame_ids": [
+          "D29/2d7bdb2e_4-ap-2.80-b4af48b8/frames/000000.tif",
+          "D29/2d7bdb2e_4-ap-2.80-b4af48b8/frames/000001.tif",
+          "D29/2d7bdb2e_4-ap-2.80-b4af48b8/frames/000002.tif",
+          "D29/2d7bdb2e_4-ap-2.80-b4af48b8/frames/000003.tif",
+          "D29/2d7bdb2e_4-ap-2.80-b4af48b8/frames/000004.tif",
+          "D29/2d7bdb2e_4-ap-2.80-b4af48b8/frames/000005.tif",
+          "D29/2d7bdb2e_4-ap-2.80-b4af48b8/frames/000006.tif",
+          "D29/2d7bdb2e_4-ap-2.80-b4af48b8/frames/000007.tif",
+          "D29/2d7bdb2e_4-ap-2.80-b4af48b8/frames/000008.tif"
+        ],
+        "reference_id": "D29/2d7bdb2e_4-ap-2.80-b4af48b8/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/139a9b31_0-ap-2.80-18038856",
+        "group_id": "group-46910360ef05403f8309",
+        "source_scene_id": "139a9b31_0/ap-2.80",
+        "frame_ids": [
+          "D29/139a9b31_0-ap-2.80-18038856/frames/000000.tif",
+          "D29/139a9b31_0-ap-2.80-18038856/frames/000001.tif",
+          "D29/139a9b31_0-ap-2.80-18038856/frames/000002.tif",
+          "D29/139a9b31_0-ap-2.80-18038856/frames/000003.tif",
+          "D29/139a9b31_0-ap-2.80-18038856/frames/000004.tif",
+          "D29/139a9b31_0-ap-2.80-18038856/frames/000005.tif",
+          "D29/139a9b31_0-ap-2.80-18038856/frames/000006.tif",
+          "D29/139a9b31_0-ap-2.80-18038856/frames/000007.tif",
+          "D29/139a9b31_0-ap-2.80-18038856/frames/000008.tif"
+        ],
+        "reference_id": "D29/139a9b31_0-ap-2.80-18038856/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/14f444a4_0-ap-1.40-862b9068",
+        "group_id": "group-07f47e734be13f87593d",
+        "source_scene_id": "14f444a4_0/ap-1.40",
+        "frame_ids": [
+          "D29/14f444a4_0-ap-1.40-862b9068/frames/000000.tif",
+          "D29/14f444a4_0-ap-1.40-862b9068/frames/000001.tif",
+          "D29/14f444a4_0-ap-1.40-862b9068/frames/000002.tif",
+          "D29/14f444a4_0-ap-1.40-862b9068/frames/000003.tif",
+          "D29/14f444a4_0-ap-1.40-862b9068/frames/000004.tif",
+          "D29/14f444a4_0-ap-1.40-862b9068/frames/000005.tif",
+          "D29/14f444a4_0-ap-1.40-862b9068/frames/000006.tif",
+          "D29/14f444a4_0-ap-1.40-862b9068/frames/000007.tif",
+          "D29/14f444a4_0-ap-1.40-862b9068/frames/000008.tif"
+        ],
+        "reference_id": "D29/14f444a4_0-ap-1.40-862b9068/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/611e9623_0-ap-2.80-f70fb7b0",
+        "group_id": "group-78bf284137df21f58af1",
+        "source_scene_id": "611e9623_0/ap-2.80",
+        "frame_ids": [
+          "D29/611e9623_0-ap-2.80-f70fb7b0/frames/000000.tif",
+          "D29/611e9623_0-ap-2.80-f70fb7b0/frames/000001.tif",
+          "D29/611e9623_0-ap-2.80-f70fb7b0/frames/000002.tif",
+          "D29/611e9623_0-ap-2.80-f70fb7b0/frames/000003.tif",
+          "D29/611e9623_0-ap-2.80-f70fb7b0/frames/000004.tif",
+          "D29/611e9623_0-ap-2.80-f70fb7b0/frames/000005.tif",
+          "D29/611e9623_0-ap-2.80-f70fb7b0/frames/000006.tif",
+          "D29/611e9623_0-ap-2.80-f70fb7b0/frames/000007.tif",
+          "D29/611e9623_0-ap-2.80-f70fb7b0/frames/000008.tif"
+        ],
+        "reference_id": "D29/611e9623_0-ap-2.80-f70fb7b0/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/4040000d_1-ap-4.00-b0b19f20",
+        "group_id": "group-4c989e94cdd9f21ec3a6",
+        "source_scene_id": "4040000d_1/ap-4.00",
+        "frame_ids": [
+          "D29/4040000d_1-ap-4.00-b0b19f20/frames/000000.tif",
+          "D29/4040000d_1-ap-4.00-b0b19f20/frames/000001.tif",
+          "D29/4040000d_1-ap-4.00-b0b19f20/frames/000002.tif",
+          "D29/4040000d_1-ap-4.00-b0b19f20/frames/000003.tif",
+          "D29/4040000d_1-ap-4.00-b0b19f20/frames/000004.tif",
+          "D29/4040000d_1-ap-4.00-b0b19f20/frames/000005.tif",
+          "D29/4040000d_1-ap-4.00-b0b19f20/frames/000006.tif",
+          "D29/4040000d_1-ap-4.00-b0b19f20/frames/000007.tif",
+          "D29/4040000d_1-ap-4.00-b0b19f20/frames/000008.tif"
+        ],
+        "reference_id": "D29/4040000d_1-ap-4.00-b0b19f20/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/1036e2cc_1-ap-2.80-8cceb9ab",
+        "group_id": "group-733f877a949200cdf71b",
+        "source_scene_id": "1036e2cc_1/ap-2.80",
+        "frame_ids": [
+          "D29/1036e2cc_1-ap-2.80-8cceb9ab/frames/000000.tif",
+          "D29/1036e2cc_1-ap-2.80-8cceb9ab/frames/000001.tif",
+          "D29/1036e2cc_1-ap-2.80-8cceb9ab/frames/000002.tif",
+          "D29/1036e2cc_1-ap-2.80-8cceb9ab/frames/000003.tif",
+          "D29/1036e2cc_1-ap-2.80-8cceb9ab/frames/000004.tif",
+          "D29/1036e2cc_1-ap-2.80-8cceb9ab/frames/000005.tif",
+          "D29/1036e2cc_1-ap-2.80-8cceb9ab/frames/000006.tif",
+          "D29/1036e2cc_1-ap-2.80-8cceb9ab/frames/000007.tif",
+          "D29/1036e2cc_1-ap-2.80-8cceb9ab/frames/000008.tif"
+        ],
+        "reference_id": "D29/1036e2cc_1-ap-2.80-8cceb9ab/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/654fa81c_0-ap-2.80-dd0bcb28",
+        "group_id": "group-58a98ed98fd9ee61eb55",
+        "source_scene_id": "654fa81c_0/ap-2.80",
+        "frame_ids": [
+          "D29/654fa81c_0-ap-2.80-dd0bcb28/frames/000000.tif",
+          "D29/654fa81c_0-ap-2.80-dd0bcb28/frames/000001.tif",
+          "D29/654fa81c_0-ap-2.80-dd0bcb28/frames/000002.tif",
+          "D29/654fa81c_0-ap-2.80-dd0bcb28/frames/000003.tif",
+          "D29/654fa81c_0-ap-2.80-dd0bcb28/frames/000004.tif",
+          "D29/654fa81c_0-ap-2.80-dd0bcb28/frames/000005.tif",
+          "D29/654fa81c_0-ap-2.80-dd0bcb28/frames/000006.tif",
+          "D29/654fa81c_0-ap-2.80-dd0bcb28/frames/000007.tif",
+          "D29/654fa81c_0-ap-2.80-dd0bcb28/frames/000008.tif"
+        ],
+        "reference_id": "D29/654fa81c_0-ap-2.80-dd0bcb28/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/1329bbd4_1-ap-4.00-fe5e4b09",
+        "group_id": "group-ebb36c2c294cd82b3d46",
+        "source_scene_id": "1329bbd4_1/ap-4.00",
+        "frame_ids": [
+          "D29/1329bbd4_1-ap-4.00-fe5e4b09/frames/000000.tif",
+          "D29/1329bbd4_1-ap-4.00-fe5e4b09/frames/000001.tif",
+          "D29/1329bbd4_1-ap-4.00-fe5e4b09/frames/000002.tif",
+          "D29/1329bbd4_1-ap-4.00-fe5e4b09/frames/000003.tif",
+          "D29/1329bbd4_1-ap-4.00-fe5e4b09/frames/000004.tif",
+          "D29/1329bbd4_1-ap-4.00-fe5e4b09/frames/000005.tif",
+          "D29/1329bbd4_1-ap-4.00-fe5e4b09/frames/000006.tif",
+          "D29/1329bbd4_1-ap-4.00-fe5e4b09/frames/000007.tif",
+          "D29/1329bbd4_1-ap-4.00-fe5e4b09/frames/000008.tif"
+        ],
+        "reference_id": "D29/1329bbd4_1-ap-4.00-fe5e4b09/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/54b56e7f_0-ap-4.00-9b50adb2",
+        "group_id": "group-75ef7a56f18b2b413933",
+        "source_scene_id": "54b56e7f_0/ap-4.00",
+        "frame_ids": [
+          "D29/54b56e7f_0-ap-4.00-9b50adb2/frames/000000.tif",
+          "D29/54b56e7f_0-ap-4.00-9b50adb2/frames/000001.tif",
+          "D29/54b56e7f_0-ap-4.00-9b50adb2/frames/000002.tif",
+          "D29/54b56e7f_0-ap-4.00-9b50adb2/frames/000003.tif",
+          "D29/54b56e7f_0-ap-4.00-9b50adb2/frames/000004.tif",
+          "D29/54b56e7f_0-ap-4.00-9b50adb2/frames/000005.tif",
+          "D29/54b56e7f_0-ap-4.00-9b50adb2/frames/000006.tif",
+          "D29/54b56e7f_0-ap-4.00-9b50adb2/frames/000007.tif",
+          "D29/54b56e7f_0-ap-4.00-9b50adb2/frames/000008.tif"
+        ],
+        "reference_id": "D29/54b56e7f_0-ap-4.00-9b50adb2/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/692ed1e3_2-ap-2.00-67c359e3",
+        "group_id": "group-4aa41ab0666a17cec06a",
+        "source_scene_id": "692ed1e3_2/ap-2.00",
+        "frame_ids": [
+          "D29/692ed1e3_2-ap-2.00-67c359e3/frames/000000.tif",
+          "D29/692ed1e3_2-ap-2.00-67c359e3/frames/000001.tif",
+          "D29/692ed1e3_2-ap-2.00-67c359e3/frames/000002.tif",
+          "D29/692ed1e3_2-ap-2.00-67c359e3/frames/000003.tif",
+          "D29/692ed1e3_2-ap-2.00-67c359e3/frames/000004.tif",
+          "D29/692ed1e3_2-ap-2.00-67c359e3/frames/000005.tif",
+          "D29/692ed1e3_2-ap-2.00-67c359e3/frames/000006.tif",
+          "D29/692ed1e3_2-ap-2.00-67c359e3/frames/000007.tif",
+          "D29/692ed1e3_2-ap-2.00-67c359e3/frames/000008.tif"
+        ],
+        "reference_id": "D29/692ed1e3_2-ap-2.00-67c359e3/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/2d137d1f_0-ap-1.40-dfad5a95",
+        "group_id": "group-7d4aeb4fbbfac0fee079",
+        "source_scene_id": "2d137d1f_0/ap-1.40",
+        "frame_ids": [
+          "D29/2d137d1f_0-ap-1.40-dfad5a95/frames/000000.tif",
+          "D29/2d137d1f_0-ap-1.40-dfad5a95/frames/000001.tif",
+          "D29/2d137d1f_0-ap-1.40-dfad5a95/frames/000002.tif",
+          "D29/2d137d1f_0-ap-1.40-dfad5a95/frames/000003.tif",
+          "D29/2d137d1f_0-ap-1.40-dfad5a95/frames/000004.tif",
+          "D29/2d137d1f_0-ap-1.40-dfad5a95/frames/000005.tif",
+          "D29/2d137d1f_0-ap-1.40-dfad5a95/frames/000006.tif",
+          "D29/2d137d1f_0-ap-1.40-dfad5a95/frames/000007.tif",
+          "D29/2d137d1f_0-ap-1.40-dfad5a95/frames/000008.tif"
+        ],
+        "reference_id": "D29/2d137d1f_0-ap-1.40-dfad5a95/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/23ff7108_3-ap-2.80-473f9cf0",
+        "group_id": "group-11e06ce5388840785614",
+        "source_scene_id": "23ff7108_3/ap-2.80",
+        "frame_ids": [
+          "D29/23ff7108_3-ap-2.80-473f9cf0/frames/000000.tif",
+          "D29/23ff7108_3-ap-2.80-473f9cf0/frames/000001.tif",
+          "D29/23ff7108_3-ap-2.80-473f9cf0/frames/000002.tif",
+          "D29/23ff7108_3-ap-2.80-473f9cf0/frames/000003.tif",
+          "D29/23ff7108_3-ap-2.80-473f9cf0/frames/000004.tif",
+          "D29/23ff7108_3-ap-2.80-473f9cf0/frames/000005.tif",
+          "D29/23ff7108_3-ap-2.80-473f9cf0/frames/000006.tif",
+          "D29/23ff7108_3-ap-2.80-473f9cf0/frames/000007.tif",
+          "D29/23ff7108_3-ap-2.80-473f9cf0/frames/000008.tif"
+        ],
+        "reference_id": "D29/23ff7108_3-ap-2.80-473f9cf0/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/8aedf2_3-ap-1.40-6cf5dc55",
+        "group_id": "group-36768df154f928612216",
+        "source_scene_id": "8aedf2_3/ap-1.40",
+        "frame_ids": [
+          "D29/8aedf2_3-ap-1.40-6cf5dc55/frames/000000.tif",
+          "D29/8aedf2_3-ap-1.40-6cf5dc55/frames/000001.tif",
+          "D29/8aedf2_3-ap-1.40-6cf5dc55/frames/000002.tif",
+          "D29/8aedf2_3-ap-1.40-6cf5dc55/frames/000003.tif",
+          "D29/8aedf2_3-ap-1.40-6cf5dc55/frames/000004.tif",
+          "D29/8aedf2_3-ap-1.40-6cf5dc55/frames/000005.tif",
+          "D29/8aedf2_3-ap-1.40-6cf5dc55/frames/000006.tif",
+          "D29/8aedf2_3-ap-1.40-6cf5dc55/frames/000007.tif",
+          "D29/8aedf2_3-ap-1.40-6cf5dc55/frames/000008.tif"
+        ],
+        "reference_id": "D29/8aedf2_3-ap-1.40-6cf5dc55/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/665d5135_1-ap-4.00-a64bf2ca",
+        "group_id": "group-9759a4ef5a74d9d278f2",
+        "source_scene_id": "665d5135_1/ap-4.00",
+        "frame_ids": [
+          "D29/665d5135_1-ap-4.00-a64bf2ca/frames/000000.tif",
+          "D29/665d5135_1-ap-4.00-a64bf2ca/frames/000001.tif",
+          "D29/665d5135_1-ap-4.00-a64bf2ca/frames/000002.tif",
+          "D29/665d5135_1-ap-4.00-a64bf2ca/frames/000003.tif",
+          "D29/665d5135_1-ap-4.00-a64bf2ca/frames/000004.tif",
+          "D29/665d5135_1-ap-4.00-a64bf2ca/frames/000005.tif",
+          "D29/665d5135_1-ap-4.00-a64bf2ca/frames/000006.tif",
+          "D29/665d5135_1-ap-4.00-a64bf2ca/frames/000007.tif",
+          "D29/665d5135_1-ap-4.00-a64bf2ca/frames/000008.tif"
+        ],
+        "reference_id": "D29/665d5135_1-ap-4.00-a64bf2ca/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/548af4ce_1-ap-2.00-51561386",
+        "group_id": "group-e397bbcf3aa36ff349e9",
+        "source_scene_id": "548af4ce_1/ap-2.00",
+        "frame_ids": [
+          "D29/548af4ce_1-ap-2.00-51561386/frames/000000.tif",
+          "D29/548af4ce_1-ap-2.00-51561386/frames/000001.tif",
+          "D29/548af4ce_1-ap-2.00-51561386/frames/000002.tif",
+          "D29/548af4ce_1-ap-2.00-51561386/frames/000003.tif",
+          "D29/548af4ce_1-ap-2.00-51561386/frames/000004.tif",
+          "D29/548af4ce_1-ap-2.00-51561386/frames/000005.tif",
+          "D29/548af4ce_1-ap-2.00-51561386/frames/000006.tif",
+          "D29/548af4ce_1-ap-2.00-51561386/frames/000007.tif",
+          "D29/548af4ce_1-ap-2.00-51561386/frames/000008.tif"
+        ],
+        "reference_id": "D29/548af4ce_1-ap-2.00-51561386/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/577feefa_0-ap-5.60-c208ee2d",
+        "group_id": "group-519892d1a6c387f3d38a",
+        "source_scene_id": "577feefa_0/ap-5.60",
+        "frame_ids": [
+          "D29/577feefa_0-ap-5.60-c208ee2d/frames/000000.tif",
+          "D29/577feefa_0-ap-5.60-c208ee2d/frames/000001.tif",
+          "D29/577feefa_0-ap-5.60-c208ee2d/frames/000002.tif",
+          "D29/577feefa_0-ap-5.60-c208ee2d/frames/000003.tif",
+          "D29/577feefa_0-ap-5.60-c208ee2d/frames/000004.tif",
+          "D29/577feefa_0-ap-5.60-c208ee2d/frames/000005.tif",
+          "D29/577feefa_0-ap-5.60-c208ee2d/frames/000006.tif",
+          "D29/577feefa_0-ap-5.60-c208ee2d/frames/000007.tif",
+          "D29/577feefa_0-ap-5.60-c208ee2d/frames/000008.tif"
+        ],
+        "reference_id": "D29/577feefa_0-ap-5.60-c208ee2d/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/3c601367_0-ap-1.40-aaac76bb",
+        "group_id": "group-ff2de3c4cdd95e21cb23",
+        "source_scene_id": "3c601367_0/ap-1.40",
+        "frame_ids": [
+          "D29/3c601367_0-ap-1.40-aaac76bb/frames/000000.tif",
+          "D29/3c601367_0-ap-1.40-aaac76bb/frames/000001.tif",
+          "D29/3c601367_0-ap-1.40-aaac76bb/frames/000002.tif",
+          "D29/3c601367_0-ap-1.40-aaac76bb/frames/000003.tif",
+          "D29/3c601367_0-ap-1.40-aaac76bb/frames/000004.tif",
+          "D29/3c601367_0-ap-1.40-aaac76bb/frames/000005.tif",
+          "D29/3c601367_0-ap-1.40-aaac76bb/frames/000006.tif",
+          "D29/3c601367_0-ap-1.40-aaac76bb/frames/000007.tif",
+          "D29/3c601367_0-ap-1.40-aaac76bb/frames/000008.tif"
+        ],
+        "reference_id": "D29/3c601367_0-ap-1.40-aaac76bb/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/47447ad1_4-ap-1.40-96e37685",
+        "group_id": "group-80d9e8ebc333d984df8c",
+        "source_scene_id": "47447ad1_4/ap-1.40",
+        "frame_ids": [
+          "D29/47447ad1_4-ap-1.40-96e37685/frames/000000.tif",
+          "D29/47447ad1_4-ap-1.40-96e37685/frames/000001.tif",
+          "D29/47447ad1_4-ap-1.40-96e37685/frames/000002.tif",
+          "D29/47447ad1_4-ap-1.40-96e37685/frames/000003.tif",
+          "D29/47447ad1_4-ap-1.40-96e37685/frames/000004.tif",
+          "D29/47447ad1_4-ap-1.40-96e37685/frames/000005.tif",
+          "D29/47447ad1_4-ap-1.40-96e37685/frames/000006.tif",
+          "D29/47447ad1_4-ap-1.40-96e37685/frames/000007.tif",
+          "D29/47447ad1_4-ap-1.40-96e37685/frames/000008.tif"
+        ],
+        "reference_id": "D29/47447ad1_4-ap-1.40-96e37685/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/5b496958_0-ap-4.00-3163323b",
+        "group_id": "group-24e85de44e459c31c6ff",
+        "source_scene_id": "5b496958_0/ap-4.00",
+        "frame_ids": [
+          "D29/5b496958_0-ap-4.00-3163323b/frames/000000.tif",
+          "D29/5b496958_0-ap-4.00-3163323b/frames/000001.tif",
+          "D29/5b496958_0-ap-4.00-3163323b/frames/000002.tif",
+          "D29/5b496958_0-ap-4.00-3163323b/frames/000003.tif",
+          "D29/5b496958_0-ap-4.00-3163323b/frames/000004.tif",
+          "D29/5b496958_0-ap-4.00-3163323b/frames/000005.tif",
+          "D29/5b496958_0-ap-4.00-3163323b/frames/000006.tif",
+          "D29/5b496958_0-ap-4.00-3163323b/frames/000007.tif",
+          "D29/5b496958_0-ap-4.00-3163323b/frames/000008.tif"
+        ],
+        "reference_id": "D29/5b496958_0-ap-4.00-3163323b/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/774d3781_3-ap-2.00-be40e2a3",
+        "group_id": "group-417514f30358b7cac6c2",
+        "source_scene_id": "774d3781_3/ap-2.00",
+        "frame_ids": [
+          "D29/774d3781_3-ap-2.00-be40e2a3/frames/000000.tif",
+          "D29/774d3781_3-ap-2.00-be40e2a3/frames/000001.tif",
+          "D29/774d3781_3-ap-2.00-be40e2a3/frames/000002.tif",
+          "D29/774d3781_3-ap-2.00-be40e2a3/frames/000003.tif",
+          "D29/774d3781_3-ap-2.00-be40e2a3/frames/000004.tif",
+          "D29/774d3781_3-ap-2.00-be40e2a3/frames/000005.tif",
+          "D29/774d3781_3-ap-2.00-be40e2a3/frames/000006.tif",
+          "D29/774d3781_3-ap-2.00-be40e2a3/frames/000007.tif",
+          "D29/774d3781_3-ap-2.00-be40e2a3/frames/000008.tif"
+        ],
+        "reference_id": "D29/774d3781_3-ap-2.00-be40e2a3/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/9e1337e_1-ap-5.60-b93c8869",
+        "group_id": "group-eca7809f4c46cb146bd8",
+        "source_scene_id": "9e1337e_1/ap-5.60",
+        "frame_ids": [
+          "D29/9e1337e_1-ap-5.60-b93c8869/frames/000000.tif",
+          "D29/9e1337e_1-ap-5.60-b93c8869/frames/000001.tif",
+          "D29/9e1337e_1-ap-5.60-b93c8869/frames/000002.tif",
+          "D29/9e1337e_1-ap-5.60-b93c8869/frames/000003.tif",
+          "D29/9e1337e_1-ap-5.60-b93c8869/frames/000004.tif",
+          "D29/9e1337e_1-ap-5.60-b93c8869/frames/000005.tif",
+          "D29/9e1337e_1-ap-5.60-b93c8869/frames/000006.tif",
+          "D29/9e1337e_1-ap-5.60-b93c8869/frames/000007.tif",
+          "D29/9e1337e_1-ap-5.60-b93c8869/frames/000008.tif"
+        ],
+        "reference_id": "D29/9e1337e_1-ap-5.60-b93c8869/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/44eb1f4a_0-ap-2.00-d241dc07",
+        "group_id": "group-eeb3af27bea5834ce125",
+        "source_scene_id": "44eb1f4a_0/ap-2.00",
+        "frame_ids": [
+          "D29/44eb1f4a_0-ap-2.00-d241dc07/frames/000000.tif",
+          "D29/44eb1f4a_0-ap-2.00-d241dc07/frames/000001.tif",
+          "D29/44eb1f4a_0-ap-2.00-d241dc07/frames/000002.tif",
+          "D29/44eb1f4a_0-ap-2.00-d241dc07/frames/000003.tif",
+          "D29/44eb1f4a_0-ap-2.00-d241dc07/frames/000004.tif",
+          "D29/44eb1f4a_0-ap-2.00-d241dc07/frames/000005.tif",
+          "D29/44eb1f4a_0-ap-2.00-d241dc07/frames/000006.tif",
+          "D29/44eb1f4a_0-ap-2.00-d241dc07/frames/000007.tif",
+          "D29/44eb1f4a_0-ap-2.00-d241dc07/frames/000008.tif"
+        ],
+        "reference_id": "D29/44eb1f4a_0-ap-2.00-d241dc07/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/52062200_1-ap-4.00-564dffa9",
+        "group_id": "group-7126893b6e020b413749",
+        "source_scene_id": "52062200_1/ap-4.00",
+        "frame_ids": [
+          "D29/52062200_1-ap-4.00-564dffa9/frames/000000.tif",
+          "D29/52062200_1-ap-4.00-564dffa9/frames/000001.tif",
+          "D29/52062200_1-ap-4.00-564dffa9/frames/000002.tif",
+          "D29/52062200_1-ap-4.00-564dffa9/frames/000003.tif",
+          "D29/52062200_1-ap-4.00-564dffa9/frames/000004.tif",
+          "D29/52062200_1-ap-4.00-564dffa9/frames/000005.tif",
+          "D29/52062200_1-ap-4.00-564dffa9/frames/000006.tif",
+          "D29/52062200_1-ap-4.00-564dffa9/frames/000007.tif",
+          "D29/52062200_1-ap-4.00-564dffa9/frames/000008.tif"
+        ],
+        "reference_id": "D29/52062200_1-ap-4.00-564dffa9/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/235b8e4a_1-ap-4.00-bc086d8d",
+        "group_id": "group-72d386dc1e48e04ea29a",
+        "source_scene_id": "235b8e4a_1/ap-4.00",
+        "frame_ids": [
+          "D29/235b8e4a_1-ap-4.00-bc086d8d/frames/000000.tif",
+          "D29/235b8e4a_1-ap-4.00-bc086d8d/frames/000001.tif",
+          "D29/235b8e4a_1-ap-4.00-bc086d8d/frames/000002.tif",
+          "D29/235b8e4a_1-ap-4.00-bc086d8d/frames/000003.tif",
+          "D29/235b8e4a_1-ap-4.00-bc086d8d/frames/000004.tif",
+          "D29/235b8e4a_1-ap-4.00-bc086d8d/frames/000005.tif",
+          "D29/235b8e4a_1-ap-4.00-bc086d8d/frames/000006.tif",
+          "D29/235b8e4a_1-ap-4.00-bc086d8d/frames/000007.tif",
+          "D29/235b8e4a_1-ap-4.00-bc086d8d/frames/000008.tif"
+        ],
+        "reference_id": "D29/235b8e4a_1-ap-4.00-bc086d8d/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/6966301c_2-ap-2.80-3925baeb",
+        "group_id": "group-8013d885bf2f8a5228a0",
+        "source_scene_id": "6966301c_2/ap-2.80",
+        "frame_ids": [
+          "D29/6966301c_2-ap-2.80-3925baeb/frames/000000.tif",
+          "D29/6966301c_2-ap-2.80-3925baeb/frames/000001.tif",
+          "D29/6966301c_2-ap-2.80-3925baeb/frames/000002.tif",
+          "D29/6966301c_2-ap-2.80-3925baeb/frames/000003.tif",
+          "D29/6966301c_2-ap-2.80-3925baeb/frames/000004.tif",
+          "D29/6966301c_2-ap-2.80-3925baeb/frames/000005.tif",
+          "D29/6966301c_2-ap-2.80-3925baeb/frames/000006.tif",
+          "D29/6966301c_2-ap-2.80-3925baeb/frames/000007.tif",
+          "D29/6966301c_2-ap-2.80-3925baeb/frames/000008.tif"
+        ],
+        "reference_id": "D29/6966301c_2-ap-2.80-3925baeb/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/240db7ce_1-ap-5.60-23e5fc8a",
+        "group_id": "group-73cfc96fef8f34c5169d",
+        "source_scene_id": "240db7ce_1/ap-5.60",
+        "frame_ids": [
+          "D29/240db7ce_1-ap-5.60-23e5fc8a/frames/000000.tif",
+          "D29/240db7ce_1-ap-5.60-23e5fc8a/frames/000001.tif",
+          "D29/240db7ce_1-ap-5.60-23e5fc8a/frames/000002.tif",
+          "D29/240db7ce_1-ap-5.60-23e5fc8a/frames/000003.tif",
+          "D29/240db7ce_1-ap-5.60-23e5fc8a/frames/000004.tif",
+          "D29/240db7ce_1-ap-5.60-23e5fc8a/frames/000005.tif",
+          "D29/240db7ce_1-ap-5.60-23e5fc8a/frames/000006.tif",
+          "D29/240db7ce_1-ap-5.60-23e5fc8a/frames/000007.tif",
+          "D29/240db7ce_1-ap-5.60-23e5fc8a/frames/000008.tif"
+        ],
+        "reference_id": "D29/240db7ce_1-ap-5.60-23e5fc8a/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/539c5d1b_0-ap-4.00-fb46a2a2",
+        "group_id": "group-c5bf32c30afedf30d426",
+        "source_scene_id": "539c5d1b_0/ap-4.00",
+        "frame_ids": [
+          "D29/539c5d1b_0-ap-4.00-fb46a2a2/frames/000000.tif",
+          "D29/539c5d1b_0-ap-4.00-fb46a2a2/frames/000001.tif",
+          "D29/539c5d1b_0-ap-4.00-fb46a2a2/frames/000002.tif",
+          "D29/539c5d1b_0-ap-4.00-fb46a2a2/frames/000003.tif",
+          "D29/539c5d1b_0-ap-4.00-fb46a2a2/frames/000004.tif",
+          "D29/539c5d1b_0-ap-4.00-fb46a2a2/frames/000005.tif",
+          "D29/539c5d1b_0-ap-4.00-fb46a2a2/frames/000006.tif",
+          "D29/539c5d1b_0-ap-4.00-fb46a2a2/frames/000007.tif",
+          "D29/539c5d1b_0-ap-4.00-fb46a2a2/frames/000008.tif"
+        ],
+        "reference_id": "D29/539c5d1b_0-ap-4.00-fb46a2a2/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/e37e423_0-ap-2.80-c735cfc2",
+        "group_id": "group-4bc685c9d9549b07cbb2",
+        "source_scene_id": "e37e423_0/ap-2.80",
+        "frame_ids": [
+          "D29/e37e423_0-ap-2.80-c735cfc2/frames/000000.tif",
+          "D29/e37e423_0-ap-2.80-c735cfc2/frames/000001.tif",
+          "D29/e37e423_0-ap-2.80-c735cfc2/frames/000002.tif",
+          "D29/e37e423_0-ap-2.80-c735cfc2/frames/000003.tif",
+          "D29/e37e423_0-ap-2.80-c735cfc2/frames/000004.tif",
+          "D29/e37e423_0-ap-2.80-c735cfc2/frames/000005.tif",
+          "D29/e37e423_0-ap-2.80-c735cfc2/frames/000006.tif",
+          "D29/e37e423_0-ap-2.80-c735cfc2/frames/000007.tif",
+          "D29/e37e423_0-ap-2.80-c735cfc2/frames/000008.tif"
+        ],
+        "reference_id": "D29/e37e423_0-ap-2.80-c735cfc2/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/6fec49d7_3-ap-2.80-e3c18f1b",
+        "group_id": "group-0bd1a608f1f7e260e7be",
+        "source_scene_id": "6fec49d7_3/ap-2.80",
+        "frame_ids": [
+          "D29/6fec49d7_3-ap-2.80-e3c18f1b/frames/000000.tif",
+          "D29/6fec49d7_3-ap-2.80-e3c18f1b/frames/000001.tif",
+          "D29/6fec49d7_3-ap-2.80-e3c18f1b/frames/000002.tif",
+          "D29/6fec49d7_3-ap-2.80-e3c18f1b/frames/000003.tif",
+          "D29/6fec49d7_3-ap-2.80-e3c18f1b/frames/000004.tif",
+          "D29/6fec49d7_3-ap-2.80-e3c18f1b/frames/000005.tif",
+          "D29/6fec49d7_3-ap-2.80-e3c18f1b/frames/000006.tif",
+          "D29/6fec49d7_3-ap-2.80-e3c18f1b/frames/000007.tif",
+          "D29/6fec49d7_3-ap-2.80-e3c18f1b/frames/000008.tif"
+        ],
+        "reference_id": "D29/6fec49d7_3-ap-2.80-e3c18f1b/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/5a9a4a4b_1-ap-2.00-f922131f",
+        "group_id": "group-554ed73882d8277d7f31",
+        "source_scene_id": "5a9a4a4b_1/ap-2.00",
+        "frame_ids": [
+          "D29/5a9a4a4b_1-ap-2.00-f922131f/frames/000000.tif",
+          "D29/5a9a4a4b_1-ap-2.00-f922131f/frames/000001.tif",
+          "D29/5a9a4a4b_1-ap-2.00-f922131f/frames/000002.tif",
+          "D29/5a9a4a4b_1-ap-2.00-f922131f/frames/000003.tif",
+          "D29/5a9a4a4b_1-ap-2.00-f922131f/frames/000004.tif",
+          "D29/5a9a4a4b_1-ap-2.00-f922131f/frames/000005.tif",
+          "D29/5a9a4a4b_1-ap-2.00-f922131f/frames/000006.tif",
+          "D29/5a9a4a4b_1-ap-2.00-f922131f/frames/000007.tif",
+          "D29/5a9a4a4b_1-ap-2.00-f922131f/frames/000008.tif"
+        ],
+        "reference_id": "D29/5a9a4a4b_1-ap-2.00-f922131f/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/5427966d_2-ap-1.40-7dbec2b9",
+        "group_id": "group-4055e1f87625ae7809d1",
+        "source_scene_id": "5427966d_2/ap-1.40",
+        "frame_ids": [
+          "D29/5427966d_2-ap-1.40-7dbec2b9/frames/000000.tif",
+          "D29/5427966d_2-ap-1.40-7dbec2b9/frames/000001.tif",
+          "D29/5427966d_2-ap-1.40-7dbec2b9/frames/000002.tif",
+          "D29/5427966d_2-ap-1.40-7dbec2b9/frames/000003.tif",
+          "D29/5427966d_2-ap-1.40-7dbec2b9/frames/000004.tif",
+          "D29/5427966d_2-ap-1.40-7dbec2b9/frames/000005.tif",
+          "D29/5427966d_2-ap-1.40-7dbec2b9/frames/000006.tif",
+          "D29/5427966d_2-ap-1.40-7dbec2b9/frames/000007.tif",
+          "D29/5427966d_2-ap-1.40-7dbec2b9/frames/000008.tif"
+        ],
+        "reference_id": "D29/5427966d_2-ap-1.40-7dbec2b9/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/15349c6_2-ap-4.00-f72eb15e",
+        "group_id": "group-86cb46849bb5fc88a17b",
+        "source_scene_id": "15349c6_2/ap-4.00",
+        "frame_ids": [
+          "D29/15349c6_2-ap-4.00-f72eb15e/frames/000000.tif",
+          "D29/15349c6_2-ap-4.00-f72eb15e/frames/000001.tif",
+          "D29/15349c6_2-ap-4.00-f72eb15e/frames/000002.tif",
+          "D29/15349c6_2-ap-4.00-f72eb15e/frames/000003.tif",
+          "D29/15349c6_2-ap-4.00-f72eb15e/frames/000004.tif",
+          "D29/15349c6_2-ap-4.00-f72eb15e/frames/000005.tif",
+          "D29/15349c6_2-ap-4.00-f72eb15e/frames/000006.tif",
+          "D29/15349c6_2-ap-4.00-f72eb15e/frames/000007.tif",
+          "D29/15349c6_2-ap-4.00-f72eb15e/frames/000008.tif"
+        ],
+        "reference_id": "D29/15349c6_2-ap-4.00-f72eb15e/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/676ba32b_0-ap-2.80-1384098f",
+        "group_id": "group-ad9c728249b9483b27e6",
+        "source_scene_id": "676ba32b_0/ap-2.80",
+        "frame_ids": [
+          "D29/676ba32b_0-ap-2.80-1384098f/frames/000000.tif",
+          "D29/676ba32b_0-ap-2.80-1384098f/frames/000001.tif",
+          "D29/676ba32b_0-ap-2.80-1384098f/frames/000002.tif",
+          "D29/676ba32b_0-ap-2.80-1384098f/frames/000003.tif",
+          "D29/676ba32b_0-ap-2.80-1384098f/frames/000004.tif",
+          "D29/676ba32b_0-ap-2.80-1384098f/frames/000005.tif",
+          "D29/676ba32b_0-ap-2.80-1384098f/frames/000006.tif",
+          "D29/676ba32b_0-ap-2.80-1384098f/frames/000007.tif",
+          "D29/676ba32b_0-ap-2.80-1384098f/frames/000008.tif"
+        ],
+        "reference_id": "D29/676ba32b_0-ap-2.80-1384098f/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/6d67dcd1_0-ap-1.40-bb058cc6",
+        "group_id": "group-eb7acdd1542e7f4a54a7",
+        "source_scene_id": "6d67dcd1_0/ap-1.40",
+        "frame_ids": [
+          "D29/6d67dcd1_0-ap-1.40-bb058cc6/frames/000000.tif",
+          "D29/6d67dcd1_0-ap-1.40-bb058cc6/frames/000001.tif",
+          "D29/6d67dcd1_0-ap-1.40-bb058cc6/frames/000002.tif",
+          "D29/6d67dcd1_0-ap-1.40-bb058cc6/frames/000003.tif",
+          "D29/6d67dcd1_0-ap-1.40-bb058cc6/frames/000004.tif",
+          "D29/6d67dcd1_0-ap-1.40-bb058cc6/frames/000005.tif",
+          "D29/6d67dcd1_0-ap-1.40-bb058cc6/frames/000006.tif",
+          "D29/6d67dcd1_0-ap-1.40-bb058cc6/frames/000007.tif",
+          "D29/6d67dcd1_0-ap-1.40-bb058cc6/frames/000008.tif"
+        ],
+        "reference_id": "D29/6d67dcd1_0-ap-1.40-bb058cc6/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/303ff5e6_2-ap-4.00-0a25d116",
+        "group_id": "group-cde86d3de94b4bf9e17e",
+        "source_scene_id": "303ff5e6_2/ap-4.00",
+        "frame_ids": [
+          "D29/303ff5e6_2-ap-4.00-0a25d116/frames/000000.tif",
+          "D29/303ff5e6_2-ap-4.00-0a25d116/frames/000001.tif",
+          "D29/303ff5e6_2-ap-4.00-0a25d116/frames/000002.tif",
+          "D29/303ff5e6_2-ap-4.00-0a25d116/frames/000003.tif",
+          "D29/303ff5e6_2-ap-4.00-0a25d116/frames/000004.tif",
+          "D29/303ff5e6_2-ap-4.00-0a25d116/frames/000005.tif",
+          "D29/303ff5e6_2-ap-4.00-0a25d116/frames/000006.tif",
+          "D29/303ff5e6_2-ap-4.00-0a25d116/frames/000007.tif",
+          "D29/303ff5e6_2-ap-4.00-0a25d116/frames/000008.tif"
+        ],
+        "reference_id": "D29/303ff5e6_2-ap-4.00-0a25d116/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/56241c0a_1-ap-5.60-3a145dfc",
+        "group_id": "group-c41e71158cc0a023102d",
+        "source_scene_id": "56241c0a_1/ap-5.60",
+        "frame_ids": [
+          "D29/56241c0a_1-ap-5.60-3a145dfc/frames/000000.tif",
+          "D29/56241c0a_1-ap-5.60-3a145dfc/frames/000001.tif",
+          "D29/56241c0a_1-ap-5.60-3a145dfc/frames/000002.tif",
+          "D29/56241c0a_1-ap-5.60-3a145dfc/frames/000003.tif",
+          "D29/56241c0a_1-ap-5.60-3a145dfc/frames/000004.tif",
+          "D29/56241c0a_1-ap-5.60-3a145dfc/frames/000005.tif",
+          "D29/56241c0a_1-ap-5.60-3a145dfc/frames/000006.tif",
+          "D29/56241c0a_1-ap-5.60-3a145dfc/frames/000007.tif",
+          "D29/56241c0a_1-ap-5.60-3a145dfc/frames/000008.tif"
+        ],
+        "reference_id": "D29/56241c0a_1-ap-5.60-3a145dfc/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/208c1f27_2-ap-5.60-de2a01dd",
+        "group_id": "group-7d464a8d5d5203f66297",
+        "source_scene_id": "208c1f27_2/ap-5.60",
+        "frame_ids": [
+          "D29/208c1f27_2-ap-5.60-de2a01dd/frames/000000.tif",
+          "D29/208c1f27_2-ap-5.60-de2a01dd/frames/000001.tif",
+          "D29/208c1f27_2-ap-5.60-de2a01dd/frames/000002.tif",
+          "D29/208c1f27_2-ap-5.60-de2a01dd/frames/000003.tif",
+          "D29/208c1f27_2-ap-5.60-de2a01dd/frames/000004.tif",
+          "D29/208c1f27_2-ap-5.60-de2a01dd/frames/000005.tif",
+          "D29/208c1f27_2-ap-5.60-de2a01dd/frames/000006.tif",
+          "D29/208c1f27_2-ap-5.60-de2a01dd/frames/000007.tif",
+          "D29/208c1f27_2-ap-5.60-de2a01dd/frames/000008.tif"
+        ],
+        "reference_id": "D29/208c1f27_2-ap-5.60-de2a01dd/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/2a3cd45c_0-ap-5.60-5bed7370",
+        "group_id": "group-825bf466777a0e73aaa2",
+        "source_scene_id": "2a3cd45c_0/ap-5.60",
+        "frame_ids": [
+          "D29/2a3cd45c_0-ap-5.60-5bed7370/frames/000000.tif",
+          "D29/2a3cd45c_0-ap-5.60-5bed7370/frames/000001.tif",
+          "D29/2a3cd45c_0-ap-5.60-5bed7370/frames/000002.tif",
+          "D29/2a3cd45c_0-ap-5.60-5bed7370/frames/000003.tif",
+          "D29/2a3cd45c_0-ap-5.60-5bed7370/frames/000004.tif",
+          "D29/2a3cd45c_0-ap-5.60-5bed7370/frames/000005.tif",
+          "D29/2a3cd45c_0-ap-5.60-5bed7370/frames/000006.tif",
+          "D29/2a3cd45c_0-ap-5.60-5bed7370/frames/000007.tif",
+          "D29/2a3cd45c_0-ap-5.60-5bed7370/frames/000008.tif"
+        ],
+        "reference_id": "D29/2a3cd45c_0-ap-5.60-5bed7370/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/50ac0c2f_3-ap-1.40-2d438d05",
+        "group_id": "group-47e7bbbbc278d6e8486c",
+        "source_scene_id": "50ac0c2f_3/ap-1.40",
+        "frame_ids": [
+          "D29/50ac0c2f_3-ap-1.40-2d438d05/frames/000000.tif",
+          "D29/50ac0c2f_3-ap-1.40-2d438d05/frames/000001.tif",
+          "D29/50ac0c2f_3-ap-1.40-2d438d05/frames/000002.tif",
+          "D29/50ac0c2f_3-ap-1.40-2d438d05/frames/000003.tif",
+          "D29/50ac0c2f_3-ap-1.40-2d438d05/frames/000004.tif",
+          "D29/50ac0c2f_3-ap-1.40-2d438d05/frames/000005.tif",
+          "D29/50ac0c2f_3-ap-1.40-2d438d05/frames/000006.tif",
+          "D29/50ac0c2f_3-ap-1.40-2d438d05/frames/000007.tif",
+          "D29/50ac0c2f_3-ap-1.40-2d438d05/frames/000008.tif"
+        ],
+        "reference_id": "D29/50ac0c2f_3-ap-1.40-2d438d05/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/572d27e3_3-ap-5.60-08acb346",
+        "group_id": "group-0df3c1b3155fba0fd141",
+        "source_scene_id": "572d27e3_3/ap-5.60",
+        "frame_ids": [
+          "D29/572d27e3_3-ap-5.60-08acb346/frames/000000.tif",
+          "D29/572d27e3_3-ap-5.60-08acb346/frames/000001.tif",
+          "D29/572d27e3_3-ap-5.60-08acb346/frames/000002.tif",
+          "D29/572d27e3_3-ap-5.60-08acb346/frames/000003.tif",
+          "D29/572d27e3_3-ap-5.60-08acb346/frames/000004.tif",
+          "D29/572d27e3_3-ap-5.60-08acb346/frames/000005.tif",
+          "D29/572d27e3_3-ap-5.60-08acb346/frames/000006.tif",
+          "D29/572d27e3_3-ap-5.60-08acb346/frames/000007.tif",
+          "D29/572d27e3_3-ap-5.60-08acb346/frames/000008.tif"
+        ],
+        "reference_id": "D29/572d27e3_3-ap-5.60-08acb346/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/d811a1b_1-ap-1.40-1529b3a8",
+        "group_id": "group-7f1373079096396658b2",
+        "source_scene_id": "d811a1b_1/ap-1.40",
+        "frame_ids": [
+          "D29/d811a1b_1-ap-1.40-1529b3a8/frames/000000.tif",
+          "D29/d811a1b_1-ap-1.40-1529b3a8/frames/000001.tif",
+          "D29/d811a1b_1-ap-1.40-1529b3a8/frames/000002.tif",
+          "D29/d811a1b_1-ap-1.40-1529b3a8/frames/000003.tif",
+          "D29/d811a1b_1-ap-1.40-1529b3a8/frames/000004.tif",
+          "D29/d811a1b_1-ap-1.40-1529b3a8/frames/000005.tif",
+          "D29/d811a1b_1-ap-1.40-1529b3a8/frames/000006.tif",
+          "D29/d811a1b_1-ap-1.40-1529b3a8/frames/000007.tif",
+          "D29/d811a1b_1-ap-1.40-1529b3a8/frames/000008.tif"
+        ],
+        "reference_id": "D29/d811a1b_1-ap-1.40-1529b3a8/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/1557c9a5_2-ap-2.00-c8922358",
+        "group_id": "group-b93a2d9d1a3763977a6b",
+        "source_scene_id": "1557c9a5_2/ap-2.00",
+        "frame_ids": [
+          "D29/1557c9a5_2-ap-2.00-c8922358/frames/000000.tif",
+          "D29/1557c9a5_2-ap-2.00-c8922358/frames/000001.tif",
+          "D29/1557c9a5_2-ap-2.00-c8922358/frames/000002.tif",
+          "D29/1557c9a5_2-ap-2.00-c8922358/frames/000003.tif",
+          "D29/1557c9a5_2-ap-2.00-c8922358/frames/000004.tif",
+          "D29/1557c9a5_2-ap-2.00-c8922358/frames/000005.tif",
+          "D29/1557c9a5_2-ap-2.00-c8922358/frames/000006.tif",
+          "D29/1557c9a5_2-ap-2.00-c8922358/frames/000007.tif",
+          "D29/1557c9a5_2-ap-2.00-c8922358/frames/000008.tif"
+        ],
+        "reference_id": "D29/1557c9a5_2-ap-2.00-c8922358/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/4d6e4423_3-ap-2.80-9a12278e",
+        "group_id": "group-5c4e7cb287460f24693f",
+        "source_scene_id": "4d6e4423_3/ap-2.80",
+        "frame_ids": [
+          "D29/4d6e4423_3-ap-2.80-9a12278e/frames/000000.tif",
+          "D29/4d6e4423_3-ap-2.80-9a12278e/frames/000001.tif",
+          "D29/4d6e4423_3-ap-2.80-9a12278e/frames/000002.tif",
+          "D29/4d6e4423_3-ap-2.80-9a12278e/frames/000003.tif",
+          "D29/4d6e4423_3-ap-2.80-9a12278e/frames/000004.tif",
+          "D29/4d6e4423_3-ap-2.80-9a12278e/frames/000005.tif",
+          "D29/4d6e4423_3-ap-2.80-9a12278e/frames/000006.tif",
+          "D29/4d6e4423_3-ap-2.80-9a12278e/frames/000007.tif",
+          "D29/4d6e4423_3-ap-2.80-9a12278e/frames/000008.tif"
+        ],
+        "reference_id": "D29/4d6e4423_3-ap-2.80-9a12278e/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/1a4897de_1-ap-5.60-b0d152d3",
+        "group_id": "group-9a0a66e92bf2a13342a9",
+        "source_scene_id": "1a4897de_1/ap-5.60",
+        "frame_ids": [
+          "D29/1a4897de_1-ap-5.60-b0d152d3/frames/000000.tif",
+          "D29/1a4897de_1-ap-5.60-b0d152d3/frames/000001.tif",
+          "D29/1a4897de_1-ap-5.60-b0d152d3/frames/000002.tif",
+          "D29/1a4897de_1-ap-5.60-b0d152d3/frames/000003.tif",
+          "D29/1a4897de_1-ap-5.60-b0d152d3/frames/000004.tif",
+          "D29/1a4897de_1-ap-5.60-b0d152d3/frames/000005.tif",
+          "D29/1a4897de_1-ap-5.60-b0d152d3/frames/000006.tif",
+          "D29/1a4897de_1-ap-5.60-b0d152d3/frames/000007.tif",
+          "D29/1a4897de_1-ap-5.60-b0d152d3/frames/000008.tif"
+        ],
+        "reference_id": "D29/1a4897de_1-ap-5.60-b0d152d3/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/75c6cc2c_1-ap-2.80-fdb4ac04",
+        "group_id": "group-2b19fdb40577b22b42dc",
+        "source_scene_id": "75c6cc2c_1/ap-2.80",
+        "frame_ids": [
+          "D29/75c6cc2c_1-ap-2.80-fdb4ac04/frames/000000.tif",
+          "D29/75c6cc2c_1-ap-2.80-fdb4ac04/frames/000001.tif",
+          "D29/75c6cc2c_1-ap-2.80-fdb4ac04/frames/000002.tif",
+          "D29/75c6cc2c_1-ap-2.80-fdb4ac04/frames/000003.tif",
+          "D29/75c6cc2c_1-ap-2.80-fdb4ac04/frames/000004.tif",
+          "D29/75c6cc2c_1-ap-2.80-fdb4ac04/frames/000005.tif",
+          "D29/75c6cc2c_1-ap-2.80-fdb4ac04/frames/000006.tif",
+          "D29/75c6cc2c_1-ap-2.80-fdb4ac04/frames/000007.tif",
+          "D29/75c6cc2c_1-ap-2.80-fdb4ac04/frames/000008.tif"
+        ],
+        "reference_id": "D29/75c6cc2c_1-ap-2.80-fdb4ac04/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/124755d3_1-ap-2.00-3cd52427",
+        "group_id": "group-f0abf53aa6d9ae133284",
+        "source_scene_id": "124755d3_1/ap-2.00",
+        "frame_ids": [
+          "D29/124755d3_1-ap-2.00-3cd52427/frames/000000.tif",
+          "D29/124755d3_1-ap-2.00-3cd52427/frames/000001.tif",
+          "D29/124755d3_1-ap-2.00-3cd52427/frames/000002.tif",
+          "D29/124755d3_1-ap-2.00-3cd52427/frames/000003.tif",
+          "D29/124755d3_1-ap-2.00-3cd52427/frames/000004.tif",
+          "D29/124755d3_1-ap-2.00-3cd52427/frames/000005.tif",
+          "D29/124755d3_1-ap-2.00-3cd52427/frames/000006.tif",
+          "D29/124755d3_1-ap-2.00-3cd52427/frames/000007.tif",
+          "D29/124755d3_1-ap-2.00-3cd52427/frames/000008.tif"
+        ],
+        "reference_id": "D29/124755d3_1-ap-2.00-3cd52427/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/15d607a3_2-ap-1.40-0f217795",
+        "group_id": "group-1b6d36d23cad15ced053",
+        "source_scene_id": "15d607a3_2/ap-1.40",
+        "frame_ids": [
+          "D29/15d607a3_2-ap-1.40-0f217795/frames/000000.tif",
+          "D29/15d607a3_2-ap-1.40-0f217795/frames/000001.tif",
+          "D29/15d607a3_2-ap-1.40-0f217795/frames/000002.tif",
+          "D29/15d607a3_2-ap-1.40-0f217795/frames/000003.tif",
+          "D29/15d607a3_2-ap-1.40-0f217795/frames/000004.tif",
+          "D29/15d607a3_2-ap-1.40-0f217795/frames/000005.tif",
+          "D29/15d607a3_2-ap-1.40-0f217795/frames/000006.tif",
+          "D29/15d607a3_2-ap-1.40-0f217795/frames/000007.tif",
+          "D29/15d607a3_2-ap-1.40-0f217795/frames/000008.tif"
+        ],
+        "reference_id": "D29/15d607a3_2-ap-1.40-0f217795/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      },
+      {
+        "dataset": "D29",
+        "scene_id": "D29/2e60e10d_3-ap-1.40-56526d21",
+        "group_id": "group-20b5909bcf2fbf5bf922",
+        "source_scene_id": "2e60e10d_3/ap-1.40",
+        "frame_ids": [
+          "D29/2e60e10d_3-ap-1.40-56526d21/frames/000000.tif",
+          "D29/2e60e10d_3-ap-1.40-56526d21/frames/000001.tif",
+          "D29/2e60e10d_3-ap-1.40-56526d21/frames/000002.tif",
+          "D29/2e60e10d_3-ap-1.40-56526d21/frames/000003.tif",
+          "D29/2e60e10d_3-ap-1.40-56526d21/frames/000004.tif",
+          "D29/2e60e10d_3-ap-1.40-56526d21/frames/000005.tif",
+          "D29/2e60e10d_3-ap-1.40-56526d21/frames/000006.tif",
+          "D29/2e60e10d_3-ap-1.40-56526d21/frames/000007.tif",
+          "D29/2e60e10d_3-ap-1.40-56526d21/frames/000008.tif"
+        ],
+        "reference_id": "D29/2e60e10d_3-ap-1.40-56526d21/references/000000.tif",
+        "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+        "color_recipe_sha256": "b7bf8cc7e132970c9197c9c3ab5091440d66e822ea9bce3d73a3a1e74235aae6"
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "activation_policies": [
+    2
+  ],
+  "exit_status": 0,
+  "had_foreground_application": true,
+  "java_pid": 36406,
+  "zerene_activation_events": 0,
+  "zerene_was_frontmost": false,
+  "foreground_baseline_identical_tiff_pixels": 4
+}

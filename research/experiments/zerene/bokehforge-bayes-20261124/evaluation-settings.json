@@ -1,0 +1,816 @@
+[
+  {
+    "split": "tuning",
+    "trial": 0,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 50,
+      "dmap_estimation_radius": 10,
+      "dmap_smoothing_radius": 5
+    },
+    "methods": [
+      "dmap",
+      "pmax"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 1,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 66,
+      "dmap_estimation_radius": 10,
+      "dmap_smoothing_radius": 9
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 2,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 81,
+      "dmap_estimation_radius": 12,
+      "dmap_smoothing_radius": 11
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 3,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 15,
+      "dmap_estimation_radius": 20,
+      "dmap_smoothing_radius": 16
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 4,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 83,
+      "dmap_estimation_radius": 13,
+      "dmap_smoothing_radius": 24
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 5,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 41,
+      "dmap_estimation_radius": 28,
+      "dmap_smoothing_radius": 19
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 6,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 47,
+      "dmap_estimation_radius": 27,
+      "dmap_smoothing_radius": 22
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 7,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 10,
+      "dmap_estimation_radius": 29,
+      "dmap_smoothing_radius": 1
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 8,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 100,
+      "dmap_estimation_radius": 28,
+      "dmap_smoothing_radius": 7
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 9,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 3,
+      "dmap_estimation_radius": 10,
+      "dmap_smoothing_radius": 0
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 10,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 74,
+      "dmap_estimation_radius": 1,
+      "dmap_smoothing_radius": 3
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 11,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 42,
+      "dmap_estimation_radius": 24,
+      "dmap_smoothing_radius": 9
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 12,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 48,
+      "dmap_estimation_radius": 19,
+      "dmap_smoothing_radius": 12
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 13,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 62,
+      "dmap_estimation_radius": 3,
+      "dmap_smoothing_radius": 16
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 14,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 50,
+      "dmap_estimation_radius": 14,
+      "dmap_smoothing_radius": 14
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 15,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 61,
+      "dmap_estimation_radius": 22,
+      "dmap_smoothing_radius": 1
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 16,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 85,
+      "dmap_estimation_radius": 20,
+      "dmap_smoothing_radius": 14
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 17,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 77,
+      "dmap_estimation_radius": 12,
+      "dmap_smoothing_radius": 4
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 18,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 32,
+      "dmap_estimation_radius": 4,
+      "dmap_smoothing_radius": 14
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 19,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 33,
+      "dmap_estimation_radius": 8,
+      "dmap_smoothing_radius": 23
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 20,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 2,
+      "dmap_estimation_radius": 30,
+      "dmap_smoothing_radius": 23
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 21,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 51,
+      "dmap_estimation_radius": 17,
+      "dmap_smoothing_radius": 13
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 22,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 52,
+      "dmap_estimation_radius": 20,
+      "dmap_smoothing_radius": 16
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 23,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 48,
+      "dmap_estimation_radius": 16,
+      "dmap_smoothing_radius": 18
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 24,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 58,
+      "dmap_estimation_radius": 18,
+      "dmap_smoothing_radius": 10
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 25,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 51,
+      "dmap_estimation_radius": 23,
+      "dmap_smoothing_radius": 14
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 26,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 28,
+      "dmap_estimation_radius": 16,
+      "dmap_smoothing_radius": 9
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 27,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 73,
+      "dmap_estimation_radius": 30,
+      "dmap_smoothing_radius": 10
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 28,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 66,
+      "dmap_estimation_radius": 19,
+      "dmap_smoothing_radius": 12
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 29,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 41,
+      "dmap_estimation_radius": 12,
+      "dmap_smoothing_radius": 2
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 30,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 93,
+      "dmap_estimation_radius": 2,
+      "dmap_smoothing_radius": 19
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 31,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 42,
+      "dmap_estimation_radius": 18,
+      "dmap_smoothing_radius": 12
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 32,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 54,
+      "dmap_estimation_radius": 14,
+      "dmap_smoothing_radius": 8
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 33,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 57,
+      "dmap_estimation_radius": 19,
+      "dmap_smoothing_radius": 12
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 34,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 65,
+      "dmap_estimation_radius": 19,
+      "dmap_smoothing_radius": 7
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 35,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 66,
+      "dmap_estimation_radius": 23,
+      "dmap_smoothing_radius": 17
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 36,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 61,
+      "dmap_estimation_radius": 23,
+      "dmap_smoothing_radius": 12
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 37,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 36,
+      "dmap_estimation_radius": 19,
+      "dmap_smoothing_radius": 16
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 38,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 1,
+      "dmap_estimation_radius": 7,
+      "dmap_smoothing_radius": 17
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 39,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 64,
+      "dmap_estimation_radius": 16,
+      "dmap_smoothing_radius": 17
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 40,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 53,
+      "dmap_estimation_radius": 19,
+      "dmap_smoothing_radius": 11
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 41,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 50,
+      "dmap_estimation_radius": 21,
+      "dmap_smoothing_radius": 10
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 42,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 66,
+      "dmap_estimation_radius": 14,
+      "dmap_smoothing_radius": 12
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 43,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 56,
+      "dmap_estimation_radius": 18,
+      "dmap_smoothing_radius": 9
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 44,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 18,
+      "dmap_estimation_radius": 27,
+      "dmap_smoothing_radius": 10
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 45,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 45,
+      "dmap_estimation_radius": 22,
+      "dmap_smoothing_radius": 5
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 46,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 64,
+      "dmap_estimation_radius": 17,
+      "dmap_smoothing_radius": 9
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 47,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 43,
+      "dmap_estimation_radius": 17,
+      "dmap_smoothing_radius": 9
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 48,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 50,
+      "dmap_estimation_radius": 26,
+      "dmap_smoothing_radius": 16
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 49,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 93,
+      "dmap_estimation_radius": 20,
+      "dmap_smoothing_radius": 0
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 50,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 34,
+      "dmap_estimation_radius": 1,
+      "dmap_smoothing_radius": 2
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "tuning",
+    "trial": 51,
+    "saved_stacks": 50,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 57,
+      "dmap_estimation_radius": 21,
+      "dmap_smoothing_radius": 8
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "validation",
+    "trial": 0,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 50,
+      "dmap_estimation_radius": 10,
+      "dmap_smoothing_radius": 5
+    },
+    "methods": [
+      "dmap",
+      "pmax"
+    ]
+  },
+  {
+    "split": "validation",
+    "trial": 10,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 66,
+      "dmap_estimation_radius": 10,
+      "dmap_smoothing_radius": 9
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "validation",
+    "trial": 20,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 48,
+      "dmap_estimation_radius": 19,
+      "dmap_smoothing_radius": 12
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "validation",
+    "trial": 30,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 58,
+      "dmap_estimation_radius": 18,
+      "dmap_smoothing_radius": 10
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "validation",
+    "trial": 40,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 58,
+      "dmap_estimation_radius": 18,
+      "dmap_smoothing_radius": 10
+    },
+    "methods": [
+      "dmap"
+    ]
+  },
+  {
+    "split": "validation",
+    "trial": 50,
+    "saved_stacks": 100,
+    "expected_stacks": 100,
+    "dmap_parameters": {
+      "dmap_percentile": 56,
+      "dmap_estimation_radius": 18,
+      "dmap_smoothing_radius": 9
+    },
+    "methods": [
+      "dmap"
+    ]
+  }
+]

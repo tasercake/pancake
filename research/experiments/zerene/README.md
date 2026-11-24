@@ -1,5 +1,7 @@
 # Unattended Zerene Stacker experiments
 
+[BokehForge DMap sweep results](bokehforge-bayes-20261124/README.md) include held-out validation, per-stack scores, and the code used for the run.
+
 The [runner](run_stack.py) uses the installed macOS app and Zerene's [Batch API](https://zerenesystems.com/cms/stacker/docs/batchapi). It passes `-Dapple.awt.BackgroundOnly=true` to Java so Zerene can stack without taking keyboard focus. Zerene saves the results and exits automatically.
 
 ## Setup
