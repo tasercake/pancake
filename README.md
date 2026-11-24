@@ -1,6 +1,10 @@
-# Focus-stacking research
+<h1 align="center">
+  <img src="assets/pancake-stacker-wordmark.png" alt="Pancake Stacker" width="300">
+</h1>
 
-Research and tools for building a high-quality macro focus-stacking benchmark.
+<p align="center">
+  Research and tools for building a high-quality macro focus-stacking benchmark.
+</p>
 
 - [BokehForge](bokehforge/README.md): verified dataset download CLI and Python library for loading frames on demand.
 - [Pancake](pancake/README.md): future focus-stacking application rewrite in `pancake/`.
