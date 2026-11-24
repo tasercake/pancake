@@ -1,3 +1,0 @@
-# Exact 0a9ae85 real E9 CUDA functional witnesses
-
-Each genuine `337×510` RGB16 export reproduced the earlier CUDA encoded and decoded hashes and recorded nine exact first-reference and sequential registration maps. The same nine native E9 originals and the exact binary reauthenticated after both jobs. Both TIFFs were removed after decoding, and both private cache directories were removed after their metadata had been retained. The raw archive contains explicit process settings, receipts and events, with no application binaries or photo or TIFF payloads. This is actual physical CUDA functional evidence. The session did not collect a warm, cold or device-memory qualification measurement.

@@ -1,4 +1,0 @@
-# Frozen native-generation/roundtrip environment; Python 3.12.12.
-imagecodecs==2026.11.11
-numpy==2.5.4
-tifffile==2026.11.12

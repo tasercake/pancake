@@ -1,6 +1,0 @@
-imagecodecs==2026.11.11
-numpy==2.4.2
-opencv-python-headless==5.0.0.93
-OpenEXR==3.5.4
-rawpy==0.28.0
-tifffile==2026.3.3

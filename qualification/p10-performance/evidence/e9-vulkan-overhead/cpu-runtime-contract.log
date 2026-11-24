@@ -1,9 +1,0 @@
-
-running 5 tests
-test cpu_budget_and_explicit_index_respect_the_qualified_runtime ... ok
-test explicit_cpu_qualifies_a_real_shared_kernel ... ok
-test incompatible_and_overflowing_device_requests_fail ... ok
-test preferred_runtime_names_round_trip_for_cli_receipts ... ok
-test skipped_work_does_not_claim_device_loss ... ok
-
-test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
