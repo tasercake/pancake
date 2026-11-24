@@ -1,11 +1,14 @@
 """Index native focus stacks and decode their frames on demand."""
 
 from bisect import bisect_right
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import ExitStack, contextmanager
 from dataclasses import dataclass, field
+from functools import partial
 from hashlib import file_digest, sha256
 from io import BytesIO
 import json
+from itertools import batched
 from operator import index
 from pathlib import Path, PurePosixPath
 from stat import S_ISLNK
@@ -69,6 +72,11 @@ class Frame:
     _original: _Original = field(repr=False)
     _transfer: str = field(repr=False)
     _recipe_sha256: str = field(repr=False)
+
+    @property
+    def asset_sha256(self):
+        """Hash of the verified native file, including its container if archived."""
+        return self._original.asset.sha256
 
 
 @dataclass(frozen=True)
@@ -292,10 +300,28 @@ class FrameDecoder:
 
     def decode_many(self, frames, *, output="array"):
         """Decode the requested frames in order, sharing ZIP handles for this call."""
+        return tuple(self.iter_decode(frames, output=output))
+
+    def iter_decode(self, frames, *, output="array", workers=1):
+        """Stream decoded frames in order. Close the iterator if stopping early."""
         _validate_output(output)
+        if workers < 1:
+            raise ValueError("workers must be positive")
         with ExitStack() as stack:
             archives = {}
-            return tuple(self._decode_frame(frame, output, archives, stack) for frame in frames)
+            if workers == 1:
+                for frame in frames:
+                    yield self._decode_frame(frame, output, archives, stack)
+                return
+            decode_frame = partial(self._decode_frame, output=output, archives=archives, stack=stack)
+            with ThreadPoolExecutor(max_workers=workers) as executor:
+                for batch in batched(frames, workers):
+                    for frame in batch:
+                        original = frame._original
+                        path = original.asset.path
+                        if original.member is not None and path.suffix.lower() == ".zip" and path not in archives:
+                            archives[path] = stack.enter_context(ZipFile(path))
+                    yield from executor.map(decode_frame, batch)
 
     def _decode_frame(self, frame, output, archives, stack):
         original = frame._original
@@ -306,7 +332,7 @@ class FrameDecoder:
         provenance = {
             "frame_id": frame.id, "scene_id": frame.scene_id, "role": frame.role,
             "source_path": frame.source_path, "source_sha256": frame.source_sha256,
-            "asset_sha256": original.asset.sha256, "recipe_sha256": frame._recipe_sha256,
+            "asset_sha256": frame.asset_sha256, "recipe_sha256": frame._recipe_sha256,
             "page": frame.page, "ordinal": frame.ordinal, "shape": tuple(rgb.shape),
             "decode": metadata, **frame.metadata,
         }

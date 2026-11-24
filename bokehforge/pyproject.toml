@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "numpy>=2.2,<3",
+  "scipy>=1.15,<2",
   "pillow>=11,<13",
   "tifffile>=2025.1.10",
   "imagecodecs>=2025.3.30",

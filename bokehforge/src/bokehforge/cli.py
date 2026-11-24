@@ -10,11 +10,15 @@ def main(argv=None):
     data = groups.add_parser("data", help="Acquire evaluation datasets")
     actions = data.add_subparsers(dest="action", required=True)
     actions.add_parser("download", add_help=False, help="Download verified originals")
-    _, remaining = parser.parse_known_args(argv)
-    from .data.download import main as download
+    groups.add_parser("bench", add_help=False, help="Score a stacker against RGB ground truth")
+    args, remaining = parser.parse_known_args(argv)
+    if args.group == "bench":
+        from .bench import main as command
+    else:
+        from .data.download import main as command
 
     try:
-        return download(remaining)
+        return command(remaining)
     except (OSError, RuntimeError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
