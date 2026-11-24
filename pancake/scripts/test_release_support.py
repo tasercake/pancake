@@ -1,6 +1,7 @@
 """Tests for the packages assembled by the manual release workflow."""
 
 import json
+import os
 import subprocess
 import tempfile
 import unittest
@@ -65,6 +66,22 @@ class ReleaseSupportTests(unittest.TestCase):
             inventory = json.loads((root / "payload" / receipt["file"]).read_text())
             self.assertEqual(inventory["target"], "x86_64-pc-windows-msvc")
             self.assertEqual(inventory["features"], "pancake/fixture")
+
+    def test_macos_release_linker_uses_the_static_zstd_at_the_same_link_position(self):
+        linker = Path(__file__).with_name("macos-release-linker.sh")
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            driver = root / "xcrun"
+            driver.write_text('#!/bin/sh\nprintf "%s\\n" "$@"\n')
+            driver.chmod(0o755)
+            archive = root / "static zstd" / "libzstd.a"
+            archive.parent.mkdir()
+            archive.touch()
+            env = {**os.environ, "PATH": os.pathsep.join((temporary, os.environ["PATH"])),
+                   "PANCAKE_ZSTD_ARCHIVE": str(archive)}
+            args = ["-arch", "arm64", "-lz", "-lzstd", "-lc++"]
+            output = subprocess.check_output(["bash", linker, *args], text=True, env=env)
+            self.assertEqual(output.splitlines(), ["clang", *args[:3], str(archive), args[-1]])
 
     @patch("release_support.subprocess.run")
     def test_cli_success_without_tiff_fails_smoke_check(self, run):

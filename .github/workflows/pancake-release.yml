@@ -117,6 +117,22 @@ jobs:
           cp "$package" "$DIST/"
           cp "$RUNNER_TEMP/deb/package-receipt.json" "$DIST/pancake-linux-amd64-receipt.json"
 
+      - name: Build the pinned static Zstandard library
+        if: runner.os == 'macOS'
+        run: |
+          version=1.5.7
+          tarball="zstd-$version.tar.gz"
+          source_url="https://github.com/meta/zstd/releases/download/v$version/$tarball"
+          digest=eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3
+          curl --fail --silent --show-error --location "$source_url" --output "$RUNNER_TEMP/$tarball"
+          printf '%s  %s\n' "$digest" "$RUNNER_TEMP/$tarball" | shasum -a 256 --check
+          tar -xzf "$RUNNER_TEMP/$tarball" -C "$RUNNER_TEMP"
+          zstd="$RUNNER_TEMP/zstd-$version"
+          make -C "$zstd/lib" -j "$CARGO_BUILD_JOBS" libzstd.a
+          printf 'PANCAKE_ZSTD_ARCHIVE=%s/lib/libzstd.a\nPANCAKE_ZSTD_SOURCE=%s\n' "$zstd" "$zstd" >> "$GITHUB_ENV"
+          printf 'CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=%s/scripts/macos-release-linker.sh\n' "$PWD" >> "$GITHUB_ENV"
+          printf 'Source: %s\nSource SHA-256: %s\n' "$source_url" "$digest" > "$RUNNER_TEMP/zstd-source.txt"
+
       - name: Build and verify the Apple Silicon app archive
         if: runner.os == 'macOS'
         run: |
@@ -124,14 +140,16 @@ jobs:
           python -B scripts/package_macos.py --output "$payload" \
             --bundle-identifier com.github.tasercake.pancake --build-number "$GITHUB_RUN_NUMBER"
           python -B scripts/release_support.py notices "$payload" "$RUST_TARGET" --features cubecl/metal-native
-          mv "$payload/build.log" "$payload/package-receipt.json" "$RUNNER_TEMP/"
+          mkdir "$payload/native-zstd"
+          cp "$PANCAKE_ZSTD_SOURCE/LICENSE" "$RUNNER_TEMP/zstd-source.txt" "$payload/native-zstd/"
+          mv "$payload/build.log" "$DIST/pancake-macos-arm64-build.log"
+          mv "$payload/package-receipt.json" "$DIST/pancake-macos-arm64-receipt.json"
           package="$DIST/pancake-$RELEASE_VERSION-macos-arm64.zip"
           ditto -c -k --sequesterRsrc "$payload" "$package"
           ditto -x -k "$package" "$RUNNER_TEMP/macos-unpacked"
           codesign --verify --strict "$RUNNER_TEMP/macos-unpacked/Pancake.app"
           test -x "$RUNNER_TEMP/macos-unpacked/Pancake.app/Contents/MacOS/pancake-gui"
           python -B scripts/release_support.py smoke "$RUNNER_TEMP/macos-unpacked/pancake-cli"
-          cp "$RUNNER_TEMP/package-receipt.json" "$DIST/pancake-macos-arm64-receipt.json"
 
       - name: Build and verify the Windows ZIP
         if: runner.os == 'Windows'
