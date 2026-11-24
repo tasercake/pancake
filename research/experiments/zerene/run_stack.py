@@ -5,14 +5,14 @@ import argparse
 import fcntl
 import json
 import os
-from pathlib import Path
 import shlex
 import signal
 import subprocess
 import sys
 import time
 import xml.etree.ElementTree as ET
-
+from contextlib import contextmanager
+from pathlib import Path
 
 MAIN_CLASS = "com.zerenesystems.stacker.gui.MainFrame"
 IMAGE_SUFFIXES = {".jpeg", ".jpg", ".tif", ".tiff"}
@@ -47,13 +47,10 @@ def launch_command(preferences):
     return command[:command.index(MAIN_CLASS) + 1]
 
 
-def write_batch(path, output, methods, args):
-    root = ET.Element("ZereneStackerBatchScript")
-    queue = ET.SubElement(root, "BatchQueue")
-    batches = ET.SubElement(queue, "Batches", length="1")
-    batch = ET.SubElement(batches, "Batch")
+def make_batch(source, output, methods, args):
+    batch = ET.Element("Batch")
     sources = ET.SubElement(batch, "Sources", length="1")
-    ET.SubElement(sources, "Source", value="%CurrentProject%")
+    ET.SubElement(sources, "Source", value=str(source))
     ET.SubElement(batch, "ProjectDispositionCode", value="101")  # Temporary project
     tasks = ET.SubElement(batch, "Tasks", length=str(len(methods)))
     for method in methods:
@@ -85,8 +82,39 @@ def write_batch(path, output, methods, args):
         for key, value in values.items():
             ET.SubElement(preferences, key, value=value)
         ET.SubElement(task, "TaskIndicatorCode", value=TASK_CODES[method])
+    return batch
+
+
+def write_batches(path, batches):
+    root = ET.Element("ZereneStackerBatchScript")
+    queue = ET.SubElement(root, "BatchQueue")
+    ET.SubElement(queue, "Batches", length=str(len(batches))).extend(batches)
     ET.indent(root)
     ET.ElementTree(root).write(path, encoding="UTF-8", xml_declaration=True)
+
+
+def write_batch(path, output, methods, args):
+    write_batches(path, [make_batch("%CurrentProject%", output, methods, args)])
+
+
+def batch_command(java, batch_path, inputs=()):
+    return [
+        # Set the macOS activation policy before AWT initializes.
+        *java[:-1], "-Dapple.awt.BackgroundOnly=true", java[-1],
+        "-noSplashScreen", "-runMinimized", "-showProgressWhenMinimized=false",
+        "-suppressSaveProperties", "-exitOnBatchScriptCompletion",
+        "-batchScript", str(batch_path), *map(str, inputs),
+    ]
+
+
+@contextmanager
+def batch_lock(preferences):
+    with (preferences / "batch-runner.lock").open("a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise ValueError("Another Zerene batch runner is active.") from error
+        yield
 
 
 def run_zerene(command, log_path, timeout):
@@ -154,20 +182,12 @@ def main():
     try:
         inputs = collect_inputs([path.expanduser() for path in args.inputs])
         java = launch_command(preferences)
-        with (preferences / "batch-runner.lock").open("a") as lock:
-            try:
-                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError as error:
-                raise ValueError("Another Zerene batch runner is active.") from error
+        with batch_lock(preferences):
             output.mkdir(mode=0o700, parents=True)
             batch_path = output / "batch.xml"
             write_batch(batch_path, output, methods, args)
             (output / "inputs.json").write_text(json.dumps([str(path) for path in inputs], indent=2) + "\n")
-            command = [
-                *java, "-noSplashScreen", "-runMinimized", "-showProgressWhenMinimized=false",
-                "-suppressSaveProperties", "-exitOnBatchScriptCompletion",
-                "-batchScript", str(batch_path), *map(str, inputs),
-            ]
+            command = batch_command(java, batch_path, inputs)
             print(f"Zerene processing {len(inputs)} frames. Log: {log_path}", file=sys.stderr, flush=True)
             started = time.monotonic()
             run_zerene(command, log_path, args.timeout)
