@@ -55,7 +55,8 @@ class ReleaseSupportTests(unittest.TestCase):
             source, _ = _workspace(root)
             with (source / "Cargo.toml").open("a") as manifest:
                 manifest.write('\n[features]\nfixture = []\n')
-            subprocess.run(["git", "commit", "-qam", "Declare fixture feature"], cwd=source, check=True)
+            subprocess.run(["git", "-c", "user.name=Fixture", "-c", "user.email=test@localhost",
+                            "commit", "-qam", "Declare fixture feature"], cwd=source, check=True)
             revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=source, text=True).strip()
             receipt = stage_notices(root / "payload", source, revision, file_sha256(source / "Cargo.lock"),
                                     target="x86_64-pc-windows-msvc", features="pancake/fixture",
