@@ -61,8 +61,13 @@ def _production_packages(source, target, features):
         if match is None:
             raise ValueError(f"Unrecognized Cargo package in release graph: {line}")
         selected.add(match.groups())
+    # Build dependencies can select host-only packages during a cross-build.
+    compiler = _command(source, "rustc", "-vV").decode().splitlines()
+    host = next(line.removeprefix("host: ") for line in compiler if line.startswith("host: "))
+    platform_args = tuple(arg for platform in dict.fromkeys((target, host))
+                          for arg in ("--filter-platform", platform))
     metadata = _command(source, "cargo", "metadata", "--locked", "--offline", "--format-version", "1",
-                        "--filter-platform", target, *feature_args)
+                        *platform_args, *feature_args)
     by_id = {}
     for package in json.loads(metadata)["packages"]:
         key = package["name"], package["version"]

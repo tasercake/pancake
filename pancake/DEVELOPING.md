@@ -36,7 +36,7 @@ change or release.
 | `nightly` | Canonical macOS Miri, randomized layouts, and macOS branch coverage. Linux runs randomized layouts in a separate job. |
 | `sanitizers` | Independent Linux address and thread sanitizer jobs for CPU targets. |
 | `policy` | Advisory and unused-dependency checks, vendored patch fixtures, and lint, coverage, and mutation guardrail fixtures. |
-| `release` | Platform, native macOS and Windows builds, policy, nightly layout and Miri checks, and Linux thread sanitizer. |
+| `release` | Platform, native macOS and Windows builds, policy, nightly layout and Miri checks, and Linux address and thread sanitizers. |
 | `all` | Every hosted assurance group. |
 
 Run physical GPU and native desktop checks on a suitable machine, especially
