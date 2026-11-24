@@ -1,9 +1,9 @@
 [submodule "focus-stack"]
-	path = submodules/focus-stack
+	path = .submodules/focus-stack
 	url = https://github.com/PetteriAimonen/focus-stack.git
 [submodule "submodules/OpenFocus"]
-	path = submodules/OpenFocus
+	path = .submodules/OpenFocus
 	url = https://github.com/Xinzhe99/OpenFocus.git
 [submodule "submodules/shinestacker"]
-	path = submodules/shinestacker
+	path = .submodules/shinestacker
 	url = https://github.com/lucalista/shinestacker.git

@@ -6,7 +6,7 @@ Research and tools for building a high-quality macro focus-stacking benchmark.
 - [Pancake](pancake/README.md): future focus-stacking application rewrite in `pancake/`.
 - [Research](research/README.md): artifact reviews, algorithms, measurement design, and dataset evidence.
 - [Unattended Zerene Stacker](research/experiments/zerene/README.md): run PMax and DMap reference stacks with the installed macOS app.
-- `submodules/`: upstream focus-stacking implementations.
+- `.submodules/`: upstream focus-stacking implementations.
 - `datasets/`: native downloads and their manifests. Download logs and reports live in `datasets/.bokehforge/`.
 
 Run Bokehforge from the repository root:
