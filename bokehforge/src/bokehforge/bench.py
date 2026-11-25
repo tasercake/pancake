@@ -142,12 +142,17 @@ def _run_stacker(catalog, scene, row, algorithm, shape, workers):
 def _read_candidate(path):
     with tifffile.TiffFile(path) as image:
         if len(image.pages) != 1:
-            raise ValueError("Expected a single-page TIFF")
+            raise ValueError(f"The delivery has {len(image.pages)} TIFF pages. The benchmark requires one page.")
         page = image.pages[0]
+        if page.photometric != tifffile.PHOTOMETRIC.RGB or page.axes != "YXS" or page.samplesperpixel != 3:
+            photometric = getattr(page.photometric, "name", page.photometric)
+            raise ValueError("The benchmark requires an interleaved TIFF with three RGB channels per pixel. "
+                             f"The TIFF uses {photometric} photometric interpretation, "
+                             f"{page.samplesperpixel} samples per pixel, and {page.axes} axis order.")
         orientation = page.tags.get("Orientation")
-        if (page.photometric != tifffile.PHOTOMETRIC.RGB or page.axes != "YXS"
-                or page.samplesperpixel != 3 or (orientation is not None and orientation.value != 1)):
-            raise ValueError("Expected orientation-1, interleaved RGB TIFF")
+        if orientation is not None and orientation.value != 1:
+            raise ValueError(f"The TIFF has orientation {orientation.value}. "
+                             "The benchmark requires orientation 1 (top-left).")
         return page.asarray()
 
 
@@ -160,7 +165,7 @@ def _load_candidate(path, row, *, fingerprint=False):
     except FileNotFoundError as exc:
         row.update(status="missing_output", error=_error_text(exc))
     except Exception as exc:
-        row.update(status="invalid_output", error=_error_text(exc))
+        row.update(status="invalid_output", error=str(exc))
     return None
 
 

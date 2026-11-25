@@ -85,7 +85,12 @@
             <figure class="pane candidate">
               <figcaption><span>Stacker output</span><span class="pane-meta" id="candidate-meta"></span></figcaption>
               <div class="image-well" id="candidate-image"></div>
-              <p class="candidate-benchmark" id="candidate-benchmark" role="status" hidden></p>
+              <div class="benchmark-line candidate-benchmark" hidden>
+                <span id="candidate-benchmark" role="status"></span>
+                <button class="benchmark-info" type="button" aria-label="Why this output scored zero"
+                  aria-haspopup="dialog" aria-controls="benchmark-details"
+                  title="Why this output scored zero" hidden>i</button>
+              </div>
             </figure>
             <figure class="pane">
               <figcaption><span id="reference-title">Ground truth</span><span class="pane-meta" id="reference-meta"></span></figcaption>
@@ -150,7 +155,12 @@
     <div class="dialog-heading">
       <div class="lightbox-caption">
         <h2 id="image-title" aria-live="polite"></h2>
-        <p class="lightbox-benchmark" id="lightbox-benchmark" role="status" hidden></p>
+        <div class="benchmark-line lightbox-benchmark" hidden>
+          <span id="lightbox-benchmark" role="status"></span>
+          <button class="benchmark-info" type="button" aria-label="Why this output scored zero"
+            aria-keyshortcuts="I" aria-haspopup="dialog" aria-controls="benchmark-details"
+            title="Why this output scored zero (I)" hidden>i</button>
+        </div>
       </div>
       <div class="tools">
         <button class="quiet zoom-button" id="zoom-out" type="button" aria-label="Zoom out">−</button>
@@ -173,6 +183,14 @@
     <div class="filmstrip lightbox-strip" id="lightbox-strip" role="list" aria-label="Scene images">
       <div class="rail-track" role="presentation"></div>
     </div>
+  </dialog>
+
+  <dialog id="benchmark-details" aria-labelledby="benchmark-details-title" aria-describedby="benchmark-reason">
+    <div class="dialog-heading">
+      <h2 id="benchmark-details-title">Why this output scored zero</h2>
+      <button class="quiet" type="button" data-close="benchmark-details">Close</button>
+    </div>
+    <p id="benchmark-reason"></p>
   </dialog>
 </body>
 </html>

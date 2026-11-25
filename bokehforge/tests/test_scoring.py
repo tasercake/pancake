@@ -102,8 +102,12 @@ def test_fixed_profile_combines_native_family_weights():
     assert scene_score(Measurement(dict.fromkeys(FEATURES, 1.0), {})) == pytest.approx(100 * np.exp(-5))
 
 
-@pytest.mark.parametrize("delivery", [np.zeros((5, 4, 3)), np.zeros((4, 4, 3), np.float32),
-                                       np.full((5, 4, 3), np.nan, np.float32), np.zeros((5, 4, 4), np.float32)])
-def test_bad_deliveries_fail_before_measurement(delivery):
-    with pytest.raises(ValueError, match="finite float32 linear-sRGB"):
+@pytest.mark.parametrize(("delivery", "reason"), [
+    (np.zeros((5, 4, 3)), "uses float64 samples"),
+    (np.zeros((4, 4, 3), np.float32), "image is 4 × 4 pixels.*4 × 5 pixels"),
+    (np.full((5, 4, 3), np.nan, np.float32), "non-finite pixel values"),
+    (np.zeros((5, 4, 4), np.float32), "requires a nonempty RGB image with three channels"),
+])
+def test_bad_deliveries_fail_before_measurement(delivery, reason):
+    with pytest.raises(ValueError, match=reason):
         measure(delivery, np.zeros((5, 4, 3), np.float32))

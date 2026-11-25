@@ -174,15 +174,33 @@ h3 { font-size: .9375rem; }
 .pane.candidate { border-color: #665536; }
 .pane figcaption { padding: .7rem .75rem; min-height: 2.75rem; display: flex; align-items: center; justify-content: space-between; gap: .6rem; font-size: .875rem; font-weight: 625; background: #25272a; }
 .pane.candidate figcaption { background: #2b2822; }
-.candidate-benchmark {
-  margin: 0;
-  padding: .54rem .75rem;
-  border-top: 1px solid var(--stroke);
+.benchmark-line {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  min-inline-size: 0;
   color: var(--muted);
   font-size: .8125rem;
   font-variant-numeric: tabular-nums;
 }
-.candidate-benchmark[data-scored="true"], .output-tabs .benchmark-badge { color: var(--warm); }
+.benchmark-info {
+  flex: none;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--warm);
+}
+#benchmark-details .dialog-heading { flex-wrap: wrap; }
+#benchmark-reason { padding: .9rem 1rem; margin: 0; overflow-wrap: anywhere; }
+.candidate-benchmark {
+  margin: 0;
+  padding: .54rem .75rem;
+  border-top: 1px solid var(--stroke);
+}
+.benchmark-line[data-scored="true"], .output-tabs .benchmark-badge { color: var(--warm); }
 .pane-meta { font-size: .8125rem; font-weight: 450; text-align: right; overflow-wrap: anywhere; }
 .image-well {
   display: grid;
@@ -309,18 +327,9 @@ dialog::backdrop { background: #090a0bdc; }
 }
 .image-dialog .dialog-heading { flex-wrap: wrap; }
 .image-dialog .tools { flex-wrap: wrap; }
-.lightbox-caption { display: flex; flex: 1 1 12rem; align-items: center; gap: .55rem; min-inline-size: 0; }
-#image-title, .lightbox-benchmark { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#image-title { min-inline-size: 0; }
-.lightbox-benchmark {
-  flex: 0 0 auto;
-  max-inline-size: 66%;
-  margin: 0;
-  color: var(--muted);
-  font-size: .8125rem;
-  font-variant-numeric: tabular-nums;
-}
-.lightbox-benchmark[data-scored="true"] { color: var(--warm); }
+.lightbox-caption { display: flex; flex: 1 1 18rem; align-items: center; gap: .55rem; min-inline-size: 0; }
+#image-title, #lightbox-benchmark { min-inline-size: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lightbox-benchmark { flex: 0 1 auto; max-inline-size: 80%; }
 .zoom-button { min-width: 2.5rem; }
 .lightbox-body { position: relative; min-height: 0; }
 .image-view {

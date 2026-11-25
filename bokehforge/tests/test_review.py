@@ -532,7 +532,24 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
         cropped, = reopened.scene_details(scene, run)["outputs"]
         assert cropped["benchmark"]["status"] == "invalid_output"
         assert cropped["benchmark"]["score"] == 0
+        assert "image is 7 × 6 pixels" in cropped["benchmark"]["error"]
+        assert "native dimensions of 8 × 6 pixels" in cropped["benchmark"]["error"]
         assert len(calls) == 2
+
+        reopened.scores.close()
+        receipt = path.parents[2] / "scores" / f"{scene}.json"
+        saved = json.loads(receipt.read_text())
+        saved.pop("invalid_detail_version")
+        saved["result"]["error"] = "Expected finite float32 linear-sRGB RGB on the (6, 8, 3) grid"
+        receipt.write_text(json.dumps(saved))
+        reopened = open_review(root, store)
+        with reopened.events.subscribe() as (reader, writer):
+            reader.settimeout(5)
+            assert reopened.scene_details(scene, run)["outputs"][0]["benchmark"]["status"] == "pending"
+            while ("scores", 1) not in map(event_payload, reopened.events.take(reader, writer)):
+                pass
+        assert reopened.scene_details(scene, run)["outputs"][0]["benchmark"] == cropped["benchmark"]
+        assert len(calls) == 3
     finally:
         gate.set()
         app.scores.close()
