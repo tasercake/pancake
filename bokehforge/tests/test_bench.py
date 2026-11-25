@@ -12,7 +12,7 @@ from PIL import Image
 from bokehforge.alignment import CROP_SCORE_VERSION
 from bokehforge.bench import _score
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
-from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, SCORE_VERSION, VIEW_WEIGHTS
+from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, SCORE_VERSION
 
 _FIXTURE_REFERENCE = np.float32(20 / 255)
 
@@ -62,11 +62,11 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert result.returncode == 0, result.stderr
     assert result.stdout == "100.000000\n"
     report = json.loads((output / "report.json").read_text())
-    assert report["schema_version"] == 2
+    assert report["schema_version"] == 3
     assert report["score"] == 100.0
     assert report["score_version"] == SCORE_VERSION
     assert report["scoring"]["family_weights"] == FAMILY_WEIGHTS
-    assert report["scoring"]["view_weights"] == VIEW_WEIGHTS
+    assert "view_weights" not in report["scoring"]
     assert report["scoring"]["damage_scale"] == SCORE_DAMAGE_SCALE
     assert report["scene_status_counts"] == {"ok": 1, "unscored": 1}
     assert report["reference_status_counts"] == {"eligible": 1, "no_eligible_reference": 1}
@@ -78,7 +78,8 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     pixels = tifffile.imread(output / target["image"])
     assert pixels.dtype == np.float32
     assert np.all(pixels == _FIXTURE_REFERENCE)
-    assert list(target["score_features"].values()) == [0] * len(FEATURES)
+    assert target["score_features"] == dict.fromkeys(FEATURES, 0)
+    assert set(target["artifact_diagnostics"]["views"]) == {"native"}
 
     replay_dir = tmp_path / "replay"
     replay = run_bench(corpus, replay_dir, "--candidate-dir", str(output / "images"))

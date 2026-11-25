@@ -5,17 +5,13 @@ from dataclasses import dataclass
 import numpy as np
 from scipy import ndimage as ndi
 
-SCORE_VERSION = "reference-fidelity-v1"
+SCORE_VERSION = "reference-fidelity-v2"
 SCORE_DAMAGE_SCALE = 5
 FAMILY_WEIGHTS = {
     "tone": 0.17, "color": 0.16, "lost_detail": 0.18,
     "added_structure": 0.15, "boundary": 0.23, "range": 0.11,
 }
-VIEW_WEIGHTS = {"fit": 0.30, "native": 0.50, "zoom": 0.20}
-FEATURES = tuple(f"{view}.{family}" for view in VIEW_WEIGHTS for family in FAMILY_WEIGHTS)
-_VIEW_SIZE = 640
-_CROP_SIZE = 96
-_ZOOM = 2
+FEATURES = tuple(f"native.{family}" for family in FAMILY_WEIGHTS)
 # Linear sRGB to D65 XYZ, normalized by the D65 white point.
 _XYZ = np.array([
     [0.4124564, 0.3575761, 0.1804375],
@@ -28,7 +24,6 @@ _XYZ = np.array([
 class Measurement:
     features: dict[str, float]
     diagnostics: dict
-    view_support: dict[str, float] | None = None
 
 
 def validate_rgb(pixels, shape=None):
@@ -199,44 +194,24 @@ def _pool(damage, support, support_integral):
     }
 
 
-def _fit(rgb):
-    height, width = rgb.shape[:2]
-    scale = min(1, _VIEW_SIZE / max(height, width))
-    if scale == 1:
-        return rgb
-    shape = max(1, round(height * scale)), max(1, round(width * scale))
-    filtered = _blur(rgb, (0.5 / scale, 0.5 / scale, 0))
-    return ndi.zoom(filtered, (shape[0] / height, shape[1] / width, 1), order=1,
-                    grid_mode=True, mode="reflect")
-
-
-def _crops(height, width):
-    h, w = min(height, _CROP_SIZE), min(width, _CROP_SIZE)
-    origins = ((0, 0), (0, width - w), (height - h, 0),
-               (height - h, width - w), ((height - h) // 2, (width - w) // 2))
-    return [(x, y, x + w, y + h) for y, x in dict.fromkeys(origins)]
-
-
-def _zoom(rgb):
-    return ndi.zoom(rgb, (_ZOOM, _ZOOM, 1), order=1, grid_mode=True, mode="reflect")
-
-
-def _view(candidate, target, box, support=None):
+def _measure(candidate, target, support=None):
+    height, width = target.shape[:2]
     maps, signed = _maps(candidate, target, support)
     support_integral = None if support is None else _integral(support)
+    features = {}
     rows = {}
-    x, y, right, bottom = box
-    sx, sy = (right - x) / target.shape[1], (bottom - y) / target.shape[0]
     for name, damage in zip(FAMILY_WEIGHTS, maps, strict=True):
         burden, summary = _pool(damage, support, support_integral)
-        if local := summary["worst_box_view_xyxy"]:
-            x0, y0, x1, y1 = local
-            summary["worst_box_native_xyxy"] = [x + x0 * sx, y + y0 * sy, x + x1 * sx, y + y1 * sy]
+        if region := summary["worst_box_view_xyxy"]:
+            summary["worst_box_native_xyxy"] = region
+        features[f"native.{name}"] = burden
         rows[name] = {"burden": burden, **summary}
-    result = {"native_box_xyxy": box, "view_size_wh": target.shape[1::-1], "families": rows, **signed}
+    native = {"native_box_xyxy": (0, 0, width, height), "view_size_wh": (width, height),
+              "families": rows, **signed}
     if support is not None:
-        result["covered_fraction"] = float(support.mean())
-    return result
+        native["covered_fraction"] = float(support.mean())
+    rmse = float(np.sqrt(_supported_mean(np.square(np.subtract(candidate, target, dtype=np.float64)), support)))
+    return Measurement(features, {"views": {"native": [native]}, "linear_rgb_rmse": rmse})
 
 
 def measure(candidate, target):
@@ -246,77 +221,8 @@ def measure(candidate, target):
     return _measure(candidate, target)
 
 
-def _render_view(candidate, target, box, render, support=None):
-    if support is None or support.all():
-        return _view(render(candidate), render(target), box)
-    if not support.any():
-        return None
-    weights = support[..., None].astype(np.float32)
-    rendered_weights = render(weights)
-    # Both images use the same sampling grid and only real delivered pixels.
-    valid = rendered_weights[..., 0] >= 0.5
-    # A subpixel footprint in the fit view can disappear even with real native support.
-    if not valid.any():
-        valid = rendered_weights[..., 0] > 0
-    if not valid.any():
-        return None
-
-    def render_supported(image):
-        return np.divide(render(image * weights), rendered_weights,
-                         out=np.zeros((*valid.shape, 3), dtype=np.float32),
-                         where=rendered_weights > 0)
-
-    return _view(render_supported(candidate), render_supported(target), box, valid)
-
-
-def _measure(candidate, target, support=None):
-    height, width = target.shape[:2]
-    box = (0, 0, width, height)
-    # Bound interpolation and filtering, including on extreme but finite input.
-    # All native out-of-SDR samples still participate in the range measurement.
-    fit_candidate, fit_target = (np.clip(image, -8, 8) for image in (candidate, target))
-    fit = _render_view(fit_candidate, fit_target, box, _fit, support)
-    native = _view(candidate, target, box, support)
-    zoom = []
-    for x, y, right, bottom in _crops(height, width):
-        window = np.s_[y:bottom, x:right]
-        valid = None if support is None else support[window]
-        record = _render_view(fit_candidate[window], fit_target[window],
-                              (x, y, right, bottom), _zoom, valid)
-        if record is not None:
-            zoom.append(record)
-    views = {"fit": [] if fit is None else [fit], "native": [native], "zoom": zoom}
-    features = {}
-    view_support = {}
-    for view, records in views.items():
-        if not records:
-            continue
-        fractions = [record.get("covered_fraction", 1.0) for record in records] if view == "zoom" else [1.0]
-        largest_fraction, total_fraction = max(fractions), sum(fractions)
-        view_support[view] = largest_fraction
-        for family in FAMILY_WEIGHTS:
-            values = [record["families"][family]["burden"] for record in records]
-            if largest_fraction == 1 and total_fraction == len(records):
-                features[f"{view}.{family}"] = (max(values) + sum(values) / len(values)) / 2
-            else:
-                weighted = [value * fraction for value, fraction in zip(values, fractions, strict=True)]
-                features[f"{view}.{family}"] = (max(weighted) / largest_fraction
-                                                 + sum(weighted) / total_fraction) / 2
-    rmse = float(np.sqrt(_supported_mean(np.square(np.subtract(candidate, target, dtype=np.float64)), support)))
-    diagnostics = {"views": views, "linear_rgb_rmse": rmse}
-    if support is not None:
-        diagnostics["view_support"] = view_support
-    return Measurement(features, diagnostics, view_support if support is not None else None)
-
-
 def scene_score(measurement):
     """Apply the fixed reference-fidelity profile to the measured damage."""
-    features = measurement.features
-    weights = VIEW_WEIGHTS
-    if measurement.view_support is not None:
-        effective = {view: VIEW_WEIGHTS[view] * support for view, support in measurement.view_support.items()}
-        total = sum(effective.values())
-        weights = {view: weight / total for view, weight in effective.items()}
-    damage = sum(v * w * features[f"{view}.{family}"]
-                 for view, v in weights.items() for family, w in FAMILY_WEIGHTS.items())
+    damage = sum(weight * measurement.features[f"native.{family}"]
+                 for family, weight in FAMILY_WEIGHTS.items())
     return float(100 * np.exp(-SCORE_DAMAGE_SCALE * damage))

@@ -22,7 +22,7 @@ from .data._files import digest
 from .data._config import DEFAULT_CONFIG, data_root, read_config
 from .data.download import save_json
 from .data.lazy import SceneCatalog
-from .scoring import FAMILY_WEIGHTS, SCORE_DAMAGE_SCALE, SCORE_VERSION, VIEW_WEIGHTS, measure, scene_score, validate_rgb
+from .scoring import FAMILY_WEIGHTS, SCORE_DAMAGE_SCALE, SCORE_VERSION, measure, scene_score, validate_rgb
 from .stacking import StackFrame, StackInput
 
 _RGB_REFERENCES = {"rendered_all_in_focus", "synthetic_source_image_reference"}
@@ -272,8 +272,7 @@ def main(argv=None):
     score, scored_groups = _score(rows)
     statuses = Counter(row["status"] for row in rows)
     references = Counter(row["reference_status"] for row in rows)
-    scoring = {"family_weights": FAMILY_WEIGHTS, "view_weights": VIEW_WEIGHTS,
-               "damage_scale": SCORE_DAMAGE_SCALE,
+    scoring = {"family_weights": FAMILY_WEIGHTS, "damage_scale": SCORE_DAMAGE_SCALE,
                "runtime": {name: version(name) for name in ("bokehforge", "numpy", "scipy", "tifffile")},
                "python": sys.version.split()[0],
                "aggregation": "equal datasets; equal leakage groups within each dataset"}
@@ -281,7 +280,7 @@ def main(argv=None):
         scoring["alignment"] = {"max_rotation_degrees": MAX_ROTATION_DEGREES,
                                 "coverage_penalty": "multiply by covered fraction of the reference"}
     save_json(args.output / "report.json", {
-        "schema_version": 2, "score": score, "score_version": args.score_profile,
+        "schema_version": 3, "score": score, "score_version": args.score_profile,
         "scoring": scoring,
         "scored_groups": scored_groups, "cohort_sha256": cohort_hash, "algorithm": implementation,
         "data_root": str(root.resolve()), "decode_workers": args.decode_workers, "seconds": perf_counter() - start,

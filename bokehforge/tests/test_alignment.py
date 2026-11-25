@@ -27,16 +27,18 @@ def test_perfect_off_center_crops_score_in_proportion_to_area(target):
         assert measurement.diagnostics["linear_rgb_rmse"] == 0
 
 
-def test_exact_crop_can_miss_every_fixed_zoom_window():
+def test_off_center_crop_is_measured_on_the_native_reference_grid():
     rng = np.random.default_rng(44)
     target = rng.uniform(0.25, 0.75, size=(230, 650, 3)).astype(np.float32)
     delivered = target[99:121, 113:138]
     score, measurement, alignment = evaluate_crop(delivered, target)
     assert alignment["placements"][0]["offset_yx"] == [99, 113]
-    assert measurement.diagnostics["views"]["zoom"] == []
-    assert measurement.diagnostics["views"]["fit"][0]["view_size_wh"][0] == 640
-    assert set(measurement.view_support) == {"fit", "native"}
-    assert score == pytest.approx(100 * delivered.size / target.size)
+    assert set(measurement.diagnostics["views"]) == {"native"}
+    native, = measurement.diagnostics["views"]["native"]
+    assert native["view_size_wh"] == (650, 230)
+    coverage = delivered.size / target.size
+    assert native["covered_fraction"] == pytest.approx(coverage)
+    assert score == pytest.approx(100 * coverage)
 
 
 def test_small_roll_is_recovered_and_costs_coverage(target):
