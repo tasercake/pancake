@@ -78,6 +78,7 @@ h1 { margin: 0; font-size: clamp(1.65rem, 3.2vw, 2.65rem); letter-spacing: -.055
 .scene-controls { display: flex; align-items: end; gap: .85rem; flex: none; }
 .control { display: grid; gap: .35rem; color: var(--muted); font-size: .875rem; }
 .control select { color: #edece8; }
+#dataset { max-width: min(21rem, 90vw); }
 .scene-navigation { display: flex; gap: .35rem; }
 .scene-navigation input {
   width: 4.1rem;

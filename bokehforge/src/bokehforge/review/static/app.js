@@ -476,7 +476,9 @@ async function boot() {
     }
     for (const tool of catalog.stackers) tools.set(tool.id, tool);
     scenes = catalog.scenes;
-    for (const dataset of new Set(scenes.map((item) => item.dataset))) $("dataset").add(new Option(dataset, dataset));
+    for (const [id, name] of Object.entries(catalog.datasets)) {
+      $("dataset").add(new Option(name === id ? id : `${name} (${id})`, id));
+    }
     $("dataset").value = parameters.get("dataset") ?? "";
     if ($("dataset").selectedIndex < 0) $("dataset").value = "";
     runs = await api("/api/runs");
