@@ -1,10 +1,12 @@
 # Local focus stack review
 
-From the repository root, start the app and open the loopback URL it prints.
+From the repository root, start the app and open one of the HTTP URLs it prints.
 
 ```sh
 uv run --project bokehforge --frozen bokehforge review
 ```
+
+The server listens on all IPv4 interfaces by default. From another device, open `http://<hostname>:8765` using the server's hostname or its LAN or Tailscale IPv4 address. The Tailscale MagicDNS short name works when it matches the server's hostname. Any device that can reach the port can review images, save ratings, and start evaluations. Use `--host 127.0.0.1` for access from the host computer only, or bind to a specific interface by giving its IPv4 address.
 
 Use `--root /path/to/datasets` if the verified downloads are outside the default `datasets/` directory. The [dataset guide](data.md) covers downloading the sources. The app uses their download manifests and indexes every scene in the local catalog by default. Repeat `--dataset` to limit a session, or pass the catalog's `--config` and `--lock` overrides. The first index can take a while for large archives. Once initialized, the app loads individual images on demand and works offline. Add `--offline` to `uv run` if its environment and Python are already installed.
 

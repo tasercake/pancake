@@ -1,10 +1,12 @@
-"""Serve the loopback-only BokehForge rating app."""
+"""Serve the BokehForge rating app over HTTP."""
 
 import argparse
 from functools import lru_cache
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from ipaddress import ip_address
 import json
 from pathlib import Path
+from socket import gethostname
 from threading import BoundedSemaphore, Thread
 from urllib.parse import parse_qs, urlsplit
 
@@ -18,6 +20,7 @@ ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8"),
           "/style.css": ("style.css", "text/css; charset=utf-8")}
 SIZES = {"thumb": 192, "fit": 1500, "native": 0}
+ALL_INTERFACES = "0.0.0.0"
 
 
 class CatalogPending(RuntimeError):
@@ -140,10 +143,20 @@ class Handler(BaseHTTPRequestHandler):
         self.handle_request(self.post)
 
     def handle_request(self, route):
-        host = self.headers.get("Host")
+        host = self.headers.get("Host", "").lower()
         port = self.server.server_port
-        if host not in {f"localhost:{port}", f"127.0.0.1:{port}"}:
-            self.json(403, {"error": "Use the loopback address printed by BokehForge"})
+        destination = self.connection.getsockname()[0]
+        names = self.server.review_hosts | {destination}
+        if ip_address(destination).is_loopback:
+            names.add("localhost")
+        # Trust the literal destination of this connection and configured names.
+        # A hostname that merely resolves here could be used for DNS rebinding.
+        if port == 80:
+            host = host.removesuffix(":80")
+        else:
+            names = {f"{name}:{port}" for name in names}
+        if host not in names:
+            self.json(403, {"error": "Use this computer's hostname or IP address and the review port"})
             return
         origin = self.headers.get("Origin")
         if origin is not None and origin != f"http://{host}":
@@ -227,6 +240,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Cross-Origin-Resource-Policy", "same-origin")
         self.send_header("Content-Security-Policy",
                          "default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
         if filename:
@@ -239,13 +253,22 @@ class Handler(BaseHTTPRequestHandler):
             super().log_request(code, size)
 
 
+class ReviewServer(ThreadingHTTPServer):
+    def __init__(self, address):
+        self.hostname = gethostname().lower()
+        self.review_hosts = {self.hostname, address[0].lower()} - {ALL_INTERFACES}
+        super().__init__(address, Handler)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="bokehforge review",
                                      description="Browse and rate focus stacks on this computer")
     parser.add_argument("--root", type=Path, default=REPO / "datasets", help="BokehForge dataset root")
     parser.add_argument("--store", type=Path, default=REPO / "artifacts/bokehforge-review",
                         help="Local evaluations and ratings directory")
-    parser.add_argument("--port", type=int, default=8765, help="Loopback HTTP port (default: 8765)")
+    parser.add_argument("--host", default=ALL_INTERFACES,
+                        help="IPv4 bind address (default: 0.0.0.0, all interfaces)")
+    parser.add_argument("--port", type=int, default=8765, help="HTTP port (default: 8765)")
     parser.add_argument("--dataset", action="append", help="Limit to a dataset ID, repeatable")
     parser.add_argument("--config", type=Path, help="Optional catalog policy overrides")
     parser.add_argument("--lock", type=Path, help="Optional source snapshot")
@@ -256,9 +279,13 @@ def main(argv=None):
     args = parser.parse_args(argv)
     args.root = args.root.resolve()
     args.store = args.store.resolve()
-    with lock_store(args.store), ThreadingHTTPServer(("127.0.0.1", args.port), Handler) as server:
+    with lock_store(args.store), ReviewServer((args.host, args.port)) as server:
         server.app = Review(args)
-        print(f"BokehForge Review · http://127.0.0.1:{server.server_port}", flush=True)
+        port = server.server_port
+        if args.host == ALL_INTERFACES:
+            print(f"BokehForge Review · http://{server.hostname}:{port} · http://127.0.0.1:{port}", flush=True)
+        else:
+            print(f"BokehForge Review · http://{args.host}:{port}", flush=True)
         try:
             server.serve_forever()
         except KeyboardInterrupt:
