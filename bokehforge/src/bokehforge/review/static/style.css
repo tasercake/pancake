@@ -309,7 +309,18 @@ dialog::backdrop { background: #090a0bdc; }
 }
 .image-dialog .dialog-heading { flex-wrap: wrap; }
 .image-dialog .tools { flex-wrap: wrap; }
-#image-title { flex: 1 1 12rem; min-inline-size: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lightbox-caption { display: flex; flex: 1 1 12rem; align-items: center; gap: .55rem; min-inline-size: 0; }
+#image-title, .lightbox-benchmark { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#image-title { min-inline-size: 0; }
+.lightbox-benchmark {
+  flex: 0 0 auto;
+  max-inline-size: 66%;
+  margin: 0;
+  color: var(--muted);
+  font-size: .8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.lightbox-benchmark[data-scored="true"] { color: var(--warm); }
 .zoom-button { min-width: 2.5rem; }
 .lightbox-body { position: relative; min-height: 0; }
 .image-view {
