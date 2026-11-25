@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
 
-from bokehforge.scoring import FEATURES, Measurement, measure, scene_score
+from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, Measurement, measure, scene_score
 
 
 def rgb(pixels):
@@ -100,6 +100,59 @@ def test_fixed_profile_combines_native_family_weights():
     damage = 0.16 * 0.2 + 0.23 * 0.6 + 0.18 * 0.3
     assert scene_score(Measurement(features, {})) == pytest.approx(100 * np.exp(-5 * damage))
     assert scene_score(Measurement(dict.fromkeys(FEATURES, 1.0), {})) == pytest.approx(100 * np.exp(-5))
+
+
+def test_explanation_recomposes_score_from_real_tiles():
+    target = np.full((113, 151, 3), 0.28, dtype=np.float32)
+    candidate = target.copy()
+    candidate[3:31, 131:151] = (0.61, 0.43, 0.30)
+    baseline = measure(candidate, target)
+    summary = measure(candidate, target, details="summary")
+    detailed = measure(candidate, target, details="tiles")
+    assert baseline.explanation is None
+    assert summary.score == detailed.score == baseline.score
+    assert summary.features == detailed.features == baseline.features
+    assert summary.diagnostics == detailed.diagnostics == baseline.diagnostics
+    explanation = detailed.explanation
+    assert explanation["reference_size_wh"] == [151, 113]
+    assert "tile_grids" not in summary.explanation
+    assert explanation["weighted_damage"] == summary.explanation["weighted_damage"]
+    grids = explanation["tile_grids"]
+    assert len(grids) == 8
+    for grid in grids.values():
+        assert grid["x_edges"][0] == grid["y_edges"][0] == 0
+        assert grid["x_edges"][-1] == 151 and grid["y_edges"][-1] == 113
+        tile_count = (len(grid["x_edges"]) - 1) * (len(grid["y_edges"]) - 1)
+        assert grid["covered_pixels"] is None
+        assert all(len(values) == tile_count for values in grid["values"].values())
+
+    for name, family in explanation["families"].items():
+        pool = family["pool"]
+        assert family["weight"] == FAMILY_WEIGHTS[name]
+        assert family["burden"] == pytest.approx(sum(term["contribution"] for term in pool.values()))
+        assert family["weighted_damage"] == family["burden"] * family["weight"]
+        assert pool["mean"]["value"] == baseline.diagnostics["views"]["native"][0]["families"][name]["mean"]
+        tail = pool["tail"]
+        values = grids[tail["grid_id"]]["values"][name]
+        selected = [values[index] for index in tail["tile_indices"]]
+        assert sorted(selected) == sorted(values)[-tail["tile_count"]:]
+        assert np.mean(selected) == pytest.approx(tail["value"])
+        grid_tails = []
+        for grid in grids.values():
+            values = sorted(grid["values"][name])
+            count = max(1, int(np.ceil(0.01 * len(values))))
+            grid_tails.append(np.mean(values[-count:]))
+        assert tail["value"] == pytest.approx(max(grid_tails))
+        worst = pool["worst"]
+        assert worst["value"] == max(max(grid["values"][name]) for grid in grids.values())
+        if worst["tile_index"] is not None:
+            grid = grids[worst["grid_id"]]
+            y, x = divmod(worst["tile_index"], len(grid["x_edges"]) - 1)
+            assert worst["box_xyxy"] == [grid["x_edges"][x], grid["y_edges"][y],
+                                         grid["x_edges"][x + 1], grid["y_edges"][y + 1]]
+    damage = sum(family["weighted_damage"] for family in explanation["families"].values())
+    assert explanation["weighted_damage"] == damage
+    assert detailed.score == 100 * np.exp(-SCORE_DAMAGE_SCALE * damage)
 
 
 @pytest.mark.parametrize(("delivery", "reason"), [

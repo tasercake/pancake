@@ -43,13 +43,19 @@ def test_off_center_crop_is_measured_on_the_native_reference_grid():
 
 def test_small_roll_is_recovered_and_costs_coverage(target):
     delivered = rotate(target, 2.35, axes=(1, 0), reshape=False, order=1, mode="reflect")
-    score, _, alignment = evaluate_crop(delivered, target)
+    score, _, alignment = evaluate_crop(delivered, target, details="summary")
     placement = alignment["placements"][0]
     assert placement["offset_yx"] == [0, 0]
     assert placement["rotation_degrees"] == pytest.approx(-2.35, abs=0.06)
     assert 0.95 < placement["coverage"] < 1
     assert score > scene_score(measure(delivered, target)) + 30
     assert score == pytest.approx(placement["coverage"] * placement["overlap_score"])
+    transform = np.array(alignment["explanation"]["placements"][0]["candidate_to_reference_xy"])
+    center = np.array([(target.shape[1] - 1) / 2, (target.shape[0] - 1) / 2, 1])
+    assert transform @ center == pytest.approx(center[:2])
+    angle = np.deg2rad(placement["rotation_degrees"])
+    assert transform @ [center[0] + 1, center[1], 1] == pytest.approx(
+        center[:2] + [np.cos(angle), -np.sin(angle)])
 
 
 def test_cropping_keeps_real_color_and_movement_errors(target):
@@ -76,12 +82,30 @@ def test_equivalent_repeating_placements_share_credit():
     tile = np.random.default_rng(42).uniform(0.2, 0.8, size=(24, 25, 3)).astype(np.float32)
     target = np.tile(tile, (6, 7, 1))
     delivered = target[52:116, 29:107]
-    score, _, alignment = evaluate_crop(delivered, target)
+    score, _, alignment = evaluate_crop(delivered, target, details="tiles")
     placements = alignment["placements"]
     assert len(placements) > 1
     assert sum(placement["weight"] for placement in placements) == pytest.approx(1)
     assert all(placement["overlap_score"] == 100 for placement in placements)
     assert score == pytest.approx(100 * delivered.size / target.size)
+    plain_score, _, plain_alignment = evaluate_crop(delivered, target)
+    explanation = alignment.pop("explanation")
+    assert plain_alignment == alignment and plain_score == score == explanation["score"]
+    assert sum(p["score_contribution"] for p in explanation["placements"]) == pytest.approx(score)
+    assert len(explanation["placements"]) == len(placements)
+    for placement in explanation["placements"]:
+        y, x = placement["offset_yx"]
+        assert placement["candidate_to_reference_xy"] == [[1, 0, x], [0, 1, y]]
+        comparison = placement["comparison"]
+        pixel_count = delivered.shape[0] * delivered.shape[1]
+        assert comparison["measured_pixels"] == pixel_count
+        for grid in comparison["tile_grids"].values():
+            assert sum(grid["covered_pixels"]) == pixel_count
+            assert 0 in grid["covered_pixels"]
+        for family in comparison["families"].values():
+            tail = family["pool"]["tail"]
+            grid = comparison["tile_grids"][tail["grid_id"]]
+            assert all(grid["covered_pixels"][index] > 0 for index in tail["tile_indices"])
 
 
 def test_same_grid_and_uniform_crop(target):

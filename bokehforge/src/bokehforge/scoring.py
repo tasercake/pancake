@@ -1,6 +1,7 @@
 """Fixed-coordinate, full-reference image quality measurements for BokehForge."""
 
 from dataclasses import dataclass
+from typing import Literal
 
 import numpy as np
 from scipy import ndimage as ndi
@@ -12,6 +13,22 @@ FAMILY_WEIGHTS = {
     "added_structure": 0.15, "boundary": 0.23, "range": 0.11,
 }
 FEATURES = tuple(f"native.{family}" for family in FAMILY_WEIGHTS)
+SCORE_EXPLANATION_VERSION = 1
+SCORE_DETAIL_LEVELS = ("summary", "tiles")
+ScoreDetails = Literal["summary", "tiles"]
+_POOL_WEIGHTS = {"mean": 0.40, "tail": 0.35, "worst": 0.25}
+_POOL_LABELS = {"mean": "Average damage", "tail": "Average of the worst 1% of tiles",
+                "worst": "Worst single tile"}
+_TAIL_FRACTION = 0.01
+_AFFECTED_THRESHOLD = 0.25
+_FAMILY_LABELS = {
+    "tone": ("Tone", "Brightness and contrast differences"),
+    "color": ("Color", "Differences in tint or color intensity"),
+    "lost_detail": ("Lost detail", "Local contrast missing from the delivery"),
+    "added_structure": ("Added structure", "Excess local contrast and fine variation"),
+    "boundary": ("Boundary", "Shape and brightness differences near reference edges"),
+    "range": ("Range", "Changes beyond display black or white and near clipping"),
+}
 # Linear sRGB to D65 XYZ, normalized by the D65 white point.
 _XYZ = np.array([
     [0.4124564, 0.3575761, 0.1804375],
@@ -24,6 +41,16 @@ _XYZ = np.array([
 class Measurement:
     features: dict[str, float]
     diagnostics: dict
+    explanation: dict | None = None
+
+    @property
+    def score(self):
+        return scene_score(self)
+
+
+def _validate_details(details):
+    if details is not None and details not in SCORE_DETAIL_LEVELS:
+        raise ValueError(f"Expected score details to be None, 'summary', or 'tiles', got {details!r}")
 
 
 def validate_rgb(pixels, shape=None):
@@ -160,8 +187,7 @@ def _maps(candidate, target, support=None):
 
 def _axis_tiles(length, side, offset):
     edges = np.arange(offset, length, side, dtype=int)
-    edges = np.unique(np.r_[0, edges, length])
-    return edges[:-1], edges[1:]
+    return np.unique(np.r_[0, edges, length])
 
 
 def _integral(image):
@@ -173,64 +199,168 @@ def _tile_totals(integral, y0, y1, x0, x1):
             - integral[np.ix_(y1, x0)] + integral[np.ix_(y0, x0)])
 
 
-def _pool(damage, support, support_integral):
-    """Pool typical damage and supported defects on four overlapping tile phases."""
+@dataclass(frozen=True)
+class _TileGrid:
+    side: int
+    offset_yx: tuple[int, int]
+    x: np.ndarray
+    y: np.ndarray
+    nominal_pixels: int
+    covered: np.ndarray | None
+
+    @property
+    def id(self):
+        return f"{self.side}:{self.offset_yx[0]}:{self.offset_yx[1]}"
+
+    def totals(self, integral):
+        return _tile_totals(integral, self.y[:-1], self.y[1:], self.x[:-1], self.x[1:])
+
+    def box(self, index):
+        iy, ix = divmod(index, self.x.size - 1)
+        return [int(self.x[ix]), int(self.y[iy]), int(self.x[ix + 1]), int(self.y[iy + 1])]
+
+    def describe(self):
+        return {"grid_id": self.id, "tile_size": self.side, "offset_yx": list(self.offset_yx)}
+
+    def describe_tiles(self):
+        return {**self.describe(), "x_edges": self.x.tolist(), "y_edges": self.y.tolist(),
+                "nominal_pixels": self.nominal_pixels,
+                "covered_pixels": None if self.covered is None else self.covered.ravel().tolist(),
+                "values": {}}
+
+
+def _tile_grids(height, width, support):
+    support_integral = None if support is None else _integral(support)
+    grids = []
+    for side in (8, 32):
+        for y_offset, x_offset in ((0, 0), (0, side // 2), (side // 2, 0), (side // 2, side // 2)):
+            y = _axis_tiles(height, side, y_offset)
+            x = _axis_tiles(width, side, x_offset)
+            covered = None if support_integral is None else _tile_totals(
+                support_integral, y[:-1], y[1:], x[:-1], x[1:]).astype(np.int32)
+            grids.append(_TileGrid(side, (y_offset, x_offset), x, y, min(side, height) * min(side, width), covered))
+    return grids
+
+
+def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=None):
+    """Compute the metric and optionally retain the evidence from those same tiles."""
     mean = float(_supported_mean(damage, support))
     integral = _integral(damage if support is None else damage * support)
     worst, tail, region = 0.0, 0.0, None
-    height, width = damage.shape
-    for side in (8, 32):
-        for y_offset, x_offset in ((0, 0), (0, side // 2), (side // 2, 0), (side // 2, side // 2)):
-            y0, y1 = _axis_tiles(height, side, y_offset)
-            x0, x1 = _axis_tiles(width, side, x_offset)
-            totals = _tile_totals(integral, y0, y1, x0, x1)
-            # A small edge tile needs the same supporting area as an interior tile.
-            tiles = np.clip(totals / (min(side, height) * min(side, width)), 0, 1)
-            iy, ix = np.unravel_index(np.argmax(tiles), tiles.shape)
-            if tiles[iy, ix] > worst:
-                worst = float(tiles[iy, ix])
-                region = [int(x0[ix]), int(y0[iy]), int(x1[ix]), int(y1[iy])]
-            # A phase partitions the image, so its tail never counts the same pixel twice.
-            flat = tiles.ravel()
-            if support_integral is not None:
-                flat = tiles[_tile_totals(support_integral, y0, y1, x0, x1) > 0]
-            count = max(1, int(np.ceil(0.01 * flat.size)))
-            tail = max(tail, float(np.partition(flat, flat.size - count)[-count:].mean()))
-    return 0.40 * mean + 0.35 * tail + 0.25 * worst, {
+    worst_tile, tail_selection, winning_tiles = None, None, None
+    for grid in grids:
+        # Even a short edge tile uses the full nominal area as its denominator.
+        tiles = np.clip(grid.totals(integral) / grid.nominal_pixels, 0, 1).ravel()
+        index = int(np.argmax(tiles))
+        if tiles[index] > worst:
+            worst = float(tiles[index])
+            region = grid.box(index)
+            if explain:
+                worst_tile = {**grid.describe(), "tile_index": index, "box_xyxy": region}
+        # A grid partitions the image, so its tail never counts the same pixel twice.
+        eligible = tiles if grid.covered is None else tiles[grid.covered.ravel() > 0]
+        count = max(1, int(np.ceil(_TAIL_FRACTION * eligible.size)))
+        top = np.partition(eligible, eligible.size - count)[-count:]
+        tile_tail = float(top.mean())
+        if tile_tail > tail or (explain and tail_selection is None):
+            tail = tile_tail
+            if explain:
+                tail_selection = {**grid.describe(), "tile_count": count, "eligible_tile_count": int(eligible.size),
+                                  "cutoff": float(top[0])}
+                if tiles_by_grid is not None:
+                    winning_tiles = (grid, tiles)
+        if tiles_by_grid is not None:
+            tiles_by_grid[grid.id]["values"][family] = tiles.tolist()
+
+    values = {"mean": mean, "tail": tail, "worst": worst}
+    contributions = {key: _POOL_WEIGHTS[key] * value for key, value in values.items()}
+    summary = {
         "mean": mean, "tail": tail, "worst": worst, "worst_box_view_xyxy": region,
-        "affected_fraction": float(_supported_mean(damage >= 0.25, support)),
+        "affected_fraction": float(_supported_mean(damage >= _AFFECTED_THRESHOLD, support)),
     }
+    components = None
+    if explain:
+        components = {key: {"label": _POOL_LABELS[key], "value": value, "weight": _POOL_WEIGHTS[key],
+                            "contribution": contributions[key]} for key, value in values.items()}
+        components["worst"].update(worst_tile or dict.fromkeys(
+            ("grid_id", "tile_size", "offset_yx", "tile_index", "box_xyxy")))
+        components["tail"].update(tail_selection)
+        components["tail"]["fraction"] = _TAIL_FRACTION
+        if winning_tiles is not None:
+            grid, tiles = winning_tiles
+            cutoff = tail_selection["cutoff"]
+            above = np.flatnonzero(tiles > cutoff)
+            ties = tiles == cutoff
+            if grid.covered is not None:
+                ties &= grid.covered.ravel() > 0
+            indices = np.flatnonzero(ties)[:tail_selection["tile_count"] - above.size]
+            components["tail"]["tile_indices"] = np.sort(np.r_[above, indices]).tolist()
+    burden = contributions["mean"] + contributions["tail"] + contributions["worst"]
+    return burden, summary, components
 
 
-def _measure(candidate, target, support=None):
+def _measure(candidate, target, support=None, *, details=None):
     height, width = target.shape[:2]
     maps, signed = _maps(candidate, target, support)
-    support_integral = None if support is None else _integral(support)
+    grids = _tile_grids(height, width, support)
+    tile_data = {grid.id: grid.describe_tiles() for grid in grids} if details == "tiles" else None
     features = {}
     rows = {}
-    for name, damage in zip(FAMILY_WEIGHTS, maps, strict=True):
-        burden, summary = _pool(damage, support, support_integral)
+    families = {}
+    for (name, weight), damage in zip(FAMILY_WEIGHTS.items(), maps, strict=True):
+        burden, summary, components = _pool(damage, support, grids, explain=details is not None,
+                                             tiles_by_grid=tile_data, family=name)
         if region := summary["worst_box_view_xyxy"]:
             summary["worst_box_native_xyxy"] = region
         features[f"native.{name}"] = burden
         rows[name] = {"burden": burden, **summary}
+        if components is not None:
+            label, description = _FAMILY_LABELS[name]
+            families[name] = {"label": label, "description": description, "weight": weight, "burden": burden,
+                              "weighted_damage": weight * burden, "pool": components,
+                              "affected_fraction": summary["affected_fraction"]}
     native = {"native_box_xyxy": (0, 0, width, height), "view_size_wh": (width, height),
               "families": rows, **signed}
     if support is not None:
         native["covered_fraction"] = float(support.mean())
     rmse = float(np.sqrt(_supported_mean(np.square(np.subtract(candidate, target, dtype=np.float64)), support)))
-    return Measurement(features, {"views": {"native": [native]}, "linear_rgb_rmse": rmse})
+    explanation = None
+    if details is not None:
+        explanation = {
+            "reference_size_wh": [width, height], "damage_range": [0, 1], "affected_threshold": _AFFECTED_THRESHOLD,
+            "weighted_damage": _weighted_damage(features), "families": families,
+            "measured_pixels": height * width if support is None else int(support.sum()),
+            "diagnostics": {**signed, "linear_rgb_rmse": rmse},
+        }
+        if tile_data is not None:
+            explanation["tile_grids"] = tile_data
+    return Measurement(features, {"views": {"native": [native]}, "linear_rgb_rmse": rmse}, explanation)
 
 
-def measure(candidate, target):
-    """Compare two canonical float32 linear-sRGB images on the target grid."""
+def measure(candidate, target, *, details: ScoreDetails | None = None):
+    """Compare two canonical float32 linear-sRGB images on the target grid.
+
+    The result has a scalar `.score`. Request `summary` for weighted components,
+    or `tiles` for the exact grids of patch values used to pool those components.
+    """
+    _validate_details(details)
     validate_rgb(target)
     validate_rgb(candidate, target.shape)
-    return _measure(candidate, target)
+    return _measure(candidate, target, details=details)
+
+
+def _weighted_damage(features):
+    return sum(weight * features[f"native.{family}"] for family, weight in FAMILY_WEIGHTS.items())
 
 
 def scene_score(measurement):
     """Apply the fixed reference-fidelity profile to the measured damage."""
-    damage = sum(weight * measurement.features[f"native.{family}"]
-                 for family, weight in FAMILY_WEIGHTS.items())
-    return float(100 * np.exp(-SCORE_DAMAGE_SCALE * damage))
+    return float(100 * np.exp(-SCORE_DAMAGE_SCALE * _weighted_damage(measurement.features)))
+
+
+def _score_explanation(profile, details, candidate, target, score, confidence, placements):
+    return {
+        "schema_version": SCORE_EXPLANATION_VERSION, "profile": profile, "detail_level": details, "score": score,
+        "damage_scale": SCORE_DAMAGE_SCALE, "reference_size_wh": list(target.shape[1::-1]),
+        "candidate_size_wh": list(candidate.shape[1::-1]), "confidence": confidence, "placements": placements,
+    }
