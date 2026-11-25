@@ -12,7 +12,7 @@ Repeat `--dataset` or `--scene` to select a fixed cohort. The default scans down
 
 ## Stacker interface
 
-Pass `--algorithm package.module:callable` with the module installed in the BokehForge environment or on `PYTHONPATH`. The callable runs once per eligible scene and returns a NumPy array containing finite, full-resolution, float32 linear-sRGB samples in H×W×3 order on the declared target grid. Alignment and output framing are the stacker's responsibility. `StackInput` provides the scene ID, ordered focal frame IDs, target shape, and a single-pass frame iterator. A frame includes canonical RGB pixels, optional source alpha, and available capture metadata. Read focal frames during the call and copy arrays before modifying them.
+Pass `--algorithm package.module:callable` with the module installed in the BokehForge environment or on `PYTHONPATH`. The callable runs once per eligible scene and returns one NumPy array containing finite, full-resolution, float32 linear-sRGB samples in H×W×3 order. The default profile requires the declared target grid. The crop-tolerant profile accepts a smaller image at the original pixel scale and infers its placement from its pixels. `StackInput` provides the scene ID, ordered focal frame IDs, target shape, and a single-pass frame iterator. A frame includes canonical RGB pixels, optional source alpha, and available capture metadata. Read focal frames during the call and copy arrays before modifying them.
 
 ```python
 from bokehforge.stacking import StackInput
@@ -31,7 +31,7 @@ uv run --project bokehforge --frozen bokehforge bench \
 
 ## The score
 
-Standard output contains one cohort score from 0 to 100. A perfect delivery scores 100. Higher scores indicate closer agreement with ground truth across the tested views and artifact families. Every run uses the built-in score profile `reference-fidelity-v1`.
+Standard output contains one cohort score from 0 to 100. A perfect delivery scores 100. Higher scores indicate closer agreement with ground truth across the tested views and artifact families. The default profile is `reference-fidelity-v1`.
 
 The scorer uses the delivered image and the RGB target. It compares them in the target coordinates, without fitting an alignment, exposure, or color correction to the output. It makes three identically rendered comparisons.
 
@@ -57,3 +57,15 @@ Within a view, each family combines mean damage (40%), a tail of the worst 1% of
 An eligible stacker failure or a missing or invalid delivery scores zero. An eligible reference, input decode, or scoring error withholds the aggregate because the evaluation failed. A scene without a supported reference is listed as unscored and excluded from the aggregate. The command prints `unscored` if the aggregate is unavailable. A nonzero exit reports a runtime failure even when some scene scores were computed.
 
 `report.json` uses schema version 2 and records the fixed weights and the curve's `damage_scale` under `scoring`. It also contains the cohort fingerprint, runtime versions, eligibility and exit details, score features, and diagnostics. For each view and family it gives affected fraction and the worst tile in both view and native coordinates. Boxes use half-open `[left, top, right, bottom]` pixel coordinates. RGB RMSE and signed lightness, Lab chroma, and exposure offsets are diagnostic.
+
+## Crop-tolerant scoring
+
+Add `--score-profile reference-fidelity-crop-v1` to either an algorithm run or a replay of saved images. The stacker still delivers one image. Crop coordinates and other alignment metadata come from the scorer's own image comparison.
+
+This profile searches for shifts and up to three degrees of rigid rotation using brightness patterns spread across the image. The unrotated crop rectangle must fit inside the reference, so full-size images have a fixed center and trimming one pixel only unlocks one pixel of translation. At full size, the scorer applies rotation only when the image evidence clearly improves over the fixed placement. Enlargement, shrinkage, stretching and local warps are outside the fit.
+
+The scorer samples the delivered pixels on the reference grid and measures quality where the images overlap. The fit view retains the reference viewing scale, and the close-up windows stay at the reference corners and center. A partly covered close-up carries less influence, and a window with no overlap contributes no readings. The reported coverage is the fraction of reference pixel positions covered by real delivered pixels, capped at the ratio of delivered to reference pixels. A perfect crop covering 95% scores 95 when its placement is clear.
+
+When several placements have similar evidence, the score averages their overlap-quality scores multiplied by their coverage, weighted by image agreement. Weak evidence reduces the available weight smoothly toward a zero-score no-match outcome. These weights are heuristics based on image agreement. Crop-profile reports record the inferred offset, rotation, coverage, overlap score and weight for each evaluated placement. The offset is the unrotated crop origin in row, column order, and rotation is around the crop center. The feature readings describe the leading placement. An unmatched delivery receives zero and is reported under the scene's `alignment` field. The saved image, if requested, is the stacker's original delivery.
+
+Compare results only within the same score profile. Rotation requires interpolation and can affect measured fine detail. The three-degree limit and agreement thresholds are starting points for this profile.
