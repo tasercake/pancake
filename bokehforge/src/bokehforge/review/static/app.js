@@ -30,6 +30,7 @@ let runOptions = "", outputState = "", candidateState = "";
 let activeImage = null, imageVersion = "";
 const readyThumbs = new Map();
 const panelImages = new WeakMap();
+const LIGHTBOX_HOVER_DELAY = 66;
 
 function stackerLabel(id) {
   return tools.get(id)?.label ?? (id === "zerene" ? "Zerene Stacker" : id);
@@ -209,6 +210,7 @@ function setLightboxGallery(gallery, data) {
   }
   if (activeImage?.gallery !== gallery) return;
   if (changed) {
+    clearTimeout(gallery.hoverTimer);
     clearLightboxHover(gallery);
     fillLightboxStrip(gallery);
   }
@@ -271,8 +273,12 @@ function moveLightbox(step) {
 function selectLightboxEntry(entry) {
   const state = activeImage;
   const { gallery, stage } = state;
-  if (lightboxImageKey(state) === lightboxImageKey(entry)) return;
+  clearTimeout(gallery.hoverTimer);
   if (gallery.hover?.entry !== entry) clearLightboxHover(gallery);
+  if (lightboxImageKey(state) === lightboxImageKey(entry)) {
+    paintLightboxOverlays();
+    return;
+  }
   const { u, v } = lightboxAnchor();
   cancelLightboxRequests(state);
   // Keep the last rendered image and its label together until the next image loads.
@@ -280,6 +286,20 @@ function selectLightboxEntry(entry) {
     image: state.image, scale: state.scale, actual: state.actual, position: { u, v },
   });
   lightboxRail.select(lightboxIndex());
+}
+
+function scheduleLightboxHover(gallery, entry, thumbnail) {
+  clearTimeout(gallery.hoverTimer);
+  if (!entry && !gallery.hover) return;
+  gallery.hoverTimer = setTimeout(() => {
+    if (activeImage?.gallery !== gallery || !$("image-dialog").open) return;
+    if (entry && thumbnail.isConnected) {
+      if (gallery.hover?.entry !== entry) previewLightboxEntry(entry, thumbnail);
+    } else {
+      clearLightboxHover(gallery);
+      paintLightboxOverlays();
+    }
+  }, LIGHTBOX_HOVER_DELAY);
 }
 
 function previewLightboxEntry(entry, thumbnail) {
@@ -531,6 +551,7 @@ function paintLightboxOverlays() {
 }
 
 function closeLightboxRequests(state) {
+  clearTimeout(state.gallery.hoverTimer);
   cancelLightboxRequests(state);
   clearLightboxHover(state.gallery);
   cancelReferenceRequests(state.gallery);
@@ -634,13 +655,12 @@ function lightboxStripEntry(entry) {
   button.append(thumbnail, part("span", entry.label ?? entry.title));
   button.addEventListener("pointerenter", (event) => {
     if (event.pointerType !== "touch" && !event.buttons && activeImage?.gallery === gallery) {
-      previewLightboxEntry(entry, thumbnail);
+      scheduleLightboxHover(gallery, entry, thumbnail);
     }
   });
-  button.addEventListener("pointerleave", () => {
-    if (activeImage?.gallery === gallery && gallery.hover?.entry === entry) {
-      clearLightboxHover(gallery);
-      paintLightboxOverlays();
+  button.addEventListener("pointerleave", (event) => {
+    if (event.pointerType !== "touch" && activeImage?.gallery === gallery) {
+      scheduleLightboxHover(gallery);
     }
   });
   button.onclick = () => {
@@ -1265,11 +1285,9 @@ const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
 const filmRail = new VirtualRail($("filmstrip"), "x", 112, frameEntry);
 const lightboxStrip = $("lightbox-strip");
 const lightboxRail = new VirtualRail(lightboxStrip, "x", 100, lightboxStripEntry);
-lightboxStrip.addEventListener("pointerleave", () => {
+lightboxStrip.addEventListener("pointerleave", (event) => {
   const gallery = activeImage?.gallery;
-  if (!gallery?.hover) return;
-  clearLightboxHover(gallery);
-  paintLightboxOverlays();
+  if (event.pointerType !== "touch" && gallery) scheduleLightboxHover(gallery);
 });
 
 $("dataset").onchange = () => filterScenes(scene?.id);
