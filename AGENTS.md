@@ -15,6 +15,15 @@ the [developer guide](pancake/DEVELOPING.md).
 | [`research/`](research/) | Dataset and algorithm research, benchmark methods, and experiments. The comparison stackers in `.submodules/` support research and some optional review runners. Ordinary Pancake builds do not need them. |
 | [`assets/`](assets/) | Pancake branding and small synthetic quickstart frames. |
 
+## Real-time data and events
+
+- Do not use polling or polling-like implementations for real-time data transfer,
+  progress, or events. This includes interval requests, timer-driven refreshes,
+  repeated status or file checks, and long-polling fallbacks.
+- Publish updates when state changes and use an event-driven or push-based
+  mechanism such as callbacks, notifications, Server-Sent Events, or WebSockets.
+  On reconnect, send the current state over the event channel.
+
 ## Bootstrap and verify
 
 - For Pancake, read [`pancake/AGENTS.md`](pancake/AGENTS.md) before changing

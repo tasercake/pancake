@@ -9,11 +9,11 @@ import os
 from pathlib import Path
 import re
 from tempfile import TemporaryDirectory
-from threading import Event, Lock, Thread
+from threading import Lock, Thread
 from uuid import uuid4
 
 from .images import normalize_output, stage_frame
-from .stacker_setup import BIN_DIR, EXE, REPO, RunStopped, StackerSetup, run_logged
+from .stacker_setup import BIN_DIR, EXE, REPO, RunSignal, RunStopped, StackerSetup, run_logged
 
 RUN_ID = re.compile(r"\d{8}T\d{12}Z-[a-f0-9]{8}")
 
@@ -119,13 +119,14 @@ def _render(tool, frames, work, log, stop):
 
 
 class Runs:
-    def __init__(self, store, stackers):
+    def __init__(self, store, stackers, on_change=lambda: None):
         self.root = store / "runs"
         self.stackers = stackers
         self.setup = StackerSetup(store)
         self.worker = None
         self.active = None
-        self.stop = Event()
+        self.stop = RunSignal()
+        self.on_change = on_change
         self.lock = Lock()
         for path in self.root.glob("*/progress.json"):
             progress = _read(path)
@@ -199,6 +200,7 @@ class Runs:
                         "ready": 0, "failed": 0, "current_scene": None, "setup_errors": {}, "prepared": []}
             _write(base / "progress.json", progress)
             _write(base / "run.json", run)
+            self.on_change()
             self.active = run_id
             self.stop.clear()
             self.worker = Thread(target=self._worker, args=(base, catalog, scene_ids, tools, progress),
@@ -221,13 +223,17 @@ class Runs:
         if self.stop.is_set():
             raise RunStopped()
 
+    def _save_progress(self, base, progress):
+        _write(base / "progress.json", progress)
+        self.on_change()
+
     def _worker(self, base, catalog, scene_ids, tools, progress):
         try:
             tools = self._prepare_tools(base, tools, len(scene_ids), progress)
             for scene_id in scene_ids if tools else ():
                 self._check_stop()
                 progress["current_scene"] = scene_id
-                _write(base / "progress.json", progress)
+                self._save_progress(base, progress)
                 self._evaluate_scene(base, catalog, catalog.scene(scene_id), tools, progress)
             progress["status"] = "completed_with_errors" if progress["failed"] else "completed"
         except RunStopped:
@@ -236,7 +242,7 @@ class Runs:
             progress.update(status="error", error=str(exc))
         finally:
             progress.update(finished_at=_now().isoformat(), current_scene=None, setup=None)
-            _write(base / "progress.json", progress)
+            self._save_progress(base, progress)
 
     def _prepare_tools(self, base, tools, scene_count, progress):
         ready = []
@@ -246,7 +252,7 @@ class Runs:
 
             def tell(message):
                 progress["setup"] = {"stacker": tool.id, "message": message}
-                _write(base / "progress.json", progress)
+                self._save_progress(base, progress)
 
             try:
                 path = self.setup.prepare(tool, log, self.stop, tell)
@@ -263,9 +269,9 @@ class Runs:
                     "log": log.relative_to(base).as_posix(),
                 }
                 progress["failed"] += scene_count
-                _write(base / "progress.json", progress)
+                self._save_progress(base, progress)
         progress["setup"] = None
-        _write(base / "progress.json", progress)
+        self._save_progress(base, progress)
         return ready
 
     def _evaluate_scene(self, base, catalog, scene, tools, progress):
@@ -306,4 +312,4 @@ class Runs:
                         row["log"] = log.relative_to(base).as_posix()
                 _write(base / tool.id / "results" / f"{scene.id}.json", row)
                 progress[row["status"]] += 1
-                _write(base / "progress.json", progress)
+                self._save_progress(base, progress)

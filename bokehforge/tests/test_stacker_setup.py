@@ -1,13 +1,15 @@
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from socket import create_server
 import sys
-from threading import Event
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 import tifffile
 
 from bokehforge.review import runs
-from bokehforge.review.stacker_setup import StackerSetup
+from bokehforge.review.stacker_setup import RunSignal, RunStopped, StackerSetup, run_logged
 
 
 def test_evaluation_prepares_missing_tools_and_keeps_independent_results(tmp_path, monkeypatch):
@@ -73,7 +75,24 @@ def test_setup_reuses_checked_tool_without_running_installer(tmp_path, monkeypat
     assert setup.available(tool) is None
     log = tmp_path / "setup.log"
     expected = tmp_path / "tools/openfocus/abc/bin/openfocus"
-    assert setup.prepare(tool, log, Event(), lambda message: None) == str(expected)
-    assert setup.prepare(tool, log, Event(), lambda message: None) == str(expected)
+    assert setup.prepare(tool, log, RunSignal(), lambda message: None) == str(expected)
+    assert setup.prepare(tool, log, RunSignal(), lambda message: None) == str(expected)
     assert installs == ["openfocus"]
     assert Path(expected.parents[1], "ready").read_text() == "bin/openfocus"
+
+
+def test_active_command_wakes_when_run_is_cancelled(tmp_path):
+    stop = RunSignal()
+    with create_server(("127.0.0.1", 0)) as listener, ThreadPoolExecutor(max_workers=1) as worker:
+        listener.settimeout(5)
+        port = listener.getsockname()[1]
+        program = ("import socket; "
+                   f"connection = socket.create_connection(('127.0.0.1', {port})); "
+                   "connection.recv(1)")
+        future = worker.submit(run_logged, [sys.executable, "-c", program], tmp_path,
+                               tmp_path / "run.log", stop, "Test command", timeout=10)
+        connection, _ = listener.accept()
+        with connection:
+            stop.set()
+            with pytest.raises(RunStopped):
+                future.result(timeout=5)
