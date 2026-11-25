@@ -202,6 +202,7 @@ function setLightboxGallery(gallery, data) {
   const changed = images.length !== gallery.images.length || images.some((entry, index) =>
     lightboxImageKey(entry) !== lightboxImageKey(gallery.images[index]) || entry.title !== gallery.images[index].title);
   if (changed) gallery.images = images;
+  gallery.benchmarks = new Map(data.outputs.map(({ stacker, benchmark }) => [stacker, benchmark]));
   if (gallery.referenceFrame?.id !== reference?.id) {
     cancelReferenceRequests(gallery);
     gallery.referenceImages = {};
@@ -236,21 +237,39 @@ function openLightbox(title, params, previewImage, sceneId = scene?.id) {
   const gallery = {
     scene: sceneId, run: runId, reference: currentScene ? referenceIndex : 0, images: [entry],
     surface, hoverLayer, hover: null, referenceLayer, referenceImages: {},
-    baseTitle: title, swipe: false, split: 0.5, holdKey: "",
+    baseEntry: entry, benchmarks: new Map(), swipe: false, split: 0.5, holdKey: "",
   };
   if (currentScene && details) {
     setLightboxGallery(gallery, details);
   } else if (!currentScene && sceneId) {
-    gallery.request = new AbortController();
-    api(url("/api/scene", { scene: sceneId, run: gallery.run }), undefined, { signal: gallery.request.signal })
-      .then((data) => setLightboxGallery(gallery, data))
-      .catch(() => {}); // The selected thumbnail is still available to inspect.
+    loadLightboxGallery(gallery);
   }
   const dialog = $("image-dialog");
   if (!dialog.open) dialog.showModal();
   showLightboxImage(entry, gallery, stage, previewImage);
   fillLightboxStrip(gallery);
   $("image-view").focus();
+}
+
+function lightboxScoresPending(gallery) {
+  return [...gallery.benchmarks.values()].some((benchmark) => benchmark?.status === "pending");
+}
+
+async function loadLightboxGallery(gallery) {
+  const revision = scoreRevision;
+  const request = new AbortController();
+  gallery.request = request;
+  const { signal } = request;
+  try {
+    const data = await api(url("/api/scene", { scene: gallery.scene, run: gallery.run }), undefined, { signal });
+    if (signal.aborted) return;
+    setLightboxGallery(gallery, data);
+    if (revision !== scoreRevision && lightboxScoresPending(gallery)) loadLightboxGallery(gallery);
+  } catch {
+    // Keep the current preview available if its scene cannot be loaded.
+  } finally {
+    if (gallery.request === request) gallery.request = null;
+  }
 }
 
 function lightboxIndex() {
@@ -371,7 +390,7 @@ function setLightboxTitle(title) {
 function setLightboxImage(state, image) {
   state.image?.remove();
   state.image = image;
-  state.gallery.baseTitle = state.title;
+  state.gallery.baseEntry = state.entry;
   state.gallery.surface.prepend(image);
   const hover = state.gallery.hover;
   if (hover && lightboxImageKey(hover.entry) === lightboxImageKey(state)) clearLightboxHover(state.gallery);
@@ -380,12 +399,12 @@ function setLightboxImage(state, image) {
 function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
   const { title, params } = entry;
   const state = {
-    title, params, gallery, stage, image: null, requests: new Set(), scale: 1,
+    entry, title, params, gallery, stage, image: null, requests: new Set(), scale: 1,
     actual: false, position: null, nativeRequested: false, nativeLoaded: false, pending: "",
     ...viewport,
   };
   activeImage = state;
-  if (!state.image) gallery.baseTitle = title;
+  if (!state.image) gallery.baseEntry = entry;
   const fallback = !state.image && ((previewImage?.complete && previewImage.naturalWidth &&
                     (previewImage.currentSrc || previewImage.src)) ||
     readyThumbs.get(imageURL(params, "thumb")));
@@ -526,7 +545,10 @@ function paintLightboxOverlays() {
   const divider = $("reference-divider");
   layer.hidden = !showing;
   divider.hidden = !showing || held;
-  setLightboxTitle(held && showing ? referenceTitle(reference) : previewing ? hover.entry.title : gallery.baseTitle);
+  const entry = previewing ? hover.entry : gallery.baseEntry;
+  const viewingReference = held && showing;
+  setLightboxTitle(viewingReference ? referenceTitle(reference) : entry.title);
+  renderBenchmark($("lightbox-benchmark"), viewingReference ? null : gallery.benchmarks.get(entry.params.stacker), true);
   let status = state.pending;
   if (hover) status = previewing ? "" : hover.unavailable ? "Preview unavailable" : "Loading preview…";
   if (comparing && reference && !overlay) {
@@ -768,6 +790,9 @@ function applyScores(revision) {
   if (revision === scoreRevision) return;
   scoreRevision = revision;
   if (!sceneRequest && pendingScores()) loadScene();
+  const gallery = activeImage?.gallery;
+  if (gallery && (gallery.scene !== scene?.id || gallery.run !== runId) &&
+      !gallery.request && lightboxScoresPending(gallery)) loadLightboxGallery(gallery);
 }
 
 function sourceFrameTitle(frame, index) {
@@ -825,14 +850,20 @@ function renderReference() {
 
 const benchmarkNumber = new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-function renderBenchmark(benchmark) {
-  const label = $("candidate-benchmark");
+function renderBenchmark(label, benchmark, compact = false) {
   label.hidden = !benchmark;
   const scored = benchmark?.score != null;
-  const invalid = benchmark?.status === "invalid_output" ? " · Invalid delivery" : "";
-  const text = scored ? `Benchmark score ${benchmarkNumber.format(benchmark.score)} / 100${invalid}` :
-    { pending: "Calculating benchmark score…", unscored: "No eligible benchmark reference" }[benchmark?.status] ??
-    (benchmark ? "Benchmark score unavailable" : "");
+  let text = "";
+  if (scored) {
+    const value = benchmarkNumber.format(benchmark.score);
+    text = compact ? `Score ${value} / 100` : `Benchmark score ${value} / 100`;
+    if (!compact && benchmark.status === "invalid_output") text += " · Invalid delivery";
+  } else if (benchmark) {
+    const messages = compact
+      ? { pending: "Scoring…", unscored: "Unscored" }
+      : { pending: "Calculating benchmark score…", unscored: "No eligible benchmark reference" };
+    text = messages[benchmark.status] ?? "Benchmark score unavailable";
+  }
   if (label.textContent !== text) label.textContent = text;
   label.dataset.scored = scored;
   label.title = [benchmark?.profile, benchmark?.error].filter(Boolean).join(" · ");
@@ -892,7 +923,7 @@ function renderOutput() {
     }
     candidateState = currentImage;
   }
-  renderBenchmark(row?.benchmark);
+  renderBenchmark($("candidate-benchmark"), row?.benchmark);
   renderRating(row);
 }
 

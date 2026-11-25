@@ -148,7 +148,10 @@
   </dialog>
   <dialog class="image-dialog" id="image-dialog" aria-labelledby="image-title">
     <div class="dialog-heading">
-      <h2 id="image-title" aria-live="polite"></h2>
+      <div class="lightbox-caption">
+        <h2 id="image-title" aria-live="polite"></h2>
+        <p class="lightbox-benchmark" id="lightbox-benchmark" role="status" hidden></p>
+      </div>
       <div class="tools">
         <button class="quiet zoom-button" id="zoom-out" type="button" aria-label="Zoom out">−</button>
         <button class="quiet" id="image-fit" type="button" aria-label="Fit image">Fit</button>
