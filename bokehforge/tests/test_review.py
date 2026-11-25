@@ -1,10 +1,12 @@
 from argparse import Namespace
 import csv
 from hashlib import sha256
+from http.client import HTTPConnection
 from io import BytesIO, StringIO
 import json
 from shutil import copyfile
 import sys
+from threading import Thread
 from time import monotonic, sleep
 
 import numpy as np
@@ -13,7 +15,7 @@ import pytest
 import tifffile
 
 from bokehforge.review import runs
-from bokehforge.review.server import Review
+from bokehforge.review.server import Review, ReviewServer
 
 
 def write_scene(root, level):
@@ -109,3 +111,38 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     assert stale["status"] == "different_source" and stale["rating"] is None
     with pytest.raises(KeyError):
         changed.rate({**choice, "grade": 5})
+
+
+def test_review_accepts_machine_hostname_and_same_http_origin(tmp_path, monkeypatch):
+    monkeypatch.setattr("bokehforge.review.server.gethostname", lambda: "review-node")
+    root = tmp_path / "data"
+    write_scene(root, 0.25)
+    with ReviewServer(("0.0.0.0", 0)) as server:
+        server.app = open_review(root, tmp_path / "review")
+        worker = Thread(target=server.serve_forever, kwargs={"poll_interval": 0.02})
+        worker.start()
+        port = server.server_port
+
+        def request(host, origin=None):
+            headers = {"Host": host}
+            if origin is not None:
+                headers["Origin"] = origin
+            client = HTTPConnection("127.0.0.1", port, timeout=3)
+            try:
+                client.request("GET", "/api/catalog", headers=headers)
+                response = client.getresponse()
+                return response.status, response.read()
+            finally:
+                client.close()
+
+        try:
+            authority = f"review-node:{port}"
+            status, body = request(authority, f"http://{authority}")
+            assert status == 200 and json.loads(body)["status"] == "ready"
+            assert request(f"127.0.0.1:{port}")[0] == 200
+            assert request(f"localhost:{port}")[0] == 200
+            assert request(f"other-site.test:{port}")[0] == 403
+            assert request(authority, f"http://other-site.test:{port}")[0] == 403
+        finally:
+            server.shutdown()
+            worker.join()
