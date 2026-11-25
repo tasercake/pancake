@@ -30,7 +30,7 @@ let runOptions = "", outputState = "", candidateState = "";
 let activeImage = null, imageVersion = "";
 const readyThumbs = new Map();
 const panelImages = new WeakMap();
-const LIGHTBOX_HOVER_DELAY = 66;
+const LIGHTBOX_HOVER_EXIT_DELAY = 100;
 
 function stackerLabel(id) {
   return tools.get(id)?.label ?? (id === "zerene" ? "Zerene Stacker" : id);
@@ -307,18 +307,14 @@ function selectLightboxEntry(entry) {
   lightboxRail.select(lightboxIndex());
 }
 
-function scheduleLightboxHover(gallery, entry, thumbnail) {
+function scheduleLightboxHoverReset(gallery) {
   clearTimeout(gallery.hoverTimer);
-  if (!entry && !gallery.hover) return;
+  if (!gallery.hover) return;
   gallery.hoverTimer = setTimeout(() => {
     if (activeImage?.gallery !== gallery || !$("image-dialog").open) return;
-    if (entry && thumbnail.isConnected) {
-      if (gallery.hover?.entry !== entry) previewLightboxEntry(entry, thumbnail);
-    } else {
-      clearLightboxHover(gallery);
-      paintLightboxOverlays();
-    }
-  }, LIGHTBOX_HOVER_DELAY);
+    clearLightboxHover(gallery);
+    paintLightboxOverlays();
+  }, LIGHTBOX_HOVER_EXIT_DELAY);
 }
 
 function previewLightboxEntry(entry, thumbnail) {
@@ -677,12 +673,13 @@ function lightboxStripEntry(entry) {
   button.append(thumbnail, part("span", entry.label ?? entry.title));
   button.addEventListener("pointerenter", (event) => {
     if (event.pointerType !== "touch" && !event.buttons && activeImage?.gallery === gallery) {
-      scheduleLightboxHover(gallery, entry, thumbnail);
+      clearTimeout(gallery.hoverTimer);
+      if (gallery.hover?.entry !== entry) previewLightboxEntry(entry, thumbnail);
     }
   });
   button.addEventListener("pointerleave", (event) => {
     if (event.pointerType !== "touch" && activeImage?.gallery === gallery) {
-      scheduleLightboxHover(gallery);
+      scheduleLightboxHoverReset(gallery);
     }
   });
   button.onclick = () => {
@@ -1318,7 +1315,7 @@ const lightboxStrip = $("lightbox-strip");
 const lightboxRail = new VirtualRail(lightboxStrip, "x", 100, lightboxStripEntry);
 lightboxStrip.addEventListener("pointerleave", (event) => {
   const gallery = activeImage?.gallery;
-  if (event.pointerType !== "touch" && gallery) scheduleLightboxHover(gallery);
+  if (event.pointerType !== "touch" && gallery) scheduleLightboxHoverReset(gallery);
 });
 
 $("dataset").onchange = () => filterScenes(scene?.id);
