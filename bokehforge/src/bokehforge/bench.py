@@ -16,12 +16,11 @@ from time import perf_counter
 import numpy as np
 import tifffile
 
-from .calibration import ScoreCalibration
 from .data._canonical import encode_tiff
 from .data._files import digest
 from .data.download import CONFIG_DIRECTORY, save_json
 from .data.lazy import SceneCatalog
-from .scoring import FAMILY_WEIGHTS, SCORE_VERSION, VIEW_WEIGHTS, measure, scene_score, validate_rgb
+from .scoring import FAMILY_WEIGHTS, SCORE_DAMAGE_SCALE, SCORE_VERSION, VIEW_WEIGHTS, measure, scene_score, validate_rgb
 from .stacking import StackFrame, StackInput
 
 _RGB_REFERENCES = {"rendered_all_in_focus", "synthetic_source_image_reference"}
@@ -146,7 +145,7 @@ def _read_candidate(path):
         return page.asarray()
 
 
-def _run_scene(catalog, scene, row, algorithm, args, calibration):
+def _run_scene(catalog, scene, row, algorithm, args):
     row.update(frames_read=0, scene_score=None, status="ok")
     reference = _reference(catalog, scene, row)
     if reference is None:
@@ -184,7 +183,7 @@ def _run_scene(catalog, scene, row, algorithm, args, calibration):
     scoring_start = perf_counter()
     try:
         measurement = measure(result, reference)
-        row.update(scene_score=scene_score(measurement, calibration), score_features=measurement.features,
+        row.update(scene_score=scene_score(measurement), score_features=measurement.features,
                    artifact_diagnostics=measurement.diagnostics)
     except Exception as exc:
         row.update(status="scoring_error", reference_status="error", scene_score=None, error=_error_text(exc))
@@ -227,7 +226,6 @@ def main(argv=None):
     parser.add_argument("--scene", action="append", help="Exact catalog scene ID, repeatable. Default: all selected scenes")
     parser.add_argument("--config", type=Path, help="Optional catalog policy overrides")
     parser.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
-    parser.add_argument("--score-calibration", type=Path, help="Frozen calibration fitted from blinded ratings")
     parser.add_argument("--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)")
     parser.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     parser.add_argument("--progress", action="store_true", help="Write progress to stderr")
@@ -246,7 +244,6 @@ def main(argv=None):
         algorithm, implementation = None, {"candidate_dir": str(args.candidate_dir.resolve())}
     else:
         algorithm, implementation = _load_algorithm(args.algorithm)
-    calibration, calibration_hash = ScoreCalibration.load(args.score_calibration) if args.score_calibration else (None, None)
     start = perf_counter()
     catalog = SceneCatalog(root, datasets=args.dataset, config=args.config, lock=args.lock)
     selected = set(args.scene or catalog.scene_ids)
@@ -266,17 +263,16 @@ def main(argv=None):
         if args.progress and (dataset != last_dataset or index % 25 == 0):
             print(f"{index}/{len(scenes)} {scene.id} ({row['frame_count']} frames)", file=sys.stderr, flush=True)
         last_dataset = dataset
-        _run_scene(catalog, scene, row, algorithm, args, calibration)
+        _run_scene(catalog, scene, row, algorithm, args)
     score, scored_groups = _score(rows)
     statuses = Counter(row["status"] for row in rows)
     references = Counter(row["reference_status"] for row in rows)
     save_json(args.output / "report.json", {
-        "schema_version": 1, "score": score, "score_version": SCORE_VERSION,
-        "scoring": {"calibration": "ordinal_model" if calibration else "provisional_engineering_curve",
-                    "calibration_sha256": calibration_hash,
+        "schema_version": 2, "score": score, "score_version": SCORE_VERSION,
+        "scoring": {"family_weights": FAMILY_WEIGHTS, "view_weights": VIEW_WEIGHTS,
+                    "damage_scale": SCORE_DAMAGE_SCALE,
                     "runtime": {name: version(name) for name in ("bokehforge", "numpy", "scipy", "tifffile")},
-                    "python": sys.version.split()[0], "family_weights": None if calibration else FAMILY_WEIGHTS,
-                    "view_weights": None if calibration else VIEW_WEIGHTS,
+                    "python": sys.version.split()[0],
                     "aggregation": "equal datasets; equal leakage groups within each dataset"},
         "scored_groups": scored_groups, "cohort_sha256": cohort_hash, "algorithm": implementation,
         "data_root": str(root.resolve()), "decode_workers": args.decode_workers, "seconds": perf_counter() - start,

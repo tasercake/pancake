@@ -4,9 +4,9 @@ from dataclasses import dataclass
 
 import numpy as np
 from scipy import ndimage as ndi
-from scipy.special import expit
 
-SCORE_VERSION = "reference-readiness-v4"
+SCORE_VERSION = "reference-fidelity-v1"
+SCORE_DAMAGE_SCALE = 5
 FAMILY_WEIGHTS = {
     "tone": 0.17, "color": 0.16, "lost_detail": 0.18,
     "added_structure": 0.15, "boundary": 0.23, "range": 0.11,
@@ -221,16 +221,9 @@ def measure(candidate, target):
     return Measurement(features, {"views": views, "linear_rgb_rmse": rmse})
 
 
-def scene_score(measurement, calibration=None):
-    """Return the only optimization target, a bounded 0–100 scene score."""
+def scene_score(measurement):
+    """Apply the fixed reference-fidelity profile to the measured damage."""
     features = measurement.features
-    if not any(features.values()):
-        return 100.0
-    if calibration is not None:
-        damage = sum(weight * features[key] for key, weight in calibration.weights.items())
-        probabilities = expit(np.asarray(calibration.thresholds) - damage)
-        # Anchor a perfect delivery without adding a discontinuity at zero damage.
-        return float(100 * probabilities.sum() / expit(calibration.thresholds).sum())
     damage = sum(v * w * features[f"{view}.{family}"]
                  for view, v in VIEW_WEIGHTS.items() for family, w in FAMILY_WEIGHTS.items())
-    return float(100 * np.exp(-5 * damage))
+    return float(100 * np.exp(-SCORE_DAMAGE_SCALE * damage))
