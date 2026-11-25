@@ -309,6 +309,41 @@ dialog::backdrop { background: #090a0bdc; }
 .image-view.dragging { cursor: grabbing; }
 .lightbox-stage { display: grid; place-items: center; min-width: 100%; min-height: 100%; }
 .lightbox-stage img { display: block; user-select: none; -webkit-user-drag: none; }
+.lightbox-surface { position: relative; }
+.lightbox-reference { position: absolute; inset: 0; background: #0e1011; pointer-events: none; }
+.lightbox-reference img { width: 100%; height: 100%; object-fit: contain; }
+#reference-swipe[aria-pressed="true"] { border-color: var(--warm); color: var(--warm); background: #312a20; }
+.reference-divider {
+  position: absolute;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--warm);
+  box-shadow: 0 0 0 1px #101214;
+  pointer-events: none;
+}
+#reference-slider {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2.25rem;
+  height: 2.25rem;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--warm);
+  border-radius: 50%;
+  background: #191b1e;
+  color: var(--warm);
+  cursor: ew-resize;
+  touch-action: none;
+  pointer-events: auto;
+}
+#reference-slider::before {
+  content: "";
+  width: .45rem;
+  height: .8rem;
+  border-inline: 2px solid currentColor;
+}
 #lightbox-status {
   position: absolute;
   bottom: .6rem;
