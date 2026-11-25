@@ -167,22 +167,81 @@ function cancelLightboxRequests(state) {
   state.requests.clear();
 }
 
-function openLightbox(title, params, previewImage) {
-  if (activeImage) cancelLightboxRequests(activeImage);
-  const dialog = $("image-dialog");
-  const view = $("image-view");
+function lightboxSequence(data, gallery) {
+  const images = data.frames.map((frame, index) => ({
+    title: sourceFrameTitle(frame, index), params: { frame: frame.id },
+  }));
+  for (const output of data.outputs) {
+    if (output.status === "ready") images.push({
+      title: tools.get(output.stacker)?.label ?? "stacker output",
+      params: { scene: gallery.scene, run: gallery.run, stacker: output.stacker },
+    });
+  }
+  const reference = data.references[gallery.reference];
+  if (reference) images.push({ title: referenceTitle(reference), params: { frame: reference.id } });
+  return images;
+}
+
+function openLightbox(title, params, previewImage, sceneId = scene?.id) {
+  const previous = activeImage;
+  previous?.gallery.request?.abort();
+  if (previous) cancelLightboxRequests(previous);
   const stage = part("div", undefined, "lightbox-stage");
-  const state = {
-    title, params, stage, image: null, requests: new Set(), scale: 1,
-    actual: false, nativeRequested: false, nativeLoaded: false, pending: "",
-  };
-  activeImage = state;
+  $("image-view").replaceChildren(stage);
+  const entry = { title, params };
+  const currentScene = sceneId === scene?.id;
+  const gallery = { scene: sceneId, run: runId, reference: currentScene ? referenceIndex : 0, images: [entry] };
+  if (currentScene && details) {
+    gallery.images = lightboxSequence(details, gallery);
+  } else if (!currentScene && sceneId) {
+    gallery.request = new AbortController();
+    api(url("/api/scene", { scene: sceneId, run: gallery.run }), undefined, { signal: gallery.request.signal })
+      .then((data) => { gallery.images = lightboxSequence(data, gallery); })
+      .catch(() => {}); // The selected thumbnail is still available to inspect.
+  }
+  const dialog = $("image-dialog");
+  if (!dialog.open) dialog.showModal();
+  showLightboxImage(entry, gallery, stage, previewImage);
+  $("image-view").focus();
+}
+
+function moveLightbox(step) {
+  const state = activeImage;
+  const { gallery, stage } = state;
+  const { images } = gallery;
+  if (images.length < 2) return;
+  const { frame, stacker } = state.params;
+  const index = images.findIndex((entry) => frame ? entry.params.frame === frame : entry.params.stacker === stacker);
+  const next = index < 0 ? (step > 0 ? 0 : images.length - 1) : (index + step + images.length) % images.length;
+  const entry = images[next];
+  const { u, v } = lightboxAnchor();
+  cancelLightboxRequests(state);
+  // Keep the last rendered image and its label together until the next image loads.
+  showLightboxImage(entry, gallery, stage, undefined, {
+    image: state.image, scale: state.scale, actual: state.actual, position: { u, v },
+  });
+}
+
+function setLightboxTitle(title) {
   $("image-title").textContent = title;
   $("image-title").title = title;
-  view.replaceChildren(stage);
-  dialog.showModal();
-  const fallback = (previewImage?.complete && previewImage.naturalWidth &&
-                    (previewImage.currentSrc || previewImage.src)) || readyThumbs.get(imageURL(params, "thumb"));
+}
+
+function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
+  const { title, params } = entry;
+  const state = {
+    title, params, gallery, stage, image: null, requests: new Set(), scale: 1,
+    actual: false, position: null, nativeRequested: false, nativeLoaded: false, pending: "",
+    ...viewport,
+  };
+  activeImage = state;
+  if (!state.image) {
+    setLightboxTitle(title);
+    stage.replaceChildren();
+  }
+  const fallback = !state.image && ((previewImage?.complete && previewImage.naturalWidth &&
+                    (previewImage.currentSrc || previewImage.src)) ||
+    readyThumbs.get(imageURL(params, "thumb")));
   if (fallback) {
     const image = part("img");
     image.alt = title;
@@ -191,7 +250,9 @@ function openLightbox(title, params, previewImage) {
       state.image = image;
       stage.replaceChildren(image);
     } else {
+      state.requests.add(image);
       image.addEventListener("load", () => {
+        state.requests.delete(image);
         if (activeImage !== state || state.image) return;
         state.image = image;
         stage.replaceChildren(image);
@@ -199,20 +260,21 @@ function openLightbox(title, params, previewImage) {
       }, { once: true });
     }
   }
-  requestLightbox("fit");
+  requestLightbox(state.actual || state.scale > 1 ? "native" : "fit");
 }
 
 function lightboxAnchor(x, y) {
   const state = activeImage;
   const view = $("image-view");
   const rect = view.getBoundingClientRect();
+  const position = x === undefined && y === undefined ? state.position : null;
   x ??= rect.left + view.clientWidth / 2;
   y ??= rect.top + view.clientHeight / 2;
   const image = state.image?.getBoundingClientRect();
   return {
     x: x - rect.left, y: y - rect.top,
-    u: image?.width ? (x - image.left) / image.width : 0.5,
-    v: image?.height ? (y - image.top) / image.height : 0.5,
+    u: position?.u ?? (image?.width ? (x - image.left) / image.width : 0.5),
+    v: position?.v ?? (image?.height ? (y - image.top) / image.height : 0.5),
   };
 }
 
@@ -256,6 +318,7 @@ function requestLightbox(variant) {
     if (native) state.nativeLoaded = true;
     state.pending = !native && state.nativeRequested ? "Loading full resolution…" : "";
     state.image = image;
+    setLightboxTitle(state.title);
     state.stage.replaceChildren(image);
     paintLightbox(anchor);
   }, { once: true });
@@ -271,6 +334,7 @@ function requestLightbox(variant) {
 function zoomLightbox(scale, x, y) {
   const state = activeImage;
   const anchor = lightboxAnchor(x, y);
+  state.position = null;
   state.actual = false;
   state.scale = Math.max(1, Math.min(12, scale));
   if (state.scale > 1) requestLightbox("native");
@@ -289,6 +353,7 @@ function setPixelMode(actual) {
     zoomLightbox(1);
     return;
   }
+  activeImage.position = null;
   activeImage.actual = true;
   requestLightbox("native");
   paintLightbox();
@@ -300,12 +365,12 @@ function railItem(className) {
   return item;
 }
 
-function inspectButton(title, params, image) {
+function inspectButton(title, params, image, sceneId) {
   const button = part("button", undefined, "inspect-thumb");
   button.type = "button";
   button.title = "Inspect " + title;
   button.setAttribute("aria-label", button.title);
-  button.onclick = () => openLightbox(title, params, image);
+  button.onclick = () => openLightbox(title, params, image, sceneId);
   return button;
 }
 
@@ -322,7 +387,7 @@ function sceneEntry(item, index) {
   const text = part("span", undefined, "scene-entry-text");
   text.append(part("strong", item.name), part("small", `${item.dataset} · ${number.format(item.frames)} frames`));
   button.append(preview, text);
-  const inspect = inspectButton(`scene preview · ${item.name}`, params, image);
+  const inspect = inspectButton(`scene preview · ${item.name}`, params, image, item.id);
   preview.ondblclick = inspect.onclick;
   row.append(button, inspect);
   return row;
@@ -405,6 +470,8 @@ async function loadScene() {
     if (signal.aborted) return;
     const firstLoad = !details;
     details = data;
+    const gallery = activeImage?.gallery;
+    if (gallery?.scene === scene.id && gallery.run === runId) gallery.images = lightboxSequence(data, gallery);
     outputLoading = false;
     showMessage($("scene-error"), "");
     if (firstLoad) {
@@ -424,6 +491,10 @@ async function loadScene() {
   }
 }
 
+function sourceFrameTitle(frame, index) {
+  return `source frame ${index + 1} · ${frame.name}`;
+}
+
 function selectFrame(index) {
   const frame = details?.frames[index];
   if (!frame) return;
@@ -434,7 +505,7 @@ function selectFrame(index) {
   $("source-meta").textContent = frame.focus_distance_m === undefined
     ? `Frame ${index + 1} / ${details.frames.length}`
     : `${number.format(frame.focus_distance_m)} m · ƒ/${number.format(frame.aperture_f_number)}`;
-  showImage($("source-image"), `source frame ${index + 1} · ${frame.name}`, { frame: frame.id });
+  showImage($("source-image"), sourceFrameTitle(frame, index), { frame: frame.id });
   cancelWarmup();
   warmupTimer = setTimeout(() => {
     if (document.hidden) return;
@@ -451,10 +522,14 @@ function cancelWarmup() {
   warming = [];
 }
 
+function referenceTitle(frame) {
+  return `reference · ${frame.name}`;
+}
+
 function showReference() {
   const frame = details.references[referenceIndex];
   $("reference-meta").textContent = frame ? frame.name : "";
-  if (frame) showImage($("reference-image"), `reference · ${frame.name}`, { frame: frame.id });
+  if (frame) showImage($("reference-image"), referenceTitle(frame), { frame: frame.id });
   else placeholder($("reference-image"), "No ground truth available", details.reference_semantics);
 }
 
@@ -856,7 +931,10 @@ $("zoom-in").onclick = () => zoomLightbox(lightboxScale() * 1.5);
 $("zoom-out").onclick = () => zoomLightbox(lightboxScale() / 1.5);
 const lightboxView = $("image-view");
 lightboxView.addEventListener("wheel", (event) => {
-  if (event.shiftKey) return;
+  if (event.shiftKey) {
+    activeImage.position = null;
+    return;
+  }
   event.preventDefault();
   const units = event.deltaMode ? 20 : 1;
   const scale = Math.exp(Math.max(-1, Math.min(1, -event.deltaY * units / 300)));
@@ -865,21 +943,37 @@ lightboxView.addEventListener("wheel", (event) => {
 lightboxView.addEventListener("dblclick", (event) => {
   zoomLightbox(lightboxScale() > 1 ? 1 : 2, event.clientX, event.clientY);
 });
-$("image-dialog").addEventListener("keydown", (event) => {
+document.addEventListener("keydown", (event) => {
+  if (!activeImage || !$("image-dialog").open || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+    event.preventDefault();
+    moveLightbox(event.key === "ArrowLeft" ? -1 : 1);
+    return;
+  }
+  if (event.target === lightboxView &&
+      ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
+    activeImage.position = null;
+  }
   const zoom = { "+": 1.5, "=": 1.5, "-": 1 / 1.5 }[event.key];
-  if (event.ctrlKey || event.metaKey || event.altKey || (!zoom && event.key !== "0")) return;
+  if (!zoom && event.key !== "0") return;
   event.preventDefault();
   zoomLightbox(zoom ? lightboxScale() * zoom : 1);
 });
 let panStart = null;
 lightboxView.addEventListener("pointerdown", (event) => {
-  if (event.pointerType === "touch" || event.button !== 0 || !lightboxView.classList.contains("pannable")) return;
+  if (!lightboxView.classList.contains("pannable")) return;
+  if (event.pointerType === "touch") {
+    activeImage.position = null;
+    return;
+  }
+  if (event.button !== 0) return;
   lightboxView.setPointerCapture(event.pointerId);
   panStart = { x: event.clientX, y: event.clientY, left: lightboxView.scrollLeft, top: lightboxView.scrollTop };
   lightboxView.classList.add("dragging");
 });
 lightboxView.addEventListener("pointermove", (event) => {
   if (!panStart) return;
+  activeImage.position = null;
   lightboxView.scrollTo(panStart.left + panStart.x - event.clientX, panStart.top + panStart.y - event.clientY);
 });
 lightboxView.addEventListener("lostpointercapture", () => {
@@ -889,6 +983,7 @@ lightboxView.addEventListener("lostpointercapture", () => {
 $("image-dialog").addEventListener("close", (event) => {
   if (event.currentTarget.open || !activeImage) return;
   cancelLightboxRequests(activeImage);
+  activeImage.gallery.request?.abort();
   activeImage = null;
   lightboxView.replaceChildren();
 });
