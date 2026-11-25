@@ -107,7 +107,7 @@ def _sign_and_verify(source, executable, identifier, *, bundle=False):
     return {"verification": verified, "display": display}
 
 
-def build_package(source, output, identifier, build_number):
+def build_package(source, output, identifier, build_number, *, target_dir=None):
     """Build, stage, and verify one private package on native Apple Silicon."""
     if platform.system() != "Darwin" or platform.machine() != "arm64":
         raise ValueError("Package on an Apple Silicon macOS host running an arm64 process")
@@ -119,6 +119,10 @@ def build_package(source, output, identifier, build_number):
         raise FileExistsError(f"Package output already exists: {output}")
     source = source.resolve(strict=True)
     output = output.resolve()
+    if target_dir is not None:
+        target_dir = target_dir.resolve()
+        if target_dir.is_relative_to(output):
+            raise ValueError("Keep the Cargo target directory outside the package output")
     identity = _source_identity(source)
     metadata = _bundle_metadata(source, identifier, build_number)
     with (source / "rust-toolchain.toml").open("rb") as pin:
@@ -127,14 +131,14 @@ def build_package(source, output, identifier, build_number):
 
     with tempfile.TemporaryDirectory(prefix=".pancake-macos-", dir=output.parent) as scratch:
         temporary = Path(scratch)
-        target_dir = temporary / "target"
+        build_dir = temporary / "target" if target_dir is None else target_dir
         payload = temporary / "package"
         app = payload / "Pancake.app"
         contents = app / "Contents"
         gui_dir = contents / "MacOS"
         gui_dir.mkdir(parents=True)
         build = ["cargo", toolchain, "build", "--locked", "--release", "--workspace", "--bins",
-                 "--target", TARGET, "--features", "cubecl/metal-native", "--target-dir", str(target_dir)]
+                 "--target", TARGET, "--features", "cubecl/metal-native", "--target-dir", str(build_dir)]
         sdk = ("xcrun", "--no-cache", "--sdk", "macosx")
         provenance = {
             "cargo": _apple(source, "cargo", toolchain, "--version"),
@@ -148,7 +152,7 @@ def build_package(source, output, identifier, build_number):
         }
         overrides = {name: os.environ[name] for name in BUILD_OVERRIDES if name in os.environ}
         (payload / "build.log").write_text(_apple(source, *build), encoding="utf-8")
-        release = target_dir / TARGET / "release"
+        release = build_dir / TARGET / "release"
         plist = contents / "Info.plist"
         plist.write_bytes(plistlib.dumps(metadata, fmt=plistlib.FMT_XML))
         plist_check = _apple(source, "plutil", "-lint", plist)
@@ -208,10 +212,12 @@ def main(argv=None):
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--bundle-identifier", required=True)
     parser.add_argument("--build-number", required=True)
+    parser.add_argument("--target-dir", type=Path,
+                        help="Reuse a Cargo target directory for this checkout (default: a temporary directory)")
     options = parser.parse_args(argv)
     try:
         build_package(Path(__file__).resolve().parents[1], options.output,
-                      options.bundle_identifier, options.build_number)
+                      options.bundle_identifier, options.build_number, target_dir=options.target_dir)
     except (ValueError, OSError, subprocess.CalledProcessError) as error:
         parser.exit(1, f"{error}\n")
 

@@ -27,6 +27,10 @@ from the same directory. It writes `stacked.tif` in the current directory.
 cargo run --locked --release -p pancake-cli -- --cpu --input ../assets/quickstart/focus-near.png ../assets/quickstart/focus-far.png --output stacked.tif
 ```
 
+For CLI-only builds, use `cargo build --locked --release -p pancake-cli` to
+skip compiling the desktop dependencies. Add `--timings` to a Cargo build to
+see per-crate compile times in the generated HTML report.
+
 For packaged builds, use the [release guide](docs/releases.md).
 
 ## Tests and assurance

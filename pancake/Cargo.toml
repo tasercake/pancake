@@ -131,8 +131,6 @@ unescaped_backticks = "deny"
 
 [profile.release]
 overflow-checks = true
-lto = "thin"
-codegen-units = 1
 
 [profile.test]
 overflow-checks = true
