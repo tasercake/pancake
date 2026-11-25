@@ -9,7 +9,7 @@ from scipy import optimize, signal
 
 from .scoring import _measure, scene_score, validate_rgb
 
-CROP_SCORE_VERSION = "reference-fidelity-crop-v1"
+CROP_SCORE_VERSION = "reference-fidelity-crop-v2"
 MAX_ROTATION_DEGREES = 3.0
 _SEARCH_SIDE = 384
 _MAX_HYPOTHESES = 3

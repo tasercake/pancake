@@ -21,7 +21,7 @@ def test_exact_match_preserves_grain_bokeh_and_headroom():
     assert scene_score(measurement) == 100
     assert set(measurement.features.values()) == {0}
     assert measurement.diagnostics["linear_rgb_rmse"] == 0
-    assert len(measurement.diagnostics["views"]["zoom"]) == 5
+    assert set(measurement.diagnostics["views"]) == {"native"}
 
 
 def test_missing_nyquist_detail_grows_continuously_in_four_directions():
@@ -83,19 +83,21 @@ def test_native_coverage_finds_localized_defects_and_preserves_coordinates():
     candidate[28:44, 196:208] = 0.62
     measurement = measure(candidate, target)
     views = measurement.diagnostics["views"]
-    assert views["fit"][0]["view_size_wh"][0] == 640
-    assert max(zoom["view_size_wh"][0] for zoom in views["zoom"]) == 192
-    native = views["native"][0]["families"]["tone"]
+    assert set(views) == {"native"}
+    view, = views["native"]
+    assert view["view_size_wh"] == (740, 151)
+    assert set(measurement.features) == set(FEATURES)
+    native = view["families"]["tone"]
     left, top, right, bottom = native["worst_box_native_xyxy"]
     assert left < 208 and right > 196 and top < 44 and bottom > 28
     assert native["tail"] > native["mean"]
     assert scene_score(measurement) < 100
 
 
-def test_fixed_profile_combines_view_and_family_weights():
+def test_fixed_profile_combines_native_family_weights():
     features = dict.fromkeys(FEATURES, 0.0)
-    features.update({"fit.color": 0.2, "native.boundary": 0.6, "zoom.lost_detail": 0.3})
-    damage = 0.30 * 0.16 * 0.2 + 0.50 * 0.23 * 0.6 + 0.20 * 0.18 * 0.3
+    features.update({"native.color": 0.2, "native.boundary": 0.6, "native.lost_detail": 0.3})
+    damage = 0.16 * 0.2 + 0.23 * 0.6 + 0.18 * 0.3
     assert scene_score(Measurement(features, {})) == pytest.approx(100 * np.exp(-5 * damage))
     assert scene_score(Measurement(dict.fromkeys(FEATURES, 1.0), {})) == pytest.approx(100 * np.exp(-5))
 
