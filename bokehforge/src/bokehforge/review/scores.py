@@ -7,6 +7,8 @@ from threading import Condition, Thread
 from ..bench import has_benchmark_reference, score_saved_output
 from ..scoring import SCORE_VERSION
 
+_INVALID_DETAIL_VERSION = 1
+
 
 class Scores:
     def __init__(self, on_change):
@@ -37,8 +39,11 @@ class Scores:
                 return self.recent[key]
             try:
                 saved = json.loads(receipt.read_text(encoding="utf-8"))
-                if saved["identity"] == list(identity):
-                    return saved["result"]
+                result = saved["result"]
+                current_details = (result["status"] != "invalid_output"
+                                   or saved.get("invalid_detail_version") == _INVALID_DETAIL_VERSION)
+                if saved["identity"] == list(identity) and current_details:
+                    return result
             except (OSError, ValueError, KeyError, TypeError):
                 pass
             if not self.closed and self.active != key:
@@ -80,7 +85,8 @@ class Scores:
         pending = receipt.with_suffix(".tmp")
         try:
             receipt.parent.mkdir(parents=True, exist_ok=True)
-            pending.write_text(json.dumps({"identity": identity, "result": result}) + "\n", encoding="utf-8")
+            saved = {"identity": identity, "result": result, "invalid_detail_version": _INVALID_DETAIL_VERSION}
+            pending.write_text(json.dumps(saved) + "\n", encoding="utf-8")
             pending.replace(receipt)
         except OSError:
             # The score can still be displayed from memory with a read-only store.

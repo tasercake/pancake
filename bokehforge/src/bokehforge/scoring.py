@@ -28,11 +28,19 @@ class Measurement:
 
 def validate_rgb(pixels, shape=None):
     """Check the delivery grid, precision, and finite sample contract."""
-    if (not isinstance(pixels, np.ndarray) or pixels.dtype.kind != "f" or pixels.dtype.itemsize != 4
-            or pixels.ndim != 3 or pixels.shape[2] != 3 or not all(pixels.shape)
-            or (shape is not None and pixels.shape != shape) or not np.isfinite(pixels).all()):
-        grid = "HxWx3" if shape is None else str(shape)
-        raise ValueError(f"Expected finite float32 linear-sRGB RGB on the {grid} grid")
+    if not isinstance(pixels, np.ndarray):
+        raise ValueError("The benchmark requires an RGB image array.")
+    if pixels.ndim != 3 or pixels.shape[2] != 3 or not all(pixels.shape):
+        raise ValueError(f"The benchmark requires a nonempty RGB image with three channels. "
+                         f"The image has array shape {pixels.shape}.")
+    if shape is not None and pixels.shape != shape:
+        raise ValueError(f"The image is {pixels.shape[1]} × {pixels.shape[0]} pixels. The benchmark requires "
+                         f"the reference's native dimensions of {shape[1]} × {shape[0]} pixels.")
+    if pixels.dtype.kind != "f" or pixels.dtype.itemsize != 4:
+        raise ValueError(f"The image uses {pixels.dtype} samples. "
+                         "The benchmark requires 32-bit floating-point linear-sRGB samples.")
+    if not np.isfinite(pixels).all():
+        raise ValueError("The image contains non-finite pixel values (NaN or infinity).")
 
 
 def _lab(rgb):

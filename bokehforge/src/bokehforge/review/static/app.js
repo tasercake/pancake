@@ -848,13 +848,17 @@ function renderReference() {
 const benchmarkNumber = new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function renderBenchmark(label, benchmark, compact = false) {
-  label.hidden = !benchmark;
+  const line = label.parentElement;
+  const info = label.nextElementSibling;
+  const invalid = benchmark?.status === "invalid_output" && benchmark.score === 0;
+  line.hidden = !benchmark;
+  info.hidden = !invalid;
   const scored = benchmark?.score != null;
   let text = "";
   if (scored) {
     const value = benchmarkNumber.format(benchmark.score);
     text = compact ? `Score ${value} / 100` : `Benchmark score ${value} / 100`;
-    if (!compact && benchmark.status === "invalid_output") text += " · Invalid delivery";
+    if (invalid) text += " · Invalid delivery";
   } else if (benchmark) {
     const messages = compact
       ? { pending: "Scoring…", unscored: "Unscored" }
@@ -862,8 +866,14 @@ function renderBenchmark(label, benchmark, compact = false) {
     text = messages[benchmark.status] ?? "Benchmark score unavailable";
   }
   if (label.textContent !== text) label.textContent = text;
-  label.dataset.scored = scored;
-  label.title = [benchmark?.profile, benchmark?.error].filter(Boolean).join(" · ");
+  line.dataset.scored = scored;
+  label.title = benchmark?.profile ?? "";
+  info.dataset.reason = invalid ? benchmark.error || "The delivery failed the benchmark's image requirements." : "";
+}
+
+function showBenchmarkReason(button) {
+  $("benchmark-reason").textContent = button.dataset.reason;
+  $("benchmark-details").showModal();
 }
 
 function renderOutput() {
@@ -1383,7 +1393,13 @@ lightboxView.addEventListener("dblclick", (event) => {
   zoomLightbox(lightboxScale() > 1 ? 1 : 2, event.clientX, event.clientY);
 });
 document.addEventListener("keydown", (event) => {
-  if (!activeImage || !$("image-dialog").open || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (!activeImage || !$("image-dialog").open || $("benchmark-details").open ||
+      event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.key.toLowerCase() === "i") {
+    const button = $("lightbox-benchmark").nextElementSibling;
+    if (!button.hidden && !event.repeat) showBenchmarkReason(button);
+    return;
+  }
   if (event.key === ".") {
     if (activeImage.gallery.referenceFrame) {
       event.preventDefault();
@@ -1447,6 +1463,7 @@ $("image-dialog").addEventListener("close", (event) => {
 new ResizeObserver(() => {
   if (activeImage) paintLightbox();
 }).observe(lightboxView);
+for (const button of document.querySelectorAll(".benchmark-info")) button.onclick = () => showBenchmarkReason(button);
 for (const button of document.querySelectorAll("[data-close]")) button.onclick = () => $(button.dataset.close).close();
 document.addEventListener("keydown", (event) => {
   if (!scene || document.querySelector("dialog[open]") ||
