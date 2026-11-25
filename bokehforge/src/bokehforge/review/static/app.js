@@ -31,6 +31,10 @@ let activeImage = null, imageVersion = "";
 const readyThumbs = new Map();
 const panelImages = new WeakMap();
 
+function stackerLabel(id) {
+  return tools.get(id)?.label ?? (id === "zerene" ? "Zerene Stacker" : id);
+}
+
 function url(path, params = {}) {
   return path + "?" + new URLSearchParams(params);
 }
@@ -179,7 +183,7 @@ function setLightboxGallery(gallery, data) {
   }));
   for (const output of data.outputs) {
     if (output.status === "ready") images.push({
-      title: tools.get(output.stacker)?.label ?? "stacker output",
+      title: stackerLabel(output.stacker),
       params: { scene: gallery.scene, run: gallery.run, stacker: output.stacker },
     });
   }
@@ -661,7 +665,7 @@ function renderOutput() {
     const tabStrip = $("output-tabs");
     const focused = tabStrip.contains(document.activeElement) ? document.activeElement.dataset.stacker : null;
     const tabs = outputs.map((output) => {
-      const button = part("button", tools.get(output.stacker)?.label ?? output.stacker);
+      const button = part("button", stackerLabel(output.stacker));
       button.type = "button";
       button.dataset.stacker = output.stacker;
       button.title = unavailable[output.status]?.[0] ?? "View stacker output";
@@ -681,12 +685,12 @@ function renderOutput() {
   const params = { scene: scene.id, run: runId, stacker: stackerId };
   const currentImage = JSON.stringify([params, row?.status, row?.image, row?.error, !details || outputLoading]);
   if (candidateState !== currentImage) {
-    const tool = row && tools.get(stackerId);
-    $("candidate-meta").textContent = tool?.label ?? "";
-    $("candidate-meta").title = tool?.method ?? "";
+    const method = runs.find((run) => run.id === runId)?.methods?.[stackerId];
+    $("candidate-meta").textContent = row ? stackerLabel(stackerId) : "";
+    $("candidate-meta").title = row ? method ?? tools.get(stackerId)?.method ?? "" : "";
     const well = $("candidate-image");
     if (row?.status === "ready") {
-      showImage(well, tool?.label ?? "stacker output", params);
+      showImage(well, stackerLabel(stackerId), params);
     } else if (row) {
       const [title, description] = unavailable[row.status];
       placeholder(well, title, row.error || description, row.log ? url("/api/log", params) : "");
@@ -706,7 +710,7 @@ function ratingKey() {
 
 function renderRating(row) {
   const ready = row?.status === "ready";
-  $("rating-title").textContent = ready ? "Rate " + (tools.get(row.stacker)?.label ?? row.stacker) : "Rate outputs";
+  $("rating-title").textContent = ready ? "Rate " + stackerLabel(row.stacker) : "Rate outputs";
   $("rating-form").hidden = !ready;
   $("rating-empty").hidden = ready;
   $("rating-empty").textContent = row || outputLoading || !details
@@ -783,7 +787,7 @@ function renderRuns() {
     const stopped = stopping === banner.id;
     const setup = banner.setup;
     const settingUp = setup && banner.status === "running";
-    const setupLabel = tools.get(setup?.stacker)?.label ?? setup?.stacker;
+    const setupLabel = stackerLabel(setup?.stacker);
     $("run-status").textContent = stopped ? "Stopping evaluation…" :
       settingUp ? `Setting up ${setupLabel}` : runStates[banner.status];
     $("run-detail").textContent = (settingUp ? setup.message : banner.error) ??
@@ -819,6 +823,69 @@ function applyRuns(history) {
   renderRuns();
 }
 
+function toolSetting(key, setting) {
+  const label = part("label", undefined, "tool-setting");
+  const control = part(setting.choices ? "select" : "input");
+  control.dataset.setting = key;
+  if (setting.choices) {
+    control.append(...Object.entries(setting.choices).map(([value, text]) => new Option(text, value)));
+    control.value = setting.default;
+  } else if (typeof setting.default === "boolean") {
+    control.type = "checkbox";
+    control.checked = setting.default;
+    label.classList.add("tool-flag");
+  } else {
+    control.type = "number";
+    control.min = setting.minimum;
+    control.max = setting.maximum;
+    control.step = setting.step;
+    control.value = setting.default;
+    control.required = true;
+  }
+  const text = part("span", setting.label);
+  label.append(...(control.type === "checkbox" ? [control, text] : [text, control]));
+  return { label, control, when: setting.when };
+}
+
+function toolOption(tool, prepared) {
+  const card = part("div", undefined, "tool-option");
+  const label = part("label", undefined, "tool-option-label");
+  const checkbox = part("input");
+  checkbox.type = "checkbox";
+  checkbox.name = "stacker";
+  checkbox.value = tool.id;
+  const ready = tool.available || (!tool.setup_hint && prepared.has(tool.id));
+  checkbox.checked = ready;
+  const subtitle = part("span");
+  label.append(checkbox, part("strong", tool.label), subtitle);
+
+  const details = part("details", undefined, "tool-settings");
+  const summary = part("summary", "Settings");
+  summary.setAttribute("aria-label", tool.label + " settings");
+  const grid = part("div", undefined, "tool-settings-grid");
+  const settings = new Map(Object.entries(tool.options).map(([key, setting]) => [key, toolSetting(key, setting)]));
+  grid.append(...Array.from(settings.values(), ({ label }) => label));
+  const update = () => {
+    for (const { label, control, when } of settings.values()) {
+      const hidden = Boolean(when && settings.get(when[0]).control.value !== when[1]);
+      label.hidden = hidden;
+      control.disabled = hidden;
+    }
+    const fusion = settings.get("method")?.control;
+    const method = fusion?.selectedOptions[0]?.text ?? tool.method;
+    const hint = ready ? "" :
+      tool.setup_hint ? " · Local installation required" : " · Sets up on first run";
+    subtitle.textContent = method + hint;
+    subtitle.title = tool.setup_hint && !tool.available ? tool.setup_hint : subtitle.textContent;
+  };
+  details.addEventListener("change", update);
+  details.append(summary, grid);
+  if (tool.setup_hint && !tool.available) details.append(part("p", tool.setup_hint, "tool-setup-hint muted"));
+  card.append(label, details);
+  update();
+  return card;
+}
+
 function openRunDialog() {
   const scope = $("scope");
   scope.replaceChildren(new Option("Current scene", "scene"), new Option("Current dataset", "dataset"),
@@ -834,19 +901,7 @@ function openRunDialog() {
   };
   scope.onchange();
   const prepared = new Set(runs.flatMap((run) => run.prepared ?? []));
-  const choices = [...tools.values()].map((tool) => {
-    const label = part("label", undefined, "tool-option");
-    const checkbox = part("input");
-    checkbox.type = "checkbox";
-    checkbox.name = "stacker";
-    checkbox.value = tool.id;
-    checkbox.checked = tool.available || prepared.has(tool.id);
-    const subtitle = part("span", checkbox.checked ? tool.method : `${tool.method} · Sets up on first run`);
-    subtitle.title = subtitle.textContent;
-    label.append(checkbox, part("strong", tool.label), subtitle);
-    return label;
-  });
-  $("available-tools").replaceChildren(...choices);
+  $("available-tools").replaceChildren(...Array.from(tools.values(), (tool) => toolOption(tool, prepared)));
   $("start-run").disabled = false;
   showMessage($("run-error"), "");
   $("new-run").showModal();
@@ -859,9 +914,26 @@ async function startRun(event) {
     showMessage($("run-error"), "Choose at least one stacking program.");
     return;
   }
+  const options = {};
+  for (const checkbox of event.target.querySelectorAll('input[name="stacker"]:checked')) {
+    const details = checkbox.closest(".tool-option").querySelector(".tool-settings");
+    const settings = {};
+    for (const input of details.querySelectorAll("[data-setting]:enabled")) {
+      if (!input.validity.valid) {
+        details.open = true;
+        input.reportValidity();
+        return;
+      }
+      settings[input.dataset.setting] = input.type === "checkbox" ? input.checked :
+        input.type === "number" ? input.valueAsNumber : input.value;
+    }
+    options[checkbox.value] = settings;
+  }
   $("start-run").disabled = true;
   try {
-    const result = await api("/api/runs", { scope: $("scope").value, scene: scene.id, dataset: scene.dataset, stackers });
+    const result = await api("/api/runs", {
+      scope: $("scope").value, scene: scene.id, dataset: scene.dataset, stackers, options,
+    });
     $("new-run").close();
     changeRun(result.id);
   } catch (error) {

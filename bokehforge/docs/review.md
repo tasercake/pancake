@@ -18,13 +18,27 @@ Select an evaluation and a stacker to compare its output with a source frame and
 
 ## Set up the stackers
 
-Every stacker is selectable in **New evaluation**. When you start the run, Review uses any stackers it can already find and prepares the others before processing scenes. First-time setup may download dependencies. The run banner shows what is being installed, and setup failures include a log for the affected stacker. Other selected stackers can continue when one setup fails.
+Choose the stackers in **New evaluation**. When you start the run, Review uses the available open-source stackers and prepares any others you selected before processing scenes. First-time setup may download dependencies. The run banner shows what is being installed, and setup failures include a log for the affected stacker. Other selected stackers can continue when one setup fails.
 
 Review builds Pancake with its pinned Rust toolchain and lockfile. The host needs [Rust with rustup and the platform's build tools](../../pancake/DEVELOPING.md#build-from-source) for this step. Focus-stack uses the publisher's checksum-verified release where it matches the pinned submodule and host platform. The source-build fallback uses the host's C++ tools and OpenCV development files. OpenFocus and ShineStacker install from their pinned submodules into separate Python environments under the review store's `tools/` folder. Review reuses completed setups on subsequent runs.
 
 Use `--pancake`, `--focus-stack`, `--openfocus`, or `--shine-python` to use an existing executable or the Python interpreter with ShineStacker installed. Review also recognizes the repository's standard build and submodule environment paths, and looks for the Pancake, focus-stack, and OpenFocus commands on `PATH`.
 
-Select **New evaluation**, pick the current scene, its dataset, or all indexed datasets, and choose the tools. Each job runs serially in the background while you browse. It prepares full-resolution 16-bit sRGB TIFFs from BokehForge's linear frames, clipping to the SDR range for the external tools. Each tool uses its own processing precision. Runs use Pancake's default fusion on CPU, focus-stack's default complex-wavelet method, OpenFocus's StackMFF V3 on CPU, and ShineStacker's alignment and pyramid stack. Large stacks can take substantial time, memory, and temporary disk space. Stop a run from its progress banner. Any outputs already saved remain reviewable.
+On macOS and Windows, **Zerene Stacker** uses the licensed or trial installation on the computer running Review. Sign in to the desktop on that computer, open Zerene once to record its launch settings, then quit the interactive app before starting an evaluation. Review runs its local Java batch process and saves the result alongside the other stackers. The Zerene option is hidden on Linux. See the [Zerene Batch API](https://zerenesystems.com/cms/stacker/docs/batchapi).
+
+## Configure an evaluation
+
+Select the current scene, its dataset, or all indexed datasets. Each stacker has a **Settings** accordion. Leave it closed for a quick run with the defaults, or open it to choose processing options.
+
+| Stacker | Quick-run settings | Options |
+| --- | --- | --- |
+| Pancake | Hybrid fusion, alignment off, automatic device | Fusion method, alignment, cropping, CPU or GPU selection |
+| focus-stack | Aligned complex-wavelet fusion, OpenCL when available | Alignment, cropping, consistency filter, denoise strength, CPU or automatic OpenCL |
+| OpenFocus | StackMFF V3 with soft blending and exposure matching, alignment off, automatic device | Fusion method, alignment, exposure matching, V3 blend mode, CPU or automatic acceleration for supported methods |
+| ShineStacker | Aligned pyramid fusion | Pyramid or depth map fusion, alignment, pyramid window size |
+| Zerene Stacker | Aligned PMax fusion | PMax or DMap, alignment, DMap contrast percentile and filtering radii |
+
+ShineStacker and Zerene use their built-in processing without a GPU setting. Each job runs serially in the background while you browse. Review prepares full-resolution 16-bit sRGB TIFFs from BokehForge's linear frames, clipping to the SDR range for the external tools. Large stacks can take substantial time, memory, and temporary disk space. Stop a run from its progress banner. Any outputs already saved remain reviewable.
 
 ## Local files
 
@@ -35,7 +49,7 @@ ratings.sqlite3
 previews-v2/                                    # Bounded display cache, rebuilt as needed
 tools/                                          # Automatically installed stackers
 runs/<run-id>/
-  run.json                                      # Scope, cohort, methods, and interchange format
+  run.json                                      # Scope, cohort, settings, and interchange format
   progress.json                                 # Job state and output totals
   <stacker-id>/
     setup.log                                  # First-run setup output, when needed

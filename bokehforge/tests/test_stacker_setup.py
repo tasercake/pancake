@@ -9,13 +9,14 @@ import pytest
 import tifffile
 
 from bokehforge.review import runs
+from bokehforge.review.stackers import Stacker
 from bokehforge.review.stacker_setup import RunSignal, RunStopped, StackerSetup, run_logged
 
 
 def test_evaluation_prepares_missing_tools_and_keeps_independent_results(tmp_path, monkeypatch):
     devices = {
-        "focus-stack": runs.Stacker("focus-stack", "focus-stack", "Wavelet", ()),
-        "openfocus": runs.Stacker("openfocus", "OpenFocus", "StackMFF V3", ()),
+        "focus-stack": Stacker("focus-stack", "focus-stack", "Wavelet", ()),
+        "openfocus": Stacker("openfocus", "OpenFocus", "StackMFF V3", ()),
     }
     batches = runs.Runs(tmp_path, devices)
     scene = SimpleNamespace(id="Demo/scene", frame_ids=(), reference_ids=(),
@@ -61,7 +62,7 @@ def test_evaluation_prepares_missing_tools_and_keeps_independent_results(tmp_pat
 def test_setup_reuses_checked_tool_without_running_installer(tmp_path, monkeypatch):
     setup = StackerSetup(tmp_path, repo=tmp_path)
     setup.pins = {".submodules/OpenFocus": "abc"}
-    tool = runs.Stacker("openfocus", "OpenFocus", "V3", ())
+    tool = Stacker("openfocus", "OpenFocus", "V3", ())
     installs = []
 
     def install(tool, directory, log, stop, tell):

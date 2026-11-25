@@ -14,6 +14,8 @@ from threading import Condition, Event, Thread
 from urllib.request import urlopen
 from zipfile import ZipFile
 
+from . import _zerene
+
 REPO = Path(__file__).resolve().parents[4]
 BIN_DIR = "Scripts" if os.name == "nt" else "bin"
 EXE = ".exe" if os.name == "nt" else ""
@@ -169,6 +171,11 @@ class StackerSetup:
         return self.root / stacker / pin if pin else None
 
     def available(self, tool):
+        if tool.id == "zerene":
+            try:
+                return _zerene.launch_command(_zerene.preferences_directory())[0]
+            except (OSError, ValueError):
+                return None
         if configured := executable(*tool.candidates):
             return configured
         directory = self._directory(tool.id)
@@ -272,6 +279,8 @@ class StackerSetup:
             return binary
 
     def prepare(self, tool, log, stop, tell):
+        if tool.id == "zerene":
+            return _zerene.launch_command(_zerene.preferences_directory())[0]
         if found := self.available(tool):
             return found
         if tool.id == "pancake":
@@ -290,7 +299,7 @@ class StackerSetup:
         if tool.id == "shinestacker":
             # Import the same modules as the headless runner without launching a stack.
             check = [str(binary), "-c", (
-                "from shinestacker.algorithms import AlignFrames, CombinedActions, FocusStack, PyramidStack, StackJob; "
+                "from shinestacker.algorithms import AlignFrames, CombinedActions, DepthMapStack, FocusStack, PyramidStack, StackJob; "
                 "from shinestacker.config.config import config")]
         run_logged(check, self.repo, log, stop, f"Checking {tool.label}", timeout=60)
         if tool.id != "pancake":

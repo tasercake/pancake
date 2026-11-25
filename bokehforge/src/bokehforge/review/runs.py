@@ -1,7 +1,7 @@
 """Local evaluation batches and their durable, per-scene results."""
 
 from contextlib import contextmanager
-from dataclasses import dataclass, replace
+from dataclasses import replace
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
@@ -12,46 +12,11 @@ from tempfile import TemporaryDirectory
 from threading import Lock, Thread
 from uuid import uuid4
 
+from . import _zerene
 from .images import normalize_output, stage_frame
-from .stacker_setup import BIN_DIR, EXE, REPO, RunSignal, RunStopped, StackerSetup, run_logged
+from .stacker_setup import RunSignal, RunStopped, StackerSetup, run_logged
 
 RUN_ID = re.compile(r"\d{8}T\d{12}Z-[a-f0-9]{8}")
-
-
-@dataclass(frozen=True)
-class Stacker:
-    id: str
-    label: str
-    method: str
-    candidates: tuple[str | Path, ...]
-    executable: str | None = None
-
-    def command(self, frames, output):
-        if self.id == "pancake":
-            return [self.executable, "--cpu", "--bit-depth", "16", "--output", output, "--input", *frames]
-        if self.id == "focus-stack":
-            return [self.executable, f"--output={output}", *frames]
-        if self.id == "openfocus":
-            return [self.executable, "-i", "frames", "-o", output, "--frame-order", "name", "-m", "stackmffv3", "--cpu"]
-        return [self.executable, str(Path(__file__).with_name("_shine.py")), "frames", output]
-
-
-def configured_stackers(args):
-    modules = REPO / ".submodules"
-    pancake = "pancake-cli" + EXE
-    focus = "focus-stack" + EXE
-    openfocus = "openfocus" + EXE
-    python = "python" + EXE
-    return {tool.id: tool for tool in (
-        Stacker("pancake", "Pancake", "Default fusion · CPU",
-                (args.pancake,) if args.pancake else (REPO / "pancake/target/release" / pancake, pancake)),
-        Stacker("focus-stack", "focus-stack", "Complex wavelet",
-                (args.focus_stack,) if args.focus_stack else (modules / "focus-stack/build" / focus, focus)),
-        Stacker("openfocus", "OpenFocus", "StackMFF V3 · CPU",
-                (args.openfocus,) if args.openfocus else (modules / "OpenFocus/.venv" / BIN_DIR / openfocus, openfocus)),
-        Stacker("shinestacker", "ShineStacker", "Alignment + Pyramid",
-                (args.shine_python,) if args.shine_python else (modules / "shinestacker/.venv" / BIN_DIR / python,)),
-    )}
 
 
 def _now():
@@ -113,6 +78,18 @@ def lock_store(directory):
 
 
 def _render(tool, frames, work, log, stop):
+    if tool.id == "zerene":
+        preferences = _zerene.preferences_directory()
+        destination = work / "zerene"
+        destination.mkdir()
+        batch = destination / "batch.xml"
+        options = dict(tool.options)
+        method = options.pop("method")
+        _zerene.write_batch(batch, destination, (method,), **options)
+        command = _zerene.batch_command(_zerene.launch_command(preferences), batch, (work / frame for frame in frames))
+        with _zerene.batch_lock(preferences):
+            run_logged(command, work, log, stop, tool.label, timeout=3600)
+        return _zerene.batch_output(destination, method)
     delivery = f"{tool.id}.tif"
     run_logged(tool.command(frames, delivery), work, log, stop, tool.label)
     return work / delivery
@@ -135,7 +112,9 @@ class Runs:
 
     def tooling(self):
         return [{"id": tool.id, "label": tool.label, "method": tool.method,
-                 "available": self.setup.available(tool) is not None}
+                 "available": self.setup.available(tool) is not None,
+                 "options": tool.describe_options(),
+                 **({"setup_hint": _zerene.INSTALL_HINT} if tool.id == "zerene" else {})}
                 for tool in self.stackers.values()]
 
     def list(self):
@@ -179,13 +158,17 @@ class Runs:
             rows.append({"stacker": stacker, **row})
         return rows
 
-    def start(self, catalog, scene_ids, stacker_ids, scope):
+    def start(self, catalog, scene_ids, stacker_ids, scope, options=None):
+        if options is None:
+            options = {}
         with self.lock:
             if self.worker is not None and self.worker.is_alive():
                 raise RuntimeError("An evaluation is already running")
             if not stacker_ids or any(key not in self.stackers for key in stacker_ids):
                 raise ValueError("Select at least one supported stacker")
-            tools = [self.stackers[key] for key in dict.fromkeys(stacker_ids)]
+            if not isinstance(options, dict) or options.keys() - set(stacker_ids):
+                raise ValueError("Settings must belong to the selected stacking programs")
+            tools = [self.stackers[key].with_options(options.get(key, {})) for key in dict.fromkeys(stacker_ids)]
             started = _now()
             run_id = started.strftime("%Y%m%dT%H%M%S%fZ-") + uuid4().hex[:8]
             base = self.directory(run_id)
@@ -194,6 +177,7 @@ class Runs:
                    "scope": scope, "scene_ids": scene_ids,
                    "stackers": [tool.id for tool in tools],
                    "methods": {tool.id: tool.method for tool in tools},
+                   "options": {tool.id: tool.options for tool in tools},
                    "input_format": "16-bit SDR sRGB TIFF",
                    "output_format": "float32 linear-sRGB RGB TIFF"}
             progress = {"status": "running", "total": len(scene_ids) * len(tools),
