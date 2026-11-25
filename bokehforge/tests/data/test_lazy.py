@@ -21,6 +21,8 @@ def write_lock(tmp_path, dataset, layout, paths, **metadata):
         **metadata,
     }
     (raw / "download-manifest.json").write_text(json.dumps(source))
+    config = tmp_path / "sources.json"
+    config.write_text(json.dumps({"datasets": [{"id": dataset}]}))
     lock = tmp_path / "sources.lock.json"
     lock.write_text(json.dumps({"datasets": [source]}))
     return root, lock
@@ -38,9 +40,20 @@ def test_catalog_and_views_load_infinigen_on_demand(tmp_path):
         with BytesIO() as payload:
             Image.new("RGB", (7, 5), (120, 84, 9)).save(payload, format="PNG")
             archive.writestr("data/abc123_1/image_all_in_focus.png", payload.getvalue())
-    root, _ = write_lock(tmp_path, "D29", "infinigen_defocus", [native])
+    root, lock = write_lock(tmp_path, "D29", "infinigen_defocus", [native])
+    legacy = {"id": "D04", "status": "available", "layout": "archive_stacks",
+              "files": [{"path": "missing.zip"}]}
+    manifest = root / "raw/D04/download-manifest.json"
+    manifest.parent.mkdir()
+    manifest.write_text(json.dumps(legacy))
+    snapshot = json.loads(lock.read_text())
+    snapshot["datasets"].append(legacy)
+    lock.write_text(json.dumps(snapshot))
 
     catalog = SceneCatalog(root)
+    assert SceneCatalog(root, lock=lock).scene_ids == catalog.scene_ids
+    with pytest.raises(ValueError, match="Unknown or undownloaded datasets"):
+        SceneCatalog(root, datasets="D04")
     scene, = map(catalog.scene, catalog.scene_ids)
     assert len(scene.frame_ids) == 9 and len(scene.reference_ids) == 1
     assert [catalog.frame(frame_id).metadata["focus_distance_m"] for frame_id in scene.frame_ids] == list(distances)
@@ -85,7 +98,7 @@ def test_archived_tiff_indexes_pages_and_preserves_alpha(tmp_path):
         with ZipFile(native, "w") as archive:
             archive.writestr("scene/stack.tif", payload.getvalue())
     root, _ = write_lock(tmp_path, "fixture", "archive_stacks", [native])
-    catalog = SceneCatalog(root)
+    catalog = SceneCatalog(root, config=tmp_path / "sources.json")
     scene = catalog.scene(catalog.scene_ids[0])
     sample = FrameWindowDataset(catalog, window_size=2)[0]
     assert len(scene.frame_ids) == 2 and len(FusionPairDataset(catalog)) == 0
@@ -103,7 +116,7 @@ def test_archived_tiff_indexes_pages_and_preserves_alpha(tmp_path):
     with pytest.raises(ValueError, match="changed after catalog"):
         catalog.decoder.decode(second)
     with pytest.raises(ValueError, match="mismatched source SHA-256"):
-        SceneCatalog(root)
+        SceneCatalog(root, config=tmp_path / "sources.json")
 
 
 def test_catalog_rejects_unsafe_archive_members(tmp_path):
@@ -113,7 +126,7 @@ def test_catalog_rejects_unsafe_archive_members(tmp_path):
         archive.writestr("../outside.png", b"pixels")
     root, _ = write_lock(tmp_path, "fixture", "archive_stacks", [native])
     with pytest.raises(ValueError, match="Unsafe archive member"):
-        SceneCatalog(root)
+        SceneCatalog(root, config=tmp_path / "sources.json")
 
 
 def test_conversion_policy_preserves_source_identity_and_natural_order(tmp_path):
@@ -124,7 +137,7 @@ def test_conversion_policy_preserves_source_identity_and_natural_order(tmp_path)
         Image.new("RGB", (9, 8), (value,) * 3).save(path)
     root, lock = write_lock(tmp_path, "fixture", "directory_stacks", originals, transfer="srgb")
     source_lock = lock.read_bytes()
-    srgb = SceneCatalog(root, lock=lock)
+    srgb = SceneCatalog(root, lock=lock, config=tmp_path / "sources.json")
     scene = srgb.scene(srgb.scene_ids[0])
     frame_id = scene.frame_ids[0]
     assert srgb.frame(frame_id).source_path == "scene/frame2.png"
@@ -149,7 +162,7 @@ def test_float_headroom_and_negative_values_survive_tiff_encoding(tmp_path):
     for path in originals:
         tifffile.imwrite(path, pixels, photometric="rgb")
     root, _ = write_lock(tmp_path, "fixture", "directory_stacks", originals, transfer="linear")
-    catalog = SceneCatalog(root)
+    catalog = SceneCatalog(root, config=tmp_path / "sources.json")
     frames = FrameWindowDataset(catalog, window_size=2, output="tiff")[0]["frames"]
     assert all(np.array_equal(tifffile.imread(BytesIO(frame)), pixels) for frame in frames)
 
@@ -161,7 +174,7 @@ def test_edmf_catalog_quarantines_incomplete_pairs(tmp_path):
         path.parent.mkdir(parents=True, exist_ok=True)
         Image.new("RGB", (8, 8)).save(path)
     root, _ = write_lock(tmp_path, "fixture", "edmf", originals)
-    catalog = SceneCatalog(root)
+    catalog = SceneCatalog(root, config=tmp_path / "sources.json")
     assert len(catalog.scene_ids) == 1
     assert len(catalog.quarantine["fixture"]) == 1
     assert catalog.quarantine["fixture"][0]["scene"] == "pair-0002"

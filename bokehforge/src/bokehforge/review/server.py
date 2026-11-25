@@ -11,6 +11,7 @@ from threading import BoundedSemaphore, Thread
 from urllib.parse import parse_qs, urlsplit
 
 from .. import SceneCatalog
+from ..data._config import DEFAULT_CONFIG, data_root, read_config
 from .images import output_pixels, preview
 from .ratings import Ratings
 from .runs import REPO, Runs, configured_stackers, lock_store
@@ -275,21 +276,21 @@ class ReviewServer(ThreadingHTTPServer):
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="bokehforge review",
                                      description="Browse and rate focus stacks on this computer")
-    parser.add_argument("--root", type=Path, default=REPO / "datasets", help="BokehForge dataset root")
+    parser.add_argument("--root", type=Path, help="BokehForge dataset root")
     parser.add_argument("--store", type=Path, default=REPO / "artifacts/bokehforge-review",
                         help="Local evaluations and ratings directory")
     parser.add_argument("--host", default=ALL_INTERFACES,
                         help="IPv4 bind address (default: 0.0.0.0, all interfaces)")
     parser.add_argument("--port", type=int, default=8765, help="HTTP port (default: 8765)")
     parser.add_argument("--dataset", action="append", help="Limit to a dataset ID, repeatable")
-    parser.add_argument("--config", type=Path, help="Optional catalog policy overrides")
+    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
     parser.add_argument("--lock", type=Path, help="Optional source snapshot")
     parser.add_argument("--pancake", help="Path to pancake-cli")
     parser.add_argument("--focus-stack", help="Path to focus-stack")
     parser.add_argument("--openfocus", help="Path to openfocus")
     parser.add_argument("--shine-python", help="Path to a Python with ShineStacker installed")
     args = parser.parse_args(argv)
-    args.root = args.root.resolve()
+    args.root = (args.root or data_root(args.config, read_config(args.config).get("defaults", {}))).resolve()
     args.store = args.store.resolve()
     with lock_store(args.store), ReviewServer((args.host, args.port)) as server:
         server.app = Review(args)

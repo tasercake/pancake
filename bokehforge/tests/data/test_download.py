@@ -79,6 +79,7 @@ def locked_source(tmp_path, origin, checksum=None):
                        "sha256": checksum or hashlib.sha256(state["body"]).hexdigest()}],
         }],
     }
+    (tmp_path / "sources.json").write_text(json.dumps({"datasets": [{"id": "fixture"}]}))
     path = tmp_path / "sources.lock.json"
     path.write_text(json.dumps(lock))
     return path
@@ -87,7 +88,7 @@ def locked_source(tmp_path, origin, checksum=None):
 def run_download(tmp_path, lock):
     return subprocess.run(
         [*COMMAND, "--root", str(tmp_path / "data"), "--lock", str(lock),
-         "--dataset", "fixture", "--reserve-gib", "0", "--workers", "1"],
+         "--config", str(tmp_path / "sources.json"), "--reserve-gib", "0", "--workers", "1"],
         capture_output=True, text=True,
     )
 

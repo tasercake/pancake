@@ -19,7 +19,8 @@ import tifffile
 from .alignment import CROP_SCORE_VERSION, MAX_ROTATION_DEGREES, evaluate_crop
 from .data._canonical import encode_tiff
 from .data._files import digest
-from .data.download import CONFIG_DIRECTORY, save_json
+from .data._config import DEFAULT_CONFIG, data_root, read_config
+from .data.download import save_json
 from .data.lazy import SceneCatalog
 from .scoring import FAMILY_WEIGHTS, SCORE_DAMAGE_SCALE, SCORE_VERSION, VIEW_WEIGHTS, measure, scene_score, validate_rgb
 from .stacking import StackFrame, StackInput
@@ -228,9 +229,9 @@ def main(argv=None):
     candidate.add_argument("--candidate-dir", type=Path, help="Evaluate existing canonical TIFFs by scene ID")
     parser.add_argument("--output", required=True, type=Path, help="New directory for the report and optional images")
     parser.add_argument("--root", type=Path, help="Dataset directory used by data download")
-    parser.add_argument("--dataset", action="append", help="Dataset ID, repeatable. Default: all downloaded datasets")
+    parser.add_argument("--dataset", action="append", help="Dataset ID, repeatable. Defaults to configured downloads")
     parser.add_argument("--scene", action="append", help="Exact catalog scene ID, repeatable. Default: all selected scenes")
-    parser.add_argument("--config", type=Path, help="Optional catalog policy overrides")
+    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
     parser.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
     parser.add_argument("--score-profile", choices=(SCORE_VERSION, CROP_SCORE_VERSION), default=SCORE_VERSION,
                         help="Score on the fixed reference grid or match a delivered crop to it")
@@ -240,11 +241,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.output.exists():
         raise ValueError(f"Output directory already exists: {args.output}")
-    root = args.root
-    if root is None:
-        config = args.config or CONFIG_DIRECTORY / "sources.json"
-        defaults = json.loads(config.read_text()).get("defaults", {}) if config.is_file() else {}
-        root = config.parent / defaults["data_root"] if "data_root" in defaults else Path.cwd() / "datasets"
+    root = args.root or data_root(args.config, read_config(args.config).get("defaults", {}))
 
     if args.candidate_dir is not None:
         if not args.candidate_dir.is_dir():
