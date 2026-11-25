@@ -167,7 +167,13 @@ function cancelLightboxRequests(state) {
   state.requests.clear();
 }
 
-function lightboxSequence(data, gallery) {
+function cancelReferenceRequests(gallery) {
+  for (const image of Object.values(gallery.referenceImages)) {
+    if (!image.complete) image.removeAttribute("src");
+  }
+}
+
+function setLightboxGallery(gallery, data) {
   const images = data.frames.map((frame, index) => ({
     title: sourceFrameTitle(frame, index), params: { frame: frame.id },
   }));
@@ -179,24 +185,39 @@ function lightboxSequence(data, gallery) {
   }
   const reference = data.references[gallery.reference];
   if (reference) images.push({ title: referenceTitle(reference), params: { frame: reference.id } });
-  return images;
+  gallery.images = images;
+  if (gallery.referenceFrame?.id !== reference?.id) {
+    cancelReferenceRequests(gallery);
+    gallery.referenceImages = {};
+    gallery.referenceLayer.replaceChildren();
+    gallery.referenceFrame = reference;
+  }
+  if (activeImage?.gallery === gallery) paintReference();
 }
 
 function openLightbox(title, params, previewImage, sceneId = scene?.id) {
   const previous = activeImage;
-  previous?.gallery.request?.abort();
-  if (previous) cancelLightboxRequests(previous);
+  if (previous) closeLightboxRequests(previous);
   const stage = part("div", undefined, "lightbox-stage");
+  const surface = part("div", undefined, "lightbox-surface");
+  const referenceLayer = part("div", undefined, "lightbox-reference");
+  referenceLayer.hidden = true;
+  referenceLayer.setAttribute("aria-hidden", "true");
+  surface.append(referenceLayer);
+  stage.append(surface);
   $("image-view").replaceChildren(stage);
   const entry = { title, params };
   const currentScene = sceneId === scene?.id;
-  const gallery = { scene: sceneId, run: runId, reference: currentScene ? referenceIndex : 0, images: [entry] };
+  const gallery = {
+    scene: sceneId, run: runId, reference: currentScene ? referenceIndex : 0, images: [entry],
+    surface, referenceLayer, referenceImages: {}, baseTitle: title, swipe: false, split: 0.5, holdKey: "",
+  };
   if (currentScene && details) {
-    gallery.images = lightboxSequence(details, gallery);
+    setLightboxGallery(gallery, details);
   } else if (!currentScene && sceneId) {
     gallery.request = new AbortController();
     api(url("/api/scene", { scene: sceneId, run: gallery.run }), undefined, { signal: gallery.request.signal })
-      .then((data) => { gallery.images = lightboxSequence(data, gallery); })
+      .then((data) => setLightboxGallery(gallery, data))
       .catch(() => {}); // The selected thumbnail is still available to inspect.
   }
   const dialog = $("image-dialog");
@@ -223,8 +244,18 @@ function moveLightbox(step) {
 }
 
 function setLightboxTitle(title) {
-  $("image-title").textContent = title;
-  $("image-title").title = title;
+  const heading = $("image-title");
+  if (heading.textContent !== title) {
+    heading.textContent = title;
+    heading.title = title;
+  }
+}
+
+function setLightboxImage(state, image) {
+  state.image?.remove();
+  state.image = image;
+  state.gallery.baseTitle = state.title;
+  state.gallery.surface.prepend(image);
 }
 
 function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
@@ -235,10 +266,7 @@ function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
     ...viewport,
   };
   activeImage = state;
-  if (!state.image) {
-    setLightboxTitle(title);
-    stage.replaceChildren();
-  }
+  if (!state.image) gallery.baseTitle = title;
   const fallback = !state.image && ((previewImage?.complete && previewImage.naturalWidth &&
                     (previewImage.currentSrc || previewImage.src)) ||
     readyThumbs.get(imageURL(params, "thumb")));
@@ -247,15 +275,13 @@ function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
     image.alt = title;
     image.src = fallback;
     if (image.complete && image.naturalWidth) {
-      state.image = image;
-      stage.replaceChildren(image);
+      setLightboxImage(state, image);
     } else {
       state.requests.add(image);
       image.addEventListener("load", () => {
         state.requests.delete(image);
         if (activeImage !== state || state.image) return;
-        state.image = image;
-        stage.replaceChildren(image);
+        setLightboxImage(state, image);
         paintLightbox();
       }, { once: true });
     }
@@ -282,12 +308,14 @@ function paintLightbox(anchor = lightboxAnchor()) {
   const state = activeImage;
   const view = $("image-view");
   const image = state.image;
-  $("lightbox-status").textContent = state.pending;
   $("image-fit").disabled = state.scale === 1 && !state.actual;
   $("zoom-out").disabled = $("image-fit").disabled;
   $("zoom-in").disabled = state.scale >= 12;
   $("pixel-mode").setAttribute("aria-pressed", state.actual);
-  if (!image?.naturalWidth) return;
+  if (!image?.naturalWidth) {
+    paintReference();
+    return;
+  }
   const wide = view.clientWidth, tall = view.clientHeight;
   const fit = Math.min(1, wide / image.naturalWidth, tall / image.naturalHeight);
   const scale = state.actual ? 1 : fit * state.scale;
@@ -300,6 +328,7 @@ function paintLightbox(anchor = lightboxAnchor()) {
   view.classList.toggle("pannable", width > wide || height > tall);
   view.scrollLeft = Math.max(0, wide - width) / 2 + width * anchor.u - anchor.x;
   view.scrollTop = Math.max(0, tall - height) / 2 + height * anchor.v - anchor.y;
+  paintReference();
 }
 
 function requestLightbox(variant) {
@@ -317,9 +346,7 @@ function requestLightbox(variant) {
     const anchor = lightboxAnchor();
     if (native) state.nativeLoaded = true;
     state.pending = !native && state.nativeRequested ? "Loading full resolution…" : "";
-    state.image = image;
-    setLightboxTitle(state.title);
-    state.stage.replaceChildren(image);
+    setLightboxImage(state, image);
     paintLightbox(anchor);
   }, { once: true });
   image.addEventListener("error", () => {
@@ -329,6 +356,85 @@ function requestLightbox(variant) {
     state.pending = native ? "Full resolution unavailable" : "Image unavailable";
     paintLightbox();
   }, { once: true });
+}
+
+function requestReference(gallery, variant, priority) {
+  if (gallery.referenceImages[variant]) return;
+  const image = previewElement({ frame: gallery.referenceFrame.id }, variant, { priority });
+  image.alt = "";
+  gallery.referenceImages[variant] = image;
+  const changed = () => {
+    if (activeImage?.gallery === gallery && gallery.referenceImages[variant] === image) paintReference();
+  };
+  image.addEventListener("load", changed, { once: true });
+  image.addEventListener("error", changed, { once: true });
+}
+
+function visibleLightboxImage(gallery) {
+  const view = $("image-view").getBoundingClientRect();
+  const image = gallery.surface.getBoundingClientRect();
+  const left = Math.max(view.left, image.left);
+  const right = Math.min(view.right, image.right);
+  const top = Math.max(view.top, image.top);
+  const bottom = Math.min(view.bottom, image.bottom);
+  return { view, image, left, right, top, bottom };
+}
+
+function paintReference() {
+  const state = activeImage;
+  if (!state) return;
+  const { gallery } = state;
+  const held = Boolean(gallery.holdKey);
+  const comparing = held || gallery.swipe;
+  const reference = gallery.referenceFrame;
+  const toggle = $("reference-swipe");
+  toggle.disabled = !reference;
+  toggle.setAttribute("aria-pressed", gallery.swipe);
+  toggle.title = reference ? "Drag the divider or hold . to see the reference" : "This scene has no reference";
+  if (reference) {
+    requestReference(gallery, "fit", comparing ? "high" : "low");
+    if (comparing && (state.actual || state.scale > 1)) requestReference(gallery, "native", "high");
+  }
+  const { fit, native } = gallery.referenceImages;
+  const overlay = native?.naturalWidth ? native : fit?.naturalWidth ? fit : null;
+  const showing = comparing && overlay && state.image;
+  const layer = gallery.referenceLayer;
+  const divider = $("reference-divider");
+  layer.hidden = !showing;
+  divider.hidden = !showing || held;
+  setLightboxTitle(held && showing ? referenceTitle(reference) : gallery.baseTitle);
+  const status = comparing && reference && !overlay
+    ? (fit?.complete && (!native || native.complete) ? "Reference unavailable" : "Loading reference…")
+    : state.pending;
+  if ($("lightbox-status").textContent !== status) $("lightbox-status").textContent = status;
+  if (!showing) return;
+  if (layer.firstChild !== overlay) layer.replaceChildren(overlay);
+  if (held) {
+    layer.style.clipPath = "none";
+    return;
+  }
+
+  const { view, image, left, right, top, bottom } = visibleLightboxImage(gallery);
+  const edge = left + (right - left) * gallery.split;
+  const cut = Math.min(1, Math.max(0, (edge - image.left) / image.width));
+  layer.style.clipPath = `inset(0 ${100 * (1 - cut)}% 0 0)`;
+  divider.style.left = `${edge - view.left}px`;
+  divider.style.top = `${top - view.top}px`;
+  divider.style.height = `${Math.max(0, bottom - top)}px`;
+  $("reference-slider").setAttribute("aria-valuenow", Math.round(gallery.split * 100));
+}
+
+function closeLightboxRequests(state) {
+  cancelLightboxRequests(state);
+  cancelReferenceRequests(state.gallery);
+  state.gallery.request?.abort();
+}
+
+function releaseReference(event) {
+  const gallery = activeImage?.gallery;
+  if (!gallery?.holdKey || (event && gallery.holdKey !== (event.code || event.key))) return;
+  gallery.holdKey = "";
+  paintReference();
 }
 
 function zoomLightbox(scale, x, y) {
@@ -471,7 +577,7 @@ async function loadScene() {
     const firstLoad = !details;
     details = data;
     const gallery = activeImage?.gallery;
-    if (gallery?.scene === scene.id && gallery.run === runId) gallery.images = lightboxSequence(data, gallery);
+    if (gallery?.scene === scene.id && gallery.run === runId) setLightboxGallery(gallery, data);
     outputLoading = false;
     showMessage($("scene-error"), "");
     if (firstLoad) {
@@ -930,6 +1036,40 @@ $("image-fit").onclick = () => zoomLightbox(1);
 $("zoom-in").onclick = () => zoomLightbox(lightboxScale() * 1.5);
 $("zoom-out").onclick = () => zoomLightbox(lightboxScale() / 1.5);
 const lightboxView = $("image-view");
+$("reference-swipe").onclick = () => {
+  const gallery = activeImage.gallery;
+  gallery.swipe = !gallery.swipe;
+  paintReference();
+};
+const referenceSlider = $("reference-slider");
+function setReferenceSplit(split) {
+  activeImage.gallery.split = Math.max(0, Math.min(1, split));
+  paintReference();
+}
+function dragReference(event) {
+  const { left, right } = visibleLightboxImage(activeImage.gallery);
+  if (right > left) setReferenceSplit((event.clientX - left) / (right - left));
+}
+referenceSlider.addEventListener("pointerdown", (event) => {
+  if (event.button !== 0) return;
+  referenceSlider.setPointerCapture(event.pointerId);
+  dragReference(event);
+});
+referenceSlider.addEventListener("pointermove", (event) => {
+  if (referenceSlider.hasPointerCapture(event.pointerId) && activeImage?.gallery.swipe && !activeImage.gallery.holdKey) {
+    dragReference(event);
+  }
+});
+referenceSlider.addEventListener("pointerup", () => lightboxView.focus({ preventScroll: true }));
+referenceSlider.addEventListener("keydown", (event) => {
+  const { split } = activeImage.gallery;
+  const next = { ArrowLeft: split - 0.05, ArrowRight: split + 0.05, Home: 0, End: 1 }[event.key];
+  if (next === undefined || event.ctrlKey || event.metaKey || event.altKey) return;
+  event.preventDefault();
+  event.stopPropagation();
+  setReferenceSplit(next);
+});
+lightboxView.addEventListener("scroll", paintReference, { passive: true });
 lightboxView.addEventListener("wheel", (event) => {
   if (event.shiftKey) {
     activeImage.position = null;
@@ -945,6 +1085,16 @@ lightboxView.addEventListener("dblclick", (event) => {
 });
 document.addEventListener("keydown", (event) => {
   if (!activeImage || !$("image-dialog").open || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.key === ".") {
+    if (activeImage.gallery.referenceFrame) {
+      event.preventDefault();
+      if (!event.repeat && !activeImage.gallery.holdKey) {
+        activeImage.gallery.holdKey = event.code || event.key;
+        paintReference();
+      }
+    }
+    return;
+  }
   if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
     event.preventDefault();
     moveLightbox(event.key === "ArrowLeft" ? -1 : 1);
@@ -958,6 +1108,11 @@ document.addEventListener("keydown", (event) => {
   if (!zoom && event.key !== "0") return;
   event.preventDefault();
   zoomLightbox(zoom ? lightboxScale() * zoom : 1);
+});
+document.addEventListener("keyup", releaseReference);
+window.addEventListener("blur", () => releaseReference());
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) releaseReference();
 });
 let panStart = null;
 lightboxView.addEventListener("pointerdown", (event) => {
@@ -982,8 +1137,7 @@ lightboxView.addEventListener("lostpointercapture", () => {
 });
 $("image-dialog").addEventListener("close", (event) => {
   if (event.currentTarget.open || !activeImage) return;
-  cancelLightboxRequests(activeImage);
-  activeImage.gallery.request?.abort();
+  closeLightboxRequests(activeImage);
   activeImage = null;
   lightboxView.replaceChildren();
 });

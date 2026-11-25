@@ -153,11 +153,17 @@
         <button class="quiet" id="image-fit" type="button" aria-label="Fit image">Fit</button>
         <button class="quiet zoom-button" id="zoom-in" type="button" aria-label="Zoom in">+</button>
         <button class="quiet" id="pixel-mode" type="button" aria-pressed="false">1:1 pixels</button>
+        <button class="quiet" id="reference-swipe" type="button" aria-pressed="false" disabled>Swipe reference</button>
         <button class="quiet" data-close="image-dialog" type="button">Close</button>
       </div>
     </div>
     <div class="lightbox-body">
       <div class="image-view" id="image-view" role="region" aria-label="Image viewer" tabindex="0"></div>
+      <div class="reference-divider" id="reference-divider" hidden>
+        <button type="button" role="slider" id="reference-slider" aria-label="Reference reveal"
+          aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
+          title="Drag to reveal the reference"></button>
+      </div>
       <p id="lightbox-status" role="status"></p>
     </div>
   </dialog>
