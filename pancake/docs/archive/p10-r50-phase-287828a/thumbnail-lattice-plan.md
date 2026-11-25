@@ -11,7 +11,7 @@ For thumbnails it keeps the same `prepare_thumbnail` dimensions, RGB
 tensor, 5×5 sampler, readback and optional resident RGB handoff. The
 paired `287828a` and `07816a2` R50 diagnostic will measure the effect of
 that upload change before either stage or product optimization is claimed.
-[Shared kernel source](../../src/registration/kernels.rs)
+[Shared kernel source](../../../src/registration/kernels.rs)
 
 ## Identical sampling and summation
 

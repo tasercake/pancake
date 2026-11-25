@@ -3,8 +3,8 @@
   "review_basis": {
     "candidate": "Final P0 kernel graph: CubeCL 0.11.4, Slint 1.19.0, wgpu 30.0.2, reviewed vendor patches and lock unification",
     "evidence": [
-      "docs/p0-runtime-evidence.json",
-      "docs/p0-upstream-patch-review.md"
+      "docs/archive/p0-runtime-evidence.json",
+      "docs/archive/p0-upstream-patch-review.md"
     ],
     "metadata_sha256": "b5aeb34708c8b418bc9969d6cd1490efd1caa5e4bf18d04f9463a2df54d927c7",
     "scope": "Full metadata covers optional/platform/build paths for Clippy; cargo-deny skips cover only diagnosed desktop-target duplicate groups. Reviews do not qualify runtime behavior."

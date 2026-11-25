@@ -47,7 +47,7 @@ estimator uses 0.420 s across all 49 comparisons. The isolated
 `07816a2` candidate changes only the registration upload to one
 aligned owned buffer at the same thumbnail, warp and scoring
 callsites. A same-bytes R50 differential can establish its CPU
-effect. [Registration upload and thumbnail source](../../src/registration/kernels.rs)
+effect. [Registration upload and thumbnail source](../../../src/registration/kernels.rs)
 
 ## Replay
 

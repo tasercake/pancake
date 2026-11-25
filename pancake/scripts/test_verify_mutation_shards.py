@@ -8,9 +8,9 @@ import unittest
 
 from verify_mutation_shards import verify_shards
 
-DOCS = Path(__file__).resolve().parents[1] / "docs"
-P0 = DOCS / "p0-close-evidence/closure-mutation-outcomes.json.gz"
-P1 = DOCS / "p1-assurance-evidence/cli-config/mutation-outcomes.json.gz"
+ARCHIVE = Path(__file__).resolve().parents[1] / "docs" / "archive"
+P0 = ARCHIVE / "p0-close-evidence/closure-mutation-outcomes.json.gz"
+P1 = ARCHIVE / "p1-assurance-evidence/cli-config/mutation-outcomes.json.gz"
 
 
 class MutationShardTests(unittest.TestCase):

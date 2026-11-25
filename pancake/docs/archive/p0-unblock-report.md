@@ -22,7 +22,7 @@ Date: 2026-11-17. Integration worktree: `codex/p0-unblock`.
 | Dead host DSL function in CubeCL coverage | Narrow macro patch honors function `expand_only`, retaining checked launch and default behavior for other users. No authored source excluded from coverage. | Compile contracts plus unchanged independent CPU/GPU values and strict source coverage. |
 | Miri cannot call native JIT/GPU FFI | Pure host library tests run under Miri; real numerical integration remains mandatory in native/debug/release/layout/coverage checks. No ignored tests. | Host Miri, native tests, branch coverage, mutations and guardrails. |
 
-[Dependency policy](dependency-policy.md) defines the enforced exceptions;
+[Dependency policy](../dependency-policy.md) defines the enforced exceptions;
 [upstream patch review](p0-upstream-patch-review.md) records source provenance.
 The [kernel report](p0-kernel-qualification.md) records strict executable assurance.
 Integrated `bash scripts/check.sh all` passed on macOS: 6 debug/release tests,

@@ -207,6 +207,8 @@ jobs:
 
           Each package includes the desktop app and CLI. Use SHA256SUMS.txt to verify the downloads.
 
+          [Installation and first-launch help](https://github.com/$GH_REPO/blob/$GITHUB_SHA/pancake/docs/install.md) · [Stack your first photos](https://github.com/$GH_REPO/blob/$GITHUB_SHA/pancake/docs/desktop.md)
+
           [Source and build instructions](https://github.com/$GH_REPO/tree/$GITHUB_SHA#build-from-source).
           NOTES
           flags=()

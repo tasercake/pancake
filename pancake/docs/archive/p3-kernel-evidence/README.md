@@ -9,9 +9,9 @@ toolchain was 1.100.0. Source revision
 Its `pancake/Cargo.lock` SHA-256 is
 `52095cb40f098ea2c59e54c36a6bcf634db233759e1aff7d57f28ecc2ff02a7c`.
 
-The [CPU](../../tests/cpu_fusion_contract.rs) and
-[GPU](../../tests/gpu_fusion_contract.rs) tests execute the same
-[analytic inputs and expectations](../../tests/common/fusion_cases.rs).
+The [CPU](../../../tests/cpu_fusion_contract.rs) and
+[GPU](../../../tests/gpu_fusion_contract.rs) tests execute the same
+[analytic inputs and expectations](../../../tests/common/fusion_cases.rs).
 The oracles cover ordered weighted accumulation, first-source ties and
 zero weights, both complementary focus planes, genuine f32 identity gradients,
 multichannel upsampling and antialiased downsampling, single-pixel axes,

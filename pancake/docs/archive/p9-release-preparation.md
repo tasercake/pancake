@@ -40,7 +40,7 @@ original failed or interrupted bundles for investigation.
 ## Apple and retained builds
 
 On a clean native Apple Silicon worktree with Python 3.11 or newer, the
-[private package recipe](../scripts/package_macos.py) builds the locked
+[private package recipe](../../scripts/package_macos.py) builds the locked
 ARM64 release with CPU, wgpu Metal, and the explicit `cubecl/metal-native`
 dependency feature. Supply a stable private bundle identifier and a build
 number from 1 through 9999. The display version comes from the release crates.
@@ -63,7 +63,7 @@ developer directory and SDK, compiler and SDK linker identities, explicit
 SDK, deployment and linker overrides, and executable hashes before and
 after signing.
 
-The [portable tests](../scripts/test_package_macos.py) replay the staging
+The [portable tests](../../scripts/test_package_macos.py) replay the staging
 contract with Apple-tool fixtures. They cover the plist, command and byte
 receipts, failure cleanup, and existing and concurrently created outputs.
 Run them with

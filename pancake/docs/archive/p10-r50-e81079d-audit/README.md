@@ -41,8 +41,8 @@ This is a third, distinct scan. The selected crop holds
 207,101,952 B per original or 10,355,097,600 B across R50.
 These are addressable bytes read. Cache and memory behavior and
 completed-job savings remain unmeasured.
-[Actual RAW return](../../src/image_io/raw.rs)
-[Generic RGB validation](../../src/image_io/mod.rs)
+[Actual RAW return](../../../src/image_io/raw.rs)
+[Generic RGB validation](../../../src/image_io/mod.rs)
 
 If pursued after current assurance, keep the prototype within the
 checked Rawler return. Require the original dimension/length guard

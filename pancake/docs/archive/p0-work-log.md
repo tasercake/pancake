@@ -28,7 +28,7 @@ source/lock hashes in each receipt.
 | Initial plan and front-loaded gate design | `8fcbc52` | Prior plan history; current adopted gate ledger in owning plan. |
 | Hardware and dependency candidate audits | `19689ed`, `5370eff`, `65b185f`, `d4b0c96`, `de8940c` | [Hardware lanes](p0-hardware-test-lanes.md), [runtime audit](p0-runtime-feasibility.md), runtime evidence and reconstruction patches. |
 | Targets / corpus / preliminary baselines | `b3c3a9a`, `39bb1de`, `19b7f9e`, `e40788d` | [Target contract](p0-performance-targets.md), [baseline report](p0-performance-baseline.md), adapter corpus/RAW/baseline manifests and compressed raw logs. |
-| Dependency replacements and enforced exceptions | `936da64`, `202cad0`, `fa2060d`, `7feb615` | [Patch review](p0-upstream-patch-review.md), [policy](dependency-policy.md), vendor source manifest and executable regression tests. |
+| Dependency replacements and enforced exceptions | `936da64`, `202cad0`, `fa2060d`, `7feb615` | [Patch review](p0-upstream-patch-review.md), [policy](../dependency-policy.md), vendor source manifest and executable regression tests. |
 | Safe blur and six runtime paths | `f3fcd45`, `5f85899` | [Kernel qualification](p0-kernel-qualification.md), kernel evidence, six-path runtime manifest and retained logs/source probes. |
 | Codec / RAW sensor / color proof | `48ac5f7` | [Codec qualification](p0-codec-qualification.md), codec evidence and independent Rust/Python oracle source. |
 | Guest access and original GPU sanitizer investigation | `2062df8`, `4fa1073` | [Guest evidence](p0-guest-access-qualification.md), [sanitizer investigation](p0-sanitizer-investigation.md), bounded diagnostic source/logs. |
@@ -103,7 +103,7 @@ zbus_names 4.3.5; `0372` zvariant_derive 5.15.1; `0543` chrono 0.4.45 (all
 prefixed `RUSTSEC-2026-`). Font parsing and D-Bus/AT-SPI remain real runtime
 exposures; Chrono covers UI date/time and exact dormant Turso parents. Protected
 families cannot receive duplicate exceptions. Duplicate reviews expire
-**2027-02-15**. [Enforced policy](dependency-policy.md) records exact paths,
+**2027-02-15**. [Enforced policy](../dependency-policy.md) records exact paths,
 owners, expiry and removal conditions; no tree-wide skip or advisory downgrade.
 
 Original unit/macro/Miri logs are archived losslessly under
