@@ -1,6 +1,7 @@
 """Hidden runtime files and command logging."""
 
 import contextlib
+import os
 import sys
 import threading
 
@@ -9,12 +10,17 @@ METADATA = ".bokehforge"
 
 @contextlib.contextmanager
 def exclusive(root, name):
-    import fcntl
     root.mkdir(parents=True, exist_ok=True)
-    with (root / name).open("a") as handle:
+    with (root / name).open("a+b") as handle:
         try:
-            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
+            if os.name == "nt":
+                import msvcrt
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
             raise RuntimeError(f"Another process holds {root / name}") from None
         yield
 

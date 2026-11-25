@@ -8,11 +8,14 @@ import json
 from pathlib import Path
 from secrets import token_hex
 from socket import gethostname
-from threading import Thread
+from threading import Lock, Thread
 from urllib.parse import parse_qs, urlsplit
 
 from .. import SceneCatalog
-from ..data._config import DEFAULT_CONFIG, data_root, read_config
+from ..data._canonical import RETIRED_LAYOUTS
+from ..data._config import DEFAULT_CONFIG, read_config
+from ..data._files import safe_path
+from .downloads import Downloads
 from .images import (
     DecodedFrames, PREVIEW_VERSION, PreviewCache, ReviewFrameDecoder, SIZES, output_pixels, preview, preview_mime,
 )
@@ -27,15 +30,36 @@ ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
 ALL_INTERFACES = "0.0.0.0"
 
 
-def dataset_names(root, lock, dataset_ids):
-    if lock is not None:
-        sources = json.loads(lock.read_text())["datasets"]
-    else:
-        manifests = (root / "raw" / dataset_id / "download-manifest.json"
-                     for dataset_id in dataset_ids)
-        sources = [json.loads(path.read_text()) for path in manifests if path.is_file()]
-    names = {source["id"]: source.get("name") for source in sources}
-    return {dataset_id: names.get(dataset_id) or dataset_id for dataset_id in dataset_ids}
+def local_sources(args):
+    policies = {source["id"]: source for source in read_config(args.config or DEFAULT_CONFIG)["datasets"]
+                if source.get("layout") not in RETIRED_LAYOUTS}
+    selected = set(args.dataset or policies)
+    if selected - policies.keys():
+        raise ValueError(f"Unknown dataset IDs: {sorted(selected - policies.keys())}")
+    locked = (json.loads(args.lock.read_text())["datasets"]
+              if args.lock is not None and args.lock.is_file() else [])
+    by_id = {source["id"]: source for source in locked}
+    present, missing = {}, {}
+    for dataset_id in sorted(selected):
+        policy = policies[dataset_id]
+        if policy.get("provider") == "disabled":
+            continue
+        raw = safe_path(args.root / "raw", dataset_id)
+        path = raw / "download-manifest.json"
+        source = by_id.get(dataset_id, {}) if args.lock is not None else (
+            json.loads(path.read_text()) if path.is_file() else {})
+        if source.get("status") == "disabled":
+            continue
+        files = source.get("files", [])
+        if source.get("id") == dataset_id and source.get("status") == "available" and files and all(
+            (asset := safe_path(raw, item["path"])).is_file()
+            and (item.get("size") is None or asset.stat().st_size == item["size"])
+            for item in files
+        ):
+            present[dataset_id] = source.get("name") or policy.get("name") or dataset_id
+        else:
+            missing[dataset_id] = policy.get("name") or dataset_id
+    return present, missing
 
 
 class CatalogPending(RuntimeError):
@@ -44,22 +68,54 @@ class CatalogPending(RuntimeError):
 
 class Review:
     def __init__(self, args):
+        self.args = args
         self.catalog = None
-        self.catalog_status = {"status": "indexing", "root": str(args.root)}
+        self.catalog_status = {"status": "indexing", "root": str(args.root), "revision": 0, "missing": {}}
         self.scenes = []
+        self.catalog_lock = Lock()
+        self.indexing = False
+        self.refresh_requested = False
         self.runs = Runs(args.store, configured_stackers(args))
         self.ratings = Ratings(args.store)
         self.image_version = token_hex(8)
         self.previews = PreviewCache(args.store)
         self.decoded = DecodedFrames()
         self.frame_decoder = ReviewFrameDecoder()
-        Thread(target=self._load, args=(args,), daemon=True, name="bokehforge-catalog").start()
+        self.downloads = Downloads(args.root, args.config or DEFAULT_CONFIG, args.lock, self.refresh_catalog)
+        self.refresh_catalog()
 
-    def _load(self, args):
+    def refresh_catalog(self):
+        with self.catalog_lock:
+            self.refresh_requested = True
+            if not self.indexing:
+                self.indexing = True
+                Thread(target=self._index, daemon=True, name="bokehforge-catalog").start()
+
+    def _index(self):
+        while True:
+            with self.catalog_lock:
+                self.refresh_requested = False
+            self._load()
+            with self.catalog_lock:
+                if not self.refresh_requested:
+                    self.indexing = False
+                    return
+
+    def _load(self):
+        args = self.args
+        revision = self.catalog_status["revision"] + 1
+        summary = {"root": str(args.root), "revision": revision, "missing": {}}
         try:
-            catalog = SceneCatalog(args.root, datasets=args.dataset, config=args.config, lock=args.lock)
+            present, missing = local_sources(args)
+            summary["missing"] = missing
+            if not present:
+                self.catalog = None
+                self.scenes = []
+                self.catalog_status = {**summary, "status": "missing" if missing else "empty"}
+                return
+            catalog = SceneCatalog(args.root, datasets=tuple(present), config=args.config, lock=args.lock)
             scenes = [catalog.scene(scene_id) for scene_id in catalog.scene_ids]
-            self.scenes = [
+            entries = [
                 {"id": scene.id, "name": scene.metadata["source_scene_id"],
                  "dataset": scene.metadata["dataset_id"], "frames": len(scene.frame_ids),
                  "first_frame": scene.frame_ids[0],
@@ -67,11 +123,27 @@ class Review:
                  "preview_frame": scene.frame_ids[len(scene.frame_ids) // 2]}
                 for scene in scenes
             ]
-            datasets = dataset_names(args.root, args.lock, dict.fromkeys(scene["dataset"] for scene in self.scenes))
             self.catalog = catalog
-            self.catalog_status = {"status": "ready", "scenes": self.scenes, "datasets": datasets}
+            self.scenes = entries
+            self.catalog_status = {**summary, "status": "ready" if entries else "empty",
+                                   "scenes": entries, "datasets": present}
         except Exception as exc:
-            self.catalog_status = {**self.catalog_status, "status": "error", "error": str(exc)}
+            if self.catalog is None:
+                self.catalog_status = {**summary, "status": "error", "error": str(exc)}
+            else:
+                self.catalog_status = {**self.catalog_status, **summary, "error": str(exc)}
+
+    def download_status(self):
+        catalog = self.catalog_status
+        return {**self.downloads.snapshot(), "indexing": self.indexing,
+                "catalog_revision": catalog["revision"], "missing": catalog["missing"],
+                "catalog_error": catalog.get("error")}
+
+    def start_download(self):
+        if self.indexing:
+            raise RuntimeError("Wait for Review to check the local datasets")
+        self.downloads.start(tuple(self.catalog_status["missing"]))
+        return self.download_status()
 
     def require_catalog(self):
         if self.catalog is None:
@@ -152,7 +224,8 @@ class Review:
             label = scene.metadata["source_scene_id"]
         elif kind == "dataset":
             label = form["dataset"]
-            scene_ids = [scene["id"] for scene in self.scenes if scene["dataset"] == label]
+            scene_ids = [scene_id for scene_id in catalog.scene_ids
+                         if catalog.scene(scene_id).metadata["dataset_id"] == label]
         elif kind == "all":
             label = "All datasets"
             scene_ids = catalog.scene_ids
@@ -219,13 +292,16 @@ class Handler(BaseHTTPRequestHandler):
             self.json(500, {"error": str(exc)})
 
     def get(self, path, query):
+        if path in self.server.assets:
+            mime, body = self.server.assets[path]
+            self.send(200, mime, body)
+            return
         app = self.server.app
-        if path in ASSETS:
-            filename, mime = ASSETS[path]
-            self.send(200, mime, (STATIC / filename).read_bytes())
-        elif path == "/api/catalog":
+        if path == "/api/catalog":
             self.json(200, {**app.catalog_status, "stackers": app.runs.tooling(),
                             "image_version": app.image_version})
+        elif path == "/api/download":
+            self.json(200, app.download_status())
         elif path == "/api/runs":
             self.json(200, app.runs.list())
         elif path == "/api/scene":
@@ -278,6 +354,13 @@ class Handler(BaseHTTPRequestHandler):
                 self.json(409, {"error": str(exc)})
                 return
             self.json(201, {"id": run_id})
+        elif path == "/api/download":
+            try:
+                status = app.start_download()
+            except RuntimeError as exc:
+                self.json(409, {"error": str(exc)})
+                return
+            self.json(202, status)
         elif path == "/api/cancel":
             app.runs.cancel(form["run"])
             self.json(200, {"stopping": True})
@@ -315,6 +398,10 @@ class Handler(BaseHTTPRequestHandler):
 
 class ReviewServer(ThreadingHTTPServer):
     def __init__(self, address):
+        # Serve one asset snapshot for the lifetime of the Python process, even
+        # if the checkout is updated while this version is running.
+        self.assets = {url: (mime, (STATIC / filename).read_bytes())
+                       for url, (filename, mime) in ASSETS.items()}
         self.hostname = gethostname().lower()
         self.review_hosts = {self.hostname, address[0].lower()} - {ALL_INTERFACES}
         super().__init__(address, Handler)
@@ -323,7 +410,8 @@ class ReviewServer(ThreadingHTTPServer):
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="bokehforge review",
                                      description="Browse and rate focus stacks on this computer")
-    parser.add_argument("--root", type=Path, help="BokehForge dataset root")
+    parser.add_argument("--root", type=Path, default=REPO / "datasets",
+                        help="BokehForge dataset root (default: datasets/ in the repository)")
     parser.add_argument("--store", type=Path, default=REPO / "artifacts/bokehforge-review",
                         help="Local evaluations and ratings directory")
     parser.add_argument("--host", default=ALL_INTERFACES,
@@ -337,7 +425,10 @@ def main(argv=None):
     parser.add_argument("--openfocus", help="Path to openfocus")
     parser.add_argument("--shine-python", help="Path to a Python with ShineStacker installed")
     args = parser.parse_args(argv)
-    args.root = (args.root or data_root(args.config, read_config(args.config).get("defaults", {}))).resolve()
+    args.root = args.root.resolve()
+    args.config = args.config.resolve()
+    if args.lock is not None:
+        args.lock = args.lock.resolve()
     args.store = args.store.resolve()
     with lock_store(args.store), ReviewServer((args.host, args.port)) as server:
         server.app = Review(args)
@@ -351,5 +442,6 @@ def main(argv=None):
         except KeyboardInterrupt:
             pass
         finally:
+            server.app.downloads.close()
             server.app.runs.close()
     return 0

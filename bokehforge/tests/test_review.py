@@ -2,11 +2,12 @@ from argparse import Namespace
 import csv
 from hashlib import sha256
 from http.client import HTTPConnection
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO, StringIO
 import json
 from shutil import copyfile
 import sys
-from threading import Thread
+from threading import Event, Thread
 from time import monotonic, sleep
 
 import numpy as np
@@ -15,6 +16,7 @@ import pytest
 import tifffile
 
 from bokehforge.review import runs
+from bokehforge.review import server as review_server
 from bokehforge.review.server import Review, ReviewServer
 
 
@@ -207,3 +209,117 @@ def test_review_image_caches_and_revalidates_without_decoding(tmp_path, monkeypa
     write_scene(root, 0.5)
     changed = open_review(root, store)
     assert changed.image(query)[1] != original
+
+
+def test_review_downloads_missing_data_while_existing_scenes_remain_open(tmp_path):
+    gate = Event()
+    stream = BytesIO()
+    tifffile.imwrite(stream, np.full((1024, 1024, 3), 128, np.uint8), photometric="rgb")
+    source = stream.getvalue()
+    chunk = 1024 * 1024
+
+    class Origin(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(source)))
+            self.end_headers()
+            self.wfile.write(source[:chunk])
+            sleep(0.6)
+            self.wfile.write(source[chunk:2 * chunk])
+            if gate.wait(10):
+                self.wfile.write(source[2 * chunk:])
+
+        def log_message(self, *args):
+            pass
+
+    root = tmp_path / "data"
+    store = tmp_path / "review"
+    store.mkdir()
+    write_scene(root, 0.25)
+
+    with ThreadingHTTPServer(("127.0.0.1", 0), Origin) as origin, ReviewServer(("127.0.0.1", 0)) as server:
+        url = f"http://127.0.0.1:{origin.server_port}/frame"
+        config = tmp_path / "sources.json"
+        config.write_text(json.dumps({"defaults": {"reserve_gib": 0}, "datasets": [
+            {"id": "Demo"},
+            {"id": "New", "name": "New scenes", "provider": "files", "layout": "directory_stacks",
+             "transfer": "srgb_assumed", "reference_type": "none",
+             "files": [{"path": f"stack/{name}.tif", "url": url, "size": len(source),
+                        "sha256": sha256(source).hexdigest()} for name in ("near", "far")]},
+        ]}))
+        server.app = Review(Namespace(root=root, store=store, dataset=["Demo", "New"], config=config, lock=None,
+                                      pancake=None, focus_stack=None, openfocus=None, shine_python=None))
+        origin_thread = Thread(target=origin.serve_forever, daemon=True)
+        review_thread = Thread(target=server.serve_forever, daemon=True)
+        origin_thread.start()
+        review_thread.start()
+
+        def request(path, method="GET"):
+            client = HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+            try:
+                payload = "{}" if method == "POST" else None
+                client.request(method, path, body=payload, headers={"Content-Type": "application/json"})
+                response = client.getresponse()
+                return response.status, json.loads(response.read())
+            finally:
+                client.close()
+
+        def wait_until(path, predicate):
+            deadline = monotonic() + 8
+            while monotonic() < deadline:
+                code, payload = request(path)
+                assert code == 200, payload
+                if predicate(payload):
+                    return payload
+                sleep(0.025)
+            pytest.fail(f"Timed out for {path}: {payload}")
+
+        try:
+            before = wait_until("/api/catalog", lambda item: item["status"] == "ready")
+            assert before["missing"] == {"New": "New scenes"}
+            assert set(before["datasets"]) == {"Demo"}
+            assert request("/api/download", "POST")[0] == 202
+            assert request("/api/download", "POST")[0] == 409
+            live = wait_until("/api/download", lambda item: item["received"] > 0 and item["rate"])
+            assert live["status"] == "running"
+            assert live["total"] == len(source) * 2
+            assert 0 < live["received"] < live["total"]
+            assert live["seconds_remaining"] > 0
+            assert not (root / "raw/New/download-manifest.json").exists()
+            assert request("/api/scene?scene=" + before["scenes"][0]["id"])[0] == 200
+
+            gate.set()
+            after = wait_until("/api/catalog", lambda item: not item["missing"])
+            finished = wait_until("/api/download", lambda item: item["status"] == "complete")
+            assert set(after["datasets"]) == {"Demo", "New"}
+            assert after["revision"] > before["revision"]
+            assert finished["received"] == finished["total"]
+            assert {item["dataset"] for item in after["scenes"]} == {"Demo", "New"}
+        finally:
+            gate.set()
+            server.app.downloads.close()
+            server.shutdown()
+            origin.shutdown()
+            review_thread.join()
+            origin_thread.join()
+
+
+def test_running_review_keeps_one_version_of_static_assets(tmp_path, monkeypatch):
+    for filename, _ in review_server.ASSETS.values():
+        (tmp_path / filename).write_text("old " + filename)
+    monkeypatch.setattr(review_server, "STATIC", tmp_path)
+
+    with ReviewServer(("127.0.0.1", 0)) as server:
+        (tmp_path / "app.js").write_text("new app")
+        worker = Thread(target=server.serve_forever, kwargs={"poll_interval": 0.02})
+        worker.start()
+        client = HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+        try:
+            client.request("GET", "/app.js")
+            response = client.getresponse()
+            assert response.status == 200
+            assert response.read() == b"old app.js"
+        finally:
+            client.close()
+            server.shutdown()
+            worker.join()
