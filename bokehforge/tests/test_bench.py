@@ -10,9 +10,8 @@ import tifffile
 from PIL import Image
 
 from bokehforge.bench import _score
-from bokehforge.calibration import ScoreCalibration
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
-from bokehforge.scoring import FEATURES, SCORE_VERSION
+from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, SCORE_VERSION, VIEW_WEIGHTS
 
 _FIXTURE_REFERENCE = np.float32(20 / 255)
 
@@ -59,9 +58,12 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert result.returncode == 0, result.stderr
     assert result.stdout == "100.000000\n"
     report = json.loads((output / "report.json").read_text())
+    assert report["schema_version"] == 2
     assert report["score"] == 100.0
     assert report["score_version"] == SCORE_VERSION
-    assert report["scoring"]["calibration"] == "provisional_engineering_curve"
+    assert report["scoring"]["family_weights"] == FAMILY_WEIGHTS
+    assert report["scoring"]["view_weights"] == VIEW_WEIGHTS
+    assert report["scoring"]["damage_scale"] == SCORE_DAMAGE_SCALE
     assert report["scene_status_counts"] == {"ok": 1, "unscored": 1}
     assert report["reference_status_counts"] == {"eligible": 1, "no_eligible_reference": 1}
     assert {row["dataset_id"]: row["scene_score"] for row in report["scenes"]} == {
@@ -130,17 +132,6 @@ def test_unreferenced_selection_is_unscored(corpus, tmp_path):
     assert result.returncode == 0, result.stderr
     assert result.stdout == "unscored\n"
     assert json.loads((output / "report.json").read_text())["score"] is None
-
-
-def test_cli_loads_a_frozen_calibration(corpus, tmp_path):
-    calibration = tmp_path / "calibration.json"
-    calibration.write_text(json.dumps(ScoreCalibration(dict.fromkeys(FEATURES, 6.0), (3, 2, 1, 0)).as_dict()))
-    output = tmp_path / "calibrated"
-    result = run_bench(corpus, output, "--algorithm", "mean", "--score-calibration", str(calibration))
-    assert result.returncode == 0, result.stderr
-    assert result.stdout == "100.000000\n"
-    report = json.loads((output / "report.json").read_text())
-    assert report["scoring"]["calibration_sha256"] == sha256(calibration.read_bytes()).hexdigest()
 
 
 def test_focal_decode_error_is_reported_even_after_early_return(corpus, tmp_path):

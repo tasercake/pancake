@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
 
-from bokehforge.calibration import ScoreCalibration, fit_calibration
 from bokehforge.scoring import FEATURES, Measurement, measure, scene_score
 
 
@@ -93,26 +92,12 @@ def test_native_coverage_finds_localized_defects_and_preserves_coordinates():
     assert scene_score(measurement) < 100
 
 
-def test_calibration_can_learn_different_costs_for_equal_strength_features():
-    grades, groups, examples = [], [], []
-    important = "zoom.boundary"
-    nuisance = "fit.range"
-    for group in range(2):
-        for grade in range(5):
-            for detail in (0.12, 0.71):
-                grades.append(grade)
-                groups.append(group)
-                examples.append({**dict.fromkeys(FEATURES, 0.0), important: (4 - grade) / 4, nuisance: detail})
-    calibration = fit_calibration(examples, grades, groups)
-    assert calibration.weights[important] > calibration.weights[nuisance]
-    base = dict.fromkeys(FEATURES, 0.0)
-    a, b = [Measurement({**base, name: 0.4}, {}) for name in (important, nuisance)]
-    assert scene_score(a, calibration) < scene_score(b, calibration) < 100.000001
-    assert scene_score(Measurement(base, {}), calibration) == 100
-    with pytest.raises(ValueError):
-        ScoreCalibration(dict.fromkeys(FEATURES, 1.0), (3, 2, 2, 1))
-    with pytest.raises(ValueError):
-        fit_calibration(examples[:2], grades[:2], groups[:2])
+def test_fixed_profile_combines_view_and_family_weights():
+    features = dict.fromkeys(FEATURES, 0.0)
+    features.update({"fit.color": 0.2, "native.boundary": 0.6, "zoom.lost_detail": 0.3})
+    damage = 0.30 * 0.16 * 0.2 + 0.50 * 0.23 * 0.6 + 0.20 * 0.18 * 0.3
+    assert scene_score(Measurement(features, {})) == pytest.approx(100 * np.exp(-5 * damage))
+    assert scene_score(Measurement(dict.fromkeys(FEATURES, 1.0), {})) == pytest.approx(100 * np.exp(-5))
 
 
 @pytest.mark.parametrize("delivery", [np.zeros((5, 4, 3)), np.zeros((4, 4, 3), np.float32),
