@@ -133,7 +133,7 @@ def verified(path, item):
     checks = [(key, algorithm) for key, algorithm in [("sha256", "sha256"), ("md5", "md5"), ("git_blob_sha1", "sha1")] if item.get(key)]
     if not checks or any(digest(path, algorithm) != item[key] for key, algorithm in checks):
         return False
-    item["sha256"] = digest(path)
+    item["sha256"] = item.get("sha256") or digest(path)
     item["size"] = path.stat().st_size
     return True
 
@@ -145,8 +145,10 @@ def check_space(path, needed, reserve):
         raise RuntimeError(f"Insufficient disk space: need {needed + reserve:,} bytes including reserve; {free:,} free")
 
 
-def acquire(client, target, item, reserve, retries):
+def acquire(client, target, item, reserve, retries, *, progress=None):
     safe_path(target.parent, target.name)
+    if progress:
+        progress("checking", 0, item.get("size"))
     if verified(target, item):
         return False
     part = target.with_name(target.name + ".part")
@@ -186,22 +188,37 @@ def acquire(client, target, item, reserve, retries):
                     raise RuntimeError(f"Unexpected download HTTP status {response.status_code}")
                 expected = int(response.headers.get("Content-Length", 0))
                 check_space(target.parent, expected, reserve)
+                total = item.get("size") or (offset + expected if expected else None)
+                received = offset
+                updated = time.monotonic()
+                if progress:
+                    progress("downloading", received, total)
                 with part.open("ab" if offset else "wb") as handle:
                     for chunk in response.iter_content(1024 * 1024):
                         if chunk:
                             check_space(target.parent, len(chunk), reserve)
                             handle.write(chunk)
+                            received += len(chunk)
+                            if progress and time.monotonic() - updated >= 0.2:
+                                progress("downloading", received, total)
+                                updated = time.monotonic()
+            if progress:
+                progress("downloading", received, total)
+                progress("verifying", received, total)
             if item.get("size") is not None and part.stat().st_size != item["size"]:
                 raise RuntimeError(f"Downloaded size mismatch for {item['path']}")
+            checksum = digest(part)
             for key, algorithm in [("sha256", "sha256"), ("md5", "md5"), ("git_blob_sha1", "sha1")]:
-                if item.get(key) and digest(part, algorithm) != item[key]:
+                if item.get(key) and (checksum if key == "sha256" else digest(part, algorithm)) != item[key]:
                     part.unlink(missing_ok=True)
                     raise RuntimeError(f"Checksum mismatch ({key}) for {item['path']}")
-            item["sha256"] = digest(part)
+            item["sha256"] = checksum
             item["size"] = part.stat().st_size
             part.replace(target)
             return True
         except (requests.RequestException, OSError, RuntimeError) as exc:
+            if progress:
+                progress("retrying", part.stat().st_size if part.is_file() else 0, item.get("size"))
             error = exc
             if "disk space" in str(exc) or "Range" in str(exc) or "checksum" in str(exc).lower():
                 break
@@ -210,7 +227,7 @@ def acquire(client, target, item, reserve, retries):
     raise RuntimeError(str(error))
 
 
-def main(argv=None):
+def main(argv=None, *, progress=None):
     parser = argparse.ArgumentParser(prog="bokehforge data download", description=__doc__,
                                      epilog="Logs and reports are saved under <root>/.bokehforge/.")
     parser.add_argument("--root", type=Path)
@@ -274,20 +291,34 @@ def main(argv=None):
         active = [d for d in lock["datasets"] if d["id"] in selected]
         if args.resolve_only:
             return 0 if all(d["status"] in {"available", "disabled"} for d in active) else 2
+        if progress:
+            progress({"type": "inventory", "files": [
+                {"dataset": dataset["id"], "path": item["path"], "total": item.get("size")}
+                for dataset in active if dataset["status"] == "available" for item in dataset["files"]
+            ]})
         reports = []
         for dataset in active:
             record = {"id": dataset["id"], "status": dataset["status"], "files": len(dataset["files"]), "verified": 0, "errors": []}
             if dataset["status"] != "available":
                 record["reason"] = dataset.get("reason", "No public source download route")
-                reports.append(record); continue
+                if progress and dataset["status"] != "disabled":
+                    progress({"type": "error", "message": f"{dataset['id']}: {record['reason']}"})
+                reports.append(record)
+                continue
             inputs = dataset["files"]
             errors = []
             def task(item):
                 target = safe_path(args.root / "raw" / dataset["id"], item["path"])
+                def report(phase, received, total):
+                    if progress:
+                        progress({"type": "file", "dataset": dataset["id"], "path": item["path"],
+                                  "phase": phase, "received": received, "total": total})
                 try:
                     previous = dict(item)
                     with session() as client:
-                        changed = acquire(client, target, item, int(args.reserve_gib * 1024**3), args.retries)
+                        changed = acquire(client, target, item, int(args.reserve_gib * 1024**3), args.retries,
+                                          progress=report if progress else None)
+                    report("complete", item["size"], item["size"])
                     with MUTEX:
                         if item != previous or changed:
                             save_json(args.lock, lock)
@@ -295,6 +326,9 @@ def main(argv=None):
                 except Exception as exc:
                     with MUTEX:
                         errors.append({"path": item["path"], "error": str(exc)})
+                        if progress:
+                            report("failed", 0, item.get("size"))
+                            progress({"type": "error", "message": f"{dataset['id']}/{item['path']}: {exc}"})
                         print(f"ERROR {dataset['id']}/{item['path']}: {exc}", file=sys.stderr, flush=True)
             with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
                 list(pool.map(task, inputs))
@@ -302,6 +336,8 @@ def main(argv=None):
             reports.append(record)
             if not errors:
                 save_json(args.root / "raw" / dataset["id"] / "download-manifest.json", dataset)
+                if progress:
+                    progress({"type": "dataset_ready"})
             save_json(args.root / METADATA / "reports/download-report.json", {"schema_version": 1, "datasets": reports})
         save_json(args.root / METADATA / "reports/download-report.json", {"schema_version": 1, "datasets": reports})
         return 0 if all(d["status"] in {"complete", "disabled"} for d in reports) else 2

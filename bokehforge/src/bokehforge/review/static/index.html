@@ -26,6 +26,18 @@
       <h1>Indexing local datasets</h1>
       <p id="catalog-note">Verifying the downloaded originals before opening the scene catalog.</p>
     </section>
+    <section class="download-banner" id="download-banner" aria-labelledby="download-title" hidden>
+      <div class="download-description">
+        <h2 id="download-title">Datasets</h2>
+        <p id="download-state" role="status"></p>
+        <p class="inline-error" id="download-error" role="alert" hidden></p>
+      </div>
+      <div class="download-meter" id="download-meter" hidden>
+        <progress id="download-progress" aria-label="Dataset download progress"></progress>
+        <span id="download-detail"></span>
+      </div>
+      <button class="primary" id="download-start" type="button">Download datasets</button>
+    </section>
     <div class="run-banner" id="run-banner" hidden>
       <div><strong id="run-status"></strong><span id="run-detail"></span></div>
       <progress id="run-progress" aria-label="Evaluation progress"></progress>

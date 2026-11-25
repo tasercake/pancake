@@ -24,6 +24,7 @@ let scenes = [], visible = [], runs = [], scene = null, details = null;
 let frameIndex = 0, referenceIndex = 0, runId = "", stackerId = "", formKey = "";
 let sceneRequest, pollTimer, stopping = "";
 let warmupTimer, warming = [];
+let catalogRevision = -1, downloadTimer, startingDownload = false;
 let outputLoading = false;
 let runOptions = "", outputState = "", candidateState = "";
 let activeImage = null, imageVersion = "";
@@ -366,6 +367,7 @@ function goTo(position) {
   $("previous").disabled = visible.length <= 1;
   $("next").disabled = visible.length <= 1;
   if (scene?.id === next.id) {
+    scene = next;
     remember();
     return;
   }
@@ -707,33 +709,141 @@ async function stopRun() {
   }
 }
 
+function applyCatalog(catalog) {
+  catalogRevision = catalog.revision;
+  imageVersion = catalog.image_version;
+  for (const tool of catalog.stackers) tools.set(tool.id, tool);
+  scenes = catalog.scenes ?? [];
+  const workspace = $("workspace");
+  const notice = $("catalog-state");
+  if (scenes.length) {
+    const dataset = $("dataset");
+    const selected = workspace.hidden ? parameters.get("dataset") : dataset.value;
+    dataset.replaceChildren(new Option("All datasets", ""), ...Object.entries(catalog.datasets)
+      .map(([id, name]) => new Option(name === id ? id : `${name} (${id})`, id)));
+    dataset.value = selected ?? "";
+    if (dataset.selectedIndex < 0) dataset.value = "";
+    notice.hidden = true;
+    workspace.hidden = false;
+    filterScenes(scene?.id ?? parameters.get("scene"));
+  } else {
+    workspace.hidden = true;
+    notice.hidden = false;
+    const heading = notice.querySelector("h1");
+    if (catalog.status === "indexing") {
+      heading.textContent = "Indexing local datasets";
+      $("catalog-note").textContent = "Verifying the downloaded originals before opening the scene catalog.";
+    } else {
+      heading.textContent = catalog.status === "missing" ? "Download a dataset to get started" : "No scenes available";
+      $("catalog-note").textContent = catalog.error ?? (catalog.status === "missing"
+        ? "Scenes appear here after their dataset has been downloaded and verified."
+        : "The verified catalog contains no usable scenes.");
+    }
+  }
+  renderRuns();
+}
+
+function byteSize(bytes) {
+  const units = ["B", "KiB", "MiB", "GiB", "TiB"];
+  let unit = 0;
+  while (bytes >= 1024 && unit < units.length - 1) {
+    bytes /= 1024;
+    unit++;
+  }
+  return `${bytes.toLocaleString(undefined, { maximumFractionDigits: unit ? 1 : 0 })} ${units[unit]}`;
+}
+
+function remainingTime(seconds) {
+  if (seconds < 60) return `~${Math.max(1, Math.ceil(seconds))} sec left`;
+  const minutes = Math.ceil(seconds / 60);
+  if (minutes < 60) return `~${minutes} min left`;
+  const hours = Math.floor(minutes / 60);
+  return `~${hours} hr ${minutes % 60} min left`;
+}
+
+function renderDownload(status) {
+  const names = Object.entries(status.missing).map(([id, name]) => name === id ? id : `${name} (${id})`);
+  const active = status.status === "running";
+  const indexing = status.status === "complete" && status.indexing;
+  const banner = $("download-banner");
+  banner.hidden = !names.length && !active && !indexing && !status.error && !status.catalog_error;
+  const button = $("download-start");
+  button.hidden = !names.length || active || indexing;
+  button.disabled = startingDownload || status.indexing;
+  button.textContent = status.status === "failed" ? "Retry download" : names.length === 1 ? "Download dataset" : "Download datasets";
+
+  const phases = {
+    preparing: "Resolving dataset files…",
+    checking: "Checking existing files…",
+    downloading: "Downloading dataset files…",
+    retrying: "Retrying the transfer…",
+    verifying: "Verifying downloaded files…",
+  };
+  const message = active ? phases[status.phase] : indexing ? "Download complete. Indexing scenes…"
+    : names.length ? `Available to download · ${names.join(", ")}` : "Dataset download";
+  if ($("download-state").textContent !== message) $("download-state").textContent = message;
+  showMessage($("download-error"), status.error || status.catalog_error || "");
+
+  const meter = $("download-meter");
+  meter.hidden = !active && !indexing;
+  const progress = $("download-progress");
+  if (status.total > 0) {
+    progress.max = status.total;
+    progress.value = Math.min(status.received, status.total);
+  } else {
+    progress.removeAttribute("value");
+  }
+  const details = status.total > 0
+    ? [`${byteSize(status.received)} of ${byteSize(status.total)}`,
+       `${Math.floor(100 * progress.value / status.total)}%`]
+    : status.received > 0 ? [byteSize(status.received) + " received"] : [];
+  if (status.rate) details.push(byteSize(status.rate) + "/s");
+  if (status.seconds_remaining > 0) details.push(remainingTime(status.seconds_remaining));
+  $("download-detail").textContent = details.join(" · ");
+}
+
+function scheduleDownload(delay) {
+  clearTimeout(downloadTimer);
+  downloadTimer = setTimeout(pollDownload, delay);
+}
+
+async function pollDownload() {
+  let delay = 3000;
+  try {
+    const status = await api("/api/download");
+    if (status.catalog_revision !== catalogRevision) applyCatalog(await api("/api/catalog"));
+    renderDownload(status);
+    if (status.status === "running" || status.indexing) delay = 750;
+  } catch (error) {
+    $("download-banner").hidden = false;
+    showMessage($("download-error"), error.message);
+  }
+  scheduleDownload(delay);
+}
+
+async function startDownload() {
+  startingDownload = true;
+  $("download-start").disabled = true;
+  showMessage($("download-error"), "");
+  try {
+    renderDownload(await api("/api/download", {}));
+    scheduleDownload(750);
+  } catch (error) {
+    showMessage($("download-error"), error.message);
+  } finally {
+    startingDownload = false;
+    $("download-start").disabled = false;
+  }
+}
+
 async function boot() {
   try {
-    const catalog = await api("/api/catalog");
-    if (catalog.status === "indexing") {
-      setTimeout(boot, 1200);
-      return;
-    }
-    if (catalog.status === "error" || !catalog.scenes.length) {
-      $("catalog-state").querySelector("h1").textContent = "No scenes available";
-      $("catalog-note").textContent = catalog.error ?? "The verified catalog contains no usable scenes.";
-      return;
-    }
-    imageVersion = catalog.image_version;
-    for (const tool of catalog.stackers) tools.set(tool.id, tool);
-    scenes = catalog.scenes;
-    for (const [id, name] of Object.entries(catalog.datasets)) {
-      $("dataset").add(new Option(name === id ? id : `${name} (${id})`, id));
-    }
-    $("dataset").value = parameters.get("dataset") ?? "";
-    if ($("dataset").selectedIndex < 0) $("dataset").value = "";
-    runs = await api("/api/runs");
+    const [catalog, history] = await Promise.all([api("/api/catalog"), api("/api/runs")]);
+    runs = history;
     runId = runs.find((run) => run.id === parameters.get("run"))?.id ?? runs[0]?.id ?? "";
-    renderRuns();
-    $("catalog-state").hidden = true;
-    $("workspace").hidden = false;
-    filterScenes(parameters.get("scene"));
+    applyCatalog(catalog);
     scheduleRuns();
+    await pollDownload();
   } catch (error) {
     $("catalog-state").querySelector("h1").textContent = "Could not connect to BokehForge";
     $("catalog-note").textContent = error.message;
@@ -752,6 +862,7 @@ $("run-select").onchange = () => changeRun($("run-select").value);
 $("rating-form").oninput = captureDraft;
 $("rating-form").onsubmit = saveRating;
 $("open-run").onclick = openRunDialog;
+$("download-start").onclick = startDownload;
 $("stop-run").onclick = stopRun;
 $("run-form").onsubmit = startRun;
 $("pixel-mode").onclick = () => setPixelMode(!activeImage.actual);
