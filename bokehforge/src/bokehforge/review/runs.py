@@ -1,22 +1,20 @@
 """Local evaluation batches and their durable, per-scene results."""
 
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
 import os
 from pathlib import Path
 import re
-from shutil import which
-import subprocess
 from tempfile import TemporaryDirectory
 from threading import Event, Lock, Thread
 from uuid import uuid4
 
 from .images import normalize_output, stage_frame
+from .stacker_setup import BIN_DIR, EXE, REPO, RunStopped, StackerSetup, run_logged
 
-REPO = Path(__file__).resolve().parents[4]
 RUN_ID = re.compile(r"\d{8}T\d{12}Z-[a-f0-9]{8}")
 
 
@@ -25,8 +23,8 @@ class Stacker:
     id: str
     label: str
     method: str
-    executable: str | None
-    setup: str
+    candidates: tuple[str | Path, ...]
+    executable: str | None = None
 
     def command(self, frames, output):
         if self.id == "pancake":
@@ -38,36 +36,21 @@ class Stacker:
         return [self.executable, str(Path(__file__).with_name("_shine.py")), "frames", output]
 
 
-def _executable(override, *defaults):
-    for candidate in (override,) if override else defaults:
-        found = which(str(candidate))
-        if found:
-            # Resolving a venv's Python symlink would discard its environment.
-            return str(Path(found).absolute())
-    return None
-
-
 def configured_stackers(args):
     modules = REPO / ".submodules"
-    bin_dir = "Scripts" if os.name == "nt" else "bin"
-    extension = ".exe" if os.name == "nt" else ""
-    pancake = "pancake-cli" + extension
-    focus = "focus-stack" + extension
-    openfocus = "openfocus" + extension
-    python = "python" + extension
+    pancake = "pancake-cli" + EXE
+    focus = "focus-stack" + EXE
+    openfocus = "openfocus" + EXE
+    python = "python" + EXE
     return {tool.id: tool for tool in (
         Stacker("pancake", "Pancake", "Default fusion · CPU",
-                _executable(args.pancake, REPO / "pancake/target/release" / pancake, pancake),
-                "Build pancake-cli or pass --pancake."),
+                (args.pancake,) if args.pancake else (REPO / "pancake/target/release" / pancake, pancake)),
         Stacker("focus-stack", "focus-stack", "Complex wavelet",
-                _executable(args.focus_stack, modules / "focus-stack/build" / focus, focus),
-                "Build .submodules/focus-stack or pass --focus-stack."),
+                (args.focus_stack,) if args.focus_stack else (modules / "focus-stack/build" / focus, focus)),
         Stacker("openfocus", "OpenFocus", "StackMFF V3 · CPU",
-                _executable(args.openfocus, modules / "OpenFocus/.venv" / bin_dir / openfocus, openfocus),
-                "Install .submodules/OpenFocus into its .venv or pass --openfocus."),
+                (args.openfocus,) if args.openfocus else (modules / "OpenFocus/.venv" / BIN_DIR / openfocus, openfocus)),
         Stacker("shinestacker", "ShineStacker", "Alignment + Pyramid",
-                _executable(args.shine_python, modules / "shinestacker/.venv" / bin_dir / python),
-                "Install .submodules/shinestacker into its .venv or pass --shine-python."),
+                (args.shine_python,) if args.shine_python else (modules / "shinestacker/.venv" / BIN_DIR / python,)),
     )}
 
 
@@ -129,31 +112,9 @@ def lock_store(directory):
         yield
 
 
-class RunStopped(Exception):
-    pass
-
-
 def _render(tool, frames, work, log, stop):
     delivery = f"{tool.id}.tif"
-    command = tool.command(frames, delivery)
-    log.parent.mkdir(parents=True, exist_ok=True)
-    with log.open("wb") as stream:
-        stream.write((json.dumps(command) + "\n").encode())
-        stream.flush()
-        process = subprocess.Popen(command, cwd=work, stdin=subprocess.DEVNULL,
-                                   stdout=stream, stderr=subprocess.STDOUT)
-        while process.poll() is None and not stop.wait(0.25):
-            pass
-        if stop.is_set():
-            process.terminate()
-            try:
-                process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                process.kill()
-                process.wait()
-            raise RunStopped()
-        if process.returncode:
-            raise RuntimeError(f"{tool.label} exited with code {process.returncode}. See the stacker log.")
+    run_logged(tool.command(frames, delivery), work, log, stop, tool.label)
     return work / delivery
 
 
@@ -161,6 +122,7 @@ class Runs:
     def __init__(self, store, stackers):
         self.root = store / "runs"
         self.stackers = stackers
+        self.setup = StackerSetup(store)
         self.worker = None
         self.active = None
         self.stop = Event()
@@ -172,7 +134,7 @@ class Runs:
 
     def tooling(self):
         return [{"id": tool.id, "label": tool.label, "method": tool.method,
-                 "available": tool.executable is not None, "setup": tool.setup}
+                 "available": self.setup.available(tool) is not None}
                 for tool in self.stackers.values()]
 
     def list(self):
@@ -209,6 +171,8 @@ class Runs:
                     row = {"status": "different_source"}
                 elif row["status"] == "ready" and not (base / row["image"]).is_file():
                     row = {"status": "missing_file"}
+            elif error := progress.get("setup_errors", {}).get(stacker):
+                row = {"status": "failed", **error}
             else:
                 row = {"status": "pending" if progress["status"] == "running" else "unfinished"}
             rows.append({"stacker": stacker, **row})
@@ -221,9 +185,6 @@ class Runs:
             if not stacker_ids or any(key not in self.stackers for key in stacker_ids):
                 raise ValueError("Select at least one supported stacker")
             tools = [self.stackers[key] for key in dict.fromkeys(stacker_ids)]
-            missing = [tool.label for tool in tools if tool.executable is None]
-            if missing:
-                raise ValueError("Stacker setup needed for " + ", ".join(missing))
             started = _now()
             run_id = started.strftime("%Y%m%dT%H%M%S%fZ-") + uuid4().hex[:8]
             base = self.directory(run_id)
@@ -235,7 +196,7 @@ class Runs:
                    "input_format": "16-bit SDR sRGB TIFF",
                    "output_format": "float32 linear-sRGB RGB TIFF"}
             progress = {"status": "running", "total": len(scene_ids) * len(tools),
-                        "ready": 0, "failed": 0, "current_scene": None}
+                        "ready": 0, "failed": 0, "current_scene": None, "setup_errors": {}, "prepared": []}
             _write(base / "progress.json", progress)
             _write(base / "run.json", run)
             self.active = run_id
@@ -262,7 +223,8 @@ class Runs:
 
     def _worker(self, base, catalog, scene_ids, tools, progress):
         try:
-            for scene_id in scene_ids:
+            tools = self._prepare_tools(base, tools, len(scene_ids), progress)
+            for scene_id in scene_ids if tools else ():
                 self._check_stop()
                 progress["current_scene"] = scene_id
                 _write(base / "progress.json", progress)
@@ -273,8 +235,38 @@ class Runs:
         except Exception as exc:
             progress.update(status="error", error=str(exc))
         finally:
-            progress.update(finished_at=_now().isoformat(), current_scene=None)
+            progress.update(finished_at=_now().isoformat(), current_scene=None, setup=None)
             _write(base / "progress.json", progress)
+
+    def _prepare_tools(self, base, tools, scene_count, progress):
+        ready = []
+        for tool in tools:
+            self._check_stop()
+            log = base / tool.id / "setup.log"
+
+            def tell(message):
+                progress["setup"] = {"stacker": tool.id, "message": message}
+                _write(base / "progress.json", progress)
+
+            try:
+                path = self.setup.prepare(tool, log, self.stop, tell)
+                ready.append(replace(tool, executable=path))
+                progress["prepared"].append(tool.id)
+            except RunStopped:
+                raise
+            except Exception as exc:
+                log.parent.mkdir(parents=True, exist_ok=True)
+                with log.open("a", encoding="utf-8") as stream:
+                    stream.write(f"\n{exc}\n")
+                progress["setup_errors"][tool.id] = {
+                    "error": f"Could not set up {tool.label}. {exc}",
+                    "log": log.relative_to(base).as_posix(),
+                }
+                progress["failed"] += scene_count
+                _write(base / "progress.json", progress)
+        progress["setup"] = None
+        _write(base / "progress.json", progress)
+        return ready
 
     def _evaluate_scene(self, base, catalog, scene, tools, progress):
         fingerprint = scene_fingerprint(catalog, scene)

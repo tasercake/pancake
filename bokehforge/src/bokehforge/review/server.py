@@ -1,26 +1,29 @@
 """Serve the BokehForge rating app over HTTP."""
 
 import argparse
-from functools import lru_cache
+from hashlib import sha256
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from ipaddress import ip_address
 import json
 from pathlib import Path
+from secrets import token_hex
 from socket import gethostname
-from threading import BoundedSemaphore, Thread
+from threading import Thread
 from urllib.parse import parse_qs, urlsplit
 
 from .. import SceneCatalog
 from ..data._config import DEFAULT_CONFIG, data_root, read_config
-from .images import output_pixels, preview
+from .images import (
+    DecodedFrames, PREVIEW_VERSION, PreviewCache, ReviewFrameDecoder, SIZES, output_pixels, preview, preview_mime,
+)
 from .ratings import Ratings
 from .runs import REPO, Runs, configured_stackers, lock_store
 
 STATIC = Path(__file__).with_name("static")
 ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+          "/rail.js": ("rail.js", "text/javascript; charset=utf-8"),
           "/style.css": ("style.css", "text/css; charset=utf-8")}
-SIZES = {"thumb": 192, "fit": 1500, "native": 0}
 ALL_INTERFACES = "0.0.0.0"
 
 
@@ -46,8 +49,10 @@ class Review:
         self.scenes = []
         self.runs = Runs(args.store, configured_stackers(args))
         self.ratings = Ratings(args.store)
-        self.decode_slots = BoundedSemaphore(2)
-        self.cached_preview = lru_cache(maxsize=40)(self._preview)
+        self.image_version = token_hex(8)
+        self.previews = PreviewCache(args.store)
+        self.decoded = DecodedFrames()
+        self.frame_decoder = ReviewFrameDecoder()
         Thread(target=self._load, args=(args,), daemon=True, name="bokehforge-catalog").start()
 
     def _load(self, args):
@@ -56,7 +61,10 @@ class Review:
             scenes = [catalog.scene(scene_id) for scene_id in catalog.scene_ids]
             self.scenes = [
                 {"id": scene.id, "name": scene.metadata["source_scene_id"],
-                 "dataset": scene.metadata["dataset_id"], "frames": len(scene.frame_ids)}
+                 "dataset": scene.metadata["dataset_id"], "frames": len(scene.frame_ids),
+                 "first_frame": scene.frame_ids[0],
+                 "first_reference": next(iter(scene.reference_ids), None),
+                 "preview_frame": scene.frame_ids[len(scene.frame_ids) // 2]}
                 for scene in scenes
             ]
             datasets = dataset_names(args.root, args.lock, dict.fromkeys(scene["dataset"] for scene in self.scenes))
@@ -98,27 +106,42 @@ class Review:
                 return self.runs.directory(run_id) / row[key]
         raise KeyError(f"Evaluation {key} unavailable")
 
-    def _preview(self, name, pixels, size, thumbnail):
-        return preview(pixels(name), size, thumbnail)
-
-    def image(self, query):
+    def image_target(self, query):
         catalog = self.require_catalog()
         variant = query.get("size", "fit")
-        size = SIZES[variant]
-        thumbnail = variant == "thumb"
+        if variant not in SIZES:
+            raise ValueError("Unknown image size")
         if "frame" in query:
-            name = query["frame"]
-            catalog.frame(name)
-            pixels = self.frame_pixels
+            frame_id = query["frame"]
+            frame = catalog.frame(frame_id)
+            recipe = catalog.scene(frame.scene_id).metadata["recipe_sha256"]
+            identity = (frame.asset_sha256, frame.source_sha256, frame.page, recipe)
+            def read():
+                return self.frame_decoder.decode(frame).data
         else:
-            name = self.artifact(query, "image")
-            pixels = output_pixels
-        with self.decode_slots:
-            render = self.cached_preview if size else self._preview
-            return ("image/jpeg" if thumbnail else "image/png"), render(name, pixels, size, thumbnail)
+            path = self.artifact(query, "image")
+            stat = path.stat()
+            identity = (str(path), stat.st_ino, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size)
+            def read():
+                return output_pixels(path)
+        return variant, identity, read
 
-    def frame_pixels(self, frame_id):
-        return self.catalog.decode(frame_id).data
+    def image(self, query):
+        """Render an image for internal callers."""
+        variant, identity, read = self.image_target(query)
+        key = self.image_key(variant, identity)
+        return preview_mime(variant), self.image_body(key, variant, identity, read)
+
+    @staticmethod
+    def image_key(variant, identity):
+        parts = (PREVIEW_VERSION, variant, preview_mime(variant), identity)
+        return sha256(json.dumps(parts).encode()).hexdigest()
+
+    def image_body(self, key, variant, identity, read, background=False):
+        return self.previews.render(
+            key, lambda: preview(self.decoded.get(identity, read), variant),
+            background=background or variant == "thumb", persistent=variant != "native",
+        )
 
     def start(self, form):
         catalog = self.require_catalog()
@@ -149,10 +172,15 @@ class Review:
 
 
 class Handler(BaseHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
+    timeout = 10
+    disable_nagle_algorithm = True
+
     def do_GET(self):
         self.handle_request(self.get)
 
     def do_POST(self):
+        self.close_connection = True
         self.handle_request(self.post)
 
     def handle_request(self, route):
@@ -196,14 +224,14 @@ class Handler(BaseHTTPRequestHandler):
             filename, mime = ASSETS[path]
             self.send(200, mime, (STATIC / filename).read_bytes())
         elif path == "/api/catalog":
-            self.json(200, {**app.catalog_status, "stackers": app.runs.tooling()})
+            self.json(200, {**app.catalog_status, "stackers": app.runs.tooling(),
+                            "image_version": app.image_version})
         elif path == "/api/runs":
             self.json(200, app.runs.list())
         elif path == "/api/scene":
             self.json(200, app.scene_details(query["scene"], query.get("run")))
         elif path == "/api/image":
-            mime, body = app.image(query)
-            self.send(200, mime, body)
+            self.send_image(app, query)
         elif path == "/api/log":
             log = app.artifact(query, "log")
             with log.open("rb") as handle:
@@ -215,6 +243,20 @@ class Handler(BaseHTTPRequestHandler):
                       filename="bokehforge-ratings.csv")
         else:
             raise KeyError("Page not found")
+
+    def send_image(self, app, query):
+        variant, identity, read = app.image_target(query)
+        key = app.image_key(variant, identity)
+        etag = f'"{key}"'
+        cache = ("private, max-age=86400, immutable" if query.get("v") == app.image_version
+                 else "private, max-age=0, must-revalidate")
+        validators = self.headers.get("If-None-Match", "").split(",")
+        if any(value.strip().removeprefix("W/") in {etag, "*"} for value in validators):
+            self.send(304, preview_mime(variant), b"", cache=cache, etag=etag)
+            return
+        background = self.headers.get("X-BokehForge-Prefetch") == "1"
+        body = app.image_body(key, variant, identity, read, background)
+        self.send(200, preview_mime(variant), body, cache=cache, etag=etag)
 
     def post(self, path, _query):
         if self.headers.get_content_type() != "application/json":
@@ -247,11 +289,16 @@ class Handler(BaseHTTPRequestHandler):
     def json(self, status, payload):
         self.send(status, "application/json; charset=utf-8", json.dumps(payload).encode())
 
-    def send(self, status, mime, body, filename=None):
+    def send(self, status, mime, body, filename=None, *, cache="no-store", etag=None):
         self.send_response(status)
-        self.send_header("Content-Type", mime)
-        self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
+        if status != 304:
+            self.send_header("Content-Type", mime)
+            self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", cache)
+        if self.close_connection:
+            self.send_header("Connection", "close")
+        if etag is not None:
+            self.send_header("ETag", etag)
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Cross-Origin-Resource-Policy", "same-origin")
         self.send_header("Content-Security-Policy",
