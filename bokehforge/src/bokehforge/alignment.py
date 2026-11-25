@@ -7,7 +7,7 @@ import numpy as np
 from scipy import ndimage as ndi
 from scipy import optimize, signal
 
-from .scoring import _measure, scene_score, validate_rgb
+from .scoring import ScoreDetails, _measure, _score_explanation, _validate_details, validate_rgb
 
 CROP_SCORE_VERSION = "reference-fidelity-crop-v2"
 MAX_ROTATION_DEGREES = 3.0
@@ -202,27 +202,48 @@ def _project(candidate, shape, placement):
     return aligned, support
 
 
-def _placed_score(candidate, target, placement):
+def _placed_score(candidate, target, placement, details):
     if candidate.shape == target.shape and (placement.top, placement.left, placement.rotation) == (0, 0, 0):
-        measurement = _measure(candidate, target)
-        return measurement, scene_score(measurement), 1.0
+        measurement = _measure(candidate, target, details=details)
+        return measurement, measurement.score, 1.0
     aligned, support = _project(candidate, target.shape, placement)
     coverage = min(int(support.sum()), candidate.shape[0] * candidate.shape[1]) / support.size
     if not coverage:
         return None, 0.0, 0.0
-    measurement = _measure(aligned, target, None if support.all() else support)
-    return measurement, scene_score(measurement), coverage
+    measurement = _measure(aligned, target, None if support.all() else support, details=details)
+    return measurement, measurement.score, coverage
 
 
-def evaluate_crop(candidate, target):
-    """Return scene score, leading measurement, and image-inferred alignment details."""
+def _candidate_to_reference(candidate, placement):
+    """Return the forward placement matrix on (x, y) pixel centers."""
+    theta = radians(placement.rotation)
+    c, s = cos(theta), sin(theta)
+    cx, cy = (candidate.shape[1] - 1) / 2, (candidate.shape[0] - 1) / 2
+    return [[c, s, cx + placement.left - c * cx - s * cy],
+            [-s, c, cy + placement.top + s * cx - c * cy]]
+
+
+def evaluate_crop(candidate, target, *, details: ScoreDetails | None = None):
+    """Return the scene score, leading measurement and alignment.
+
+    When requested, alignment also contains an explanation for every scored placement.
+    """
+    _validate_details(details)
     validate_rgb(candidate)
     validate_rgb(target)
+
+    def unmatched(reason, confidence):
+        alignment = {"status": "unmatched", "reason": reason, "confidence": confidence, "placements": []}
+        if details is not None:
+            alignment["explanation"] = _score_explanation(
+                CROP_SCORE_VERSION, details, candidate, target, 0.0, confidence, [])
+            alignment["explanation"]["reason"] = reason
+        return 0.0, None, alignment
+
     limits = tuple(t - c for t, c in zip(target.shape[:2], candidate.shape[:2], strict=True))
     identity = _Placement(0.0, 0.0, 0.0, 1.0)
     if min(limits) < 0:
-        return 0.0, None, {"status": "unmatched", "reason": "output_larger_than_reference",
-                           "confidence": 0.0, "placements": []}
+        return unmatched("output_larger_than_reference", 0.0)
 
     if limits == (0, 0):
         # The reference fixes translation at full size. Apply roll only when
@@ -245,22 +266,32 @@ def evaluate_crop(candidate, target):
         best = placements[0].agreement if placements else -1.0
         confidence = float(np.clip((best - _MIN_AGREEMENT) / (_FULL_AGREEMENT - _MIN_AGREEMENT), 0, 1))
         if not confidence:
-            return 0.0, None, {"status": "unmatched", "reason": "weak_image_agreement",
-                               "confidence": confidence, "placements": []}
+            return unmatched("weak_image_agreement", confidence)
 
     best = placements[0].agreement
     weights = [max(0.0, 1 - (best - p.agreement) / _AMBIGUITY_MARGIN) ** 2 for p in placements]
     total_weight = sum(weights)
     report, score, leading = [], 0.0, None
+    explanations = []
     for placement, weight in zip(placements, weights, strict=True):
         if not weight:
             continue
-        measurement, quality, coverage = _placed_score(candidate, target, placement)
+        measurement, quality, coverage = _placed_score(candidate, target, placement, details)
         share = confidence * weight / total_weight
-        score += share * quality * coverage
+        contribution = share * quality * coverage
+        score += contribution
         if not report:
             leading = measurement
-        report.append({"offset_yx": [placement.top, placement.left],
-                       "rotation_degrees": placement.rotation, "agreement": placement.agreement,
-                       "coverage": coverage, "overlap_score": quality, "weight": share})
-    return score, leading, {"status": "matched", "confidence": confidence, "placements": report}
+        pose = {"offset_yx": [placement.top, placement.left],
+                "rotation_degrees": placement.rotation, "agreement": placement.agreement,
+                "coverage": coverage, "overlap_score": quality, "weight": share}
+        report.append(pose)
+        if details is not None:
+            explanations.append({**pose, "candidate_to_reference_xy": _candidate_to_reference(candidate, placement),
+                                 "score_contribution": contribution,
+                                 "comparison": None if measurement is None else measurement.explanation})
+    alignment = {"status": "matched", "confidence": confidence, "placements": report}
+    if details is not None:
+        alignment["explanation"] = _score_explanation(
+            CROP_SCORE_VERSION, details, candidate, target, score, confidence, explanations)
+    return score, leading, alignment

@@ -10,9 +10,10 @@ import tifffile
 from PIL import Image
 
 from bokehforge.alignment import CROP_SCORE_VERSION
-from bokehforge.bench import _score
+from bokehforge.bench import _score, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
-from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, SCORE_VERSION
+from bokehforge.data.lazy import SceneCatalog
+from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, SCORE_EXPLANATION_VERSION, SCORE_VERSION
 
 _FIXTURE_REFERENCE = np.float32(20 / 255)
 
@@ -80,9 +81,10 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert np.all(pixels == _FIXTURE_REFERENCE)
     assert target["score_features"] == dict.fromkeys(FEATURES, 0)
     assert set(target["artifact_diagnostics"]["views"]) == {"native"}
+    assert "score_explanation_path" not in target
 
     replay_dir = tmp_path / "replay"
-    replay = run_bench(corpus, replay_dir, "--candidate-dir", str(output / "images"))
+    replay = run_bench(corpus, replay_dir, "--candidate-dir", str(output / "images"), "--explain-score", "tiles")
     assert replay.returncode == 0, replay.stderr
     assert replay.stdout == result.stdout
     replay_report = json.loads((replay_dir / "report.json").read_text())
@@ -90,6 +92,19 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert replay_report["cohort_sha256"] == report["cohort_sha256"]
     assert replay_row["artifact_diagnostics"] == target["artifact_diagnostics"]
     assert replay_row["frames_read"] == 0
+    assert replay_report["score_explanation_version"] == SCORE_EXPLANATION_VERSION
+    assert replay_report["score_aggregation"]["score"] == report["score"]
+    explanation = json.loads((replay_dir / replay_row["score_explanation_path"]).read_text())
+    assert explanation["reference_id"] == target["reference_ids"][0]
+    assert explanation["scene_id"] == target["scene_id"]
+    assert explanation["score"] == replay_row["scene_score"]
+    placement, = explanation["placements"]
+    assert placement["candidate_to_reference_xy"] == [[1, 0, 0], [0, 1, 0]]
+    assert len(placement["comparison"]["tile_grids"]) == 8
+    catalog = SceneCatalog(corpus, config=corpus / "sources.json")
+    scene = catalog.scene(target["scene_id"])
+    assert score_saved_output(catalog, scene, output / target["image"], details="tiles")["explanation"] == explanation
+    assert "explanation" not in score_saved_output(catalog, scene, output / target["image"])
 
     missing = tmp_path / "empty"
     missing.mkdir()
@@ -202,6 +217,15 @@ def test_score_averages_independent_groups_and_withholds_on_reference_error():
         {"dataset_id": dataset, "leakage_group_id": group, "scene_score": score, "reference_status": "eligible"}
         for dataset, group, score in (("first", "A", 100), ("first", "A", 80), ("first", "B", 0), ("second", "C", 80))
     ]
-    assert _score(rows) == (62.5, 3)
+    explanation = {}
+    assert _score(rows, explanation=explanation) == (62.5, 3)
+    assert explanation["status"] == "ok"
+    assert explanation["datasets"]["first"] == {
+        "score": 45, "weight": 0.5,
+        "groups": {"A": {"score": 90, "weight": 0.5, "scene_count": 2},
+                   "B": {"score": 0, "weight": 0.5, "scene_count": 1}},
+    }
     rows.append({"leakage_group_id": "D", "scene_score": None, "reference_status": "error"})
-    assert _score(rows) == (None, 3)
+    assert _score(rows, explanation=explanation) == (None, 3)
+    assert explanation["status"] == "evaluation_error"
+    assert explanation["score"] is None

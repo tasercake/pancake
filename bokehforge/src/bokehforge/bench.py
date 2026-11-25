@@ -2,7 +2,7 @@
 
 import argparse
 from collections import Counter, defaultdict
-from contextlib import closing, redirect_stdout
+from contextlib import closing, redirect_stdout, suppress
 from hashlib import sha256
 from importlib import import_module
 from itertools import chain
@@ -22,7 +22,10 @@ from .data._files import digest
 from .data._config import DEFAULT_CONFIG, data_root, read_config
 from .data.download import save_json
 from .data.lazy import SceneCatalog
-from .scoring import FAMILY_WEIGHTS, SCORE_DAMAGE_SCALE, SCORE_VERSION, measure, scene_score, validate_rgb
+from .scoring import (
+    FAMILY_WEIGHTS, SCORE_DAMAGE_SCALE, SCORE_DETAIL_LEVELS, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
+    ScoreDetails, _score_explanation, _validate_details, measure, validate_rgb,
+)
 from .stacking import StackFrame, StackInput
 
 _RGB_REFERENCES = {"rendered_all_in_focus", "synthetic_source_image_reference"}
@@ -169,7 +172,7 @@ def _load_candidate(path, row, *, fingerprint=False):
     return None
 
 
-def _score_delivery(result, reference, row, profile):
+def _score_delivery(result, reference, row, profile, *, details=None):
     try:
         validate_rgb(result, reference.shape if profile == SCORE_VERSION else None)
     except ValueError as exc:
@@ -178,14 +181,25 @@ def _score_delivery(result, reference, row, profile):
 
     scoring_start = perf_counter()
     try:
+        explanation = None
         if profile == CROP_SCORE_VERSION:
-            score, measurement, alignment = evaluate_crop(result, reference)
+            score, measurement, alignment = evaluate_crop(result, reference, details=details)
+            explanation = alignment.pop("explanation", None)
             row.update(scene_score=score, alignment=alignment)
         else:
-            measurement = measure(result, reference)
-            row["scene_score"] = scene_score(measurement)
+            measurement = measure(result, reference, details=details)
+            score = row["scene_score"] = measurement.score
+            if details is not None:
+                placement = {
+                    "offset_yx": [0.0, 0.0], "rotation_degrees": 0.0, "agreement": None,
+                    "candidate_to_reference_xy": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
+                    "coverage": 1.0, "weight": 1.0, "overlap_score": score, "score_contribution": score,
+                    "comparison": measurement.explanation,
+                }
+                explanation = _score_explanation(profile, details, result, reference, score, 1.0, [placement])
         if measurement is not None:
             row.update(score_features=measurement.features, artifact_diagnostics=measurement.diagnostics)
+        return explanation
     except Exception as exc:
         row.update(status="scoring_error", reference_status="error", scene_score=None, error=_error_text(exc))
         return
@@ -193,16 +207,44 @@ def _score_delivery(result, reference, row, profile):
         row["scoring_seconds"] = perf_counter() - scoring_start
 
 
-def score_saved_output(catalog, scene, path):
-    """Return the benchmark's default per-scene score for an existing canonical TIFF."""
+def score_saved_output(catalog, scene, path, *, profile=SCORE_VERSION, details: ScoreDetails | None = None):
+    """Score an existing canonical TIFF and optionally return its measurement evidence."""
+    _validate_details(details)
+    if profile not in (SCORE_VERSION, CROP_SCORE_VERSION):
+        raise ValueError(f"Unknown score profile {profile!r}")
     row = {"status": "ok", "scene_score": None}
+    explanation = None
     reference = _reference(catalog, scene, row)
     if reference is not None:
         result = _load_candidate(path, row)
         if result is not None:
-            _score_delivery(result, reference, row, SCORE_VERSION)
-    return {"profile": SCORE_VERSION, "score": row["scene_score"], "status": row["status"],
-            **({"error": row["error"]} if "error" in row else {})}
+            explanation = _score_delivery(result, reference, row, profile, details=details)
+    response = {"profile": profile, "score": row["scene_score"], "status": row["status"]}
+    if "error" in row:
+        response["error"] = row["error"]
+    if explanation is not None:
+        response["explanation"] = {**explanation, "scene_id": scene.id, "reference_id": scene.reference_ids[0]}
+    return response
+
+
+def _save_explanation(output, scene, row, explanation):
+    path = output / "score-explanations" / (scene.id + ".json")
+    temporary = path.with_suffix(".tmp")
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with temporary.open("w", encoding="utf-8") as stream:
+            json.dump({**explanation, "scene_id": scene.id, "reference_id": scene.reference_ids[0]},
+                      stream, separators=(",", ":"), allow_nan=False)
+            stream.write("\n")
+        temporary.replace(path)
+    except (OSError, ValueError) as exc:
+        with suppress(OSError):
+            temporary.unlink(missing_ok=True)
+        row["score_explanation_error"] = _error_text(exc)
+        if row["status"] == "ok":
+            row["status"] = "score_explanation_error"
+    else:
+        row["score_explanation_path"] = path.relative_to(output).as_posix()
 
 
 def _run_scene(catalog, scene, row, algorithm, args):
@@ -228,7 +270,7 @@ def _run_scene(catalog, scene, row, algorithm, args):
 
     if row["status"] != "ok":
         return
-    _score_delivery(result, reference, row, args.score_profile)
+    explanation = _score_delivery(result, reference, row, args.score_profile, details=args.explain_score)
     if row["status"] != "ok":
         return
     if args.save_images:
@@ -241,9 +283,11 @@ def _run_scene(catalog, scene, row, algorithm, args):
             row.update(status="image_error", error=_error_text(exc))
         else:
             row["image"] = image_path.relative_to(args.output).as_posix()
+    if explanation is not None:
+        _save_explanation(args.output, scene, row, explanation)
 
 
-def _score(rows):
+def _score(rows, *, explanation=None):
     datasets = defaultdict(lambda: defaultdict(list))
     groups = set()
     for row in rows:
@@ -252,8 +296,20 @@ def _score(rows):
             datasets[row["dataset_id"]][group].append(row["scene_score"])
             groups.add(group)
     unavailable = any(row["reference_status"] == "error" for row in rows)
-    dataset_means = (fmean(map(fmean, dataset.values())) for dataset in datasets.values())
-    return (fmean(dataset_means) if datasets and not unavailable else None), len(groups)
+    group_means = {dataset: {group: fmean(scores) for group, scores in group_rows.items()}
+                   for dataset, group_rows in datasets.items()}
+    dataset_means = {dataset: fmean(scores.values()) for dataset, scores in group_means.items()}
+    score = fmean(dataset_means.values()) if dataset_means and not unavailable else None
+    if explanation is not None:
+        explanation.update(score=score, status="evaluation_error" if unavailable else "ok" if dataset_means else "unscored",
+                           datasets={
+                               dataset: {"score": score, "weight": 1 / len(dataset_means), "groups": {
+                                   group: {"score": mean, "weight": 1 / len(group_means[dataset]),
+                                           "scene_count": len(datasets[dataset][group])}
+                                   for group, mean in group_means[dataset].items()
+                               }} for dataset, score in dataset_means.items()
+                           })
+    return score, len(groups)
 
 
 def main(argv=None):
@@ -269,6 +325,8 @@ def main(argv=None):
     parser.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
     parser.add_argument("--score-profile", choices=(SCORE_VERSION, CROP_SCORE_VERSION), default=SCORE_VERSION,
                         help="Score on the fixed reference grid or match a delivered crop to it")
+    parser.add_argument("--explain-score", choices=SCORE_DETAIL_LEVELS,
+                        help="Save per-scene score components and optionally all scoring tiles")
     parser.add_argument("--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)")
     parser.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     parser.add_argument("--progress", action="store_true", help="Write progress to stderr")
@@ -303,7 +361,8 @@ def main(argv=None):
             print(f"{index}/{len(scenes)} {scene.id} ({row['frame_count']} frames)", file=sys.stderr, flush=True)
         last_dataset = dataset
         _run_scene(catalog, scene, row, algorithm, args)
-    score, scored_groups = _score(rows)
+    aggregation = {} if args.explain_score is not None else None
+    score, scored_groups = _score(rows, explanation=aggregation)
     statuses = Counter(row["status"] for row in rows)
     references = Counter(row["reference_status"] for row in rows)
     scoring = {"family_weights": FAMILY_WEIGHTS, "damage_scale": SCORE_DAMAGE_SCALE,
@@ -313,13 +372,17 @@ def main(argv=None):
     if args.score_profile == CROP_SCORE_VERSION:
         scoring["alignment"] = {"max_rotation_degrees": MAX_ROTATION_DEGREES,
                                 "coverage_penalty": "multiply by covered fraction of the reference"}
-    save_json(args.output / "report.json", {
+    report = {
         "schema_version": 3, "score": score, "score_version": args.score_profile,
         "scoring": scoring,
         "scored_groups": scored_groups, "cohort_sha256": cohort_hash, "algorithm": implementation,
         "data_root": str(root.resolve()), "decode_workers": args.decode_workers, "seconds": perf_counter() - start,
         "scene_status_counts": statuses, "reference_status_counts": references,
         "quarantine": catalog.quarantine, "scenes": rows,
-    })
+    }
+    if aggregation is not None:
+        report["score_explanation_version"] = SCORE_EXPLANATION_VERSION
+        report["score_aggregation"] = aggregation
+    save_json(args.output / "report.json", report)
     print("unscored" if score is None else f"{score:.6f}")
     return int(any(status not in {"ok", "unscored"} for status in statuses))
