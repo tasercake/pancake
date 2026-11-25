@@ -302,6 +302,7 @@ dialog::backdrop { background: #090a0bdc; }
   height: min(73dvh, 55rem);
   background: #0e1011;
   overscroll-behavior: contain;
+  overflow-anchor: none;
   scrollbar-width: none;
 }
 .image-view.pannable { cursor: grab; }
