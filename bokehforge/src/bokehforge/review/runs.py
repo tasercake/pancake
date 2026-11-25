@@ -86,10 +86,29 @@ def _write(path, payload):
     pending.replace(path)
 
 
-def scene_fingerprint(catalog, scene):
+# The catalog selection change altered the loader file hash without changing frame decoding.
+# Limit compatibility to that exact loader revision so future decoder changes invalidate old outputs.
+_PREVIOUS_LOADER_HASHES = {
+    "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7":
+        "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6",
+}
+
+
+def scene_fingerprint(catalog, scene, *, recipe_sha256=None):
     files = [(frame_id, catalog.frame(frame_id).source_sha256)
              for frame_id in (*scene.frame_ids, *scene.reference_ids)]
-    return sha256(json.dumps([scene.metadata["recipe_sha256"], files]).encode()).hexdigest()
+    return sha256(json.dumps([recipe_sha256 or scene.metadata["recipe_sha256"], files]).encode()).hexdigest()
+
+
+def compatible_scene_fingerprints(catalog, scene):
+    fingerprints = {scene_fingerprint(catalog, scene)}
+    recipe = scene.metadata["recipe"]
+    previous = _PREVIOUS_LOADER_HASHES.get(recipe["loader_sha256"])
+    if previous:
+        old_recipe = {**recipe, "loader_sha256": previous}
+        old_sha256 = sha256(json.dumps(old_recipe, sort_keys=True).encode()).hexdigest()
+        fingerprints.add(scene_fingerprint(catalog, scene, recipe_sha256=old_sha256))
+    return fingerprints
 
 
 @contextmanager
@@ -178,7 +197,7 @@ class Runs:
         run = _read(base / "run.json")
         progress = _read(base / "progress.json")
         selected = scene.id in run["scene_ids"]
-        fingerprint = scene_fingerprint(catalog, scene) if selected else None
+        fingerprints = compatible_scene_fingerprints(catalog, scene) if selected else set()
         rows = []
         for stacker in run["stackers"]:
             path = base / stacker / "results" / f"{scene.id}.json"
@@ -186,7 +205,7 @@ class Runs:
                 row = {"status": "outside_scope"}
             elif path.is_file():
                 row = _read(path)
-                if row["scene_fingerprint"] != fingerprint:
+                if row["scene_fingerprint"] not in fingerprints:
                     row = {"status": "different_source"}
                 elif row["status"] == "ready" and not (base / row["image"]).is_file():
                     row = {"status": "missing_file"}

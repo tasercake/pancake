@@ -1,5 +1,6 @@
 import hashlib
 import json
+from shutil import copytree
 import subprocess
 import sys
 
@@ -43,7 +44,7 @@ def test_download_outputs_feed_the_library_directly(tmp_path):
     manifest = json.loads((root / "raw/demo/download-manifest.json").read_text())
     assert len(manifest["files"]) == 2
     before = set(root.rglob("*"))
-    catalog = SceneCatalog(root)
+    catalog = SceneCatalog(root, config=root / "sources.json")
     frames = FrameWindowDataset(catalog, window_size=2)[0]["frames"]
     assert len(frames) == 2 and frames[0].shape == (8, 8, 3)
     assert set(root.rglob("*")) == before
@@ -61,11 +62,13 @@ def test_logs_append_and_reports_remain_idempotent(tmp_path):
     assert log.read_bytes().startswith(initial) and log.stat().st_size > len(initial)
 
 
-def test_removed_source_is_not_downloaded_from_an_old_lock(tmp_path):
+def test_old_lock_only_downloads_sources_in_active_configuration(tmp_path):
     root = source_fixture(tmp_path)
     lock = root / "sources.lock.json"
     pinned = json.loads(lock.read_text())
     retired = {"id": "D09", "status": "available", "layout": "mfi_whu", "files": []}
+    inactive = {**pinned["datasets"][0], "id": "inactive"}
+    pinned["datasets"].append(inactive)
     old_lock = json.dumps({"datasets": [*pinned["datasets"], retired]})
     lock.write_text(old_lock)
 
@@ -77,13 +80,27 @@ def test_removed_source_is_not_downloaded_from_an_old_lock(tmp_path):
     result = run_download(root)
     assert result.returncode == 0, result.stdout + result.stderr
     assert json.loads(lock.read_text()) == pinned
+    assert not (root / "raw/inactive").exists()
+    report = json.loads((root / ".bokehforge/reports/download-report.json").read_text())
+    assert [row["id"] for row in report["datasets"]] == ["demo"]
+
+    config = root / "sources.json"
+    policy = json.loads(config.read_text())
+    policy["datasets"].append(inactive)
+    config.write_text(json.dumps(policy))
+    copytree(root / "raw/demo/scene", root / "raw/inactive/scene")
+    result = run_download(root)
+    assert result.returncode == 0, result.stdout + result.stderr
+    for source_lock in (None, lock):
+        catalog = SceneCatalog(root, lock=source_lock, config=config)
+        assert {catalog.scene(scene_id).metadata["dataset_id"] for scene_id in catalog.scene_ids} == {"demo", "inactive"}
     assert not (root / "raw/D09").exists()
 
 
 def test_catalog_ignores_retired_source_from_old_manifests_and_locks(tmp_path):
     root = source_fixture(tmp_path)
     assert run_download(root).returncode == 0
-    expected_scenes = SceneCatalog(root).scene_ids
+    expected_scenes = SceneCatalog(root, config=root / "sources.json").scene_ids
     retired = {"id": "D09", "status": "available", "layout": "mfi_whu",
                "files": [{"path": "MFI-WHU.rar"}]}
     manifest = root / "raw/D09/download-manifest.json"
@@ -93,10 +110,14 @@ def test_catalog_ignores_retired_source_from_old_manifests_and_locks(tmp_path):
     pinned = json.loads(lock.read_text())
     lock.write_text(json.dumps({"datasets": [*pinned["datasets"], retired]}))
 
+    config = root / "sources.json"
+    policy = json.loads(config.read_text())
+    policy["datasets"].append(retired)
+    config.write_text(json.dumps(policy))
     for source_lock in (None, lock):
-        assert SceneCatalog(root, lock=source_lock).scene_ids == expected_scenes
+        assert SceneCatalog(root, lock=source_lock, config=root / "sources.json").scene_ids == expected_scenes
         with pytest.raises(ValueError, match="Unknown or undownloaded datasets"):
-            SceneCatalog(root, datasets="D09", lock=source_lock)
+            SceneCatalog(root, datasets="D09", lock=source_lock, config=root / "sources.json")
 
 
 def test_data_lock_prevents_concurrent_downloads(tmp_path):

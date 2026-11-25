@@ -43,12 +43,15 @@ def corpus(tmp_path):
             "id": dataset, "status": "available", "layout": layout, "transfer": "linear",
             "reference_type": reference_type, "files": files,
         }))
+
+    (root / "sources.json").write_text(json.dumps({"datasets": [{"id": "referenced"}, {"id": "field"}]}))
     return root
 
 
 def run_bench(root, output, *args, env=None):
     return subprocess.run(
-        [sys.executable, "-m", "bokehforge", "bench", "--root", str(root), "--output", str(output), *args],
+        [sys.executable, "-m", "bokehforge", "bench", "--root", str(root), "--config", str(root / "sources.json"),
+         "--output", str(output), *args],
         capture_output=True, text=True, env=env,
     )
 
@@ -196,7 +199,7 @@ def test_focal_decode_error_is_reported_even_after_early_return(corpus, tmp_path
 def test_score_averages_independent_groups_and_withholds_on_reference_error():
     rows = [
         {"dataset_id": dataset, "leakage_group_id": group, "scene_score": score, "reference_status": "eligible"}
-        for dataset, group, score in (("D09", "A", 100), ("D09", "A", 80), ("D09", "B", 0), ("D29", "C", 80))
+        for dataset, group, score in (("first", "A", 100), ("first", "A", 80), ("first", "B", 0), ("second", "C", 80))
     ]
     assert _score(rows) == (62.5, 3)
     rows.append({"leakage_group_id": "D", "scene_score": None, "reference_status": "error"})

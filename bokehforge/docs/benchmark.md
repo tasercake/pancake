@@ -3,12 +3,12 @@
 Run the mean-blend pilot on the InfinigenDefocus dataset from the repository root. Use a new output directory for each run.
 
 ```sh
-uv run --project bokehforge --frozen bokehforge data download --dataset D29
+uv run --project bokehforge --frozen bokehforge data download
 uv run --project bokehforge --frozen bokehforge bench \
-  --algorithm mean --dataset D29 --output artifacts/bench-mean --save-images --progress
+  --algorithm mean --output artifacts/bench-mean --save-images --progress
 ```
 
-Repeat `--dataset` or `--scene` to select a fixed cohort. The default scans downloaded datasets and scores those with supported all-in-focus RGB targets. `--root`, `--config`, and `--lock` have the same meanings as in the catalog. Check that the cohort fingerprint and score version match before comparing runs. Candidate images depend on the stacker environment, so pin the stacker and its dependencies too.
+Repeat `--dataset` or `--scene` to select a fixed cohort. By default the benchmark scores configured downloads with supported all-in-focus RGB targets. The shipped configuration selects D29. `--root`, `--config`, and `--lock` have the same meanings as in the catalog. Check that the cohort fingerprint and score version match before comparing runs. Candidate images depend on the stacker environment, so pin the stacker and its dependencies too.
 
 ## Stacker interface
 

@@ -21,6 +21,7 @@ from ._canonical import (
     ARCHIVES, CAMERA_RAW, IMAGES, RETIRED_LAYOUTS, TIFF_IMAGES, decode, encode_tiff,
     leakage_groups, plan_scenes, runtime_recipe, scene_metadata,
 )
+from ._config import DEFAULT_CONFIG, read_config
 from ._files import digest, safe_path
 
 _LOADER_SHA256 = digest(Path(__file__))
@@ -171,22 +172,22 @@ class SceneCatalog:
 
     def __init__(self, root, *, datasets=None, lock=None, config=None):
         raw_root = Path(root).resolve() / "raw"
-        selected = {datasets} if isinstance(datasets, str) else set(datasets or ())
+        configured = read_config(config or DEFAULT_CONFIG)["datasets"]
+        policies = {source["id"]: source for source in configured if source.get("layout") not in RETIRED_LAYOUTS}
+        requested = {datasets} if isinstance(datasets, str) else set(datasets or ())
+        selected = requested & policies.keys() if requested else policies.keys()
         if lock is None:
             manifests = sorted(raw_root.glob("*/download-manifest.json"))
-            sources = [json.loads(path.read_text()) for path in manifests
-                       if not selected or path.parent.name in selected]
+            sources = [json.loads(path.read_text()) for path in manifests if path.parent.name in selected]
         else:
             sources = json.loads(Path(lock).read_text())["datasets"]
-        # Older locks and download manifests may still list the retired MFI-WHU source.
-        sources = [source for source in sources if source.get("layout") not in RETIRED_LAYOUTS]
-        missing = selected - {source["id"] for source in sources}
+        sources = [source for source in sources
+                   if source["id"] in selected and source.get("layout") not in RETIRED_LAYOUTS]
+        missing = requested - {source["id"] for source in sources}
         if missing:
             raise ValueError(f"Unknown or undownloaded datasets: {sorted(missing)}")
         if not sources:
-            raise ValueError(f"No downloaded datasets found in {raw_root}")
-        configured = json.loads(Path(config).read_text()).get("datasets", []) if config is not None else []
-        overrides = {source["id"]: source for source in configured}
+            raise ValueError(f"No configured downloads found in {raw_root}")
 
         self.decoder = FrameDecoder()
         self.quarantine = {}
@@ -195,9 +196,7 @@ class SceneCatalog:
         grouping_records = []
         for source in sorted(sources, key=lambda item: item["id"]):
             dataset_id = source["id"]
-            if selected and dataset_id not in selected:
-                continue
-            policy = overrides.get(dataset_id, {})
+            policy = policies[dataset_id]
             if source["status"] == "disabled" or policy.get("provider") == "disabled":
                 continue
             if source["status"] != "available":

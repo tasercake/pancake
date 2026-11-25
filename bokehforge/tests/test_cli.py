@@ -43,15 +43,18 @@ def test_default_source_config_works_outside_repository(tmp_path):
     environment = os.environ.copy()
     environment.pop("PYTHONPATH", None)
     lock = tmp_path / "sources.lock.json"
-    lock.write_text(json.dumps({"datasets": [{"id": "D29", "status": "available",
-                                              "layout": "infinigen_defocus", "files": []}]}))
-    result = subprocess.run([str(executable), "data", "download", "--dataset", "D29", "--resolve-only",
+    lock.write_text(json.dumps({"datasets": [
+        {"id": "D29", "status": "available", "layout": "infinigen_defocus", "files": []},
+        {"id": "D02", "status": "resolve_failed", "layout": "sood_raw", "files": []},
+    ]}))
+    result = subprocess.run([str(executable), "data", "download", "--resolve-only",
         "--root", str(tmp_path / "data"), "--lock", str(lock)], cwd=tmp_path, env=environment,
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
-    source = next(d for d in json.loads(lock.read_text())["datasets"] if d["id"] == "D29")
-    assert source["status"] == "available"
-    assert source["layout"] == "infinigen_defocus"
+    sources = {d["id"]: d for d in json.loads(lock.read_text())["datasets"]}
+    assert sources["D29"]["status"] == "available"
+    assert sources["D29"]["layout"] == "infinigen_defocus"
+    assert sources["D02"]["status"] == "resolve_failed"
 
 
 def test_nested_project_runs_from_repository_root():

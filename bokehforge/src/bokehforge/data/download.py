@@ -18,12 +18,10 @@ from urllib.parse import quote, urlparse
 import requests
 
 from ._canonical import RETIRED_LAYOUTS
+from ._config import DEFAULT_CONFIG, data_root, read_config
 from ._files import digest, natural_key, safe_path
 from .layout import METADATA, data_run
 
-HERE = Path(__file__).resolve().parent
-CONFIG_DIRECTORY = next((parent / "config/data" for parent in HERE.parents
-                         if (parent / "config/data/sources.json").is_file()), Path.cwd() / "config/data")
 MUTEX = threading.Lock()
 
 
@@ -216,8 +214,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="bokehforge data download", description=__doc__,
                                      epilog="Logs and reports are saved under <root>/.bokehforge/.")
     parser.add_argument("--root", type=Path)
-    parser.add_argument("--config", type=Path, default=CONFIG_DIRECTORY / "sources.json")
-    parser.add_argument("--lock", type=Path, default=CONFIG_DIRECTORY / "sources.lock.json")
+    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument("--lock", type=Path)
     parser.add_argument("--dataset", action="append", help="Dataset ID; repeat to select several")
     parser.add_argument("--resolve-only", action="store_true")
     parser.add_argument("--refresh-lock", action="store_true", help="Explicitly resolve a new upstream snapshot")
@@ -226,15 +224,13 @@ def main(argv=None):
     parser.add_argument("--retries", type=int, default=3)
     parser.add_argument("--probe-url", help="Record a public endpoint response for source discovery; never download a full binary body")
     args = parser.parse_args(argv)
-    if not args.config.is_file():
-        parser.error(f"Source configuration not found: {args.config}; supply --config")
-    configured = json.loads(args.config.read_text())
+    configured = read_config(args.config)
     defaults = configured.get("defaults", {})
-    args.root = args.root or (args.config.parent / defaults.get("data_root", "."))
+    args.root = args.root or data_root(args.config, defaults)
+    args.lock = args.lock or args.config.with_name("sources.lock.json")
     args.reserve_gib = args.reserve_gib if args.reserve_gib is not None else defaults.get("reserve_gib", 15)
     if args.workers < 1 or args.retries < 1 or args.reserve_gib < 0:
         parser.error("workers/retries must be positive and reserve must be nonnegative")
-    selected = set(args.dataset or [])
     args.root = args.root.resolve()
     with data_run(args.root, "download"):
         if args.probe_url:
@@ -247,22 +243,24 @@ def main(argv=None):
                 save_json(args.root / METADATA / "probes" / (hashlib.sha256(args.probe_url.encode()).hexdigest()[:16] + ".json"), record)
                 print(json.dumps(record, indent=2))
                 return 0
-        sources = [d for d in configured["datasets"] if d.get("layout") not in RETIRED_LAYOUTS]
+        sources = {d["id"]: d for d in configured["datasets"] if d.get("layout") not in RETIRED_LAYOUTS}
+        selected = set(args.dataset or sources)
+        if selected - sources.keys():
+            parser.error(f"Unknown dataset IDs: {sorted(selected - sources.keys())}")
         lock = json.loads(args.lock.read_text()) if args.lock.exists() else {"schema_version": 1, "datasets": []}
-        lock["datasets"] = [d for d in lock["datasets"] if d.get("layout") not in RETIRED_LAYOUTS]
-        if args.refresh_lock:
-            lock["datasets"] = [d for d in lock["datasets"] if selected and d["id"] not in selected]
-        disabled = {d["id"]: d for d in sources if d.get("provider") == "disabled"}
+        lock["datasets"] = [
+            d for d in lock["datasets"]
+            if d.get("layout") not in RETIRED_LAYOUTS
+            and (d["id"] not in selected or (not args.refresh_lock and d["status"] != "resolve_failed"))
+        ]
+        disabled = {dataset_id: sources[dataset_id] for dataset_id in selected
+                    if sources[dataset_id].get("provider") == "disabled"}
         lock["datasets"] = [{**disabled[d["id"]], "status": "disabled", "files": []}
                             if d["id"] in disabled else d for d in lock["datasets"]]
         save_json(args.lock, lock)
-        configured_ids = {d["id"] for d in sources}
-        lock["datasets"] = [d for d in lock["datasets"] if not (d["status"] == "resolve_failed" and d["id"] in configured_ids and (not selected or d["id"] in selected))]
         ids = {d["id"] for d in lock["datasets"]}
-        for source in sources:
-            if selected and source["id"] not in selected:
-                continue
-            if source["id"] in ids:
+        for dataset_id, source in sources.items():
+            if dataset_id not in selected or dataset_id in ids:
                 continue
             try:
                 with session() as client:
@@ -273,15 +271,11 @@ def main(argv=None):
             lock["datasets"].append(resolved)
             print(f"RESOLVE {source['id']}: {resolved['status']} {len(resolved['files'])} files", flush=True)
             save_json(args.lock, lock)
-        available_ids = {d["id"] for d in lock["datasets"]}
-        if selected - available_ids:
-            parser.error(f"Unknown dataset IDs: {sorted(selected - available_ids)}")
+        active = [d for d in lock["datasets"] if d["id"] in selected]
         if args.resolve_only:
-            return 0 if all(d["status"] in {"available", "disabled"} for d in lock["datasets"] if not selected or d["id"] in selected) else 2
+            return 0 if all(d["status"] in {"available", "disabled"} for d in active) else 2
         reports = []
-        for dataset in lock["datasets"]:
-            if selected and dataset["id"] not in selected:
-                continue
+        for dataset in active:
             record = {"id": dataset["id"], "status": dataset["status"], "files": len(dataset["files"]), "verified": 0, "errors": []}
             if dataset["status"] != "available":
                 record["reason"] = dataset.get("reason", "No public source download route")
