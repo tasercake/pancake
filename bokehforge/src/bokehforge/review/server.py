@@ -22,6 +22,7 @@ from .images import (
 )
 from .ratings import Ratings
 from .runs import Runs, lock_store
+from .scores import Scores
 from .stacker_setup import REPO
 from .stackers import configured_stackers
 
@@ -81,6 +82,7 @@ class Review:
         self.events = Events()
         self.runs = Runs(args.store, configured_stackers(args), self.publish_runs)
         self.ratings = Ratings(args.store)
+        self.scores = Scores(self.publish_scores)
         self.image_version = token_hex(8)
         self.previews = PreviewCache(args.store)
         self.decoded = DecodedFrames()
@@ -88,6 +90,7 @@ class Review:
         self.downloads = Downloads(args.root, args.config or DEFAULT_CONFIG, args.lock,
                                    self.refresh_catalog, self.publish_download)
         self.publish_runs()
+        self.publish_scores()
         self.events.publish("catalog", self.catalog_data)
         self.refresh_catalog()
 
@@ -96,6 +99,9 @@ class Review:
 
     def publish_runs(self):
         self.events.publish("runs", self.runs.list)
+
+    def publish_scores(self):
+        self.events.publish("scores", lambda: self.scores.revision)
 
     def publish_download(self):
         self.events.publish("download", self.download_status)
@@ -176,7 +182,10 @@ class Review:
         ratings = self.ratings.get(run_id, scene.id) if run_id else {}
         outputs = self.runs.scene_results(run_id, catalog, scene)
         for result in outputs:
-            result["rating"] = ratings.get(result["stacker"]) if result["status"] == "ready" else None
+            ready = result["status"] == "ready"
+            result["rating"] = ratings.get(result["stacker"]) if ready else None
+            if ready:
+                result["benchmark"] = self.scores.get(catalog, scene, self.runs.directory(run_id), result)
         return {"frames": [self.frame_info(catalog, frame_id) for frame_id in scene.frame_ids],
                 "references": [self.frame_info(catalog, frame_id) for frame_id in scene.reference_ids],
                 "reference_type": scene.metadata["reference_type"],
@@ -449,6 +458,7 @@ class ReviewServer(ThreadingHTTPServer):
 
     def server_close(self):
         if hasattr(self, "app"):
+            self.app.scores.close()
             self.app.events.close()
         super().server_close()
 
