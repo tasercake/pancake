@@ -64,13 +64,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {platform: linux-amd64, os: ubuntu-24.04, target: x86_64-unknown-linux-gnu}
-          - {platform: macos-arm64, os: macos-15, target: aarch64-apple-darwin}
-          - {platform: windows-x64, os: windows-2025, target: x86_64-pc-windows-msvc}
+          - {platform: linux-amd64, os: ubuntu-24.04, target: x86_64-unknown-linux-gnu, jobs: 4}
+          - {platform: macos-arm64, os: macos-15, target: aarch64-apple-darwin, jobs: 3}
+          - {platform: windows-x64, os: windows-2025, target: x86_64-pc-windows-msvc, jobs: 4}
     env:
       RELEASE_VERSION: ${{ needs.version.outputs.version }}
       RUST_TARGET: ${{ matrix.target }}
-      CARGO_BUILD_JOBS: "2"
+      CARGO_BUILD_JOBS: ${{ matrix.jobs }}
       CARGO_INCREMENTAL: "0"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -80,11 +80,52 @@ jobs:
         with:
           python-version: "3.12"
       - name: Prepare the platform toolchain
+        id: toolchain
         run: |
           cargo --version
-          cargo fetch --locked --target "$RUST_TARGET"
-          mkdir -p "$RUNNER_TEMP/pancake-dist"
-          printf 'CARGO_TARGET_DIR=%s/pancake-target\nDIST=%s/pancake-dist\n' "$RUNNER_TEMP" "$RUNNER_TEMP" >> "$GITHUB_ENV"
+          target="$RUNNER_TEMP/pancake-target"
+          dist="$RUNNER_TEMP/pancake-dist"
+          mkdir -p "$dist"
+          case "$RUNNER_OS" in
+            Linux) llvm_data="${XDG_DATA_HOME:-$HOME/.local/share}/tracel" ;;
+            macOS) llvm_data="$HOME/Library/Application Support/tracel" ;;
+            Windows) llvm_data="$(cygpath -m "$LOCALAPPDATA")/tracel" ;;
+          esac
+          printf 'CARGO_TARGET_DIR=%s\nDIST=%s\nTRACEL_LLVM_DATA=%s\n' \
+            "$target" "$dist" "$llvm_data" >> "$GITHUB_ENV"
+          # Cargo build scripts can record absolute native paths and use the runner's SDK.
+          identity=$(printf '%s\n' "${ImageOS:?}" "${ImageVersion:?}" "$GITHUB_WORKSPACE" \
+            "$target" "$llvm_data" | git hash-object --stdin)
+          printf 'identity=%s\n' "$identity" >> "$GITHUB_OUTPUT"
+
+      - name: Restore compiled release dependencies
+        id: dependencies
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ env.CARGO_TARGET_DIR }}
+            ~/.cargo/registry
+            ~/.cache/tracel
+            ${{ env.TRACEL_LLVM_DATA }}
+          # Linux provenance expects a single CubeCL build variant. Restore only exact matches.
+          key: >-
+            pancake-release-${{ matrix.target }}-${{ steps.toolchain.outputs.identity }}-${{
+              hashFiles('pancake/Cargo.lock', 'pancake/Cargo.toml', 'pancake/crates/*/Cargo.toml',
+                        'pancake/.cargo/config.toml', 'pancake/rust-toolchain.toml', 'pancake/vendor/**',
+                        'pancake/notices/llvm/manifest.json', 'pancake/scripts/ci-linux-native-deps.sh',
+                        'pancake/scripts/package_macos.py', 'pancake/scripts/macos-release-linker.sh',
+                        '.github/workflows/pancake-release.yml')
+            }}
+
+      - name: Reuse unchanged vendored dependencies
+        if: steps.dependencies.outputs.cache-hit == 'true'
+        # Cargo checks path dependencies by mtime. The exact key includes their content.
+        run: find vendor -type f -exec touch -t 200001010000 {} +
+
+      - name: Fetch the locked package graph
+        if: steps.dependencies.outputs.cache-hit != 'true'
+        # Notice collection resolves the locked graph offline.
+        run: cargo fetch --locked --target "$RUST_TARGET"
 
       - name: Build and verify the Ubuntu Debian package
         if: runner.os == 'Linux'
@@ -138,6 +179,7 @@ jobs:
         run: |
           payload="$RUNNER_TEMP/macos"
           python -B scripts/package_macos.py --output "$payload" \
+            --target-dir "$CARGO_TARGET_DIR" \
             --bundle-identifier com.github.tasercake.pancake --build-number "$GITHUB_RUN_NUMBER"
           python -B scripts/release_support.py notices "$payload" "$RUST_TARGET" --features cubecl/metal-native
           mkdir "$payload/native-zstd"
@@ -169,6 +211,23 @@ jobs:
           path: ${{ runner.temp }}/pancake-dist/*
           if-no-files-found: error
           compression-level: 0
+
+      - name: Remove workspace outputs before caching
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && steps.dependencies.outputs.cache-hit != 'true'
+        run: |
+          target=()
+          if [[ "$RUNNER_OS" != Linux ]]; then target=(--target "$RUST_TARGET"); fi
+          cargo clean --locked --release "${target[@]}" --workspace
+      - name: Save compiled release dependencies
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && steps.dependencies.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ env.CARGO_TARGET_DIR }}
+            ~/.cargo/registry
+            ~/.cache/tracel
+            ${{ env.TRACEL_LLVM_DATA }}
+          key: ${{ steps.dependencies.outputs.cache-primary-key }}
 
   publish:
     name: Publish to GitHub Releases

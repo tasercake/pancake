@@ -58,11 +58,12 @@ class MacPackageTests(unittest.TestCase):
         if argv[:len(BUILD)] == BUILD:
             self.assertEqual(argv[-2], "--target-dir")
             release = Path(argv[-1]) / "aarch64-apple-darwin" / "release"
-            release.mkdir(parents=True)
+            release.mkdir(parents=True, exist_ok=True)
             for name in BINARIES:
                 binary = release / name
-                binary.write_bytes(name.encode())
-                binary.chmod(0o755)
+                if not binary.exists():
+                    binary.write_bytes(name.encode())
+                    binary.chmod(0o755)
             if self.failure == "collision":
                 self.output.mkdir()
                 (self.output / "untouched").write_text("user file")
@@ -156,6 +157,27 @@ class MacPackageTests(unittest.TestCase):
             self.assertEqual(receipt["files_sha256"][path], file_sha256(binary))
         self.assertEqual((self.output / "build.log").read_text(), "locked build output\n")
         self.assertEqual(sum(cmd[:3] == ("codesign", "--verify", "--strict") for cmd in self.commands), 2)
+
+    def test_reuses_a_cargo_target_without_signing_its_binaries(self):
+        target = self.root / "cargo-target"
+        release = target / "aarch64-apple-darwin" / "release"
+        outputs = (self.output, self.root / "another-package")
+        for output in outputs:
+            build_package(self.source, output, IDENTIFIER, "17", target_dir=target)
+            receipt = json.loads((output / "package-receipt.json").read_bytes())
+            self.assertEqual(receipt["build_command"], [*BUILD, "--target-dir", str(target)])
+            for name, item in receipt["executables"].items():
+                binary = release / name
+                self.assertEqual(binary.read_bytes(), name.encode())
+                self.assertEqual(item["source_sha256"], file_sha256(binary))
+                self.assertEqual((output / item["file"]).read_bytes(), f"{name} signed".encode())
+        self.assertEqual(set(self.root.iterdir()), {self.source, target, *outputs})
+
+    def test_refuses_a_target_within_the_package_output(self):
+        with self.assertRaisesRegex(ValueError, "outside the package output"):
+            build_package(self.source, self.output, IDENTIFIER, "17", target_dir=self.output / "build")
+        self.assertFalse(self.output.exists())
+        self.assertFalse(self.commands)
 
     def test_fails_closed_on_wrong_architecture_dependency_and_signature(self):
         for field, value, message in (

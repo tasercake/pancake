@@ -6,7 +6,7 @@
   "scope": "Canonical Miri interprets OS-neutral first-party library tests. Application and codec IO and platform-specific desktop panels have separate native execution, coverage, and sanitizer gates. The source receipt includes embedded Slint UI, while the interpreter, JIT and first-party calls through GPU drivers execute in native lanes.",
   "reviewed_files": {
     "Cargo.lock": "f523404bf033b0532dc46ce71aa515dc398f56c32e6aee1c3529cf90a27018dc",
-    "Cargo.toml": "245823d23f61ae2af7b928e7c11b899581e476306c7f99a95c898f0dba742043",
+    "Cargo.toml": "11e8c917d2d76f6c12aa57feecd85cda1d256c024c81a5fafbc71df7a7aaf55e",
     "crates/pancake-cli/Cargo.toml": "b161e3bf5f8a1bd2f8ef41cc0e447665c9ac521034230f2771d15fb766a8dffd",
     "crates/pancake-cli/src/main.rs": "0d45c2a955dd80afcdabb0274c5727ffc3ffc01f32222da9eaab55557b458668",
     "crates/pancake-cli/src/tests.rs": "706708dfe172328478ade337b387aa6e271a23f38a4955913cc972afb601deab",

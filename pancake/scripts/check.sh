@@ -98,6 +98,7 @@ case $gate in
             scripts/test_assurance_targets.py scripts/test_assurance_coverage.py scripts/test_miri_host_policy.py scripts/test_pre_commit.py \
             scripts/test_headless_dependencies.py
         python3 -B -m unittest discover -s scripts -p test_release_support.py
+        python3 -B -m unittest discover -s scripts -p test_package_macos.py
         python3 scripts/miri_host_policy.py "$root" validate
         dependency_policy
         cargo fmt --all -- --check
