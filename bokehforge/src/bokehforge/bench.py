@@ -16,6 +16,7 @@ from time import perf_counter
 import numpy as np
 import tifffile
 
+from .alignment import CROP_SCORE_VERSION, MAX_ROTATION_DEGREES, evaluate_crop
 from .data._canonical import encode_tiff
 from .data._files import digest
 from .data.download import CONFIG_DIRECTORY, save_json
@@ -175,16 +176,21 @@ def _run_scene(catalog, scene, row, algorithm, args):
     if row["status"] != "ok":
         return
     try:
-        validate_rgb(result, shape)
+        validate_rgb(result, shape if args.score_profile == SCORE_VERSION else None)
     except ValueError as exc:
         row.update(status="invalid_output", error=str(exc))
         return
 
     scoring_start = perf_counter()
     try:
-        measurement = measure(result, reference)
-        row.update(scene_score=scene_score(measurement), score_features=measurement.features,
-                   artifact_diagnostics=measurement.diagnostics)
+        if args.score_profile == CROP_SCORE_VERSION:
+            score, measurement, alignment = evaluate_crop(result, reference)
+            row.update(scene_score=score, alignment=alignment)
+        else:
+            measurement = measure(result, reference)
+            row["scene_score"] = scene_score(measurement)
+        if measurement is not None:
+            row.update(score_features=measurement.features, artifact_diagnostics=measurement.diagnostics)
     except Exception as exc:
         row.update(status="scoring_error", reference_status="error", scene_score=None, error=_error_text(exc))
         return
@@ -226,6 +232,8 @@ def main(argv=None):
     parser.add_argument("--scene", action="append", help="Exact catalog scene ID, repeatable. Default: all selected scenes")
     parser.add_argument("--config", type=Path, help="Optional catalog policy overrides")
     parser.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
+    parser.add_argument("--score-profile", choices=(SCORE_VERSION, CROP_SCORE_VERSION), default=SCORE_VERSION,
+                        help="Score on the fixed reference grid or match a delivered crop to it")
     parser.add_argument("--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)")
     parser.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     parser.add_argument("--progress", action="store_true", help="Write progress to stderr")
@@ -267,13 +275,17 @@ def main(argv=None):
     score, scored_groups = _score(rows)
     statuses = Counter(row["status"] for row in rows)
     references = Counter(row["reference_status"] for row in rows)
+    scoring = {"family_weights": FAMILY_WEIGHTS, "view_weights": VIEW_WEIGHTS,
+               "damage_scale": SCORE_DAMAGE_SCALE,
+               "runtime": {name: version(name) for name in ("bokehforge", "numpy", "scipy", "tifffile")},
+               "python": sys.version.split()[0],
+               "aggregation": "equal datasets; equal leakage groups within each dataset"}
+    if args.score_profile == CROP_SCORE_VERSION:
+        scoring["alignment"] = {"max_rotation_degrees": MAX_ROTATION_DEGREES,
+                                "coverage_penalty": "multiply by covered fraction of the reference"}
     save_json(args.output / "report.json", {
-        "schema_version": 2, "score": score, "score_version": SCORE_VERSION,
-        "scoring": {"family_weights": FAMILY_WEIGHTS, "view_weights": VIEW_WEIGHTS,
-                    "damage_scale": SCORE_DAMAGE_SCALE,
-                    "runtime": {name: version(name) for name in ("bokehforge", "numpy", "scipy", "tifffile")},
-                    "python": sys.version.split()[0],
-                    "aggregation": "equal datasets; equal leakage groups within each dataset"},
+        "schema_version": 2, "score": score, "score_version": args.score_profile,
+        "scoring": scoring,
         "scored_groups": scored_groups, "cohort_sha256": cohort_hash, "algorithm": implementation,
         "data_root": str(root.resolve()), "decode_workers": args.decode_workers, "seconds": perf_counter() - start,
         "scene_status_counts": statuses, "reference_status_counts": references,

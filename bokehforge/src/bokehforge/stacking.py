@@ -31,7 +31,7 @@ class StackInput:
 
 
 class Stacker(Protocol):
-    """Return finite, linear-sRGB float32 HWC RGB on the declared target grid."""
+    """Return one finite, linear-sRGB float32 HWC RGB image."""
 
     def __call__(self, stack: StackInput, /) -> NDArray[np.float32]: ...
 
