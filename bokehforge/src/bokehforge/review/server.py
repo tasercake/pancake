@@ -21,7 +21,9 @@ from .images import (
     DecodedFrames, PREVIEW_VERSION, PreviewCache, ReviewFrameDecoder, SIZES, output_pixels, preview, preview_mime,
 )
 from .ratings import Ratings
-from .runs import REPO, Runs, configured_stackers, lock_store
+from .runs import Runs, lock_store
+from .stacker_setup import REPO
+from .stackers import configured_stackers
 
 STATIC = Path(__file__).with_name("static")
 ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
@@ -254,7 +256,10 @@ class Review:
         stackers = form["stackers"]
         if not isinstance(stackers, list) or any(not isinstance(key, str) for key in stackers):
             raise ValueError("Stackers must be a list of supported IDs")
-        return self.runs.start(catalog, scene_ids, stackers, {"type": kind, "label": label})
+        options = form.get("options", {})
+        if not isinstance(options, dict):
+            raise ValueError("Stacker settings must be an object")
+        return self.runs.start(catalog, scene_ids, stackers, {"type": kind, "label": label}, options)
 
     def rate(self, form):
         self.artifact(form, "image")

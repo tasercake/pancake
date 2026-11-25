@@ -4,18 +4,20 @@ from hashlib import sha256
 from http.client import HTTPConnection
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO, StringIO
+from pathlib import Path
 import json
 from shutil import copyfile
 import sys
 from threading import Event, Thread
 from time import sleep
+import xml.etree.ElementTree as ET
 
 import numpy as np
 from PIL import Image
 import pytest
 import tifffile
 
-from bokehforge.review import runs
+from bokehforge.review import _zerene, runs
 from bokehforge.review import server as review_server
 from bokehforge.review.server import Review, ReviewServer
 
@@ -92,7 +94,9 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
         log.parent.mkdir(parents=True, exist_ok=True)
         log.write_text("fixture stacker output")
         if tool.id == "focus-stack":
+            assert tool.options["device"] == "auto"
             raise RuntimeError("example exit")
+        assert tool.options == {"device": "cpu", "method": "depth_map", "alignment": "off", "crop": False}
         staged = tifffile.imread(work / frames[0])
         assert staged.dtype == np.uint16
         assert np.all(staged > np.uint16(0.25 * 65535))
@@ -108,12 +112,16 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     other, scene = [item["id"] for item in app.scenes]
     with app.events.subscribe() as (reader, writer):
         reader.settimeout(10)
-        job = app.start({"scope": "scene", "scene": scene, "stackers": ["pancake", "focus-stack"]})
+        job = app.start({"scope": "scene", "scene": scene, "stackers": ["pancake", "focus-stack"],
+                         "options": {"pancake": {"method": "depth_map", "device": "cpu"}}})
         app.runs.worker.join(timeout=10)
         assert not app.runs.worker.is_alive()
         summary, = next(event_payload(packet)[1] for packet in app.events.take(reader, writer)
                         if packet.startswith(b"event: runs\n"))
     assert (summary["status"], summary["ready"], summary["failed"]) == ("completed_with_errors", 1, 1)
+    assert summary["options"]["pancake"]["device"] == "cpu"
+    assert summary["options"]["focus-stack"]["device"] == "auto"
+    assert summary["methods"]["pancake"] == "Depth map"
 
     inspected = app.scene_details(scene, job)
     assert not inspected["references"]
@@ -358,3 +366,87 @@ def test_running_review_keeps_one_version_of_static_assets(tmp_path, monkeypatch
             client.close()
             server.shutdown()
             worker.join()
+
+
+def test_linux_rejects_zerene_and_invalid_stacker_settings(tmp_path, monkeypatch):
+    monkeypatch.setattr(_zerene.platform, "system", lambda: "Linux")
+    root, store = tmp_path / "data", tmp_path / "review"
+    write_scene(root, 0.25)
+    app = open_review(root, store)
+    tools = {tool["id"]: tool for tool in app.catalog_data()["stackers"]}
+    assert set(tools) == {"pancake", "focus-stack", "openfocus", "shinestacker"}
+    for stacker in ("pancake", "focus-stack", "openfocus"):
+        assert tools[stacker]["options"]["device"]["default"] == "auto"
+
+    form = {"scope": "scene", "scene": app.scenes[0]["id"], "stackers": ["focus-stack"]}
+    with pytest.raises(ValueError, match="supported stacker"):
+        app.start({**form, "stackers": ["zerene"]})
+    with pytest.raises(ValueError, match="selected stacking programs"):
+        app.start({**form, "options": {"pancake": {"device": "cpu"}}})
+    with pytest.raises(ValueError, match="Invalid settings"):
+        app.start({**form, "options": {"focus-stack": {"flag": "--align-only"}}})
+    for strength in ("0.5", True, float("nan"), -1):
+        with pytest.raises(ValueError, match="denoise strength"):
+            app.start({**form, "options": {"focus-stack": {"denoise": strength}}})
+    assert app.runs.list() == []
+
+
+@pytest.mark.parametrize("system", ["Darwin", "Windows"])
+def test_zerene_uses_a_local_batch_and_normalizes_the_output(tmp_path, monkeypatch, system):
+    preferences = tmp_path / "Zerene Preferences"
+    preferences.mkdir()
+    java = preferences / ("java" if system == "Darwin" else "java.exe")
+    java.touch()
+    launch = preferences / "zerenstk.launchcmd"
+    java_launcher = java if system == "Darwin" else java.with_name("javaw.exe")
+    recorded = f'"{java_launcher}" -classpath "Local Zerene Jar" {_zerene.MAIN_CLASS} -ignored'
+    launch.write_text(recorded, encoding="utf-16" if system == "Windows" else "utf-8")
+    monkeypatch.setattr(_zerene.platform, "system", lambda: system)
+    monkeypatch.setattr(_zerene, "preferences_directory", lambda: preferences)
+    if system == "Windows":
+        def windows_argv(text):
+            assert text == recorded
+            return [str(java_launcher), "-classpath", "Local Zerene Jar", _zerene.MAIN_CLASS, "-ignored"]
+
+        monkeypatch.setattr(_zerene, "_windows_argv", windows_argv)
+
+    def local_java(command, work, log, stop, label, *, timeout):
+        assert command[:3] == [str(java), "-classpath", "Local Zerene Jar"]
+        assert ("-Dapple.awt.BackgroundOnly=true" in command) == (system == "Darwin")
+        assert "-ignored" not in command and timeout == 3600
+        batch, first, second = command[command.index("-batchScript") + 1:]
+        assert first == str(work / "frames/000000.tif")
+        assert second == str(work / "frames/000001.tif")
+        assert tifffile.imread(first).dtype == np.uint16
+        task = ET.parse(batch).find(".//Task")
+        assert task.find("TaskIndicatorCode").attrib["value"] == "2"
+        preferences = {entry.tag: entry.attrib["value"] for entry in task.find("Preferences")}
+        assert preferences["DepthMapControl.ContrastThresholdPercentile"] == "67.5"
+        assert preferences["DepthMapControl.EstimationRadius"] == "13"
+        assert preferences["DepthMapControl.SmoothingRadius"] == "5"
+        assert preferences["AlignmentControl.AddNewFilesAsAlreadyAligned"] == "true"
+        output = Path(task.find("OutputImagesDesignatedFolder").attrib["value"])
+        copyfile(first, output / "Zerene_dmap.tif")
+        log.parent.mkdir(parents=True)
+        log.write_text("Zerene test log")
+
+    monkeypatch.setattr(runs, "run_logged", local_java)
+    root, store = tmp_path / "data", tmp_path / "review"
+    write_scene(root, 0.25)
+    app = open_review(root, store)
+    tool = next(tool for tool in app.catalog_data()["stackers"] if tool["id"] == "zerene")
+    assert tool["available"] and tool["options"]["method"]["default"] == "pmax"
+    scene = app.scenes[0]["id"]
+    options = {"method": "dmap", "align": False, "dmap_percentile": 67.5, "dmap_estimation_radius": 13}
+    job = app.start({"scope": "scene", "scene": scene, "stackers": ["zerene"], "options": {"zerene": options}})
+    app.runs.worker.join(timeout=5)
+    assert not app.runs.worker.is_alive()
+    summary, = app.runs.list()
+    assert summary["status"] == "completed", summary
+    assert summary["options"]["zerene"] == {**options, "dmap_smoothing_radius": 5}
+    choice = {"run": job, "scene": scene, "stacker": "zerene"}
+    pixels = tifffile.imread(app.artifact(choice, "image"))
+    assert pixels.dtype == np.float32 and np.allclose(pixels, 0.25, atol=2e-5)
+    app.rate({**choice, "grade": 4})
+    result, = app.scene_details(scene, job)["outputs"]
+    assert result["rating"]["grade"] == 4

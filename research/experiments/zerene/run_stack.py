@@ -2,21 +2,19 @@
 """Run the installed macOS Zerene Stacker through its Batch API."""
 
 import argparse
-import fcntl
 import json
 import os
-import shlex
 import signal
 import subprocess
 import sys
 import time
-import xml.etree.ElementTree as ET
-from contextlib import contextmanager
 from pathlib import Path
 
-MAIN_CLASS = "com.zerenesystems.stacker.gui.MainFrame"
+# Load only the shared standard-library adapter so this script needs no Python dependencies.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "bokehforge/src/bokehforge/review"))
+from _zerene import TASK_CODES, batch_command, batch_lock, batch_output, launch_command, write_batch
+
 IMAGE_SUFFIXES = {".jpeg", ".jpg", ".tif", ".tiff"}
-TASK_CODES = {"pmax": "1", "dmap": "2"}
 
 
 def collect_inputs(paths):
@@ -34,87 +32,6 @@ def collect_inputs(paths):
         if path.stat().st_size == 0:
             raise ValueError(f"Empty input file: {path}")
     return inputs
-
-
-def launch_command(preferences):
-    recorded = preferences / "zerenstk.launchcmd"
-    if not recorded.is_file():
-        raise ValueError(f"Open Zerene Stacker once to create {recorded}.")
-    command = shlex.split(recorded.read_text())
-    if MAIN_CLASS not in command or not Path(command[0]).is_file():
-        raise ValueError(f"Invalid launch command in {recorded}. Start Zerene to refresh it.")
-    # The recorded launch can include Lightroom's temporary inputs and flags.
-    return command[:command.index(MAIN_CLASS) + 1]
-
-
-def make_batch(source, output, methods, args):
-    batch = ET.Element("Batch")
-    sources = ET.SubElement(batch, "Sources", length="1")
-    ET.SubElement(sources, "Source", value=str(source))
-    ET.SubElement(batch, "ProjectDispositionCode", value="101")  # Temporary project
-    tasks = ET.SubElement(batch, "Tasks", length=str(len(methods)))
-    for method in methods:
-        task = ET.SubElement(tasks, "Task")
-        ET.SubElement(task, "OutputImageDispositionCode", value="4")  # Designated folder
-        ET.SubElement(task, "OutputImagesDesignatedFolder", value=str(output))
-        preferences = ET.SubElement(task, "Preferences")
-        values = {
-            "OutputImageNaming.Template": method,
-            "AlignmentControl.AddNewFilesAsAlreadyAligned": str(args.already_aligned).lower(),
-            "SaveImage.FileType": "tif",
-            "SaveImage.BitsPerColor": "16",
-            "UIStyle.ShowIntermediateOutputInterval": "0.0",
-        }
-        if method == "pmax":
-            values.update({
-                "PyramidControl.RetainUDRImage": "false",
-                "PyramidControl.RetainOnlyUDRImage": "false",
-            })
-        else:
-            values.update({
-                "DepthMapControl.UseFixedContrastThresholdLevel": "false",
-                "DepthMapControl.UseFixedContrastThresholdPercentile": "true",
-                "DepthMapControl.ContrastThresholdPercentile": str(args.dmap_percentile),
-                "DepthMapControl.EstimationRadius": str(args.dmap_estimation_radius),
-                "DepthMapControl.SmoothingRadius": str(args.dmap_smoothing_radius),
-                "DepthMapControl.SaveDepthMapImage": "false",
-            })
-        for key, value in values.items():
-            ET.SubElement(preferences, key, value=value)
-        ET.SubElement(task, "TaskIndicatorCode", value=TASK_CODES[method])
-    return batch
-
-
-def write_batches(path, batches):
-    root = ET.Element("ZereneStackerBatchScript")
-    queue = ET.SubElement(root, "BatchQueue")
-    ET.SubElement(queue, "Batches", length=str(len(batches))).extend(batches)
-    ET.indent(root)
-    ET.ElementTree(root).write(path, encoding="UTF-8", xml_declaration=True)
-
-
-def write_batch(path, output, methods, args):
-    write_batches(path, [make_batch("%CurrentProject%", output, methods, args)])
-
-
-def batch_command(java, batch_path, inputs=()):
-    return [
-        # Set the macOS activation policy before AWT initializes.
-        *java[:-1], "-Dapple.awt.BackgroundOnly=true", java[-1],
-        "-noSplashScreen", "-runMinimized", "-showProgressWhenMinimized=false",
-        "-suppressSaveProperties", "-exitOnBatchScriptCompletion",
-        "-batchScript", str(batch_path), *map(str, inputs),
-    ]
-
-
-@contextmanager
-def batch_lock(preferences):
-    with (preferences / "batch-runner.lock").open("a") as lock:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as error:
-            raise ValueError("Another Zerene batch runner is active.") from error
-        yield
 
 
 def run_zerene(command, log_path, timeout):
@@ -140,17 +57,15 @@ def run_zerene(command, log_path, timeout):
 def collect_outputs(output, methods, log_path):
     results = {}
     for method in methods:
-        files = sorted(output.glob(f"*_{method}.tif"))
-        if len(files) != 1:
-            raise ValueError(f"Expected one {method} TIFF, found {len(files)}. See {log_path}.")
+        image = batch_output(output, method)
         info = subprocess.run(
-            ["/usr/bin/sips", "-g", "format", "-g", "bitsPerSample", str(files[0])],
+            ["/usr/bin/sips", "-g", "format", "-g", "bitsPerSample", str(image)],
             capture_output=True, text=True, timeout=30,
         )
         properties = set(info.stdout.split())
         if info.returncode or not {"tiff", "16"} <= properties:
-            raise ValueError(f"Invalid 16-bit TIFF at {files[0]}. See {log_path}.")
-        results[method] = files[0]
+            raise ValueError(f"Invalid 16-bit TIFF at {image}. See {log_path}.")
+        results[method] = image
     for method, source in results.items():
         destination = output / f"{method}.tif"
         source.rename(destination)
@@ -185,7 +100,9 @@ def main():
         with batch_lock(preferences):
             output.mkdir(mode=0o700, parents=True)
             batch_path = output / "batch.xml"
-            write_batch(batch_path, output, methods, args)
+            write_batch(batch_path, output, methods, align=not args.already_aligned,
+                        dmap_percentile=args.dmap_percentile, dmap_estimation_radius=args.dmap_estimation_radius,
+                        dmap_smoothing_radius=args.dmap_smoothing_radius)
             (output / "inputs.json").write_text(json.dumps([str(path) for path in inputs], indent=2) + "\n")
             command = batch_command(java, batch_path, inputs)
             print(f"Zerene processing {len(inputs)} frames. Log: {log_path}", file=sys.stderr, flush=True)
