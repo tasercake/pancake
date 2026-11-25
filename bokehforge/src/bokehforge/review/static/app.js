@@ -30,7 +30,7 @@ let runOptions = "", outputState = "", candidateState = "";
 let activeImage = null, imageVersion = "";
 const readyThumbs = new Map();
 const panelImages = new WeakMap();
-const LIGHTBOX_HOVER_EXIT_DELAY = 100;
+const LIGHTBOX_HOVER_EXIT_DELAY = 250;
 
 function stackerLabel(id) {
   return tools.get(id)?.label ?? (id === "zerene" ? "Zerene Stacker" : id);
@@ -99,16 +99,26 @@ function previewElement(params, size, { title = "", priority = "auto", lazy = fa
 }
 
 function createThumbnail(params, alt = "") {
+  const key = imageURL(params, "thumb");
   const image = previewElement(params, "thumb", { title: alt, priority: "low", lazy: true });
   image.classList.add("preview-thumb");
+  const failed = () => image.classList.add("preview-failed");
   image.addEventListener("load", () => {
-    image.classList.add("preview-loaded");
-    const key = imageURL(params, "thumb");
-    readyThumbs.delete(key);
-    readyThumbs.set(key, image.currentSrc || image.src);
-    if (readyThumbs.size > 120) readyThumbs.delete(readyThumbs.keys().next().value);
+    image.decode().then(() => {
+      image.classList.add("preview-loaded");
+      readyThumbs.delete(key);
+      readyThumbs.set(key, image.currentSrc || image.src);
+      if (readyThumbs.size > 120) readyThumbs.delete(readyThumbs.keys().next().value);
+    }, failed);
   }, { once: true });
-  image.addEventListener("error", () => image.classList.add("preview-failed"), { once: true });
+  image.addEventListener("error", failed, { once: true });
+  return image;
+}
+
+function copyPreview(src) {
+  const image = part("img");
+  image.alt = "";
+  image.src = src;
   return image;
 }
 
@@ -122,8 +132,20 @@ function prefetchImage(params) {
 
 function clearImageRequest(well) {
   const request = panelImages.get(well);
-  if (request && !request.image.complete) request.image.removeAttribute("src");
   panelImages.delete(well);
+  if (request && !request.image.isConnected) request.image.removeAttribute("src");
+}
+
+function holdPanelImage(well) {
+  clearImageRequest(well);
+  const button = well.querySelector(".pane-image-button");
+  if (button) {
+    button.setAttribute("aria-disabled", "true");
+    button.onclick = null;
+  } else {
+    well.replaceChildren();
+  }
+  return button;
 }
 
 function showImage(well, title, params) {
@@ -131,40 +153,49 @@ function showImage(well, title, params) {
   const current = panelImages.get(well);
   if (current?.src === src && current.button.isConnected) {
     current.title = title;
-    current.button.setAttribute("aria-label", "Inspect " + title);
-    current.image.alt = title;
+    if (current.shown) {
+      current.button.setAttribute("aria-label", "Inspect " + title);
+      current.shown.alt = title;
+    }
     return;
   }
-  clearImageRequest(well);
-  const button = part("button", undefined, "pane-image-button");
-  button.type = "button";
-  button.setAttribute("aria-label", "Inspect " + title);
-  const image = previewElement(params, "panel", { title, priority: "high" });
-  image.classList.add("pane-preview");
-  const request = { src, button, image, title };
-  panelImages.set(well, request);
-  const loading = part("span", "Loading image…", "image-loading");
-  loading.setAttribute("role", "status");
-  const thumbnail = readyThumbs.get(imageURL(params, "thumb"));
-  let fallback;
-  if (thumbnail) {
-    fallback = part("img", undefined, "pane-fallback");
-    fallback.alt = "";
-    fallback.src = thumbnail;
-    button.append(fallback);
-    button.classList.add("has-preview");
+  let button = holdPanelImage(well);
+  if (!button) {
+    button = part("button", undefined, "pane-image-button");
+    button.type = "button";
+    button.setAttribute("aria-label", "Inspect " + title);
+    button.setAttribute("aria-disabled", "true");
+    button.append(part("span", "Inspect", "expand"));
+    well.append(button);
   }
-  image.addEventListener("load", () => {
+  const image = previewElement(params, "panel", { title, priority: "high" });
+  const request = { src, button, image, title, shown: null };
+  panelImages.set(well, request);
+  const reveal = (ready) => {
+    if (panelImages.get(well) !== request) return;
+    ready.classList.add("pane-preview");
+    ready.alt = request.title;
+    const old = button.querySelector("img");
+    if (old) old.replaceWith(ready);
+    else button.prepend(ready);
+    request.shown = ready;
     button.classList.add("image-ready");
-    fallback?.remove();
-    loading.remove();
-  }, { once: true });
-  image.addEventListener("error", () => {
-    if (button.isConnected) placeholder(well, "Image unavailable", "BokehForge could not render this image.");
-  }, { once: true });
-  button.append(image, loading, part("span", "Inspect", "expand"));
-  button.onclick = () => openLightbox(request.title, params, image.naturalWidth ? image : fallback);
-  well.replaceChildren(button);
+    button.removeAttribute("aria-disabled");
+    button.setAttribute("aria-label", "Inspect " + request.title);
+    button.onclick = () => openLightbox(request.title, params, request.shown);
+  };
+  const thumbnail = readyThumbs.get(imageURL(params, "thumb"));
+  if (thumbnail) {
+    const fallback = copyPreview(thumbnail);
+    fallback.decode().then(() => {
+      if (!request.shown) reveal(fallback);
+    }, () => {});
+  }
+  image.decode().then(() => reveal(image), () => {
+    if (panelImages.get(well) === request && !request.shown) {
+      placeholder(well, "Image unavailable", "BokehForge could not render this image.");
+    }
+  });
 }
 
 function cancelLightboxRequests(state) {
@@ -173,7 +204,7 @@ function cancelLightboxRequests(state) {
 }
 
 function cancelReferenceRequests(gallery) {
-  for (const image of Object.values(gallery.referenceImages)) {
+  for (const { image } of Object.values(gallery.referenceImages)) {
     if (!image.complete) image.removeAttribute("src");
   }
 }
@@ -319,24 +350,26 @@ function scheduleLightboxHoverReset(gallery) {
 
 function previewLightboxEntry(entry, thumbnail) {
   const { gallery } = activeImage;
+  const shown = gallery.hover?.shown;
   clearLightboxHover(gallery);
   if (lightboxImageKey(entry) === lightboxImageKey(activeImage)) {
     paintLightboxOverlays();
     return;
   }
-  const hover = { entry, image: null, request: null, events: new AbortController(), unavailable: false };
+  const hover = { entry, shown, request: null, events: new AbortController(), unavailable: false };
   gallery.hover = hover;
   const { signal } = hover.events;
   const useThumbnail = () => {
-    if (hover.image || !thumbnail.naturalWidth) return;
-    const image = part("img");
-    image.alt = "";
-    image.src = thumbnail.currentSrc || thumbnail.src;
-    hover.image = image;
-    paintLightboxOverlays();
+    if (hover.shown?.entry === entry || !thumbnail.naturalWidth) return;
+    const image = copyPreview(thumbnail.currentSrc || thumbnail.src);
+    image.decode().then(() => {
+      if (signal.aborted || hover.shown?.entry === entry) return;
+      hover.shown = { entry, image };
+      paintLightboxOverlays();
+    }, () => {});
   };
-  thumbnail.addEventListener("load", useThumbnail, { once: true, signal });
-  useThumbnail();
+  if (thumbnail.complete) useThumbnail();
+  else thumbnail.addEventListener("load", useThumbnail, { once: true, signal });
   requestLightboxHover();
   paintLightboxOverlays();
 }
@@ -353,16 +386,15 @@ function requestLightboxHover() {
   const image = previewElement(hover.entry.params, variant);
   hover.request = image;
   const { signal } = hover.events;
-  image.addEventListener("load", () => {
-    if (hover.request !== image) return;
-    hover.image = image;
+  image.decode().then(() => {
+    if (signal.aborted || hover.request !== image) return;
+    hover.shown = { entry: hover.entry, image };
     paintLightboxOverlays();
-  }, { once: true, signal });
-  image.addEventListener("error", () => {
-    if (hover.request !== image) return;
+  }, () => {
+    if (signal.aborted || hover.request !== image) return;
     hover.unavailable = true;
     paintLightboxOverlays();
-  }, { once: true, signal });
+  });
 }
 
 function clearLightboxHover(gallery) {
@@ -371,8 +403,6 @@ function clearLightboxHover(gallery) {
   hover.events.abort();
   if (hover.request && !hover.request.complete) hover.request.removeAttribute("src");
   gallery.hover = null;
-  gallery.hoverLayer.hidden = true;
-  gallery.hoverLayer.replaceChildren();
 }
 
 function setLightboxTitle(title) {
@@ -384,10 +414,10 @@ function setLightboxTitle(title) {
 }
 
 function setLightboxImage(state, image) {
-  state.image?.remove();
+  if (state.image) state.image.replaceWith(image);
+  else state.gallery.surface.prepend(image);
   state.image = image;
   state.gallery.baseEntry = state.entry;
-  state.gallery.surface.prepend(image);
   const hover = state.gallery.hover;
   if (hover && lightboxImageKey(hover.entry) === lightboxImageKey(state)) clearLightboxHover(state.gallery);
 }
@@ -396,7 +426,7 @@ function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
   const { title, params } = entry;
   const state = {
     entry, title, params, gallery, stage, image: null, requests: new Set(), scale: 1,
-    actual: false, position: null, nativeRequested: false, nativeLoaded: false, pending: "",
+    actual: false, position: null, nativeRequested: false, nativeLoaded: false, error: "",
     ...viewport,
   };
   activeImage = state;
@@ -405,20 +435,15 @@ function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
                     (previewImage.currentSrc || previewImage.src)) ||
     readyThumbs.get(imageURL(params, "thumb")));
   if (fallback) {
-    const image = part("img");
+    const image = copyPreview(fallback);
     image.alt = title;
-    image.src = fallback;
-    if (image.complete && image.naturalWidth) {
+    state.requests.add(image);
+    image.decode().then(() => {
+      state.requests.delete(image);
+      if (activeImage !== state || state.image) return;
       setLightboxImage(state, image);
-    } else {
-      state.requests.add(image);
-      image.addEventListener("load", () => {
-        state.requests.delete(image);
-        if (activeImage !== state || state.image) return;
-        setLightboxImage(state, image);
-        paintLightbox();
-      }, { once: true });
-    }
+      paintLightbox();
+    }, () => state.requests.delete(image));
   }
   requestLightbox(state.actual || state.scale > 1 ? "native" : "fit");
 }
@@ -471,38 +496,42 @@ function requestLightbox(variant) {
   const native = variant === "native";
   if (native && (state.nativeRequested || state.nativeLoaded)) return;
   if (native) state.nativeRequested = true;
-  state.pending = native ? "Loading full resolution…" : state.image ? "Loading detail…" : "Loading image…";
+  state.error = "";
   paintLightbox();
   const image = previewElement(state.params, variant, { title: state.title, priority: "high" });
   state.requests.add(image);
-  image.addEventListener("load", () => {
+  image.decode().then(() => {
     state.requests.delete(image);
     if (activeImage !== state || (!native && state.nativeLoaded)) return;
     const anchor = lightboxAnchor();
     if (native) state.nativeLoaded = true;
-    state.pending = !native && state.nativeRequested ? "Loading full resolution…" : "";
+    state.error = "";
     setLightboxImage(state, image);
     paintLightbox(anchor);
-  }, { once: true });
-  image.addEventListener("error", () => {
+  }, () => {
     state.requests.delete(image);
     if (activeImage !== state || (!native && state.nativeLoaded)) return;
     if (native) state.nativeRequested = false;
-    state.pending = native ? "Full resolution unavailable" : "Image unavailable";
+    state.error = native ? "Full resolution unavailable" : "Image unavailable";
     paintLightbox();
-  }, { once: true });
+  });
 }
 
 function requestReference(gallery, variant, priority) {
   if (gallery.referenceImages[variant]) return;
   const image = previewElement({ frame: gallery.referenceFrame.id }, variant, { priority });
-  image.alt = "";
-  gallery.referenceImages[variant] = image;
+  const request = { image, ready: false, failed: false };
+  gallery.referenceImages[variant] = request;
   const changed = () => {
-    if (activeImage?.gallery === gallery && gallery.referenceImages[variant] === image) paintLightboxOverlays();
+    if (activeImage?.gallery === gallery && gallery.referenceImages[variant] === request) paintLightboxOverlays();
   };
-  image.addEventListener("load", changed, { once: true });
-  image.addEventListener("error", changed, { once: true });
+  image.decode().then(() => {
+    request.ready = true;
+    changed();
+  }, () => {
+    request.failed = true;
+    changed();
+  });
 }
 
 function visibleLightboxImage(gallery) {
@@ -522,9 +551,11 @@ function paintLightboxOverlays() {
   const held = Boolean(gallery.holdKey);
   const comparing = held || gallery.swipe;
   const hover = gallery.hover;
-  const previewing = Boolean(hover?.image && state.image);
+  const shown = hover?.shown;
+  const previewing = Boolean(shown && state.image);
   gallery.hoverLayer.hidden = !previewing;
-  if (previewing && gallery.hoverLayer.firstChild !== hover.image) gallery.hoverLayer.replaceChildren(hover.image);
+  if (previewing && gallery.hoverLayer.firstChild !== shown.image) gallery.hoverLayer.replaceChildren(shown.image);
+  else if (!previewing && gallery.hoverLayer.firstChild) gallery.hoverLayer.replaceChildren();
   const reference = gallery.referenceFrame;
   const toggle = $("reference-swipe");
   toggle.disabled = !reference;
@@ -535,21 +566,19 @@ function paintLightboxOverlays() {
     if (comparing && (state.actual || state.scale > 1)) requestReference(gallery, "native", "high");
   }
   const { fit, native } = gallery.referenceImages;
-  const overlay = native?.naturalWidth ? native : fit?.naturalWidth ? fit : null;
+  const overlay = native?.ready ? native.image : fit?.ready ? fit.image : null;
   const showing = comparing && overlay && state.image;
   const layer = gallery.referenceLayer;
   const divider = $("reference-divider");
   layer.hidden = !showing;
   divider.hidden = !showing || held;
-  const entry = previewing ? hover.entry : gallery.baseEntry;
+  const entry = previewing ? shown.entry : gallery.baseEntry;
   const viewingReference = held && showing;
   setLightboxTitle(viewingReference ? referenceTitle(reference) : entry.title);
   renderBenchmark($("lightbox-benchmark"), viewingReference ? null : gallery.benchmarks.get(entry.params.stacker), true);
-  let status = state.pending;
-  if (hover) status = previewing ? "" : hover.unavailable ? "Preview unavailable" : "Loading preview…";
-  if (comparing && reference && !overlay) {
-    status = fit?.complete && (!native || native.complete) ? "Reference unavailable" : "Loading reference…";
-  }
+  let status = state.error;
+  if (hover) status = hover.unavailable && shown?.entry !== hover.entry ? "Preview unavailable" : "";
+  if (comparing && !overlay && fit?.failed && (!native || native.failed)) status = "Reference unavailable";
   if ($("lightbox-status").textContent !== status) $("lightbox-status").textContent = status;
   if (!showing) return;
   if (layer.firstChild !== overlay) layer.replaceChildren(overlay);
@@ -728,7 +757,7 @@ function goTo(position) {
   $("reference-meta").textContent = "";
   showImage($("source-image"), "source frame 1", { frame: next.first_frame });
   if (next.first_reference) showImage($("reference-image"), "reference", { frame: next.first_reference });
-  else placeholder($("reference-image"), "Loading scene");
+  else holdPanelImage($("reference-image"));
   renderOutput();
   remember();
   loadScene();
@@ -924,7 +953,7 @@ function renderOutput() {
       const [title, description] = unavailable[row.status];
       placeholder(well, title, row.error || description, row.log ? url("/api/log", params) : "");
     } else if (!details || outputLoading) {
-      placeholder(well, "Loading output");
+      holdPanelImage(well);
     } else {
       placeholder(well, "No evaluation output", "Start an evaluation to compare a stacked image.");
     }
