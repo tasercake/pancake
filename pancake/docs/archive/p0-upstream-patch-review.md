@@ -5,7 +5,7 @@ Date: 2026-11-17. Worktree: `p0-patches`, base `19b7f9e`.
 ## Decision
 
 Replace two retired helper dependencies using the narrow source patches in
-[`../vendor/README.md`](../vendor/README.md). Keep Slint 1.19.0, CubeCL 0.11.4 and
+[`../vendor/README.md`](../../vendor/README.md). Keep Slint 1.19.0, CubeCL 0.11.4 and
 wgpu 30. Preserve Wayland window titles, desktop settings and accessibility.
 Do not claim full P0 passage from these dependency fixes.
 

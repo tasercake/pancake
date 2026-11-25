@@ -21,7 +21,8 @@ Run focused checks for the change. `bash scripts/check.sh` runs the routine
 core/CLI CPU tests. **Pancake required** runs the headless lint and test gates
 on pull requests and main pushes. GUI, physical GPU, native platform,
 instrumented, and deep assurance checks have explicit entry points in the
-README. Select the appropriate ones for the change and report those left unrun.
+[developer guide](DEVELOPING.md). Select the appropriate ones for the change
+and report those left unrun.
 For hook and documentation changes, use focused script tests and static checks.
 
 The executable P0 library is subject to all assurance gates. Only the exact

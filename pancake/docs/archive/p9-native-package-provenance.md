@@ -18,7 +18,7 @@ sidecar matches the pinned archive and installed content SHA-256. The bundle's
 and hashes the original Support pointer notice, full LLVM project license from
 that revision, and the BLAKE3 license. The actual selected `libLLVMSupport.a`
 contains eight BLAKE3 member names. [Bundle source](https://github.com/tracel-ai/tracel-llvm).
-[Notice manifest](../notices/llvm/manifest.json).
+[Notice manifest](../../notices/llvm/manifest.json).
 [LLVM project license](https://github.com/llvm/llvm-project/blob/ea7d852a70e8bdfaf601d6626a760f9771b2c4b4/llvm/LICENSE.TXT).
 [BLAKE3 license](https://github.com/llvm/llvm-project/blob/ea7d852a70e8bdfaf601d6626a760f9771b2c4b4/llvm/lib/Support/BLAKE3/LICENSE).
 

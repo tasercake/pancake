@@ -56,7 +56,7 @@ as a separate class for review. Keep the same source scope, test selectors,
 baseline and per-mutant deadlines. The current workflow has no such artifact
 aggregate and did not run this matrix.
 
-The opt-in [local verifier](../../../scripts/verify_mutation_shards.py) checks
+The opt-in [local verifier](../../../../scripts/verify_mutation_shards.py) checks
 a separately generated full `--list --json` artifact and directories with
 `list.json` and `outcomes.json`, in zero-based shard order. It reconciles the
 ordered expected partitions and exact outcome identities, checks successful

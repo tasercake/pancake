@@ -32,7 +32,7 @@ pointer, and deallocation code. The terminal state read now acquires the
 message publication before any data access or free. The blocked receive path
 still acquires the terminal state after it wakes. The crate's remaining
 methods retain upstream behavior and remain within the third-party trust
-boundary. The [P9 audit](../docs/p9-tsan-audit/3dc9bcf/README.md) records the
+boundary. The [P9 audit](../docs/archive/p9-tsan-audit/3dc9bcf/README.md) records the
 original warning and the controlled comparison.
 
 ## Integration boundary
@@ -68,4 +68,4 @@ The dependency-identity test was run before changes: five CubeCL dependency
 subtests and the `pin-utils` removal contract failed for the intended reason.
 After the patch, all four contract tests pass. Upstream Rust checks and full
 application integration results are recorded in
-[`../docs/p0-upstream-patch-review.md`](../docs/p0-upstream-patch-review.md).
+[the upstream patch review](../docs/archive/p0-upstream-patch-review.md).

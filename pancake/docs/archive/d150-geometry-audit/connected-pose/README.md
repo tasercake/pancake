@@ -12,7 +12,7 @@ The current `Alignment` appends a concrete `SourceMap` for every original, norma
 
 An observer-only diagnostic could retain the trusted state and report the unknown relation while separately tracing the unchanged legacy result. Production would need either measured reconnection before normalization or an explicitly reviewed failure policy. The latter could use the shared recoverable job path before export or retained-result publication and cannot qualify D150 as complete. Bounded lookahead could attempt a measured link. Its pending RGB ownership, or the extra decode of a geometry pass, must enter admission and full-job cost. Current evidence justifies neither a global fallback map nor a new default failure.
 
-[Streaming registration and pose composition](../../../src/job/registration.rs) · [Normalization before fusion](../../../src/job/stream.rs) · [Publication contract](../../../src/job/mod.rs) · [Successful completion records](../../../src/job/events.rs)
+[Streaming registration and pose composition](../../../../src/job/registration.rs) · [Normalization before fusion](../../../../src/job/stream.rs) · [Publication contract](../../../../src/job/mod.rs) · [Successful completion records](../../../../src/job/events.rs)
 
 ## Test-first design
 

@@ -58,15 +58,15 @@ RAW pool beside CPU registration and fusion leaves throughput or RSS intact.
   288 MB of f32 storage. A permitted 50 MP frame can hold 600 MB before
   decode scratch. A tight budget, unfamiliar codec or geometry, alternate
   anchor and overlapping slabs keep the original one-frame execution.
-  [Job plan](../../src/job/stream.rs) · [Decode limits](../../src/image_io/mod.rs).
+  [Job plan](../../../src/job/stream.rs) · [Decode limits](../../../src/image_io/mod.rs).
 - Keep registration, `ResidentRgb`, CubeCL, progress and publication on
   the existing job owner. `ResidentRgb` intentionally cannot move between
   threads. A diagnostic using one scoped join inside an existing bounded
   stage would need only one owned result slot. The decoder must never call
   the shared blocking checkpoint. Join and release outstanding work on
   every success, source failure, compute failure, and cancellation path.
-  Preserve the current accumulator's device drain. [Resident input](../../src/registration/mod.rs)
-  · [Accumulator drain](../../src/fusion/advanced/mod.rs).
+  Preserve the current accumulator's device drain. [Resident input](../../../src/registration/mod.rs)
+  · [Accumulator drain](../../../src/fusion/advanced/mod.rs).
 - Preserve stage and generation truth. Today each checkpoint can publish
   Paused or acknowledge cancellation because its preceding owned batch
   has drained. With concurrent decode, acknowledge only after the work
@@ -76,7 +76,7 @@ RAW pool beside CPU registration and fusion leaves throughput or RSS intact.
   next decode can therefore cover more than the frozen 250 ms deadline.
   This is a boundary risk, separate from a measured event-to-acknowledgement
   result. Host codec cancellation needs an observed safe granularity before
-  relying on a sub-250 ms drain. [Control and checkpoints](../../src/job/lifecycle.rs)
+  relying on a sub-250 ms drain. [Control and checkpoints](../../../src/job/lifecycle.rs)
   · [Frozen lifecycle endpoint](../performance-targets.json).
 - Preserve input order and the filesystem read contract. The request owns
   paths, and a progress callback or a paused user's edits can replace the
@@ -88,8 +88,8 @@ RAW pool beside CPU registration and fusion leaves throughput or RSS intact.
   Size and mtime alone cannot prove identical encoded bytes. The frozen
   benchmark's authenticated files supply such a premise for measurement.
   Ordinary path-based jobs need an equivalent verified premise or retain
-  their original decode timing. [Job entry and publication](../../src/job/mod.rs)
-  · [Actual source open](../../src/image_io/mod.rs).
+  their original decode timing. [Job entry and publication](../../../src/job/mod.rs)
+  · [Actual source open](../../../src/image_io/mod.rs).
 
 ## Verification before considering production
 
@@ -109,7 +109,7 @@ and verify that the correct generation settles, can restart, and publishes
 neither a file nor a completion record. Pause and resume a real job and
 verify no codec work survives pause acknowledgement. Exercise a tight
 budget and an ineligible format with the original synchronous route.
-[Existing job and lifecycle tests](../../tests/cpu_job.rs).
+[Existing job and lifecycle tests](../../../tests/cpu_job.rs).
 
 Only a positive exact-source diagnostic with bit-identical TIFFs,
 transforms, progress and backend events justifies a further matched run.

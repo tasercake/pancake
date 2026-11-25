@@ -25,7 +25,7 @@ archives receive explicit inventory statuses. This records discovery within
 the locked Cargo graph and leaves distribution approval with the release
 owner. System libraries resolved by APT remain external packages. Native
 build artifacts downloaded by build scripts need their own source and
-notice receipts. [Dependency policy](dependency-policy.md).
+notice receipts. [Dependency policy](../dependency-policy.md).
 
 ## Verification
 

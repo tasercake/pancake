@@ -1,5 +1,34 @@
 # Developing Pancake
 
+## Build from source
+
+Install [Rust with rustup](https://rustup.rs/). The Pancake workspace selects
+the toolchain pinned in [rust-toolchain.toml](rust-toolchain.toml).
+
+| Platform | Desktop build prerequisites |
+| --- | --- |
+| macOS on Apple Silicon | Xcode with its command-line tools selected, and Zstandard (`brew install zstd`). |
+| Ubuntu 24.04 x86-64 | A C/C++ toolchain, `pkg-config`, and the packages in [ci-linux-native-deps.sh](scripts/ci-linux-native-deps.sh). |
+| Windows x64 | Visual Studio Build Tools with **Desktop development with C++**, the Windows SDK, and the x64 MSVC Rust host toolchain. |
+
+Clone the repository and build the desktop app and CLI.
+
+```sh
+git clone https://github.com/tasercake/pancake.git
+cd pancake/pancake
+cargo build --locked --release --workspace --bins
+```
+
+Launch `target/release/pancake-gui`, or `target\release\pancake-gui.exe` on
+Windows. To check the CLI with the bundled synthetic frames, run this command
+from the same directory. It writes `stacked.tif` in the current directory.
+
+```sh
+cargo run --locked --release -p pancake-cli -- --cpu --input ../assets/quickstart/focus-near.png ../assets/quickstart/focus-far.png --output stacked.tif
+```
+
+For packaged builds, use the [release guide](docs/releases.md).
+
 ## Tests and assurance
 
 Run the Lightroom plug-in contract checks from `pancake/` with `luajit lightroom/test_open_stack.lua` or Lua 5.1.
@@ -14,7 +43,7 @@ versions in [tool-versions.sh](scripts/tool-versions.sh).
 | `bash scripts/check.sh` or `bash scripts/check.sh test` | Everyday loop. Debug Nextest for the core and headless CLI, including real CPU kernels, registration, fusion, codecs, cancellation, resource limits, and CLI integration. No display or physical accelerator is needed. |
 | `bash scripts/check.sh lint` | Repository policy and script regressions, formatting, and Clippy for the core and CLI. |
 | `bash scripts/check.sh test-gui` | GUI package tests, including the Slint workspace and software-renderer contracts. Use a supported desktop environment for tests of native window integration. |
-| `bash scripts/check.sh gpu` | Physical-GPU integration tests in debug and release. Validation fails if the runtime falls back to software. See the [hardware lanes](docs/p0-hardware-test-lanes.md). |
+| `bash scripts/check.sh gpu` | Physical-GPU integration tests in debug and release. Validation fails if the runtime falls back to software. |
 | `bash scripts/check.sh test-cpu` / `test-release` | All CPU tests, including the GUI package, for the debug or release profile. |
 | `bash scripts/check.sh test-full` | All workspace targets in debug and release, plus doctests. If any workspace package declares Cargo features, also runs the feature powerset. Requires a physical GPU. |
 | `bash scripts/check.sh fast` | Workspace-wide lint and private Rust documentation in addition to the policy checks. |
@@ -43,7 +72,7 @@ Run physical GPU and native desktop checks on a suitable machine, especially
 for changes to device routing, kernels, rendering, or desktop workflows. Local
 commands also expose `coverage`, `branches`, `deps`, `guardrails`, and
 `sanitizer address` or `sanitizer thread` on Linux x86-64. Coverage thresholds,
-the [Miri host contract](docs/p0-miri-host-boundary.md), and
+the [Miri host contract](docs/archive/p0-miri-host-boundary.md), and
 [dependency policy](docs/dependency-policy.md) apply when their gates run.
 
 Full workspace mutation analysis is an explicit local or dedicated-runner
@@ -54,5 +83,5 @@ full roster. The routine lane keeps the substantive CPU cases, and the
 specialized lanes retain the hardware and instrumentation checks. The runtime
 savings come from avoiding repeated builds and test passes on every change.
 
-The [implementation plan](docs/implementation-plan.md) covers the application architecture and implementation milestones. The [P0 work log](docs/p0-work-log.md) consolidates
-current and historical proofs, failures and later acceptance owners.
+The [engineering archive](docs/archive/) retains the implementation plan,
+qualification reports, and test evidence.

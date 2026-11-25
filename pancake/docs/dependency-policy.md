@@ -75,7 +75,7 @@ reason in the ledger.
 | RUSTSEC-2026-0372, `zvariant_derive` 5.15.1 | Host macro generates wire serialization code paired with zvariant 5. Runtime generated code handles session-bus inputs; upgrade with the full stack. |
 | RUSTSEC-2026-0543, `chrono` 0.4.45 | Slint runtime date/calendar parsing and formatting plus local clock/timezone access. Full metadata also has exact dormant Turso SQL timestamp and VFS clock paths. Replace through a reviewed compatible date/time migration. |
 
-The [upstream patch review](p0-upstream-patch-review.md) documents exposure and
+The [upstream patch review](archive/p0-upstream-patch-review.md) documents exposure and
 removal alternatives. No exception exists for `paste` or `pin-utils`; reviewed
 source patches remove those dependencies. No titlebar/accessibility feature is
 disabled to remove a notice.
