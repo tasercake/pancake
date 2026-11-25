@@ -22,7 +22,7 @@ const unavailable = {
 
 let scenes = [], visible = [], runs = [], scene = null, details = null;
 let frameIndex = 0, referenceIndex = 0, runId = parameters.get("run") ?? "", stackerId = "", formKey = "";
-let sceneRequest, stopping = "";
+let sceneRequest, scoreRevision, stopping = "";
 let warmupTimer, warming = [];
 let catalogRevision = -1, lastDownload, rateTimeout, startingDownload = false;
 let outputLoading = false;
@@ -705,11 +705,14 @@ async function loadScene() {
   sceneRequest?.abort();
   sceneRequest = new AbortController();
   const { signal } = sceneRequest;
+  const revision = scoreRevision;
+  let loaded = false;
   try {
     const data = await api(url("/api/scene", { scene: scene.id, run: runId }), undefined, { signal });
     if (signal.aborted) return;
     const firstLoad = !details;
     details = data;
+    loaded = true;
     const gallery = activeImage?.gallery;
     if (gallery?.scene === scene.id && gallery.run === runId) setLightboxGallery(gallery, data);
     outputLoading = false;
@@ -728,7 +731,23 @@ async function loadScene() {
     if (!details) {
       for (const role of ["source", "reference"]) placeholder($(`${role}-image`), "Scene unavailable");
     }
+  } finally {
+    if (!signal.aborted) {
+      sceneRequest = null;
+      // A score may finish while the scene response is still in flight.
+      if (loaded && revision !== scoreRevision && pendingScores()) loadScene();
+    }
   }
+}
+
+function pendingScores() {
+  return details?.outputs.some((output) => output.benchmark?.status === "pending");
+}
+
+function applyScores(revision) {
+  if (revision === scoreRevision) return;
+  scoreRevision = revision;
+  if (!sceneRequest && pendingScores()) loadScene();
 }
 
 function sourceFrameTitle(frame, index) {
@@ -784,13 +803,29 @@ function renderReference() {
   showReference();
 }
 
+const benchmarkNumber = new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function renderBenchmark(benchmark) {
+  const label = $("candidate-benchmark");
+  label.hidden = !benchmark;
+  const scored = benchmark?.score != null;
+  const invalid = benchmark?.status === "invalid_output" ? " · Invalid delivery" : "";
+  const text = scored ? `Benchmark score ${benchmarkNumber.format(benchmark.score)} / 100${invalid}` :
+    { pending: "Calculating benchmark score…", unscored: "No eligible benchmark reference" }[benchmark?.status] ??
+    (benchmark ? "Benchmark score unavailable" : "");
+  if (label.textContent !== text) label.textContent = text;
+  label.dataset.scored = scored;
+  label.title = [benchmark?.profile, benchmark?.error].filter(Boolean).join(" · ");
+}
+
 function renderOutput() {
   const outputs = details?.outputs ?? [];
   if (outputs.length && !outputs.some((output) => output.stacker === stackerId)) {
     stackerId = (outputs.find((output) => output.status === "ready") ?? outputs[0]).stacker;
   }
   const row = outputs.find((output) => output.stacker === stackerId);
-  const tabsKey = JSON.stringify([stackerId, outputs.map((output) => [output.stacker, output.status, output.rating?.grade])]);
+  const tabsKey = JSON.stringify([stackerId, outputs.map((output) =>
+    [output.stacker, output.status, output.rating?.grade, output.benchmark?.score])]);
   if (tabsKey !== outputState) {
     const tabStrip = $("output-tabs");
     const focused = tabStrip.contains(document.activeElement) ? document.activeElement.dataset.stacker : null;
@@ -800,6 +835,12 @@ function renderOutput() {
       button.dataset.stacker = output.stacker;
       button.title = unavailable[output.status]?.[0] ?? "View stacker output";
       button.setAttribute("aria-pressed", output === row);
+      if (output.benchmark?.score != null) {
+        const badge = part("small", benchmarkNumber.format(output.benchmark.score) + "/100", "benchmark-badge");
+        badge.title = "Benchmark score";
+        badge.setAttribute("aria-label", "Benchmark score " + badge.textContent);
+        button.append(badge);
+      }
       if (output.rating) button.append(part("small", output.rating.grade + "/5"));
       button.onclick = () => { stackerId = output.stacker; renderOutput(); };
       return button;
@@ -831,6 +872,7 @@ function renderOutput() {
     }
     candidateState = currentImage;
   }
+  renderBenchmark(row?.benchmark);
   renderRating(row);
 }
 
@@ -1212,6 +1254,7 @@ async function startDownload() {
 function connect() {
   const events = new EventSource("/api/events");
   events.addEventListener("runs", (event) => applyRuns(JSON.parse(event.data)));
+  events.addEventListener("scores", (event) => applyScores(JSON.parse(event.data)));
   events.addEventListener("catalog", (event) => applyCatalog(JSON.parse(event.data)));
   events.addEventListener("download", (event) => applyDownload(JSON.parse(event.data)));
   events.onopen = () => showMessage($("connection-status"), "");

@@ -98,8 +98,12 @@ def _read_frames(catalog, scene, row, workers):
                              frame.provenance.get("focus_distance_m"), frame.provenance.get("aperture_f_number"))
 
 
+def has_benchmark_reference(scene):
+    return scene.metadata["reference_type"] in _RGB_REFERENCES and bool(scene.reference_ids)
+
+
 def _reference(catalog, scene, row):
-    if row["reference_type"] not in _RGB_REFERENCES or not scene.reference_ids:
+    if not has_benchmark_reference(scene):
         row.update(status="unscored", reference_status="no_eligible_reference")
         return None
     try:
@@ -147,44 +151,29 @@ def _read_candidate(path):
         return page.asarray()
 
 
-def _run_scene(catalog, scene, row, algorithm, args):
-    row.update(frames_read=0, scene_score=None, status="ok")
-    reference = _reference(catalog, scene, row)
-    if reference is None:
-        return
-    shape = reference.shape
-    start = perf_counter()
+def _load_candidate(path, row, *, fingerprint=False):
     try:
-        if args.candidate_dir is not None:
-            path = args.candidate_dir / (scene.id + ".tif")
-            try:
-                result = _read_candidate(path)
-                row["candidate_sha256"] = digest(path)
-            except FileNotFoundError as exc:
-                row.update(status="missing_output", error=_error_text(exc))
-                return
-            except Exception as exc:
-                row.update(status="invalid_output", error=_error_text(exc))
-                return
-        else:
-            result = _run_stacker(catalog, scene, row, algorithm, shape, args.decode_workers)
-    except _InputError as exc:
-        row.update(status="input_error", reference_status="error", scene_score=None, error=str(exc))
-        return
-    finally:
-        row["seconds"] = perf_counter() - start
+        result = _read_candidate(path)
+        if fingerprint:
+            row["candidate_sha256"] = digest(path)
+        return result
+    except FileNotFoundError as exc:
+        row.update(status="missing_output", error=_error_text(exc))
+    except Exception as exc:
+        row.update(status="invalid_output", error=_error_text(exc))
+    return None
 
-    if row["status"] != "ok":
-        return
+
+def _score_delivery(result, reference, row, profile):
     try:
-        validate_rgb(result, shape if args.score_profile == SCORE_VERSION else None)
+        validate_rgb(result, reference.shape if profile == SCORE_VERSION else None)
     except ValueError as exc:
         row.update(status="invalid_output", error=str(exc))
         return
 
     scoring_start = perf_counter()
     try:
-        if args.score_profile == CROP_SCORE_VERSION:
+        if profile == CROP_SCORE_VERSION:
             score, measurement, alignment = evaluate_crop(result, reference)
             row.update(scene_score=score, alignment=alignment)
         else:
@@ -197,6 +186,46 @@ def _run_scene(catalog, scene, row, algorithm, args):
         return
     finally:
         row["scoring_seconds"] = perf_counter() - scoring_start
+
+
+def score_saved_output(catalog, scene, path):
+    """Return the benchmark's default per-scene score for an existing canonical TIFF."""
+    row = {"status": "ok", "scene_score": None}
+    reference = _reference(catalog, scene, row)
+    if reference is not None:
+        result = _load_candidate(path, row)
+        if result is not None:
+            _score_delivery(result, reference, row, SCORE_VERSION)
+    return {"profile": SCORE_VERSION, "score": row["scene_score"], "status": row["status"],
+            **({"error": row["error"]} if "error" in row else {})}
+
+
+def _run_scene(catalog, scene, row, algorithm, args):
+    row.update(frames_read=0, scene_score=None, status="ok")
+    reference = _reference(catalog, scene, row)
+    if reference is None:
+        return
+    shape = reference.shape
+    start = perf_counter()
+    try:
+        if args.candidate_dir is not None:
+            path = args.candidate_dir / (scene.id + ".tif")
+            result = _load_candidate(path, row, fingerprint=True)
+            if result is None:
+                return
+        else:
+            result = _run_stacker(catalog, scene, row, algorithm, shape, args.decode_workers)
+    except _InputError as exc:
+        row.update(status="input_error", reference_status="error", scene_score=None, error=str(exc))
+        return
+    finally:
+        row["seconds"] = perf_counter() - start
+
+    if row["status"] != "ok":
+        return
+    _score_delivery(result, reference, row, args.score_profile)
+    if row["status"] != "ok":
+        return
     if args.save_images:
         image_path = args.output / "images" / (scene.id + ".tif")
         try:

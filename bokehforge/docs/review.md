@@ -16,6 +16,9 @@ Use the sidebar to scroll through scene previews and filter by dataset. Select a
 
 Select an evaluation and a stacker to compare its output with a source frame and the available reference. The reference panel indicates when ground truth is unavailable. Click any comparison image or the expand control on a thumbnail to open it in the zoomable lightbox. Scroll the lightbox strip to browse the source frames, ready outputs from the selected evaluation, and any references. Hover over a thumbnail to preview it and move away to return to the selected image. Click or tap a thumbnail to select it, or use Left and Right to wrap through the strip. Zoom and pan stay fixed as you browse. Select **Swipe reference** and drag the divider to compare the image with its reference, or hold the period key (`.`) to see the reference across the whole view. You can pan while holding the key and the image resumes at the same position when you release it. Grade an output from 1 to 5, with 5 best, and save it with an optional comment. **Export ratings** downloads the saved grades and comments for every run as CSV.
 
+
+Each ready output shows the benchmark’s per-scene score out of 100 below its image and on its stacker tab. Review uses the default [`reference-fidelity-v2` profile](benchmark.md#the-score) at native resolution. The default profile gives cropped or otherwise invalid deliveries a zero, and scenes without an eligible RGB reference remain unscored. Scores are computed in the background when you open a scene and cached for subsequent visits.
+
 ## Set up the stackers
 
 Choose the stackers in **New evaluation**. When you start the run, Review uses the available open-source stackers and prepares any others you selected before processing scenes. First-time setup may download dependencies. The run banner shows what is being installed, and setup failures include a log for the affected stacker. Other selected stackers can continue when one setup fails.
@@ -55,6 +58,7 @@ runs/<run-id>/
     setup.log                                  # First-run setup output, when needed
     images/<scene-id>.tif                       # Full-resolution float32 linear-sRGB RGB
     results/<scene-id>.json                     # Outcome, input fingerprint, and relative file paths
+    scores/<scene-id>.json                      # Cached per-scene benchmark result
     logs/<scene-id>.log                         # Tool command and output
 ```
 

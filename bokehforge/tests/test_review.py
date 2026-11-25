@@ -17,7 +17,10 @@ from PIL import Image
 import pytest
 import tifffile
 
-from bokehforge.review import _zerene, runs
+from bokehforge.bench import main as bench
+from bokehforge.data._canonical import INFINIGEN_DISTANCES
+from bokehforge.review import _zerene, runs, scores
+from bokehforge.scoring import SCORE_VERSION
 from bokehforge.review import server as review_server
 from bokehforge.review.server import Review, ReviewServer
 
@@ -131,6 +134,7 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     assert summary_scene["preview_frame"] == inspected["frames"][1]["id"]
     successful, failed = inspected["outputs"]
     assert successful["status"] == "ready"
+    assert successful["benchmark"] == {"profile": SCORE_VERSION, "status": "unscored", "score": None}
     assert failed["status"] == "failed" and failed["error"] == "example exit"
     assert all(row["status"] == "outside_scope" for row in app.scene_details(other, job)["outputs"])
 
@@ -450,3 +454,87 @@ def test_zerene_uses_a_local_batch_and_normalizes_the_output(tmp_path, monkeypat
     app.rate({**choice, "grade": 4})
     result, = app.scene_details(scene, job)["outputs"]
     assert result["rating"]["grade"] == 4
+
+
+def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypatch):
+    root, store = tmp_path / "data", tmp_path / "review"
+    raw = root / "raw/Demo"
+    folder = raw / "a1_0"
+    folder.mkdir(parents=True)
+    inputs = [f"image_ap_1.40_fd_{distance:.2f}.png" for distance in INFINIGEN_DISTANCES]
+    files = []
+    for name in [*inputs, "image_all_in_focus.png"]:
+        image = folder / name
+        Image.fromarray(np.full((6, 8, 3), 64, dtype=np.uint8)).save(image)
+        files.append({"path": image.relative_to(raw).as_posix(), "sha256": sha256(image.read_bytes()).hexdigest()})
+    (raw / "download-manifest.json").write_text(json.dumps({
+        "id": "Demo", "status": "available", "layout": "infinigen_defocus", "transfer": "linear",
+        "reference_type": "rendered_all_in_focus", "files": files,
+    }))
+
+    def render(tool, frames, work, log, stop):
+        delivery = work / "generated.tif"
+        tifffile.imwrite(delivery, np.full((6, 8, 3), 32000, dtype=np.uint16), photometric="rgb")
+        return delivery
+
+    gate = Event()
+    calls = []
+    score_saved = scores.score_saved_output
+
+    def delayed_score(catalog, scene, path):
+        calls.append(path)
+        assert gate.wait(5)
+        return score_saved(catalog, scene, path)
+
+    monkeypatch.setattr(runs, "_render", render)
+    monkeypatch.setattr(scores, "score_saved_output", delayed_score)
+    app = open_review(root, store)
+    reopened = None
+    try:
+        scene = app.scenes[0]["id"]
+        run = app.start({"scope": "scene", "scene": scene, "stackers": ["pancake"]})
+        app.runs.worker.join(timeout=5)
+        assert not app.runs.worker.is_alive()
+        with app.events.subscribe() as (reader, writer):
+            reader.settimeout(5)
+            result, = app.scene_details(scene, run)["outputs"]
+            assert result["status"] == "ready"
+            assert result["benchmark"]["status"] == "pending"
+            assert app.scene_details(scene, run)["outputs"][0]["benchmark"]["status"] == "pending"
+            gate.set()
+            while ("scores", 1) not in map(event_payload, app.events.take(reader, writer)):
+                pass
+
+        result, = app.scene_details(scene, run)["outputs"]
+        score = result["benchmark"]["score"]
+        assert 0 < score < 100
+        assert result["benchmark"]["profile"] == SCORE_VERSION
+        assert len(calls) == 1
+        path = app.artifact({"run": run, "scene": scene, "stacker": "pancake"}, "image")
+        report = tmp_path / "benchmark"
+        assert bench(["--root", str(root), "--config", str(root / "sources.json"), "--candidate-dir",
+                      str(path.parents[1]), "--output", str(report)]) == 0
+        benchmark_row, = json.loads((report / "report.json").read_text())["scenes"]
+        assert benchmark_row["scene_score"] == score
+
+        reopened = open_review(root, store)
+        assert reopened.scene_details(scene, run)["outputs"][0]["benchmark"] == result["benchmark"]
+        assert reopened.scores.worker is None
+
+        crop = path.with_suffix(".replacement.tif")
+        tifffile.imwrite(crop, tifffile.imread(path)[:, :-1], photometric="rgb")
+        crop.replace(path)
+        with reopened.events.subscribe() as (reader, writer):
+            reader.settimeout(5)
+            assert reopened.scene_details(scene, run)["outputs"][0]["benchmark"]["status"] == "pending"
+            while ("scores", 1) not in map(event_payload, reopened.events.take(reader, writer)):
+                pass
+        cropped, = reopened.scene_details(scene, run)["outputs"]
+        assert cropped["benchmark"]["status"] == "invalid_output"
+        assert cropped["benchmark"]["score"] == 0
+        assert len(calls) == 2
+    finally:
+        gate.set()
+        app.scores.close()
+        if reopened is not None:
+            reopened.scores.close()
