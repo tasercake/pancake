@@ -18,7 +18,8 @@ from ..data._files import safe_path
 from .downloads import Downloads
 from .events import Events
 from .images import (
-    DecodedFrames, PREVIEW_VERSION, PreviewCache, ReviewFrameDecoder, SIZES, output_pixels, preview, preview_mime,
+    DecodedFrames, PREVIEW_VERSION, PreviewCache, ReviewFrameDecoder, SIZES,
+    output_identity, output_pixels, output_revision, preview, preview_mime,
 )
 from .ratings import Ratings
 from .runs import Runs, lock_store
@@ -30,6 +31,7 @@ STATIC = Path(__file__).with_name("static")
 ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8"),
           "/rail.js": ("rail.js", "text/javascript; charset=utf-8"),
+          "/score-explanation.js": ("score-explanation.js", "text/javascript; charset=utf-8"),
           "/style.css": ("style.css", "text/css; charset=utf-8")}
 ALL_INTERFACES = "0.0.0.0"
 
@@ -207,6 +209,17 @@ class Review:
                 return self.runs.directory(run_id) / row[key]
         raise KeyError(f"Evaluation {key} unavailable")
 
+    def score_tiles(self, query):
+        catalog = self.require_catalog()
+        scene = catalog.scene(query["scene"])
+        run_id = query["run"]
+        result = next((row for row in self.runs.scene_results(run_id, catalog, scene)
+                       if row["stacker"] == query["stacker"] and row["status"] == "ready"), None)
+        if result is None:
+            raise KeyError("Evaluation output unavailable")
+        return self.scores.tiles(catalog, scene, self.runs.directory(run_id), result,
+                                 query["rev"], query["family"], int(query["side"]))
+
     def image_target(self, query):
         catalog = self.require_catalog()
         variant = query.get("size", "fit")
@@ -221,10 +234,14 @@ class Review:
                 return self.frame_decoder.decode(frame).data
         else:
             path = self.artifact(query, "image")
-            stat = path.stat()
-            identity = (str(path), stat.st_ino, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size)
+            identity = output_identity(path)
+            if "rev" in query and query["rev"] != output_revision(identity):
+                raise ValueError("The evaluation image changed. Reload its scene for the current version.")
             def read():
-                return output_pixels(path)
+                pixels = output_pixels(path)
+                if output_identity(path) != identity:
+                    raise ValueError("The evaluation image changed while loading.")
+                return pixels
         return variant, identity, read
 
     def image(self, query):
@@ -339,6 +356,9 @@ class Handler(BaseHTTPRequestHandler):
             self.json(200, app.runs.list())
         elif path == "/api/scene":
             self.json(200, app.scene_details(query["scene"], query.get("run")))
+        elif path == "/api/score-tiles":
+            result = app.score_tiles(query)
+            self.json(202 if result["status"] == "pending" else 200, result)
         elif path == "/api/image":
             self.send_image(app, query)
         elif path == "/api/log":

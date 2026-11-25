@@ -84,12 +84,14 @@
             </figure>
             <figure class="pane candidate">
               <figcaption><span>Stacker output</span><span class="pane-meta" id="candidate-meta"></span></figcaption>
-              <div class="image-well" id="candidate-image"></div>
+              <div class="candidate-viewport"><div class="image-well" id="candidate-image"></div></div>
               <div class="benchmark-line candidate-benchmark" hidden>
                 <span id="candidate-benchmark" role="status"></span>
                 <button class="benchmark-info" type="button" aria-label="Why this output scored zero"
                   aria-haspopup="dialog" aria-controls="benchmark-details"
                   title="Why this output scored zero" hidden>i</button>
+                <button class="quiet score-explanation-trigger" id="candidate-explain" type="button"
+                  aria-expanded="false" aria-controls="candidate-explanation" hidden>Explain score</button>
               </div>
             </figure>
             <figure class="pane">
@@ -98,6 +100,7 @@
               <label class="reference-select" id="reference-control" hidden>Reference image<select id="reference-select"></select></label>
             </figure>
           </div>
+          <section class="score-explanation candidate-explanation" id="candidate-explanation" aria-label="Score explanation" hidden></section>
           <div class="film">
             <div class="film-heading">
               <div><h3>Source frames</h3><span id="film-range"></span></div>
@@ -160,6 +163,8 @@
           <button class="benchmark-info" type="button" aria-label="Why this output scored zero"
             aria-keyshortcuts="I" aria-haspopup="dialog" aria-controls="benchmark-details"
             title="Why this output scored zero (I)" hidden>i</button>
+          <button class="quiet score-explanation-trigger" id="lightbox-explain" type="button"
+            aria-expanded="false" aria-controls="lightbox-explanation" hidden>Explain score</button>
         </div>
       </div>
       <div class="tools">
@@ -179,6 +184,7 @@
           title="Drag to reveal the reference"></button>
       </div>
       <p id="lightbox-status" role="status"></p>
+      <aside class="score-explanation lightbox-explanation" id="lightbox-explanation" aria-label="Score explanation" hidden></aside>
     </div>
     <div class="filmstrip lightbox-strip" id="lightbox-strip" role="list" aria-label="Scene images">
       <div class="rail-track" role="presentation"></div>
@@ -192,5 +198,38 @@
     </div>
     <p id="benchmark-reason"></p>
   </dialog>
+
+  <template id="score-explanation-template">
+    <div class="score-explanation-heading">
+      <h3 data-score-heading></h3>
+      <button class="quiet score-explanation-dismiss" type="button" aria-label="Close score explanation">Close</button>
+    </div>
+    <div class="damage-controls">
+      <label class="damage-switch"><input data-overlay type="checkbox"> Show damage overlay</label>
+      <label>Family <select data-family></select></label>
+      <label>Grid <select data-grid>
+        <option value="8">8 px tiles</option>
+        <option value="32">32 px tiles</option>
+      </select></label>
+    </div>
+    <p class="damage-status" data-damage-status role="status" hidden></p>
+    <p class="damage-help" data-damage-curve></p>
+    <div class="damage-column-headings" aria-hidden="true">
+      <span>Damage family</span><span>Observed</span><span>Weight</span><span>Contribution</span>
+    </div>
+    <div data-damage-families></div>
+    <details class="damage-method">
+      <summary>How to read damage</summary>
+      <p>Damage ranges from 0 (no difference from the reference) to 1 (highest damage). The six families separate different ways an output can lose fidelity, such as shifting tones or smoothing away detail.</p>
+      <p>Each contribution is observed damage multiplied by its weight. The score decays exponentially as their sum increases. The overlay shows the selected family’s measured tiles on one grid at a time.</p>
+    </details>
+  </template>
+  <template id="damage-legend-template">
+    <div class="damage-legend" hidden>
+      <strong></strong>
+      <span class="damage-legend-ramp"></span>
+      <span class="damage-legend-values"><span>0</span><span>0.25</span><span>0.5</span><span>0.75</span><span>1</span></span>
+    </div>
+  </template>
 </body>
 </html>

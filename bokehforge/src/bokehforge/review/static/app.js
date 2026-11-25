@@ -1,4 +1,5 @@
 import { VirtualRail } from "./rail.js";
+import { ScoreExplanation } from "./score-explanation.js";
 
 const $ = (id) => document.getElementById(id);
 const number = new Intl.NumberFormat();
@@ -27,6 +28,7 @@ let warmupTimer, warming = [];
 let catalogRevision = -1, lastDownload, rateTimeout, startingDownload = false;
 let outputLoading = false;
 let runOptions = "", outputState = "", candidateState = "";
+let candidateScore = null;
 let activeImage = null, imageVersion = "";
 const readyThumbs = new Map();
 const panelImages = new WeakMap();
@@ -86,6 +88,12 @@ function placeholder(well, title, description, log) {
 
 function imageURL(params, size) {
   return url("/api/image", { ...params, size, v: imageVersion });
+}
+
+function outputParams(sceneId, run, stacker, benchmark) {
+  const params = { scene: sceneId, run, stacker };
+  if (benchmark?.artifact_revision) params.rev = benchmark.artifact_revision;
+  return params;
 }
 
 function previewElement(params, size, { title = "", priority = "auto", lazy = false } = {}) {
@@ -169,7 +177,7 @@ function showImage(well, title, params) {
     well.append(button);
   }
   const image = previewElement(params, "panel", { title, priority: "high" });
-  const request = { src, button, image, title, shown: null };
+  const request = { src, button, image, title, params, shown: null };
   panelImages.set(well, request);
   const reveal = (ready) => {
     if (panelImages.get(well) !== request) return;
@@ -183,6 +191,7 @@ function showImage(well, title, params) {
     button.removeAttribute("aria-disabled");
     button.setAttribute("aria-label", "Inspect " + request.title);
     button.onclick = () => openLightbox(request.title, params, request.shown);
+    if (well === $("candidate-image")) paintCandidateExplanation();
   };
   const thumbnail = readyThumbs.get(imageURL(params, "thumb"));
   if (thumbnail) {
@@ -220,7 +229,7 @@ function setLightboxGallery(gallery, data) {
   for (const output of data.outputs) {
     if (output.status === "ready") images.push({
       title: stackerLabel(output.stacker),
-      params: { scene: gallery.scene, run: gallery.run, stacker: output.stacker },
+      params: outputParams(gallery.scene, gallery.run, output.stacker, output.benchmark),
     });
   }
   const reference = data.references[gallery.reference];
@@ -231,7 +240,8 @@ function setLightboxGallery(gallery, data) {
   }
   if (reference) images.push({ title: referenceTitle(reference), label: "Reference", params: { frame: reference.id } });
   const changed = images.length !== gallery.images.length || images.some((entry, index) =>
-    lightboxImageKey(entry) !== lightboxImageKey(gallery.images[index]) || entry.title !== gallery.images[index].title);
+    lightboxImageKey(entry) !== lightboxImageKey(gallery.images[index]) || entry.title !== gallery.images[index].title ||
+    entry.params.rev !== gallery.images[index].params.rev);
   if (changed) gallery.images = images;
   gallery.benchmarks = new Map(data.outputs.map(({ stacker, benchmark }) => [stacker, benchmark]));
   if (gallery.referenceFrame?.id !== reference?.id) {
@@ -245,6 +255,8 @@ function setLightboxGallery(gallery, data) {
     clearTimeout(gallery.hoverTimer);
     clearLightboxHover(gallery);
     fillLightboxStrip(gallery);
+    const current = gallery.images[lightboxIndex()];
+    if (current && current.params.rev !== activeImage.params.rev) selectLightboxEntry(current);
   }
   paintLightboxOverlays();
 }
@@ -325,7 +337,7 @@ function selectLightboxEntry(entry) {
   const { gallery, stage } = state;
   clearTimeout(gallery.hoverTimer);
   if (gallery.hover?.entry !== entry) clearLightboxHover(gallery);
-  if (lightboxImageKey(state) === lightboxImageKey(entry)) {
+  if (lightboxImageKey(state) === lightboxImageKey(entry) && state.params.rev === entry.params.rev) {
     paintLightboxOverlays();
     return;
   }
@@ -574,27 +586,35 @@ function paintLightboxOverlays() {
   divider.hidden = !showing || held;
   const entry = previewing ? shown.entry : gallery.baseEntry;
   const viewingReference = held && showing;
+  const recorded = gallery.benchmarks.get(entry.params.stacker);
+  const benchmark = recorded?.artifact_revision === entry.params.rev ? recorded : null;
   setLightboxTitle(viewingReference ? referenceTitle(reference) : entry.title);
-  renderBenchmark($("lightbox-benchmark"), viewingReference ? null : gallery.benchmarks.get(entry.params.stacker), true);
+  renderBenchmark($("lightbox-benchmark"), viewingReference ? null : benchmark, true);
   let status = state.error;
   if (hover) status = hover.unavailable && shown?.entry !== hover.entry ? "Preview unavailable" : "";
   if (comparing && !overlay && fit?.failed && (!native || native.failed)) status = "Reference unavailable";
   if ($("lightbox-status").textContent !== status) $("lightbox-status").textContent = status;
-  if (!showing) return;
-  if (layer.firstChild !== overlay) layer.replaceChildren(overlay);
-  if (held) {
-    layer.style.clipPath = "none";
-    return;
+  let clipLeft;
+  if (showing) {
+    if (layer.firstChild !== overlay) layer.replaceChildren(overlay);
+    if (held) {
+      layer.style.clipPath = "none";
+    } else {
+      const { view, image, left, right, top, bottom } = visibleLightboxImage(gallery);
+      const edge = left + (right - left) * gallery.split;
+      const cut = Math.min(1, Math.max(0, (edge - image.left) / image.width));
+      layer.style.clipPath = `inset(0 ${100 * (1 - cut)}% 0 0)`;
+      divider.style.left = `${edge - view.left}px`;
+      divider.style.top = `${top - view.top}px`;
+      divider.style.height = `${Math.max(0, bottom - top)}px`;
+      $("reference-slider").setAttribute("aria-valuenow", Math.round(gallery.split * 100));
+      clipLeft = edge;
+    }
   }
-
-  const { view, image, left, right, top, bottom } = visibleLightboxImage(gallery);
-  const edge = left + (right - left) * gallery.split;
-  const cut = Math.min(1, Math.max(0, (edge - image.left) / image.width));
-  layer.style.clipPath = `inset(0 ${100 * (1 - cut)}% 0 0)`;
-  divider.style.left = `${edge - view.left}px`;
-  divider.style.top = `${top - view.top}px`;
-  divider.style.height = `${Math.max(0, bottom - top)}px`;
-  $("reference-slider").setAttribute("aria-valuenow", Math.round(gallery.split * 100));
+  lightboxExplanation.update(viewingReference ? null : {
+    params: entry.params, benchmark, host: gallery.surface,
+    image: previewing ? shown.image : state.image, contain: previewing, clipLeft,
+  });
 }
 
 function closeLightboxRequests(state) {
@@ -815,6 +835,8 @@ function pendingScores() {
 function applyScores(revision) {
   if (revision === scoreRevision) return;
   scoreRevision = revision;
+  candidateExplanation.scoresChanged(revision);
+  lightboxExplanation.scoresChanged(revision);
   if (!sceneRequest && pendingScores()) loadScene();
   const gallery = activeImage?.gallery;
   if (gallery && (gallery.scene !== scene?.id || gallery.run !== runId) &&
@@ -896,13 +918,26 @@ function renderBenchmark(label, benchmark, compact = false) {
   }
   if (label.textContent !== text) label.textContent = text;
   line.dataset.scored = scored;
-  label.title = benchmark?.profile ?? "";
+  label.title = [benchmark?.profile, invalid ? null : benchmark?.error].filter(Boolean).join(" · ");
   info.dataset.reason = invalid ? benchmark.error || "The delivery failed the benchmark's image requirements." : "";
 }
 
 function showBenchmarkReason(button) {
   $("benchmark-reason").textContent = button.dataset.reason;
   $("benchmark-details").showModal();
+}
+
+function paintCandidateExplanation() {
+  const request = panelImages.get($("candidate-image"));
+  if (!candidateScore) {
+    candidateExplanation.update(null);
+    return;
+  }
+  const { params, benchmark } = candidateScore;
+  const matches = request && imageURL(params, "panel") === request.src;
+  candidateExplanation.update({
+    params, benchmark, image: matches ? request.shown : null, host: request?.button, contain: true,
+  });
 }
 
 function renderOutput() {
@@ -940,7 +975,8 @@ function renderOutput() {
   const readyCount = outputs.filter((output) => output.status === "ready").length;
   const ratedCount = outputs.filter((output) => output.rating).length;
   $("rating-count").textContent = readyCount ? `${ratedCount} of ${readyCount} available outputs rated` : "";
-  const params = { scene: scene.id, run: runId, stacker: stackerId };
+  const params = outputParams(scene.id, runId, stackerId, row?.benchmark);
+  candidateScore = row?.status === "ready" ? { params, benchmark: row.benchmark } : null;
   const currentImage = JSON.stringify([params, row?.status, row?.image, row?.error, !details || outputLoading]);
   if (candidateState !== currentImage) {
     const method = runs.find((run) => run.id === runId)?.methods?.[stackerId];
@@ -960,6 +996,7 @@ function renderOutput() {
     candidateState = currentImage;
   }
   renderBenchmark($("candidate-benchmark"), row?.benchmark);
+  paintCandidateExplanation();
   renderRating(row);
 }
 
@@ -1350,6 +1387,14 @@ function connect() {
 
 const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
 const filmRail = new VirtualRail($("filmstrip"), "x", 112, frameEntry);
+const requestScoreTiles = (params, signal) => api(url("/api/score-tiles", params), undefined, { signal });
+const candidateExplanation = new ScoreExplanation(
+  $("candidate-explanation"), $("candidate-explain"), $("candidate-image").parentElement, requestScoreTiles,
+);
+const lightboxExplanation = new ScoreExplanation(
+  $("lightbox-explanation"), $("lightbox-explain"), $("image-view").parentElement, requestScoreTiles,
+);
+new ResizeObserver(paintCandidateExplanation).observe($("candidate-image"));
 const lightboxStrip = $("lightbox-strip");
 const lightboxRail = new VirtualRail(lightboxStrip, "x", 100, lightboxStripEntry);
 lightboxStrip.addEventListener("pointerleave", (event) => {
@@ -1423,7 +1468,7 @@ lightboxView.addEventListener("dblclick", (event) => {
 });
 document.addEventListener("keydown", (event) => {
   if (!activeImage || !$("image-dialog").open || $("benchmark-details").open ||
-      event.ctrlKey || event.metaKey || event.altKey) return;
+      event.target.closest?.("input, select") || event.ctrlKey || event.metaKey || event.altKey) return;
   if (event.key.toLowerCase() === "i") {
     const button = $("lightbox-benchmark").nextElementSibling;
     if (!button.hidden && !event.repeat) showBenchmarkReason(button);
@@ -1485,6 +1530,7 @@ $("image-dialog").addEventListener("close", (event) => {
   if (event.currentTarget.open || !activeImage) return;
   closeLightboxRequests(activeImage);
   activeImage = null;
+  lightboxExplanation.close();
   endLightboxPan();
   lightboxRail.setItems([]);
   lightboxView.replaceChildren();

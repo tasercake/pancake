@@ -134,7 +134,9 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     assert summary_scene["preview_frame"] == inspected["frames"][1]["id"]
     successful, failed = inspected["outputs"]
     assert successful["status"] == "ready"
-    assert successful["benchmark"] == {"profile": SCORE_VERSION, "status": "unscored", "score": None}
+    unscored = successful["benchmark"]
+    assert (unscored["profile"], unscored["status"], unscored["score"]) == (SCORE_VERSION, "unscored", None)
+    assert len(unscored["artifact_revision"]) == 64
     assert failed["status"] == "failed" and failed["error"] == "example exit"
     assert all(row["status"] == "outside_scope" for row in app.scene_details(other, job)["outputs"])
 
@@ -481,10 +483,10 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
     calls = []
     score_saved = scores.score_saved_output
 
-    def delayed_score(catalog, scene, path):
-        calls.append(path)
+    def delayed_score(catalog, scene, path, *, details):
+        calls.append(details)
         assert gate.wait(5)
-        return score_saved(catalog, scene, path)
+        return score_saved(catalog, scene, path, details=details)
 
     monkeypatch.setattr(runs, "_render", render)
     monkeypatch.setattr(scores, "score_saved_output", delayed_score)
@@ -509,7 +511,9 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
         score = result["benchmark"]["score"]
         assert 0 < score < 100
         assert result["benchmark"]["profile"] == SCORE_VERSION
-        assert len(calls) == 1
+        assert calls == ["summary"]
+        comparison = result["benchmark"]["explanation"]["placements"][0]["comparison"]
+        assert len(comparison["families"]) == 6 and "tile_grids" not in comparison
         path = app.artifact({"run": run, "scene": scene, "stacker": "pancake"}, "image")
         report = tmp_path / "benchmark"
         assert bench(["--root", str(root), "--config", str(root / "sources.json"), "--candidate-dir",
@@ -521,20 +525,39 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
         assert reopened.scene_details(scene, run)["outputs"][0]["benchmark"] == result["benchmark"]
         assert reopened.scores.worker is None
 
+        query = {"run": run, "scene": scene, "stacker": "pancake",
+                 "rev": result["benchmark"]["artifact_revision"], "family": "tone", "side": "8"}
+        with reopened.events.subscribe() as (reader, writer):
+            reader.settimeout(5)
+            assert reopened.score_tiles(query)["status"] == "pending"
+            while ("scores", 1) not in map(event_payload, reopened.events.take(reader, writer)):
+                pass
+        tiles = reopened.score_tiles(query)
+        assert tiles["artifact_revision"] == query["rev"]
+        assert tiles["family"] == "tone" and tiles["grid"]["x_edges"] == [0, 8]
+        assert len(tiles["grid"]["values"]) == 1 and tiles["grid"]["values"][0] > 0
+        assert "grids" not in tiles and "explanation" not in tiles
+        other = reopened.score_tiles({**query, "family": "color", "side": "32"})
+        assert other["family"] == "color" and other["grid"]["tile_size"] == 32
+        assert calls == ["summary", "tiles"]
+
         crop = path.with_suffix(".replacement.tif")
         tifffile.imwrite(crop, tifffile.imread(path)[:, :-1], photometric="rgb")
         crop.replace(path)
+        assert reopened.score_tiles(query)["status"] == "stale"
+        with pytest.raises(ValueError, match="evaluation image changed"):
+            reopened.image(query)
         with reopened.events.subscribe() as (reader, writer):
             reader.settimeout(5)
             assert reopened.scene_details(scene, run)["outputs"][0]["benchmark"]["status"] == "pending"
-            while ("scores", 1) not in map(event_payload, reopened.events.take(reader, writer)):
+            while ("scores", 2) not in map(event_payload, reopened.events.take(reader, writer)):
                 pass
         cropped, = reopened.scene_details(scene, run)["outputs"]
         assert cropped["benchmark"]["status"] == "invalid_output"
         assert cropped["benchmark"]["score"] == 0
         assert "image is 7 × 6 pixels" in cropped["benchmark"]["error"]
         assert "native dimensions of 8 × 6 pixels" in cropped["benchmark"]["error"]
-        assert len(calls) == 2
+        assert calls == ["summary", "tiles", "summary"]
 
         reopened.scores.close()
         receipt = path.parents[2] / "scores" / f"{scene}.json"
@@ -549,7 +572,7 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
             while ("scores", 1) not in map(event_payload, reopened.events.take(reader, writer)):
                 pass
         assert reopened.scene_details(scene, run)["outputs"][0]["benchmark"] == cropped["benchmark"]
-        assert len(calls) == 3
+        assert calls == ["summary", "tiles", "summary", "summary"]
     finally:
         gate.set()
         app.scores.close()
