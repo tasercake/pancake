@@ -8,7 +8,7 @@ import json
 from shutil import copyfile
 import sys
 from threading import Event, Thread
-from time import monotonic, sleep
+from time import sleep
 
 import numpy as np
 from PIL import Image
@@ -38,6 +38,36 @@ def write_scene(root, level):
     }))
 
 
+def event_payload(message):
+    name, data, _ = message.split(b"\n", 2)
+    return name.removeprefix(b"event: ").decode(), json.loads(data.removeprefix(b"data: "))
+
+
+class ReviewStream:
+    def __init__(self, port):
+        self.client = HTTPConnection("127.0.0.1", port, timeout=8)
+        self.latest = {}
+
+    def __enter__(self):
+        self.client.request("GET", "/api/events")
+        self.response = self.client.getresponse()
+        assert self.response.status == 200
+        assert self.response.headers["Content-Type"].startswith("text/event-stream")
+        return self
+
+    def __exit__(self, *_):
+        self.response.close()
+        self.client.close()
+
+    def expect(self, name, predicate):
+        while name not in self.latest or not predicate(self.latest[name]):
+            header = self.response.readline()
+            assert header, "Review closed the event stream"
+            event, value = event_payload(header + self.response.readline() + self.response.readline())
+            self.latest[event] = value
+        return self.latest[name]
+
+
 def open_review(root, store):
     store.mkdir(exist_ok=True)
     config = root / "sources.json"
@@ -45,10 +75,15 @@ def open_review(root, store):
     app = Review(Namespace(root=root, store=store, dataset=None, config=config, lock=None,
                            pancake=sys.executable, focus_stack=sys.executable,
                            openfocus=None, shine_python=None))
-    deadline = monotonic() + 5
-    while app.catalog_status["status"] == "indexing" and monotonic() < deadline:
-        sleep(0.005)
-    assert app.catalog_status["status"] == "ready", app.catalog_status
+    with app.events.subscribe() as (reader, writer):
+        reader.settimeout(5)
+        while True:
+            messages = app.events.take(reader, writer)
+            catalog = next((event_payload(message)[1] for message in messages
+                            if message.startswith(b"event: catalog\n")), None)
+            if catalog is not None and catalog["status"] != "indexing":
+                assert catalog["status"] == "ready", catalog
+                break
     return app
 
 
@@ -71,10 +106,13 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     app = open_review(root, store)
     assert app.catalog_status["datasets"] == {"Demo": "Demonstration stacks"}
     other, scene = [item["id"] for item in app.scenes]
-    job = app.start({"scope": "scene", "scene": scene, "stackers": ["pancake", "focus-stack"]})
-    app.runs.worker.join(timeout=10)
-    assert not app.runs.worker.is_alive()
-    summary, = app.runs.list()
+    with app.events.subscribe() as (reader, writer):
+        reader.settimeout(10)
+        job = app.start({"scope": "scene", "scene": scene, "stackers": ["pancake", "focus-stack"]})
+        app.runs.worker.join(timeout=10)
+        assert not app.runs.worker.is_alive()
+        summary, = next(event_payload(packet)[1] for packet in app.events.take(reader, writer)
+                        if packet.startswith(b"event: runs\n"))
     assert (summary["status"], summary["ready"], summary["failed"]) == ("completed_with_errors", 1, 1)
 
     inspected = app.scene_details(scene, job)
@@ -264,37 +302,34 @@ def test_review_downloads_missing_data_while_existing_scenes_remain_open(tmp_pat
             finally:
                 client.close()
 
-        def wait_until(path, predicate):
-            deadline = monotonic() + 8
-            while monotonic() < deadline:
-                code, payload = request(path)
-                assert code == 200, payload
-                if predicate(payload):
-                    return payload
-                sleep(0.025)
-            pytest.fail(f"Timed out for {path}: {payload}")
-
         try:
-            before = wait_until("/api/catalog", lambda item: item["status"] == "ready")
-            assert before["missing"] == {"New": "New scenes"}
-            assert set(before["datasets"]) == {"Demo"}
-            assert request("/api/download", "POST")[0] == 202
-            assert request("/api/download", "POST")[0] == 409
-            live = wait_until("/api/download", lambda item: item["received"] > 0 and item["rate"])
-            assert live["status"] == "running"
-            assert live["total"] == len(source) * 2
-            assert 0 < live["received"] < live["total"]
-            assert live["seconds_remaining"] > 0
-            assert not (root / "raw/New/download-manifest.json").exists()
-            assert request("/api/scene?scene=" + before["scenes"][0]["id"])[0] == 200
+            with ReviewStream(server.server_port) as events:
+                before = events.expect("catalog", lambda item: item["status"] == "ready")
+                events.expect("download", lambda item: not item["indexing"])
+                assert before["missing"] == {"New": "New scenes"}
+                assert set(before["datasets"]) == {"Demo"}
+                assert request("/api/download", "POST")[0] == 202
+                assert request("/api/download", "POST")[0] == 409
+                live = events.expect("download", lambda item: item["received"] > 0 and item["rate"])
+                assert live["status"] == "running"
+                assert live["total"] == len(source) * 2
+                assert 0 < live["received"] < live["total"]
+                assert live["seconds_remaining"] > 0
+                assert not (root / "raw/New/download-manifest.json").exists()
+                assert request("/api/scene?scene=" + before["scenes"][0]["id"])[0] == 200
 
-            gate.set()
-            after = wait_until("/api/catalog", lambda item: not item["missing"])
-            finished = wait_until("/api/download", lambda item: item["status"] == "complete")
-            assert set(after["datasets"]) == {"Demo", "New"}
-            assert after["revision"] > before["revision"]
-            assert finished["received"] == finished["total"]
-            assert {item["dataset"] for item in after["scenes"]} == {"Demo", "New"}
+                gate.set()
+                after = events.expect("catalog", lambda item: not item["missing"])
+                finished = events.expect("download", lambda item: item["status"] == "complete")
+                assert set(after["datasets"]) == {"Demo", "New"}
+                assert after["revision"] > before["revision"]
+                assert finished["received"] == finished["total"]
+                assert {item["dataset"] for item in after["scenes"]} == {"Demo", "New"}
+
+            # A reconnect receives snapshots even after the source has gone idle.
+            with ReviewStream(server.server_port) as events:
+                assert events.expect("catalog", lambda item: item["revision"] == after["revision"]) == after
+                assert events.expect("download", lambda item: not item["indexing"])["status"] == "complete"
         finally:
             gate.set()
             server.app.downloads.close()

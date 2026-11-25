@@ -21,10 +21,10 @@ const unavailable = {
 };
 
 let scenes = [], visible = [], runs = [], scene = null, details = null;
-let frameIndex = 0, referenceIndex = 0, runId = "", stackerId = "", formKey = "";
-let sceneRequest, pollTimer, stopping = "";
+let frameIndex = 0, referenceIndex = 0, runId = parameters.get("run") ?? "", stackerId = "", formKey = "";
+let sceneRequest, stopping = "";
 let warmupTimer, warming = [];
-let catalogRevision = -1, downloadTimer, startingDownload = false;
+let catalogRevision = -1, lastDownload, rateTimeout, startingDownload = false;
 let outputLoading = false;
 let runOptions = "", outputState = "", candidateState = "";
 let activeImage = null, imageVersion = "";
@@ -586,9 +586,11 @@ function changeRun(id) {
   runId = id;
   outputLoading = true;
   if (details) details.outputs = [];
-  if (scene) renderOutput();
-  remember();
-  loadScene();
+  if (scene) {
+    renderOutput();
+    remember();
+    loadScene();
+  }
 }
 
 function renderRuns() {
@@ -624,22 +626,16 @@ function renderRuns() {
   $("run-select").value = runId;
 }
 
-async function refreshRuns() {
+function applyRuns(history) {
   const old = runs.find((run) => run.id === runId);
-  runs = await api("/api/runs");
-  if (!runs.some((run) => run.id === runId)) changeRun(runs[0]?.id ?? "");
+  runs = history;
+  if (!runs.some((run) => run.id === runId)) {
+    changeRun(runs[0]?.id ?? "");
+  } else {
+    const current = runs.find((run) => run.id === runId);
+    if (current.status !== old?.status || current.ready !== old?.ready || current.failed !== old?.failed) loadScene();
+  }
   renderRuns();
-  const current = runs.find((run) => run.id === runId);
-  if (current?.status !== old?.status || current?.ready !== old?.ready || current?.failed !== old?.failed) loadScene();
-}
-
-function scheduleRuns() {
-  clearTimeout(pollTimer);
-  pollTimer = setTimeout(async () => {
-    try { await refreshRuns(); }
-    catch (error) { showMessage($("scene-error"), error.message); }
-    scheduleRuns();
-  }, runs.some((run) => run.status === "running") ? 1500 : 4500);
 }
 
 function openRunDialog() {
@@ -687,8 +683,6 @@ async function startRun(event) {
     const result = await api("/api/runs", { scope: $("scope").value, scene: scene.id, dataset: scene.dataset, stackers });
     $("new-run").close();
     changeRun(result.id);
-    await refreshRuns();
-    scheduleRuns();
   } catch (error) {
     showMessage($("run-error"), error.message);
   } finally {
@@ -710,6 +704,12 @@ async function stopRun() {
 }
 
 function applyCatalog(catalog) {
+  if (catalog.revision === catalogRevision && catalog.image_version === imageVersion) return;
+  const selectedScene = scene?.id ?? parameters.get("scene");
+  if (imageVersion && catalog.image_version !== imageVersion) {
+    scene = null;
+    details = null;
+  }
   catalogRevision = catalog.revision;
   imageVersion = catalog.image_version;
   for (const tool of catalog.stackers) tools.set(tool.id, tool);
@@ -725,7 +725,7 @@ function applyCatalog(catalog) {
     if (dataset.selectedIndex < 0) dataset.value = "";
     notice.hidden = true;
     workspace.hidden = false;
-    filterScenes(scene?.id ?? parameters.get("scene"));
+    filterScenes(selectedScene);
   } else {
     workspace.hidden = true;
     notice.hidden = false;
@@ -802,23 +802,14 @@ function renderDownload(status) {
   $("download-detail").textContent = details.join(" · ");
 }
 
-function scheduleDownload(delay) {
-  clearTimeout(downloadTimer);
-  downloadTimer = setTimeout(pollDownload, delay);
-}
-
-async function pollDownload() {
-  let delay = 3000;
-  try {
-    const status = await api("/api/download");
-    if (status.catalog_revision !== catalogRevision) applyCatalog(await api("/api/catalog"));
-    renderDownload(status);
-    if (status.status === "running" || status.indexing) delay = 750;
-  } catch (error) {
-    $("download-banner").hidden = false;
-    showMessage($("download-error"), error.message);
+function applyDownload(status) {
+  lastDownload = status;
+  renderDownload(status);
+  clearTimeout(rateTimeout);
+  if (status.rate) {
+    // The estimate expires once if transfer events go quiet.
+    rateTimeout = setTimeout(() => renderDownload({ ...status, rate: null, seconds_remaining: null }), 4000);
   }
-  scheduleDownload(delay);
 }
 
 async function startDownload() {
@@ -826,28 +817,22 @@ async function startDownload() {
   $("download-start").disabled = true;
   showMessage($("download-error"), "");
   try {
-    renderDownload(await api("/api/download", {}));
-    scheduleDownload(750);
+    await api("/api/download", {});
   } catch (error) {
     showMessage($("download-error"), error.message);
   } finally {
     startingDownload = false;
-    $("download-start").disabled = false;
+    $("download-start").disabled = Boolean(lastDownload?.indexing);
   }
 }
 
-async function boot() {
-  try {
-    const [catalog, history] = await Promise.all([api("/api/catalog"), api("/api/runs")]);
-    runs = history;
-    runId = runs.find((run) => run.id === parameters.get("run"))?.id ?? runs[0]?.id ?? "";
-    applyCatalog(catalog);
-    scheduleRuns();
-    await pollDownload();
-  } catch (error) {
-    $("catalog-state").querySelector("h1").textContent = "Could not connect to BokehForge";
-    $("catalog-note").textContent = error.message;
-  }
+function connect() {
+  const events = new EventSource("/api/events");
+  events.addEventListener("runs", (event) => applyRuns(JSON.parse(event.data)));
+  events.addEventListener("catalog", (event) => applyCatalog(JSON.parse(event.data)));
+  events.addEventListener("download", (event) => applyDownload(JSON.parse(event.data)));
+  events.onopen = () => showMessage($("connection-status"), "");
+  events.onerror = () => showMessage($("connection-status"), "Live updates disconnected. Reconnecting…");
 }
 
 const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
@@ -926,4 +911,4 @@ document.addEventListener("keydown", (event) => {
 window.addEventListener("beforeunload", (event) => {
   if (drafts.size) event.preventDefault();
 });
-boot();
+connect();

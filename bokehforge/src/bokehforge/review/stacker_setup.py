@@ -10,7 +10,7 @@ from shutil import which
 import signal
 import subprocess
 from tempfile import TemporaryDirectory
-from time import monotonic
+from threading import Condition, Event, Thread
 from urllib.request import urlopen
 from zipfile import ZipFile
 
@@ -43,6 +43,27 @@ class RunStopped(Exception):
     pass
 
 
+class RunSignal:
+    """Wake a running command immediately when evaluation is cancelled."""
+
+    def __init__(self):
+        self.condition = Condition()
+        self.cancelled = False
+
+    def set(self):
+        with self.condition:
+            self.cancelled = True
+            self.condition.notify_all()
+
+    def clear(self):
+        with self.condition:
+            self.cancelled = False
+
+    def is_set(self):
+        with self.condition:
+            return self.cancelled
+
+
 def executable(*candidates):
     for candidate in candidates:
         if candidate and (found := which(str(candidate))):
@@ -57,7 +78,9 @@ def _require(name, hint):
     raise RuntimeError(f"{name} is required for automatic setup. {hint}")
 
 
-def _terminate(process):
+def _terminate(process, exited):
+    if exited.is_set():
+        return
     if os.name == "nt":
         subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
                        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
@@ -67,14 +90,14 @@ def _terminate(process):
             os.killpg(process.pid, signal.SIGTERM)
         except ProcessLookupError:
             return
-    try:
-        process.wait(timeout=5)
-    except subprocess.TimeoutExpired:
-        if os.name != "nt":
-            os.killpg(process.pid, signal.SIGKILL)
-        else:
+    if not exited.wait(5):
+        if os.name == "nt":
             process.kill()
-        process.wait()
+        else:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
 
 
 def run_logged(command, cwd, log, stop, action, *, timeout=None, env=None):
@@ -87,14 +110,26 @@ def run_logged(command, cwd, log, stop, action, *, timeout=None, env=None):
         process = subprocess.Popen(command, cwd=cwd, stdin=subprocess.DEVNULL,
                                    stdout=stream, stderr=subprocess.STDOUT,
                                    start_new_session=os.name != "nt", env=env)
-        deadline = monotonic() + timeout if timeout else None
-        while process.poll() is None:
-            if stop.wait(0.25):
-                _terminate(process)
-                raise RunStopped()
-            if deadline is not None and monotonic() >= deadline:
-                _terminate(process)
-                raise RuntimeError(f"{action} timed out. See the stacker log.")
+        exited = Event()
+
+        def reap():
+            process.wait()
+            with stop.condition:
+                exited.set()
+                stop.condition.notify_all()
+
+        reaper = Thread(target=reap, name="bokehforge-stacker-exit")
+        reaper.start()
+        with stop.condition:
+            finished = stop.condition.wait_for(lambda: exited.is_set() or stop.cancelled, timeout)
+            cancelled = stop.cancelled
+        if cancelled or not finished:
+            _terminate(process, exited)
+        reaper.join()
+        if cancelled:
+            raise RunStopped()
+        if not finished:
+            raise RuntimeError(f"{action} timed out. See the stacker log.")
         if process.returncode:
             raise RuntimeError(f"{action} exited with code {process.returncode}. See the stacker log.")
 

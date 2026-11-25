@@ -12,11 +12,12 @@ from ..data import download
 
 
 class Downloads:
-    def __init__(self, root, config, lock, on_dataset_ready):
+    def __init__(self, root, config, lock, on_dataset_ready, on_change):
         self.root = root
         self.config = config
         self.source_lock = lock
         self.on_dataset_ready = on_dataset_ready
+        self.on_change = on_change
         self.mutex = Lock()
         self.process = None
         self.worker = None
@@ -43,6 +44,7 @@ class Downloads:
             self.worker = Thread(target=self._run, args=(datasets,), daemon=True,
                                  name="bokehforge-download")
             self.worker.start()
+        self.on_change()
 
     def _run(self, datasets):
         command = [sys.executable, "-m", "bokehforge.review.downloads",
@@ -70,6 +72,8 @@ class Downloads:
             with self.mutex:
                 self.status = "failed"
                 self.error = str(exc)
+        finally:
+            self.on_change()
 
     def _event(self, event):
         kind = event["type"]
@@ -93,6 +97,7 @@ class Downloads:
                         self.samples.popleft()
                 previous.update(phase=event["phase"], received=event["received"],
                                 total=event["total"] if event["total"] is not None else previous["total"])
+        self.on_change()
 
     def snapshot(self):
         with self.mutex:
@@ -117,15 +122,13 @@ class Downloads:
         with self.mutex:
             self.closed = True
             process = self.process
-        if process is not None and process.poll() is None:
+        if process is not None and process.returncode is None:
             process.terminate()
-            try:
-                process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                process.kill()
-                process.wait()
         if self.worker is not None:
             self.worker.join(timeout=5)
+            if self.worker.is_alive() and process is not None:
+                process.kill()
+                self.worker.join()
 
 
 def main():

@@ -7,7 +7,7 @@ from ipaddress import ip_address
 import json
 from pathlib import Path
 from secrets import token_hex
-from socket import gethostname
+from socket import SO_KEEPALIVE, SOL_SOCKET, gethostname
 from threading import Lock, Thread
 from urllib.parse import parse_qs, urlsplit
 
@@ -16,6 +16,7 @@ from ..data._canonical import RETIRED_LAYOUTS
 from ..data._config import DEFAULT_CONFIG, read_config
 from ..data._files import safe_path
 from .downloads import Downloads
+from .events import Events
 from .images import (
     DecodedFrames, PREVIEW_VERSION, PreviewCache, ReviewFrameDecoder, SIZES, output_pixels, preview, preview_mime,
 )
@@ -75,14 +76,27 @@ class Review:
         self.catalog_lock = Lock()
         self.indexing = False
         self.refresh_requested = False
-        self.runs = Runs(args.store, configured_stackers(args))
+        self.events = Events()
+        self.runs = Runs(args.store, configured_stackers(args), self.publish_runs)
         self.ratings = Ratings(args.store)
         self.image_version = token_hex(8)
         self.previews = PreviewCache(args.store)
         self.decoded = DecodedFrames()
         self.frame_decoder = ReviewFrameDecoder()
-        self.downloads = Downloads(args.root, args.config or DEFAULT_CONFIG, args.lock, self.refresh_catalog)
+        self.downloads = Downloads(args.root, args.config or DEFAULT_CONFIG, args.lock,
+                                   self.refresh_catalog, self.publish_download)
+        self.publish_runs()
+        self.events.publish("catalog", self.catalog_data)
         self.refresh_catalog()
+
+    def catalog_data(self):
+        return {**self.catalog_status, "stackers": self.runs.tooling(), "image_version": self.image_version}
+
+    def publish_runs(self):
+        self.events.publish("runs", self.runs.list)
+
+    def publish_download(self):
+        self.events.publish("download", self.download_status)
 
     def refresh_catalog(self):
         with self.catalog_lock:
@@ -90,6 +104,7 @@ class Review:
             if not self.indexing:
                 self.indexing = True
                 Thread(target=self._index, daemon=True, name="bokehforge-catalog").start()
+        self.publish_download()
 
     def _index(self):
         while True:
@@ -97,9 +112,12 @@ class Review:
                 self.refresh_requested = False
             self._load()
             with self.catalog_lock:
-                if not self.refresh_requested:
-                    self.indexing = False
-                    return
+                pending = self.refresh_requested
+                self.indexing = pending
+            self.events.publish("catalog", self.catalog_data)
+            self.publish_download()
+            if not pending:
+                return
 
     def _load(self):
         args = self.args
@@ -297,9 +315,10 @@ class Handler(BaseHTTPRequestHandler):
             self.send(200, mime, body)
             return
         app = self.server.app
-        if path == "/api/catalog":
-            self.json(200, {**app.catalog_status, "stackers": app.runs.tooling(),
-                            "image_version": app.image_version})
+        if path == "/api/events":
+            self.send_events(app)
+        elif path == "/api/catalog":
+            self.json(200, app.catalog_data())
         elif path == "/api/download":
             self.json(200, app.download_status())
         elif path == "/api/runs":
@@ -319,6 +338,22 @@ class Handler(BaseHTTPRequestHandler):
                       filename="bokehforge-ratings.csv")
         else:
             raise KeyError("Page not found")
+
+    def send_events(self, app):
+        self.close_connection = True
+        self.connection.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1)
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-store, no-transform")
+        self.send_header("Connection", "close")
+        self.send_header("X-Accel-Buffering", "no")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Cross-Origin-Resource-Policy", "same-origin")
+        self.end_headers()
+        try:
+            app.events.stream(self.connection, self.wfile.write)
+        except (BrokenPipeError, ConnectionResetError, TimeoutError):
+            pass
 
     def send_image(self, app, query):
         variant, identity, read = app.image_target(query)
@@ -405,6 +440,12 @@ class ReviewServer(ThreadingHTTPServer):
         self.hostname = gethostname().lower()
         self.review_hosts = {self.hostname, address[0].lower()} - {ALL_INTERFACES}
         super().__init__(address, Handler)
+
+
+    def server_close(self):
+        if hasattr(self, "app"):
+            self.app.events.close()
+        super().server_close()
 
 
 def main(argv=None):
