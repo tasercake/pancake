@@ -78,6 +78,9 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     inspected = app.scene_details(scene, job)
     assert not inspected["references"]
     assert len(inspected["frames"]) == 2
+    summary_scene = next(item for item in app.scenes if item["id"] == scene)
+    assert summary_scene["first_frame"] == inspected["frames"][0]["id"]
+    assert summary_scene["preview_frame"] == inspected["frames"][1]["id"]
     successful, failed = inspected["outputs"]
     assert successful["status"] == "ready"
     assert failed["status"] == "failed" and failed["error"] == "example exit"
@@ -158,3 +161,49 @@ def test_review_accepts_machine_hostname_and_same_http_origin(tmp_path, monkeypa
         finally:
             server.shutdown()
             worker.join()
+
+
+def test_review_image_caches_and_revalidates_without_decoding(tmp_path, monkeypatch):
+    root, store = tmp_path / "data", tmp_path / "review"
+    write_scene(root, 0.25)
+    app = open_review(root, store)
+    first = app.catalog.scene(app.catalog.scene_ids[0]).frame_ids[0]
+    query = {"size": "panel", "frame": first}
+    mime, original = app.image(query)
+    assert mime in {"image/png", "image/webp"}
+    assert Image.open(BytesIO(original)).size == (8, 6)
+
+    warmed = open_review(root, store)
+
+    def unexpected_decode(*_args):
+        pytest.fail("A warm preview should not read the original")
+
+    monkeypatch.setattr(warmed.frame_decoder, "decode", unexpected_decode)
+    assert warmed.image(query) == (mime, original)
+
+    with ReviewServer(("127.0.0.1", 0)) as server:
+        server.app = warmed
+        worker = Thread(target=server.serve_forever, kwargs={"poll_interval": 0.02})
+        worker.start()
+        client = HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+        path = f"/api/image?size=panel&frame={first}&v={warmed.image_version}"
+        try:
+            client.request("GET", path)
+            response = client.getresponse()
+            assert response.status == 200 and response.read() == original
+            assert "private" in response.headers["Cache-Control"]
+            assert "immutable" in response.headers["Cache-Control"]
+            etag = response.headers["ETag"]
+
+            client.request("GET", path, headers={"If-None-Match": "W/" + etag})
+            response = client.getresponse()
+            assert response.status == 304 and response.read() == b""
+            assert response.headers["ETag"] == etag
+        finally:
+            client.close()
+            server.shutdown()
+            worker.join()
+
+    write_scene(root, 0.5)
+    changed = open_review(root, store)
+    assert changed.image(query)[1] != original

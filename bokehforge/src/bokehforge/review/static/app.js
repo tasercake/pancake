@@ -1,5 +1,6 @@
+import { VirtualRail } from "./rail.js";
+
 const $ = (id) => document.getElementById(id);
-const PAGE_SIZE = 10;
 const number = new Intl.NumberFormat();
 const date = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 const parameters = new URLSearchParams(location.hash.slice(1));
@@ -21,17 +22,20 @@ const unavailable = {
 
 let scenes = [], visible = [], runs = [], scene = null, details = null;
 let frameIndex = 0, referenceIndex = 0, runId = "", stackerId = "", formKey = "";
-let requestId = 0, pollTimer, stopping = "";
+let sceneRequest, pollTimer, stopping = "";
+let warmupTimer, warming = [];
 let outputLoading = false;
 let runOptions = "", outputState = "", candidateState = "";
-let activeImage = null;
+let activeImage = null, imageVersion = "";
+const readyThumbs = new Map();
+const panelImages = new WeakMap();
 
 function url(path, params = {}) {
   return path + "?" + new URLSearchParams(params);
 }
 
-async function api(path, body) {
-  const response = await fetch(path, body === undefined ? {} : {
+async function api(path, body, { signal } = {}) {
+  const response = await fetch(path, body === undefined ? { signal } : {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
   const result = await response.json();
@@ -60,6 +64,7 @@ function remember() {
 }
 
 function placeholder(well, title, description, log) {
+  clearImageRequest(well);
   const content = part("div", undefined, "empty-image");
   content.append(part("strong", title));
   if (description) content.append(part("div", description));
@@ -73,44 +78,277 @@ function placeholder(well, title, description, log) {
   well.replaceChildren(content);
 }
 
-function showImage(well, title, params) {
-  const button = part("button");
-  button.type = "button";
-  button.setAttribute("aria-label", "Inspect " + title);
+function imageURL(params, size) {
+  return url("/api/image", { ...params, size, v: imageVersion });
+}
+
+function previewElement(params, size, { title = "", priority = "auto", lazy = false } = {}) {
   const image = part("img");
   image.alt = title;
   image.decoding = "async";
-  image.src = url("/api/image", params);
-  image.onerror = () => {
+  image.fetchPriority = priority;
+  if (lazy) image.loading = "lazy";
+  image.src = imageURL(params, size);
+  return image;
+}
+
+function createThumbnail(params, alt = "") {
+  const image = previewElement(params, "thumb", { title: alt, priority: "low", lazy: true });
+  image.classList.add("preview-thumb");
+  image.addEventListener("load", () => {
+    image.classList.add("preview-loaded");
+    const key = imageURL(params, "thumb");
+    readyThumbs.delete(key);
+    readyThumbs.set(key, image.currentSrc || image.src);
+    if (readyThumbs.size > 120) readyThumbs.delete(readyThumbs.keys().next().value);
+  }, { once: true });
+  image.addEventListener("error", () => image.classList.add("preview-failed"), { once: true });
+  return image;
+}
+
+function prefetchImage(params) {
+  const pending = new AbortController();
+  fetch(imageURL(params, "panel"), {
+    signal: pending.signal, priority: "low", headers: { "X-BokehForge-Prefetch": "1" },
+  }).then((response) => response.ok && response.arrayBuffer()).catch(() => {});
+  return () => pending.abort();
+}
+
+function clearImageRequest(well) {
+  const request = panelImages.get(well);
+  if (request && !request.image.complete) request.image.removeAttribute("src");
+  panelImages.delete(well);
+}
+
+function showImage(well, title, params) {
+  const src = imageURL(params, "panel");
+  const current = panelImages.get(well);
+  if (current?.src === src && current.button.isConnected) {
+    current.title = title;
+    current.button.setAttribute("aria-label", "Inspect " + title);
+    current.image.alt = title;
+    return;
+  }
+  clearImageRequest(well);
+  const button = part("button", undefined, "pane-image-button");
+  button.type = "button";
+  button.setAttribute("aria-label", "Inspect " + title);
+  const image = previewElement(params, "panel", { title, priority: "high" });
+  image.classList.add("pane-preview");
+  const request = { src, button, image, title };
+  panelImages.set(well, request);
+  const loading = part("span", "Loading image…", "image-loading");
+  loading.setAttribute("role", "status");
+  const thumbnail = readyThumbs.get(imageURL(params, "thumb"));
+  let fallback;
+  if (thumbnail) {
+    fallback = part("img", undefined, "pane-fallback");
+    fallback.alt = "";
+    fallback.src = thumbnail;
+    button.append(fallback);
+    button.classList.add("has-preview");
+  }
+  image.addEventListener("load", () => {
+    button.classList.add("image-ready");
+    fallback?.remove();
+    loading.remove();
+  }, { once: true });
+  image.addEventListener("error", () => {
     if (button.isConnected) placeholder(well, "Image unavailable", "BokehForge could not render this image.");
-  };
-  button.append(image, part("span", "Inspect", "expand"));
-  button.onclick = () => {
-    activeImage = { title, params };
-    $("image-title").textContent = title;
-    setPixelMode(false);
-    $("image-dialog").showModal();
-  };
+  }, { once: true });
+  button.append(image, loading, part("span", "Inspect", "expand"));
+  button.onclick = () => openLightbox(request.title, params, image.naturalWidth ? image : fallback);
   well.replaceChildren(button);
 }
 
-function setPixelMode(actual) {
-  $("pixel-mode").setAttribute("aria-pressed", actual);
+function cancelLightboxRequests(state) {
+  for (const image of state.requests) image.removeAttribute("src");
+  state.requests.clear();
+}
+
+function openLightbox(title, params, previewImage) {
+  if (activeImage) cancelLightboxRequests(activeImage);
+  const dialog = $("image-dialog");
   const view = $("image-view");
-  view.classList.toggle("actual", actual);
-  const image = part("img");
-  image.alt = activeImage.title;
-  image.src = url("/api/image", { ...activeImage.params, size: actual ? "native" : "fit" });
-  image.onerror = () => {
-    if (image.isConnected) placeholder(view, "Image unavailable", "BokehForge could not render this image.");
+  const stage = part("div", undefined, "lightbox-stage");
+  const state = {
+    title, params, stage, image: null, requests: new Set(), scale: 1,
+    actual: false, nativeRequested: false, nativeLoaded: false, pending: "",
   };
-  view.replaceChildren(image);
-  view.scrollTo(0, 0);
+  activeImage = state;
+  $("image-title").textContent = title;
+  $("image-title").title = title;
+  view.replaceChildren(stage);
+  dialog.showModal();
+  const fallback = (previewImage?.complete && previewImage.naturalWidth &&
+                    (previewImage.currentSrc || previewImage.src)) || readyThumbs.get(imageURL(params, "thumb"));
+  if (fallback) {
+    const image = part("img");
+    image.alt = title;
+    image.src = fallback;
+    if (image.complete && image.naturalWidth) {
+      state.image = image;
+      stage.replaceChildren(image);
+    } else {
+      image.addEventListener("load", () => {
+        if (activeImage !== state || state.image) return;
+        state.image = image;
+        stage.replaceChildren(image);
+        paintLightbox();
+      }, { once: true });
+    }
+  }
+  requestLightbox("fit");
+}
+
+function lightboxAnchor(x, y) {
+  const state = activeImage;
+  const view = $("image-view");
+  const rect = view.getBoundingClientRect();
+  x ??= rect.left + view.clientWidth / 2;
+  y ??= rect.top + view.clientHeight / 2;
+  const image = state.image?.getBoundingClientRect();
+  return {
+    x: x - rect.left, y: y - rect.top,
+    u: image?.width ? (x - image.left) / image.width : 0.5,
+    v: image?.height ? (y - image.top) / image.height : 0.5,
+  };
+}
+
+function paintLightbox(anchor = lightboxAnchor()) {
+  const state = activeImage;
+  const view = $("image-view");
+  const image = state.image;
+  $("lightbox-status").textContent = state.pending;
+  $("image-fit").disabled = state.scale === 1 && !state.actual;
+  $("zoom-out").disabled = $("image-fit").disabled;
+  $("zoom-in").disabled = state.scale >= 12;
+  $("pixel-mode").setAttribute("aria-pressed", state.actual);
+  if (!image?.naturalWidth) return;
+  const wide = view.clientWidth, tall = view.clientHeight;
+  const fit = Math.min(1, wide / image.naturalWidth, tall / image.naturalHeight);
+  const scale = state.actual ? 1 : fit * state.scale;
+  const width = Math.round(image.naturalWidth * scale);
+  const height = Math.round(image.naturalHeight * scale);
+  image.style.width = width + "px";
+  image.style.height = height + "px";
+  state.stage.style.width = Math.max(wide, width) + "px";
+  state.stage.style.height = Math.max(tall, height) + "px";
+  view.classList.toggle("pannable", width > wide || height > tall);
+  view.scrollLeft = Math.max(0, wide - width) / 2 + width * anchor.u - anchor.x;
+  view.scrollTop = Math.max(0, tall - height) / 2 + height * anchor.v - anchor.y;
+}
+
+function requestLightbox(variant) {
+  const state = activeImage;
+  const native = variant === "native";
+  if (native && (state.nativeRequested || state.nativeLoaded)) return;
+  if (native) state.nativeRequested = true;
+  state.pending = native ? "Loading full resolution…" : state.image ? "Loading detail…" : "Loading image…";
+  paintLightbox();
+  const image = previewElement(state.params, variant, { title: state.title, priority: "high" });
+  state.requests.add(image);
+  image.addEventListener("load", () => {
+    state.requests.delete(image);
+    if (activeImage !== state || (!native && state.nativeLoaded)) return;
+    const anchor = lightboxAnchor();
+    if (native) state.nativeLoaded = true;
+    state.pending = !native && state.nativeRequested ? "Loading full resolution…" : "";
+    state.image = image;
+    state.stage.replaceChildren(image);
+    paintLightbox(anchor);
+  }, { once: true });
+  image.addEventListener("error", () => {
+    state.requests.delete(image);
+    if (activeImage !== state || (!native && state.nativeLoaded)) return;
+    if (native) state.nativeRequested = false;
+    state.pending = native ? "Full resolution unavailable" : "Image unavailable";
+    paintLightbox();
+  }, { once: true });
+}
+
+function zoomLightbox(scale, x, y) {
+  const state = activeImage;
+  const anchor = lightboxAnchor(x, y);
+  state.actual = false;
+  state.scale = Math.max(1, Math.min(12, scale));
+  if (state.scale > 1) requestLightbox("native");
+  paintLightbox(anchor);
+}
+
+function lightboxScale() {
+  const state = activeImage;
+  if (!state.actual || !state.image) return state.scale;
+  const view = $("image-view");
+  return Math.max(1, state.image.naturalWidth / view.clientWidth, state.image.naturalHeight / view.clientHeight);
+}
+
+function setPixelMode(actual) {
+  if (!actual) {
+    zoomLightbox(1);
+    return;
+  }
+  activeImage.actual = true;
+  requestLightbox("native");
+  paintLightbox();
+}
+
+function railItem(className) {
+  const item = part("div", undefined, "rail-item " + className);
+  item.setAttribute("role", "listitem");
+  return item;
+}
+
+function inspectButton(title, params, image) {
+  const button = part("button", undefined, "inspect-thumb");
+  button.type = "button";
+  button.title = "Inspect " + title;
+  button.setAttribute("aria-label", button.title);
+  button.onclick = () => openLightbox(title, params, image);
+  return button;
+}
+
+function sceneEntry(item, index) {
+  const row = railItem("scene-row");
+  const button = part("button", undefined, "scene-entry");
+  button.type = "button";
+  button.title = item.name;
+  button.onclick = () => goTo(index);
+  const params = { frame: item.preview_frame };
+  const image = createThumbnail(params);
+  const preview = part("span", undefined, "scene-preview preview-thumbnail");
+  preview.append(image);
+  const text = part("span", undefined, "scene-entry-text");
+  text.append(part("strong", item.name), part("small", `${item.dataset} · ${number.format(item.frames)} frames`));
+  button.append(preview, text);
+  const inspect = inspectButton(`scene preview · ${item.name}`, params, image);
+  preview.ondblclick = inspect.onclick;
+  row.append(button, inspect);
+  return row;
+}
+
+function frameEntry(frame, index) {
+  const tile = railItem("frame-tile");
+  const title = `Frame ${index + 1} · ${frame.name}`;
+  const button = part("button", undefined, "thumb preview-thumbnail");
+  button.type = "button";
+  button.title = title;
+  button.setAttribute("aria-label", title);
+  button.onclick = () => selectFrame(index);
+  const params = { frame: frame.id };
+  const image = createThumbnail(params);
+  button.append(image, part("span", String(index + 1).padStart(2, "0")));
+  const inspect = inspectButton(title, params, image);
+  button.ondblclick = inspect.onclick;
+  tile.append(button, inspect);
+  return tile;
 }
 
 function filterScenes(requested) {
   const dataset = $("dataset").value;
-  visible = scenes.filter((item) => !dataset || item.dataset === dataset);
+  visible = dataset ? scenes.filter((item) => item.dataset === dataset) : scenes;
+  sceneRail.setItems(visible);
+  $("sidebar-count").textContent = number.format(visible.length);
   const current = visible.findIndex((item) => item.id === requested);
   goTo(Math.max(current, 0));
 }
@@ -119,6 +357,7 @@ function goTo(position) {
   if (!visible.length || !Number.isFinite(position)) return;
   const index = Math.min(Math.max(Math.trunc(position), 0), visible.length - 1);
   const next = visible[index];
+  sceneRail.select(index);
   $("scene-position").textContent = `Scene ${number.format(index + 1)} of ${number.format(visible.length)}`;
   $("scene-name").textContent = next.name;
   $("scene-meta").textContent = `${next.dataset} · ${number.format(next.frames)} source frames`;
@@ -131,18 +370,19 @@ function goTo(position) {
     return;
   }
   scene = next;
+  cancelWarmup();
   details = null;
   frameIndex = 0;
   referenceIndex = 0;
-  $("filmstrip").replaceChildren();
-  $("film-range").textContent = "";
-  $("film-actions").hidden = true;
+  filmRail.setItems([]);
+  $("film-range").textContent = `${number.format(next.frames)} frames`;
   $("reference-control").hidden = true;
   $("reference-title").textContent = "Ground truth";
-  for (const role of ["source", "reference"]) {
-    $(`${role}-meta`).textContent = "";
-    placeholder($(`${role}-image`), "Loading scene");
-  }
+  $("source-meta").textContent = "";
+  $("reference-meta").textContent = "";
+  showImage($("source-image"), "source frame 1", { frame: next.first_frame });
+  if (next.first_reference) showImage($("reference-image"), "reference", { frame: next.first_reference });
+  else placeholder($("reference-image"), "Loading scene");
   renderOutput();
   remember();
   loadScene();
@@ -155,21 +395,24 @@ function moveScene(step) {
 
 async function loadScene() {
   if (!scene) return;
-  const token = ++requestId;
+  sceneRequest?.abort();
+  sceneRequest = new AbortController();
+  const { signal } = sceneRequest;
   try {
-    const data = await api(url("/api/scene", { scene: scene.id, run: runId }));
-    if (token !== requestId) return;
+    const data = await api(url("/api/scene", { scene: scene.id, run: runId }), undefined, { signal });
+    if (signal.aborted) return;
     const firstLoad = !details;
     details = data;
     outputLoading = false;
     showMessage($("scene-error"), "");
     if (firstLoad) {
-      renderFilm();
       renderReference();
+      filmRail.setItems(details.frames);
+      selectFrame(frameIndex);
     }
     renderOutput();
   } catch (error) {
-    if (token !== requestId) return;
+    if (signal.aborted) return;
     outputLoading = false;
     renderOutput();
     showMessage($("scene-error"), error.message);
@@ -179,45 +422,31 @@ async function loadScene() {
   }
 }
 
-function renderFilm() {
-  const frames = details.frames;
-  const start = Math.floor(frameIndex / PAGE_SIZE) * PAGE_SIZE;
-  const end = Math.min(start + PAGE_SIZE, frames.length);
-  const thumbnails = [];
-  for (let index = start; index < end; index++) {
-    const frame = frames[index];
-    const thumb = part("button", undefined, "thumb");
-    thumb.type = "button";
-    thumb.title = `Frame ${index + 1} · ${frame.name}`;
-    thumb.setAttribute("aria-label", thumb.title);
-    thumb.dataset.index = index;
-    thumb.onclick = () => selectFrame(index);
-    const image = part("img");
-    image.alt = "";
-    image.loading = "lazy";
-    image.decoding = "async";
-    image.src = url("/api/image", { frame: frame.id, size: "thumb" });
-    thumb.append(image, part("span", String(index + 1).padStart(2, "0")));
-    thumbnails.push(thumb);
-  }
-  const strip = $("filmstrip");
-  strip.replaceChildren(...thumbnails);
-  strip.scrollLeft = 0;
-  $("film-range").textContent = `${start + 1}–${end} of ${number.format(frames.length)}`;
-  $("film-actions").hidden = frames.length <= PAGE_SIZE;
-  $("frames-previous").disabled = start === 0;
-  $("frames-next").disabled = end === frames.length;
-  selectFrame(frameIndex);
-}
-
 function selectFrame(index) {
+  const frame = details?.frames[index];
+  if (!frame) return;
+  const direction = index < frameIndex ? -1 : 1;
   frameIndex = index;
-  const frame = details.frames[index];
-  for (const thumb of $("filmstrip").children) thumb.setAttribute("aria-pressed", Number(thumb.dataset.index) === index);
+  filmRail.select(index);
+  $("film-range").textContent = `${number.format(index + 1)} of ${number.format(details.frames.length)}`;
   $("source-meta").textContent = frame.focus_distance_m === undefined
     ? `Frame ${index + 1} / ${details.frames.length}`
     : `${number.format(frame.focus_distance_m)} m · ƒ/${number.format(frame.aperture_f_number)}`;
   showImage($("source-image"), `source frame ${index + 1} · ${frame.name}`, { frame: frame.id });
+  cancelWarmup();
+  warmupTimer = setTimeout(() => {
+    if (document.hidden) return;
+    const adjacentFrame = details.frames[frameIndex + direction] ?? details.frames[frameIndex - direction];
+    const adjacentScene = visible[(visible.indexOf(scene) + 1) % visible.length];
+    const frameIds = new Set([adjacentFrame?.id, adjacentScene !== scene && adjacentScene?.first_frame]);
+    warming = [...frameIds].filter(Boolean).map((frame) => prefetchImage({ frame }));
+  }, 240);
+}
+
+function cancelWarmup() {
+  clearTimeout(warmupTimer);
+  for (const cancel of warming) cancel();
+  warming = [];
 }
 
 function showReference() {
@@ -367,11 +596,16 @@ function renderRuns() {
   $("open-run").disabled = !scenes.length || Boolean(active);
   if (banner) {
     const stopped = stopping === banner.id;
-    $("run-status").textContent = stopped ? "Stopping evaluation…" : runStates[banner.status];
-    $("run-detail").textContent = banner.error ??
+    const setup = banner.setup;
+    const settingUp = setup && banner.status === "running";
+    const setupLabel = tools.get(setup?.stacker)?.label ?? setup?.stacker;
+    $("run-status").textContent = stopped ? "Stopping evaluation…" :
+      settingUp ? `Setting up ${setupLabel}` : runStates[banner.status];
+    $("run-detail").textContent = (settingUp ? setup.message : banner.error) ??
       `${banner.scope.label} · ${banner.ready + banner.failed} of ${banner.total} outputs processed${banner.failed ? ` · ${banner.failed} failed` : ""}`;
     $("run-progress").max = banner.total;
-    $("run-progress").value = banner.ready + banner.failed;
+    if (settingUp) $("run-progress").removeAttribute("value");
+    else $("run-progress").value = banner.ready + banner.failed;
     $("stop-run").disabled = stopped;
     $("stop-run").hidden = banner !== active;
   } else {
@@ -408,22 +642,33 @@ function scheduleRuns() {
 
 function openRunDialog() {
   const scope = $("scope");
-  scope.replaceChildren(new Option("Current scene · " + scene.name, "scene"),
-    new Option("Current dataset · " + scene.dataset, "dataset"),
+  scope.replaceChildren(new Option("Current scene", "scene"), new Option("Current dataset", "dataset"),
     new Option("All indexed datasets", "all"));
+  const summary = $("scope-summary");
+  const dataset = [...$("dataset").options].find((option) => option.value === scene.dataset)?.text ?? scene.dataset;
+  scope.onchange = () => {
+    const description = {
+      scene: scene.name, dataset, all: `${number.format(scenes.length)} scenes`,
+    }[scope.value];
+    summary.textContent = description;
+    summary.title = description;
+  };
+  scope.onchange();
+  const prepared = new Set(runs.flatMap((run) => run.prepared ?? []));
   const choices = [...tools.values()].map((tool) => {
     const label = part("label", undefined, "tool-option");
     const checkbox = part("input");
     checkbox.type = "checkbox";
     checkbox.name = "stacker";
     checkbox.value = tool.id;
-    checkbox.checked = tool.available;
-    checkbox.disabled = !tool.available;
-    label.append(checkbox, part("strong", tool.label), part("span", tool.available ? tool.method : tool.setup));
+    checkbox.checked = tool.available || prepared.has(tool.id);
+    const subtitle = part("span", checkbox.checked ? tool.method : `${tool.method} · Sets up on first run`);
+    subtitle.title = subtitle.textContent;
+    label.append(checkbox, part("strong", tool.label), subtitle);
     return label;
   });
   $("available-tools").replaceChildren(...choices);
-  $("start-run").disabled = ![...tools.values()].some((tool) => tool.available);
+  $("start-run").disabled = false;
   showMessage($("run-error"), "");
   $("new-run").showModal();
 }
@@ -474,6 +719,7 @@ async function boot() {
       $("catalog-note").textContent = catalog.error ?? "The verified catalog contains no usable scenes.";
       return;
     }
+    imageVersion = catalog.image_version;
     for (const tool of catalog.stackers) tools.set(tool.id, tool);
     scenes = catalog.scenes;
     for (const [id, name] of Object.entries(catalog.datasets)) {
@@ -494,18 +740,13 @@ async function boot() {
   }
 }
 
+const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
+const filmRail = new VirtualRail($("filmstrip"), "x", 112, frameEntry);
+
 $("dataset").onchange = () => filterScenes(scene?.id);
 $("previous").onclick = () => moveScene(-1);
 $("next").onclick = () => moveScene(1);
 $("jump").onchange = () => goTo($("jump").valueAsNumber - 1);
-$("frames-previous").onclick = () => {
-  frameIndex = Math.max(0, (Math.floor(frameIndex / PAGE_SIZE) - 1) * PAGE_SIZE);
-  renderFilm();
-};
-$("frames-next").onclick = () => {
-  frameIndex = (Math.floor(frameIndex / PAGE_SIZE) + 1) * PAGE_SIZE;
-  renderFilm();
-};
 $("reference-select").onchange = () => { referenceIndex = Number($("reference-select").value); showReference(); };
 $("run-select").onchange = () => changeRun($("run-select").value);
 $("rating-form").oninput = captureDraft;
@@ -513,7 +754,51 @@ $("rating-form").onsubmit = saveRating;
 $("open-run").onclick = openRunDialog;
 $("stop-run").onclick = stopRun;
 $("run-form").onsubmit = startRun;
-$("pixel-mode").onclick = () => setPixelMode($("pixel-mode").getAttribute("aria-pressed") !== "true");
+$("pixel-mode").onclick = () => setPixelMode(!activeImage.actual);
+$("image-fit").onclick = () => zoomLightbox(1);
+$("zoom-in").onclick = () => zoomLightbox(lightboxScale() * 1.5);
+$("zoom-out").onclick = () => zoomLightbox(lightboxScale() / 1.5);
+const lightboxView = $("image-view");
+lightboxView.addEventListener("wheel", (event) => {
+  if (event.shiftKey) return;
+  event.preventDefault();
+  const units = event.deltaMode ? 20 : 1;
+  const scale = Math.exp(Math.max(-1, Math.min(1, -event.deltaY * units / 300)));
+  zoomLightbox(lightboxScale() * scale, event.clientX, event.clientY);
+}, { passive: false });
+lightboxView.addEventListener("dblclick", (event) => {
+  zoomLightbox(lightboxScale() > 1 ? 1 : 2, event.clientX, event.clientY);
+});
+$("image-dialog").addEventListener("keydown", (event) => {
+  const zoom = { "+": 1.5, "=": 1.5, "-": 1 / 1.5 }[event.key];
+  if (event.ctrlKey || event.metaKey || event.altKey || (!zoom && event.key !== "0")) return;
+  event.preventDefault();
+  zoomLightbox(zoom ? lightboxScale() * zoom : 1);
+});
+let panStart = null;
+lightboxView.addEventListener("pointerdown", (event) => {
+  if (event.pointerType === "touch" || event.button !== 0 || !lightboxView.classList.contains("pannable")) return;
+  lightboxView.setPointerCapture(event.pointerId);
+  panStart = { x: event.clientX, y: event.clientY, left: lightboxView.scrollLeft, top: lightboxView.scrollTop };
+  lightboxView.classList.add("dragging");
+});
+lightboxView.addEventListener("pointermove", (event) => {
+  if (!panStart) return;
+  lightboxView.scrollTo(panStart.left + panStart.x - event.clientX, panStart.top + panStart.y - event.clientY);
+});
+lightboxView.addEventListener("lostpointercapture", () => {
+  panStart = null;
+  lightboxView.classList.remove("dragging");
+});
+$("image-dialog").addEventListener("close", (event) => {
+  if (event.currentTarget.open || !activeImage) return;
+  cancelLightboxRequests(activeImage);
+  activeImage = null;
+  lightboxView.replaceChildren();
+});
+new ResizeObserver(() => {
+  if (activeImage) paintLightbox();
+}).observe(lightboxView);
 for (const button of document.querySelectorAll("[data-close]")) button.onclick = () => $(button.dataset.close).close();
 document.addEventListener("keydown", (event) => {
   if (!scene || document.querySelector("dialog[open]") ||
@@ -521,7 +806,10 @@ document.addEventListener("keydown", (event) => {
       event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
   if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
     event.preventDefault();
-    moveScene(event.key === "ArrowLeft" ? -1 : 1);
+    selectFrame(frameIndex + (event.key === "ArrowLeft" ? -1 : 1));
+  } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+    event.preventDefault();
+    moveScene(event.key === "ArrowUp" ? -1 : 1);
   }
 });
 window.addEventListener("beforeunload", (event) => {
