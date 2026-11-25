@@ -23,6 +23,16 @@ uv run --frozen bokehforge bench --algorithm mean --dataset D29 --output ../arti
 
 See the [benchmark guide](docs/benchmark.md) for the stacker contract, scoring profile, and saved-output replay.
 
+## Browse and rate stacks
+
+Run the local review app from the repository root:
+
+```sh
+uv run --project bokehforge --frozen bokehforge review
+```
+
+See the [review guide](docs/review.md) for dataset selection, stacker setup, and rating export.
+
 ## Use from Python
 
 In a larger Python 3.12 project, install BokehForge as a dependency from its project directory or wheel. For example, run `python -m pip install /path/to/focus-stacking/bokehforge` in your project's environment. Point the catalog at the same dataset directory used by the downloader.
