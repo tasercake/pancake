@@ -30,7 +30,7 @@ def write_scene(root, level):
                              photometric="rgb")
             files[relative] = sha256(image.read_bytes()).hexdigest()
     (raw / "download-manifest.json").write_text(json.dumps({
-        "id": "Demo", "status": "available", "layout": "directory_stacks",
+        "id": "Demo", "name": "Demonstration stacks", "status": "available", "layout": "directory_stacks",
         "transfer": "linear", "reference_type": "none",
         "files": [{"path": name, "sha256": digest} for name, digest in files.items()],
     }))
@@ -65,6 +65,7 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     root, store = tmp_path / "data", tmp_path / "review"
     write_scene(root, 0.25)
     app = open_review(root, store)
+    assert app.catalog_status["datasets"] == {"Demo": "Demonstration stacks"}
     other, scene = [item["id"] for item in app.scenes]
     job = app.start({"scope": "scene", "scene": scene, "stackers": ["pancake", "focus-stack"]})
     app.runs.worker.join(timeout=10)

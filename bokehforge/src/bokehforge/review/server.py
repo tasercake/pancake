@@ -23,6 +23,17 @@ SIZES = {"thumb": 192, "fit": 1500, "native": 0}
 ALL_INTERFACES = "0.0.0.0"
 
 
+def dataset_names(root, lock, dataset_ids):
+    if lock is not None:
+        sources = json.loads(lock.read_text())["datasets"]
+    else:
+        manifests = (root / "raw" / dataset_id / "download-manifest.json"
+                     for dataset_id in dataset_ids)
+        sources = [json.loads(path.read_text()) for path in manifests if path.is_file()]
+    names = {source["id"]: source.get("name") for source in sources}
+    return {dataset_id: names.get(dataset_id) or dataset_id for dataset_id in dataset_ids}
+
+
 class CatalogPending(RuntimeError):
     pass
 
@@ -47,8 +58,9 @@ class Review:
                  "dataset": scene.metadata["dataset_id"], "frames": len(scene.frame_ids)}
                 for scene in scenes
             ]
+            datasets = dataset_names(args.root, args.lock, dict.fromkeys(scene["dataset"] for scene in self.scenes))
             self.catalog = catalog
-            self.catalog_status = {"status": "ready", "scenes": self.scenes}
+            self.catalog_status = {"status": "ready", "scenes": self.scenes, "datasets": datasets}
         except Exception as exc:
             self.catalog_status = {**self.catalog_status, "status": "error", "error": str(exc)}
 
