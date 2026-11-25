@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BokehForge Review</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="shell masthead-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div><strong>BokehForge</strong><span>Focus stack review</span></div>
+      </div>
+      <div class="tools">
+        <a class="button quiet" href="/api/ratings.csv" download>Export ratings</a>
+        <button class="primary" id="open-run" type="button" disabled><span aria-hidden="true">+</span> New evaluation</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="notice" id="catalog-state" aria-live="polite">
+      <h1>Indexing local datasets</h1>
+      <p id="catalog-note">Verifying the downloaded originals before opening the scene catalog.</p>
+    </section>
+    <div class="run-banner" id="run-banner" hidden>
+      <div><strong id="run-status"></strong><span id="run-detail"></span></div>
+      <progress id="run-progress" aria-label="Evaluation progress"></progress>
+      <button class="quiet" id="stop-run" type="button">Stop run</button>
+    </div>
+    <section id="workspace" hidden>
+      <div class="scene-heading">
+        <div class="scene-title">
+          <p class="overline" id="scene-position"></p>
+          <h1 id="scene-name" aria-live="polite"></h1>
+          <p class="scene-meta" id="scene-meta"></p>
+        </div>
+        <div class="scene-controls">
+          <label class="control">Dataset<select id="dataset"><option value="">All datasets</option></select></label>
+          <div class="scene-navigation">
+            <button id="previous" type="button" title="Previous scene (Left arrow)">Previous</button>
+            <label class="visually-hidden" for="jump">Go to scene number</label>
+            <input id="jump" type="number" min="1" inputmode="numeric">
+            <button id="next" type="button" title="Next scene (Right arrow)">Next</button>
+          </div>
+        </div>
+      </div>
+      <p class="inline-error" id="scene-error" role="alert" hidden></p>
+      <section class="review" aria-label="Focus stack comparison">
+        <div class="review-heading">
+          <h2>Compare images</h2>
+          <label class="run-control" for="run-select">Evaluation<select id="run-select"><option value="">No evaluations yet</option></select></label>
+        </div>
+        <div class="output-tabs" id="output-tabs" aria-label="Stacker outputs"></div>
+        <div class="comparison">
+          <figure class="pane">
+            <figcaption><span>Source frame</span><span class="pane-meta" id="source-meta"></span></figcaption>
+            <div class="image-well" id="source-image"></div>
+          </figure>
+          <figure class="pane candidate">
+            <figcaption><span>Stacker output</span><span class="pane-meta" id="candidate-meta"></span></figcaption>
+            <div class="image-well" id="candidate-image"></div>
+          </figure>
+          <figure class="pane">
+            <figcaption><span id="reference-title">Ground truth</span><span class="pane-meta" id="reference-meta"></span></figcaption>
+            <div class="image-well" id="reference-image"></div>
+            <label class="reference-select" id="reference-control" hidden>Reference image<select id="reference-select"></select></label>
+          </figure>
+        </div>
+        <div class="film">
+          <div class="film-heading">
+            <div><h3>Source frames</h3><span id="film-range"></span></div>
+            <div class="film-actions" id="film-actions" hidden>
+              <button class="quiet" id="frames-previous" type="button">Previous frames</button>
+              <button class="quiet" id="frames-next" type="button">Next frames</button>
+            </div>
+          </div>
+          <div class="filmstrip" id="filmstrip" aria-label="Source frame thumbnails"></div>
+        </div>
+      </section>
+
+      <section class="review ratings" aria-labelledby="rating-title">
+        <div class="review-heading">
+          <h2 id="rating-title">Rate outputs</h2>
+          <span class="muted" id="rating-count"></span>
+        </div>
+        <form class="rating-form" id="rating-form" hidden>
+          <fieldset>
+            <legend>Grade <span class="muted">· 5 is best</span></legend>
+            <div class="grade-options">
+              <label><input required name="grade" type="radio" value="1"><span>1</span></label>
+              <label><input name="grade" type="radio" value="2"><span>2</span></label>
+              <label><input name="grade" type="radio" value="3"><span>3</span></label>
+              <label><input name="grade" type="radio" value="4"><span>4</span></label>
+              <label><input name="grade" type="radio" value="5"><span>5</span></label>
+            </div>
+          </fieldset>
+          <label class="comment" for="comment">Comment <span class="muted">· optional</span>
+            <textarea id="comment" rows="2" maxlength="4000" placeholder="Describe the details that influenced your grade"></textarea>
+          </label>
+          <div class="save-area">
+            <button class="primary" id="save-rating" type="submit">Save rating</button>
+            <span class="muted" id="rating-status" role="status"></span>
+          </div>
+        </form>
+        <p class="rating-empty muted" id="rating-empty"></p>
+      </section>
+      <footer><span>Data and ratings stay on this computer.</span><span class="keyboard">Browse scenes with <kbd>←</kbd> <kbd>→</kbd></span></footer>
+    </section>
+  </main>
+
+  <dialog id="new-run">
+    <div class="dialog-heading"><h2>New evaluation</h2><button class="quiet" type="button" data-close="new-run">Close</button></div>
+    <form id="run-form">
+      <label class="control">Evaluate<select id="scope"></select></label>
+      <fieldset class="stackers"><legend>Stacking programs</legend><div id="available-tools"></div></fieldset>
+      <p class="inline-error" id="run-error" role="alert" hidden></p>
+      <button class="primary" id="start-run" type="submit">Start evaluation</button>
+    </form>
+  </dialog>
+  <dialog class="image-dialog" id="image-dialog">
+    <div class="dialog-heading">
+      <h2 id="image-title"></h2>
+      <div class="tools">
+        <button class="quiet" id="pixel-mode" type="button" aria-pressed="false">1:1 pixels</button>
+        <button class="quiet" data-close="image-dialog" type="button">Close</button>
+      </div>
+    </div>
+    <div class="image-view" id="image-view"></div>
+  </dialog>
+</body>
+</html>

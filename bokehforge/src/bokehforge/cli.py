@@ -11,9 +11,12 @@ def main(argv=None):
     actions = data.add_subparsers(dest="action", required=True)
     actions.add_parser("download", add_help=False, help="Download verified originals")
     groups.add_parser("bench", add_help=False, help="Score a stacker against RGB ground truth")
+    groups.add_parser("review", add_help=False, help="Browse and rate focus stacks locally")
     args, remaining = parser.parse_known_args(argv)
     if args.group == "bench":
         from .bench import main as command
+    elif args.group == "review":
+        from .review.server import main as command
     else:
         from .data.download import main as command
 
