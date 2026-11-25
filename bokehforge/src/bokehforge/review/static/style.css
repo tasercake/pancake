@@ -292,14 +292,20 @@ dialog { color: inherit; background: var(--panel); border: 1px solid var(--strok
 dialog::backdrop { background: #090a0bdc; }
 .dialog-heading { padding: .85rem 1rem; border-bottom: 1px solid var(--stroke); }
 .image-dialog { width: min(95vw, 100rem); overflow-x: hidden; }
+.image-dialog[open] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: min(calc(73dvh + 10rem), 65rem, calc(100dvh - 1.5rem));
+}
 .image-dialog .dialog-heading { flex-wrap: wrap; }
 .image-dialog .tools { flex-wrap: wrap; }
 #image-title { flex: 1 1 12rem; min-inline-size: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .zoom-button { min-width: 2.5rem; }
-.lightbox-body { position: relative; }
+.lightbox-body { position: relative; min-height: 0; }
 .image-view {
   overflow: auto;
-  height: min(73dvh, 55rem);
+  height: 100%;
   background: #0e1011;
   overscroll-behavior: contain;
   overflow-anchor: none;
@@ -310,8 +316,13 @@ dialog::backdrop { background: #090a0bdc; }
 .lightbox-stage { display: grid; place-items: center; min-width: 100%; min-height: 100%; }
 .lightbox-stage img { display: block; user-select: none; -webkit-user-drag: none; }
 .lightbox-surface { position: relative; }
-.lightbox-reference { position: absolute; inset: 0; background: #0e1011; pointer-events: none; }
-.lightbox-reference img { width: 100%; height: 100%; object-fit: contain; }
+.lightbox-hover, .lightbox-reference { position: absolute; inset: 0; background: #0e1011; pointer-events: none; }
+.lightbox-hover img, .lightbox-reference img { width: 100%; height: 100%; object-fit: contain; }
+.lightbox-strip { border-top: 1px solid var(--stroke); padding: .4rem; overscroll-behavior-x: contain; }
+.lightbox-strip .rail-track { height: 64px; }
+.lightbox-tile { top: 0; width: 92px; height: 64px; }
+.lightbox-tile .thumb:focus-visible { outline-offset: -4px; }
+.lightbox-tile .thumb span { max-width: calc(100% - .4rem); overflow: hidden; text-overflow: ellipsis; }
 #reference-swipe[aria-pressed="true"] { border-color: var(--warm); color: var(--warm); background: #312a20; }
 .reference-divider {
   position: absolute;

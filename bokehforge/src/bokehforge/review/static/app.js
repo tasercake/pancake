@@ -177,9 +177,13 @@ function cancelReferenceRequests(gallery) {
   }
 }
 
+function lightboxImageKey({ params }) {
+  return params.frame ?? params.stacker;
+}
+
 function setLightboxGallery(gallery, data) {
   const images = data.frames.map((frame, index) => ({
-    title: sourceFrameTitle(frame, index), params: { frame: frame.id },
+    title: sourceFrameTitle(frame, index), label: String(index + 1), params: { frame: frame.id },
   }));
   for (const output of data.outputs) {
     if (output.status === "ready") images.push({
@@ -188,15 +192,27 @@ function setLightboxGallery(gallery, data) {
     });
   }
   const reference = data.references[gallery.reference];
-  if (reference) images.push({ title: referenceTitle(reference), params: { frame: reference.id } });
-  gallery.images = images;
+  for (const [index, frame] of data.references.entries()) {
+    if (frame !== reference) images.push({
+      title: referenceTitle(frame), label: `Ref. ${index + 1}`, params: { frame: frame.id },
+    });
+  }
+  if (reference) images.push({ title: referenceTitle(reference), label: "Reference", params: { frame: reference.id } });
+  const changed = images.length !== gallery.images.length || images.some((entry, index) =>
+    lightboxImageKey(entry) !== lightboxImageKey(gallery.images[index]) || entry.title !== gallery.images[index].title);
+  if (changed) gallery.images = images;
   if (gallery.referenceFrame?.id !== reference?.id) {
     cancelReferenceRequests(gallery);
     gallery.referenceImages = {};
     gallery.referenceLayer.replaceChildren();
     gallery.referenceFrame = reference;
   }
-  if (activeImage?.gallery === gallery) paintReference();
+  if (activeImage?.gallery !== gallery) return;
+  if (changed) {
+    clearLightboxHover(gallery);
+    fillLightboxStrip(gallery);
+  }
+  paintLightboxOverlays();
 }
 
 function openLightbox(title, params, previewImage, sceneId = scene?.id) {
@@ -204,17 +220,21 @@ function openLightbox(title, params, previewImage, sceneId = scene?.id) {
   if (previous) closeLightboxRequests(previous);
   const stage = part("div", undefined, "lightbox-stage");
   const surface = part("div", undefined, "lightbox-surface");
+  const hoverLayer = part("div", undefined, "lightbox-hover");
   const referenceLayer = part("div", undefined, "lightbox-reference");
-  referenceLayer.hidden = true;
-  referenceLayer.setAttribute("aria-hidden", "true");
-  surface.append(referenceLayer);
+  for (const layer of [hoverLayer, referenceLayer]) {
+    layer.hidden = true;
+    layer.setAttribute("aria-hidden", "true");
+  }
+  surface.append(hoverLayer, referenceLayer);
   stage.append(surface);
   $("image-view").replaceChildren(stage);
-  const entry = { title, params };
+  const entry = { title, label: title, params };
   const currentScene = sceneId === scene?.id;
   const gallery = {
     scene: sceneId, run: runId, reference: currentScene ? referenceIndex : 0, images: [entry],
-    surface, referenceLayer, referenceImages: {}, baseTitle: title, swipe: false, split: 0.5, holdKey: "",
+    surface, hoverLayer, hover: null, referenceLayer, referenceImages: {},
+    baseTitle: title, swipe: false, split: 0.5, holdKey: "",
   };
   if (currentScene && details) {
     setLightboxGallery(gallery, details);
@@ -227,24 +247,97 @@ function openLightbox(title, params, previewImage, sceneId = scene?.id) {
   const dialog = $("image-dialog");
   if (!dialog.open) dialog.showModal();
   showLightboxImage(entry, gallery, stage, previewImage);
+  fillLightboxStrip(gallery);
   $("image-view").focus();
 }
 
+function lightboxIndex() {
+  return activeImage.gallery.images.findIndex((entry) => lightboxImageKey(entry) === lightboxImageKey(activeImage));
+}
+
+function fillLightboxStrip(gallery) {
+  lightboxRail.setItems(gallery.images);
+  lightboxRail.select(lightboxIndex());
+}
+
 function moveLightbox(step) {
+  const { images } = activeImage.gallery;
+  if (images.length < 2) return;
+  const index = lightboxIndex();
+  const next = index < 0 ? (step > 0 ? 0 : images.length - 1) : (index + step + images.length) % images.length;
+  selectLightboxEntry(images[next]);
+}
+
+function selectLightboxEntry(entry) {
   const state = activeImage;
   const { gallery, stage } = state;
-  const { images } = gallery;
-  if (images.length < 2) return;
-  const { frame, stacker } = state.params;
-  const index = images.findIndex((entry) => frame ? entry.params.frame === frame : entry.params.stacker === stacker);
-  const next = index < 0 ? (step > 0 ? 0 : images.length - 1) : (index + step + images.length) % images.length;
-  const entry = images[next];
+  if (lightboxImageKey(state) === lightboxImageKey(entry)) return;
+  if (gallery.hover?.entry !== entry) clearLightboxHover(gallery);
   const { u, v } = lightboxAnchor();
   cancelLightboxRequests(state);
   // Keep the last rendered image and its label together until the next image loads.
   showLightboxImage(entry, gallery, stage, undefined, {
     image: state.image, scale: state.scale, actual: state.actual, position: { u, v },
   });
+  lightboxRail.select(lightboxIndex());
+}
+
+function previewLightboxEntry(entry, thumbnail) {
+  const { gallery } = activeImage;
+  clearLightboxHover(gallery);
+  if (lightboxImageKey(entry) === lightboxImageKey(activeImage)) {
+    paintLightboxOverlays();
+    return;
+  }
+  const hover = { entry, image: null, request: null, events: new AbortController(), unavailable: false };
+  gallery.hover = hover;
+  const { signal } = hover.events;
+  const useThumbnail = () => {
+    if (hover.image || !thumbnail.naturalWidth) return;
+    const image = part("img");
+    image.alt = "";
+    image.src = thumbnail.currentSrc || thumbnail.src;
+    hover.image = image;
+    paintLightboxOverlays();
+  };
+  thumbnail.addEventListener("load", useThumbnail, { once: true, signal });
+  useThumbnail();
+  requestLightboxHover();
+  paintLightboxOverlays();
+}
+
+function requestLightboxHover() {
+  const state = activeImage;
+  const hover = state.gallery.hover;
+  if (!hover) return;
+  const variant = state.actual || state.scale > 1 ? "native" : "fit";
+  if (hover.variant === variant || hover.variant === "native") return;
+  hover.variant = variant;
+  hover.unavailable = false;
+  if (hover.request && !hover.request.complete) hover.request.removeAttribute("src");
+  const image = previewElement(hover.entry.params, variant);
+  hover.request = image;
+  const { signal } = hover.events;
+  image.addEventListener("load", () => {
+    if (hover.request !== image) return;
+    hover.image = image;
+    paintLightboxOverlays();
+  }, { once: true, signal });
+  image.addEventListener("error", () => {
+    if (hover.request !== image) return;
+    hover.unavailable = true;
+    paintLightboxOverlays();
+  }, { once: true, signal });
+}
+
+function clearLightboxHover(gallery) {
+  const hover = gallery.hover;
+  if (!hover) return;
+  hover.events.abort();
+  if (hover.request && !hover.request.complete) hover.request.removeAttribute("src");
+  gallery.hover = null;
+  gallery.hoverLayer.hidden = true;
+  gallery.hoverLayer.replaceChildren();
 }
 
 function setLightboxTitle(title) {
@@ -260,6 +353,8 @@ function setLightboxImage(state, image) {
   state.image = image;
   state.gallery.baseTitle = state.title;
   state.gallery.surface.prepend(image);
+  const hover = state.gallery.hover;
+  if (hover && lightboxImageKey(hover.entry) === lightboxImageKey(state)) clearLightboxHover(state.gallery);
 }
 
 function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
@@ -316,8 +411,9 @@ function paintLightbox(anchor = lightboxAnchor()) {
   $("zoom-out").disabled = $("image-fit").disabled;
   $("zoom-in").disabled = state.scale >= 12;
   $("pixel-mode").setAttribute("aria-pressed", state.actual);
+  requestLightboxHover();
   if (!image?.naturalWidth) {
-    paintReference();
+    paintLightboxOverlays();
     return;
   }
   const wide = view.clientWidth, tall = view.clientHeight;
@@ -332,7 +428,7 @@ function paintLightbox(anchor = lightboxAnchor()) {
   view.classList.toggle("pannable", width > wide || height > tall);
   view.scrollLeft = Math.max(0, wide - width) / 2 + width * anchor.u - anchor.x;
   view.scrollTop = Math.max(0, tall - height) / 2 + height * anchor.v - anchor.y;
-  paintReference();
+  paintLightboxOverlays();
 }
 
 function requestLightbox(variant) {
@@ -368,7 +464,7 @@ function requestReference(gallery, variant, priority) {
   image.alt = "";
   gallery.referenceImages[variant] = image;
   const changed = () => {
-    if (activeImage?.gallery === gallery && gallery.referenceImages[variant] === image) paintReference();
+    if (activeImage?.gallery === gallery && gallery.referenceImages[variant] === image) paintLightboxOverlays();
   };
   image.addEventListener("load", changed, { once: true });
   image.addEventListener("error", changed, { once: true });
@@ -384,12 +480,16 @@ function visibleLightboxImage(gallery) {
   return { view, image, left, right, top, bottom };
 }
 
-function paintReference() {
+function paintLightboxOverlays() {
   const state = activeImage;
   if (!state) return;
   const { gallery } = state;
   const held = Boolean(gallery.holdKey);
   const comparing = held || gallery.swipe;
+  const hover = gallery.hover;
+  const previewing = Boolean(hover?.image && state.image);
+  gallery.hoverLayer.hidden = !previewing;
+  if (previewing && gallery.hoverLayer.firstChild !== hover.image) gallery.hoverLayer.replaceChildren(hover.image);
   const reference = gallery.referenceFrame;
   const toggle = $("reference-swipe");
   toggle.disabled = !reference;
@@ -406,10 +506,12 @@ function paintReference() {
   const divider = $("reference-divider");
   layer.hidden = !showing;
   divider.hidden = !showing || held;
-  setLightboxTitle(held && showing ? referenceTitle(reference) : gallery.baseTitle);
-  const status = comparing && reference && !overlay
-    ? (fit?.complete && (!native || native.complete) ? "Reference unavailable" : "Loading reference…")
-    : state.pending;
+  setLightboxTitle(held && showing ? referenceTitle(reference) : previewing ? hover.entry.title : gallery.baseTitle);
+  let status = state.pending;
+  if (hover) status = previewing ? "" : hover.unavailable ? "Preview unavailable" : "Loading preview…";
+  if (comparing && reference && !overlay) {
+    status = fit?.complete && (!native || native.complete) ? "Reference unavailable" : "Loading reference…";
+  }
   if ($("lightbox-status").textContent !== status) $("lightbox-status").textContent = status;
   if (!showing) return;
   if (layer.firstChild !== overlay) layer.replaceChildren(overlay);
@@ -430,6 +532,7 @@ function paintReference() {
 
 function closeLightboxRequests(state) {
   cancelLightboxRequests(state);
+  clearLightboxHover(state.gallery);
   cancelReferenceRequests(state.gallery);
   state.gallery.request?.abort();
 }
@@ -438,7 +541,7 @@ function releaseReference(event) {
   const gallery = activeImage?.gallery;
   if (!gallery?.holdKey || (event && gallery.holdKey !== (event.code || event.key))) return;
   gallery.holdKey = "";
-  paintReference();
+  paintLightboxOverlays();
 }
 
 function zoomLightbox(scale, x, y) {
@@ -517,6 +620,33 @@ function frameEntry(frame, index) {
   const inspect = inspectButton(title, params, image);
   button.ondblclick = inspect.onclick;
   tile.append(button, inspect);
+  return tile;
+}
+
+function lightboxStripEntry(entry) {
+  const gallery = activeImage.gallery;
+  const tile = railItem("lightbox-tile");
+  const button = part("button", undefined, "thumb preview-thumbnail");
+  button.type = "button";
+  button.title = entry.title;
+  button.setAttribute("aria-label", entry.title);
+  const thumbnail = createThumbnail(entry.params);
+  button.append(thumbnail, part("span", entry.label ?? entry.title));
+  button.addEventListener("pointerenter", (event) => {
+    if (event.pointerType !== "touch" && !event.buttons && activeImage?.gallery === gallery) {
+      previewLightboxEntry(entry, thumbnail);
+    }
+  });
+  button.addEventListener("pointerleave", () => {
+    if (activeImage?.gallery === gallery && gallery.hover?.entry === entry) {
+      clearLightboxHover(gallery);
+      paintLightboxOverlays();
+    }
+  });
+  button.onclick = () => {
+    if (activeImage?.gallery === gallery) selectLightboxEntry(entry);
+  };
+  tile.append(button);
   return tile;
 }
 
@@ -1090,6 +1220,14 @@ function connect() {
 
 const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
 const filmRail = new VirtualRail($("filmstrip"), "x", 112, frameEntry);
+const lightboxStrip = $("lightbox-strip");
+const lightboxRail = new VirtualRail(lightboxStrip, "x", 100, lightboxStripEntry);
+lightboxStrip.addEventListener("pointerleave", () => {
+  const gallery = activeImage?.gallery;
+  if (!gallery?.hover) return;
+  clearLightboxHover(gallery);
+  paintLightboxOverlays();
+});
 
 $("dataset").onchange = () => filterScenes(scene?.id);
 $("previous").onclick = () => moveScene(-1);
@@ -1111,12 +1249,12 @@ const lightboxView = $("image-view");
 $("reference-swipe").onclick = () => {
   const gallery = activeImage.gallery;
   gallery.swipe = !gallery.swipe;
-  paintReference();
+  paintLightboxOverlays();
 };
 const referenceSlider = $("reference-slider");
 function setReferenceSplit(split) {
   activeImage.gallery.split = Math.max(0, Math.min(1, split));
-  paintReference();
+  paintLightboxOverlays();
 }
 function dragReference(event) {
   const { left, right } = visibleLightboxImage(activeImage.gallery);
@@ -1141,7 +1279,7 @@ referenceSlider.addEventListener("keydown", (event) => {
   event.stopPropagation();
   setReferenceSplit(next);
 });
-lightboxView.addEventListener("scroll", paintReference, { passive: true });
+lightboxView.addEventListener("scroll", paintLightboxOverlays, { passive: true });
 lightboxView.addEventListener("wheel", (event) => {
   if (event.shiftKey) {
     activeImage.position = null;
@@ -1162,7 +1300,7 @@ document.addEventListener("keydown", (event) => {
       event.preventDefault();
       if (!event.repeat && !activeImage.gallery.holdKey) {
         activeImage.gallery.holdKey = event.code || event.key;
-        paintReference();
+        paintLightboxOverlays();
       }
     }
     return;
@@ -1199,18 +1337,22 @@ lightboxView.addEventListener("pointerdown", (event) => {
   lightboxView.classList.add("dragging");
 });
 lightboxView.addEventListener("pointermove", (event) => {
-  if (!panStart) return;
+  if (!panStart || !(event.buttons & 1)) return;
   activeImage.position = null;
   lightboxView.scrollTo(panStart.left + panStart.x - event.clientX, panStart.top + panStart.y - event.clientY);
 });
-lightboxView.addEventListener("lostpointercapture", () => {
+function endLightboxPan() {
   panStart = null;
   lightboxView.classList.remove("dragging");
-});
+}
+lightboxView.addEventListener("pointerup", endLightboxPan);
+lightboxView.addEventListener("lostpointercapture", endLightboxPan);
 $("image-dialog").addEventListener("close", (event) => {
   if (event.currentTarget.open || !activeImage) return;
   closeLightboxRequests(activeImage);
   activeImage = null;
+  endLightboxPan();
+  lightboxRail.setItems([]);
   lightboxView.replaceChildren();
 });
 new ResizeObserver(() => {
