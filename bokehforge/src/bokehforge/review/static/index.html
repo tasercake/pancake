@@ -219,7 +219,12 @@
       <h3 data-score-heading></h3>
       <button class="quiet score-explanation-dismiss" type="button" aria-label="Close score explanation">Close</button>
     </div>
-    <div class="damage-controls">
+    <p class="damage-help" data-alignment-summary></p>
+    <details class="damage-method" data-alignment-details>
+      <summary>How alignment was inferred</summary>
+      <pre data-alignment-evidence></pre>
+    </details>
+    <div class="damage-controls" data-damage-controls>
       <label class="damage-switch"><input data-overlay type="checkbox"> Show damage overlay</label>
       <label>Family <select data-family></select></label>
       <label>Grid <select data-grid>
@@ -229,14 +234,14 @@
     </div>
     <p class="damage-status" data-damage-status role="status" hidden></p>
     <p class="damage-help" data-damage-curve></p>
-    <div class="damage-column-headings" aria-hidden="true">
+    <div class="damage-column-headings" data-damage-columns aria-hidden="true">
       <span>Damage family</span><span>Observed</span><span>Weight</span><span>Contribution</span>
     </div>
     <div data-damage-families></div>
-    <details class="damage-method">
+    <details class="damage-method" data-damage-method>
       <summary>How to read damage</summary>
       <p>Damage ranges from 0 (no difference from the reference) to 1 (highest damage). The six families separate different ways an output can lose fidelity, such as shifting tones or smoothing away detail.</p>
-      <p>Each contribution is observed damage multiplied by its weight. The score decays exponentially as their sum increases. The overlay shows the selected family’s measured tiles on one grid at a time.</p>
+      <p>Each contribution is observed damage multiplied by its weight. Overlap quality decays exponentially as their sum increases. The overlay shows the selected family’s measured tiles on one grid at a time.</p>
     </details>
   </template>
   <template id="damage-legend-template">

@@ -1,4 +1,4 @@
-"""Fixed-coordinate, full-reference image quality measurements for BokehForge."""
+"""Reference coverage and native-grid image quality measurements for BokehForge."""
 
 from dataclasses import dataclass
 from typing import Literal
@@ -6,14 +6,16 @@ from typing import Literal
 import numpy as np
 from scipy import ndimage as ndi
 
-SCORE_VERSION = "reference-fidelity-v2"
+from .alignment import _xyxy, align, native_overlap, overlap, project
+
+SCORE_VERSION = "reference-fidelity-v3"
 SCORE_DAMAGE_SCALE = 5
 FAMILY_WEIGHTS = {
     "tone": 0.17, "color": 0.16, "lost_detail": 0.18,
     "added_structure": 0.15, "boundary": 0.23, "range": 0.11,
 }
 FEATURES = tuple(f"native.{family}" for family in FAMILY_WEIGHTS)
-SCORE_EXPLANATION_VERSION = 1
+SCORE_EXPLANATION_VERSION = 2
 SCORE_DETAIL_LEVELS = ("summary", "tiles")
 ScoreDetails = Literal["summary", "tiles"]
 _POOL_WEIGHTS = {"mean": 0.40, "tail": 0.35, "worst": 0.25}
@@ -42,6 +44,7 @@ class Measurement:
     features: dict[str, float]
     diagnostics: dict
     explanation: dict | None = None
+    alignment: dict | None = None
 
     @property
     def score(self):
@@ -53,16 +56,13 @@ def _validate_details(details):
         raise ValueError(f"Expected score details to be None, 'summary', or 'tiles', got {details!r}")
 
 
-def validate_rgb(pixels, shape=None):
+def validate_rgb(pixels):
     """Check the delivery grid, precision, and finite sample contract."""
     if not isinstance(pixels, np.ndarray):
         raise ValueError("The benchmark requires an RGB image array.")
     if pixels.ndim != 3 or pixels.shape[2] != 3 or not all(pixels.shape):
         raise ValueError(f"The benchmark requires a nonempty RGB image with three channels. "
                          f"The image has array shape {pixels.shape}.")
-    if shape is not None and pixels.shape != shape:
-        raise ValueError(f"The image is {pixels.shape[1]} × {pixels.shape[0]} pixels. The benchmark requires "
-                         f"the reference's native dimensions of {shape[1]} × {shape[0]} pixels.")
     if pixels.dtype.kind != "f" or pixels.dtype.itemsize != 4:
         raise ValueError(f"The image uses {pixels.dtype} samples. "
                          "The benchmark requires 32-bit floating-point linear-sRGB samples.")
@@ -168,15 +168,20 @@ def _maps(candidate, target, support=None):
     boundary = np.maximum(shape, overshoot * near_edge)
 
     # Work in float64 before subtraction so all finite float32 samples stay finite.
-    c64, t64 = candidate.astype(np.float64), target.astype(np.float64)
-    c_display, t_display = np.clip(c64, 0, 1), np.clip(t64, 0, 1)
-    headroom = abs((c64 - c_display) - (t64 - t_display))
-    # Detect flattening to an SDR endpoint relative to the expected sample.
-    at_endpoint = 1 - np.clip(np.minimum(c_display, 1 - c_display) / 0.012, 0, 1)
-    clipping = abs(c_display - t_display) * at_endpoint
-    range_error = _visibility(np.maximum(headroom, clipping).max(axis=2), 0.075).astype(np.float32)
-    c_exposure = np.maximum(_supported_mean(c64, support, axis=(0, 1)), 0) @ _XYZ[1]
-    t_exposure = np.maximum(_supported_mean(t64, support, axis=(0, 1)), 0) @ _XYZ[1]
+    # Work on one channel at a time to limit peak memory at native resolution.
+    range_error = np.zeros_like(cl)
+    for start in range(0, candidate.shape[0], 128):
+        rows = slice(start, start + 128)
+        channels = zip(np.moveaxis(candidate[rows], -1, 0), np.moveaxis(target[rows], -1, 0), strict=True)
+        for ci, ti in channels:
+            c64, t64 = ci.astype(np.float64), ti.astype(np.float64)
+            c_display, t_display = np.clip(c64, 0, 1), np.clip(t64, 0, 1)
+            headroom = abs((c64 - c_display) - (t64 - t_display))
+            at_endpoint = 1 - np.clip(np.minimum(c_display, 1 - c_display) / 0.012, 0, 1)
+            clipping = abs(c_display - t_display) * at_endpoint
+            np.maximum(range_error[rows], _visibility(np.maximum(headroom, clipping), 0.075), out=range_error[rows])
+    c_exposure = np.maximum(_supported_mean(candidate, support, axis=(0, 1)), 0) @ _XYZ[1]
+    t_exposure = np.maximum(_supported_mean(target, support, axis=(0, 1)), 0) @ _XYZ[1]
     return (tone, color, lost, extra, boundary, range_error), {
         "mean_delta_lightness": float(_supported_mean(delta, support)),
         "global_exposure_delta_stops": float(np.log2((c_exposure + 1e-5) / (t_exposure + 1e-5))),
@@ -229,7 +234,7 @@ class _TileGrid:
                 "values": {}}
 
 
-def _tile_grids(height, width, support):
+def _tile_grids(height, width, support, exact_box=None):
     support_integral = None if support is None else _integral(support)
     grids = []
     for side in (8, 32):
@@ -238,19 +243,26 @@ def _tile_grids(height, width, support):
             x = _axis_tiles(width, side, x_offset)
             covered = None if support_integral is None else _tile_totals(
                 support_integral, y[:-1], y[1:], x[:-1], x[1:]).astype(np.int32)
+            if exact_box is not None and exact_box != (0, 0, height, width):
+                top, left, bottom, right = exact_box
+                rows = np.maximum(0, np.minimum(y[1:], bottom) - np.maximum(y[:-1], top))
+                columns = np.maximum(0, np.minimum(x[1:], right) - np.maximum(x[:-1], left))
+                covered = rows[:, None] * columns
             grids.append(_TileGrid(side, (y_offset, x_offset), x, y, min(side, height) * min(side, width), covered))
     return grids
 
 
 def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=None):
     """Compute the metric and optionally retain the evidence from those same tiles."""
-    mean = float(_supported_mean(damage, support))
-    integral = _integral(damage if support is None else damage * support)
+    exact = damage is None
+    mean = 0.0 if exact else float(_supported_mean(damage, support))
+    integral = None if exact else _integral(damage if support is None else damage * support)
     worst, tail, region = 0.0, 0.0, None
     worst_tile, tail_selection, winning_tiles = None, None, None
     for grid in grids:
         # Even a short edge tile uses the full nominal area as its denominator.
-        tiles = np.clip(grid.totals(integral) / grid.nominal_pixels, 0, 1).ravel()
+        tiles = (np.zeros((grid.x.size - 1) * (grid.y.size - 1)) if exact else
+                 np.clip(grid.totals(integral) / grid.nominal_pixels, 0, 1).ravel())
         index = int(np.argmax(tiles))
         if tiles[index] > worst:
             worst = float(tiles[index])
@@ -276,7 +288,7 @@ def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=N
     contributions = {key: _POOL_WEIGHTS[key] * value for key, value in values.items()}
     summary = {
         "mean": mean, "tail": tail, "worst": worst, "worst_box_view_xyxy": region,
-        "affected_fraction": float(_supported_mean(damage >= _AFFECTED_THRESHOLD, support)),
+        "affected_fraction": 0.0 if exact else float(_supported_mean(damage >= _AFFECTED_THRESHOLD, support)),
     }
     components = None
     if explain:
@@ -299,10 +311,18 @@ def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=N
     return burden, summary, components
 
 
-def _measure(candidate, target, support=None, *, details=None):
+def _measure(candidate, target, support=None, *, details=None, exact_box=None):
     height, width = target.shape[:2]
-    maps, signed = _maps(candidate, target, support)
-    grids = _tile_grids(height, width, support)
+    if exact_box is None:
+        maps, signed = _maps(candidate, target, support)
+        measured_pixels = height * width if support is None else int(support.sum())
+    else:
+        top, left, bottom, right = exact_box
+        measured_pixels = (bottom - top) * (right - left)
+        maps = (None,) * len(FAMILY_WEIGHTS)
+        signed = dict.fromkeys(("mean_delta_lightness", "global_exposure_delta_stops",
+                                "mean_delta_lab_a", "mean_delta_lab_b"), 0.0)
+    grids = _tile_grids(height, width, support, exact_box) if exact_box is None or details is not None else []
     tile_data = {grid.id: grid.describe_tiles() for grid in grids} if details == "tiles" else None
     features = {}
     rows = {}
@@ -321,15 +341,19 @@ def _measure(candidate, target, support=None, *, details=None):
                               "affected_fraction": summary["affected_fraction"]}
     native = {"native_box_xyxy": (0, 0, width, height), "view_size_wh": (width, height),
               "families": rows, **signed}
-    if support is not None:
-        native["covered_fraction"] = float(support.mean())
-    rmse = float(np.sqrt(_supported_mean(np.square(np.subtract(candidate, target, dtype=np.float64)), support)))
+    if measured_pixels < height * width:
+        native["covered_fraction"] = measured_pixels / (height * width)
+    rmse = 0.0
+    if exact_box is None:
+        mse = np.mean([_supported_mean(np.square(np.subtract(c, t, dtype=np.float64)), support)
+                       for c, t in zip(np.moveaxis(candidate, -1, 0), np.moveaxis(target, -1, 0), strict=True)])
+        rmse = float(np.sqrt(mse))
     explanation = None
     if details is not None:
         explanation = {
             "reference_size_wh": [width, height], "damage_range": [0, 1], "affected_threshold": _AFFECTED_THRESHOLD,
             "weighted_damage": _weighted_damage(features), "families": families,
-            "measured_pixels": height * width if support is None else int(support.sum()),
+            "measured_pixels": measured_pixels,
             "diagnostics": {**signed, "linear_rgb_rmse": rmse},
         }
         if tile_data is not None:
@@ -338,15 +362,54 @@ def _measure(candidate, target, support=None, *, details=None):
 
 
 def measure(candidate, target, *, details: ScoreDetails | None = None):
-    """Compare two canonical float32 linear-sRGB images on the target grid.
+    """Score one delivered RGB image against the reference at its native resolution.
 
-    The result has a scalar `.score`. Request `summary` for weighted components,
-    or `tiles` for the exact grids of patch values used to pool those components.
+    Alignment and per-placement score terms are always available in `.alignment`.
+    Request `summary` for damage pooling components or `tiles` for local values.
     """
     _validate_details(details)
     validate_rgb(target)
-    validate_rgb(candidate, target.shape)
-    return _measure(candidate, target, details=details)
+    validate_rgb(candidate)
+    placements, alignment = align(candidate, target)
+    rows, explanations = [], []
+    leading = None
+    for placement in placements:
+        geometry, resolution, polygon = overlap(placement, target.shape[:2])
+        comparison = None
+        if geometry > 0:
+            if placement.evidence["source"] in {"exact_native_delivery_in_reference", "exact_reference_in_native_delivery"}:
+                comparison = _measure(None, target, details=details, exact_box=native_overlap(placement, target.shape))
+            else:
+                aligned, support = project(candidate, target.shape, placement)
+                if support is None or support.any():
+                    comparison = _measure(aligned, target, support, details=details)
+        quality = 0.0 if comparison is None else comparison.score
+        coverage = min(geometry, resolution)
+        weighted = placement.weight * coverage * quality
+        row = {**placement.pose.describe(), "evidence": placement.evidence,
+               "candidate_content_box_xyxy": _xyxy(placement.box), "padding": list(placement.padding),
+               "reference_overlap_polygon_xy": polygon, "geometric_coverage": geometry,
+               "resolution_cap": resolution, "coverage": coverage, "weight": placement.weight,
+               "overlap_score": quality, "score_contribution": weighted,
+               "comparison_status": "no_measured_reference_centers" if comparison is None else "measured"}
+        rows.append(row)
+        if leading is None:
+            leading = comparison
+        if details is not None:
+            explanations.append({**row, "comparison": None if comparison is None else comparison.explanation})
+    alignment["placements"] = rows
+    score = sum(row["score_contribution"] for row in rows)
+    explanation = None
+    if details is not None:
+        explanation = {
+            "schema_version": SCORE_EXPLANATION_VERSION, "profile": SCORE_VERSION, "detail_level": details,
+            "score": score, "damage_scale": SCORE_DAMAGE_SCALE,
+            "reference_size_wh": alignment["reference_size_wh"], "candidate_size_wh": alignment["candidate_size_wh"],
+            "confidence": alignment["confidence"], "alignment_status": alignment["status"],
+            "reason": alignment["reason"], "placements": explanations,
+        }
+    return Measurement(leading.features if leading else {}, leading.diagnostics if leading else {},
+                       explanation, alignment)
 
 
 def _weighted_damage(features):
@@ -354,13 +417,7 @@ def _weighted_damage(features):
 
 
 def scene_score(measurement):
-    """Apply the fixed reference-fidelity profile to the measured damage."""
+    """The final reference-fidelity score of a measurement."""
+    if measurement.alignment is not None:
+        return sum(row["score_contribution"] for row in measurement.alignment["placements"])
     return float(100 * np.exp(-SCORE_DAMAGE_SCALE * _weighted_damage(measurement.features)))
-
-
-def _score_explanation(profile, details, candidate, target, score, confidence, placements):
-    return {
-        "schema_version": SCORE_EXPLANATION_VERSION, "profile": profile, "detail_level": details, "score": score,
-        "damage_scale": SCORE_DAMAGE_SCALE, "reference_size_wh": list(target.shape[1::-1]),
-        "candidate_size_wh": list(candidate.shape[1::-1]), "confidence": confidence, "placements": placements,
-    }

@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
 
-from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, Measurement, measure, scene_score
+from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, Measurement, _measure, measure, scene_score
 
 
 def rgb(pixels):
@@ -10,7 +10,7 @@ def rgb(pixels):
 
 
 def score(candidate, target):
-    return scene_score(measure(candidate, target))
+    return scene_score(_measure(candidate, target))
 
 
 def test_exact_match_preserves_grain_bokeh_and_headroom():
@@ -30,7 +30,7 @@ def test_missing_nyquist_detail_grows_continuously_in_four_directions():
     for carrier in (x, y, x + y, x - y):
         values = []
         for amplitude in (0.014, 0.019, 0.021, 0.028):
-            lost = measure(rgb(colors), rgb(colors + amplitude * (2 * (carrier % 2) - 1)))
+            lost = _measure(rgb(colors), rgb(colors + amplitude * (2 * (carrier % 2) - 1)))
             assert lost.features["native.lost_detail"] > 0
             values.append(scene_score(lost))
         assert all(a > b for a, b in zip(values, values[1:]))
@@ -113,10 +113,10 @@ def test_explanation_recomposes_score_from_real_tiles():
     assert summary.score == detailed.score == baseline.score
     assert summary.features == detailed.features == baseline.features
     assert summary.diagnostics == detailed.diagnostics == baseline.diagnostics
-    explanation = detailed.explanation
+    explanation = detailed.explanation["placements"][0]["comparison"]
     assert explanation["reference_size_wh"] == [151, 113]
     assert "tile_grids" not in summary.explanation
-    assert explanation["weighted_damage"] == summary.explanation["weighted_damage"]
+    assert explanation["weighted_damage"] == summary.explanation["placements"][0]["comparison"]["weighted_damage"]
     grids = explanation["tile_grids"]
     assert len(grids) == 8
     for grid in grids.values():
@@ -157,7 +157,6 @@ def test_explanation_recomposes_score_from_real_tiles():
 
 @pytest.mark.parametrize(("delivery", "reason"), [
     (np.zeros((5, 4, 3)), "uses float64 samples"),
-    (np.zeros((4, 4, 3), np.float32), "image is 4 × 4 pixels.*4 × 5 pixels"),
     (np.full((5, 4, 3), np.nan, np.float32), "non-finite pixel values"),
     (np.zeros((5, 4, 4), np.float32), "requires a nonempty RGB image with three channels"),
 ])

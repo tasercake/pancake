@@ -553,6 +553,7 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
                       str(path.parents[1]), "--output", str(report)]) == 0
         benchmark_row, = json.loads((report / "report.json").read_text())["scenes"]
         assert benchmark_row["scene_score"] == score
+        assert benchmark_row["alignment"] == result["benchmark"]["alignment"]
 
         reopened = open_review(root, store)
         assert reopened.scene_details(scene, run)["outputs"][0]["benchmark"] == result["benchmark"]
@@ -586,17 +587,16 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
             while ("scores", 2) not in map(event_payload, reopened.events.take(reader, writer)):
                 pass
         cropped, = reopened.scene_details(scene, run)["outputs"]
-        assert cropped["benchmark"]["status"] == "invalid_output"
-        assert cropped["benchmark"]["score"] == 0
-        assert "image is 7 × 6 pixels" in cropped["benchmark"]["error"]
-        assert "native dimensions of 8 × 6 pixels" in cropped["benchmark"]["error"]
+        assert cropped["benchmark"]["status"] == "ok"
+        assert 0 < cropped["benchmark"]["score"] < score
+        assert cropped["benchmark"]["alignment"]["placements"][0]["coverage"] == 7 / 8
         assert calls == ["summary", "tiles", "summary"]
 
         reopened.scores.close()
         receipt = path.parents[2] / "scores" / f"{scene}.json"
         saved = json.loads(receipt.read_text())
-        saved.pop("invalid_detail_version")
-        saved["result"]["error"] = "Expected finite float32 linear-sRGB RGB on the (6, 8, 3) grid"
+        saved["identity"][0] = "reference-fidelity-v2"
+        saved["result"]["profile"] = "reference-fidelity-v2"
         receipt.write_text(json.dumps(saved))
         reopened = open_review(root, store)
         with reopened.events.subscribe() as (reader, writer):
