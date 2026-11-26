@@ -1,6 +1,7 @@
 """Serve the BokehForge rating app over HTTP."""
 
 import argparse
+from contextlib import suppress
 from hashlib import sha256
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from ipaddress import ip_address
@@ -12,6 +13,7 @@ from threading import Lock, Thread
 from urllib.parse import parse_qs, urlsplit
 
 from .. import SceneCatalog
+from ..bench import has_benchmark_reference
 from ..data._canonical import RETIRED_LAYOUTS
 from ..data._config import DEFAULT_CONFIG, read_config
 from ..data._files import safe_path
@@ -183,11 +185,20 @@ class Review:
         scene = catalog.scene(scene_id)
         ratings = self.ratings.get(run_id, scene.id) if run_id else {}
         outputs = self.runs.scene_results(run_id, catalog, scene)
+        benchmark_supported = has_benchmark_reference(scene)
         for result in outputs:
             ready = result["status"] == "ready"
             result["rating"] = ratings.get(result["stacker"]) if ready else None
-            if ready:
-                result["benchmark"] = self.scores.get(catalog, scene, self.runs.directory(run_id), result)
+            if not ready:
+                continue
+            directory = self.runs.directory(run_id)
+            if benchmark_supported:
+                benchmark = self.scores.get(catalog, scene, directory, result)
+                result["benchmark"] = benchmark
+                result["artifact_revision"] = benchmark.get("artifact_revision")
+            else:
+                with suppress(OSError):
+                    result["artifact_revision"] = output_revision(output_identity(directory / result["image"]))
         return {"frames": [self.frame_info(catalog, frame_id) for frame_id in scene.frame_ids],
                 "references": [self.frame_info(catalog, frame_id) for frame_id in scene.reference_ids],
                 "reference_type": scene.metadata["reference_type"],
@@ -212,6 +223,8 @@ class Review:
     def score_tiles(self, query):
         catalog = self.require_catalog()
         scene = catalog.scene(query["scene"])
+        if not has_benchmark_reference(scene):
+            raise KeyError("Benchmark tiles require a supported RGB ground-truth image")
         run_id = query["run"]
         result = next((row for row in self.runs.scene_results(run_id, catalog, scene)
                        if row["stacker"] == query["stacker"] and row["status"] == "ready"), None)

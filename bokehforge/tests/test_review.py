@@ -134,19 +134,21 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     assert summary_scene["preview_frame"] == inspected["frames"][1]["id"]
     successful, failed = inspected["outputs"]
     assert successful["status"] == "ready"
-    unscored = successful["benchmark"]
-    assert (unscored["profile"], unscored["status"], unscored["score"]) == (SCORE_VERSION, "unscored", None)
-    assert len(unscored["artifact_revision"]) == 64
+    assert "benchmark" not in successful
+    assert len(successful["artifact_revision"]) == 64
+    assert app.scores.worker is None
     assert failed["status"] == "failed" and failed["error"] == "example exit"
     assert all(row["status"] == "outside_scope" for row in app.scene_details(other, job)["outputs"])
 
     choice = {"run": job, "scene": scene, "stacker": "pancake"}
+    with pytest.raises(KeyError, match="ground-truth"):
+        app.score_tiles({**choice, "rev": successful["artifact_revision"], "family": "tone", "side": "8"})
     path = app.artifact(choice, "image")
     assert path == store / "runs" / job / "pancake/images" / (scene + ".tif")
     pixels = tifffile.imread(path)
     assert pixels.dtype == np.float32
     assert np.allclose(pixels, 0.25, atol=2e-5)
-    mime, preview = app.image({**choice, "size": "native"})
+    mime, preview = app.image({**choice, "size": "native", "rev": successful["artifact_revision"]})
     assert mime == "image/png"
     assert Image.open(BytesIO(preview)).size == (8, 6)
 
@@ -511,6 +513,7 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
         score = result["benchmark"]["score"]
         assert 0 < score < 100
         assert result["benchmark"]["profile"] == SCORE_VERSION
+        assert result["artifact_revision"] == result["benchmark"]["artifact_revision"]
         assert calls == ["summary"]
         comparison = result["benchmark"]["explanation"]["placements"][0]["comparison"]
         assert len(comparison["families"]) == 6 and "tile_grids" not in comparison

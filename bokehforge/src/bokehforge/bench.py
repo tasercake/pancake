@@ -102,16 +102,18 @@ def _read_frames(catalog, scene, row, workers):
 
 
 def has_benchmark_reference(scene):
-    return scene.metadata["reference_type"] in _RGB_REFERENCES and bool(scene.reference_ids)
+    return scene.metadata["reference_type"] in _RGB_REFERENCES and len(scene.reference_ids) == 1
+
+
+def _require_benchmark_reference(scene):
+    if not has_benchmark_reference(scene):
+        kind = scene.metadata["reference_type"]
+        raise ValueError(f"Benchmark scene {scene.id} requires exactly one supported RGB ground-truth image "
+                         f"(reference type {kind!r}, found {len(scene.reference_ids)} images).")
 
 
 def _reference(catalog, scene, row):
-    if not has_benchmark_reference(scene):
-        row.update(status="unscored", reference_status="no_eligible_reference")
-        return None
     try:
-        if len(scene.reference_ids) != 1:
-            raise ValueError("Expected exactly one RGB reference")
         reference = catalog.decode(scene.reference_ids[0])
         validate_rgb(reference.data)
         if reference.alpha is not None:
@@ -208,10 +210,11 @@ def _score_delivery(result, reference, row, profile, *, details=None):
 
 
 def score_saved_output(catalog, scene, path, *, profile=SCORE_VERSION, details: ScoreDetails | None = None):
-    """Score an existing canonical TIFF and optionally return its measurement evidence."""
+    """Compare a canonical TIFF with the scene's required RGB ground truth."""
     _validate_details(details)
     if profile not in (SCORE_VERSION, CROP_SCORE_VERSION):
         raise ValueError(f"Unknown score profile {profile!r}")
+    _require_benchmark_reference(scene)
     row = {"status": "ok", "scene_score": None}
     explanation = None
     reference = _reference(catalog, scene, row)
@@ -299,9 +302,9 @@ def _score(rows, *, explanation=None):
     group_means = {dataset: {group: fmean(scores) for group, scores in group_rows.items()}
                    for dataset, group_rows in datasets.items()}
     dataset_means = {dataset: fmean(scores.values()) for dataset, scores in group_means.items()}
-    score = fmean(dataset_means.values()) if dataset_means and not unavailable else None
+    score = None if unavailable else fmean(dataset_means.values())
     if explanation is not None:
-        explanation.update(score=score, status="evaluation_error" if unavailable else "ok" if dataset_means else "unscored",
+        explanation.update(score=score, status="evaluation_error" if unavailable else "ok",
                            datasets={
                                dataset: {"score": score, "weight": 1 / len(dataset_means), "groups": {
                                    group: {"score": mean, "weight": 1 / len(group_means[dataset]),
@@ -320,7 +323,8 @@ def main(argv=None):
     parser.add_argument("--output", required=True, type=Path, help="New directory for the report and optional images")
     parser.add_argument("--root", type=Path, help="Dataset directory used by data download")
     parser.add_argument("--dataset", action="append", help="Dataset ID, repeatable. Defaults to configured downloads")
-    parser.add_argument("--scene", action="append", help="Exact catalog scene ID, repeatable. Default: all selected scenes")
+    parser.add_argument("--scene", action="append",
+                        help="Exact catalog scene ID, repeatable. Every selected scene requires RGB ground truth")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
     parser.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
     parser.add_argument("--score-profile", choices=(SCORE_VERSION, CROP_SCORE_VERSION), default=SCORE_VERSION,
@@ -335,12 +339,6 @@ def main(argv=None):
         raise ValueError(f"Output directory already exists: {args.output}")
     root = args.root or data_root(args.config, read_config(args.config).get("defaults", {}))
 
-    if args.candidate_dir is not None:
-        if not args.candidate_dir.is_dir():
-            raise ValueError(f"Candidate directory does not exist: {args.candidate_dir}")
-        algorithm, implementation = None, {"candidate_dir": str(args.candidate_dir.resolve())}
-    else:
-        algorithm, implementation = _load_algorithm(args.algorithm)
     start = perf_counter()
     catalog = SceneCatalog(root, datasets=args.dataset, config=args.config, lock=args.lock)
     selected = set(args.scene or catalog.scene_ids)
@@ -349,6 +347,15 @@ def main(argv=None):
     scenes = [catalog.scene(scene_id) for scene_id in catalog.scene_ids if scene_id in selected]
     if not scenes:
         raise ValueError("No benchmark scenes in the selected datasets")
+    for scene in scenes:
+        _require_benchmark_reference(scene)
+
+    if args.candidate_dir is not None:
+        if not args.candidate_dir.is_dir():
+            raise ValueError(f"Candidate directory does not exist: {args.candidate_dir}")
+        algorithm, implementation = None, {"candidate_dir": str(args.candidate_dir.resolve())}
+    else:
+        algorithm, implementation = _load_algorithm(args.algorithm)
     rows = [_describe_scene(catalog, scene) for scene in scenes]
     cohort_hash = _hash(rows)
     args.output.mkdir(parents=True)
@@ -385,4 +392,4 @@ def main(argv=None):
         report["score_aggregation"] = aggregation
     save_json(args.output / "report.json", report)
     print("unscored" if score is None else f"{score:.6f}")
-    return int(any(status not in {"ok", "unscored"} for status in statuses))
+    return int(any(status != "ok" for status in statuses))

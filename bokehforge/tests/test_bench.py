@@ -12,7 +12,7 @@ from PIL import Image
 from bokehforge.alignment import CROP_SCORE_VERSION
 from bokehforge.bench import _score, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
-from bokehforge.data.lazy import SceneCatalog
+from bokehforge.data.lazy import Scene, SceneCatalog
 from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, SCORE_EXPLANATION_VERSION, SCORE_VERSION
 
 _FIXTURE_REFERENCE = np.float32(20 / 255)
@@ -59,7 +59,8 @@ def run_bench(root, output, *args, env=None):
 
 def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     output = tmp_path / "mean"
-    result = run_bench(corpus, output, "--algorithm", "mean", "--decode-workers", "2", "--save-images")
+    result = run_bench(corpus, output, "--dataset", "referenced", "--algorithm", "mean",
+                       "--decode-workers", "2", "--save-images")
     assert result.returncode == 0, result.stderr
     assert result.stdout == "100.000000\n"
     report = json.loads((output / "report.json").read_text())
@@ -69,12 +70,10 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert report["scoring"]["family_weights"] == FAMILY_WEIGHTS
     assert "view_weights" not in report["scoring"]
     assert report["scoring"]["damage_scale"] == SCORE_DAMAGE_SCALE
-    assert report["scene_status_counts"] == {"ok": 1, "unscored": 1}
-    assert report["reference_status_counts"] == {"eligible": 1, "no_eligible_reference": 1}
-    assert {row["dataset_id"]: row["scene_score"] for row in report["scenes"]} == {
-        "field": None, "referenced": 100.0,
-    }
-    target = next(row for row in report["scenes"] if row["reference_status"] == "eligible")
+    assert report["scene_status_counts"] == {"ok": 1}
+    assert report["reference_status_counts"] == {"eligible": 1}
+    target, = report["scenes"]
+    assert target["dataset_id"] == "referenced" and target["scene_score"] == 100.0
     assert target["frames_read"] == target["frame_count"] == 9
     pixels = tifffile.imread(output / target["image"])
     assert pixels.dtype == np.float32
@@ -84,7 +83,8 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert "score_explanation_path" not in target
 
     replay_dir = tmp_path / "replay"
-    replay = run_bench(corpus, replay_dir, "--candidate-dir", str(output / "images"), "--explain-score", "tiles")
+    replay = run_bench(corpus, replay_dir, "--scene", target["scene_id"],
+                       "--candidate-dir", str(output / "images"), "--explain-score", "tiles")
     assert replay.returncode == 0, replay.stderr
     assert replay.stdout == result.stdout
     replay_report = json.loads((replay_dir / "report.json").read_text())
@@ -108,7 +108,8 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
 
     missing = tmp_path / "empty"
     missing.mkdir()
-    result_missing = run_bench(corpus, tmp_path / "report-missing", "--candidate-dir", str(missing))
+    result_missing = run_bench(corpus, tmp_path / "report-missing", "--dataset", "referenced",
+                                "--candidate-dir", str(missing))
     assert result_missing.returncode == 1
     assert result_missing.stdout == "0.000000\n"
 
@@ -126,23 +127,21 @@ def test_external_stacker_failure_counts_and_cohort_is_stable(corpus, tmp_path):
         "    frame = next(scene.frames)\n"
         "    assert not frame.pixels.flags.writeable\n"
         "    assert frame.ordinal == 0 and frame.id == scene.frame_ids[0]\n"
-        "    if scene.scene_id.startswith('referenced/'):\n"
-        "        return frame.pixels[:-1]\n"
-        "    return frame.pixels\n"
+        "    return frame.pixels[:-1]\n"
     )
     output = tmp_path / "external"
-    result = run_bench(corpus, output, "--algorithm", "fixture_stacker:stack",
+    result = run_bench(corpus, output, "--dataset", "referenced", "--algorithm", "fixture_stacker:stack",
                        env={**os.environ, "PYTHONPATH": str(tmp_path)})
     assert result.returncode == 1, result.stderr
     assert result.stdout == "0.000000\n"
     assert "loading fixture stacker" in result.stderr and "stacking fixture scene" in result.stderr
     report = json.loads((output / "report.json").read_text())
-    assert report["scene_status_counts"] == {"invalid_output": 1, "unscored": 1}
-    assert {row["dataset_id"]: row["frames_read"] for row in report["scenes"]} == {"field": 0, "referenced": 9}
+    assert report["scene_status_counts"] == {"invalid_output": 1}
+    assert {row["dataset_id"]: row["frames_read"] for row in report["scenes"]} == {"referenced": 9}
     assert report["algorithm"]["module_sha256"] == sha256(plugin.read_bytes()).hexdigest()
 
     baseline = tmp_path / "mean"
-    assert run_bench(corpus, baseline, "--algorithm", "mean").returncode == 0
+    assert run_bench(corpus, baseline, "--dataset", "referenced", "--algorithm", "mean").returncode == 0
     assert report["cohort_sha256"] == json.loads((baseline / "report.json").read_text())["cohort_sha256"]
 
 
@@ -150,12 +149,12 @@ def test_crop_profile_scores_original_delivery_and_replays_it(corpus, tmp_path):
     plugin = tmp_path / "crop_stacker.py"
     plugin.write_text("def stack(scene):\n    return next(scene.frames).pixels[1:, 1:]\n")
     env = {**os.environ, "PYTHONPATH": str(tmp_path)}
-    fixed = run_bench(corpus, tmp_path / "fixed", "--algorithm", "crop_stacker:stack", env=env)
+    fixed = run_bench(corpus, tmp_path / "fixed", "--dataset", "referenced", "--algorithm", "crop_stacker:stack", env=env)
     assert fixed.returncode == 1
     assert fixed.stdout == "0.000000\n"
 
     output = tmp_path / "crop"
-    cropped = run_bench(corpus, output, "--algorithm", "crop_stacker:stack", "--save-images",
+    cropped = run_bench(corpus, output, "--dataset", "referenced", "--algorithm", "crop_stacker:stack", "--save-images",
                         "--score-profile", CROP_SCORE_VERSION, env=env)
     assert cropped.returncode == 0, cropped.stderr
     assert cropped.stdout == "50.000000\n"
@@ -166,18 +165,47 @@ def test_crop_profile_scores_original_delivery_and_replays_it(corpus, tmp_path):
     assert scene["alignment"]["placements"][0]["overlap_score"] == 100
     assert tifffile.imread(output / scene["image"]).shape == (2, 3, 3)
 
-    replay = run_bench(corpus, tmp_path / "replay", "--candidate-dir", str(output / "images"),
+    replay = run_bench(corpus, tmp_path / "replay", "--dataset", "referenced", "--candidate-dir", str(output / "images"),
                        "--score-profile", CROP_SCORE_VERSION)
     assert replay.returncode == 0, replay.stderr
     assert replay.stdout == cropped.stdout
 
 
-def test_unreferenced_selection_is_unscored(corpus, tmp_path):
+@pytest.mark.parametrize("selection", [(), ("--dataset", "field")])
+def test_bench_rejects_selections_without_ground_truth(corpus, tmp_path, selection):
+    plugin = tmp_path / "must_not_load.py"
+    plugin.write_text("raise AssertionError('stacker loaded before reference validation')\n")
     output = tmp_path / "field"
-    result = run_bench(corpus, output, "--algorithm", "mean", "--dataset", "field")
-    assert result.returncode == 0, result.stderr
-    assert result.stdout == "unscored\n"
-    assert json.loads((output / "report.json").read_text())["score"] is None
+    result = run_bench(corpus, output, *selection, "--algorithm", "must_not_load:stack",
+                       env={**os.environ, "PYTHONPATH": str(tmp_path)})
+    assert result.returncode == 2, result.stderr
+    assert result.stdout == ""
+    assert "Benchmark scene field/" in result.stderr
+    assert "requires exactly one supported RGB ground-truth image" in result.stderr
+    assert not output.exists()
+
+
+def test_replay_rejects_selection_without_ground_truth(corpus, tmp_path):
+    candidates = tmp_path / "candidates"
+    candidates.mkdir()
+    output = tmp_path / "replay"
+    result = run_bench(corpus, output, "--candidate-dir", str(candidates))
+    assert result.returncode == 2, result.stderr
+    assert result.stdout == ""
+    assert "requires exactly one supported RGB ground-truth image" in result.stderr
+    assert not output.exists()
+
+
+@pytest.mark.parametrize(("reference_type", "reference_ids"), [
+    ("none", ()),
+    ("rendered_all_in_focus", ()),
+    ("focal_stack", ("source",)),
+    ("rendered_all_in_focus", ("first", "second")),
+])
+def test_score_saved_output_requires_one_supported_reference(tmp_path, reference_type, reference_ids):
+    scene = Scene("example", (), reference_ids, {"reference_type": reference_type})
+    with pytest.raises(ValueError, match="requires exactly one supported RGB ground-truth image"):
+        score_saved_output(None, scene, tmp_path / "output.tif")
 
 
 def test_focal_decode_error_is_reported_even_after_early_return(corpus, tmp_path):
