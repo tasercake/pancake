@@ -90,9 +90,9 @@ function imageURL(params, size) {
   return url("/api/image", { ...params, size, v: imageVersion });
 }
 
-function outputParams(sceneId, run, stacker, benchmark) {
+function outputParams(sceneId, run, stacker, revision) {
   const params = { scene: sceneId, run, stacker };
-  if (benchmark?.artifact_revision) params.rev = benchmark.artifact_revision;
+  if (revision) params.rev = revision;
   return params;
 }
 
@@ -229,7 +229,7 @@ function setLightboxGallery(gallery, data) {
   for (const output of data.outputs) {
     if (output.status === "ready") images.push({
       title: stackerLabel(output.stacker),
-      params: outputParams(gallery.scene, gallery.run, output.stacker, output.benchmark),
+      params: outputParams(gallery.scene, gallery.run, output.stacker, output.artifact_revision),
     });
   }
   const reference = data.references[gallery.reference];
@@ -911,10 +911,9 @@ function renderBenchmark(label, benchmark, compact = false) {
     text = compact ? `Score ${value} / 100` : `Benchmark score ${value} / 100`;
     if (invalid) text += " · Invalid delivery";
   } else if (benchmark) {
-    const messages = compact
-      ? { pending: "Scoring…", unscored: "Unscored" }
-      : { pending: "Calculating benchmark score…", unscored: "No eligible benchmark reference" };
-    text = messages[benchmark.status] ?? "Benchmark score unavailable";
+    text = benchmark.status === "pending"
+      ? (compact ? "Scoring…" : "Calculating benchmark score…")
+      : "Benchmark score unavailable";
   }
   if (label.textContent !== text) label.textContent = text;
   line.dataset.scored = scored;
@@ -975,7 +974,7 @@ function renderOutput() {
   const readyCount = outputs.filter((output) => output.status === "ready").length;
   const ratedCount = outputs.filter((output) => output.rating).length;
   $("rating-count").textContent = readyCount ? `${ratedCount} of ${readyCount} available outputs rated` : "";
-  const params = outputParams(scene.id, runId, stackerId, row?.benchmark);
+  const params = outputParams(scene.id, runId, stackerId, row?.artifact_revision);
   candidateScore = row?.status === "ready" ? { params, benchmark: row.benchmark } : null;
   const currentImage = JSON.stringify([params, row?.status, row?.image, row?.error, !details || outputLoading]);
   if (candidateState !== currentImage) {

@@ -4,7 +4,7 @@ from collections import OrderedDict
 import json
 from threading import Condition, Thread
 
-from ..bench import has_benchmark_reference, score_saved_output
+from ..bench import score_saved_output
 from ..scoring import FAMILY_WEIGHTS, SCORE_EXPLANATION_VERSION, SCORE_VERSION
 from .images import output_identity, output_revision
 
@@ -35,8 +35,6 @@ class Scores:
         fields = {"profile": SCORE_VERSION, "score": None, "artifact_revision": revision}
         if expected_revision is not None and expected_revision != revision:
             return {**fields, "status": "stale"}
-        if not has_benchmark_reference(scene):
-            return {**fields, "status": "unscored"}
         identity = (SCORE_VERSION, scene.metadata["recipe_sha256"], result["scene_fingerprint"],
                     *artifact[1:])
         key = (receipt, identity, detail)
