@@ -12,6 +12,8 @@ from pathlib import Path, PurePosixPath
 TARGET = "x86_64-unknown-linux-gnu"
 ROOTS = ("pancake-cli", "pancake-gui")
 DOC_DIRECTORY = Path("usr/share/doc/pancake/dependency-notices")
+GUI_FONT_NOTICES = tuple(PurePosixPath("assets/fonts") / name
+                         for name in ("IBMPlexMono-OFL.txt", "SpaceGrotesk-OFL.txt"))
 NOTICE_NAME = re.compile(
     r"^(?:licen[cs]es?|licensing|unlicense|copying|copyright|notices?|authors|patents|"
     r"third[-_ ]party[-_ ](?:licenses?|notices?))"
@@ -124,17 +126,22 @@ def _local_notices(package, source, repository, revision, vendor_map):
     relative = crate.relative_to(repository).as_posix()
     vendored = crate.is_relative_to(source / "vendor")
     listing = _command(repository, "git", "ls-tree", "-r", "-z", revision, "--", relative)
+    font_notices = set(GUI_FONT_NOTICES) if package["name"] == "pancake-gui" else set()
     files = {}
     for entry in filter(None, listing.split(b"\0")):
         metadata, name = entry.split(b"\t", 1)
         mode, _, blob = metadata.decode().split()
         path = PurePosixPath(name.decode()).relative_to(relative)
+        font_notice = path in font_notices
         # The workspace root also contains sibling crates and the complete vendor tree.
         if (not vendored and len(path.parts) > 1 and path.parts[0].casefold() not in {"licenses", "licences"}
-                and str(path) != package["license_file"]):
+                and not font_notice and str(path) != package["license_file"]):
             continue
-        if mode in {"100644", "100755"} and _notice_path(path, package["license_file"]):
+        if mode in {"100644", "100755"} and (font_notice or _notice_path(path, package["license_file"])):
             files[path] = _command(repository, "git", "cat-file", "blob", blob)
+    missing = font_notices - files.keys()
+    if missing:
+        raise ValueError(f"Missing bundled font notices: {', '.join(str(path) for path in sorted(missing))}")
     provenance = {"commit": revision, "directory": relative}
     if vendored:
         provenance["upstream_patch"] = vendor_map.get((package["name"], package["version"], crate.name))

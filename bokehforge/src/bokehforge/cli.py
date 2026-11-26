@@ -1,4 +1,4 @@
-"""Command-line entry point for Bokehforge."""
+"""Command-line entry point for BokehForge."""
 
 import argparse
 import sys
@@ -6,9 +6,9 @@ import sys
 
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="bokehforge", description="A measurement-first workbench for focus stacking.")
-    groups = parser.add_subparsers(dest="group", required=True)
+    groups = parser.add_subparsers(dest="group", required=True, title="Commands", metavar="COMMAND")
     data = groups.add_parser("data", help="Acquire evaluation datasets")
-    actions = data.add_subparsers(dest="action", required=True)
+    actions = data.add_subparsers(dest="action", required=True, title="Data commands", metavar="COMMAND")
     actions.add_parser("download", add_help=False, help="Download verified originals")
     groups.add_parser("bench", add_help=False, help="Score a stacker against RGB ground truth")
     groups.add_parser("review", add_help=False, help="Browse and rate focus stacks locally")

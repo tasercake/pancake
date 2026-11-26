@@ -317,23 +317,33 @@ def _score(rows, *, explanation=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="bokehforge bench", description=__doc__)
-    candidate = parser.add_mutually_exclusive_group(required=True)
+    source = parser.add_argument_group("Stack source")
+    candidate = source.add_mutually_exclusive_group(required=True)
     candidate.add_argument("--algorithm", help="mean or an importable Python module:callable")
     candidate.add_argument("--candidate-dir", type=Path, help="Evaluate existing canonical TIFFs by scene ID")
-    parser.add_argument("--output", required=True, type=Path, help="New directory for the report and optional images")
-    parser.add_argument("--root", type=Path, help="Dataset directory used by data download")
-    parser.add_argument("--dataset", action="append", help="Dataset ID, repeatable. Defaults to configured downloads")
-    parser.add_argument("--scene", action="append",
-                        help="Exact catalog scene ID, repeatable. Every selected scene requires RGB ground truth")
-    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
-    parser.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
-    parser.add_argument("--score-profile", choices=(SCORE_VERSION, CROP_SCORE_VERSION), default=SCORE_VERSION,
-                        help="Score on the fixed reference grid or match a delivered crop to it")
-    parser.add_argument("--explain-score", choices=SCORE_DETAIL_LEVELS,
-                        help="Save per-scene score components and optionally all scoring tiles")
-    parser.add_argument("--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)")
-    parser.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
-    parser.add_argument("--progress", action="store_true", help="Write progress to stderr")
+    selection = parser.add_argument_group("Scene selection")
+    selection.add_argument("--root", type=Path, help="Dataset directory used by data download")
+    selection.add_argument("--dataset", action="append", help="Dataset ID, repeatable. Defaults to configured downloads")
+    selection.add_argument("--scene", action="append",
+                           help="Exact catalog scene ID, repeatable. Every selected scene requires RGB ground truth")
+    selection.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
+    selection.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
+    score_options = parser.add_argument_group("Scoring")
+    score_options.add_argument(
+        "--score-profile", choices=(SCORE_VERSION, CROP_SCORE_VERSION), default=SCORE_VERSION,
+        help="Score on the fixed reference grid or match a delivered crop to it",
+    )
+    score_options.add_argument(
+        "--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)",
+    )
+    report_options = parser.add_argument_group("Report")
+    report_options.add_argument("--output", required=True, type=Path, help="New directory for the report and optional images")
+    report_options.add_argument(
+        "--explain-score", choices=SCORE_DETAIL_LEVELS,
+        help="Save per-scene score components and optionally all scoring tiles",
+    )
+    report_options.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
+    report_options.add_argument("--progress", action="store_true", help="Write progress to stderr")
     args = parser.parse_args(argv)
     if args.output.exists():
         raise ValueError(f"Output directory already exists: {args.output}")

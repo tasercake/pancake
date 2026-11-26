@@ -12,7 +12,7 @@ import tempfile
 import tomllib
 from pathlib import Path, PurePosixPath
 
-from package_notices import file_sha256
+from package_notices import GUI_FONT_NOTICES, file_sha256
 
 
 TARGET = "aarch64-apple-darwin"
@@ -169,6 +169,15 @@ def build_package(source, output, identifier, build_number, *, target_dir=None):
                 "source_sha256": digest,
                 **_inspect_binary(source, staged),
             }
+        # Keep the notices with the app when it is moved out of the ZIP.
+        font_notices = contents / "Resources/font-notices"
+        font_notices.mkdir(parents=True)
+        for relative in GUI_FONT_NOTICES:
+            original = source / "crates/pancake-gui" / relative
+            staged = font_notices / relative.name
+            shutil.copyfile(original, staged)
+            if file_sha256(staged) != file_sha256(original):
+                raise ValueError(f"Font notice changed while copying {relative.name}")
         executables["pancake-cli"]["signature"] = _sign_and_verify(
             source, payload / "pancake-cli", f"{identifier}.cli",
         )

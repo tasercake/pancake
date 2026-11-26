@@ -1,16 +1,20 @@
 //! Native Pancake desktop application.
 
+use std::cell::Cell;
 use std::error::Error;
 use std::io::{self, Write as _};
 use std::path::PathBuf;
+use std::rc::Rc;
 
-use slint::{BackendSelector, ComponentHandle, SharedString};
+use slint::{BackendSelector, Color, ComponentHandle, SharedString};
 use slint_interpreter::{Compiler, ComponentDefinition, ComponentInstance, Value};
 
-use preferences::{Preferences, Store};
+use preferences::{Accent, Preferences, Store};
 
+pub mod branding;
 pub mod delivery;
 pub mod desktop_menu;
+pub mod filmstrip;
 pub mod history;
 #[cfg(any(target_os = "macos", test))]
 pub mod lightroom;
@@ -33,23 +37,103 @@ pub(crate) fn show_error(window: &ComponentInstance, message: &str) {
     }
 }
 
-/// Commit two actual choices to the active preference profile.
-///
+/// Select two native choices without changing the stored accent.
 /// # Errors
-///
-/// Returns invalid-choice or profile-write errors.
-fn save_preferences(store: &Store, args: &[Value]) -> Result<(), Box<dyn Error>> {
+/// Returns invalid-choice or callback data errors.
+fn change_choices(current: Preferences, args: &[Value]) -> Result<Preferences, String> {
     let [Value::String(theme), Value::String(device)] = args else {
         return Err("Preferences panel supplied invalid values.".into());
     };
-    store.save(Preferences::from_choices(theme.as_str(), device.as_str())?)
+    let chosen = Preferences::from_choices(theme.as_str(), device.as_str())?;
+    Ok(Preferences {
+        accent: current.accent,
+        ..chosen
+    })
+}
+
+/// Update the requested accent without changing the stored theme or device.
+/// # Errors
+/// Returns an invalid accent or callback payload error.
+fn change_accent(current: Preferences, args: &[Value]) -> Result<Preferences, String> {
+    let [Value::String(accent)] = args else {
+        return Err("Preferences panel supplied an invalid accent.".into());
+    };
+    Ok(Preferences {
+        accent: Accent::parse(accent.as_str())?,
+        ..current
+    })
+}
+
+/// Publish the persisted choices and the colors resolved for their theme.
+/// # Errors
+/// Returns errors from native property bindings.
+fn apply_preferences(
+    window: &ComponentInstance,
+    preferences: Preferences,
+) -> Result<(), Box<dyn Error>> {
+    window.set_property("theme-index", i32::from(preferences.theme.index()).into())?;
+    window.set_property("device-index", i32::from(preferences.device.index()).into())?;
+    window.set_property(
+        "accent-value",
+        SharedString::from(preferences.accent.hex()).into(),
+    )?;
+    let ([red, green, blue], [ink_red, ink_green, ink_blue]) =
+        preferences.accent.presentation(preferences.theme);
+    window.set_property(
+        "accent-surface",
+        Color::from_rgb_u8(red, green, blue).into(),
+    )?;
+    window.set_property(
+        "accent-ink",
+        Color::from_rgb_u8(ink_red, ink_green, ink_blue).into(),
+    )?;
+    Ok(())
+}
+
+/// Preference transformations start from the last committed state.
+type ChangePreference = fn(Preferences, &[Value]) -> Result<Preferences, String>;
+
+/// Attach one preference action, keeping in-memory state and disk in sync.
+/// # Errors
+/// Returns errors from the corresponding native callback binding.
+fn bind_preference(
+    window: &ComponentInstance,
+    profile: &Rc<(Store, Cell<Preferences>)>,
+    name: &str,
+    change: ChangePreference,
+) -> Result<(), Box<dyn Error>> {
+    let weak = window.as_weak();
+    let profile = Rc::clone(profile);
+    window.set_callback(name, move |args| {
+        if let Some(window) = weak.upgrade() {
+            let (store, active) = profile.as_ref();
+            let result = change(active.get(), args)
+                .map_err(Box::<dyn Error>::from)
+                .and_then(|preferences| {
+                    store.save(preferences)?;
+                    active.set(preferences);
+                    apply_preferences(&window, preferences)
+                });
+            match result {
+                Ok(()) => show_error(&window, ""),
+                Err(error) => {
+                    // A native selector can change locally before the commit is accepted.
+                    let theme = i32::from(active.get().theme.index());
+                    let device = i32::from(active.get().device.index());
+                    let _theme_restored = window.set_property("theme-index", theme.into());
+                    let _device_restored = window.set_property("device-index", device.into());
+                    show_error(&window, &format!("Could not save preferences: {error}"));
+                }
+            }
+        }
+        Value::Void
+    })?;
+    Ok(())
 }
 
 /// Apply stored settings to real selectors and persist later user changes.
-///
 /// # Errors
-///
-/// Returns errors for an unavailable profile directory or invalid UI bindings.
+/// Returns errors for unavailable profile directories or invalid UI bindings.
 fn configure_preferences(window: &ComponentInstance, store: Store) -> Result<(), Box<dyn Error>> {
     let preferences = match store.read() {
         Ok(preferences) => preferences,
@@ -58,25 +142,10 @@ fn configure_preferences(window: &ComponentInstance, store: Store) -> Result<(),
             Preferences::default()
         }
     };
-    window.set_property(
-        "theme-index",
-        Value::Number(f64::from(preferences.theme.index())),
-    )?;
-    window.set_property(
-        "device-index",
-        Value::Number(f64::from(preferences.device.index())),
-    )?;
-    let weak = window.as_weak();
-    window.set_callback("save-preferences", move |args| {
-        if let Some(window) = weak.upgrade() {
-            match save_preferences(&store, args) {
-                Ok(()) => show_error(&window, ""),
-                Err(error) => show_error(&window, &format!("Could not save preferences: {error}")),
-            }
-        }
-        Value::Void
-    })?;
-    Ok(())
+    apply_preferences(window, preferences)?;
+    let profile = Rc::new((store, Cell::new(preferences)));
+    bind_preference(window, &profile, "save-preferences", change_choices)?;
+    bind_preference(window, &profile, "save-accent", change_accent)
 }
 
 /// Bind the Lightroom installer to the current macOS app bundle.
@@ -140,8 +209,10 @@ fn configure_lightroom(window: &ComponentInstance) -> Result<(), Box<dyn Error>>
 fn main() -> Result<(), Box<dyn Error>> {
     let mut options = pancake::job::Options::from_env()?;
     configure_backend(&mut options)?;
+    branding::register_fonts()?;
     let window = compile_workspace()?.create()?;
     window.set_property("native-menu-bar", cfg!(not(target_os = "linux")).into())?;
+    window.set_property("wordmark", branding::wordmark()?.into())?;
     window.set_property(
         "app-version",
         SharedString::from(env!("CARGO_PKG_VERSION")).into(),

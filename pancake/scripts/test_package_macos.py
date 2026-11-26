@@ -18,6 +18,7 @@ BUILD = (
     "--target", "aarch64-apple-darwin", "--features", "cubecl/metal-native",
 )
 BINARIES = ("pancake-cli", "pancake-gui")
+FONT_LICENSES = ("IBMPlexMono-OFL.txt", "SpaceGrotesk-OFL.txt")
 
 
 class MacPackageTests(unittest.TestCase):
@@ -34,6 +35,10 @@ class MacPackageTests(unittest.TestCase):
             crate = self.source / "crates" / name
             crate.mkdir(parents=True)
             (crate / "Cargo.toml").write_text(f'[package]\nname = "{name}"\nversion = "0.1.0"\n')
+        fonts = self.source / "crates/pancake-gui/assets/fonts"
+        fonts.mkdir(parents=True)
+        for name in FONT_LICENSES:
+            (fonts / name).write_text(f"Original {name} font license.\n")
         self.git("init", "--quiet")
         self.git("add", ".")
         self.git("-c", "user.name=Fixture", "-c", "user.email=test@localhost",
@@ -90,6 +95,9 @@ class MacPackageTests(unittest.TestCase):
         if argv[:2] == ("codesign", "--force"):
             signed = Path(argv[-1])
             if signed.suffix == ".app":
+                for name in FONT_LICENSES:
+                    self.assertEqual((signed / "Contents/Resources/font-notices" / name).read_bytes(),
+                                     (self.source / "crates/pancake-gui/assets/fonts" / name).read_bytes())
                 signatures = signed / "Contents" / "_CodeSignature"
                 signatures.mkdir()
                 (signatures / "CodeResources").write_bytes(b"resources")
@@ -147,6 +155,9 @@ class MacPackageTests(unittest.TestCase):
         self.assertNotIn("UNRELATED_FIXTURE", overrides)
         self.assertEqual(receipt["files_sha256"]["Pancake.app/Contents/Info.plist"], file_sha256(plist_path))
         self.assertIn("Pancake.app/Contents/_CodeSignature/CodeResources", receipt["files_sha256"])
+        for name in FONT_LICENSES:
+            relative = f"Pancake.app/Contents/Resources/font-notices/{name}"
+            self.assertEqual(receipt["files_sha256"][relative], file_sha256(self.output / relative))
         for name, path in zip(BINARIES, ("pancake-cli", "Pancake.app/Contents/MacOS/pancake-gui"), strict=True):
             binary = self.output / path
             self.assertEqual(binary.read_bytes(), f"{name} signed".encode())

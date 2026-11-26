@@ -357,7 +357,9 @@ def test_review_downloads_missing_data_while_existing_scenes_remain_open(tmp_pat
 
 def test_running_review_keeps_one_version_of_static_assets(tmp_path, monkeypatch):
     for filename, _ in review_server.ASSETS.values():
-        (tmp_path / filename).write_text("old " + filename)
+        asset = tmp_path / filename
+        asset.parent.mkdir(parents=True, exist_ok=True)
+        asset.write_text("old " + filename)
     monkeypatch.setattr(review_server, "STATIC", tmp_path)
 
     with ReviewServer(("127.0.0.1", 0)) as server:
@@ -370,6 +372,34 @@ def test_running_review_keeps_one_version_of_static_assets(tmp_path, monkeypatch
             response = client.getresponse()
             assert response.status == 200
             assert response.read() == b"old app.js"
+        finally:
+            client.close()
+            server.shutdown()
+            worker.join()
+
+
+def test_review_serves_bundled_fonts_and_notices():
+    fonts = ("IBMPlexMono-Regular.ttf", "IBMPlexMono-SemiBold.ttf",
+             "SpaceGrotesk-Regular.ttf", "SpaceGrotesk-SemiBold.ttf")
+    with ReviewServer(("127.0.0.1", 0)) as server:
+        worker = Thread(target=server.serve_forever)
+        worker.start()
+        client = HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+        try:
+            client.request("GET", "/style.css")
+            stylesheet = client.getresponse().read().decode()
+            for font in fonts:
+                path = f"/fonts/{font}"
+                assert f'url("{path}")' in stylesheet
+                client.request("GET", path)
+                response = client.getresponse()
+                assert response.status == 200 and response.headers["Content-Type"] == "font/ttf"
+                assert response.read().startswith(b"\x00\x01\x00\x00")
+            for notice in ("IBMPlexMono-OFL.txt", "SpaceGrotesk-OFL.txt"):
+                client.request("GET", f"/fonts/{notice}")
+                response = client.getresponse()
+                assert response.status == 200
+                assert b"SIL OPEN FONT LICENSE" in response.read()
         finally:
             client.close()
             server.shutdown()

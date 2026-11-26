@@ -20,6 +20,7 @@ NATIVE_BUNDLE = {
     "archive_sha256": "a" * 64, "archive_sidecar_sha256": "b" * 64,
     "installed_content_sha256": "c" * 64, "upstream_commit": "d" * 40,
 }
+FONT_LICENSES = ("IBMPlexMono-OFL.txt", "SpaceGrotesk-OFL.txt")
 
 
 def _workspace(root):
@@ -72,6 +73,11 @@ def _workspace(root):
         if component == "cli":
             manifest += ('fixture-dep = { path = "../../vendor/fixture-dep-1.0.0" }\n'
                          '[dev-dependencies]\nfixture-dev = { path = "../../vendor/fixture-dev-1.0.0" }\n')
+        else:
+            fonts = directory / "assets/fonts"
+            fonts.mkdir(parents=True)
+            for name in FONT_LICENSES:
+                (fonts / name).write_text(f"Original {name} font license.\n")
         (directory / "Cargo.toml").write_text(manifest)
     subprocess.run(["cargo", "generate-lockfile", "--offline", "--quiet"], cwd=source, check=True)
     subprocess.run(["git", "init", "--quiet"], cwd=source, check=True)
@@ -132,10 +138,18 @@ class LinuxPackageTests(unittest.TestCase):
             self.assertEqual(len(shared), 1)
             self.assertEqual((inventory.parent / shared[0]["file"]).read_bytes(),
                              (source_root / "LICENSE").read_bytes())
-            for component in ("pancake-cli", "pancake-gui"):
-                self.assertEqual(items[component]["status"], "covered_by_shared_project_notice")
-                self.assertEqual(items[component]["shared_project_license"], shared[0])
-                self.assertFalse(items[component]["notices"])
+            self.assertEqual(items["pancake-cli"]["status"], "covered_by_shared_project_notice")
+            self.assertEqual(items["pancake-cli"]["shared_project_license"], shared[0])
+            self.assertFalse(items["pancake-cli"]["notices"])
+            self.assertEqual(items["pancake-gui"]["status"], "present")
+            self.assertEqual(items["pancake-gui"]["shared_project_license"], shared[0])
+            gui_notices = {item["file"] for item in items["pancake-gui"]["notices"]}
+            for name in FONT_LICENSES:
+                relative = Path("assets/fonts") / name
+                packed_path = Path("pancake-gui-0.1.0") / relative
+                self.assertIn(packed_path.as_posix(), gui_notices)
+                self.assertEqual((inventory.parent / packed_path).read_bytes(),
+                                 (source_root / "crates/gui" / relative).read_bytes())
             self.assertEqual(set(receipt["native_llvm"]), {
                 (NATIVE_DOCS / name).as_posix() for name in ("LICENSE.TXT", "manifest.json", "build-provenance.json")
             })

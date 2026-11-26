@@ -33,6 +33,57 @@ let activeImage = null, imageVersion = "";
 const readyThumbs = new Map();
 const panelImages = new WeakMap();
 const LIGHTBOX_HOVER_EXIT_DELAY = 250;
+const ACCENT_KEY = "bokehforge.review.accent";
+const DEFAULT_ACCENT = "#ffffff";
+const CHANNEL_WEIGHTS = [0.2126, 0.7152, 0.0722];
+
+function luminance(channels) {
+  return channels.reduce((result, value, index) => {
+    const srgb = value / 255;
+    const linear = srgb <= 0.04045 ? srgb / 12.92 : ((srgb + 0.055) / 1.055) ** 2.4;
+    return result + linear * CHANNEL_WEIGHTS[index];
+  }, 0);
+}
+
+function applyAccent(value) {
+  const channels = value.match(/[a-f0-9]{2}/gi).map((pair) => parseInt(pair, 16));
+  const field = luminance([0x34, 0x34, 0x34]);
+  let applied = channels;
+  for (let step = 1; (luminance(applied) + 0.05) / (field + 0.05) < 4.5; step++) {
+    applied = channels.map((value) => Math.round(value + (255 - value) * step / 255));
+  }
+  const light = luminance(applied) + 0.05;
+  const ink = light / 0.05 >= 1.05 / light ? "#000000" : "#ffffff";
+  const accent = "#" + applied.map((part) => part.toString(16).padStart(2, "0")).join("");
+  document.documentElement.style.setProperty("--accent", accent);
+  document.documentElement.style.setProperty("--accent-ink", ink);
+}
+
+function configureAppearance() {
+  const input = $("accent-color");
+  try {
+    const stored = localStorage.getItem(ACCENT_KEY);
+    if (/^#[a-f0-9]{6}$/i.test(stored ?? "")) input.value = stored;
+  } catch {
+    // The picker still works for this page if the browser blocks storage.
+  }
+  const save = () => {
+    applyAccent(input.value);
+    try {
+      localStorage.setItem(ACCENT_KEY, input.value);
+    } catch {
+      // Some browsers disable storage for local origins.
+    }
+  };
+  input.oninput = () => applyAccent(input.value);
+  input.onchange = save;
+  $("reset-accent").onclick = () => {
+    input.value = DEFAULT_ACCENT;
+    save();
+  };
+  $("open-appearance").onclick = () => $("appearance").showModal();
+  applyAccent(input.value);
+}
 
 function stackerLabel(id) {
   return tools.get(id)?.label ?? (id === "zerene" ? "Zerene Stacker" : id);
@@ -704,10 +755,13 @@ function frameEntry(frame, index) {
   button.onclick = () => selectFrame(index);
   const params = { frame: frame.id };
   const image = createThumbnail(params);
-  button.append(image, part("span", String(index + 1).padStart(2, "0")));
+  button.append(image, part("span", String(index + 1).padStart(3, "0")));
   const inspect = inspectButton(title, params, image);
   button.ondblclick = inspect.onclick;
-  tile.append(button, inspect);
+  const filename = part("span", frame.name, "frame-filename");
+  filename.setAttribute("aria-hidden", "true");
+  filename.title = frame.name;
+  tile.append(button, inspect, filename);
   return tile;
 }
 
@@ -754,6 +808,8 @@ function goTo(position) {
   sceneRail.select(index);
   $("scene-position").textContent = `Scene ${number.format(index + 1)} of ${number.format(visible.length)}`;
   $("scene-name").textContent = next.name;
+  $("active-scene-name").textContent = next.name;
+  $("active-scene").title = next.name;
   $("scene-meta").textContent = `${next.dataset} · ${number.format(next.frames)} source frames`;
   $("jump").value = index + 1;
   $("jump").max = visible.length;
@@ -772,6 +828,7 @@ function goTo(position) {
   filmRail.setItems([]);
   $("film-range").textContent = `${number.format(next.frames)} frames`;
   $("reference-control").hidden = true;
+  setReferenceAvailability(Boolean(next.first_reference));
   $("reference-title").textContent = "Ground truth";
   $("source-meta").textContent = "";
   $("reference-meta").textContent = "";
@@ -878,11 +935,19 @@ function referenceTitle(frame) {
   return `reference · ${frame.name}`;
 }
 
+function setReferenceAvailability(available, explanation = "") {
+  $("reference-pane").hidden = !available;
+  const status = $("reference-availability");
+  status.hidden = available;
+  status.title = explanation;
+}
+
 function showReference() {
   const frame = details.references[referenceIndex];
+  setReferenceAvailability(Boolean(frame), details.reference_semantics);
   $("reference-meta").textContent = frame ? frame.name : "";
   if (frame) showImage($("reference-image"), referenceTitle(frame), { frame: frame.id });
-  else placeholder($("reference-image"), "No ground truth available", details.reference_semantics);
+  else holdPanelImage($("reference-image"));
 }
 
 function renderReference() {
@@ -1262,6 +1327,9 @@ function applyCatalog(catalog) {
   imageVersion = catalog.image_version;
   for (const tool of catalog.stackers) tools.set(tool.id, tool);
   scenes = catalog.scenes ?? [];
+  $("show-scenes").disabled = !scenes.length;
+  $("active-scene").hidden = $("scene-navigation").hidden = !scenes.length;
+  if (!scenes.length) $("scene-browser").hidePopover?.();
   const workspace = $("workspace");
   const notice = $("catalog-state");
   if (scenes.length) {
@@ -1401,6 +1469,9 @@ lightboxStrip.addEventListener("pointerleave", (event) => {
   if (event.pointerType !== "touch" && gallery) scheduleLightboxHoverReset(gallery);
 });
 
+$("scene-browser").addEventListener("toggle", ({ newState }) => {
+  if (newState === "open") sceneRail.select(visible.indexOf(scene));
+});
 $("dataset").onchange = () => filterScenes(scene?.id);
 $("previous").onclick = () => moveScene(-1);
 $("next").onclick = () => moveScene(1);
@@ -1554,4 +1625,10 @@ document.addEventListener("keydown", (event) => {
 window.addEventListener("beforeunload", (event) => {
   if (drafts.size) event.preventDefault();
 });
+const commandBar = document.querySelector(".command-bar");
+new ResizeObserver(([entry]) => {
+  const height = entry.borderBoxSize[0].blockSize;
+  document.documentElement.style.setProperty("--command-height", `${height + 4}px`);
+}).observe(commandBar);
+configureAppearance();
 connect();

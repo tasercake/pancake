@@ -13,11 +13,11 @@ use slint::platform::{
     Key, Platform, PlatformError, PointerEventButton, WindowAdapter, WindowEvent,
 };
 use slint::{
-    ComponentHandle as _, Image, LogicalPosition, PhysicalSize, Rgb8Pixel, SharedPixelBuffer,
+    Color, ComponentHandle as _, Image, LogicalPosition, PhysicalSize, Rgb8Pixel, SharedPixelBuffer,
 };
 use slint_interpreter::{ComponentInstance, Value};
 
-use super::preferences::{Preferences, Store};
+use super::preferences::{Accent, Preferences, Store, Theme};
 
 /// Own access to system fonts for the lifetime of one offscreen GUI thread.
 static OFFSCREEN_UI: Mutex<()> = Mutex::new(());
@@ -138,6 +138,7 @@ fn exercise_comparison() -> Result<(), Box<dyn Error>> {
         u32::try_from(WIDTH)?,
         u32::try_from(HEIGHT)?,
     ));
+    super::branding::register_fonts()?;
     let workspace = super::compile_workspace()?.create()?;
     workspace.set_property("native-menu-bar", false.into())?;
     workspace.set_property("preview", solid(RESULT).into())?;
@@ -280,6 +281,7 @@ fn exercise_viewer_fit() -> Result<(), Box<dyn Error>> {
         u32::try_from(WIDTH)?,
         u32::try_from(HEIGHT)?,
     ));
+    super::branding::register_fonts()?;
     let workspace = super::compile_workspace()?.create()?;
     workspace.set_property("native-menu-bar", false.into())?;
     let mut portrait = SharedPixelBuffer::new(40, 320);
@@ -317,7 +319,7 @@ fn observe_fit_command(
         .ok_or("The fit image did not reach its canvas edge.")?;
     let y = bottom / 2;
     let middle = rows.get(y).ok_or("Missing image row.")?;
-    let canvas = Rgb8Pixel::new(20, 22, 25);
+    let canvas = Rgb8Pixel::new(25, 25, 25);
     let left = middle
         .iter()
         .position(|&pixel| pixel == canvas)
@@ -335,17 +337,27 @@ fn observe_fit_command(
         delta_x: 0.0,
         delta_y: 1.0,
     })?;
-    let zoomed = render(adapter)?;
+    let zoomed = render(adapter).map_err(|error| format!("After viewer scroll: {error}"))?;
     let photo_pixels =
         |picture: &[Rgb8Pixel]| picture.iter().filter(|&&pixel| pixel == RESULT).count();
     if photo_pixels(&zoomed) <= photo_pixels(&original) {
         return Err("Scrolling did not change the real displayed photograph.".into());
     }
 
-    // The leftmost toolbar button starts ten pixels inside the canvas.
-    let fit = position(left.saturating_add(18), bottom.saturating_add(24))?;
+    // Fit is the first outlined control in the right-hand toolbar group.
+    let toolbar_y = 22;
+    let field_edge = Rgb8Pixel::new(127, 127, 127);
+    let toolbar = rows.get(toolbar_y).ok_or("Missing workspace toolbar.")?;
+    let first_field = toolbar
+        .iter()
+        .enumerate()
+        .skip(WIDTH / 2)
+        .find(|&(_, &pixel)| pixel == field_edge)
+        .map(|(index, _)| index)
+        .ok_or("Missing the toolbar's first viewer control.")?;
+    let fit = position(first_field.saturating_add(14), toolbar_y)?;
     let _hover = window.dispatch_event_with_result(WindowEvent::PointerMoved { position: fit })?;
-    let _hovered = render(adapter)?;
+    let _hovered = render(adapter).map_err(|error| format!("After Fit hover: {error}"))?;
     if window.has_active_animations() {
         return Err("Hovering on Fit scheduled a decorative animation.".into());
     }
@@ -357,21 +369,29 @@ fn observe_fit_command(
         position: fit,
         button: PointerEventButton::Left,
     })?;
-    let fitted = render(adapter)?;
+    let fitted = render(adapter).map_err(|error| format!("After Fit click: {error}"))?;
     if photo_pixels(&fitted) != photo_pixels(&original) || window.has_active_animations() {
         return Err(
             "A Fit click must restore the photograph with no trailing skin animation.".into(),
         );
     }
 
-    // Fit returns focus to the canvas, then tab visits Fit and 1:1 in order.
-    for key in [Key::Tab, Key::Tab, Key::Return] {
+    // Fit returns focus to the canvas. Reverse tab order reaches its zoom toolbar.
+    for key in [
+        Key::Backtab,
+        Key::Backtab,
+        Key::Backtab,
+        Key::Backtab,
+        Key::Backtab,
+        Key::Return,
+    ] {
         let _pressed =
             window.dispatch_event_with_result(WindowEvent::KeyPressed { text: key.into() })?;
         let _released =
             window.dispatch_event_with_result(WindowEvent::KeyReleased { text: key.into() })?;
     }
-    let actual = render(adapter)?;
+    let actual =
+        render(adapter).map_err(|error| format!("After toolbar keyboard access: {error}"))?;
     if !(12_000..=13_600).contains(&photo_pixels(&actual)) || window.has_active_animations() {
         return Err(
             "Keyboard activation must show the 40 × 320 photograph at 1:1 without animation."
@@ -414,10 +434,11 @@ fn exercise_preference_recovery() -> Result<(), Box<dyn Error>> {
     let adapter = MinimalSoftwareWindow::new(RepaintBufferType::NewBuffer);
     let platform_window = Rc::downgrade(&adapter);
     slint::platform::set_platform(Box::new(Offscreen(platform_window.clone())))?;
+    super::branding::register_fonts()?;
     let workspace = super::compile_workspace()?.create()?;
     super::configure_preferences(&workspace, Store::new(profile.clone()))?;
     if !preference_error(&workspace)?.starts_with("Could not read preferences:")
-        || workspace.get_property("theme-index")? != Value::from(0_i32)
+        || workspace.get_property("theme-index")? != Value::from(1_i32)
         || workspace.get_property("device-index")? != Value::from(0_i32)
         || fs::read(&destination)? != malformed
     {
@@ -440,12 +461,14 @@ fn exercise_preference_recovery() -> Result<(), Box<dyn Error>> {
     fs::remove_dir(destination)?;
     let _saved = workspace.invoke("save-preferences", &choices)?;
     if !preference_error(&workspace)?.is_empty()
-        || Store::new(profile).read()? != Preferences::from_choices("Dark", "CPU")?
+        || Store::new(profile.clone()).read()? != Preferences::from_choices("Dark", "CPU")?
     {
         return Err(
             "A successful retry must save the choices and clear the previous error.".into(),
         );
     }
+
+    observe_accent_preferences(&workspace, &Store::new(profile))?;
 
     let component = workspace.as_weak();
     drop(workspace);
@@ -453,6 +476,48 @@ fn exercise_preference_recovery() -> Result<(), Box<dyn Error>> {
     if component.upgrade().is_some() || platform_window.upgrade().is_some() {
         return Err(
             "The repaired profile window retained its callback or platform adapter.".into(),
+        );
+    }
+    Ok(())
+}
+
+/// The real preference callbacks keep an accent across theme changes.
+/// # Errors
+/// Returns a persistence, color or status binding error.
+fn observe_accent_preferences(
+    workspace: &ComponentInstance,
+    store: &Store,
+) -> Result<(), Box<dyn Error>> {
+    let white = Value::from(Color::from_rgb_u8(255, 255, 255));
+    if workspace.get_property("accent-surface")? != white {
+        return Err("The initial graphite workspace must use a white accent.".into());
+    }
+    let _invalid = workspace.invoke("save-accent", &[Value::String("#bad".into())])?;
+    if !preference_error(workspace)?.ends_with("Enter an accent as #RRGGBB.")
+        || store.read()?.accent != Accent::default()
+        || workspace.get_property("accent-surface")? != white
+    {
+        return Err("A mistyped accent must preserve the applied and persisted colors.".into());
+    }
+
+    let accent = Accent::parse("#061329")?;
+    let _accepted = workspace.invoke("save-accent", &[Value::String(accent.hex().into())])?;
+    if store.read()?.accent != accent || !preference_error(workspace)?.is_empty() {
+        return Err("The committed accent must survive a preference read.".into());
+    }
+    let dark = workspace.get_property("accent-surface")?;
+    let _changed_theme = workspace.invoke(
+        "save-preferences",
+        &[Value::String("Light".into()), Value::String("CPU".into())],
+    )?;
+    let ([red, green, blue], _) = accent.presentation(Theme::Light);
+    let light = workspace.get_property("accent-surface")?;
+    if light == dark
+        || light != Value::from(Color::from_rgb_u8(red, green, blue))
+        || store.read()?.accent != accent
+    {
+        return Err(
+            "Theme changes must resolve contrast without replacing the requested accent.".into(),
         );
     }
     Ok(())

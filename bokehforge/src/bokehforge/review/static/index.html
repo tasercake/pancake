@@ -8,20 +8,33 @@
   <script type="module" src="/app.js"></script>
 </head>
 <body>
-  <header class="masthead">
-    <div class="shell masthead-inner">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <div><strong>BokehForge</strong><span>Focus stack review</span></div>
-      </div>
-      <div class="tools">
-        <a class="button quiet" href="/api/ratings.csv" download>Export ratings</a>
-        <button class="primary" id="open-run" type="button" disabled><span aria-hidden="true">+</span> New evaluation</button>
-      </div>
+  <header class="command-bar">
+    <strong class="product-name">BokehForge Review</strong>
+    <div class="command-group">
+      <button class="quiet" id="show-scenes" type="button" popovertarget="scene-browser" disabled>
+        <span class="folder-icon" aria-hidden="true"></span>Scenes
+      </button>
+      <span id="active-scene" hidden>
+        <span class="stack-icon" aria-hidden="true"><span></span></span>
+        <span id="active-scene-name"></span>
+      </span>
+    </div>
+    <div class="command-group scene-navigation" id="scene-navigation" hidden>
+      <button class="quiet" id="previous" type="button" title="Previous scene (Up arrow)">Previous</button>
+      <label class="visually-hidden" for="jump">Go to scene number</label>
+      <input id="jump" type="number" min="1" inputmode="numeric">
+      <button class="quiet" id="next" type="button" title="Next scene (Down arrow)">Next</button>
+    </div>
+    <div class="command-group">
+      <button class="quiet" id="open-run" type="button" disabled><span aria-hidden="true">+</span> New evaluation</button>
+      <a class="button quiet" href="/api/ratings.csv" download><span class="export-icon" aria-hidden="true"></span>Export ratings</a>
+    </div>
+    <div class="command-group appearance-tools">
+      <button class="quiet" id="open-appearance" type="button" aria-haspopup="dialog">Appearance</button>
     </div>
   </header>
 
-  <main class="shell">
+  <main>
     <p id="connection-status" class="inline-error" role="status" hidden></p>
     <section class="notice" id="catalog-state" aria-live="polite">
       <h1>Indexing local datasets</h1>
@@ -45,73 +58,46 @@
       <button class="quiet" id="stop-run" type="button">Stop run</button>
     </div>
     <div class="workspace" id="workspace" hidden>
-      <aside class="scene-sidebar" aria-labelledby="scenes-title">
-        <div class="sidebar-header">
-          <div class="sidebar-title"><h2 id="scenes-title">Scenes</h2><span id="sidebar-count" class="muted"></span></div>
-          <label class="control">Dataset<select id="dataset"><option value="">All datasets</option></select></label>
-        </div>
-        <div class="scene-list" id="scene-list" aria-label="Dataset scenes" tabindex="0">
-          <div class="rail-track" role="list"></div>
-        </div>
-      </aside>
-      <section class="workspace-body" aria-label="Scene review">
-        <div class="scene-heading">
-          <div class="scene-title">
-            <p class="overline" id="scene-position"></p>
-            <h1 id="scene-name" aria-live="polite"></h1>
-            <p class="scene-meta" id="scene-meta"></p>
-          </div>
-          <div class="scene-controls">
-            <div class="scene-navigation">
-              <button id="previous" type="button" title="Previous scene (Up arrow)">Previous</button>
-              <label class="visually-hidden" for="jump">Go to scene number</label>
-              <input id="jump" type="number" min="1" inputmode="numeric">
-              <button id="next" type="button" title="Next scene (Down arrow)">Next</button>
+      <section class="review" aria-label="Focus stack comparison">
+        <p id="scene-error" class="inline-error" role="alert" hidden></p>
+        <div class="comparison">
+          <figure class="pane">
+            <figcaption><span>Source frame</span><span class="pane-meta" id="source-meta"></span></figcaption>
+            <div class="image-well" id="source-image"></div>
+          </figure>
+          <figure class="pane candidate">
+            <figcaption><span>Stacker output</span><span class="pane-meta" id="candidate-meta"></span></figcaption>
+            <div class="candidate-viewport"><div class="image-well" id="candidate-image"></div></div>
+            <div class="benchmark-line candidate-benchmark" hidden>
+              <span id="candidate-benchmark" role="status"></span>
+              <button class="benchmark-info" type="button" aria-label="Why this output scored zero"
+                aria-haspopup="dialog" aria-controls="benchmark-details"
+                title="Why this output scored zero" hidden>i</button>
+              <button class="quiet score-explanation-trigger" id="candidate-explain" type="button"
+                aria-expanded="false" aria-controls="candidate-explanation" hidden>Explain score</button>
             </div>
-          </div>
+          </figure>
+          <figure class="pane" id="reference-pane" hidden>
+            <figcaption><span id="reference-title">Ground truth</span><span class="pane-meta" id="reference-meta"></span></figcaption>
+            <div class="image-well" id="reference-image"></div>
+            <label class="reference-select" id="reference-control" hidden>Reference image<select id="reference-select"></select></label>
+          </figure>
         </div>
-        <p class="inline-error" id="scene-error" role="alert" hidden></p>
-        <section class="review" aria-label="Focus stack comparison">
-          <div class="review-heading">
-            <h2>Compare images</h2>
-            <label class="run-control" for="run-select">Evaluation<select id="run-select"><option value="">No evaluations yet</option></select></label>
-          </div>
-          <div class="output-tabs" id="output-tabs" aria-label="Stacker outputs"></div>
-          <div class="comparison">
-            <figure class="pane">
-              <figcaption><span>Source frame</span><span class="pane-meta" id="source-meta"></span></figcaption>
-              <div class="image-well" id="source-image"></div>
-            </figure>
-            <figure class="pane candidate">
-              <figcaption><span>Stacker output</span><span class="pane-meta" id="candidate-meta"></span></figcaption>
-              <div class="candidate-viewport"><div class="image-well" id="candidate-image"></div></div>
-              <div class="benchmark-line candidate-benchmark" hidden>
-                <span id="candidate-benchmark" role="status"></span>
-                <button class="benchmark-info" type="button" aria-label="Why this output scored zero"
-                  aria-haspopup="dialog" aria-controls="benchmark-details"
-                  title="Why this output scored zero" hidden>i</button>
-                <button class="quiet score-explanation-trigger" id="candidate-explain" type="button"
-                  aria-expanded="false" aria-controls="candidate-explanation" hidden>Explain score</button>
-              </div>
-            </figure>
-            <figure class="pane">
-              <figcaption><span id="reference-title">Ground truth</span><span class="pane-meta" id="reference-meta"></span></figcaption>
-              <div class="image-well" id="reference-image"></div>
-              <label class="reference-select" id="reference-control" hidden>Reference image<select id="reference-select"></select></label>
-            </figure>
-          </div>
-          <section class="score-explanation candidate-explanation" id="candidate-explanation" aria-label="Score explanation" hidden></section>
-          <div class="film">
-            <div class="film-heading">
-              <div><h3>Source frames</h3><span id="film-range"></span></div>
-            </div>
-            <div class="filmstrip" id="filmstrip" aria-label="Source frame thumbnails" tabindex="0">
-              <div class="rail-track" role="list"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="review ratings" aria-labelledby="rating-title">
+        <section class="score-explanation candidate-explanation" id="candidate-explanation" aria-label="Score explanation" hidden></section>
+      </section>
+      <aside class="inspector" aria-labelledby="evaluation-title">
+        <h2 id="evaluation-title">Evaluation</h2>
+        <div class="scene-title">
+          <h1 id="scene-name" aria-live="polite"></h1>
+          <p id="scene-position" class="muted"></p>
+          <p id="scene-meta" class="muted"></p>
+          <p id="reference-availability" class="muted" hidden>Ground truth unavailable</p>
+        </div>
+        <label class="control run-control" for="run-select">Evaluation run
+          <select id="run-select"><option value="">No evaluations yet</option></select>
+        </label>
+        <div class="output-tabs" id="output-tabs" aria-label="Stacker outputs"></div>
+        <section class="ratings" aria-labelledby="rating-title">
           <div class="review-heading">
             <h2 id="rating-title">Rate outputs</h2>
             <span class="muted" id="rating-count"></span>
@@ -137,13 +123,42 @@
           </form>
           <p class="rating-empty muted" id="rating-empty"></p>
         </section>
-        <footer class="keyboard">Scenes <kbd>↑</kbd> <kbd>↓</kbd><span aria-hidden="true">·</span> Source frames <kbd>←</kbd> <kbd>→</kbd></footer>
-      </section>
+      </aside>
+      <div class="film">
+        <div class="film-heading">
+          <div><h3>Source frames</h3><span id="film-range"></span></div>
+        </div>
+        <div class="filmstrip" id="filmstrip" aria-label="Source frame thumbnails" tabindex="0">
+          <div class="rail-track" role="list"></div>
+        </div>
+      </div>
+      <footer class="keyboard">Scenes <kbd>↑</kbd> <kbd>↓</kbd><span aria-hidden="true">·</span> Source frames <kbd>←</kbd> <kbd>→</kbd></footer>
     </div>
   </main>
+  <aside class="scene-browser" id="scene-browser" popover="auto" aria-labelledby="scenes-title">
+    <div class="sidebar-header">
+      <div class="sidebar-title"><h2 id="scenes-title">Scenes</h2><span id="sidebar-count" class="muted"></span></div>
+      <label class="control">Dataset<select id="dataset"><option value="">All datasets</option></select></label>
+    </div>
+    <div class="scene-list" id="scene-list" aria-label="Dataset scenes" tabindex="0">
+      <div class="rail-track" role="list"></div>
+    </div>
+  </aside>
+  <dialog id="appearance" aria-labelledby="appearance-title">
+    <div class="dialog-heading">
+      <h2 id="appearance-title">Appearance</h2>
+      <button class="quiet" type="button" data-close="appearance">Close</button>
+    </div>
+    <div class="appearance-panel">
+      <label for="accent-color">Accent color</label>
+      <input id="accent-color" type="color" value="#ffffff" aria-describedby="accent-help">
+      <button class="quiet" id="reset-accent" type="button">Reset accent</button>
+      <p id="accent-help">Review lightens dark accents to keep selections and actions readable.</p>
+    </div>
+  </dialog>
 
-  <dialog id="new-run">
-    <div class="dialog-heading"><h2>New evaluation</h2><button class="quiet" type="button" data-close="new-run">Close</button></div>
+  <dialog id="new-run" aria-labelledby="new-run-title">
+    <div class="dialog-heading"><h2 id="new-run-title">New evaluation</h2><button class="quiet" type="button" data-close="new-run">Close</button></div>
     <form id="run-form" novalidate>
       <div class="scope-field">
         <label class="control">Evaluate<select id="scope" aria-describedby="scope-summary"></select></label>

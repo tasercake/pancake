@@ -1,59 +1,96 @@
-import { Button, CheckBox, ComboBox, LineEdit, Palette, ScrollView } from "std-widgets.slint";
+import { Palette, ScrollView } from "std-widgets.slint";
 
-// A label for the settings panels and inspector.
-component SectionLabel inherits Text {
-    color: Palette.foreground;
-    font-size: 16px;
-    font-weight: 600;
+// Graphite and its existing light counterpart share the same semantic roles.
+global Desk {
+    in property <bool> dark: true;
+    in property <color> accent: #ffffff;
+    in property <color> on-accent: #000000;
+    out property <color> frame: dark ? #1e1e1e : #f3f3f3;
+    out property <color> toolbar: dark ? #232323 : #f2f2f2;
+    out property <color> matte: #191919;
+    out property <color> pane: dark ? #2b2b2b : #ffffff;
+    out property <color> film: dark ? #252525 : #f7f7f7;
+    out property <color> field: dark ? #343434 : #e9e9e9;
+    out property <color> divider: dark ? #565656 : #c1c1c1;
+    out property <color> boundary: dark ? #7f7f7f : #727272;
+    out property <color> foreground: dark ? #f2f2f2 : #141414;
+    out property <color> secondary: dark ? #c2c2c2 : #505050;
+    out property <color> icon: dark ? #dedede : #343434;
+    out property <color> keyline: #101010;
+    out property <string> workspace-face: "IBM Plex Mono";
+    out property <string> action-face: "Space Grotesk";
+}
+
+component DeskText inherits Text {
+    color: Desk.foreground;
+    font-family: Desk.workspace-face;
     vertical-alignment: center;
-    height: 28px;
 }
 
-// A labelled numerical entry, committed when the user leaves the field.
-component Parameter inherits HorizontalLayout {
-    in property <string> label;
-    in property <string> identifier;
-    in-out property <string> value;
-    height: 32px;
-    spacing: 6px;
-    Text {
-        text: root.label;
-        color: Palette.foreground;
-        vertical-alignment: center;
-        horizontal-stretch: 1;
-    }
-    LineEdit {
-        text <=> root.value;
-        width: 84px;
-        accessible-id: root.identifier;
-        accessible-label: root.label;
-    }
+component SectionLabel inherits DeskText {
+    font-size: 15px;
+    font-weight: 600;
+    height: 24px;
 }
 
-// Viewer commands acknowledge input immediately, without animating their chrome.
+component Rule inherits Rectangle {
+    height: 1px;
+    background: Desk.divider;
+}
+
+enum Glyph { none, folder, list, stack, compare, export, crop, chevron }
+
+component IconLine inherits Path {
+    width: 16px;
+    height: 16px;
+    viewbox-width: 24;
+    viewbox-height: 24;
+    stroke: Desk.icon;
+    stroke-width: 1px;
+    stroke-line-cap: round;
+    stroke-line-join: round;
+}
+
+component ToolIcon inherits Rectangle {
+    in property <Glyph> glyph;
+    in property <color> ink: Desk.icon;
+
+    width: 16px;
+    height: 16px;
+    accessible-role: none;
+    if root.glyph == Glyph.folder: IconLine { stroke: root.ink; commands: "M2 6 V20 H22 V8 H11 L8 5 H3 Z"; }
+    if root.glyph == Glyph.list: IconLine { stroke: root.ink; commands: "M2 4 H22 V20 H2 Z M9 4 V20 M12 8 H19 M12 12 H19 M12 16 H19"; }
+    if root.glyph == Glyph.stack: IconLine { stroke: root.ink; commands: "M2 7 L12 2 L22 7 L12 12 Z M2 12 L12 17 L22 12 M2 17 L12 22 L22 17"; }
+    if root.glyph == Glyph.compare: IconLine { stroke: root.ink; commands: "M2 4 H22 V20 H2 Z M12 4 V20"; }
+    if root.glyph == Glyph.export: IconLine { stroke: root.ink; commands: "M11 4 H3 V21 H20 V12 M12 13 L22 3 M15 3 H22 V10"; }
+    if root.glyph == Glyph.crop: IconLine { stroke: root.ink; commands: "M6 2 V18 H22 M2 6 H18 V22"; }
+    if root.glyph == Glyph.chevron: IconLine { stroke: root.ink; commands: "M6 9 L12 15 L18 9"; }
+}
+
+// Commands update directly from input. The filled action is reserved for a decision.
 component ViewCommand inherits Rectangle {
     in property <string> text;
+    in property <Glyph> glyph;
     in property <bool> enabled: true;
     in property <bool> primary;
+    in property <bool> flat;
     in property <bool> checkable;
     in property <bool> checked;
     callback clicked();
 
-    private property <bool> emphasized: root.enabled && (root.primary || root.checked || pointer.pressed);
-    private property <bool> hovered: root.enabled && pointer.has-hover;
+    private property <color> ink: !root.enabled ? Desk.secondary : root.primary ? Desk.on-accent : Desk.foreground;
 
-    min-width: max(32px, content.min-width);
-    min-height: max(32px, content.min-height);
+    min-width: max(30px, content.min-width);
+    min-height: 30px;
     horizontal-stretch: 0;
     vertical-stretch: 0;
     border-radius: 4px;
-    border-width: 1px;
-    border-color: keys.has-focus && root.enabled
-        ? (root.emphasized ? Palette.accent-foreground : Palette.accent-background)
-        : Palette.border;
-    background: root.emphasized ? Palette.accent-background
-        : root.hovered ? Palette.selection-background
-        : root.enabled ? Palette.control-background : Palette.alternate-background;
+    border-width: keys.has-focus && root.enabled ? 2px : !root.flat && !root.primary ? 1px : 0px;
+    border-color: keys.has-focus && root.enabled ? (root.primary ? Desk.on-accent : Desk.accent) : Desk.boundary;
+    background: !root.enabled ? (root.flat ? transparent : Desk.pane)
+        : root.primary ? Desk.accent
+        : pointer.has-hover || !root.flat ? Desk.field : transparent;
+
     forward-focus: keys;
     accessible-role: button;
     accessible-enabled: root.enabled;
@@ -64,21 +101,34 @@ component ViewCommand inherits Rectangle {
         if root.enabled { root.clicked(); }
     }
 
+    public function focus-command() {
+        keys.focus();
+    }
+
     content := HorizontalLayout {
-        padding-left: 12px;
-        padding-right: 12px;
-        padding-top: 5px;
-        padding-bottom: 5px;
+        padding-left: 8px;
+        padding-right: 8px;
+        spacing: 6px;
         alignment: center;
-        Text {
+        if root.glyph != Glyph.none: ToolIcon {
+            glyph: root.glyph;
+            ink: root.enabled && root.checked ? Desk.accent : root.ink;
+            cross-axis-self-alignment: center;
+        }
+        if root.text != "": DeskText {
             text: root.text;
-            horizontal-alignment: center;
-            vertical-alignment: center;
-            color: root.emphasized ? Palette.accent-foreground
-                : root.hovered ? Palette.selection-foreground
-                : root.enabled ? Palette.control-foreground : Palette.alternate-foreground;
+            font-family: root.primary ? Desk.action-face : Desk.workspace-face;
+            font-weight: root.primary ? 600 : 400;
+            color: root.ink;
             accessible-role: none;
         }
+    }
+
+    if root.checked: Rectangle {
+        y: parent.height - 2px;
+        width: parent.width;
+        height: 2px;
+        background: Desk.accent;
     }
 
     pointer := TouchArea {
@@ -96,6 +146,440 @@ component ViewCommand inherits Rectangle {
                 return accept;
             }
             return reject;
+        }
+    }
+}
+
+// Standard text editing retains selection and the platform clipboard.
+component DeskInput inherits Rectangle {
+    in-out property <string> text <=> input.text;
+    callback accepted();
+
+    height: 32px;
+    border-radius: 4px;
+    border-width: input.has-focus ? 2px : 1px;
+    border-color: input.has-focus ? Desk.accent : Desk.boundary;
+    background: Desk.field;
+    forward-focus: input;
+    accessible-role: text-input;
+    accessible-value <=> root.text;
+    accessible-action-set-value(value) => { root.text = value; }
+
+    input := TextInput {
+        x: 8px;
+        width: parent.width - 16px;
+        height: parent.height;
+        single-line: true;
+        vertical-alignment: center;
+        font-family: Desk.workspace-face;
+        color: Desk.foreground;
+        selection-background-color: Desk.accent;
+        selection-foreground-color: Desk.on-accent;
+        accepted => { root.accepted(); }
+        accessible-role: none;
+    }
+}
+
+// A compact choice field keeps current values and the keyboard focus visible.
+component DeskChoice inherits Rectangle {
+    in property <[string]> model;
+    in property <[string]> choice-ids;
+    in-out property <int> current-index;
+    in property <bool> enabled: true;
+    out property <string> current-value: root.model[root.current-index];
+    private property <bool> menu-focused;
+    callback selected(string);
+
+    height: 32px;
+    min-width: 100px;
+    border-radius: 4px;
+    border-width: choice-keys.has-focus ? 2px : 1px;
+    border-color: choice-keys.has-focus ? Desk.accent : Desk.boundary;
+    background: root.enabled ? Desk.field : Desk.pane;
+    forward-focus: choice-keys;
+    accessible-role: combobox;
+    accessible-enabled: root.enabled;
+    accessible-expandable: true;
+    accessible-expanded: root.menu-focused;
+    accessible-value: root.current-value;
+    accessible-action-expand => { if root.enabled { menu.show(); } }
+    accessible-action-default => { if root.enabled { menu.show(); } }
+
+    function choose(index: int) {
+        if index >= 0 && index < root.model.length {
+            root.current-index = index;
+            root.selected(root.model[index]);
+        }
+    }
+
+    DeskText {
+        x: 8px;
+        width: parent.width - 32px;
+        height: parent.height;
+        text: root.current-value;
+        color: root.enabled ? Desk.foreground : Desk.secondary;
+        overflow: elide;
+        accessible-role: none;
+    }
+    ToolIcon {
+        x: parent.width - 22px;
+        y: (parent.height - self.height) / 2;
+        glyph: Glyph.chevron;
+    }
+    TouchArea {
+        enabled: root.enabled;
+        clicked => { choice-keys.focus(); menu.show(); }
+    }
+    choice-keys := FocusScope {
+        width: 0px;
+        height: 0px;
+        enabled: root.enabled;
+        key-pressed(event) => {
+            if event.text == Key.Space || event.text == Key.Return {
+                menu.show();
+                return accept;
+            }
+            if event.text == Key.UpArrow {
+                root.choose(max(0, root.current-index - 1));
+                return accept;
+            }
+            if event.text == Key.DownArrow {
+                root.choose(min(root.model.length - 1, root.current-index + 1));
+                return accept;
+            }
+            return reject;
+        }
+    }
+    menu := PopupWindow {
+        x: 0px;
+        y: root.height + 4px;
+        width: max(160px, root.width);
+        height: 34px * root.model.length + 8px;
+        close-policy: close-on-click-outside;
+        forward-focus: popup-keys;
+
+        popup-keys := FocusScope {
+            focus-changed-event => { root.menu-focused = self.has-focus; }
+            key-pressed(event) => {
+                if event.text == Key.Escape || event.text == Key.Return || event.text == Key.Space {
+                    menu.close();
+                    choice-keys.focus();
+                    return accept;
+                }
+                if event.text == Key.UpArrow {
+                    root.choose(max(0, root.current-index - 1));
+                    return accept;
+                }
+                if event.text == Key.DownArrow {
+                    root.choose(min(root.model.length - 1, root.current-index + 1));
+                    return accept;
+                }
+                return reject;
+            }
+
+            Rectangle {
+                border-width: 1px;
+                border-color: Desk.boundary;
+                border-radius: 4px;
+                background: Desk.pane;
+                VerticalLayout {
+                    padding: 4px;
+                    spacing: 4px;
+                    for option[index] in root.model: ViewCommand {
+                        height: 30px;
+                        horizontal-stretch: 1;
+                        flat: true;
+                        text: option;
+                        checkable: true;
+                        checked: root.current-index == index;
+                        accessible-id: index < root.choice-ids.length ? root.choice-ids[index] : "";
+                        accessible-role: radio-button;
+                        clicked => {
+                            root.choose(index);
+                            menu.close();
+                            choice-keys.focus();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+component DeskCheck inherits Rectangle {
+    in property <string> text;
+    in-out property <bool> checked;
+    in property <bool> enabled: true;
+    height: 30px;
+    border-radius: 4px;
+    border-width: keys.has-focus && root.enabled ? 2px : 0px;
+    border-color: Desk.accent;
+    forward-focus: keys;
+    accessible-role: checkbox;
+    accessible-label: root.text;
+    accessible-enabled: root.enabled;
+    accessible-checkable: true;
+    accessible-checked: root.checked;
+    accessible-action-default => { if root.enabled { root.checked = !root.checked; } }
+
+    HorizontalLayout {
+        spacing: 8px;
+        Rectangle {
+            width: 16px;
+            height: 16px;
+            cross-axis-self-alignment: center;
+            border-width: 1px;
+            border-color: root.checked && root.enabled ? Desk.accent : Desk.boundary;
+            border-radius: 3px;
+            background: root.checked && root.enabled ? Desk.accent : Desk.field;
+            if root.checked: IconLine {
+                width: 14px;
+                height: 14px;
+                x: 1px;
+                y: 1px;
+                stroke: root.enabled ? Desk.on-accent : Desk.secondary;
+                commands: "M5 12 L10 17 L20 7";
+            }
+        }
+        DeskText {
+            text: root.text;
+            color: root.enabled ? Desk.foreground : Desk.secondary;
+            accessible-role: none;
+        }
+    }
+    TouchArea {
+        enabled: root.enabled;
+        clicked => { root.checked = !root.checked; }
+    }
+    keys := FocusScope {
+        width: 0px;
+        height: 0px;
+        enabled: root.enabled;
+        key-pressed(event) => {
+            if event.text == Key.Space || event.text == Key.Return {
+                root.checked = !root.checked;
+                return accept;
+            }
+            return reject;
+        }
+    }
+}
+
+component Parameter inherits HorizontalLayout {
+    in property <string> label;
+    in property <string> identifier;
+    in-out property <string> value;
+
+    height: 32px;
+    spacing: 8px;
+    DeskText { text: root.label; horizontal-stretch: 1; }
+    DeskInput {
+        text <=> root.value;
+        width: 60px;
+        accessible-id: root.identifier;
+        accessible-label: root.label;
+    }
+}
+
+component FrameTile inherits Rectangle {
+    in property <image> photo;
+    in property <string> filename;
+    in property <string> number;
+    in property <bool> current;
+    in property <bool> selected;
+    callback activate();
+    callback context();
+
+    width: 101px;
+    height: 92px;
+    accessible-role: button;
+    accessible-label: root.filename;
+    accessible-checkable: true;
+    accessible-checked: root.selected;
+    accessible-action-default => { root.activate(); }
+
+    Rectangle {
+        y: 0px;
+        height: 70px;
+        background: Desk.keyline;
+        border-width: root.selected ? 2px : 1px;
+        border-color: root.selected ? Desk.accent : Desk.boundary;
+        border-radius: 4px;
+
+        Image {
+            x: 3px;
+            y: 3px;
+            width: parent.width - 6px;
+            height: parent.height - 6px;
+            source: root.photo;
+            image-fit: contain;
+            accessible-role: none;
+        }
+        if root.photo.width == 0: Text {
+            width: parent.width;
+            height: parent.height;
+            color: #c2c2c2;
+            text: "No preview";
+            font-family: Desk.action-face;
+            font-size: 12px;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+        if root.current: Rectangle {
+            x: 2px;
+            y: 2px;
+            width: 34px;
+            height: 20px;
+            background: Desk.accent;
+            border-radius: 3px;
+            DeskText { text: root.number; horizontal-alignment: center; font-weight: 600; color: Desk.on-accent; }
+        }
+    }
+    DeskText {
+        y: 74px;
+        height: 18px;
+        width: parent.width;
+        text: root.number;
+        font-weight: root.current ? 600 : 400;
+        color: root.current ? Desk.foreground : Desk.secondary;
+        horizontal-alignment: center;
+    }
+    TouchArea {
+        clicked => { root.activate(); }
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down && event.button == PointerEventButton.right {
+                root.context();
+            }
+        }
+    }
+}
+
+component SourceStrip inherits Rectangle {
+    in property <[string]> frames;
+    in property <[image]> thumbnails;
+    in property <int> selected-index;
+    in property <bool> all-selected;
+    in property <bool> list-open;
+    property <length> stride: 109px;
+    private property <image> placeholder;
+    out property <int> first-visible: max(0, floor(-strip.content-x / root.stride));
+    out property <int> visible-count: ceil(strip.visible-width / root.stride) + 1;
+
+    callback select-frame(int);
+    callback frame-menu(int);
+    callback move-selection(int);
+    callback toggle-list();
+    callback range-changed(int, int);
+
+    background: Desk.film;
+    height: 124px;
+    forward-focus: strip-keys;
+    accessible-id: "frames";
+    accessible-role: groupbox;
+    accessible-label: "Source frames";
+
+    changed first-visible => { root.range-changed(root.first-visible, root.visible-count); }
+    changed visible-count => { root.range-changed(root.first-visible, root.visible-count); }
+    changed selected-index => {
+        if root.selected-index >= 0 {
+            let start = root.selected-index * root.stride;
+            let end = start + root.stride;
+            if start < -strip.content-x {
+                strip.content-x = -start;
+            } else if end > -strip.content-x + strip.visible-width {
+                strip.content-x = min(0px, strip.visible-width - end);
+            }
+        }
+    }
+
+    Rule { width: parent.width; y: 0px; }
+    HorizontalLayout {
+        padding: 12px;
+        spacing: 8px;
+        VerticalLayout {
+            width: 104px;
+            spacing: 2px;
+            alignment: start;
+            SectionLabel { text: "Sources"; }
+            DeskText {
+                text: root.frames.length == 1 ? "1 frame" : "\{root.frames.length} frames";
+                color: Desk.secondary;
+                accessible-id: "frames.count";
+                height: 20px;
+            }
+            HorizontalLayout {
+                alignment: start;
+                spacing: 4px;
+                ViewCommand {
+                    glyph: Glyph.list;
+                    flat: true;
+                    checkable: true;
+                    checked: root.list-open;
+                    accessible-id: "layout.sidebar";
+                    accessible-label: "Source files";
+                    clicked => { root.toggle-list(); }
+                }
+                ViewCommand {
+                    text: "‹";
+                    accessible-id: "viewer.previous";
+                    accessible-label: "Previous source";
+                    enabled: root.frames.length > 0;
+                    clicked => { root.move-selection(-1); }
+                }
+                ViewCommand {
+                    text: "›";
+                    accessible-id: "viewer.next";
+                    accessible-label: "Next source";
+                    enabled: root.frames.length > 0;
+                    clicked => { root.move-selection(1); }
+                }
+            }
+        }
+        Rectangle { width: 1px; background: Desk.divider; }
+        strip-keys := FocusScope {
+            horizontal-stretch: 1;
+            key-pressed(event) => {
+                if event.text == Key.LeftArrow || event.text == Key.RightArrow {
+                    root.move-selection(event.text == Key.LeftArrow ? -1 : 1);
+                    return accept;
+                }
+                if (event.text == Key.Space || event.text == Key.Return) && root.selected-index >= 0 {
+                    root.select-frame(root.selected-index);
+                    return accept;
+                }
+                return reject;
+            }
+
+            strip := ScrollView {
+                content-width: max(self.visible-width, root.frames.length * root.stride);
+                content-height: self.visible-height;
+                vertical-scrollbar-policy: always-off;
+
+                for name[index] in root.frames: FrameTile {
+                    x: index * root.stride;
+                    y: 0px;
+                    photo: index < root.thumbnails.length ? root.thumbnails[index] : root.placeholder;
+                    filename: name;
+                    number: index + 1 < 10 ? "00\{index + 1}" : index + 1 < 100 ? "0\{index + 1}" : "\{index + 1}";
+                    current: root.selected-index == index;
+                    selected: root.all-selected || self.current;
+                    accessible-id: "frame.\{index}";
+                    activate => { strip-keys.focus(); root.select-frame(index); }
+                    context => { root.frame-menu(index); }
+                }
+
+                if root.frames.length == 0: DeskText {
+                    width: parent.width;
+                    height: 82px;
+                    text: "No source frames";
+                    color: Desk.secondary;
+                }
+            }
+            if self.has-focus: Rectangle {
+                border-width: 2px;
+                border-color: Desk.accent;
+                border-radius: 4px;
+            }
         }
     }
 }
@@ -134,7 +618,7 @@ component ViewCanvas inherits Rectangle {
     property <length> picture-y: root.height / 2 - root.center-y * root.zoom * 1px;
 
     clip: true;
-    background: #141619;
+    background: Desk.matte;
     accessible-role: image;
     accessible-id: "viewer";
     accessible-label: "Image viewer";
@@ -192,15 +676,34 @@ component ViewCanvas inherits Rectangle {
     if root.comparing: Rectangle {
         x: root.width * root.split;
         y: 0;
-        width: 2px;
+        width: 3px;
         height: root.height;
-        background: #e6ebf0;
+        background: Desk.keyline;
+        Rectangle { x: 1px; width: 1px; height: parent.height; background: #ffffff; }
+        Rectangle {
+            x: -4px;
+            width: 11px;
+            height: 4px;
+            border-width: 1px;
+            border-color: Desk.keyline;
+            background: #ffffff;
+        }
+        Rectangle {
+            x: -4px;
+            y: parent.height - self.height;
+            width: 11px;
+            height: 4px;
+            border-width: 1px;
+            border-color: Desk.keyline;
+            background: #ffffff;
+        }
     }
     if !root.has-image: Text {
         width: parent.width;
         y: (parent.height - self.height) / 2;
-        text: "No image to preview";
-        color: #b2b8c1;
+        text: "Open files to start a stack";
+        font-family: Desk.action-face;
+        color: #c2c2c2;
         horizontal-alignment: center;
     }
 
@@ -258,7 +761,9 @@ export component Workspace inherits Window {
     min-height: 600px;
     preferred-width: 1170px;
     preferred-height: 730px;
-    background: Palette.background;
+    background: Desk.frame;
+    default-font-family: Desk.workspace-face;
+    default-font-size: 13px;
 
     in property <string> app-version;
     in property <string> lightroom-status: "The Lightroom Classic plug-in requires macOS.";
@@ -266,7 +771,11 @@ export component Workspace inherits Window {
     in property <bool> lightroom-installed;
     callback install-lightroom();
     in property <bool> native-menu-bar: true;
-    in-out property <int> theme-index: 0;
+    in-out property <int> theme-index: 1;
+    in-out property <string> accent-value: "#ffffff";
+    in property <color> accent-surface: #ffffff;
+    in property <color> accent-ink: #000000;
+    in property <image> wordmark;
     in-out property <int> device-index: 0;
     in-out property <int> method-index: 1;
     in-out property <int> alignment-index: 0;
@@ -278,6 +787,7 @@ export component Workspace inherits Window {
 
     // These models hold actual files and finished results provided by the host.
     in property <[string]> frames;
+    in property <[image]> thumbnails;
     in property <[string]> results;
     in property <[string]> recent-folders;
     in property <bool> result-can-crop;
@@ -306,6 +816,8 @@ export component Workspace inherits Window {
     property <bool> has-preview: root.preview-width > 0 && root.preview-height > 0;
 
     callback save-preferences(string, string);
+    callback save-accent(string);
+    callback thumbnail-range(int, int);
     callback select-source(int);
     callback select-result(int);
     callback import-files();
@@ -335,7 +847,7 @@ export component Workspace inherits Window {
     property <[string]> methods: ["Laplacian", "Hybrid", "Weighted average", "Depth map", "Exposure fusion"];
     property <[string]> method-ids: ["method.laplacian", "method.hybrid", "method.weighted_average", "method.depth_map", "method.exposure_fusion"];
     property <string> page: "workspace";
-    property <bool> sidebar-visible: true;
+    property <bool> sidebar-visible: false;
     property <bool> inspector-visible: true;
     property <bool> advanced-visible: false;
     in-out property <bool> compare: false;
@@ -347,8 +859,14 @@ export component Workspace inherits Window {
         root.update-theme();
     }
 
+    changed accent-surface => { root.update-theme(); }
+    changed accent-ink => { root.update-theme(); }
+
     function update-theme() {
-        Palette.color-scheme = root.theme-index == 1 ? ColorScheme.dark : ColorScheme.light;
+        Desk.dark = root.theme-index == 1;
+        Desk.accent = root.accent-surface;
+        Desk.on-accent = root.accent-ink;
+        Palette.color-scheme = Desk.dark ? ColorScheme.dark : ColorScheme.light;
     }
 
     init => {
@@ -380,243 +898,274 @@ export component Workspace inherits Window {
     }
 
     VerticalLayout {
-        Rectangle {
-            height: 54px;
-            background: Palette.alternate-background;
-            HorizontalLayout {
-                padding: 10px;
-                spacing: 8px;
-                SectionLabel {
-                    text: "Pancake";
-                    font-size: 18px;
-                    height: 34px;
-                }
-                Button {
-                    text: "File";
-                    accessible-id: "file.menu";
-                    enabled: !root.running;
-                    clicked => { root.file-menu(); }
-                }
-                Button {
-                    text: "New";
-                    accessible-id: "workspace.new";
-                    enabled: !root.running;
-                    clicked => { root.new-request(); }
-                }
-                Button {
-                    text: "Open files…";
-                    accessible-id: "import.files";
-                    enabled: !root.running;
-                    clicked => { root.import-files(); }
-                }
-                Button {
-                    text: "Open folder…";
-                    accessible-id: "import.folder";
-                    enabled: !root.running;
-                    clicked => { root.import-folder(); }
-                }
-                Rectangle { horizontal-stretch: 1; }
-                ViewCommand {
-                    text: "View";
-                    accessible-id: "mode.view";
-                    enabled: root.has-preview;
-                    checkable: true;
-                    checked: !root.compare;
-                    clicked => { root.compare = false; }
-                }
-                ViewCommand {
-                    text: "Compare";
-                    accessible-id: "mode.compare";
-                    enabled: root.selected-result >= 0 && root.frames.length > 0;
-                    checkable: true;
-                    checked: root.compare;
-                    clicked => { root.compare-preview(); }
-                }
-                Button {
-                    text: "Sources";
-                    accessible-id: "layout.sidebar";
-                    checkable: true;
-                    checked <=> root.sidebar-visible;
-                }
-                Button {
-                    text: "Inspector";
-                    accessible-id: "layout.inspector";
-                    checkable: true;
-                    checked <=> root.inspector-visible;
-                }
-                Button {
-                    text: "Preferences";
-                    accessible-id: "settings.open";
-                    clicked => { root.page = "preferences"; }
-                }
-                Button {
-                    text: "About";
-                    accessible-id: "about.open";
-                    clicked => { root.page = "about"; }
-                }
-            }
-        }
-        if root.prompt != "": Rectangle {
-            background: Palette.alternate-background;
-            VerticalLayout {
-                padding: 14px;
-                spacing: 8px;
-                SectionLabel {
-                    text: root.prompt == "replace"
-                        ? "Replace the current source frames?"
-                        : "Save your result before closing this workspace?";
-                }
+        if root.page == "workspace": VerticalLayout {
+            Rectangle {
+                height: 46px;
+                background: Desk.toolbar;
+                Rule { width: parent.width; y: parent.height - 1px; }
                 HorizontalLayout {
-                    alignment: start;
-                    spacing: 6px;
-                    Button {
-                        text: "Keep working";
-                        accessible-id: "dialog.cancel";
-                        clicked => { root.cancel-transition(); }
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    padding-top: 7px;
+                    padding-bottom: 8px;
+                    spacing: 4px;
+                    ViewCommand {
+                        text: "File";
+                        flat: true;
+                        accessible-id: "file.menu";
+                        enabled: !root.running;
+                        clicked => { root.file-menu(); }
                     }
-                    if root.prompt != "replace" && root.selected-result >= 0: Button {
-                        text: "Export…";
+                    ViewCommand {
+                        text: "New";
+                        flat: true;
+                        accessible-id: "workspace.new";
+                        enabled: !root.running;
+                        clicked => { root.new-request(); }
+                    }
+                    ViewCommand {
+                        text: "Open files…";
+                        glyph: Glyph.folder;
+                        flat: true;
+                        accessible-id: "import.files";
+                        enabled: !root.running;
+                        clicked => { root.import-files(); }
+                    }
+                    Rectangle { width: 1px; background: Desk.divider; }
+                    ViewCommand {
+                        text: "Stack";
+                        flat: true;
+                        glyph: Glyph.stack;
+                        checkable: true;
+                        checked: root.inspector-visible;
+                        accessible-id: "layout.inspector";
+                        accessible-label: "Stack inspector";
+                        clicked => { root.inspector-visible = !root.inspector-visible; }
+                    }
+                    ViewCommand {
+                        text: "Compare";
+                        flat: true;
+                        glyph: Glyph.compare;
+                        checkable: true;
+                        checked: root.compare;
+                        accessible-id: "mode.compare";
+                        enabled: root.selected-result >= 0 && root.frames.length > 0;
                         clicked => {
-                            root.page = "export";
-                            root.cancel-transition();
+                            if root.compare { root.compare = false; }
+                            else { root.compare-preview(); }
                         }
                     }
-                    Button {
-                        text: root.prompt == "replace" ? "Replace" : "Discard";
-                        accessible-id: root.prompt == "replace"
-                            ? "dialog.replace"
-                            : root.prompt == "close" ? "dialog.discard_close" : "dialog.discard";
-                        clicked => { root.confirm-transition(); }
+                    ViewCommand {
+                        text: "Export";
+                        flat: true;
+                        glyph: Glyph.export;
+                        accessible-id: "export.start";
+                        enabled: root.selected-result >= 0 && !root.running;
+                        clicked => { root.page = "export"; }
+                    }
+                    Rectangle { horizontal-stretch: 1; }
+                    ViewCommand {
+                        text: "Fit";
+                        accessible-id: "viewer.fit";
+                        enabled: root.has-preview;
+                        clicked => { canvas.fit-image(); }
+                    }
+                    ViewCommand {
+                        text: "1:1";
+                        accessible-id: "viewer.actual";
+                        enabled: root.has-preview;
+                        clicked => { canvas.set-zoom(1); }
+                    }
+                    ViewCommand {
+                        text: "−";
+                        accessible-id: "viewer.zoom_out";
+                        accessible-label: "Zoom out";
+                        enabled: root.has-preview;
+                        clicked => { canvas.set-zoom(canvas.zoom / 1.35); }
+                    }
+                    ViewCommand {
+                        text: "+";
+                        accessible-id: "viewer.zoom_in";
+                        accessible-label: "Zoom in";
+                        enabled: root.has-preview;
+                        clicked => { canvas.set-zoom(canvas.zoom * 1.35); }
+                    }
+                    Rectangle { width: 1px; background: Desk.divider; }
+                    ViewCommand {
+                        text: "Settings";
+                        flat: true;
+                        accessible-label: "Preferences";
+                        accessible-id: "settings.open";
+                        clicked => { root.page = "preferences"; }
+                    }
+                    ViewCommand {
+                        text: "About";
+                        flat: true;
+                        accessible-id: "about.open";
+                        clicked => { root.page = "about"; }
                     }
                 }
             }
-        }
-        if root.file-open: VerticalLayout {
-            alignment: start;
-            padding: 8px;
-            spacing: 5px;
-            Button { text: "Open files…"; clicked => { root.file-open = false; root.import-files(); } }
-            Button { text: "Open folder…"; clicked => { root.file-open = false; root.import-folder(); } }
-            SectionLabel { text: "Recent folders"; accessible-id: "recent.open"; }
-            if root.recent-folders.length == 0: Button { text: "No recent folders"; accessible-id: "recent.empty"; enabled: false; }
-            for title[index] in root.recent-folders: Button {
-                text: title;
-                clicked => { root.file-open = false; root.open-recent(index); }
-            }
-            if root.recent-folders.length > 0: Button {
-                text: "Clear menu";
-                accessible-id: "recent.clear";
-                clicked => { root.file-open = false; root.clear-recent(); }
-            }
-            Button { text: "Close menu"; clicked => { root.file-open = false; } }
-        }
-        if root.context-index >= 0: HorizontalLayout {
-            alignment: start;
-            padding: 8px;
-            spacing: 5px;
-            Button {
-                text: "Reveal source";
-                accessible-id: "frames.reveal";
-                clicked => { root.reveal-source(root.context-index); root.context-index = -1; }
-            }
-            Button {
-                text: "Remove source";
-                accessible-id: "frames.remove_one";
-                clicked => { root.remove-sources(root.context-index); root.context-index = -1; }
-            }
-        }
-        if root.page == "workspace": HorizontalLayout {
-            spacing: 1px;
-            if root.sidebar-visible: Rectangle {
-                width: 207px;
-                background: Palette.alternate-background;
-                accessible-id: "frames";
-                accessible-role: groupbox;
-                accessible-label: "Source frames";
+            if root.prompt != "": Rectangle {
+                background: Desk.pane;
                 VerticalLayout {
-                    spacing: 10px;
-                    padding: 14px;
-                    SectionLabel { text: "Sources"; }
-                    Text {
-                        text: root.frames.length == 1 ? "1 frame" : "\{root.frames.length} frames";
-                        accessible-id: "frames.count";
-                        color: Palette.foreground;
+                    padding: 12px;
+                    spacing: 8px;
+                    SectionLabel {
+                        font-family: Desk.action-face;
+                        text: root.prompt == "replace"
+                            ? "Replace the current source frames?"
+                            : "Save your result before closing this workspace?";
                     }
                     HorizontalLayout {
-                        spacing: 5px;
-                        Button {
-                            text: "Select all";
-                            accessible-id: "frames.select_all";
-                            enabled: root.frames.length > 0 && !root.running;
-                            checkable: true;
-                            checked <=> root.all-selected;
+                        alignment: start;
+                        spacing: 8px;
+                        ViewCommand {
+                            text: "Keep working";
+                            accessible-id: "dialog.cancel";
+                            clicked => { root.cancel-transition(); }
                         }
-                        Button {
-                            text: "Remove";
-                            accessible-id: "frames.remove_selected";
-                            enabled: root.frames.length > 0 && (root.all-selected || root.selected-source >= 0) && !root.running;
+                        if root.prompt != "replace" && root.selected-result >= 0: ViewCommand {
+                            text: "Export…";
+                            primary: true;
                             clicked => {
-                                root.remove-sources(root.all-selected ? -1 : root.selected-source);
-                                root.all-selected = false;
+                                root.page = "export";
+                                root.cancel-transition();
                             }
                         }
+                        ViewCommand {
+                            text: root.prompt == "replace" ? "Replace" : "Discard";
+                            primary: root.prompt == "replace" || root.selected-result < 0;
+                            accessible-id: root.prompt == "replace"
+                                ? "dialog.replace"
+                                : root.prompt == "close" ? "dialog.discard_close" : "dialog.discard";
+                            clicked => { root.confirm-transition(); }
+                        }
                     }
-                    ScrollView {
-                        VerticalLayout {
-                            spacing: 4px;
-                            alignment: start;
-                            for name[index] in root.frames: Rectangle {
-                                height: 33px;
-                                border-radius: 4px;
-                                property <bool> chosen: root.all-selected || root.selected-source == index;
-                                background: self.chosen ? Palette.accent-background : Palette.control-background;
-                                accessible-id: "frame.\{index}";
-                                accessible-role: button;
-                                accessible-label: name;
-                                accessible-action-default => { root.select-frame(index); }
-                                Text {
-                                    x: 8px;
-                                    width: parent.width - 16px;
-                                    height: parent.height;
-                                    color: parent.chosen ? Palette.accent-foreground : Palette.foreground;
-                                    vertical-alignment: center;
-                                    text: name;
-                                    overflow: elide;
-                                    accessible-role: none;
+                }
+            }
+            if root.file-open: Rectangle {
+                background: Desk.pane;
+                VerticalLayout {
+                    alignment: start;
+                    padding: 8px;
+                    spacing: 4px;
+                    HorizontalLayout {
+                        alignment: start;
+                        spacing: 8px;
+                        ViewCommand { text: "Open files…"; clicked => { root.file-open = false; root.import-files(); } }
+                        ViewCommand {
+                            text: "Open folder…";
+                            accessible-id: "import.folder";
+                            clicked => { root.file-open = false; root.import-folder(); }
+                        }
+                        ViewCommand { text: "Close menu"; clicked => { root.file-open = false; } }
+                    }
+                    SectionLabel { text: "Recent folders"; accessible-id: "recent.open"; }
+                    if root.recent-folders.length == 0: ViewCommand {
+                        text: "No recent folders";
+                        accessible-id: "recent.empty";
+                        enabled: false;
+                    }
+                    for title[index] in root.recent-folders: ViewCommand {
+                        text: title;
+                        flat: true;
+                        clicked => { root.file-open = false; root.open-recent(index); }
+                    }
+                    if root.recent-folders.length > 0: ViewCommand {
+                        text: "Clear menu";
+                        accessible-id: "recent.clear";
+                        clicked => { root.file-open = false; root.clear-recent(); }
+                    }
+                }
+            }
+            if root.context-index >= 0: HorizontalLayout {
+                alignment: start;
+                padding: 8px;
+                spacing: 8px;
+                ViewCommand {
+                    text: "Reveal source";
+                    accessible-id: "frames.reveal";
+                    clicked => { root.reveal-source(root.context-index); root.context-index = -1; }
+                }
+                ViewCommand {
+                    text: "Remove source";
+                    accessible-id: "frames.remove_one";
+                    clicked => { root.remove-sources(root.context-index); root.context-index = -1; }
+                }
+            }
+            HorizontalLayout {
+                vertical-stretch: 1;
+                if root.sidebar-visible: Rectangle {
+                    width: 208px;
+                    background: Desk.pane;
+                    accessible-role: groupbox;
+                    accessible-label: "Source files";
+                    VerticalLayout {
+                        padding: 12px;
+                        spacing: 8px;
+                        SectionLabel { text: "Source files"; }
+                        HorizontalLayout {
+                            spacing: 8px;
+                            ViewCommand {
+                                text: "Select all";
+                                accessible-id: "frames.select_all";
+                                enabled: root.frames.length > 0 && !root.running;
+                                checkable: true;
+                                checked: root.all-selected;
+                                clicked => { root.all-selected = !root.all-selected; }
+                            }
+                            ViewCommand {
+                                text: "Remove";
+                                accessible-id: "frames.remove_selected";
+                                enabled: root.frames.length > 0 && (root.all-selected || root.selected-source >= 0) && !root.running;
+                                clicked => {
+                                    root.remove-sources(root.all-selected ? -1 : root.selected-source);
+                                    root.all-selected = false;
                                 }
-                                TouchArea {
-                                    clicked => { root.select-frame(index); }
-                                    pointer-event(event) => {
-                                        if event.kind == PointerEventKind.down && event.button == PointerEventButton.right {
-                                            root.source-menu(index);
+                            }
+                        }
+                        ScrollView {
+                            horizontal-scrollbar-policy: always-off;
+                            VerticalLayout {
+                                alignment: start;
+                                spacing: 4px;
+                                for name[index] in root.frames: Rectangle {
+                                    height: 32px;
+                                    border-radius: 4px;
+                                    property <bool> chosen: root.all-selected || root.selected-source == index;
+                                    background: self.chosen ? Desk.accent : Desk.field;
+                                    accessible-id: "source-list.\{index}";
+                                    accessible-role: button;
+                                    accessible-label: name;
+                                    accessible-checkable: true;
+                                    accessible-checked: self.chosen;
+                                    accessible-action-default => { root.select-frame(index); }
+                                    DeskText {
+                                        x: 8px;
+                                        width: parent.width - 16px;
+                                        height: parent.height;
+                                        color: parent.chosen ? Desk.on-accent : Desk.foreground;
+                                        text: name;
+                                        overflow: elide;
+                                        accessible-role: none;
+                                    }
+                                    TouchArea {
+                                        clicked => { root.select-frame(index); }
+                                        pointer-event(event) => {
+                                            if event.kind == PointerEventKind.down && event.button == PointerEventButton.right {
+                                                root.source-menu(index);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    if root.results.length > 0: Rectangle {
-                        accessible-id: "results";
-                        accessible-role: groupbox;
-                        accessible-label: "Retained results";
-                        VerticalLayout {
-                            spacing: 4px;
-                            SectionLabel { text: "Results"; }
-                            Text { text: "\{root.results.length}"; accessible-id: "results.count"; color: Palette.foreground; }
-                            for label[index] in root.results: ViewCommand {
-                                text: label;
-                                primary: root.selected-result == index;
-                                accessible-id: "result.\{index}";
-                                clicked => { root.select-result(index); }
-                            }
-                        }
-                    }
                 }
-            }
-            VerticalLayout {
-                        horizontal-stretch: 1;
+                if root.sidebar-visible: Rectangle { width: 1px; background: Desk.divider; }
                 canvas := ViewCanvas {
-                    vertical-stretch: 1;
+                    horizontal-stretch: 1;
                     primary-image: root.preview;
                     image-width: root.preview-width;
                     image-height: root.preview-height;
@@ -631,163 +1180,240 @@ export component Workspace inherits Window {
                     result-method: root.selected-result-method;
                     next-source(step) => { root.change-source(step); }
                 }
-                Rectangle {
-                    height: 48px;
-                    background: Palette.alternate-background;
-                    HorizontalLayout {
-                        padding-left: 10px;
-                        padding-right: 10px;
-                        spacing: 8px;
-                        ViewCommand { text: "Fit"; accessible-id: "viewer.fit"; enabled: root.has-preview; clicked => { canvas.fit-image(); } }
-                        ViewCommand { text: "1:1"; accessible-id: "viewer.actual"; enabled: root.has-preview; clicked => { canvas.set-zoom(1); } }
-                        ViewCommand { text: "−"; accessible-id: "viewer.zoom_out"; accessible-label: "Zoom out"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom / 1.35); } }
-                        ViewCommand { text: "+"; accessible-id: "viewer.zoom_in"; accessible-label: "Zoom in"; enabled: root.has-preview; clicked => { canvas.set-zoom(canvas.zoom * 1.35); } }
-                        ViewCommand { text: "‹"; accessible-id: "viewer.previous"; accessible-label: "Previous source"; enabled: root.frames.length > 0; clicked => { root.change-source(-1); } }
-                        ViewCommand { text: "›"; accessible-id: "viewer.next"; accessible-label: "Next source"; enabled: root.frames.length > 0; clicked => { root.change-source(1); } }
-                        Rectangle { horizontal-stretch: 1; }
-                        Button {
-                            text: "Crop";
-                            accessible-id: "result.crop";
-                            enabled: root.result-can-crop && !root.running;
-                            clicked => { root.crop-result(); }
-                        }
-                        Button {
-                            text: "Export";
-                            accessible-id: "export.start";
-                            enabled: root.selected-result >= 0 && !root.running;
-                            clicked => { root.page = "export"; }
-                        }
-                    }
-                }
-                HorizontalLayout {
-                    padding: 8px;
-                    spacing: 6px;
-                    Button {
-                        text: "Save view…";
-                        accessible-id: "export.viewport";
-                        enabled: root.has-preview && !root.running;
-                        clicked => {
-                            root.export-viewport(
-                                canvas.absolute-position.x / 1px,
-                                canvas.absolute-position.y / 1px,
-                                canvas.width / 1px, canvas.height / 1px
-                            );
-                        }
-                    }
-                    Button {
-                        text: "Batch export…";
-                        accessible-id: "export.batch";
-                        enabled: root.selected-result >= 0 && !root.running;
-                        clicked => { root.export-batch(); }
-                    }
-                    if root.result-cropped: Text {
-                        accessible-id: "result.crop.state";
-                        text: "Cropped";
-                        vertical-alignment: center;
-                        color: Palette.foreground;
-                    }
-                }
-                if root.error-message != "": Rectangle {
-                    background: Palette.alternate-background;
-                    accessible-id: "dialog.error";
+                if root.inspector-visible: Rectangle { width: 1px; background: Desk.divider; }
+                if root.inspector-visible: Rectangle {
+                    width: 256px;
+                    background: Desk.pane;
                     accessible-role: groupbox;
-                    accessible-label: "Pancake error";
-                    HorizontalLayout {
-                        padding: 10px;
-                        spacing: 8px;
-                        Text { text: root.error-message; wrap: word-wrap; color: Palette.foreground; }
-                        Button { text: "Dismiss"; accessible-id: "dialog.accept"; clicked => { root.error-message = ""; } }
+                    accessible-label: "Stack inspector";
+                    VerticalLayout {
+                        ScrollView {
+                            horizontal-scrollbar-policy: always-off;
+                            VerticalLayout {
+                                padding: 12px;
+                                spacing: 6px;
+                                alignment: start;
+                                SectionLabel { text: "Stack"; }
+                                HorizontalLayout {
+                                    spacing: 8px;
+                                    DeskText { text: "Method"; width: 80px; }
+                                    DeskChoice {
+                                        model: root.methods;
+                                        choice-ids: root.method-ids;
+                                        current-index <=> root.method-index;
+                                        enabled: !root.running;
+                                        accessible-id: "stack.method";
+                                        accessible-label: "Stack method";
+                                    }
+                                }
+                                HorizontalLayout {
+                                    spacing: 8px;
+                                    DeskText { text: "Alignment"; width: 80px; }
+                                    DeskChoice {
+                                        model: ["Off", "Translation", "Euclidean", "Similarity", "Affine", "Breathing"];
+                                        current-index <=> root.alignment-index;
+                                        enabled: !root.running;
+                                        accessible-id: "alignment";
+                                        accessible-label: "Alignment";
+                                    }
+                                }
+                                DeskCheck {
+                                    text: "Crop aligned margins";
+                                    accessible-id: "autocrop";
+                                    checked <=> root.crop-enabled;
+                                    enabled: !root.running;
+                                }
+                                DeskCheck {
+                                    text: "Advanced settings";
+                                    accessible-id: "advanced";
+                                    checked <=> root.advanced-visible;
+                                }
+                                if root.advanced-visible && root.method-index != 4: Parameter {
+                                    label: "Kernel size";
+                                    identifier: "kernel-size";
+                                    value <=> root.kernel-size;
+                                }
+                                if root.advanced-visible && (root.method-index < 2 || root.method-index == 4): Parameter {
+                                    label: "Pyramid levels";
+                                    identifier: "pyramid-levels";
+                                    value <=> root.pyramid-levels;
+                                }
+                                if root.advanced-visible && root.method-index < 2: Parameter {
+                                    label: "Scale factor";
+                                    identifier: "scale-factor";
+                                    value <=> root.scale-factor;
+                                }
+                                Rule {}
+                                SectionLabel { text: "Output"; }
+                                HorizontalLayout {
+                                    spacing: 8px;
+                                    DeskText { text: "Format"; width: 80px; }
+                                    DeskChoice {
+                                        model: ["PNG", "JPEG", "TIFF", "OpenEXR"];
+                                        current-index <=> root.export-format-index;
+                                        accessible-id: "output.format";
+                                        accessible-label: "Output format";
+                                    }
+                                }
+                                HorizontalLayout {
+                                    spacing: 8px;
+                                    DeskText { text: "Bit depth"; width: 80px; }
+                                    DeskChoice {
+                                        model: ["8-bit", "16-bit"];
+                                        current-index <=> root.export-depth-index;
+                                        enabled: root.export-format-index == 0 || root.export-format-index == 2;
+                                        accessible-id: "output.depth";
+                                        accessible-label: "Output bit depth";
+                                    }
+                                }
+                                HorizontalLayout {
+                                    spacing: 4px;
+                                    ViewCommand {
+                                        text: "Crop";
+                                        glyph: Glyph.crop;
+                                        accessible-id: "result.crop";
+                                        enabled: root.result-can-crop && !root.running;
+                                        clicked => { root.crop-result(); }
+                                    }
+                                    ViewCommand {
+                                        text: "Save view…";
+                                        accessible-id: "export.viewport";
+                                        enabled: root.has-preview && !root.running;
+                                        clicked => {
+                                            root.export-viewport(
+                                                canvas.absolute-position.x / 1px,
+                                                canvas.absolute-position.y / 1px,
+                                                canvas.width / 1px,
+                                                canvas.height / 1px,
+                                            );
+                                        }
+                                    }
+                                }
+                                HorizontalLayout {
+                                    spacing: 4px;
+                                    ViewCommand {
+                                        text: "View";
+                                        accessible-id: "mode.view";
+                                        checkable: true;
+                                        checked: root.has-preview && !root.compare;
+                                        enabled: root.has-preview;
+                                        clicked => { root.compare = false; }
+                                    }
+                                    ViewCommand {
+                                        text: "Batch export…";
+                                        accessible-id: "export.batch";
+                                        enabled: root.selected-result >= 0 && !root.running;
+                                        clicked => { root.export-batch(); }
+                                    }
+                                }
+                                if root.result-cropped: DeskText {
+                                    text: "Cropped";
+                                    accessible-id: "result.crop.state";
+                                    color: Desk.secondary;
+                                }
+                                Rule {}
+                                SectionLabel { text: "Source"; }
+                                DeskText {
+                                    text: root.selected-source >= 0 && root.selected-source < root.frames.length
+                                        ? root.frames[root.selected-source] : "No source selected";
+                                    horizontal-stretch: 1;
+                                    overflow: elide;
+                                    font-weight: 600;
+                                }
+                                if root.results.length > 0: VerticalLayout {
+                                    spacing: 4px;
+                                    accessible-id: "results";
+                                    accessible-role: groupbox;
+                                    accessible-label: "Retained results";
+                                    SectionLabel { text: "Results"; }
+                                    DeskText { text: "\{root.results.length}"; accessible-id: "results.count"; color: Desk.secondary; }
+                                    for label[index] in root.results: ViewCommand {
+                                        text: label;
+                                        checkable: true;
+                                        checked: root.selected-result == index;
+                                        accessible-id: "result.\{index}";
+                                        clicked => { root.select-result(index); }
+                                    }
+                                }
+                            }
+                        }
+                        Rule {}
+                        VerticalLayout {
+                            padding: 12px;
+                            spacing: 6px;
+                            DeskText {
+                                text: root.stack-status;
+                                color: Desk.secondary;
+                                accessible-id: "stack.status";
+                                accessible-label: root.stack-status;
+                                accessible-description: root.stack-details;
+                                overflow: elide;
+                            }
+                            if root.running: HorizontalLayout {
+                                spacing: 4px;
+                                ViewCommand { text: "Pause"; accessible-id: "stack.pause"; enabled: root.can-pause; clicked => { root.pause(); } }
+                                ViewCommand { text: "Resume"; accessible-id: "stack.resume"; enabled: root.can-resume; clicked => { root.resume(); } }
+                                ViewCommand { text: "Stop"; accessible-id: "stack.stop"; enabled: root.can-cancel; clicked => { root.cancel(); } }
+                            }
+                            ViewCommand {
+                                text: "Start stack";
+                                primary: true;
+                                accessible-id: "stack.start";
+                                enabled: root.frames.length > 1 && !root.running;
+                                clicked => { root.stack(); }
+                            }
+                        }
                     }
                 }
             }
-            if root.inspector-visible: Rectangle {
-                width: 239px;
-                background: Palette.alternate-background;
-                VerticalLayout {
-                    padding: 14px;
+            if root.error-message != "": Rectangle {
+                background: Desk.pane;
+                accessible-id: "dialog.error";
+                accessible-role: groupbox;
+                accessible-label: "Pancake error";
+                HorizontalLayout {
+                    padding: 10px;
                     spacing: 8px;
-                    SectionLabel { text: "Stack method"; }
-                    for method[index] in root.methods: Button {
-                        text: method;
-                        accessible-id: root.method-ids[index];
-                        primary: root.method-index == index;
-                        accessible-role: radio-button;
-                        accessible-checkable: true;
-                        accessible-checked: root.method-index == index;
-                        enabled: !root.running;
-                        clicked => { root.method-index = index; }
+                    DeskText {
+                        text: root.error-message;
+                        font-family: Desk.action-face;
+                        wrap: word-wrap;
+                        horizontal-stretch: 1;
                     }
-                    SectionLabel { text: "Alignment"; }
-                    ComboBox {
-                        accessible-id: "alignment";
-                        accessible-label: self.current-value;
-                        model: ["Off", "Translation", "Euclidean", "Similarity", "Affine", "Breathing"];
-                        current-index <=> root.alignment-index;
-                        enabled: !root.running;
-                    }
-                    CheckBox {
-                        text: "Crop aligned margins";
-                        accessible-id: "autocrop";
-                        checked <=> root.crop-enabled;
-                        enabled: !root.running;
-                    }
-                    CheckBox {
-                        text: "Advanced settings";
-                        accessible-id: "advanced";
-                        checked <=> root.advanced-visible;
-                    }
-                    if root.advanced-visible && root.method-index != 4: Parameter {
-                        label: "Kernel size";
-                        identifier: "kernel-size";
-                        value <=> root.kernel-size;
-                    }
-                    if root.advanced-visible && (root.method-index < 2 || root.method-index == 4): Parameter {
-                        label: "Pyramid levels";
-                        identifier: "pyramid-levels";
-                        value <=> root.pyramid-levels;
-                    }
-                    if root.advanced-visible && root.method-index < 2: Parameter {
-                        label: "Scale factor";
-                        identifier: "scale-factor";
-                        value <=> root.scale-factor;
-                    }
-                    Rectangle { vertical-stretch: 1; }
-                    Text {
-                        text: root.stack-status;
-                        color: Palette.foreground;
-                        accessible-id: "stack.status";
-                        accessible-label: root.stack-status;
-                        accessible-description: root.stack-details;
-                    }
-                    HorizontalLayout {
-                        spacing: 5px;
-                        Button { text: "Pause"; accessible-id: "stack.pause"; enabled: root.can-pause; clicked => { root.pause(); } }
-                        Button { text: "Resume"; accessible-id: "stack.resume"; enabled: root.can-resume; clicked => { root.resume(); } }
-                        Button { text: "Stop"; accessible-id: "stack.stop"; enabled: root.can-cancel; clicked => { root.cancel(); } }
-                    }
-                    Button {
-                        text: "Start stack";
+                    ViewCommand {
+                        text: "Dismiss";
                         primary: true;
-                        accessible-id: "stack.start";
-                        enabled: root.frames.length > 1 && !root.running;
-                        clicked => { root.stack(); }
+                        accessible-id: "dialog.accept";
+                        clicked => { root.error-message = ""; }
                     }
                 }
+            }
+            SourceStrip {
+                frames: root.frames;
+                thumbnails: root.thumbnails;
+                selected-index: root.selected-source;
+                all-selected: root.all-selected;
+                list-open: root.sidebar-visible;
+                select-frame(index) => { root.select-frame(index); }
+                frame-menu(index) => { root.source-menu(index); }
+                move-selection(step) => { root.change-source(step); }
+                toggle-list => { root.sidebar-visible = !root.sidebar-visible; }
+                range-changed(first, count) => { root.thumbnail-range(first, count); }
             }
         }
         if root.page == "export": VerticalLayout {
-            padding: 22px;
+            padding: 20px;
             spacing: 12px;
             alignment: start;
             SectionLabel { text: "Export result"; }
             HorizontalLayout {
                 spacing: 12px;
                 alignment: start;
-                Text { text: "Format"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
-                ComboBox {
+                DeskText { text: "Format"; width: 140px; }
+                DeskChoice {
                     width: 205px;
                     accessible-id: "export.format";
-                    accessible-label: self.current-value;
+                    accessible-label: "Export format";
                     model: ["PNG", "JPEG", "TIFF", "OpenEXR"];
                     current-index <=> root.export-format-index;
                 }
@@ -795,11 +1421,11 @@ export component Workspace inherits Window {
             HorizontalLayout {
                 spacing: 12px;
                 alignment: start;
-                Text { text: "Bit depth"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
-                ComboBox {
+                DeskText { text: "Bit depth"; width: 140px; }
+                DeskChoice {
                     width: 205px;
                     accessible-id: "export.depth";
-                    accessible-label: self.current-value;
+                    accessible-label: "Export bit depth";
                     model: ["8-bit", "16-bit"];
                     current-index <=> root.export-depth-index;
                     enabled: root.export-format-index == 0 || root.export-format-index == 2;
@@ -808,8 +1434,8 @@ export component Workspace inherits Window {
             HorizontalLayout {
                 spacing: 8px;
                 alignment: start;
-                Button { text: "Cancel"; accessible-id: "dialog.cancel"; clicked => { root.page = "workspace"; } }
-                Button {
+                ViewCommand { text: "Cancel"; accessible-id: "dialog.cancel"; clicked => { root.page = "workspace"; } }
+                ViewCommand {
                     text: "Continue…";
                     accessible-id: "export.confirm";
                     primary: true;
@@ -821,18 +1447,18 @@ export component Workspace inherits Window {
             }
         }
         if root.page == "preferences": VerticalLayout {
-            padding: 22px;
+            padding: 20px;
             alignment: start;
             spacing: 12px;
             SectionLabel { text: "Preferences"; }
             HorizontalLayout {
                 spacing: 12px;
                 alignment: start;
-                Text { text: "Theme"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
-                ComboBox {
+                DeskText { text: "Theme"; width: 140px; }
+                DeskChoice {
                     width: 205px;
                     accessible-id: "settings.theme";
-                    accessible-label: self.current-value;
+                    accessible-label: "Theme";
                     model: root.themes;
                     current-index <=> root.theme-index;
                     selected(_) => { root.save-preferences(root.themes[root.theme-index], root.devices[root.device-index]); }
@@ -841,53 +1467,89 @@ export component Workspace inherits Window {
             HorizontalLayout {
                 spacing: 12px;
                 alignment: start;
-                Text { text: "Processing device"; width: 140px; vertical-alignment: center; color: Palette.foreground; }
-                ComboBox {
+                DeskText { text: "Accent color"; width: 140px; }
+                DeskInput {
+                    text <=> root.accent-value;
+                    width: 105px;
+                    accessible-id: "settings.accent";
+                    accessible-label: "Accent color as a hexadecimal RGB value";
+                    accepted => { root.save-accent(root.accent-value); }
+                }
+                Rectangle {
+                    width: 28px;
+                    height: 22px;
+                    border-width: 1px;
+                    border-color: Desk.boundary;
+                    border-radius: 4px;
+                    background: Desk.accent;
+                    cross-axis-self-alignment: center;
+                    accessible-role: image;
+                    accessible-label: "Applied accent color";
+                }
+                ViewCommand {
+                    text: "Apply";
+                    accessible-id: "settings.accent.apply";
+                    clicked => { root.save-accent(root.accent-value); }
+                }
+            }
+            HorizontalLayout {
+                spacing: 12px;
+                alignment: start;
+                DeskText { text: "Processing device"; width: 140px; }
+                DeskChoice {
                     width: 205px;
                     accessible-id: "settings.device";
-                    accessible-label: self.current-value;
+                    accessible-label: "Processing device";
                     model: root.devices;
                     current-index <=> root.device-index;
                     selected(_) => { root.save-preferences(root.themes[root.theme-index], root.devices[root.device-index]); }
                 }
             }
+            Rule {}
             SectionLabel { text: "Lightroom Classic"; }
-            Text {
+            DeskText {
                 text: root.lightroom-status;
                 wrap: word-wrap;
-                color: Palette.foreground;
+                font-family: Desk.action-face;
                 accessible-id: "settings.lightroom.status";
             }
-            Button {
+            ViewCommand {
                 text: root.lightroom-installed ? "Reinstall Lightroom plug-in" : "Install Lightroom plug-in";
                 accessible-id: "settings.lightroom.action";
                 enabled: root.lightroom-installable;
                 clicked => { root.install-lightroom(); }
-                horizontal-stretch: 0;
             }
-            Button {
-                text: "Done";
-                accessible-id: "dialog.close";
-                horizontal-stretch: 0;
-                clicked => { root.page = "workspace"; }
-            }
-            if root.error-message != "": Text {
+            if root.error-message != "": DeskText {
                 text: root.error-message;
                 wrap: word-wrap;
-                color: Palette.foreground;
+                font-family: Desk.action-face;
+            }
+            ViewCommand {
+                text: "Done";
+                primary: true;
+                accessible-id: "dialog.close";
+                clicked => { root.page = "workspace"; }
             }
         }
         if root.page == "about": VerticalLayout {
-            padding: 22px;
+            padding: 20px;
             alignment: start;
             spacing: 12px;
             SectionLabel { text: "About Pancake"; accessible-id: "about.window"; }
-            Text { text: root.app-version; accessible-id: "about.version"; color: Palette.foreground; }
-            Text { text: "Focus stacking and exposure fusion"; color: Palette.foreground; }
-            Button {
+            if root.wordmark.width > 0: Image {
+                source: root.wordmark;
+                width: 216px;
+                height: 216px;
+                image-fit: contain;
+                accessible-role: image;
+                accessible-label: "Original Pancake Stacker wordmark";
+            }
+            DeskText { text: root.app-version; accessible-id: "about.version"; }
+            DeskText { text: "Focus stacking and exposure fusion"; font-family: Desk.action-face; }
+            ViewCommand {
                 text: "Done";
+                primary: true;
                 accessible-id: "dialog.close";
-                horizontal-stretch: 0;
                 clicked => { root.page = "workspace"; }
             }
         }

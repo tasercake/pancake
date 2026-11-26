@@ -18,6 +18,30 @@ def test_cli_exposes_data_commands(arguments, expected):
     result = subprocess.run([sys.executable, "-m", "bokehforge", *arguments], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert all(value in result.stdout for value in expected)
+    assert not result.stderr
+    assert "\x1b" not in result.stdout
+
+
+@pytest.mark.parametrize("arguments, heading, option", [
+    ([], "Commands", "bench"),
+    (["data"], "Data commands", "download"),
+    (["bench"], "Stack source", "--algorithm"),
+    (["bench"], "Scene selection", "--scene"),
+    (["bench"], "Report", "--output"),
+    (["data", "download"], "Dataset selection", "--dataset"),
+    (["data", "download"], "Download limits", "--workers"),
+    (["review"], "Connection", "--host"),
+    (["review"], "Stackers", "--pancake"),
+])
+def test_cli_groups_controls_by_task(arguments, heading, option):
+    result = subprocess.run(
+        [sys.executable, "-m", "bokehforge", *arguments, "--help"], capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    _, label, rest = result.stdout.partition(f"\n{heading}:\n")
+    assert label, result.stdout
+    assert option in rest.partition("\n\n")[0]
+
 
 
 @pytest.mark.parametrize("arguments", [["unknown"], ["data", "unknown"], ["data", "process"]])

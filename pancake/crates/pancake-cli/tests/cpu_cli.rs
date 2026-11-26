@@ -69,6 +69,27 @@ fn help_is_headless() -> Result<(), Box<dyn Error>> {
             format!("help must document {option}"),
         )?;
     }
+    for (heading, option) in [
+        ("Sources:", "--input"),
+        ("Stack:", "--method"),
+        ("Alignment:", "--alignment-mode"),
+        ("Output:", "--bit-depth"),
+        ("Compute:", "--device"),
+    ] {
+        let mut group = stdout
+            .lines()
+            .skip_while(|line| *line != heading)
+            .skip(1)
+            .take_while(|line| line.is_empty() || line.starts_with(' '));
+        require(
+            group.any(|line| line.trim_start().starts_with(option)),
+            format!("{heading} help must document {option}"),
+        )?;
+    }
+    require(
+        !stdout.contains('\x1b'),
+        "redirected help must be plain text",
+    )?;
     require(output.stderr.is_empty(), "help must write to stdout")?;
     Ok(())
 }

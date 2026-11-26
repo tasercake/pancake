@@ -19,13 +19,16 @@ for _, path in ipairs { photoPath, secondPhotoPath } do
 end
 
 local events, failure, cancel, appMissing, renderFailure, launchFailure, offline, partialRender
+local failureTitle, failureSeverity
 local function record(event) events[#events + 1] = event end
 local sdk = {
     LrApplication = {
         activeCatalog = function() return { getTargetPhotos = function() return targetPhotos end } end,
     },
     LrDialogs = {
-        message = function(_, details) failure = details end,
+        message = function(title, details, severity)
+            failureTitle, failure, failureSeverity = title, details, severity
+        end,
     },
     LrExportSession = function(params)
         assert(#params.photosToExport == 2)
@@ -152,6 +155,7 @@ assert(table.concat(events, '|') == 'mkdir|render|render|done|' .. table.concat(
 
 renderFailure = true
 run(2)
+assert(failureTitle == 'Could not open photos in Pancake' and failureSeverity == 'critical')
 assert(failure:find('Render failure', 1, true))
 assert(table.concat(events, '|') == 'mkdir|render|done|delete')
 renderFailure = false
@@ -215,6 +219,7 @@ assert(table.concat(events, '|') == 'render|render|done|' .. table.concat({
 
 renderFailure = true
 runPreset(2)
+assert(failureTitle == 'Could not open photos in Pancake' and failureSeverity == 'critical')
 assert(failure:find('Render failure', 1, true))
 assert(table.concat(events, '|') == 'render|done')
 renderFailure = false

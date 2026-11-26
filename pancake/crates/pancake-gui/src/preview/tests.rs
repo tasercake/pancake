@@ -33,3 +33,50 @@ fn retains_no_more_than_four_display_images() -> Result<(), String> {
     }
     Ok(())
 }
+
+/// A filmstrip thumbnail retains image orientation and bounded RGB samples.
+/// # Errors
+/// Returns a sample, geometry or renderer-buffer mismatch.
+#[test]
+fn thumbnail_samples_a_real_wide_frame_with_bounded_storage() -> Result<(), String> {
+    let width = 480;
+    let height = 240;
+    let mut samples = Vec::with_capacity(480_usize.saturating_mul(240).saturating_mul(3));
+    for _ in 0..height {
+        for x in 0..width {
+            let sample = if x == 0 {
+                [1.0, 0.0, 0.0]
+            } else {
+                [0.0, 0.0, 1.0]
+            };
+            samples.extend(sample);
+        }
+    }
+    let frame = RgbImage::new(width, height, samples)?;
+    let thumbnail = super::Thumbnail::new(&frame)?.into_image();
+    let raster = thumbnail
+        .to_rgba8()
+        .ok_or("Missing filmstrip thumbnail raster.")?;
+    let first = raster
+        .as_slice()
+        .first()
+        .ok_or("Missing thumbnail sample.")?;
+    let last = raster
+        .as_slice()
+        .last()
+        .ok_or("Missing thumbnail sample.")?;
+    if (
+        raster.width(),
+        raster.height(),
+        first.r,
+        first.b,
+        last.r,
+        last.b,
+    ) != (160, 80, 255, 0, 0, 255)
+    {
+        return Err(
+            "The thumbnail lost real source samples, proportions, or its size limit.".into(),
+        );
+    }
+    Ok(())
+}
