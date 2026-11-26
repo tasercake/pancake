@@ -9,11 +9,10 @@ import pytest
 import tifffile
 from PIL import Image
 
-from bokehforge.alignment import CROP_SCORE_VERSION
 from bokehforge.bench import _score, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
 from bokehforge.data.lazy import Scene, SceneCatalog
-from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, SCORE_EXPLANATION_VERSION, SCORE_VERSION
+from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, SCORE_EXPLANATION_VERSION, SCORE_VERSION, measure
 
 _FIXTURE_REFERENCE = np.float32(20 / 255)
 
@@ -64,7 +63,7 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert result.returncode == 0, result.stderr
     assert result.stdout == "100.000000\n"
     report = json.loads((output / "report.json").read_text())
-    assert report["schema_version"] == 3
+    assert report["schema_version"] == 4
     assert report["score"] == 100.0
     assert report["score_version"] == SCORE_VERSION
     assert report["scoring"]["family_weights"] == FAMILY_WEIGHTS
@@ -127,7 +126,7 @@ def test_external_stacker_failure_counts_and_cohort_is_stable(corpus, tmp_path):
         "    frame = next(scene.frames)\n"
         "    assert not frame.pixels.flags.writeable\n"
         "    assert frame.ordinal == 0 and frame.id == scene.frame_ids[0]\n"
-        "    return frame.pixels[:-1]\n"
+        "    return frame.pixels.astype('float64')\n"
     )
     output = tmp_path / "external"
     result = run_bench(corpus, output, "--dataset", "referenced", "--algorithm", "fixture_stacker:stack",
@@ -145,30 +144,40 @@ def test_external_stacker_failure_counts_and_cohort_is_stable(corpus, tmp_path):
     assert report["cohort_sha256"] == json.loads((baseline / "report.json").read_text())["cohort_sha256"]
 
 
-def test_crop_profile_scores_original_delivery_and_replays_it(corpus, tmp_path):
+def test_default_scores_original_crop_and_replays_it(corpus, tmp_path):
     plugin = tmp_path / "crop_stacker.py"
     plugin.write_text("def stack(scene):\n    return next(scene.frames).pixels[1:, 1:]\n")
     env = {**os.environ, "PYTHONPATH": str(tmp_path)}
-    fixed = run_bench(corpus, tmp_path / "fixed", "--dataset", "referenced", "--algorithm", "crop_stacker:stack", env=env)
-    assert fixed.returncode == 1
-    assert fixed.stdout == "0.000000\n"
-
     output = tmp_path / "crop"
     cropped = run_bench(corpus, output, "--dataset", "referenced", "--algorithm", "crop_stacker:stack", "--save-images",
-                        "--score-profile", CROP_SCORE_VERSION, env=env)
+                        env=env)
     assert cropped.returncode == 0, cropped.stderr
     assert cropped.stdout == "50.000000\n"
     report = json.loads((output / "report.json").read_text())
-    assert report["score_version"] == CROP_SCORE_VERSION
+    assert report["score_version"] == SCORE_VERSION
     scene = next(row for row in report["scenes"] if row["reference_status"] == "eligible")
     assert scene["alignment"]["placements"][0]["coverage"] == 0.5
     assert scene["alignment"]["placements"][0]["overlap_score"] == 100
     assert tifffile.imread(output / scene["image"]).shape == (2, 3, 3)
 
-    replay = run_bench(corpus, tmp_path / "replay", "--dataset", "referenced", "--candidate-dir", str(output / "images"),
-                       "--score-profile", CROP_SCORE_VERSION)
+    replay_dir = tmp_path / "replay"
+    replay = run_bench(corpus, replay_dir, "--dataset", "referenced", "--candidate-dir", str(output / "images"))
     assert replay.returncode == 0, replay.stderr
     assert replay.stdout == cropped.stdout
+    replay_row, = json.loads((replay_dir / "report.json").read_text())["scenes"]
+    assert replay_row["alignment"] == scene["alignment"]
+    saved = output / scene["image"]
+    catalog = SceneCatalog(corpus, datasets=["referenced"], config=corpus / "sources.json")
+    catalog_scene = catalog.scene(scene["scene_id"])
+    reference = catalog.decode(catalog_scene.reference_ids[0]).data
+    assert measure(tifffile.imread(saved), reference).alignment == replay_row["alignment"]
+    assert score_saved_output(catalog, catalog_scene, saved)["alignment"] == replay_row["alignment"]
+
+    removed = run_bench(corpus, tmp_path / "removed", "--dataset", "referenced", "--candidate-dir", str(output / "images"),
+                        "--score-profile", "reference-fidelity-crop-v2")
+    assert removed.returncode == 2
+    assert "unrecognized arguments: --score-profile" in removed.stderr
+
 
 
 @pytest.mark.parametrize("selection", [(), ("--dataset", "field")])

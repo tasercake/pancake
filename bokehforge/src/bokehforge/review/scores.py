@@ -4,6 +4,7 @@ from collections import OrderedDict
 import json
 from threading import Condition, Thread
 
+from ..alignment import ALIGNMENT_VERSION
 from ..bench import score_saved_output
 from ..scoring import FAMILY_WEIGHTS, SCORE_EXPLANATION_VERSION, SCORE_VERSION
 from .images import output_identity, output_revision
@@ -35,7 +36,7 @@ class Scores:
         fields = {"profile": SCORE_VERSION, "score": None, "artifact_revision": revision}
         if expected_revision is not None and expected_revision != revision:
             return {**fields, "status": "stale"}
-        identity = (SCORE_VERSION, scene.metadata["recipe_sha256"], result["scene_fingerprint"],
+        identity = (SCORE_VERSION, ALIGNMENT_VERSION, scene.metadata["recipe_sha256"], result["scene_fingerprint"],
                     *artifact[1:])
         key = (receipt, identity, detail)
         cache = self.recent if detail == "summary" else self.spatial
@@ -117,12 +118,16 @@ class Scores:
         explanation = result.pop("explanation", None)
         if explanation is None:
             return result
-        placement, = explanation["placements"]
+        placements = explanation["placements"]
+        if not placements or placements[0]["comparison"] is None:
+            return {**result, "status": "no_overlay"}
+        placement = placements[0]
         grids = placement["comparison"]["tile_grids"]
         return {**result, "reference_id": explanation["reference_id"],
                 "reference_size_wh": explanation["reference_size_wh"],
                 "candidate_size_wh": explanation["candidate_size_wh"],
                 "candidate_to_reference_xy": placement["candidate_to_reference_xy"],
+                "candidate_content_box_xyxy": placement["candidate_content_box_xyxy"],
                 "grids": {key: grids[key] for key in _OVERLAY_GRIDS.values()}}
 
     @staticmethod

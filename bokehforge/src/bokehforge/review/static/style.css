@@ -349,6 +349,15 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
   padding: .38rem .2rem;
   font-variant-numeric: tabular-nums;
 }
+[data-alignment-evidence] {
+  max-height: 16rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: .75rem;
+}
+
+.damage-controls[hidden], .damage-column-headings[hidden] { display: none; }
 .damage-column-headings { color: var(--muted); font-size: .72rem; }
 .damage-column-headings > :not(:first-child), .damage-family summary > :not(:first-child) { text-align: right; }
 .damage-family { border-top: 1px solid var(--stroke); }

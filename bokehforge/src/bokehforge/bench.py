@@ -16,7 +16,7 @@ from time import perf_counter
 import numpy as np
 import tifffile
 
-from .alignment import CROP_SCORE_VERSION, MAX_ROTATION_DEGREES, evaluate_crop
+from .alignment import ALIGNMENT_VERSION, MAX_ROTATION_DEGREES
 from .data._canonical import encode_tiff
 from .data._files import digest
 from .data._config import DEFAULT_CONFIG, data_root, read_config
@@ -24,7 +24,7 @@ from .data.download import save_json
 from .data.lazy import SceneCatalog
 from .scoring import (
     FAMILY_WEIGHTS, SCORE_DAMAGE_SCALE, SCORE_DETAIL_LEVELS, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
-    ScoreDetails, _score_explanation, _validate_details, measure, validate_rgb,
+    ScoreDetails, _validate_details, measure, validate_rgb,
 )
 from .stacking import StackFrame, StackInput
 
@@ -117,7 +117,7 @@ def _reference(catalog, scene, row):
         reference = catalog.decode(scene.reference_ids[0])
         validate_rgb(reference.data)
         if reference.alpha is not None:
-            raise ValueError("The RGB reference profile cannot score native alpha")
+            raise ValueError("The RGB benchmark reference cannot have native alpha")
     except Exception as exc:
         row.update(status="reference_error", reference_status="error", error=_error_text(exc))
         return None
@@ -174,34 +174,20 @@ def _load_candidate(path, row, *, fingerprint=False):
     return None
 
 
-def _score_delivery(result, reference, row, profile, *, details=None):
+def _score_delivery(result, reference, row, *, details=None):
     try:
-        validate_rgb(result, reference.shape if profile == SCORE_VERSION else None)
+        validate_rgb(result)
     except ValueError as exc:
         row.update(status="invalid_output", error=str(exc))
         return
 
     scoring_start = perf_counter()
     try:
-        explanation = None
-        if profile == CROP_SCORE_VERSION:
-            score, measurement, alignment = evaluate_crop(result, reference, details=details)
-            explanation = alignment.pop("explanation", None)
-            row.update(scene_score=score, alignment=alignment)
-        else:
-            measurement = measure(result, reference, details=details)
-            score = row["scene_score"] = measurement.score
-            if details is not None:
-                placement = {
-                    "offset_yx": [0.0, 0.0], "rotation_degrees": 0.0, "agreement": None,
-                    "candidate_to_reference_xy": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
-                    "coverage": 1.0, "weight": 1.0, "overlap_score": score, "score_contribution": score,
-                    "comparison": measurement.explanation,
-                }
-                explanation = _score_explanation(profile, details, result, reference, score, 1.0, [placement])
-        if measurement is not None:
+        measurement = measure(result, reference, details=details)
+        row.update(scene_score=measurement.score, alignment=measurement.alignment)
+        if measurement.features:
             row.update(score_features=measurement.features, artifact_diagnostics=measurement.diagnostics)
-        return explanation
+        return measurement.explanation
     except Exception as exc:
         row.update(status="scoring_error", reference_status="error", scene_score=None, error=_error_text(exc))
         return
@@ -209,11 +195,9 @@ def _score_delivery(result, reference, row, profile, *, details=None):
         row["scoring_seconds"] = perf_counter() - scoring_start
 
 
-def score_saved_output(catalog, scene, path, *, profile=SCORE_VERSION, details: ScoreDetails | None = None):
+def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = None):
     """Compare a canonical TIFF with the scene's required RGB ground truth."""
     _validate_details(details)
-    if profile not in (SCORE_VERSION, CROP_SCORE_VERSION):
-        raise ValueError(f"Unknown score profile {profile!r}")
     _require_benchmark_reference(scene)
     row = {"status": "ok", "scene_score": None}
     explanation = None
@@ -221,10 +205,11 @@ def score_saved_output(catalog, scene, path, *, profile=SCORE_VERSION, details: 
     if reference is not None:
         result = _load_candidate(path, row)
         if result is not None:
-            explanation = _score_delivery(result, reference, row, profile, details=details)
-    response = {"profile": profile, "score": row["scene_score"], "status": row["status"]}
-    if "error" in row:
-        response["error"] = row["error"]
+            explanation = _score_delivery(result, reference, row, details=details)
+    response = {"profile": SCORE_VERSION, "score": row["scene_score"], "status": row["status"]}
+    for field in ("error", "alignment"):
+        if field in row:
+            response[field] = row[field]
     if explanation is not None:
         response["explanation"] = {**explanation, "scene_id": scene.id, "reference_id": scene.reference_ids[0]}
     return response
@@ -273,7 +258,7 @@ def _run_scene(catalog, scene, row, algorithm, args):
 
     if row["status"] != "ok":
         return
-    explanation = _score_delivery(result, reference, row, args.score_profile, details=args.explain_score)
+    explanation = _score_delivery(result, reference, row, details=args.explain_score)
     if row["status"] != "ok":
         return
     if args.save_images:
@@ -330,10 +315,6 @@ def main(argv=None):
     selection.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
     score_options = parser.add_argument_group("Scoring")
     score_options.add_argument(
-        "--score-profile", choices=(SCORE_VERSION, CROP_SCORE_VERSION), default=SCORE_VERSION,
-        help="Score on the fixed reference grid or match a delivered crop to it",
-    )
-    score_options.add_argument(
         "--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)",
     )
     report_options = parser.add_argument_group("Report")
@@ -386,11 +367,10 @@ def main(argv=None):
                "runtime": {name: version(name) for name in ("bokehforge", "numpy", "scipy", "tifffile")},
                "python": sys.version.split()[0],
                "aggregation": "equal datasets; equal leakage groups within each dataset"}
-    if args.score_profile == CROP_SCORE_VERSION:
-        scoring["alignment"] = {"max_rotation_degrees": MAX_ROTATION_DEGREES,
-                                "coverage_penalty": "multiply by covered fraction of the reference"}
+    scoring["alignment"] = {"schema_version": ALIGNMENT_VERSION, "max_rotation_degrees": MAX_ROTATION_DEGREES,
+                            "coverage_penalty": "minimum of relative intersection area and contributing delivery samples"}
     report = {
-        "schema_version": 3, "score": score, "score_version": args.score_profile,
+        "schema_version": 4, "score": score, "score_version": SCORE_VERSION,
         "scoring": scoring,
         "scored_groups": scored_groups, "cohort_sha256": cohort_hash, "algorithm": implementation,
         "data_root": str(root.resolve()), "decode_workers": args.decode_workers, "seconds": perf_counter() - start,

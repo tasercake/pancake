@@ -56,6 +56,10 @@ function drawGrid(canvas, payload) {
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d");
+  const [left, top, right, bottom] = payload.candidate_content_box_xyxy;
+  ctx.beginPath();
+  ctx.rect(left, top, right - left, bottom - top);
+  ctx.clip();
   ctx.setTransform(ia, ic, ib, id, 0.5 - ia * (tx + 0.5) - ib * (ty + 0.5),
     0.5 - ic * (tx + 0.5) - id * (ty + 0.5));
   const colors = Array.from({ length: 256 }, (_, index) => {
@@ -124,32 +128,52 @@ export class ScoreExplanation {
   update(context) {
     const benchmark = context?.benchmark;
     const explanation = benchmark?.explanation;
-    const comparison = explanation?.placements[0]?.comparison;
+    const placement = explanation?.placements[0];
     const p = context?.params;
-    const key = comparison && p?.rev && p.rev === benchmark.artifact_revision
+    const key = explanation && p?.rev && p.rev === benchmark.artifact_revision
       ? JSON.stringify([p.run, p.scene, p.stacker, p.rev, explanation.reference_id, benchmark.profile]) : "";
     this.context = key ? context : null;
     if (key !== this.key) {
       this.key = key;
       this.trigger.hidden = !key;
       this.setOpen(this.open);
-      if (key) this.showSummary(explanation, comparison);
+      if (key) this.showSummary(explanation, placement, benchmark.alignment);
     }
-    this.toggle.checked = Boolean(key && this.overlayFor === key);
-    this.toggle.disabled = !context?.image;
+    this.toggle.checked = Boolean(placement?.comparison && key && this.overlayFor === key);
+    this.toggle.disabled = !context?.image || !placement?.comparison;
     this.paintOverlay();
   }
 
-  showSummary(explanation, comparison) {
-    const families = Object.entries(comparison.families);
+  showSummary(explanation, placement, alignment) {
+    const comparison = placement?.comparison;
+    const families = Object.entries(comparison?.families ?? {});
     const previousFamily = this.family.value;
     this.root.querySelector("[data-score-heading]").textContent =
       "Benchmark score " + points.format(explanation.score) + " / 100";
-    this.root.querySelector("[data-damage-curve]").textContent =
-      "Weighted damage " + damage(comparison.weighted_damage) +
-      " · 100 × exp(−" + number.format(explanation.damage_scale) + " × weighted damage)";
+    const summary = this.root.querySelector("[data-alignment-summary]");
+    if (!placement) {
+      summary.textContent = "The scorer could not place the delivery on the reference.";
+    } else {
+      const alternatives = explanation.placements.length;
+      const coverage = "Reference area " + percent.format(placement.geometric_coverage);
+      const resolution = "resolution cap " + percent.format(placement.resolution_cap);
+      const quality = "overlap quality " + points.format(placement.overlap_score);
+      const confidence = "match confidence " + percent.format(explanation.confidence);
+      summary.textContent = [coverage, resolution, quality, confidence].join(" · ") +
+        (alternatives > 1 ? " · Showing the leading of " + alternatives + " placements" : "") +
+        (explanation.alignment_status === "uncertain" ? " · Native placement inferred from limited detail" : "");
+    }
+    this.root.querySelector("[data-alignment-details]").hidden = !alignment;
+    this.root.querySelector("[data-alignment-evidence]").textContent = JSON.stringify(alignment, null, 2) ?? "";
+    for (const id of ["controls", "columns", "method", "curve"]) {
+      this.root.querySelector("[data-damage-" + id + "]").hidden = !comparison;
+    }
+    this.root.querySelector("[data-damage-curve]").textContent = comparison
+      ? "Weighted damage " + damage(comparison.weighted_damage) +
+        " · Overlap quality = 100 × exp(−" + number.format(explanation.damage_scale) + " × weighted damage)"
+      : "";
     this.family.replaceChildren(...families.map(([id, info]) => new Option(info.label, id)));
-    if (Object.hasOwn(comparison.families, previousFamily)) this.family.value = previousFamily;
+    if (Object.hasOwn(comparison?.families ?? {}, previousFamily)) this.family.value = previousFamily;
     this.root.querySelector("[data-damage-families]").replaceChildren(...families.map(([, info]) => familyRow(info)));
   }
 
