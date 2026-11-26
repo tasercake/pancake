@@ -1513,22 +1513,28 @@ export component Workspace inherits Window {
                 font-family: Desk.action-face;
                 accessible-id: "settings.lightroom.status";
             }
-            ViewCommand {
-                text: root.lightroom-installed ? "Reinstall Lightroom plug-in" : "Install Lightroom plug-in";
-                accessible-id: "settings.lightroom.action";
-                enabled: root.lightroom-installable;
-                clicked => { root.install-lightroom(); }
+            HorizontalLayout {
+                alignment: start;
+                ViewCommand {
+                    text: root.lightroom-installed ? "Reinstall Lightroom plug-in" : "Install Lightroom plug-in";
+                    accessible-id: "settings.lightroom.action";
+                    enabled: root.lightroom-installable;
+                    clicked => { root.install-lightroom(); }
+                }
             }
             if root.error-message != "": DeskText {
                 text: root.error-message;
                 wrap: word-wrap;
                 font-family: Desk.action-face;
             }
-            ViewCommand {
-                text: "Done";
-                primary: true;
-                accessible-id: "dialog.close";
-                clicked => { root.page = "workspace"; }
+            HorizontalLayout {
+                alignment: start;
+                ViewCommand {
+                    text: "Done";
+                    primary: true;
+                    accessible-id: "dialog.close";
+                    clicked => { root.page = "workspace"; }
+                }
             }
         }
         if root.page == "about": VerticalLayout {
@@ -1546,11 +1552,14 @@ export component Workspace inherits Window {
             }
             DeskText { text: root.app-version; accessible-id: "about.version"; }
             DeskText { text: "Focus stacking and exposure fusion"; font-family: Desk.action-face; }
-            ViewCommand {
-                text: "Done";
-                primary: true;
-                accessible-id: "dialog.close";
-                clicked => { root.page = "workspace"; }
+            HorizontalLayout {
+                alignment: start;
+                ViewCommand {
+                    text: "Done";
+                    primary: true;
+                    accessible-id: "dialog.close";
+                    clicked => { root.page = "workspace"; }
+                }
             }
         }
     }
