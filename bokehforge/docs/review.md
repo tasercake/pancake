@@ -19,6 +19,8 @@ Select an evaluation and a stacker to compare its output with a source frame and
 
 Each ready output shows the benchmark’s per-scene score out of 100 below its image, on its stacker tab, and in the lightbox header while you view or preview the output. Review uses the default [`reference-fidelity-v2` profile](benchmark.md#the-score) at native resolution. The default profile gives cropped or otherwise invalid deliveries a zero, and scenes without an eligible RGB reference remain unscored. Select the **i** beside **Invalid delivery** for the reason. In the lightbox, press **I** to open it while previewing a thumbnail. Scores are computed in the background when you open a scene and cached for subsequent visits.
 
+Select **Explain score** in either view to see how the six damage families contribute to the weighted damage and final score. Expand a family to see the pooling values and weights. Turn on **Show damage overlay** to inspect that family’s measured tile values on the output. Choose the 8- or 32-pixel grid and use the 0–1 legend. A zero-damage or unmeasured tile is transparent. In the lightbox, the overlay follows zoom and pan, clips to the output side of a swipe, and disappears when you show only the reference. Review calculates tile data when you request the overlay.
+
 ## Set up the stackers
 
 Choose the stackers in **New evaluation**. When you start the run, Review uses the available open-source stackers and prepares any others you selected before processing scenes. First-time setup may download dependencies. The run banner shows what is being installed, and setup failures include a log for the affected stacker. Other selected stackers can continue when one setup fails.

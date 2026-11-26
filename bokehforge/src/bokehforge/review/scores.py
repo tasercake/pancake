@@ -5,9 +5,11 @@ import json
 from threading import Condition, Thread
 
 from ..bench import has_benchmark_reference, score_saved_output
-from ..scoring import SCORE_VERSION
+from ..scoring import FAMILY_WEIGHTS, SCORE_EXPLANATION_VERSION, SCORE_VERSION
+from .images import output_identity, output_revision
 
 _INVALID_DETAIL_VERSION = 1
+_OVERLAY_GRIDS = {8: "8:0:0", 32: "32:0:0"}
 
 
 class Scores:
@@ -17,43 +19,70 @@ class Scores:
         self.condition = Condition()
         self.pending = OrderedDict()
         self.recent = OrderedDict()
+        self.spatial = OrderedDict()
         self.active = None
         self.closed = False
         self.worker = None
 
-    def get(self, catalog, scene, directory, result):
-        if not has_benchmark_reference(scene):
-            return {"profile": SCORE_VERSION, "status": "unscored", "score": None}
+    def get(self, catalog, scene, directory, result, *, detail="summary", expected_revision=None):
         image = directory / result["image"]
         receipt = directory / result["stacker"] / "scores" / f"{scene.id}.json"
         try:
-            stat = image.stat()
+            artifact = output_identity(image)
         except OSError as exc:
             return {"profile": SCORE_VERSION, "status": "missing_output", "score": None, "error": str(exc)}
+        revision = output_revision(artifact)
+        fields = {"profile": SCORE_VERSION, "score": None, "artifact_revision": revision}
+        if expected_revision is not None and expected_revision != revision:
+            return {**fields, "status": "stale"}
+        if not has_benchmark_reference(scene):
+            return {**fields, "status": "unscored"}
         identity = (SCORE_VERSION, scene.metadata["recipe_sha256"], result["scene_fingerprint"],
-                    stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
-        key = (receipt, identity)
+                    *artifact[1:])
+        key = (receipt, identity, detail)
+        cache = self.recent if detail == "summary" else self.spatial
         with self.condition:
-            if key in self.recent:
-                self.recent.move_to_end(key)
-                return self.recent[key]
-            try:
-                saved = json.loads(receipt.read_text(encoding="utf-8"))
-                result = saved["result"]
-                current_details = (result["status"] != "invalid_output"
-                                   or saved.get("invalid_detail_version") == _INVALID_DETAIL_VERSION)
-                if saved["identity"] == list(identity) and current_details:
-                    return result
-            except (OSError, ValueError, KeyError, TypeError):
-                pass
+            if key in cache:
+                cache.move_to_end(key)
+                return {**cache[key], "artifact_revision": revision}
+            if detail == "summary":
+                saved = self._read_summary(receipt, identity)
+                if saved is not None:
+                    return {**saved, "artifact_revision": revision}
             if not self.closed and self.active != key:
-                self.pending[key] = (catalog, scene, image)
+                self.pending[key] = (catalog, scene, image, artifact)
                 self.pending.move_to_end(key)
                 if self.worker is None:
                     self.worker = Thread(target=self._work, name="bokehforge-review-scores", daemon=True)
                     self.worker.start()
                 self.condition.notify()
-        return {"profile": SCORE_VERSION, "status": "pending", "score": None}
+        return {**fields, "status": "pending"}
+
+    @staticmethod
+    def _read_summary(receipt, identity):
+        try:
+            saved = json.loads(receipt.read_text(encoding="utf-8"))
+            result = saved["result"]
+            if saved["identity"] != list(identity):
+                return None
+            if result["status"] == "invalid_output" and saved.get("invalid_detail_version") != _INVALID_DETAIL_VERSION:
+                return None
+            if result["status"] == "ok" and result.get("explanation", {}).get("schema_version") != SCORE_EXPLANATION_VERSION:
+                return None
+            return result
+        except (OSError, ValueError, KeyError, TypeError, AttributeError):
+            return None
+
+    def tiles(self, catalog, scene, directory, result, revision, family, side):
+        if family not in FAMILY_WEIGHTS or side not in _OVERLAY_GRIDS:
+            raise ValueError("Unknown damage family or grid size")
+        spatial = self.get(catalog, scene, directory, result, detail="tiles", expected_revision=revision)
+        grids = spatial.pop("grids", None)
+        if grids is None:
+            return spatial
+        grid = grids[_OVERLAY_GRIDS[side]]
+        return {**spatial, "family": family,
+                "grid": {**grid, "values": grid["values"][family]}}
 
     def _work(self):
         while True:
@@ -63,25 +92,44 @@ class Scores:
                     return
                 # Score the currently requested scene before older ones. Run
                 # one native comparison at a time to limit memory use.
-                key, (catalog, scene, image) = self.pending.popitem()
+                key, (catalog, scene, image, artifact) = self.pending.popitem()
                 self.active = key
+            detail = key[2]
             try:
-                result = score_saved_output(catalog, scene, image)
+                result = score_saved_output(catalog, scene, image, details=detail)
+                if output_identity(image) != artifact:
+                    result = {"profile": SCORE_VERSION, "status": "stale", "score": None}
+                elif detail == "tiles":
+                    result = self._spatial_result(result)
             except Exception as exc:
                 result = {"profile": SCORE_VERSION, "status": "scoring_error", "score": None, "error": str(exc)}
-            if result["status"] in {"ok", "invalid_output"}:
+            if detail == "summary" and result["status"] in {"ok", "invalid_output"}:
                 self._save(key, result)
             with self.condition:
-                self.recent[key] = result
-                if len(self.recent) > 128:
-                    self.recent.popitem(last=False)
+                cache, limit = (self.recent, 128) if detail == "summary" else (self.spatial, 2)
+                cache[key] = result
+                if len(cache) > limit:
+                    cache.popitem(last=False)
                 self.active = None
                 self.revision += 1
             self.on_change()
 
     @staticmethod
+    def _spatial_result(result):
+        explanation = result.pop("explanation", None)
+        if explanation is None:
+            return result
+        placement, = explanation["placements"]
+        grids = placement["comparison"]["tile_grids"]
+        return {**result, "reference_id": explanation["reference_id"],
+                "reference_size_wh": explanation["reference_size_wh"],
+                "candidate_size_wh": explanation["candidate_size_wh"],
+                "candidate_to_reference_xy": placement["candidate_to_reference_xy"],
+                "grids": {key: grids[key] for key in _OVERLAY_GRIDS.values()}}
+
+    @staticmethod
     def _save(key, result):
-        receipt, identity = key
+        receipt, identity, _ = key
         pending = receipt.with_suffix(".tmp")
         try:
             receipt.parent.mkdir(parents=True, exist_ok=True)

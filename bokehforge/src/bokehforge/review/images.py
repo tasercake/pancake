@@ -4,7 +4,9 @@ from collections import OrderedDict
 from concurrent.futures import Future
 from contextlib import ExitStack, closing, contextmanager
 from dataclasses import dataclass
+from hashlib import sha256
 from io import BytesIO
+import json
 from pathlib import Path
 from threading import Condition, Lock
 from zipfile import ZipFile
@@ -324,3 +326,12 @@ def normalize_output(delivery, destination):
 
 def output_pixels(path: Path):
     return tifffile.imread(path, maxworkers=1)
+
+
+def output_identity(path):
+    stat = path.stat()
+    return (str(path), stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
+
+
+def output_revision(identity):
+    return sha256(json.dumps(identity).encode()).hexdigest()
