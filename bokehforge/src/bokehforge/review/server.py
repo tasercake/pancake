@@ -34,7 +34,13 @@ ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8"),
           "/rail.js": ("rail.js", "text/javascript; charset=utf-8"),
           "/score-explanation.js": ("score-explanation.js", "text/javascript; charset=utf-8"),
-          "/style.css": ("style.css", "text/css; charset=utf-8")}
+          "/style.css": ("style.css", "text/css; charset=utf-8"),
+          "/fonts/IBMPlexMono-Regular.ttf": ("fonts/IBMPlexMono-Regular.ttf", "font/ttf"),
+          "/fonts/IBMPlexMono-SemiBold.ttf": ("fonts/IBMPlexMono-SemiBold.ttf", "font/ttf"),
+          "/fonts/SpaceGrotesk-Regular.ttf": ("fonts/SpaceGrotesk-Regular.ttf", "font/ttf"),
+          "/fonts/SpaceGrotesk-SemiBold.ttf": ("fonts/SpaceGrotesk-SemiBold.ttf", "font/ttf"),
+          "/fonts/IBMPlexMono-OFL.txt": ("fonts/IBMPlexMono-OFL.txt", "text/plain; charset=utf-8"),
+          "/fonts/SpaceGrotesk-OFL.txt": ("fonts/SpaceGrotesk-OFL.txt", "text/plain; charset=utf-8")}
 ALL_INTERFACES = "0.0.0.0"
 
 
@@ -499,20 +505,23 @@ class ReviewServer(ThreadingHTTPServer):
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="bokehforge review",
                                      description="Browse and rate focus stacks on this computer")
-    parser.add_argument("--root", type=Path, default=REPO / "datasets",
-                        help="BokehForge dataset root (default: datasets/ in the repository)")
-    parser.add_argument("--store", type=Path, default=REPO / "artifacts/bokehforge-review",
-                        help="Local evaluations and ratings directory")
-    parser.add_argument("--host", default=ALL_INTERFACES,
-                        help="IPv4 bind address (default: 0.0.0.0, all interfaces)")
-    parser.add_argument("--port", type=int, default=8765, help="HTTP port (default: 8765)")
-    parser.add_argument("--dataset", action="append", help="Limit to a dataset ID, repeatable")
-    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
-    parser.add_argument("--lock", type=Path, help="Optional source snapshot")
-    parser.add_argument("--pancake", help="Path to pancake-cli")
-    parser.add_argument("--focus-stack", help="Path to focus-stack")
-    parser.add_argument("--openfocus", help="Path to openfocus")
-    parser.add_argument("--shine-python", help="Path to a Python with ShineStacker installed")
+    workspace = parser.add_argument_group("Workspace")
+    workspace.add_argument("--root", type=Path, default=REPO / "datasets",
+                           help="BokehForge dataset root (default: datasets/ in the repository)")
+    workspace.add_argument("--store", type=Path, default=REPO / "artifacts/bokehforge-review",
+                           help="Local evaluations and ratings directory")
+    workspace.add_argument("--dataset", action="append", help="Limit to a dataset ID, repeatable")
+    workspace.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
+    workspace.add_argument("--lock", type=Path, help="Optional source snapshot")
+    connection = parser.add_argument_group("Connection")
+    connection.add_argument("--host", default=ALL_INTERFACES,
+                            help="IPv4 bind address (default: 0.0.0.0, all interfaces)")
+    connection.add_argument("--port", type=int, default=8765, help="HTTP port (default: 8765)")
+    stackers = parser.add_argument_group("Stackers")
+    stackers.add_argument("--pancake", help="Path to pancake-cli")
+    stackers.add_argument("--focus-stack", help="Path to focus-stack")
+    stackers.add_argument("--openfocus", help="Path to openfocus")
+    stackers.add_argument("--shine-python", help="Path to a Python with ShineStacker installed")
     args = parser.parse_args(argv)
     args.root = args.root.resolve()
     args.config = args.config.resolve()

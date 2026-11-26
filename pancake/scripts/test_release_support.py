@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 from package_notices import file_sha256, stage_notices, verify_notices
 from release_support import package_windows, release_version, smoke_stack
-from test_package_linux import _workspace
+from test_package_linux import FONT_LICENSES, _workspace
 
 
 class ReleaseSupportTests(unittest.TestCase):
@@ -66,6 +66,12 @@ class ReleaseSupportTests(unittest.TestCase):
             inventory = json.loads((root / "payload" / receipt["file"]).read_text())
             self.assertEqual(inventory["target"], "x86_64-pc-windows-msvc")
             self.assertEqual(inventory["features"], "pancake/fixture")
+            gui = next(package for package in inventory["packages"] if package["name"] == "pancake-gui")
+            for name in FONT_LICENSES:
+                relative = f"pancake-gui-0.1.0/assets/fonts/{name}"
+                self.assertIn(relative, {item["file"] for item in gui["notices"]})
+                self.assertEqual((root / "payload/dependency-notices" / relative).read_bytes(),
+                                 (source / "crates/gui/assets/fonts" / name).read_bytes())
 
     def test_macos_release_linker_uses_the_static_zstd_at_the_same_link_position(self):
         linker = Path(__file__).with_name("macos-release-linker.sh")

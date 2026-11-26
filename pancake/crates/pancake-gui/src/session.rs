@@ -15,6 +15,7 @@ use slint::{
 };
 use slint_interpreter::{ComponentInstance, Value};
 
+use super::filmstrip::Filmstrip;
 use super::history::RecentFolders;
 use super::panel::{self, Picker};
 use super::preview::{Cache, ImageKey, Preview};
@@ -43,6 +44,8 @@ struct Session {
     history: RecentFolders,
     /// Short display-only cache separate from computation and export data.
     previews: Cache,
+    /// Bounded indexed filmstrip, decoded independently of the result viewer.
+    filmstrip: Filmstrip,
     /// User transition awaiting an explicit confirmation.
     pending: Option<Transition>,
     /// One native file panel and state captured by its invoking action.
@@ -156,7 +159,7 @@ impl Session {
     /// # Errors
     ///
     /// Returns a Slint binding error.
-    fn refresh_lists(&self, window: &ComponentInstance) -> UiResult {
+    fn refresh_lists(&mut self, window: &ComponentInstance) -> UiResult {
         let names = self
             .sources
             .paths()
@@ -173,6 +176,7 @@ impl Session {
             .iter()
             .map(|result| SharedString::from(method_label(result.stack.settings().method)))
             .collect::<Vec<_>>();
+        self.filmstrip.update_sources(self.sources.paths())?;
         window.set_property("frames", ModelRc::new(VecModel::from(names)).into())?;
         window.set_property("results", ModelRc::new(VecModel::from(results)).into())?;
         Ok(())
@@ -204,6 +208,7 @@ impl Session {
         window.set_property("result-cropped", false.into())?;
         window.set_property("compare", false.into())?;
         self.selected = None;
+        self.filmstrip.focus(index)?;
         Ok(())
     }
 
@@ -508,6 +513,7 @@ pub fn configure(
         results: Vec::new(),
         history: RecentFolders::open(profile)?,
         previews,
+        filmstrip: Filmstrip::new(window)?,
         pending: None,
         file_panel: None,
         #[cfg(target_os = "linux")]
@@ -559,6 +565,7 @@ pub fn configure(
     for &(name, action) in actions {
         register(window, &session, name, action)?;
     }
+    register_thumbnail_scroll(window, &session)?;
     let close_session = Rc::clone(&session);
     let close_window = window.as_weak();
     window.window().on_close_requested(move || {
@@ -608,6 +615,38 @@ fn register(
         }
         Value::Void
     })?;
+    Ok(())
+}
+
+/// Translate a real visible filmstrip change into one background request.
+/// # Errors
+/// Returns an invalid callback name or signature.
+fn register_thumbnail_scroll(
+    window: &ComponentInstance,
+    session: &Rc<RefCell<Session>>,
+) -> UiResult {
+    let weak = window.as_weak();
+    let session = Rc::clone(session);
+    window.set_callback("thumbnail-range", move |args| {
+        if let Some(window) = weak.upgrade()
+            // Updating the source model can also change the viewport synchronously.
+            && let Ok(mut active) = session.try_borrow_mut()
+            && let Err(error) = request_thumbnail_band(&mut active, args)
+        {
+            show_error(&window, &error.to_string());
+        }
+        Value::Void
+    })?;
+    Ok(())
+}
+
+/// Resolve viewport coordinates supplied by the filmstrip component.
+/// # Errors
+/// Returns an invalid coordinate or worker synchronization error.
+fn request_thumbnail_band(session: &mut Session, args: &[Value]) -> UiResult {
+    let start = ordinal(args.first())?;
+    let count = ordinal(args.get(1))?;
+    session.filmstrip.request(start, count)?;
     Ok(())
 }
 
@@ -1058,6 +1097,7 @@ fn apply_transition(
         new_sources.add(&files)?;
         session.history.remember(&folder)?;
     }
+    session.filmstrip.reset()?;
     session.sources = new_sources;
     session.selected = None;
     session.results.clear();

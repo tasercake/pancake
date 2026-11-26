@@ -5,14 +5,26 @@
 ## Make a focus stack
 
 1. Shoot the same composition at several focus distances so every part you want sharp is in focus in at least one frame. For a first stack, use a stationary subject, consistent lighting and exposure, and a tripod if you have one.
-2. Click **Open files…** and select two or more frames, or click **Open folder…** to load a folder of frames. Start with JPEGs or TIFFs of the same dimensions.
-3. In the **Inspector**, leave **Hybrid** selected and click **Start stack**. The result appears in the viewer when processing finishes.
+2. Click **Open files…** and select two or more frames, or choose **File → Open folder…** to load a folder of frames. Start with JPEGs or TIFFs of the same dimensions.
+3. In the **Stack** inspector, leave **Hybrid** selected and click **Start stack**. The result appears in the viewer when processing finishes.
 4. Click **Compare** to inspect a source frame and the result in a split view. Click **1:1** to check fine detail and **Fit** to see the whole image.
 5. Click **Export**. Choose **TIFF** and **16-bit** for a file you can edit further, or **JPEG** for a smaller file to share. Click **Continue…** and choose where to save it.
 
 If you have no stack handy, save both sample frames ([near focus](../../assets/quickstart/focus-near.png) and [far focus](../../assets/quickstart/focus-far.png)) and open them together.
 
 ![Pancake workspace showing a finished Hybrid stack from the near and far sample frames](../../assets/quickstart/pancake-desktop.png)
+
+## Browse sources and adjust the workspace
+
+The filmstrip shows source frames in processing order. Click a thumbnail to
+inspect that frame, or use the arrow keys with the viewer focused. The current
+frame has an outlined thumbnail and a numbered marker. Use **Files** to
+reveal the full source list or manage the selection.
+
+Pancake starts in the graphite theme. In **Preferences**, you can choose the
+light theme or enter an accent as a six-digit color such as `#dabb91`. Pancake
+adjusts the displayed shade for contrast and saves your original choice. The
+default accent is white.
 
 ## Adjust a stack
 

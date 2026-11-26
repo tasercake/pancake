@@ -5,7 +5,7 @@ use std::fs::{self, File};
 use std::io::{ErrorKind, Read};
 use std::path::{Path, PathBuf};
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 #[cfg(test)]
 mod tests;
@@ -15,9 +15,9 @@ mod tests;
 #[serde(rename_all = "snake_case")]
 pub enum Theme {
     /// Light desktop controls.
-    #[default]
     Light,
     /// Dark desktop controls.
+    #[default]
     Dark,
 }
 
@@ -64,6 +64,9 @@ pub struct Preferences {
     pub theme: Theme,
     /// Selected compute policy.
     pub device: Device,
+    /// Original accent requested by the user, independent of the current theme.
+    #[serde(default)]
+    pub accent: Accent,
 }
 
 impl Preferences {
@@ -84,8 +87,113 @@ impl Preferences {
             "GPU" => Device::Gpu,
             _ => return Err(format!("Unknown processing device {device:?}.")),
         };
-        Ok(Self { theme, device })
+        Ok(Self {
+            theme,
+            device,
+            accent: Accent::default(),
+        })
     }
+}
+
+/// Persisted RGB request. The applied color is resolved for the active theme.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct Accent([u8; 3]);
+
+impl Default for Accent {
+    fn default() -> Self {
+        Self([255; 3])
+    }
+}
+
+impl Accent {
+    /// Parse the editable six-digit hexadecimal RGB value.
+    /// # Errors
+    /// Returns a field diagnostic for any value outside that format.
+    pub fn parse(text: &str) -> Result<Self, &'static str> {
+        let digits = text
+            .trim()
+            .strip_prefix('#')
+            .filter(|digits| {
+                digits.len() == 6 && digits.bytes().all(|byte| byte.is_ascii_hexdigit())
+            })
+            .ok_or("Enter an accent as #RRGGBB.")?;
+        let [_, red, green, blue] = u32::from_str_radix(digits, 16)
+            .map_err(|_| "Enter an accent as #RRGGBB.")?
+            .to_be_bytes();
+        Ok(Self([red, green, blue]))
+    }
+
+    /// Display the original choice as canonical hexadecimal.
+    #[must_use]
+    pub fn hex(self) -> String {
+        let [red, green, blue] = self.0;
+        format!("#{red:02x}{green:02x}{blue:02x}")
+    }
+
+    /// Keep a shared accent visible on the controlling field and choose its ink.
+    #[must_use]
+    pub fn presentation(self, theme: Theme) -> ([u8; 3], [u8; 3]) {
+        let (field, destination) = match theme {
+            Theme::Dark => ([52; 3], 255_u8),
+            Theme::Light => ([233; 3], 0_u8),
+        };
+        let fill = (0_u16..=255)
+            .map(|amount| blend(self.0, destination, amount))
+            .find(|&color| contrast(color, field) >= 4.5_f64)
+            .unwrap_or([destination; 3]);
+        let white = [255; 3];
+        let black = [0; 3];
+        let ink = if contrast(fill, black) >= contrast(fill, white) {
+            black
+        } else {
+            white
+        };
+        (fill, ink)
+    }
+}
+
+impl Serialize for Accent {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&self.hex())
+    }
+}
+
+impl<'de> Deserialize<'de> for Accent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let value = serde_json::Value::deserialize(deserializer)?;
+        let requested = value.as_str().and_then(|text| Self::parse(text).ok());
+        Ok(requested.unwrap_or_default())
+    }
+}
+
+/// Interpolate integer sRGB channels, preserving the chosen hue in either theme.
+fn blend(color: [u8; 3], target: u8, amount: u16) -> [u8; 3] {
+    color.map(|channel| {
+        let requested = u16::from(channel).saturating_mul(255_u16.saturating_sub(amount));
+        let endpoint = u16::from(target).saturating_mul(amount);
+        let [_, blended] =
+            (requested.saturating_add(endpoint).saturating_add(127) / 255).to_be_bytes();
+        blended
+    })
+}
+
+/// Relative luminance contrast for two sRGB colors.
+fn contrast(first: [u8; 3], second: [u8; 3]) -> f64 {
+    let (first, second) = (luminance(first), luminance(second));
+    (first.max(second) + 0.05) / (first.min(second) + 0.05)
+}
+
+/// Convert sRGB to linear light before calculating relative luminance.
+fn luminance(color: [u8; 3]) -> f64 {
+    let [red, green, blue] = color.map(|channel| {
+        let srgb = f64::from(channel) / 255.0_f64;
+        if srgb <= 0.040_45_f64 {
+            srgb / 12.92_f64
+        } else {
+            ((srgb + 0.055) / 1.055).powf(2.4)
+        }
+    });
+    red.mul_add(0.2126, green.mul_add(0.7152, blue * 0.0722))
 }
 
 /// Files rooted in one application profile.

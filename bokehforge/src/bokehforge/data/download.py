@@ -230,16 +230,23 @@ def acquire(client, target, item, reserve, retries, *, progress=None):
 def main(argv=None, *, progress=None):
     parser = argparse.ArgumentParser(prog="bokehforge data download", description=__doc__,
                                      epilog="Logs and reports are saved under <root>/.bokehforge/.")
-    parser.add_argument("--root", type=Path)
-    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
-    parser.add_argument("--lock", type=Path)
-    parser.add_argument("--dataset", action="append", help="Dataset ID; repeat to select several")
-    parser.add_argument("--resolve-only", action="store_true")
-    parser.add_argument("--refresh-lock", action="store_true", help="Explicitly resolve a new upstream snapshot")
-    parser.add_argument("--reserve-gib", type=float)
-    parser.add_argument("--workers", type=int, default=4)
-    parser.add_argument("--retries", type=int, default=3)
-    parser.add_argument("--probe-url", help="Record a public endpoint response for source discovery; never download a full binary body")
+    selection = parser.add_argument_group("Dataset selection")
+    selection.add_argument("--root", type=Path, help="Dataset directory")
+    selection.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    selection.add_argument("--lock", type=Path)
+    selection.add_argument("--dataset", action="append", help="Dataset ID; repeat to select several")
+    resolution = parser.add_argument_group("Source resolution")
+    resolution.add_argument(
+        "--resolve-only", action="store_true", help="Resolve source files without downloading them",
+    )
+    resolution.add_argument("--refresh-lock", action="store_true", help="Explicitly resolve a new upstream snapshot")
+    resolution.add_argument(
+        "--probe-url", help="Record a public endpoint response without downloading a full binary body",
+    )
+    limits = parser.add_argument_group("Download limits")
+    limits.add_argument("--reserve-gib", type=float, help="Minimum free space to retain in GiB")
+    limits.add_argument("--workers", type=int, default=4, help="Concurrent downloads (default: 4)")
+    limits.add_argument("--retries", type=int, default=3, help="Maximum attempts per file (default: 3)")
     args = parser.parse_args(argv)
     configured = read_config(args.config)
     defaults = configured.get("defaults", {})

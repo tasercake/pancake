@@ -31,44 +31,83 @@ impl Preview {
     ///
     /// Returns an error if the frame's geometry or sample access is inconsistent.
     pub fn new(frame: &RgbImage) -> Result<Self, String> {
-        let (width, height) = (frame.width(), frame.height());
-        let max_axis = width.max(height);
-        let scale = max_axis.div_ceil(MAX_PREVIEW_AXIS).max(1);
-        let (display_width, display_height) = (width.div_ceil(scale), height.div_ceil(scale));
-        let convert =
-            |axis| u32::try_from(axis).map_err(|error| format!("Preview dimension: {error}"));
-
-        let mut raster =
-            SharedPixelBuffer::<Rgba8Pixel>::new(convert(display_width)?, convert(display_height)?);
-        let (pixels, remainder) = frame.samples().as_chunks::<3>();
-        if !remainder.is_empty() {
-            return Err("Preview source has incomplete RGB pixels.".into());
-        }
-
-        for (y, row) in raster
-            .make_mut_slice()
-            .chunks_exact_mut(display_width)
-            .enumerate()
-        {
-            let source_start = y
-                .checked_mul(scale)
-                .and_then(|index| index.checked_mul(width))
-                .ok_or("Preview row exceeded source geometry.")?;
-            for (x, pixel) in row.iter_mut().enumerate() {
-                let index = x
-                    .checked_mul(scale)
-                    .and_then(|index| source_start.checked_add(index))
-                    .ok_or("Preview column exceeded source geometry.")?;
-                let [red, green, blue] = *pixels.get(index).ok_or("Preview sample was missing.")?;
-                *pixel = Rgba8Pixel::new(channel(red)?, channel(green)?, channel(blue)?, 255);
-            }
-        }
+        let raster = sample_raster(frame, MAX_PREVIEW_AXIS)?;
         Ok(Self {
             picture: Image::from_rgba8(raster),
-            width: convert(width)?,
-            height: convert(height)?,
+            width: display_dimension(frame.width())?,
+            height: display_dimension(frame.height())?,
         })
     }
+}
+
+/// One bounded filmstrip raster, transferable to the native event thread.
+#[derive(Debug)]
+pub(super) struct Thumbnail {
+    /// Oriented display samples with no connection to renderer resources.
+    raster: SharedPixelBuffer<Rgba8Pixel>,
+}
+
+impl Thumbnail {
+    /// Downsample the full-precision decoded frame for the filmstrip.
+    /// # Errors
+    /// Returns a sample or source geometry mismatch.
+    pub(super) fn new(frame: &RgbImage) -> Result<Self, String> {
+        Ok(Self {
+            raster: sample_raster(frame, 160)?,
+        })
+    }
+
+    /// Attach the native renderer image on the view thread.
+    pub(super) fn into_image(self) -> Image {
+        Image::from_rgba8(self.raster)
+    }
+}
+
+/// Convert one supported raster dimension to the toolkit representation.
+/// # Errors
+/// Returns a representation error for an oversized axis.
+fn display_dimension(axis: usize) -> Result<u32, String> {
+    u32::try_from(axis).map_err(|error| format!("Preview dimension: {error}"))
+}
+
+/// Produce a separate bounded display raster, preserving the original samples.
+/// # Errors
+/// Returns a source shape or sample conversion error.
+fn sample_raster(
+    frame: &RgbImage,
+    max_display_axis: usize,
+) -> Result<SharedPixelBuffer<Rgba8Pixel>, String> {
+    let (width, height) = (frame.width(), frame.height());
+    let scale = width.max(height).div_ceil(max_display_axis).max(1);
+    let (display_width, display_height) = (width.div_ceil(scale), height.div_ceil(scale));
+    let mut raster = SharedPixelBuffer::<Rgba8Pixel>::new(
+        display_dimension(display_width)?,
+        display_dimension(display_height)?,
+    );
+    let (pixels, remainder) = frame.samples().as_chunks::<3>();
+    if !remainder.is_empty() {
+        return Err("Preview source has incomplete RGB pixels.".into());
+    }
+
+    for (y, row) in raster
+        .make_mut_slice()
+        .chunks_exact_mut(display_width)
+        .enumerate()
+    {
+        let source_start = y
+            .checked_mul(scale)
+            .and_then(|index| index.checked_mul(width))
+            .ok_or("Preview row exceeded source geometry.")?;
+        for (x, pixel) in row.iter_mut().enumerate() {
+            let index = x
+                .checked_mul(scale)
+                .and_then(|index| source_start.checked_add(index))
+                .ok_or("Preview column exceeded source geometry.")?;
+            let [red, green, blue] = *pixels.get(index).ok_or("Preview sample was missing.")?;
+            *pixel = Rgba8Pixel::new(channel(red)?, channel(green)?, channel(blue)?, 255);
+        }
+    }
+    Ok(raster)
 }
 
 /// Identity of an unchanged source or an immutable result representation.

@@ -123,7 +123,7 @@ end
 
 local function reportFailure(action)
     local ok, message = LrTasks.pcall(action)
-    if not ok then LrDialogs.message('Pancake export failed', tostring(message), 'critical') end
+    if not ok then LrDialogs.message('Could not open photos in Pancake', tostring(message), 'critical') end
 end
 
 function M.openSelected(edited)

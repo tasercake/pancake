@@ -15,6 +15,11 @@ the [developer guide](pancake/DEVELOPING.md).
 | [`research/`](research/) | Dataset and algorithm research, benchmark methods, and experiments. The comparison stackers in `.submodules/` support research and some optional review runners. Ordinary Pancake builds do not need them. |
 | [`assets/`](assets/) | Pancake branding and small synthetic quickstart frames. |
 
+## Interface design
+
+Use [DESIGN.md](DESIGN.md) for shared visual and interaction rules across
+Pancake and BokehForge.
+
 ## Real-time data and events
 
 - Do not use polling or polling-like implementations for real-time data transfer,

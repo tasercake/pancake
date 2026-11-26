@@ -11,82 +11,105 @@ use pancake::config::{
 };
 use pancake::job::{Options, run};
 
-/// Process a focal stack or exposure bracket.
+/// Stack a series of photos or fuse an exposure bracket.
 #[derive(Debug, Parser)]
-#[command(version, name = "pancake-cli")]
+#[command(
+    version,
+    name = "pancake-cli",
+    after_help = "To stack two images, run\n  pancake-cli --input near.tif far.tif --output stacked.tif"
+)]
 #[expect(
     clippy::struct_excessive_bools,
     reason = "Each boolean represents an independent command-line switch"
 )]
 struct Arguments {
     /// Input files or quoted glob patterns. Repeat to add more inputs.
-    #[arg(long, required = true, num_args = 1.., value_name = "PATH")]
+    #[arg(long, required = true, num_args = 1.., value_name = "PATH", help_heading = "Sources")]
     input: Vec<PathBuf>,
     /// Export destination; the extension selects the image format.
-    #[arg(long, value_name = "PATH")]
+    #[arg(long, value_name = "PATH", help_heading = "Output")]
     output: PathBuf,
     /// Combine with laplacian, hybrid, `weighted_average`, `depth_map`, or `exposure_fusion`.
-    #[arg(long, value_name = "METHOD")]
+    #[arg(long, value_name = "METHOD", help_heading = "Stack")]
     method: Option<Method>,
     /// Align inputs with a translation model unless a model is supplied.
-    #[arg(long)]
+    #[arg(long, help_heading = "Alignment")]
     align: bool,
     /// Select off, translation, euclidean, similarity, affine, or breathing.
-    #[arg(long, value_name = "MODE")]
+    #[arg(long, value_name = "MODE", help_heading = "Alignment")]
     alignment_mode: Option<AlignmentMode>,
     /// Reference frame: first, middle, or previous.
-    #[arg(long = "alignment-ref", value_name = "FRAME")]
+    #[arg(
+        long = "alignment-ref",
+        value_name = "FRAME",
+        help_heading = "Alignment"
+    )]
     alignment_reference: Option<AlignmentReference>,
     /// Focus measurement window size.
-    #[arg(long, value_name = "PIXELS")]
+    #[arg(long, value_name = "PIXELS", help_heading = "Stack")]
     kernel_size: Option<u32>,
     /// Number of levels in the focus pyramid.
-    #[arg(long, value_name = "LEVELS")]
+    #[arg(long, value_name = "LEVELS", help_heading = "Stack")]
     pyramid_levels: Option<u32>,
     /// Registration downsampling factor.
-    #[arg(long, value_name = "FACTOR")]
+    #[arg(long, value_name = "FACTOR", help_heading = "Alignment")]
     scale_factor: Option<u32>,
     /// Maximum positive fractional scale change between frames.
-    #[arg(long, allow_negative_numbers = true, value_name = "FRACTION")]
+    #[arg(
+        long,
+        allow_negative_numbers = true,
+        value_name = "FRACTION",
+        help_heading = "Alignment"
+    )]
     max_scale_step: Option<f32>,
     /// Request high-precision registration.
-    #[arg(long)]
+    #[arg(long, help_heading = "Alignment")]
     max_precision: bool,
     /// Process the requested number of inputs per slab; zero uses the whole stack.
-    #[arg(long, allow_negative_numbers = true, value_name = "FRAMES")]
+    #[arg(
+        long,
+        allow_negative_numbers = true,
+        value_name = "FRAMES",
+        help_heading = "Stack"
+    )]
     slab_size: Option<u32>,
     /// Neighboring slabs share this many inputs.
-    #[arg(long, allow_negative_numbers = true, value_name = "FRAMES")]
+    #[arg(
+        long,
+        allow_negative_numbers = true,
+        value_name = "FRAMES",
+        help_heading = "Stack"
+    )]
     slab_overlap: Option<u32>,
     /// Choose focus and pyramid parameters from the input dimensions.
-    #[arg(long)]
+    #[arg(long, help_heading = "Stack")]
     auto: bool,
     /// Crop to the usable area of the registered stack.
-    #[arg(long)]
+    #[arg(long, help_heading = "Output")]
     auto_crop: bool,
     /// Lossy output quality, from 1 to 100.
-    #[arg(long, value_name = "PERCENT")]
+    #[arg(long, value_name = "PERCENT", help_heading = "Output")]
     quality: Option<u8>,
     /// Emit a sharpness report for a completed result.
-    #[arg(long)]
+    #[arg(long, help_heading = "Output")]
     quality_report: bool,
     /// Export 8 or 16 bits per integer color channel where supported.
-    #[arg(long, value_name = "BITS")]
+    #[arg(long, value_name = "BITS", help_heading = "Output")]
     bit_depth: Option<BitDepth>,
     /// Run all numerical work on the CPU.
-    #[arg(long, conflicts_with_all = ["gpu", "device"])]
+    #[arg(long, conflicts_with_all = ["gpu", "device"], help_heading = "Compute")]
     cpu: bool,
     /// Run numerical work on a GPU.
-    #[arg(long, conflicts_with = "device")]
+    #[arg(long, conflicts_with = "device", help_heading = "Compute")]
     gpu: bool,
     /// Device preference: cpu, gpu, or auto.
-    #[arg(long, value_name = "DEVICE")]
+    #[arg(long, value_name = "DEVICE", help_heading = "Compute")]
     device: Option<DevicePreference>,
     /// Select a specific GPU.
-    #[arg(long, value_name = "INDEX")]
+    #[arg(long, value_name = "INDEX", help_heading = "Compute")]
     gpu_id: Option<usize>,
     /// Use the similarity model as the default when aligning.
-    #[arg(long)]
+    #[arg(long, help_heading = "Alignment")]
     rotation_scale: bool,
 }
 
