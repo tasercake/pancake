@@ -12,6 +12,8 @@ import tempfile
 import tomllib
 from pathlib import Path, PurePosixPath
 
+from release_support import VERSION_PATTERN
+
 from package_notices import GUI_FONT_NOTICES, file_sha256
 
 
@@ -61,7 +63,7 @@ def _bundle_metadata(source, identifier, build_number):
     if len(versions) != 1:
         raise ValueError("The CLI and GUI release versions differ")
     version = versions.pop()
-    if re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version) is None:
+    if re.fullmatch(VERSION_PATTERN, version) is None:
         raise ValueError("Use a three-component Cargo release version for the app bundle")
     return {
         "CFBundleDevelopmentRegion": "en",
@@ -71,7 +73,7 @@ def _bundle_metadata(source, identifier, build_number):
         "CFBundleInfoDictionaryVersion": "6.0",
         "CFBundleName": "Pancake",
         "CFBundlePackageType": "APPL",
-        "CFBundleShortVersionString": version,
+        "CFBundleShortVersionString": version.partition("-")[0],
         "CFBundleVersion": build_number,
     }
 

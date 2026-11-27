@@ -12,6 +12,12 @@ from pathlib import Path
 from package_notices import ROOTS, file_sha256, stage_notices, verify_notices
 
 SOURCE = Path(__file__).resolve().parents[1]
+VERSION_PATTERN = r"(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)){2}(?:-rc\.[1-9][0-9]*)?"
+
+
+def debian_version(version):
+    """Keep Debian release candidates ordered before the corresponding stable package."""
+    return version.replace("-rc.", "~rc.")
 
 
 def release_version(source):
@@ -22,8 +28,8 @@ def release_version(source):
         with manifest.open("rb") as stream:
             versions.add(tomllib.load(stream)["package"]["version"])
     version = next(iter(versions))
-    if len(versions) != 1 or re.fullmatch(r"(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)){2}", version) is None:
-        raise ValueError("Core, CLI and GUI must have the same three-component version")
+    if len(versions) != 1 or re.fullmatch(VERSION_PATTERN, version) is None:
+        raise ValueError("Core, CLI and GUI must have the same three-component version, optionally with an rc suffix")
     return version
 
 

@@ -14,6 +14,7 @@ from pathlib import Path
 
 from package_native_llvm import stage_native_llvm_notices, verify_native_llvm_notices
 from package_notices import file_sha256, stage_notices, verify_notices
+from release_support import debian_version
 
 BINARIES = ("pancake-cli", "pancake-gui")
 # Slint/winit and Vulkan can load these at runtime without an ELF NEEDED entry.
@@ -71,7 +72,7 @@ def _dependency_report(staging, binaries, control):
 
 
 def build_package(release, output, version, maintainer, revision, lock_digest, *, source_root,
-                  native_llvm_receipt=None):
+                  native_llvm_receipt=None, archive_version=None):
     """Stage, extract and verify the package before publishing local artifacts."""
     if sys.platform != "linux" or platform.machine() != "x86_64":
         raise ValueError("Build the Debian package on a Linux x86-64 package host")
@@ -122,7 +123,7 @@ def build_package(release, output, version, maintainer, revision, lock_digest, *
         metadata = payload / "DEBIAN"
         metadata.mkdir()
         (metadata / "control").write_text(f"{control}Depends: {dependencies}\n", encoding="utf-8")
-        archive_name = f"pancake_{version}_amd64.deb"
+        archive_name = f"pancake_{archive_version or version}_amd64.deb"
         archive = staging / archive_name
         _run("dpkg-deb", "--root-owner-group", "--build", payload, archive)
         extracted = staging / "verify"
@@ -162,9 +163,10 @@ def main(argv=None):
         if dirty:
             raise ValueError(f"Commit Pancake source changes before packaging:\n{dirty}")
         revision = _run("git", "-C", pancake, "rev-parse", "HEAD").stdout.strip()
-        build_package(args.release_dir, args.output, manifest["package"]["version"], args.maintainer,
+        version = manifest["package"]["version"]
+        build_package(args.release_dir, args.output, debian_version(version), args.maintainer,
                       revision, file_sha256(pancake / "Cargo.lock"), source_root=pancake,
-                      native_llvm_receipt=args.native_llvm_receipt)
+                      native_llvm_receipt=args.native_llvm_receipt, archive_version=version)
         print(args.output / "package-receipt.json")
         return 0
     except subprocess.CalledProcessError as error:
