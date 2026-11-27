@@ -1,12 +1,12 @@
 # Install Pancake Stacker
 
-Open [Pancake releases](https://github.com/tasercake/pancake/releases), choose the newest release, and expand **Assets**. Download the package for your computer. Each package includes the desktop app and the command-line tool.
+Choose the newest release and expand **Assets** to find the download for your computer. For releases that offer ZIP downloads, follow the installation instructions linked from the release notes. [Pancake releases](https://github.com/tasercake/pancake/releases)
 
 ## macOS (Apple Silicon)
 
-1. Download `pancake-<version>-macos-arm64.zip`.
-2. Double-click the ZIP in Finder to extract it.
-3. Move `Pancake.app` to **Applications** or your user **Applications** folder. Open the app from there.
+1. Download `pancake-<version>-macos-arm64.dmg` and double-click it in Finder.
+2. Drag `Pancake.app` to the **Applications** shortcut in the disk image. You can also copy it into your user **Applications** folder.
+3. Open Pancake from **Applications**. Eject the disk image in Finder when you're done with it.
 
 To tell whether your Mac uses Apple Silicon, open **Apple menu → About This Mac** and look for an Apple chip.
 
@@ -14,9 +14,9 @@ The app is ad-hoc signed and has no Apple notarization. If macOS blocks the firs
 
 ## Windows x64
 
-1. Download `pancake-<version>-windows-x64.zip`.
-2. Right-click the ZIP and choose **Extract All**.
-3. Open `pancake-gui.exe` from the extracted folder. You can keep that folder wherever you want to run Pancake.
+Download `pancake-gui-<version>-windows-x64.exe` and double-click it in File Explorer. You can move the executable to any folder you want to keep it in.
+
+The command-line tool is available as `pancake-cli-<version>-windows-x64.exe`. Licenses and dependency notices are available in `pancake-notices-<version>-windows-x64.tar.gz`.
 
 To check your architecture, open **Settings → System → About** and look for an x64-based processor under **System type**.
 

@@ -1,12 +1,12 @@
 # Build and publish Pancake packages
 
-In GitHub, open [Actions → Pancake packages](https://github.com/tasercake/pancake/actions/workflows/pancake-release.yml) and choose **Run workflow**. The workflow starts only when manually dispatched. By default it builds all three packages and uploads them to the Actions run for review.
+In GitHub Actions, open **Pancake packages** and choose **Run workflow**. By default it builds the release assets for all three platforms and uploads them to the Actions run for review. [Pancake packages workflow](https://github.com/tasercake/pancake/actions/workflows/pancake-release.yml)
 
 | Platform | Package | How to run |
 | --- | --- | --- |
-| macOS on Apple Silicon | ZIP containing `Pancake.app` and `pancake-cli` | Extract the ZIP and move the app to Applications. The app is ad-hoc signed and has no Apple notarization. |
+| macOS on Apple Silicon | `pancake-<version>-macos-arm64.dmg` containing `Pancake.app` and `pancake-cli` | Open the DMG and drag the app into Applications. The app is ad-hoc signed and has no Apple notarization. |
 | Ubuntu 24.04 x86-64 | `pancake_<version>_amd64.deb` | Install with `sudo apt install ./pancake_<version>_amd64.deb`. Launch Pancake from the application menu or run `pancake-cli` in a terminal. |
-| Windows x64 | Portable ZIP with `pancake-gui.exe` and `pancake-cli.exe` | Extract both executables before launching. The executables are unsigned and use the x64 Microsoft Visual C++ runtime. |
+| Windows x64 | `pancake-gui-<version>-windows-x64.exe` and `pancake-cli-<version>-windows-x64.exe` | Run either executable directly. Both are unsigned and use the x64 Microsoft Visual C++ runtime. The release includes a separate Windows notices archive. |
 
 Each builder uses the committed Rust toolchain and Cargo lockfile. The macOS release build also links a pinned static copy of Zstandard. Before it uploads its package, it runs a two-frame CPU stack with the packaged CLI. The Linux and macOS jobs retain package receipts on the Actions run. Desktop and accelerator verification is covered separately in the [developer guide](../DEVELOPING.md).
 
@@ -19,7 +19,7 @@ When packaging repeatedly on an Apple Silicon Mac, pass `--target-dir "$PWD/targ
 1. Set the same three-component version in the core, CLI, and GUI Cargo manifests. Update the CLI and GUI's exact core dependency versions and commit the matching `Cargo.lock`.
 2. Run the package build on the commit you want to release and review the artifacts. Run [Pancake assurance](https://github.com/tasercake/pancake/actions/workflows/pancake-assurance.yml) and the appropriate native checks when qualifying a release.
 3. From the default branch, dispatch **Pancake packages** with **Publish the verified packages to GitHub Releases** checked. The prerelease checkbox is on by default.
-4. After all three builds and smoke tests succeed, the workflow creates the `v<version>` tag at the dispatched commit and publishes the three packages with `SHA256SUMS.txt` and a link to the corresponding source. Each publish uses a fresh version tag.
+4. After all three platform builds and smoke tests succeed, the workflow creates the `v<version>` tag at the dispatched commit and publishes the verified assets with `SHA256SUMS.txt` and a link to the corresponding source. Each publish uses a fresh version tag.
 
 From the GitHub CLI, run the build-only or publishing form.
 
