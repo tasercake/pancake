@@ -44,7 +44,7 @@ The app exports 8- or 16-bit TIFF and PNG, JPEG, and OpenEXR. TIFF export can re
 
 ## Lightroom Classic on macOS
 
-1. Move the packaged `Pancake.app` to **Applications** or your user's **Applications** folder.
+1. Keep Pancake in a stable location. For a packaged `Pancake.app`, use **Applications**. For a local build, you can use the standalone `pancake-gui` executable.
 2. Open Pancake and choose **Preferences → Install Lightroom plug-in**. Restart Lightroom Classic if it was open.
 3. Select at least two photos in Lightroom Classic. Right-click the selection and open **Export**. Choose **Pancake (Originals)** for supported source files or **Pancake (With Lightroom Edits)** for full-size 16-bit sRGB TIFFs. Both commands are also available under **File → Plug-in Extras**.
 4. Stack and export in Pancake. Use Lightroom Classic's **Import** command to bring the result back into your catalog.
