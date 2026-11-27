@@ -62,6 +62,15 @@ def run_bench(root, output, *args, env=None):
     )
 
 
+def test_cpu_cli_requires_disabling_inspection(tmp_path, capsys):
+    output = tmp_path / "benchmark"
+    with pytest.raises(SystemExit) as exc:
+        main(["--algorithm", "mean", "--output", str(output), "--device", "cpu"])
+    assert exc.value.code == 2
+    assert "--device cpu requires --no-attention" in capsys.readouterr().err
+    assert not output.exists()
+
+
 def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     output = tmp_path / "mean"
     result = run_bench(corpus, output, "--dataset", "referenced", "--algorithm", "mean",
@@ -89,7 +98,7 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
 
     replay_dir = tmp_path / "replay"
     replay = run_bench(corpus, replay_dir, "--scene", target["scene_id"],
-                       "--candidate-dir", str(output / "images"), "--explain-score", "tiles")
+                       "--candidate-dir", str(output / "images"), "--explain-score", "tiles", "--device", "cpu")
     assert replay.returncode == 0, replay.stderr
     assert replay.stdout == result.stdout
     replay_report = json.loads((replay_dir / "report.json").read_text())

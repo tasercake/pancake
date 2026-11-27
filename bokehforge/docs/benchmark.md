@@ -29,6 +29,20 @@ bokehforge/.venv/bin/bokehforge bench \
   --candidate-dir artifacts/bench-mean/images --dataset D29 --output artifacts/bench-replay
 ```
 
+## Scoring device
+
+`--device auto` (the default) prefers NVIDIA CUDA when available. With the
+inspection extra and Triton installed, it also accelerates native-resolution
+damage maps for large images. `--device gpu` requires that CUDA backend and
+uses it for all measured image sizes. Use `--device cpu --no-attention`
+to score on the CPU with the base installation. The flag controls scoring
+independently of the stacker.
+
+CPU and GPU damage measurement use the same scoring arithmetic and pooling.
+Inspection map generation uses CUDA to preserve the existing profile's
+output. Python callers can score on either device with a supplied
+`inspection_heatmap`.
+
 ## The score
 
 Standard output contains one cohort score from 0 to 100. The default score version is `reference-fidelity-v3-inspection-v2`. With `--no-attention` the score version is `reference-fidelity-v3`. A pixel-identical full view scores 100. An exact native-scale crop covering 81% of the reference scores 81, wherever it lies. Enlarging that crop back to the original file dimensions still leaves 19% of the reference missing. A half-size full view can cover the whole reference, but its delivery samples cap its score at 25 before any quality loss.
