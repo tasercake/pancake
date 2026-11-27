@@ -31,17 +31,18 @@ bokehforge/.venv/bin/bokehforge bench \
 
 ## Scoring device
 
-`--device auto` (the default) prefers NVIDIA CUDA when available. With the
-inspection extra and Triton installed, it also accelerates native-resolution
-damage maps for large images. `--device gpu` requires that CUDA backend and
-uses it for all measured image sizes. Use `--device cpu --no-attention`
-to score on the CPU with the base installation. The flag controls scoring
-independently of the stacker.
+`--device auto` (the default) prefers NVIDIA CUDA, then Apple Metal (MPS),
+for damage measurement on large images. CUDA requires PyTorch and Triton and
+runs most damage-map operations on the GPU. MPS requires an MPS-enabled PyTorch
+installation and runs the edge neighborhood filters on the GPU. The other
+MPS calculations stay on the CPU, including those that require double precision.
+`--device gpu` requires one of these backends for any measured image size.
+Use `--device cpu --no-attention` to score on the CPU with the base installation.
+The flag controls scoring independently of the stacker.
 
-CPU and GPU damage measurement use the same scoring arithmetic and pooling.
-Inspection map generation uses CUDA to preserve the existing profile's
-output. Python callers can score on either device with a supplied
-`inspection_heatmap`.
+Inspection map generation still requires CUDA and uses the same model arithmetic.
+On a Mac, use `--device auto --no-attention` for MPS damage measurement. Python
+callers can also use MPS with a supplied `inspection_heatmap`.
 
 ## The score
 

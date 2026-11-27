@@ -214,7 +214,8 @@ def damage_maps(candidate, target, c, t, delta, support):
         _normalize[grid](output, denominators[sigma], n, block)
         return output
 
-    tone, lost, extra, boundary = (torch.empty_like(t) for _ in range(4))
+    output = t.new_empty((5, h, w))
+    tone, lost, extra, boundary, channel_range = output.unbind()
     for sigma in (0, 1.1, 2.5):
         cs, ts = (blur(c, sigma), blur(t, sigma)) if sigma else (c, t)
         _directions[grid](cs, ts, mask, lost, extra, h, w, masked, not sigma,
@@ -234,6 +235,15 @@ def damage_maps(candidate, target, c, t, delta, support):
         return torch.from_numpy(contiguous).to(device)
 
     raw_c, raw_t = upload(candidate), upload(target)
-    channel_range = torch.empty_like(t)
     _range[grid](raw_c, raw_t, channel_range, n, block, enable_fp_fusion=False)
-    return tuple(image.cpu().numpy() for image in (tone, lost, extra, boundary, channel_range))
+
+    # One transfer into pinned host memory avoids staging five large pageable
+    # copies. The copy is synchronous so NumPy can read the result immediately.
+    if n >= 1_000_000:
+        try:
+            host = torch.empty(output.shape, dtype=output.dtype, device="cpu", pin_memory=True)
+        except RuntimeError:
+            pass  # Pinned memory may be unavailable even when CUDA is usable.
+        else:
+            return tuple(host.copy_(output).numpy())
+    return tuple(output.cpu().numpy())
