@@ -253,7 +253,7 @@ function showImage(well, title, params) {
   }
   image.decode().then(() => reveal(image), () => {
     if (panelImages.get(well) === request && !request.shown) {
-      placeholder(well, "Image unavailable", "BokehForge could not render this image.");
+      placeholder(well, "Image unavailable", "Stackroom could not render this image.");
     }
   });
 }

@@ -54,7 +54,7 @@ The scorer requires two images, the stacker's delivery and the ground-truth refe
 
 ## Inspection-weighted scoring
 
-Bench and Review generate an Inspection blend from the clean all-in-focus reference as part of scoring each valid delivery. Every alignment uses the same reference map. The report records the SHA-256 of the generated map. The scorer keeps the last reference map in memory to reuse across repeated comparisons. Use `--no-attention` to skip model downloads, loading, map generation, and attention weighting. For a valid delivery, a download or inference error withholds the score.
+The BokehForge benchmark and Stackroom generate an Inspection blend from the clean all-in-focus reference as part of scoring each valid delivery. Every alignment uses the same reference map. The report records the SHA-256 of the generated map. The scorer keeps the last reference map in memory to reuse across repeated comparisons. Use `--no-attention` to skip model downloads, loading, map generation, and attention weighting. For a valid delivery, a download or inference error withholds the score.
 
 The raw map is the soft union of **ReLIQS**, **Texture & light**, **SAM 2.1 Hiera Large**, and **TempSAL overall**. The inputs use the same sRGB preview with a long edge of at most 640 pixels. The scorer resizes the blend to the native reference grid. Texture & light measures local detail, lighting variation, and color contrast. SAM contributes a zero map when no region meets the mask size criteria.
 
@@ -102,7 +102,7 @@ The report’s scene-level `alignment` object and the Python API expose the same
 | `status`, `reason`, `confidence` | Match, uncertain placement, or no match, with the reason and total available score weight. |
 | `placements` | Each evaluated transform and its evidence source, content box, padding decisions, clipped overlap polygon, `geometric_coverage`, `resolution_cap`, effective `coverage`, `overlap_score`, `weight`, and `score_contribution`. Sum the contributions to recover the scene score. |
 
-An exact or low-information path can have an empty candidate list because its evidence is recorded in the stages. The feature readings and Review overlay use the leading placement. The saved image remains the stacker’s original delivery.
+An exact or low-information path can have an empty candidate list because its evidence is recorded in the stages. The feature readings and Stackroom overlay use the leading placement. The saved image remains the stacker’s original delivery.
 
 ## Score explanations
 
@@ -116,4 +116,4 @@ In Python, `measure(candidate, target)` returns an object with `.score` and `.al
 
 ## Comparing older runs
 
-Older JSON keeps its original `score_version` or `profile` label. Compare scores with matching scorer versions and cohort fingerprints. To compare an older saved delivery with a new run, replay the original TIFF into a new output directory. Inspection-weighted Review scores are cached in memory for the current session. Compare inspection-weighted benchmark runs with matching map hashes as well.
+Older JSON keeps its original `score_version` or `profile` label. Compare scores with matching scorer versions and cohort fingerprints. To compare an older saved delivery with a new run, replay the original TIFF into a new output directory. Inspection-weighted Stackroom scores are cached in memory for the current session. Compare inspection-weighted benchmark runs with matching map hashes as well.

@@ -187,10 +187,10 @@ class StackerSetup:
 
     def _checkout(self, stacker_id, directory, log, stop):
         path, origin = SUBMODULES[stacker_id]
-        git = _require("git", "Install Git and run Review from the repository checkout.")
+        git = _require("git", "Install Git and run Stackroom from the repository checkout.")
         pin = self.pins.get(path)
         if not pin:
-            raise RuntimeError(f"Could not read the pinned source for {stacker_id}. Run Review from the repository checkout.")
+            raise RuntimeError(f"Could not read the pinned source for {stacker_id}. Run Stackroom from the repository checkout.")
         local = self.repo / path
         # Use an initialized local submodule if it has the pinned commit.
         if (local / ".git").exists():
@@ -211,14 +211,14 @@ class StackerSetup:
         cargo = _require("cargo", "Install Rust with rustup for this host.")
         work = self.repo / "pancake"
         if not (work / "Cargo.toml").is_file():
-            raise RuntimeError("Run Review from the Pancake Stacker repository to build Pancake Stacker")
+            raise RuntimeError("Run Stackroom from the Pancake Stacker repository to build Pancake Stacker")
         tell("Building Pancake Stacker with its pinned toolchain")
         run_logged([cargo, "build", "--locked", "--release", "--package", "pancake-cli",
                     "--target-dir", str(work / "target")], work, log, stop, "Building Pancake Stacker")
         return work / "target/release" / ("pancake-cli" + EXE)
 
     def _python_stacker(self, tool, directory, log, stop, tell):
-        uv = _require("uv", "Install uv or point Review at an existing stacker.")
+        uv = _require("uv", "Install uv or point Stackroom at an existing stacker.")
         venv = directory / ".venv"
         python = venv / BIN_DIR / ("python" + EXE)
         with TemporaryDirectory(prefix="source-", dir=directory) as scratch:
@@ -288,7 +288,7 @@ class StackerSetup:
         else:
             directory = self._directory(tool.id)
             if directory is None:
-                raise RuntimeError(f"Could not read the pinned {tool.label} source. Run Review from the repository checkout with Git installed.")
+                raise RuntimeError(f"Could not read the pinned {tool.label} source. Run Stackroom from the repository checkout with Git installed.")
             directory.mkdir(parents=True, exist_ok=True)
             if tool.id == "focus-stack":
                 binary = self._focus_stack(directory, log, stop, tell)

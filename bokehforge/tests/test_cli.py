@@ -8,8 +8,8 @@ import pytest
 
 
 @pytest.mark.parametrize("arguments,expected", [
-    (["--help"], ["bokehforge", "data", "bench", "review"]),
-    (["review", "--help"], ["bokehforge review", "--root", "--store", "--host", "--no-attention"]),
+    (["--help"], ["bokehforge", "data", "bench", "review", "Stackroom"]),
+    (["review", "--help"], ["bokehforge review", "Stackroom", "--root", "--store", "--host", "--no-attention"]),
     (["bench", "--help"], ["bokehforge bench", "--algorithm", "--candidate-dir", "--no-attention"]),
     (["data", "--help"], ["download"]),
     (["data", "download", "--help"], ["bokehforge data download", "--dataset"]),

@@ -81,7 +81,7 @@ def ensure_inspection_assets(directory: Path):
 
     directory.mkdir(parents=True, exist_ok=True)
     # The dataset downloader uses a predictable .part path so a later run can resume.
-    # Serialize writers to this cache across Bench and Review processes.
+    # Serialize writers to this cache across benchmark and Stackroom processes.
     with FileLock(directory / ".download.lock"), session() as client:
         for asset in pending:
             target = directory / asset["path"]

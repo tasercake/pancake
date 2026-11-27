@@ -31,7 +31,7 @@ class Downloads:
     def start(self, datasets):
         with self.mutex:
             if self.closed:
-                raise RuntimeError("Review is shutting down")
+                raise RuntimeError("Stackroom is shutting down")
             if self.status == "running":
                 raise RuntimeError("A dataset download is already running")
             if not datasets:

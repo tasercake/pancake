@@ -11,14 +11,14 @@ the [developer guide](pancake/DEVELOPING.md).
 | Path | What lives there |
 | --- | --- |
 | [`pancake/`](pancake/) | Rust workspace. `src/` contains image I/O, registration, fusion, and the shared job engine. `crates/pancake-gui/` contains the Slint desktop app, `crates/pancake-cli/` contains the CLI, and `lightroom/` contains the macOS Lightroom Classic plug-in. |
-| [`bokehforge/`](bokehforge/) | Python toolkit for dataset downloads, lazy frame loading, benchmarking, and local stack review. Start with its [README](bokehforge/README.md) and keep its user documentation there. |
+| [`bokehforge/`](bokehforge/) | Python toolkit for dataset downloads, lazy frame loading, and benchmarking. It includes Stackroom for local focus stack review. Start with the [BokehForge README](bokehforge/README.md) and keep its user documentation there. |
 | [`research/`](research/) | Dataset and algorithm research, benchmark methods, and experiments. The comparison stackers in `.submodules/` support research and some optional review runners. Ordinary Pancake builds do not need them. |
 | [`assets/`](assets/) | Pancake branding and small synthetic quickstart frames. |
 
 ## Interface design
 
 Use [DESIGN.md](DESIGN.md) for shared visual and interaction rules across
-Pancake and BokehForge.
+Pancake Stacker and Stackroom.
 
 ## Real-time data and events
 

@@ -11,5 +11,5 @@
   `updateFontNames=True` so the static face carries the correct style metadata.
   [Space Grotesk license](SpaceGrotesk-OFL.txt)
 
-BokehForge Review bundles byte-identical copies with the same licenses for
+Stackroom bundles byte-identical copies with the same licenses for
 offline use in its local server.

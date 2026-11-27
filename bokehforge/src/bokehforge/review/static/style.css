@@ -105,7 +105,8 @@ h3 { font-size: 1rem; }
   border-bottom: 1px solid var(--stroke);
   background: var(--bar);
 }
-.product-name { margin-right: .25rem; white-space: nowrap; }
+.product-brand { display: grid; gap: .1rem; margin-inline-end: .25rem; line-height: 1.15; }
+.product-brand span { color: var(--muted); font-family: var(--decision-font); font-size: .75rem; }
 .command-group, .tools { display: flex; align-items: center; gap: .35rem; min-width: 0; }
 .command-group { padding-inline-start: .55rem; border-inline-start: 1px solid var(--stroke); }
 .command-bar :is(button, .button) { border-color: transparent; }
