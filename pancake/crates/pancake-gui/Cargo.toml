@@ -16,7 +16,7 @@ num-traits = "=0.2.19"
 slint = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "unstable-wgpu-30", "compat-1-18", "accessibility", "raw-window-handle-06", "unstable-winit-030", "unstable-fontique-012"] }
 slint-interpreter = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "compat-1-18", "accessibility"] }
 spin_on = "=0.1.1"
-dirs = "=6.0.0"
+dirs = "=7.0.0"
 serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.154"
 tempfile = "=3.27.0"
