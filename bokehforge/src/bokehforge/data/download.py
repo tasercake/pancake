@@ -20,7 +20,7 @@ import requests
 from ._canonical import RETIRED_LAYOUTS
 from ._config import DEFAULT_CONFIG, data_root, read_config
 from ._files import digest, natural_key, safe_path
-from .layout import METADATA, data_run
+from .layout import METADATA, data_run, local_source, matches_pins
 
 MUTEX = threading.Lock()
 
@@ -79,7 +79,9 @@ def resolve_source(client, source):
         result.update(status=provider, files=[])
         return result
     files = []
-    if provider == "github":
+    if "files" in source:
+        files = source["files"]
+    elif provider == "github":
         repo = source["repository"]
         commit = get_json(client, f"https://api.github.com/repos/{repo}/commits/{source.get('ref', 'HEAD')}")["sha"]
         tree = get_json(client, f"https://api.github.com/repos/{repo}/git/trees/{commit}?recursive=1")
@@ -114,8 +116,6 @@ def resolve_source(client, source):
             seen.add((md5, item["size"]))
             files.append({"path": item["name"], "url": item["download_url"], "size": item["size"], "md5": md5, "sha256": None})
         result["revision"] = str(metadata["version"])
-    elif provider == "files":
-        files = source["files"]
     else:
         raise ValueError(f"Unknown provider {provider}")
     if not files:
@@ -231,10 +231,10 @@ def main(argv=None, *, progress=None):
     parser = argparse.ArgumentParser(prog="bokehforge data download", description=__doc__,
                                      epilog="Logs and reports are saved under <root>/.bokehforge/.")
     selection = parser.add_argument_group("Dataset selection")
-    selection.add_argument("--root", type=Path, help="Dataset directory")
+    selection.add_argument("--root", type=Path, help="Dataset directory (default: the shared BokehForge data location)")
     selection.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     selection.add_argument("--lock", type=Path)
-    selection.add_argument("--dataset", action="append", help="Dataset ID; repeat to select several")
+    selection.add_argument("--dataset", dest="datasets", action="append", help="Dataset ID; repeat to select several")
     resolution = parser.add_argument_group("Source resolution")
     resolution.add_argument(
         "--resolve-only", action="store_true", help="Resolve source files without downloading them",
@@ -247,45 +247,60 @@ def main(argv=None, *, progress=None):
     limits.add_argument("--reserve-gib", type=float, help="Minimum free space to retain in GiB")
     limits.add_argument("--workers", type=int, default=4, help="Concurrent downloads (default: 4)")
     limits.add_argument("--retries", type=int, default=3, help="Maximum attempts per file (default: 3)")
-    args = parser.parse_args(argv)
-    configured = read_config(args.config)
+    return download_datasets(**vars(parser.parse_args(argv)), progress=progress)
+
+
+def download_datasets(*, datasets=None, config=DEFAULT_CONFIG, root=None, lock=None, reserve_gib=None,
+                      workers=4, retries=3, resolve_only=False, refresh_lock=False, probe_url=None,
+                      progress=None, only_missing=False):
+    """Acquire verified originals using the same store and events for all callers."""
+    config = Path(config).resolve()
+    configured = read_config(config)
     defaults = configured.get("defaults", {})
-    args.root = args.root or data_root(args.config, defaults)
-    args.lock = args.lock or args.config.with_name("sources.lock.json")
-    args.reserve_gib = args.reserve_gib if args.reserve_gib is not None else defaults.get("reserve_gib", 15)
-    if args.workers < 1 or args.retries < 1 or args.reserve_gib < 0:
-        parser.error("workers/retries must be positive and reserve must be nonnegative")
-    args.root = args.root.resolve()
-    with data_run(args.root, "download"):
-        if args.probe_url:
-            with session() as client, client.get(args.probe_url, stream=True, timeout=(20, 90)) as response:
+    root = Path(root).expanduser().resolve() if root is not None else data_root(config, defaults)
+    bundled = config == DEFAULT_CONFIG and lock is None
+    lock_path = (Path(lock).expanduser().resolve() if lock is not None else
+                 (root / METADATA if bundled else config.parent) / "sources.lock.json")
+    reserve_gib = reserve_gib if reserve_gib is not None else defaults.get("reserve_gib", 15)
+    if workers < 1 or retries < 1 or reserve_gib < 0:
+        raise ValueError("workers/retries must be positive and reserve must be nonnegative")
+    sources = {d["id"]: d for d in configured["datasets"] if d.get("layout") not in RETIRED_LAYOUTS}
+    selected = set(datasets or sources)
+    if unknown := selected - sources.keys():
+        raise ValueError(f"Unknown dataset IDs: {sorted(unknown)}")
+    with data_run(root, "download") as (out, err):
+        if probe_url:
+            with session() as client, client.get(probe_url, stream=True, timeout=(20, 90)) as response:
                 content_type = response.headers.get("Content-Type", "")
                 textual = any(x in content_type for x in ["text/", "json", "xml"])
-                record = {"url": args.probe_url, "resolved_url": response.url, "status": response.status_code,
+                record = {"url": probe_url, "resolved_url": response.url, "status": response.status_code,
                           "content_type": content_type, "content_length": response.headers.get("Content-Length"),
                           "text": response.raw.read(65536, decode_content=True).decode("utf-8", "replace") if textual else None}
-                save_json(args.root / METADATA / "probes" / (hashlib.sha256(args.probe_url.encode()).hexdigest()[:16] + ".json"), record)
-                print(json.dumps(record, indent=2))
+                save_json(root / METADATA / "probes" / (hashlib.sha256(probe_url.encode()).hexdigest()[:16] + ".json"), record)
+                print(json.dumps(record, indent=2), file=out)
                 return 0
-        sources = {d["id"]: d for d in configured["datasets"] if d.get("layout") not in RETIRED_LAYOUTS}
-        selected = set(args.dataset or sources)
-        if selected - sources.keys():
-            parser.error(f"Unknown dataset IDs: {sorted(selected - sources.keys())}")
-        lock = json.loads(args.lock.read_text()) if args.lock.exists() else {"schema_version": 1, "datasets": []}
+        if only_missing:
+            selected = {key for key in selected if local_source(root, key, pins=sources[key]) is None}
+            if not selected:
+                return 0
+        print(f"Preparing datasets {', '.join(sorted(selected))} in {root}", file=err, flush=True)
+        lock = json.loads(lock_path.read_text()) if lock_path.exists() else {"schema_version": 1, "datasets": []}
         lock["datasets"] = [
             d for d in lock["datasets"]
             if d.get("layout") not in RETIRED_LAYOUTS
-            and (d["id"] not in selected or (not args.refresh_lock and d["status"] != "resolve_failed"))
+            and (d["id"] not in selected or (not refresh_lock and d["status"] != "resolve_failed"
+                 and (not bundled or matches_pins(d, sources[d["id"]]))))
         ]
         disabled = {dataset_id: sources[dataset_id] for dataset_id in selected
                     if sources[dataset_id].get("provider") == "disabled"}
         lock["datasets"] = [{**disabled[d["id"]], "status": "disabled", "files": []}
                             if d["id"] in disabled else d for d in lock["datasets"]]
-        save_json(args.lock, lock)
+        save_json(lock_path, lock)
         ids = {d["id"] for d in lock["datasets"]}
         for dataset_id, source in sources.items():
             if dataset_id not in selected or dataset_id in ids:
                 continue
+            print(f"Resolving {dataset_id} ({source.get('name', dataset_id)})", file=err, flush=True)
             try:
                 with session() as client:
                     resolved = resolve_source(client, source)
@@ -293,10 +308,10 @@ def main(argv=None, *, progress=None):
                 reason = re.sub(r"&uuid=[^&\s:]+", "&uuid=<ephemeral>", str(exc))
                 resolved = {**source, "status": "resolve_failed", "reason": reason, "files": []}
             lock["datasets"].append(resolved)
-            print(f"RESOLVE {source['id']}: {resolved['status']} {len(resolved['files'])} files", flush=True)
-            save_json(args.lock, lock)
+            print(f"RESOLVE {source['id']}: {resolved['status']} {len(resolved['files'])} files", file=out, flush=True)
+            save_json(lock_path, lock)
         active = [d for d in lock["datasets"] if d["id"] in selected]
-        if args.resolve_only:
+        if resolve_only:
             return 0 if all(d["status"] in {"available", "disabled"} for d in active) else 2
         if progress:
             progress({"type": "inventory", "files": [
@@ -308,45 +323,66 @@ def main(argv=None, *, progress=None):
             record = {"id": dataset["id"], "status": dataset["status"], "files": len(dataset["files"]), "verified": 0, "errors": []}
             if dataset["status"] != "available":
                 record["reason"] = dataset.get("reason", "No public source download route")
-                if progress and dataset["status"] != "disabled":
-                    progress({"type": "error", "message": f"{dataset['id']}: {record['reason']}"})
+                if dataset["status"] != "disabled":
+                    message = f"{dataset['id']}: {record['reason']}"
+                    print(f"ERROR {message}", file=err, flush=True)
+                    if progress:
+                        progress({"type": "error", "message": message})
                 reports.append(record)
                 continue
             inputs = dataset["files"]
             errors = []
             def task(item):
-                target = safe_path(args.root / "raw" / dataset["id"], item["path"])
+                name = f"{dataset['id']}/{item['path']}"
+                phase_shown = None
+                last_update = 0
+
                 def report(phase, received, total):
+                    nonlocal phase_shown, last_update
                     if progress:
                         progress({"type": "file", "dataset": dataset["id"], "path": item["path"],
                                   "phase": phase, "received": received, "total": total})
+                    now = time.monotonic()
+                    if phase in ("complete", "failed"):
+                        return
+                    if phase == phase_shown and (phase != "downloading" or
+                                                 (now - last_update < 5 and received != total)):
+                        return
+                    phase_shown, last_update = phase, now
+                    count = f" {received / 1024**2:,.1f} MiB" if received else ""
+                    if total is not None and phase == "downloading":
+                        count = f" {received / 1024**2:,.1f} / {total / 1024**2:,.1f} MiB ({received / max(total, 1):.0%})"
+                    print(f"{phase.capitalize()} {name}{count}", file=err, flush=True)
+
                 try:
-                    previous = dict(item)
+                    target = safe_path(root / "raw" / dataset["id"], item["path"])
+                    acquired = dict(item)
                     with session() as client:
-                        changed = acquire(client, target, item, int(args.reserve_gib * 1024**3), args.retries,
-                                          progress=report if progress else None)
-                    report("complete", item["size"], item["size"])
+                        changed = acquire(client, target, acquired, int(reserve_gib * 1024**3), retries, progress=report)
+                    report("complete", acquired["size"], acquired["size"])
                     with MUTEX:
-                        if item != previous or changed:
-                            save_json(args.lock, lock)
-                        print(f"{'FETCH' if changed else 'VERIFY'} {dataset['id']}/{item['path']}", flush=True)
+                        if acquired != item or changed:
+                            item.update(acquired)
+                            save_json(lock_path, lock)
+                        print(f"{'FETCH' if changed else 'VERIFY'} {name}", file=out, flush=True)
                 except Exception as exc:
                     with MUTEX:
                         errors.append({"path": item["path"], "error": str(exc)})
                         if progress:
                             report("failed", 0, item.get("size"))
                             progress({"type": "error", "message": f"{dataset['id']}/{item['path']}: {exc}"})
-                        print(f"ERROR {dataset['id']}/{item['path']}: {exc}", file=sys.stderr, flush=True)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
+                        print(f"ERROR {name}: {exc}", file=err, flush=True)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
                 list(pool.map(task, inputs))
             record.update(status="complete" if not errors else "incomplete", verified=len(inputs) - len(errors), errors=sorted(errors, key=lambda x: x["path"]))
             reports.append(record)
             if not errors:
-                save_json(args.root / "raw" / dataset["id"] / "download-manifest.json", dataset)
+                save_json(root / "raw" / dataset["id"] / "download-manifest.json", dataset)
+                print(f"Ready {dataset['id']} ({dataset.get('name', dataset['id'])})", file=err, flush=True)
                 if progress:
                     progress({"type": "dataset_ready"})
-            save_json(args.root / METADATA / "reports/download-report.json", {"schema_version": 1, "datasets": reports})
-        save_json(args.root / METADATA / "reports/download-report.json", {"schema_version": 1, "datasets": reports})
+            save_json(root / METADATA / "reports/download-report.json", {"schema_version": 1, "datasets": reports})
+        save_json(root / METADATA / "reports/download-report.json", {"schema_version": 1, "datasets": reports})
         return 0 if all(d["status"] in {"complete", "disabled"} for d in reports) else 2
 
 
