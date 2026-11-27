@@ -10,6 +10,7 @@ from package_notices import file_sha256
 from release_support import release_version
 
 SOURCE = Path(__file__).resolve().parents[1]
+CHECKSUMS = "SHA256SUMS.txt"
 
 
 def git(*args):
@@ -35,40 +36,56 @@ def missing_assets(expected, assets):
     return [name for name in expected if name not in seen]
 
 
+def package_names(version):
+    """Return the same platform filenames for the downloads and the upload check."""
+    return (
+        f"pancake_{version}_amd64.deb",
+        f"pancake-{version}-macos-arm64.dmg",
+        f"pancake-gui-{version}-windows-x64.exe",
+        f"pancake-cli-{version}-windows-x64.exe",
+        f"pancake-notices-{version}-windows-x64.tar.gz",
+    )
+
+
+def release_notes(repository, revision, version, changelog):
+    """Put direct download links first, followed by changes and installation help."""
+    deb, mac, windows_gui, windows_cli, windows_notices = package_names(version)
+    repo_url = f"https://github.com/{repository}"
+    download = f"{repo_url}/releases/download/v{version}"
+    return (
+        "## Downloads\n\n"
+        "| Platform | Download |\n"
+        "| --- | --- |\n"
+        f"| macOS (Apple Silicon) | [Disk image (.dmg)]({download}/{mac}) |\n"
+        f"| Windows x64 | [Desktop app (.exe)]({download}/{windows_gui}) · "
+        f"[CLI (.exe)]({download}/{windows_cli}) · [License notices (.tar.gz)]({download}/{windows_notices}) |\n"
+        f"| Ubuntu 24.04 x86-64 | [Debian package (.deb)]({download}/{deb}) |\n\n"
+        f"[SHA-256 checksums]({download}/{CHECKSUMS})\n\n"
+        + changelog.rstrip()
+        + "\n\n## Installation\n\n"
+        + "- **Apple Silicon** — Open the DMG and drag Pancake.app into Applications. "
+        + "The app is ad-hoc signed and has no Apple notarization. The image also includes pancake-cli.\n"
+        + f"- **Ubuntu 24.04 x86-64** — Install the DEB with `sudo apt install ./{deb}`.\n"
+        + "- **Windows x64** — Run the standalone desktop or CLI executable. Both are unsigned.\n\n"
+        + f"[Installation and first-launch help]({repo_url}/blob/{revision}/pancake/docs/install.md) · "
+        + f"[Stack your first photos]({repo_url}/blob/{revision}/pancake/docs/desktop.md) · "
+        + f"[Source and build instructions]({repo_url}/tree/{revision}#build-from-source)\n"
+    )
+
+
 def publish(distribution, candidate, prerelease):
     """Bind the tag to the candidate and publish only after verifying draft contents."""
     repo = os.environ["GH_REPO"]
     revision = git("rev-parse", "HEAD")
     version = release_version(SOURCE)
-    deb = f"pancake_{version}_amd64.deb"
-    packages = [
-        deb,
-        f"pancake-{version}-macos-arm64.dmg",
-        f"pancake-gui-{version}-windows-x64.exe",
-        f"pancake-cli-{version}-windows-x64.exe",
-        f"pancake-notices-{version}-windows-x64.tar.gz",
-    ]
+    packages = package_names(version)
     expected = {name: f"sha256:{file_sha256(distribution / name)}" for name in packages}
-    checksums = distribution / "SHA256SUMS.txt"
+    checksums = distribution / CHECKSUMS
     checksums.write_text("".join(f"{expected[name][7:]}  {name}\n" for name in packages), encoding="utf-8")
     expected[checksums.name] = f"sha256:{file_sha256(checksums)}"
     notes = candidate / "release-notes.md"
-    repo_url = f"https://github.com/{repo}"
     changelog = (candidate / "changelog.md").read_text(encoding="utf-8")
-    notes.write_text(
-        changelog
-        + "\n## Downloads\n\n"
-        + "- **Apple Silicon** — Open the DMG and drag Pancake.app into Applications. "
-        + "The app is ad-hoc signed and has no Apple notarization. The image also includes pancake-cli.\n"
-        + f"- **Ubuntu 24.04 x86-64** — Install the DEB with `sudo apt install ./{deb}`.\n"
-        + "- **Windows x64** — Run the standalone desktop or CLI executable. "
-        + "Both are unsigned. License notices are a separate download.\n\n"
-        + "Use SHA256SUMS.txt to verify the downloads.\n\n"
-        + f"[Installation and first-launch help]({repo_url}/blob/{revision}/pancake/docs/install.md) · "
-        + f"[Stack your first photos]({repo_url}/blob/{revision}/pancake/docs/desktop.md) · "
-        + f"[Source and build instructions]({repo_url}/tree/{revision}#build-from-source)\n",
-        encoding="utf-8",
-    )
+    notes.write_text(release_notes(repo, revision, version, changelog), encoding="utf-8")
     tag = f"v{version}"
     tag_ref = f"refs/tags/{tag}"
     if current := git("ls-remote", "--tags", "origin", tag_ref):

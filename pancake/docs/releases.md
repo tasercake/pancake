@@ -22,7 +22,7 @@ Select **prerelease** or **stable**, then click **Run workflow**. Actions assign
 - **Stable** uses `v<version>` and describes all changes since the previous stable release, including changes in intervening prereleases. The first stable release uses the full history.
 - **Build-only** checks and stages the candidate packages as Actions artifacts for review.
 
-The changelog links the complete set of included changes. Copilot adds focused highlights and recommends a version bump. The workflow reserves a new tag, continues an open release-candidate series, and uses a minor bump for breaking changes during initial `0.x` development. Git and conventional commit markers provide the fallback when Copilot is unavailable. Any change that failed verification stops publication.
+Release notes start with a download table for the three platforms and a checksum link. The changelog links the complete set of included changes. Copilot adds focused highlights and recommends a version bump. The workflow reserves a new tag, continues an open release-candidate series, and uses a minor bump for breaking changes during initial `0.x` development. Git and conventional commit markers provide the fallback when Copilot is unavailable. Any change that failed verification stops publication.
 
 If publication is interrupted after the draft is staged, use **Re-run failed jobs** on the same Actions run to reuse its checked artifacts and tag. The publisher verifies asset checksums before making the draft public.
 
