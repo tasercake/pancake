@@ -25,21 +25,37 @@ RELEASE_NOTICES = ("LICENSE", "dependency-notices/inventory.json", "native-llvm/
 
 
 class MacDiskImageTests(unittest.TestCase):
-    """Keep the Finder install window focused on the app and its drop target."""
+    """Keep the drag target and first-launch guidance together in Finder."""
 
-    def test_finder_layout_stages_only_app_and_applications(self):
-        app = "/tmp/Pancake Stacker/Pancake Stacker.app"
+    def test_finder_layout_includes_illustrated_guidance_and_one_help_document(self):
+        app = Path("/tmp/Pancake Stacker/Pancake Stacker.app")
+        assets = Path(__file__).resolve().with_name("macos-dmg")
         settings = runpy.run_path(str(Path(__file__).with_name("macos-dmg-settings.py")),
-                                  init_globals={"defines": {"app": app}})
-        self.assertEqual(settings["files"], [app])
+                                  init_globals={"defines": {"app": str(app), "assets": str(assets)}})
+        help_page = assets / "First Launch Help.html"
+        self.assertEqual(settings["files"], [str(app), str(help_page)])
         self.assertEqual(settings["symlinks"], {"Applications": "/Applications"})
         self.assertEqual(settings["default_view"], "icon-view")
-        self.assertEqual(settings["background"], "builtin-arrow")
+        self.assertEqual(settings["background"], str(assets / "first-launch.png"))
+        width, height = settings["window_rect"][1]
+        for suffix, scale in (("", 1), ("@2x", 2)):
+            png = (assets / f"first-launch{suffix}.png").read_bytes()
+            self.assertEqual(png[:8], b"\x89PNG\r\n\x1a\n")
+            self.assertEqual(int.from_bytes(png[16:20], "big"), width * scale)
+            self.assertEqual(int.from_bytes(png[20:24], "big"), height * scale)
+
         positions = settings["icon_locations"]
-        self.assertEqual(positions.keys(), {"Pancake Stacker.app", "Applications"})
-        left, right = positions["Pancake Stacker.app"], positions["Applications"]
+        self.assertEqual(positions.keys(), {app.name, "Applications", help_page.name})
+        left, right = positions[app.name], positions["Applications"]
         self.assertLess(left[0], right[0])
         self.assertEqual(left[1], right[1])
+        self.assertGreater(positions[help_page.name][1], left[1])
+
+        html = help_page.read_text(encoding="utf-8")
+        self.assertIn('href="x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension"', html)
+        self.assertIn('href="https://support.apple.com/en-us/102445"', html)
+        self.assertIn("Open Anyway", html)
+        self.assertIn("https://github.com/tasercake/pancake/releases", html)
 
 
 class MacPackageTests(unittest.TestCase):
