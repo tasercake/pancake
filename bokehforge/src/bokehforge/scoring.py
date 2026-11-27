@@ -1,12 +1,14 @@
 """Reference coverage and native-grid image quality measurements for BokehForge."""
 
+from base64 import b64encode
 from dataclasses import dataclass
 from typing import Literal
+from zlib import compress
 
 import numpy as np
 from scipy import ndimage as ndi
 
-from ._device import Device, use_cuda_damage, validate_device
+from ._device import DamageBackend, Device, damage_backend
 from ._workers import alignment_worker, workers
 from .alignment import _xyxy, align, native_overlap, overlap, project
 
@@ -21,13 +23,15 @@ FAMILY_WEIGHTS = {
 }
 FEATURES = tuple(f"native.{family}" for family in FAMILY_WEIGHTS)
 SCORE_EXPLANATION_VERSION = 2
-SCORE_DETAIL_LEVELS = ("summary", "tiles")
-ScoreDetails = Literal["summary", "tiles"]
+SCORE_DETAIL_LEVELS = ("summary", "tiles", "attention")
+ScoreDetails = Literal["summary", "tiles", "attention"]
 _POOL_WEIGHTS = {"mean": 0.40, "tail": 0.35, "worst": 0.25}
 _POOL_LABELS = {"mean": "Average damage", "tail": "Average of the worst 1% of tiles",
                 "worst": "Worst single tile"}
 _TAIL_FRACTION = 0.01
 _AFFECTED_THRESHOLD = 0.25
+_STRIP_ROWS = 192
+_FILTER_HALO = 40
 _FAMILY_LABELS = {
     "tone": ("Tone", "Brightness and contrast differences"),
     "color": ("Color", "Differences in tint or color intensity"),
@@ -58,7 +62,7 @@ class Measurement:
 
 def _validate_details(details):
     if details is not None and details not in SCORE_DETAIL_LEVELS:
-        raise ValueError(f"Expected score details to be None, 'summary', or 'tiles', got {details!r}")
+        raise ValueError(f"Expected score details to be None or one of {SCORE_DETAIL_LEVELS}, got {details!r}")
 
 
 def validate_rgb(pixels):
@@ -77,8 +81,18 @@ def validate_rgb(pixels):
 
 def _lab(rgb):
     # The display clips at SDR black and white. Native range evidence is measured separately.
-    rgb = np.clip(rgb, 0, 1)
-    xyz = np.stack([rgb[..., 0] * x + rgb[..., 1] * y + rgb[..., 2] * z for x, y, z in _XYZ])
+    channels = np.empty((3, *rgb.shape[:2]), dtype=np.float32)
+    np.clip(np.moveaxis(rgb, -1, 0), 0, 1, out=channels)
+    red, green, blue = channels
+    xyz = np.empty_like(channels)
+    scratch = np.empty_like(red)
+    # Work on contiguous planes and retain the original multiply/add order.
+    for output, (r, g, b) in zip(xyz, _XYZ, strict=True):
+        np.multiply(red, r, out=output)
+        np.multiply(green, g, out=scratch)
+        np.add(output, scratch, out=output)
+        np.multiply(blue, b, out=scratch)
+        np.add(output, scratch, out=output)
     curve = np.where(xyz > (6 / 29) ** 3, np.cbrt(xyz), xyz * (841 / 108) + 4 / 29)
     x, y, z = curve
     return 116 * y - 16, 500 * (x - y), 200 * (y - z)
@@ -166,22 +180,20 @@ def _detail(candidate, target, blur, support):
     return lost, extra
 
 
-def _damage(candidate, target, support):
-    cl, ca, cb = _lab(candidate)
-    tl, ta, tb = _lab(target)
-    delta = cl - tl
+def _lightness_damage(cl, tl, delta, support, extrema=None):
     blur = _supported_blur(support)
     local_delta = blur(delta, 2.5)
     # Tone carries broad gain, contrast, local lighting, and seam differences.
     tone = _visibility(np.maximum(abs(local_delta), abs(blur(delta, 10))), 8.0)
-    # CIELAB opponent-plane distance keeps a cast visible alongside a tone error.
-    color = _visibility(np.hypot(ca - ta, cb - tb), 10.0)
 
     lost, extra = _detail(cl, tl, blur, support)
-    upper = ndi.maximum_filter(tl, size=3, mode="reflect")
-    lower = ndi.minimum_filter(tl, size=3, mode="reflect")
-    edge_weight = _visibility(upper - lower, 6.0)
-    near_edge = ndi.maximum_filter(edge_weight, size=9, mode="reflect")
+    if extrema is None:
+        upper = ndi.maximum_filter(tl, size=3, mode="reflect")
+        lower = ndi.minimum_filter(tl, size=3, mode="reflect")
+        edge_weight = _visibility(upper - lower, 6.0)
+        near_edge = ndi.maximum_filter(edge_weight, size=9, mode="reflect")
+    else:
+        upper, lower, edge_weight, near_edge = extrema
     # Residual grain is useful evidence in smooth backgrounds. At an existing
     # transition, the signed detail bank and edge neighborhood carry the signal.
     grain = _visibility(abs(delta - blur(delta, 0.85)), 5.0) * (1 - edge_weight)
@@ -190,7 +202,17 @@ def _damage(candidate, target, support):
     overshoot = _visibility(np.maximum.reduce([cl - upper, lower - cl, np.zeros_like(cl)]), 6.0)
     boundary = np.maximum(shape, overshoot * near_edge)
 
-    return (tone, color, lost, extra, boundary, _range_damage(candidate, target)), (delta, ca - ta, cb - tb)
+    return tone, lost, extra, boundary
+
+
+def _damage(candidate, target, support):
+    cl, ca, cb = _lab(candidate)
+    tl, ta, tb = _lab(target)
+    delta, delta_a, delta_b = cl - tl, ca - ta, cb - tb
+    tone, lost, extra, boundary = _lightness_damage(cl, tl, delta, support)
+    # CIELAB opponent-plane distance keeps a cast visible alongside a tone error.
+    color = _visibility(np.hypot(delta_a, delta_b), 10.0)
+    return (tone, color, lost, extra, boundary, _range_damage(candidate, target)), (delta, delta_a, delta_b)
 
 
 def _range_damage(candidate, target):
@@ -214,14 +236,12 @@ def _rgb_exposure(pixels, support):
     return np.maximum(_supported_mean(pixels, support, axis=(0, 1)), 0) @ _XYZ[1]
 
 
-def _cuda_maps(candidate, target, support):
-    from ._cuda_damage import damage_maps
-
+def _lab_comparison(candidate, target):
     height, width = target.shape[:2]
     cl, tl, delta, delta_a, delta_b, color = np.empty((6, height, width), dtype=np.float32)
 
     def prepare(start):
-        rows = slice(start, start + 192)
+        rows = slice(start, start + _STRIP_ROWS)
         c, a, b = _lab(candidate[rows])
         t, ta, tb = _lab(target[rows])
         cl[rows], tl[rows] = c, t
@@ -230,31 +250,68 @@ def _cuda_maps(candidate, target, support):
         np.subtract(b, tb, out=delta_b[rows])
         color[rows] = _visibility(np.hypot(delta_a[rows], delta_b[rows]), 10.)
 
-    list(workers().map(prepare, range(0, height, 192)))
+    list(workers().map(prepare, range(0, height, _STRIP_ROWS)))
+    return cl, tl, (delta, delta_a, delta_b), color
+
+
+def _cuda_maps(candidate, target, support):
+    from ._cuda_damage import damage_maps
+
+    cl, tl, deltas, color = _lab_comparison(candidate, target)
+    delta, _, _ = deltas
     tone, lost, extra, boundary, rgb_range = damage_maps(candidate, target, cl, tl, delta, support)
-    return (tone, color, lost, extra, boundary, rgb_range), (delta, delta_a, delta_b)
+    return (tone, color, lost, extra, boundary, rgb_range), deltas
 
 
-def _maps(candidate, target, support=None, *, cuda=False):
+def _damage_strips(shape, count, calculate):
+    height, width = shape
+    arrays = np.empty((count, height, width), dtype=np.float32)
+
+    def strip(start):
+        # The radius-40 tone filter is the widest stencil. Preserve reflection
+        # at the actual image edges while keeping strip work cache-local.
+        end = min(start + _STRIP_ROWS, height)
+        first, last = max(0, start - _FILTER_HALO), min(height, end + _FILTER_HALO)
+        for output, values in zip(arrays, calculate(slice(first, last)), strict=True):
+            output[start:end] = values[start - first:end - first]
+
+    list(workers().map(strip, range(0, height, _STRIP_ROWS)))
+    return arrays
+
+
+def _mps_maps(candidate, target, support):
+    from ._mps_damage import lightness_extrema, neighborhood_strength
+
+    cl, tl, deltas, color = _lab_comparison(candidate, target)
+    delta, _, _ = deltas
+    upper, lower = lightness_extrema(tl)
+    # Keep division in NumPy and in its original position before the max filter.
+    strength = _visibility(upper - lower, 6.0)
+    extrema = upper, lower, strength, neighborhood_strength(strength)
+
+    def calculate(rows):
+        lightness = _lightness_damage(cl[rows], tl[rows], delta[rows],
+                                      None if support is None else support[rows], tuple(plane[rows] for plane in extrema))
+        return (*lightness, _range_damage(candidate[rows], target[rows]))
+
+    tone, lost, extra, boundary, rgb_range = _damage_strips(target.shape[:2], 5, calculate)
+    return (tone, color, lost, extra, boundary, rgb_range), deltas
+
+
+def _maps(candidate, target, support=None, *, backend: DamageBackend = "cpu"):
     height, width = target.shape[:2]
     large = height * width >= 1_000_000
     exposure = [workers().submit(_rgb_exposure, image, support) for image in (candidate, target)] if large else None
-    if cuda:
+    if backend == "cuda":
         maps, (delta, delta_a, delta_b) = _cuda_maps(candidate, target, support)
-    elif height >= 192 and large:
-        arrays = np.empty((len(FAMILY_WEIGHTS) + 3, height, width), dtype=np.float32)
+    elif backend == "mps":
+        maps, (delta, delta_a, delta_b) = _mps_maps(candidate, target, support)
+    elif height >= _STRIP_ROWS and large:
+        def calculate(rows):
+            maps, signed = _damage(candidate[rows], target[rows], None if support is None else support[rows])
+            return (*maps, *signed)
 
-        def strip(start):
-            # All filters are local. The widest is the radius-40 tone filter.
-            # The halo keeps reflection at the actual reference border.
-            end = min(start + 192, height)
-            first, last = max(0, start - 40), min(height, end + 40)
-            maps, signed = _damage(candidate[first:last], target[first:last],
-                                   None if support is None else support[first:last])
-            for output, values in zip(arrays, (*maps, *signed), strict=True):
-                output[start:end] = values[start - first:end - first]
-
-        list(workers().map(strip, range(0, height, 192)))
+        arrays = _damage_strips((height, width), len(FAMILY_WEIGHTS) + 3, calculate)
         maps, (delta, delta_a, delta_b) = arrays[:len(FAMILY_WEIGHTS)], arrays[len(FAMILY_WEIGHTS):]
     else:
         maps, (delta, delta_a, delta_b) = _damage(candidate, target, support)
@@ -287,15 +344,22 @@ def _tile_totals(integral, y0, y1, x0, x1):
 def _tile_integral(image, support, edges):
     """Compute the original vertical-then-horizontal sums at tile corners."""
     ys, xs = edges
-    vertical = np.zeros(image.shape[1], dtype=np.float64)
-    sampled = np.zeros((len(ys), image.shape[1]), dtype=np.float64)
-    start = 0
-    for index, stop in enumerate(ys[1:], 1):
-        for row in range(start, stop):
-            values = image[row] if support is None else image[row] * support[row]
-            np.add(vertical, values, out=vertical)
-        sampled[index] = vertical
-        start = stop
+    height, width = image.shape
+    slab_rows = 96
+    buffer = np.zeros((min(height, slab_rows) + 1, width), dtype=np.float64)
+    sampled = np.zeros((len(ys), width), dtype=np.float64)
+    for start in range(0, height, slab_rows):
+        stop = min(start + slab_rows, height)
+        slab = buffer[:stop - start + 1]
+        if support is None:
+            slab[1:] = image[start:stop]
+        else:
+            np.multiply(image[start:stop], support[start:stop], out=slab[1:])
+        np.cumsum(slab, axis=0, out=slab)
+        first, last = np.searchsorted(ys, (start, stop), side="right")
+        np.take(slab, ys[first:last] - start, axis=0, out=sampled[first:last])
+        # Seed the next slab with the preceding sum, preserving every addition.
+        buffer[0] = slab[-1]
     compact = np.zeros((len(ys), len(xs)), dtype=np.float64)
     sampled.cumsum(axis=1, out=sampled)
     compact[:, 1:] = sampled[:, xs[1:] - 1]
@@ -419,14 +483,15 @@ def _rgb_rmse(candidate, target, support):
     return float(np.sqrt(mse))
 
 
-def _measure(candidate, target, support=None, *, details=None, exact_box=None, inspection=None, cuda=False):
+def _measure(candidate, target, support=None, *, details=None, exact_box=None, inspection=None,
+             backend: DamageBackend = "cpu"):
     height, width = target.shape[:2]
     large = height * width >= 1_000_000
     rmse_work = None
     if exact_box is None:
         if large:
             rmse_work = workers().submit(_rgb_rmse, candidate, target, support)
-        maps, signed = _maps(candidate, target, support, cuda=cuda)
+        maps, signed = _maps(candidate, target, support, backend=backend)
         measured_pixels = height * width if support is None else int(support.sum())
     else:
         top, left, bottom, right = exact_box
@@ -512,14 +577,15 @@ def measure(candidate, target, *, details: ScoreDetails | None = None, inspectio
 
 def _measure_delivery(candidate, target, *, details, device, heatmap=None, generate=None):
     """Score images already checked against the RGB input contract."""
-    validate_device(device)
     large = target.shape[0] * target.shape[1] >= 1_000_000
-    cuda = (large or device == "gpu") and use_cuda_damage(device)
+    backend = damage_backend(device) if large or device != "auto" else "cpu"
     pending = alignment_worker().submit(align, candidate, target) if large and generate is not None else None
     try:
         if generate is not None:
             heatmap = generate(target)
-        inspection = None if heatmap is None else _inspection_weights(validate_heatmap(heatmap, target.shape[:2]))
+        if heatmap is not None:
+            heatmap = validate_heatmap(heatmap, target.shape[:2])
+        inspection = None if heatmap is None else _inspection_weights(heatmap)
     except BaseException:
         if pending is not None and not pending.cancel():
             pending.exception()
@@ -537,17 +603,22 @@ def _measure_delivery(candidate, target, *, details, device, heatmap=None, gener
             else:
                 aligned, support = project(candidate, target.shape, placement)
                 if support is None or support.any():
-                    if cuda and device == "auto":
+                    try:
+                        comparison = _measure(aligned, target, support, details=details,
+                                              inspection=inspection, backend=backend)
+                    except RuntimeError as exc:
+                        if backend == "cpu" or device != "auto":
+                            raise
                         from torch import OutOfMemoryError
 
-                        try:
-                            comparison = _measure(aligned, target, support, details=details,
-                                                  inspection=inspection, cuda=True)
-                        except OutOfMemoryError:
-                            cuda = False
+                        # PyTorch's MPS allocator uses RuntimeError for exhaustion.
+                        if not isinstance(exc, OutOfMemoryError) and not (
+                            backend == "mps" and str(exc).startswith("MPS backend out of memory")
+                        ):
+                            raise
+                        backend = "cpu"
                     if comparison is None:
-                        comparison = _measure(aligned, target, support, details=details,
-                                              inspection=inspection, cuda=cuda)
+                        comparison = _measure(aligned, target, support, details=details, inspection=inspection)
         quality = 0.0 if comparison is None else comparison.score
         coverage = min(geometry, resolution)
         weighted = placement.weight * coverage * quality
@@ -574,6 +645,20 @@ def _measure_delivery(candidate, target, *, details, device, heatmap=None, gener
             "confidence": alignment["confidence"], "alignment_status": alignment["status"],
             "reason": alignment["reason"], "placements": explanations,
         }
+        if heatmap is not None:
+            weights, mix = inspection
+            diagnostic = {
+                "size_wh": [heatmap.shape[1], heatmap.shape[0]],
+                "range": [0, 1],
+                "mean": float(heatmap.mean(dtype=np.float64)),
+                "mix": mix,
+                "damage_multiplier_range": [1.0, 1.0] if weights is None
+                else [float(weights.min()), float(weights.max())],
+            }
+            if details == "attention":
+                pixels = heatmap.astype("<f4", copy=False).tobytes()
+                diagnostic.update(encoding="base64+zlib+float32-le", data=b64encode(compress(pixels, 1)).decode("ascii"))
+            explanation["attention"] = diagnostic
     return Measurement(leading.features if leading else {}, leading.diagnostics if leading else {},
                        explanation, alignment)
 

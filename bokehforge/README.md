@@ -11,7 +11,7 @@ uv sync --frozen
 uv run --frozen bokehforge data download
 ```
 
-The downloader, catalog, benchmark, and Stackroom all select datasets from the active source configuration. Older downloads and lock entries stay on disk. To use other datasets, pass a configuration that lists them. Repeat `--dataset` to select specific configured sources. `--root` selects the dataset directory, which defaults to `datasets/` at the repository root. For a wheel installation, supply `--config /path/to/sources.json` on the command line or `config="/path/to/sources.json"` in Python.
+The downloader, Python library, benchmark, and Stackroom share one per-user dataset directory across installations and Git worktrees. Set `BOKEHFORGE_DATA_ROOT` to reuse an existing directory. See the [data guide](docs/data.md) for platform defaults and custom sources.
 
 ## Benchmark stacks
 
@@ -35,18 +35,19 @@ See the [Stackroom guide](docs/review.md) for dataset selection, stacker setup, 
 
 ## Use from Python
 
-In a larger Python 3.12 project, install BokehForge as a dependency from its project directory or wheel. For example, run `python -m pip install /path/to/focus-stacking/bokehforge` in your project's environment. Point the catalog at the same dataset directory used by the downloader.
+Install BokehForge in your Python 3.12 environment from this project directory or a wheel. For example, run `python -m pip install /path/to/focus-stacking/bokehforge`. The package includes the source configuration and file hashes. `load_dataset` downloads missing originals with live progress and decodes scenes as you iterate.
 
 ```python
-from bokehforge import FrameWindowDataset, FusionPairDataset, SceneCatalog
+from bokehforge import DATASET_INFINIGEN_DEFOCUS, load_dataset
 
-catalog = SceneCatalog("/path/to/datasets")
-scene = catalog.scene(catalog.scene_ids[0])
-frame = catalog.decode(scene.frame_ids[0])  # .data, .alpha, .provenance
-window = FrameWindowDataset(catalog, window_size=8, scene_ids=[scene.id])[0]
-pair = FusionPairDataset(catalog, scene_ids=[scene.id], output="tiff")[0]
+dataset = load_dataset(DATASET_INFINIGEN_DEFOCUS)
+for batch in dataset.batches(8):
+    for sample in batch:
+        frames, reference = sample.frames, sample.reference
+    # Optional NumPy arrays when the shapes match:
+    frames, references = batch.frames(), batch.references()
 ```
 
-Reuse a catalog across views. It checks native inputs when it opens and decodes pixels when you request a frame or sample. The views work with PyTorch's `DataLoader` when PyTorch is installed in your application.
+Pass a list of dataset constants or `DATASET_ALL` to load multiple built-in sources. Set `download=False` to use only local data. The [data guide](docs/data.md) covers batch shapes and the lower-level catalog and PyTorch-compatible views.
 
 See the [data guide](docs/data.md) for sample fields, color and provenance contracts, and source configuration. Run the project tests with `uv run --frozen pytest`.

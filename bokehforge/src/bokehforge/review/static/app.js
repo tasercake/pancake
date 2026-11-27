@@ -1454,12 +1454,13 @@ function connect() {
 
 const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
 const filmRail = new VirtualRail($("filmstrip"), "x", 112, frameEntry);
-const requestScoreTiles = (params, signal) => api(url("/api/score-tiles", params), undefined, { signal });
+const requestScoreOverlay = (mode, params, signal) =>
+  api(url(mode === "attention" ? "/api/score-attention" : "/api/score-tiles", params), undefined, { signal });
 const candidateExplanation = new ScoreExplanation(
-  $("candidate-explanation"), $("candidate-explain"), $("candidate-image").parentElement, requestScoreTiles,
+  $("candidate-explanation"), $("candidate-explain"), $("candidate-image").parentElement, requestScoreOverlay,
 );
 const lightboxExplanation = new ScoreExplanation(
-  $("lightbox-explanation"), $("lightbox-explain"), $("image-view").parentElement, requestScoreTiles,
+  $("lightbox-explanation"), $("lightbox-explain"), $("image-view").parentElement, requestScoreOverlay,
 );
 new ResizeObserver(paintCandidateExplanation).observe($("candidate-image"));
 const lightboxStrip = $("lightbox-strip");

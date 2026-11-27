@@ -1,9 +1,11 @@
+from base64 import b64decode
 from hashlib import sha256
 import json
 import os
 import subprocess
 import sys
 from threading import Event
+from zlib import decompress
 
 import numpy as np
 import pytest
@@ -167,6 +169,15 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     saved = score_saved_output(catalog, scene, path, details="tiles", inspection=Inspection())
     assert saved["score"] == row["scene_score"]
     assert saved["explanation"] == json.loads((output / row["score_explanation_path"]).read_text())
+    assert "data" not in saved["explanation"]["attention"]
+    diagnostic = measure(candidate, reference, inspection_heatmap=heatmap, details="attention")
+    assert diagnostic.score == saved["score"]
+    attention = diagnostic.explanation["attention"]
+    assert attention["encoding"] == "base64+zlib+float32-le"
+    assert attention["size_wh"] == list(reference.shape[1::-1])
+    pixels = np.frombuffer(decompress(b64decode(attention["data"])), dtype="<f4").reshape(heatmap.shape)
+    np.testing.assert_array_equal(pixels, heatmap)
+    assert attention["damage_multiplier_range"] == [0.75, 1.25]
 
     updated = Event()
     review = Scores(updated.set)
@@ -182,6 +193,19 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
         assert updated.wait(5)
         tiles = review.tiles(catalog, scene, tmp_path, delivery, result["artifact_revision"], "tone", 8)
         assert tiles["inspection_map_sha256"] == saved["inspection_map_sha256"]
+        assert "data" not in result["explanation"]["attention"]
+        updated.clear()
+        revision = result["artifact_revision"]
+        assert review.attention_overlay(catalog, scene, tmp_path, delivery, revision)["status"] == "pending"
+        assert updated.wait(5)
+        overlay = review.attention_overlay(catalog, scene, tmp_path, delivery, revision)
+        assert overlay["artifact_revision"] == revision
+        assert overlay["inspection_map_sha256"] == saved["inspection_map_sha256"]
+        assert overlay["reference_id"] == scene.reference_ids[0]
+        assert overlay["candidate_to_reference_xy"] == tiles["candidate_to_reference_xy"]
+        assert overlay["attention"]["encoding"] == "base64+uint8"
+        assert b64decode(overlay["attention"]["data"]) == np.rint(heatmap * 255).astype(np.uint8).tobytes()
+        assert review.attention_overlay(catalog, scene, tmp_path, delivery, "outdated")["status"] == "stale"
         assert len(seen) == 3
     finally:
         review.close()

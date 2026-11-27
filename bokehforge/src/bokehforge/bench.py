@@ -20,7 +20,7 @@ from ._device import DEVICES, Device
 from .alignment import ALIGNMENT_VERSION, MAX_ROTATION_DEGREES
 from .data._canonical import encode_tiff
 from .data._files import digest
-from .data._config import DEFAULT_CONFIG, data_root, read_config
+from .data._config import DEFAULT_CONFIG, data_root
 from .data.download import save_json
 from .data.lazy import SceneCatalog
 from .inspection import INSPECTION_MAP_VERSION, Inspection, inspection_for
@@ -320,7 +320,8 @@ def main(argv=None):
     candidate.add_argument("--algorithm", help="mean or an importable Python module:callable")
     candidate.add_argument("--candidate-dir", type=Path, help="Evaluate existing canonical TIFFs by scene ID")
     selection = parser.add_argument_group("Scene selection")
-    selection.add_argument("--root", type=Path, help="Dataset directory used by data download")
+    selection.add_argument("--root", type=Path,
+                           help="Dataset directory (default: the shared BokehForge data location)")
     selection.add_argument("--dataset", action="append", help="Dataset ID, repeatable. Defaults to configured downloads")
     selection.add_argument("--scene", action="append",
                            help="Exact catalog scene ID, repeatable. Every selected scene requires RGB ground truth")
@@ -329,7 +330,7 @@ def main(argv=None):
     score_options = parser.add_argument_group("Scoring")
     score_options.add_argument("--no-attention", action="store_true", help="Disable inspection heatmaps and damage weighting")
     score_options.add_argument("--device", choices=DEVICES, default="auto",
-                               help="Scoring device (default: auto, prefer CUDA when available)")
+                               help="Damage scoring device (default: auto, prefer CUDA or Apple MPS when available)")
     score_options.add_argument(
         "--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)",
     )
@@ -337,7 +338,7 @@ def main(argv=None):
     report_options.add_argument("--output", required=True, type=Path, help="New directory for the report and optional images")
     report_options.add_argument(
         "--explain-score", choices=SCORE_DETAIL_LEVELS,
-        help="Save per-scene score components and optionally all scoring tiles",
+        help="Save score components, with exact scoring tiles or the native attention map on request",
     )
     report_options.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     report_options.add_argument("--progress", action="store_true", help="Write progress to stderr")
@@ -346,7 +347,7 @@ def main(argv=None):
         parser.error("--device cpu requires --no-attention because the Inspection profile requires CUDA")
     if args.output.exists():
         raise ValueError(f"Output directory already exists: {args.output}")
-    root = args.root or data_root(args.config, read_config(args.config).get("defaults", {}))
+    root = args.root.expanduser().resolve() if args.root is not None else data_root(args.config)
 
     start = perf_counter()
     catalog = SceneCatalog(root, datasets=args.dataset, config=args.config, lock=args.lock)

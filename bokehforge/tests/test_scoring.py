@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
 
-from bokehforge._device import cuda_available, use_cuda_damage
+from bokehforge._device import cuda_available, damage_backend, mps_available
 from bokehforge.scoring import (
     FAMILY_WEIGHTS, FEATURES, INSPECTION_SCORE_VERSION, SCORE_DAMAGE_SCALE, Measurement,
     _damage, _inspection_weights, _integral, _maps, _measure, _tile_integral, measure, scene_score,
@@ -19,18 +19,31 @@ def score(candidate, target):
 
 def test_device_selection_falls_back_only_in_auto(monkeypatch):
     monkeypatch.setattr("bokehforge._device.cuda_available", lambda: False)
-    assert use_cuda_damage("auto") is False
-    assert use_cuda_damage("cpu") is False
+    monkeypatch.setattr("bokehforge._device.mps_available", lambda: False)
+    assert damage_backend("auto") == "cpu"
+    assert damage_backend("cpu") == "cpu"
     with pytest.raises(RuntimeError, match="--device gpu requires CUDA"):
-        use_cuda_damage("gpu")
+        damage_backend("gpu")
 
 
-def test_tile_prefix_keeps_rounding_order_and_support():
+def test_device_selection_prefers_supported_gpu_backends(monkeypatch):
+    monkeypatch.setattr("bokehforge._device.cuda_available", lambda: True)
+    monkeypatch.setattr("bokehforge._device.find_spec", lambda _: None)
+    monkeypatch.setattr("bokehforge._device.mps_available", lambda: True)
+    assert damage_backend("auto") == "mps"
+    assert damage_backend("gpu") == "mps"
+    assert damage_backend("cpu") == "cpu"
+    monkeypatch.setattr("bokehforge._device.find_spec", lambda _: object())
+    assert damage_backend("auto") == "cuda"
+
+
+@pytest.mark.parametrize("masked", [False, True])
+def test_tile_prefix_keeps_rounding_order_and_support(masked):
     rng = np.random.default_rng(129)
-    damage = np.exp2(-rng.integers(0, 128, (67, 83)).astype(np.float32))
-    support = rng.random(damage.shape) > 0.2
-    y, x = np.r_[0:67:4, 67], np.r_[0:83:4, 83]
-    expected = _integral(damage * support)[np.ix_(y, x)]
+    damage = np.exp2(-rng.integers(0, 128, (213, 83)).astype(np.float32))
+    support = rng.random(damage.shape) > 0.2 if masked else None
+    y, x = np.r_[0:213:4, 213], np.r_[0:83:4, 83]
+    expected = _integral(damage if support is None else damage * support)[np.ix_(y, x)]
     np.testing.assert_array_equal(_tile_integral(damage, support, (y, x)), expected)
 
 
@@ -44,21 +57,45 @@ def test_parallel_damage_uses_full_image_halos():
         np.testing.assert_array_equal(left, right)
 
 
-@pytest.mark.parametrize("masked", [False, True])
-def test_gpu_preserves_tile_values_diagnostics_and_scores(masked):
-    if not cuda_available() or not use_cuda_damage("auto"):
+@pytest.mark.parametrize(("shape", "masked"), [((29, 43), False), ((509, 1967), True)])
+def test_gpu_preserves_tile_values_diagnostics_and_scores(shape, masked):
+    if damage_backend("auto") != "cuda":
         pytest.skip("Requires CUDA and Triton")
     rng = np.random.default_rng(65)
-    target = rng.uniform(-.05, 1.1, size=(29, 43, 3)).astype(np.float32)
+    target = rng.uniform(-.05, 1.1, size=(*shape, 3)).astype(np.float32)
     candidate = target.copy()
     candidate[:, 5:16, 1] *= .65
     candidate[23, 20, 0], target[23, 20, 0] = -np.finfo(np.float32).max, np.finfo(np.float32).max
     support = (rng.random(target.shape[:2]) > .08) if masked else None
     attention = _inspection_weights(rng.random(target.shape[:2], dtype=np.float32))
     cpu = _measure(candidate, target, support, details="tiles", inspection=attention)
-    gpu = _measure(candidate, target, support, details="tiles", inspection=attention, cuda=True)
+    gpu = _measure(candidate, target, support, details="tiles", inspection=attention, backend="cuda")
     assert cpu == gpu
     assert cpu.score == gpu.score
+
+
+@pytest.mark.parametrize("shape", [(1, 2), (33, 43), (215, 89)])
+def test_mps_edge_path_preserves_scores_and_explanations(monkeypatch, shape):
+    pytest.importorskip("torch")
+    from bokehforge import _mps_damage
+
+    # Exercise the same tensor operations on MPS when present, and otherwise
+    # check their CPU or CUDA implementation against the reference scorer.
+    tensor_device = "mps" if mps_available() else "cuda" if cuda_available() else "cpu"
+    for name in ("lightness_extrema", "neighborhood_strength"):
+        operation = getattr(_mps_damage, name)
+        monkeypatch.setattr(_mps_damage, name, lambda values, operation=operation: operation(values, device=tensor_device))
+    rng = np.random.default_rng(135)
+    target = rng.uniform(-.1, 1.1, (*shape, 3)).astype(np.float32)
+    candidate = target.copy()
+    candidate[:, :shape[1] // 2, 2] -= np.float32(.24)
+    support = rng.random(shape) > .1
+    support[0, 0] = True
+    attention = _inspection_weights(rng.random(shape, dtype=np.float32))
+    expected = _measure(candidate, target, support, details="tiles", inspection=attention)
+    actual = _measure(candidate, target, support, details="tiles", inspection=attention, backend="mps")
+    assert actual == expected
+    assert actual.score == expected.score
 
 
 def test_exact_match_preserves_grain_bokeh_and_headroom():

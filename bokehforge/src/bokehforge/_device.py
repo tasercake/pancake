@@ -7,6 +7,7 @@ from typing import Literal
 
 Device = Literal["auto", "cpu", "gpu"]
 DEVICES = ("auto", "cpu", "gpu")
+DamageBackend = Literal["cpu", "cuda", "mps"]
 
 
 def validate_device(device):
@@ -23,12 +24,23 @@ def cuda_available():
     return torch.cuda.is_available()
 
 
-def use_cuda_damage(device):
+@lru_cache(maxsize=1)
+def mps_available():
+    if find_spec("torch") is None:
+        return False
+    import torch
+
+    return torch.backends.mps.is_available()
+
+
+def damage_backend(device: Device) -> DamageBackend:
     validate_device(device)
     if device == "cpu":
-        return False
+        return "cpu"
     if cuda_available() and find_spec("triton") is not None:
-        return True
+        return "cuda"
+    if mps_available():
+        return "mps"
     if device == "gpu":
-        raise RuntimeError("--device gpu requires CUDA and the inspection dependencies with Triton")
-    return False
+        raise RuntimeError("--device gpu requires CUDA with Triton or Apple Metal (MPS) with PyTorch")
+    return "cpu"

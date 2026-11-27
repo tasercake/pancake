@@ -38,7 +38,7 @@ def test_download_outputs_feed_the_library_directly(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     assert (root / ".bokehforge/reports/download-report.json").is_file()
     log = (root / ".bokehforge/logs/download.log").read_text()
-    assert result.stdout.strip() in log
+    assert all(line in log for line in (result.stdout + result.stderr).splitlines())
     assert not list(root.glob("*.log")) and not list(root.glob("*-report.json"))
     assert (root / ".bokehforge/locks/data.lock").is_file()
     manifest = json.loads((root / "raw/demo/download-manifest.json").read_text())

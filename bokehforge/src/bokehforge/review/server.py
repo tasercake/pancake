@@ -15,8 +15,9 @@ from urllib.parse import parse_qs, urlsplit
 from .. import SceneCatalog
 from ..bench import has_benchmark_reference
 from ..data._canonical import RETIRED_LAYOUTS
-from ..data._config import DEFAULT_CONFIG, read_config
+from ..data._config import DEFAULT_CONFIG, data_root, read_config
 from ..data._files import safe_path
+from ..data.layout import local_source
 from .downloads import Downloads
 from .events import Events
 from .images import (
@@ -45,7 +46,8 @@ ALL_INTERFACES = "0.0.0.0"
 
 
 def local_sources(args):
-    policies = {source["id"]: source for source in read_config(args.config or DEFAULT_CONFIG)["datasets"]
+    config = args.config or DEFAULT_CONFIG
+    policies = {source["id"]: source for source in read_config(config)["datasets"]
                 if source.get("layout") not in RETIRED_LAYOUTS}
     selected = set(args.dataset or policies)
     if selected - policies.keys():
@@ -64,12 +66,8 @@ def local_sources(args):
             json.loads(path.read_text()) if path.is_file() else {})
         if source.get("status") == "disabled":
             continue
-        files = source.get("files", [])
-        if source.get("id") == dataset_id and source.get("status") == "available" and files and all(
-            (asset := safe_path(raw, item["path"])).is_file()
-            and (item.get("size") is None or asset.stat().st_size == item["size"])
-            for item in files
-        ):
+        pins = policy if config == DEFAULT_CONFIG and args.lock is None else None
+        if local_source(args.root, dataset_id, snapshot=source, pins=pins):
             present[dataset_id] = source.get("name") or policy.get("name") or dataset_id
         else:
             missing[dataset_id] = policy.get("name") or dataset_id
@@ -226,18 +224,23 @@ class Review:
                 return self.runs.directory(run_id) / row[key]
         raise KeyError(f"Evaluation {key} unavailable")
 
-    def score_tiles(self, query):
+    def _score_output(self, query):
         catalog = self.require_catalog()
         scene = catalog.scene(query["scene"])
         if not has_benchmark_reference(scene):
-            raise KeyError("Benchmark tiles require a supported RGB ground-truth image")
+            raise KeyError("Benchmark overlays require a supported RGB ground-truth image")
         run_id = query["run"]
         result = next((row for row in self.runs.scene_results(run_id, catalog, scene)
                        if row["stacker"] == query["stacker"] and row["status"] == "ready"), None)
         if result is None:
             raise KeyError("Evaluation output unavailable")
-        return self.scores.tiles(catalog, scene, self.runs.directory(run_id), result,
-                                 query["rev"], query["family"], int(query["side"]))
+        return catalog, scene, self.runs.directory(run_id), result
+
+    def score_tiles(self, query):
+        return self.scores.tiles(*self._score_output(query), query["rev"], query["family"], int(query["side"]))
+
+    def score_attention(self, query):
+        return self.scores.attention_overlay(*self._score_output(query), query["rev"])
 
     def image_target(self, query):
         catalog = self.require_catalog()
@@ -378,6 +381,9 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/score-tiles":
             result = app.score_tiles(query)
             self.json(202 if result["status"] == "pending" else 200, result)
+        elif path == "/api/score-attention":
+            result = app.score_attention(query)
+            self.json(202 if result["status"] == "pending" else 200, result)
         elif path == "/api/image":
             self.send_image(app, query)
         elif path == "/api/log":
@@ -506,8 +512,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="bokehforge review",
                                      description="Stackroom, focus stack review by BokehForge")
     workspace = parser.add_argument_group("Workspace")
-    workspace.add_argument("--root", type=Path, default=REPO / "datasets",
-                           help="BokehForge dataset root (default: datasets/ in the repository)")
+    workspace.add_argument("--root", type=Path,
+                           help="Dataset directory (default: the shared BokehForge data location)")
     workspace.add_argument("--store", type=Path, default=REPO / "artifacts/bokehforge-review",
                            help="Local evaluations and ratings directory")
     workspace.add_argument("--dataset", action="append", help="Limit to a dataset ID, repeatable")
@@ -524,8 +530,8 @@ def main(argv=None):
     stackers.add_argument("--openfocus", help="Path to openfocus")
     stackers.add_argument("--shine-python", help="Path to a Python with ShineStacker installed")
     args = parser.parse_args(argv)
-    args.root = args.root.resolve()
     args.config = args.config.resolve()
+    args.root = args.root.expanduser().resolve() if args.root is not None else data_root(args.config)
     if args.lock is not None:
         args.lock = args.lock.resolve()
     args.store = args.store.resolve()

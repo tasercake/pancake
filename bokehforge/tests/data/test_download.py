@@ -5,8 +5,12 @@ import subprocess
 import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
 from pathlib import Path
+from zipfile import ZipFile
 
+import numpy as np
+from PIL import Image
 import pytest
 
 COMMAND = [sys.executable, "-m", "bokehforge", "data", "download"]
@@ -297,3 +301,85 @@ def test_temporary_resolution_failure_is_retried_on_rerun(tmp_path,origin):
                            '--dataset','fixture','--reserve-gib','0'],capture_output=True,text=True)
     assert result.returncode==0,result.stdout+result.stderr
     assert (tmp_path/'data/raw/fixture/source.bin').read_bytes()==origin[1]['body']
+
+
+def test_library_downloads_and_streams_selected_datasets(tmp_path, origin, monkeypatch, capsys):
+    from bokehforge import DATASET_ALL, DATASET_INFINIGEN_DEFOCUS, FrameDecoder, load_dataset
+    from bokehforge.data import datasets, download
+    from bokehforge.data._canonical import INFINIGEN_DISTANCES
+
+    archive_data = BytesIO()
+    with ZipFile(archive_data, "w") as archive:
+        for i, distance in enumerate(INFINIGEN_DISTANCES):
+            image = BytesIO()
+            Image.new("RGB", (7, 5), (i * 10, 24, 87)).save(image, format="PNG")
+            archive.writestr(f"data/abc123_1/image_ap_1.40_fd_{distance:.2f}.png", image.getvalue())
+        archive.writestr("data/abc123_1/image_all_in_focus.png", image.getvalue())
+    body = origin[1]["body"] = archive_data.getvalue()
+    item = {"path": "InfinigenDefocus.zip", "url": origin[0], "size": len(body), "sha256": hashlib.sha256(body).hexdigest()}
+    sources = [
+        {"id": key, "provider": "huggingface", "revision": "test", "layout": "infinigen_defocus",
+         "transfer": "srgb", "files": [item]}
+        for key in (DATASET_INFINIGEN_DEFOCUS, "second")
+    ]
+    config = tmp_path / "sources.json"
+    config.write_text(json.dumps({"defaults": {"reserve_gib": 0}, "datasets": sources}))
+    monkeypatch.setattr(datasets, "DEFAULT_CONFIG", config)
+    monkeypatch.setattr(download, "DEFAULT_CONFIG", config)
+    root = tmp_path / "shared"
+    monkeypatch.setenv("BOKEHFORGE_DATA_ROOT", str(root))
+    decode_many = FrameDecoder.decode_many
+    decoded = []
+
+    def track_decode(self, frames, **kwargs):
+        frames = tuple(frames)
+        decoded.append(len(frames))
+        return decode_many(self, frames, **kwargs)
+
+    monkeypatch.setattr(FrameDecoder, "decode_many", track_decode)
+    with pytest.raises(FileNotFoundError, match="D29"):
+        load_dataset(DATASET_INFINIGEN_DEFOCUS, download=False)
+    assert origin[1]["requests"] == []
+    assert not root.exists()
+
+    assert len(load_dataset(DATASET_INFINIGEN_DEFOCUS)) == 1
+    progress = capsys.readouterr().err
+    assert "Downloading D29/InfinigenDefocus.zip" in progress
+    assert "100%" in progress and "Verifying D29/InfinigenDefocus.zip" in progress
+    assert "Ready D29" in progress
+    assert "Verifying and indexing datasets D29" in progress
+    assert origin[1]["requests"] == [None]
+    assert not (root / "raw/second").exists()
+
+    dataset = load_dataset([DATASET_INFINIGEN_DEFOCUS, "second", DATASET_INFINIGEN_DEFOCUS])
+    assert len(dataset) == 2 and not decoded
+    assert origin[1]["requests"] == [None, None]
+    assert (root / ".bokehforge/sources.lock.json").is_file()
+    batch, = dataset.batches(8)
+    assert decoded == [10, 10]
+    assert len(batch) == 2 and next(iter(batch)) is batch[0]
+    assert batch.frames().shape == (2, 9, 5, 7, 3)
+    assert batch.references().shape == (2, 5, 7, 3)
+    assert batch.frames().dtype == np.float32
+    assert np.array_equal(batch.references()[0], batch[0].reference)
+    assert np.all(np.diff(batch.frames()[0, :, 0, 0, 0]) > 0)
+    assert len(load_dataset(DATASET_ALL, download=False)) == 2
+    assert origin[1]["requests"] == [None, None]
+
+    with pytest.raises(ValueError, match="Unknown built-in datasets"):
+        load_dataset("unknown")
+    with pytest.raises(ValueError, match="at least one dataset"):
+        load_dataset([])
+
+
+def test_batch_can_hold_samples_with_different_shapes():
+    from bokehforge import Batch, Sample
+
+    small = np.zeros((5, 7, 3), dtype=np.float32)
+    large = np.zeros((10, 14, 3), dtype=np.float32)
+    samples = Batch((Sample("small", (small, small), small), Sample("large", (large, large), large)))
+    assert samples[0].frames[0] is small and samples[1].reference is large
+    with pytest.raises(ValueError, match="frame count and shape"):
+        samples.frames()
+    with pytest.raises(ValueError, match="same shape"):
+        samples.references()

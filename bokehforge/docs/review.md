@@ -10,7 +10,7 @@ Stackroom uses attention-weighted scores by default. Install the [inspection dep
 
 The server listens on all IPv4 interfaces by default. From another device, open `http://<hostname>:8765` using the server's hostname or its LAN or Tailscale IPv4 address. The Tailscale MagicDNS short name works when it matches the server's hostname. Any device that can reach the port can review images, save ratings, and start downloads or evaluations. Use `--host 127.0.0.1` for access from the host computer only, or bind to a specific interface by giving its IPv4 address.
 
-Stackroom uses `datasets/` under the server's repository root. Pass `--root /path/to/datasets` to use a different directory. The shipped configuration selects InfinigenDefocus (D29). Use `--config` for a different source configuration, repeat `--dataset` to select specific configured datasets, or pass `--lock` for a pinned source snapshot.
+Stackroom uses the [shared data directory](data.md#download-verified-originals) used by the BokehForge CLI and Python library. Set `BOKEHFORGE_DATA_ROOT` across worktrees or pass `--root /path/to/datasets` for this server. The shipped configuration selects InfinigenDefocus (D29). Use `--config` for a different source configuration, repeat `--dataset` to select specific configured datasets, or pass `--lock` for a pinned source snapshot.
 
 When configured data is missing, select **Download dataset** in Stackroom. The meter shows bytes received and estimated time remaining once there is enough transfer history. You can browse and rate existing scenes during the download. As each dataset is verified and indexed, its scenes appear automatically. Stackroom receives catalog, transfer, and evaluation updates over one Server-Sent Events connection. If it disconnects, the browser reconnects and receives the current state. Downloads continue while the browser is closed. Retrying resumes partial files when the provider supports byte ranges. See the [dataset guide](data.md) for manual downloads and local logs.
 
@@ -25,7 +25,9 @@ For scenes with one supported RGB ground-truth image, each ready output shows th
 
 Open **Explain score** to see the inferred area, resolution cap, overlap quality, and match confidence. **How alignment was inferred** shows search evidence and the score contribution of each retained placement. An unmatched delivery still has an explanation with the reason.
 
-Expand a damage family to see the pooling values and weights. Turn on **Show damage overlay**, choose the 8- or 32-pixel grid, and use the 0–1 legend. The overlay uses the leading placement. Zero-damage and unmeasured tiles are transparent. In the lightbox, the overlay follows zoom and pan, clips to the output side of a swipe, and disappears when you show only the reference. Stackroom calculates the tile data when you request the overlay.
+Under **Explain score**, choose **Damage** or **Attention** from **Overlay**. Damage shows differences for the selected family on an 8- or 32-pixel grid. Expand a family to see the pooling values and weights. Attention shows which reference regions the scorer emphasizes, on a 0–1 scale. It is available for attention-weighted scores with an aligned output.
+
+Both overlays use the leading placement and load on demand. The lightbox keeps them aligned during zoom and pan and confines them to the output side of a reference swipe. The full reference stays clear for comparison.
 
 ## Set up the stackers
 
