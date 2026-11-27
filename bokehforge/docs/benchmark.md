@@ -1,6 +1,6 @@
 # Focus-stacking benchmark
 
-Run the mean-blend pilot on the InfinigenDefocus dataset from the repository root. Set up the [inspection models](#install-the-inspection-models) once and use a new output directory for each run.
+Run the mean-blend pilot on the InfinigenDefocus dataset from the repository root. Install the [inspection dependencies](#install-the-inspection-models) once and use a new output directory for each run.
 
 ```sh
 bokehforge/.venv/bin/bokehforge data download
@@ -54,7 +54,7 @@ The scorer requires two images, the stacker's delivery and the ground-truth refe
 
 ## Inspection-weighted scoring
 
-Bench and Review generate an Inspection blend from the clean all-in-focus reference as part of scoring each valid delivery. Every alignment uses the same reference map. The report records the SHA-256 of the generated map. The scorer keeps the last reference map in memory to reuse across repeated comparisons. Use `--no-attention` to disable model loading, map generation, and attention weighting. For a valid delivery, an inference error withholds the score.
+Bench and Review generate an Inspection blend from the clean all-in-focus reference as part of scoring each valid delivery. Every alignment uses the same reference map. The report records the SHA-256 of the generated map. The scorer keeps the last reference map in memory to reuse across repeated comparisons. Use `--no-attention` to skip model downloads, loading, map generation, and attention weighting. For a valid delivery, a download or inference error withholds the score.
 
 The raw map is the soft union of **ReLIQS**, **Texture & light**, **SAM 2.1 Hiera Large**, and **TempSAL overall**. The inputs use the same sRGB preview with a long edge of at most 640 pixels. The scorer resizes the blend to the native reference grid. Texture & light measures local detail, lighting variation, and color contrast. SAM contributes a zero map when no region meets the mask size criteria.
 
@@ -68,20 +68,20 @@ From the repository root, install the pinned inference dependencies once. This p
 uv sync --project bokehforge --frozen --extra inspection
 ```
 
-Place the upstream files in `~/.cache/bokehforge/inspection-models`. If `XDG_CACHE_HOME` is set, use its `bokehforge/inspection-models` subdirectory. Set `BOKEHFORGE_INSPECTION_MODELS` to use an existing model directory elsewhere. Obtain the upstream code and weights under the applicable terms.
+BokehForge downloads any missing files when it first scores with attention. A cold cache needs about 3.2 GB for the model files. The default cache is `~/.cache/bokehforge/inspection-models`, or `bokehforge/inspection-models` under `XDG_CACHE_HOME` when set. Set `BOKEHFORGE_INSPECTION_MODELS` to use a different directory, including an existing installation. Files that pass the pinned checksums are reused offline. Downloads are verified before they replace incomplete or corrupted files.
 
 The model directory has this layout. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS code and checkpoint](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
 
 ```text
 inspection-models/
-  reliqs/                    ReLIQS source checkout
+  reliqs/                    ReLIQS inference source and tokenizer assets
   reliqs-weights-ready.pth   KonIQ/model_weights.pth
   tempsal-code/              TempSAL src/ containing model.py and PNAS/
   tempsal-ready.pt           PNAS checkpoint from the upstream inference notebook
-  sam2/                      Hugging Face snapshot with configuration and model.safetensors
+  sam2/                      Transformers configuration and model.safetensors
 ```
 
-The loader verifies the three checkpoint fingerprints. To run on a machine without the models, append `--no-attention` to the benchmark or review command.
+An interrupted transfer can resume on the next scoring attempt.
 
 In Python, `measure(candidate, target)` and `score_saved_output(catalog, scene, path)` also generate attention by default. Pass `attention=False` to use the unweighted score. `measure` can also accept an explicit finite `[0, 1]` heatmap on the native reference grid through `inspection_heatmap`.
 

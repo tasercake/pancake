@@ -48,12 +48,8 @@ class Inspection:
     def _load():
         from .inspection_models import inspection_blend
 
-        directory = _model_directory()
-        if not directory.is_dir():
-            raise ValueError(f"Inspection models were not found in {directory}. "
-                             "See the benchmark guide for model setup or use --no-attention.")
         try:
-            return inspection_blend(directory)
+            return inspection_blend(_model_directory())
         except (ImportError, OSError, RuntimeError) as exc:
             raise RuntimeError(f"Could not load the Inspection blend: {exc}. "
                                "See the benchmark guide for model setup or use --no-attention.") from exc

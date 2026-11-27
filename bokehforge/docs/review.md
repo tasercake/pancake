@@ -6,7 +6,7 @@ From the repository root, start the app and open one of the HTTP URLs it prints.
 bokehforge/.venv/bin/bokehforge review
 ```
 
-Review uses attention-weighted scores by default. [Set up the inspection models](benchmark.md#install-the-inspection-models) once, or start Review with `--no-attention` for the unweighted score.
+Review uses attention-weighted scores by default. Install the [inspection dependencies](benchmark.md#install-the-inspection-models) once. Review downloads missing model files on first use. Start Review with `--no-attention` for the unweighted score.
 
 The server listens on all IPv4 interfaces by default. From another device, open `http://<hostname>:8765` using the server's hostname or its LAN or Tailscale IPv4 address. The Tailscale MagicDNS short name works when it matches the server's hostname. Any device that can reach the port can review images, save ratings, and start downloads or evaluations. Use `--host 127.0.0.1` for access from the host computer only, or bind to a specific interface by giving its IPv4 address.
 
