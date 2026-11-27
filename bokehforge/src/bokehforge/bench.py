@@ -2,12 +2,15 @@
 
 import argparse
 from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing, redirect_stdout, suppress
+from dataclasses import dataclass
 from hashlib import sha256
 from importlib import import_module
 from itertools import chain
 from importlib.metadata import version
 import json
+import os
 from pathlib import Path
 from statistics import fmean
 import sys
@@ -16,13 +19,13 @@ from time import perf_counter
 import numpy as np
 import tifffile
 
-from ._device import DEVICES, Device
+from ._device import DEVICES, Device, damage_backend
 from .alignment import ALIGNMENT_VERSION, MAX_ROTATION_DEGREES
 from .data._canonical import encode_tiff
 from .data._files import digest
 from .data._config import DEFAULT_CONFIG, data_root
 from .data.download import save_json
-from .data.lazy import SceneCatalog
+from .data.lazy import Scene, SceneCatalog
 from .inspection import INSPECTION_MAP_VERSION, Inspection, inspection_for
 from .scoring import (
     FAMILY_WEIGHTS, INSPECTION_MAX_MULTIPLIER, INSPECTION_MIX, INSPECTION_SCORE_VERSION,
@@ -32,6 +35,9 @@ from .scoring import (
 from .stacking import StackFrame, StackInput
 
 _RGB_REFERENCES = {"rendered_all_in_focus", "synthetic_source_image_reference"}
+_MIN_PARALLEL_PIXELS = 1_000_000
+_MAX_PARALLEL_PIXELS = 20_000_000
+_RETRY_SCORING = object()
 
 
 class _InputError(RuntimeError):
@@ -177,13 +183,33 @@ def _load_candidate(path, row, *, fingerprint=False):
     return None
 
 
-def _score_delivery(result, reference, row, *, details=None, inspection=None, device: Device = "auto"):
+def _validate_candidate(result, row):
     try:
         validate_rgb(result)
     except ValueError as exc:
         row.update(status="invalid_output", error=str(exc))
-        return
+        return False
+    return True
 
+
+def _allocation_failed(error):
+    torch = sys.modules.get("torch")
+    exhausted = (MemoryError, getattr(torch, "OutOfMemoryError", MemoryError))
+    while error is not None:
+        if isinstance(error, exhausted) or (
+            isinstance(error, RuntimeError) and str(error).startswith(("CUDA out of memory", "CUDA error: out of memory"))
+        ):
+            return True
+        error = error.__cause__
+    return False
+
+
+def _score_delivery(result, reference, row, *, details=None, inspection=None, device: Device = "auto"):
+    if _validate_candidate(result, row):
+        return _score_validated_delivery(result, reference, row, details=details, inspection=inspection, device=device)
+
+
+def _score_validated_delivery(result, reference, row, *, details, inspection, device, in_batch=False):
     scoring_start = perf_counter()
     try:
         def generate(target):
@@ -191,12 +217,15 @@ def _score_delivery(result, reference, row, *, details=None, inspection=None, de
             return heatmap
 
         measurement = _measure_delivery(result, reference, details=details, device=device,
-                                        generate=generate if inspection is not None else None)
+                                        generate=generate if inspection is not None else None,
+                                        retry_on_oom=not in_batch)
         row.update(scene_score=measurement.score, alignment=measurement.alignment)
         if measurement.features:
             row.update(score_features=measurement.features, artifact_diagnostics=measurement.diagnostics)
         return measurement.explanation
     except Exception as exc:
+        if in_batch and _allocation_failed(exc):
+            return _RETRY_SCORING
         row.update(status="scoring_error", reference_status="error", scene_score=None, error=_error_text(exc))
         return
     finally:
@@ -205,10 +234,16 @@ def _score_delivery(result, reference, row, *, details=None, inspection=None, de
 
 def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = None, attention=True, inspection=None,
                        device: Device = "auto"):
-    """Compare a canonical TIFF with the scene's required RGB ground truth."""
+    """Compare a canonical TIFF with the scene's required RGB ground truth.
+
+    A custom inspection provider can supply a precomputed heatmap and its digest.
+    """
     _validate_details(details)
     _require_benchmark_reference(scene)
-    inspection = (inspection or inspection_for(device)) if attention else None
+    if not attention:
+        inspection = None
+    elif not inspection or (device == "mps" and type(inspection) is Inspection):
+        inspection = inspection_for(device)
     row = {"status": "ok", "scene_score": None}
     explanation = None
     reference = _reference(catalog, scene, row)
@@ -259,7 +294,19 @@ def _save_explanation(output, scene, row, explanation):
         row["score_explanation_path"] = path.relative_to(output).as_posix()
 
 
-def _run_scene(catalog, scene, row, algorithm, args, inspection):
+@dataclass
+class _PreparedScene:
+    scene: Scene
+    row: dict
+    result: np.ndarray
+    reference: np.ndarray
+
+    @property
+    def pixels(self):
+        return self.reference.shape[0] * self.reference.shape[1]
+
+
+def _prepare_scene(catalog, scene, row, algorithm, args):
     row.update(frames_read=0, scene_score=None, status="ok")
     reference = _reference(catalog, scene, row)
     if reference is None:
@@ -280,12 +327,12 @@ def _run_scene(catalog, scene, row, algorithm, args, inspection):
     finally:
         row["seconds"] = perf_counter() - start
 
-    if row["status"] != "ok":
-        return
-    with redirect_stdout(sys.stderr):
-        explanation = _score_delivery(result, reference, row, details="full" if args.explain_score else None,
-                                      inspection=inspection,
-                                      device=args.device)
+    if row["status"] == "ok" and _validate_candidate(result, row):
+        return _PreparedScene(scene, row, result, reference)
+
+
+def _save_scene(prepared, args, explanation):
+    scene, row, result = prepared.scene, prepared.row, prepared.result
     if row["status"] != "ok":
         return
     if args.save_images:
@@ -300,6 +347,103 @@ def _run_scene(catalog, scene, row, algorithm, args, inspection):
             row["image"] = image_path.relative_to(args.output).as_posix()
     if explanation is not None:
         _save_explanation(args.output, scene, row, explanation)
+
+
+def _score_prepared_scene(prepared, row, args, inspection, *, in_batch=False):
+    return _score_validated_delivery(prepared.result, prepared.reference, row, details="full" if args.explain_score else None,
+                                     inspection=inspection, device=args.device, in_batch=in_batch)
+
+
+def _run_scene(catalog, scene, row, algorithm, args, inspection):
+    if (prepared := _prepare_scene(catalog, scene, row, algorithm, args)) is not None:
+        with redirect_stdout(sys.stderr):
+            explanation = _score_prepared_scene(prepared, row, args, inspection)
+        _save_scene(prepared, args, explanation)
+
+
+def _host_replay_fits():
+    try:
+        free = os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE")
+        paths = Path("/proc/self/cgroup").read_text().splitlines()
+        if len(paths) != 1 or not paths[0].startswith("0::/"):
+            return False
+        root = Path("/sys/fs/cgroup")
+        group = (root / paths[0][4:]).resolve()
+        if not group.is_relative_to(root) or not group.is_dir():
+            return False
+        for parent in (group, *group.parents):
+            with suppress(FileNotFoundError):
+                limit = (parent / "memory.max").read_text().strip()
+                if limit != "max":
+                    free = min(free, int(limit) - int((parent / "memory.current").read_text()))
+            if parent == root:
+                break
+    except (AttributeError, OSError, ValueError):
+        return False
+    # Allow room for two decoded deliveries, projection and pooling working
+    # sets, and temporary arrays while decoding the next scene.
+    return free >= 8 * 1024 ** 3
+
+
+def _cuda_replay_fits(batch, device):
+    if any(not _MIN_PARALLEL_PIXELS <= scene.pixels <= _MAX_PARALLEL_PIXELS
+           or scene.result.size > _MAX_PARALLEL_PIXELS * 3 for scene in batch):
+        return False
+    if not _host_replay_fits():
+        return False
+    try:
+        if damage_backend(device) != "cuda":
+            return False
+        import torch
+
+        cuda = torch.cuda
+        # The replay workers use the CLI's default device and stream.
+        if cuda.current_device() != 0 or cuda.current_stream() != cuda.default_stream():
+            return False
+        if torch.is_autocast_enabled("cuda"):
+            return False
+        free, _ = cuda.mem_get_info()
+    except (ImportError, OSError, RuntimeError):
+        return False
+    # Allow for a cold Inspection blend plus full-resolution maps for both
+    # deliveries, including support masks and CUDA allocator headroom.
+    pixels = sum(scene.pixels for scene in batch)
+    if len(batch) == 1:
+        pixels += _MAX_PARALLEL_PIXELS
+    return free >= 6 * 1024 ** 3 + 128 * pixels
+
+
+def _score_replay_batch(batch, args, inspection, executor):
+    def attempt(prepared):
+        row = prepared.row.copy()
+        return row, _score_prepared_scene(prepared, row, args, inspection, in_batch=True)
+
+    if len(batch) == 2 and _cuda_replay_fits(batch, args.device):
+        # Drain both attempts before retrying a CUDA or host allocation failure.
+        outcomes = list(executor.map(attempt, batch))
+    else:
+        outcomes = [(None, _RETRY_SCORING)] * len(batch)
+    for prepared, (row, explanation) in zip(batch, outcomes, strict=True):
+        if explanation is _RETRY_SCORING:
+            explanation = _score_prepared_scene(prepared, prepared.row, args, inspection)
+        else:
+            prepared.row.update(row)
+        _save_scene(prepared, args, explanation)
+
+
+def _run_replays(catalog, entries, args, inspection):
+    batch = []
+    with redirect_stdout(sys.stderr), ThreadPoolExecutor(max_workers=2, thread_name_prefix="bokehforge-replay") as executor:
+        for scene, row in entries:
+            prepared = _prepare_scene(catalog, scene, row, None, args)
+            if prepared is not None:
+                batch.append(prepared)
+                if len(batch) == 2 or not _cuda_replay_fits(batch, args.device):
+                    _score_replay_batch(batch, args, inspection, executor)
+                    batch.clear()
+                del prepared
+        if batch:
+            _score_replay_batch(batch, args, inspection, executor)
 
 
 def _score(rows, *, explanation=None):
@@ -344,7 +488,8 @@ def main(argv=None):
     score_options = parser.add_argument_group("Scoring")
     score_options.add_argument("--no-attention", action="store_true", help="Disable inspection heatmaps and damage weighting")
     score_options.add_argument("--device", choices=DEVICES, default="auto",
-                               help="Damage scoring device (default: auto, prefer CUDA or Apple MPS when available)")
+                               help="Damage scoring backend. Auto (default) prefers CUDA, then MPS, then CPU. "
+                                    "GPU requires CUDA or MPS.")
     score_options.add_argument(
         "--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)",
     )
@@ -357,8 +502,8 @@ def main(argv=None):
     report_options.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     report_options.add_argument("--progress", action="store_true", help="Write progress to stderr")
     args = parser.parse_args(argv)
-    if args.device == "cpu" and not args.no_attention:
-        parser.error("--device cpu requires --no-attention because the Inspection profile requires CUDA")
+    if args.device in ("cpu", "mps") and not args.no_attention:
+        parser.error(f"--device {args.device} requires --no-attention because the Inspection profile requires CUDA")
     if args.output.exists():
         raise ValueError(f"Output directory already exists: {args.output}")
     root = args.root.expanduser().resolve() if args.root is not None else data_root(args.config)
@@ -386,13 +531,22 @@ def main(argv=None):
     args.output.mkdir(parents=True)
     if args.progress:
         print(f"Benchmarking {len(scenes)} scenes from {root.resolve()}", file=sys.stderr, flush=True)
-    last_dataset = None
-    for index, (scene, row) in enumerate(zip(scenes, rows, strict=True), 1):
-        dataset = row["dataset_id"]
-        if args.progress and (dataset != last_dataset or index % 25 == 0):
-            print(f"{index}/{len(scenes)} {scene.id} ({row['frame_count']} frames)", file=sys.stderr, flush=True)
-        last_dataset = dataset
-        _run_scene(catalog, scene, row, algorithm, args, inspection)
+
+    def entries():
+        last_dataset = None
+        for index, (scene, row) in enumerate(zip(scenes, rows, strict=True), 1):
+            dataset = row["dataset_id"]
+            if args.progress and (dataset != last_dataset or index % 25 == 0):
+                print(f"{index}/{len(scenes)} {scene.id} ({row['frame_count']} frames)", file=sys.stderr, flush=True)
+            last_dataset = dataset
+            yield scene, row
+
+    if (args.candidate_dir is not None and inspection is not None and len(scenes) > 1
+            and not args.explain_score):
+        _run_replays(catalog, entries(), args, inspection)
+    else:
+        for scene, row in entries():
+            _run_scene(catalog, scene, row, algorithm, args, inspection)
     aggregation = {} if args.explain_score else None
     score, scored_groups = _score(rows, explanation=aggregation)
     statuses = Counter(row["status"] for row in rows)

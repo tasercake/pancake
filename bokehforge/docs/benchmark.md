@@ -29,20 +29,31 @@ bokehforge/.venv/bin/bokehforge bench \
   --candidate-dir artifacts/bench-mean/images --dataset D29 --output artifacts/bench-replay
 ```
 
+On Linux, saved deliveries with generated Inspection maps can score two scenes
+at a time when their sizes and available host and CUDA memory allow it. Report
+rows and output images follow catalog order. The report's total `seconds`
+measures elapsed time, and per-scene `scoring_seconds` can overlap. Stacker runs
+and full explanation exports process one scene at a time.
+
 ## Scoring device
 
 `--device auto` (the default) prefers NVIDIA CUDA, then Apple Metal (MPS),
-for damage measurement on large images. CUDA requires PyTorch and Triton and
-runs most damage-map operations on the GPU. MPS requires an MPS-enabled PyTorch
-installation and runs the edge neighborhood filters on the GPU. The other
-MPS calculations stay on the CPU, including those that require double precision.
-`--device gpu` requires one of these backends for any measured image size.
+then CPU for damage measurement. Auto retries damage measurement on CPU if
+the selected accelerator runs out of memory. CUDA requires PyTorch and
+Triton and runs most damage-map operations on the GPU. MPS requires an
+MPS-enabled PyTorch installation and runs the edge neighborhood filters on
+the GPU. The other MPS calculations stay on the CPU, including those that
+require double precision.
+
+`--device cuda` or `--device mps` requires that specific backend.
+`--device gpu` requires a supported accelerator and prefers CUDA when both
+are available. The device choices apply at every measured image size.
 Use `--device cpu --no-attention` to score on the CPU with the base installation.
 The flag controls scoring independently of the stacker.
 
-Inspection map generation still requires CUDA and uses the same model arithmetic.
-On a Mac, use `--device auto --no-attention` for MPS damage measurement. Python
-callers can also use MPS with a supplied `inspection_heatmap`.
+Inspection map generation requires CUDA. Use `--device mps --no-attention`
+to benchmark with MPS. Python callers can use MPS damage measurement with a
+supplied `inspection_heatmap`.
 
 ## The score
 

@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
 
+from bokehforge import scoring
 from bokehforge._device import cuda_available, damage_backend, mps_available
 from bokehforge.scoring import (
     FAMILY_WEIGHTS, FEATURES, INSPECTION_SCORE_VERSION, SCORE_DAMAGE_SCALE, Measurement,
@@ -17,6 +18,49 @@ def score(candidate, target):
     return scene_score(_measure(candidate, target))
 
 
+@pytest.mark.parametrize("layout", ["packed", "readonly", "cropped", "strided", "byte-swapped", "unaligned"])
+@pytest.mark.parametrize("shape", [(1, 1), (193, 97)])
+def test_lab_preparation_keeps_numpy_rounding_and_layouts(layout, shape, monkeypatch):
+    if scoring._scoring_native is None:
+        pytest.skip("The optional native scorer is unavailable")
+    rng = np.random.default_rng(709)
+    # Cross both a comparison strip and the native working buffer boundary.
+    candidate = rng.uniform(-0.1, 1.1, (*shape, 3)).astype(np.float32)
+    target = rng.uniform(-0.1, 1.1, candidate.shape).astype(np.float32)
+    threshold = np.float32((6 / 29) ** 3)
+    edge = [np.nextafter(threshold, np.float32(0)), threshold,
+            np.nextafter(threshold, np.float32(1)), -0.0, 1.0, np.finfo(np.float32).max]
+    edge = np.asarray(edge[:shape[1]], dtype=np.float32)
+    candidate[0, :len(edge)] = edge[:, None]
+
+    def view(pixels):
+        if layout == "readonly":
+            pixels.setflags(write=False)
+        elif layout == "cropped":
+            pixels = np.pad(pixels, ((0, 0), (2, 3), (0, 0)))[:, 2:-3]
+        elif layout == "strided":
+            pixels = pixels[::-1, ::2, ::-1]
+        elif layout == "byte-swapped":
+            pixels = pixels.byteswap().view(pixels.dtype.newbyteorder())
+        elif layout == "unaligned":
+            buffer = np.empty(pixels.nbytes + 1, dtype=np.uint8)
+            unaligned = np.ndarray(pixels.shape, dtype=pixels.dtype, buffer=buffer, offset=1)
+            unaligned[:] = pixels
+            pixels = unaligned
+        return pixels
+
+    candidate, target = view(candidate), view(target)
+
+    def planes():
+        cl, tl, deltas, color = scoring._lab_comparison(candidate, target)
+        return *scoring._lab(candidate), cl, tl, *deltas, color
+
+    actual = planes()
+    monkeypatch.setattr(scoring, "_scoring_native", None)
+    for observed, expected in zip(actual, planes(), strict=True):
+        np.testing.assert_array_equal(observed.view(np.uint32), expected.view(np.uint32))
+
+
 def test_device_selection_falls_back_only_in_auto(monkeypatch):
     monkeypatch.setattr("bokehforge._device.cuda_available", lambda: False)
     monkeypatch.setattr("bokehforge._device.mps_available", lambda: False)
@@ -24,6 +68,10 @@ def test_device_selection_falls_back_only_in_auto(monkeypatch):
     assert damage_backend("cpu") == "cpu"
     with pytest.raises(RuntimeError, match="--device gpu requires CUDA"):
         damage_backend("gpu")
+    with pytest.raises(RuntimeError, match="--device cuda requires CUDA"):
+        damage_backend("cuda")
+    with pytest.raises(RuntimeError, match="--device mps requires Apple Metal"):
+        damage_backend("mps")
 
 
 def test_device_selection_prefers_supported_gpu_backends(monkeypatch):
@@ -33,8 +81,114 @@ def test_device_selection_prefers_supported_gpu_backends(monkeypatch):
     assert damage_backend("auto") == "mps"
     assert damage_backend("gpu") == "mps"
     assert damage_backend("cpu") == "cpu"
+    with pytest.raises(RuntimeError, match="--device cuda requires CUDA"):
+        damage_backend("cuda")
     monkeypatch.setattr("bokehforge._device.find_spec", lambda _: object())
     assert damage_backend("auto") == "cuda"
+    assert damage_backend("gpu") == "cuda"
+    assert damage_backend("cuda") == "cuda"
+    assert damage_backend("mps") == "mps"
+    monkeypatch.setattr("bokehforge._device.mps_available", lambda: False)
+    with pytest.raises(RuntimeError, match="--device mps requires Apple Metal"):
+        damage_backend("mps")
+
+
+@pytest.fixture
+def small_delivery():
+    target = np.random.default_rng(2943).uniform(.05, .8, size=(29, 43, 3)).astype(np.float32)
+    candidate = target.copy()
+    candidate[:, 5:16, 1] *= .65
+    return candidate, target
+
+
+@pytest.mark.parametrize("device", ["cuda", "mps"])
+def test_measure_uses_native_accelerator_on_small_images(device, small_delivery, monkeypatch):
+    try:
+        damage_backend(device)
+    except RuntimeError as exc:
+        pytest.skip(str(exc))
+
+    maps = getattr(scoring, f"_{device}_maps")
+    shapes = []
+
+    def record_maps(candidate, target, support):
+        shapes.append(target.shape)
+        return maps(candidate, target, support)
+
+    monkeypatch.setattr(scoring, f"_{device}_maps", record_maps)
+    candidate, target = small_delivery
+    heatmap = np.linspace(0, 1, target.shape[0] * target.shape[1], dtype=np.float32).reshape(target.shape[:2])
+    options = {"details": "tiles", "inspection_heatmap": heatmap}
+    expected = measure(candidate, target, device="cpu", **options)
+    assert measure(candidate, target, device=device, **options) == expected
+    assert target.shape in shapes
+    if damage_backend("auto") == device:
+        shapes.clear()
+        assert measure(candidate, target, **options) == expected
+        assert target.shape in shapes
+
+
+@pytest.mark.parametrize("exhausted", [True, False])
+def test_only_auto_retries_accelerator_out_of_memory(small_delivery, monkeypatch, exhausted):
+    backend = damage_backend("auto")
+    if backend == "cpu":
+        pytest.skip("Requires a scoring accelerator")
+
+    if not exhausted:
+        failure = RuntimeError("Accelerator operation failed")
+    elif backend == "mps":
+        failure = RuntimeError("MPS backend out of memory")
+    else:
+        from torch import OutOfMemoryError
+
+        failure = OutOfMemoryError("CUDA out of memory")
+    attempts = []
+
+    def fail_maps(candidate, target, support):
+        attempts.append(target.shape)
+        raise failure
+
+    monkeypatch.setattr(scoring, f"_{backend}_maps", fail_maps)
+    candidate, target = small_delivery
+    baseline = measure(candidate, target, attention=False, device="cpu")
+    if exhausted:
+        assert measure(candidate, target, attention=False) == baseline
+    else:
+        with pytest.raises(type(failure), match=str(failure)):
+            measure(candidate, target, attention=False)
+    assert attempts == [target.shape]
+
+    for forced in (backend, "gpu"):
+        with pytest.raises(type(failure), match=str(failure)):
+            measure(candidate, target, attention=False, device=forced)
+    assert attempts == [target.shape] * 3
+
+
+def test_measure_rejects_cuda_inspection_for_mps(small_delivery):
+    with pytest.raises(RuntimeError, match="Inspection profile requires CUDA"):
+        measure(*small_delivery, device="mps")
+
+
+def test_generated_attention_is_reported_for_unmatched_delivery(monkeypatch):
+    pixels = rgb(np.zeros((1000, 1000), dtype=np.float32))
+    heatmap = np.full(pixels.shape[:2], .5, dtype=np.float32)
+
+    def align(candidate, reference):
+        return [], {
+            "status": "unmatched", "reason": "unmatched", "confidence": 0.,
+            "candidate_size_wh": [1000, 1000], "reference_size_wh": [1000, 1000],
+        }
+
+    def unexpected_backend(device):
+        pytest.fail("An unmatched delivery does not need a damage backend")
+
+    monkeypatch.setattr(scoring, "align", align)
+    monkeypatch.setattr(scoring, "damage_backend", unexpected_backend)
+    expected = scoring._measure_delivery(pixels, pixels, details="summary", device="auto", heatmap=heatmap)
+    actual = scoring._measure_delivery(pixels, pixels, details="summary", device="auto", generate=lambda _: heatmap)
+    assert actual == expected
+    assert actual.explanation["attention"]["mean"] == .5
+    assert actual.score == 0
 
 
 @pytest.mark.parametrize("masked", [False, True])

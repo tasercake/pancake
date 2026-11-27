@@ -100,29 +100,34 @@ def _sam2(directory, device):
         # pipeline. Quality is independent of upsampling and stability, so
         # discard low-IoU masks before expanding them to preview resolution.
         masks, boxes, scores = [], [], []
+        sizes = [image.size[::-1]]
         for inputs in generate.preprocess(image, points_per_crop=16, points_per_batch=32):
-            sizes = inputs.pop("original_sizes").tolist()
+            inputs.pop("original_sizes")
             inputs.pop("reshaped_input_sizes")
             inputs.pop("input_boxes")  # SAM 2 only sees point prompts on the full image.
             inputs.pop("is_last")
             inputs = generate._ensure_tensor_on_device(inputs, device=generate.device)
             output = generate.model(**inputs)
             quality = output.iou_scores[0].flatten()
-            eligible = quality > .8
-            low = output.pred_masks[0].flatten(0, 1)[eligible]
-            if low.numel() == 0:
+            eligible = (quality > .8).nonzero().flatten()
+            if eligible.numel() == 0:
                 continue
+            # Gather from the strided multimask slice without copying masks
+            # for points that did not meet the quality threshold.
+            batch_masks = output.pred_masks[0]
+            per_point = batch_masks.shape[1]
+            low = batch_masks[eligible // per_point, eligible % per_point]
             full, = generate.image_processor.post_process_masks([low[None]], sizes, binarize=False)
             full = full[0]
-            stable = _compute_stability_score(full, 0, 1) > .9
-            binary = full[stable] > 0
+            stable = (_compute_stability_score(full, 0, 1) > .9).nonzero().flatten()
+            binary = full.index_select(0, stable) > 0
             masks.append(binary)
-            boxes.append(_batched_mask_to_box(binary).cpu())
-            scores.append(quality[eligible][stable].cpu())
+            boxes.append(_batched_mask_to_box(binary))
+            scores.append(quality[eligible[stable]])
         if not masks:
             return (), ()
-        boxes = torch.cat(boxes).float()
-        scores = torch.cat(scores)
+        boxes = torch.cat(boxes).cpu().float()
+        scores = torch.cat(scores).cpu()
         # The original pipeline suppresses boxes on CPU in prompt order.
         # Keep that tie-breaking and transfer only the selected binary masks.
         keep = batched_nms(boxes, scores, torch.zeros(len(boxes)), .7)
