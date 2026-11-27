@@ -601,11 +601,13 @@ component ViewCanvas inherits Rectangle {
     callback next-source(int);
 
     property <bool> has-image: root.image-width > 0 && root.image-height > 0;
-    property <bool> fit-mode: true;
+    property <float> max-scale: 4;
     property <float> fit-scale: root.has-image
-        ? min(root.width / (root.frame-width * 1px), root.height / (root.frame-height * 1px))
+        ? min(root.max-scale, root.width / (root.frame-width * 1px), root.height / (root.frame-height * 1px))
         : 1;
-    property <float> detail-scale: 1;
+    // A zero detail scale keeps the image fitted as the viewer changes size.
+    property <float> detail-scale: 0;
+    property <bool> fit-mode: root.detail-scale <= root.fit-scale;
     out property <float> zoom: root.fit-mode ? root.fit-scale : root.detail-scale;
     property <float> manual-x: 0;
     property <float> manual-y: 0;
@@ -632,7 +634,7 @@ component ViewCanvas inherits Rectangle {
         + "\"cropped\":\{root.cropped ? "true" : "false"}}";
 
     public function fit-image() {
-        root.fit-mode = true;
+        root.detail-scale = 0;
         root.focus-viewer();
     }
 
@@ -641,10 +643,10 @@ component ViewCanvas inherits Rectangle {
     }
 
     public function set-zoom(scale: float) {
+        let bounded-scale = min(root.max-scale, scale);
         root.manual-x = root.center-x;
         root.manual-y = root.center-y;
-        root.fit-mode = false;
-        root.detail-scale = max(0.01, min(256, scale));
+        root.detail-scale = bounded-scale <= root.fit-scale ? 0 : bounded-scale;
         root.focus-viewer();
     }
 
@@ -749,7 +751,7 @@ component ViewCanvas inherits Rectangle {
         }
         scroll-event(event) => {
             if event.delta-y == 0px { return reject; }
-            root.set-zoom(event.delta-y > 0px ? root.zoom * 1.2 : root.zoom / 1.2);
+            root.set-zoom(event.delta-y > 0px ? root.zoom * 1.04 : root.zoom / 1.04);
             accept
         }
     }
