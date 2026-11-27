@@ -102,11 +102,13 @@ package.path = plugin .. '?.lua;' .. package.path
 local function runPreset(menu)
     events, failure = {}, nil
     local env = {}
-    local preset = assert(loadfile(plugin .. service.builtInPresetsDir .. '/' .. commands[menu].title .. '.lrtemplate'))
+    local filename = menu == 2 and 'Pancake (With Lightroom Edits).lrtemplate' or 'Pancake (Originals).lrtemplate'
+    local preset = assert(loadfile(plugin .. service.builtInPresetsDir .. '/' .. filename))
     setfenv(preset, env)()
     assert(env.s.title == commands[menu].title)
     local settings = env.s.value
     assert(settings.exportServiceProvider == info.LrToolkitIdentifier)
+    assert(settings.exportServiceProviderTitle == info.LrPluginName)
     local edited = menu == 2
     assert(settings[info.LrToolkitIdentifier .. '_withEdits'] == edited)
     local provider = dofile(plugin .. service.file)

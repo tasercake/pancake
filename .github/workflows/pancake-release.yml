@@ -324,14 +324,21 @@ jobs:
             "$CARGO_TARGET_DIR/$RUST_TARGET/release" "$payload" "$DIST" "$RELEASE_VERSION"
           python -B scripts/release_support.py smoke "$DIST/pancake-cli-$RELEASE_VERSION-windows-x64.exe"
 
-      - name: Verify the Windows Explorer product name
+      - name: Verify the Windows Explorer branding
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $app = Join-Path $env:DIST "pancake-gui-$env:RELEASE_VERSION-windows-x64.exe"
+          $app = Join-Path $env:DIST "pancake-gui-${env:RELEASE_VERSION}-windows-x64.exe"
           $info = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($app)
           if ($info.ProductName -cne "Pancake Stacker" -or $info.FileDescription -cne "Pancake Stacker") {
             throw "The Windows executable is missing Pancake Stacker product metadata"
+          }
+          Add-Type -Name ShellIcons -Namespace Pancake -MemberDefinition @'
+          [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+          public static extern uint ExtractIconEx(string file, int index, IntPtr large, IntPtr small, uint count);
+          '@
+          if ([Pancake.ShellIcons]::ExtractIconEx($app, -1, [IntPtr]::Zero, [IntPtr]::Zero, 0) -ne 1) {
+            throw "The Windows executable must contain one application icon group"
           }
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
