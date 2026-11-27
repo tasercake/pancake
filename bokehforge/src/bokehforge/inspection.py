@@ -8,6 +8,8 @@ from threading import Lock
 import numpy as np
 from PIL import Image
 
+from ._device import Device
+from ._workers import workers
 from .scoring import validate_heatmap, validate_rgb
 
 INSPECTION_MAP_VERSION = "inspection-blend-v1"
@@ -25,11 +27,19 @@ def _model_directory():
 def reference_preview(reference):
     validate_rgb(reference)
     pixels = np.empty(reference.shape, np.uint8)
-    for start in range(0, reference.shape[0], 128):
+
+    def encode(start):
         rows = slice(start, start + 128)
         linear = np.clip(reference[rows], 0, 1)
         srgb = np.where(linear <= 0.0031308, 12.92 * linear, 1.055 * linear ** (1 / 2.4) - .055)
         pixels[rows] = np.rint(srgb * 255)
+
+    strips = range(0, reference.shape[0], 128)
+    if reference.shape[0] * reference.shape[1] >= 1_000_000:
+        list(workers().map(encode, strips))
+    else:
+        for start in strips:
+            encode(start)
     height, width = reference.shape[:2]
     scale = min(1, _MAX_SIDE / max(height, width))
     size = max(1, round(width * scale)), max(1, round(height * scale))
@@ -73,3 +83,9 @@ class Inspection:
 
 
 default_inspection = Inspection()
+
+
+def inspection_for(device: Device):
+    if device == "cpu":
+        raise RuntimeError("The Inspection profile requires CUDA. Disable attention or supply a heatmap.")
+    return default_inspection

@@ -1,12 +1,15 @@
 """Infer one delivery-to-reference similarity from RGB evidence."""
 
 from dataclasses import dataclass
-from itertools import product
+from functools import lru_cache
+from itertools import batched, product
 from math import ceil, cos, exp, log, radians, sin
 
 import numpy as np
 from PIL import Image
 from scipy import fft, ndimage as ndi, optimize
+
+from ._workers import workers
 
 ALIGNMENT_VERSION = 1
 MAX_ROTATION_DEGREES = 5.0
@@ -257,10 +260,34 @@ def _resize_plane(image, size):
     return np.asarray(Image.fromarray(clipped).resize(tuple(size[::-1]), Image.Resampling.BOX))
 
 
-def _texture(image, side):
-    shape = np.array(image.shape[:2])
-    size = np.maximum(1, np.rint(shape / max(1, max(shape) / side))).astype(int)
-    rgb = np.stack([_resize_plane(image[..., i], size) for i in range(3)])
+def _texture_pair(candidate, target):
+    """Reuse each full-resolution clipped plane at every search scale."""
+    shapes = [np.array(image.shape[:2]) for image in (candidate, target)]
+    channels = [image[..., channel] for image in (candidate, target) for channel in range(3)]
+    large = max(max(shape) for shape in shapes) >= 1024
+    process = workers().map if large else map
+
+    def prepare(channel):
+        return Image.fromarray(np.clip(channel, 0, 1))
+
+    planes = list(process(prepare, channels))
+
+    def at_scale(side):
+        sizes = [np.maximum(1, np.rint(shape / max(1, max(shape) / side))).astype(int) for shape in shapes]
+
+        def resize(index):
+            size = tuple(sizes[index // 3][::-1])
+            plane = planes[index]
+            return np.asarray(plane if plane.size == size else plane.resize(size, Image.Resampling.BOX))
+
+        reduced = list(process(resize, range(6)))
+        return [_texture(np.stack(reduced[3 * i:3 * i + 3]), shape, size)
+                for i, (shape, size) in enumerate(zip(shapes, sizes, strict=True))]
+
+    return at_scale
+
+
+def _texture(rgb, shape, size):
     light = np.einsum("cij,c->ij", rgb, _LUMA)
     color = np.stack((light, (rgb[0] - rgb[1]) * 0.55, (rgb[2] - rgb[1]) * 0.55))
     # Locally centered luma and two color-opponent planes are used for
@@ -307,20 +334,31 @@ class _Correlation:
     def _sums(integral, h, w):
         return integral[:, h:, w:] - integral[:, :-h, w:] - integral[:, h:, :-w] + integral[:, :-h, :-w]
 
-    def correlate(self, template):
-        h, w = template.shape[1:]
-        centered = template - template.mean(axis=(1, 2), keepdims=True)
-        norm = np.square(centered).sum(dtype=np.float64)
-        if norm <= h * w * 1e-13:
-            return None
-        if (h, w) not in self.energy:
-            totals = self._sums(self.total, h, w)
-            energy = self._sums(self.squares, h, w)[0] - np.square(totals).sum(axis=0) / (h * w)
-            self.energy[h, w] = np.maximum(energy, h * w * 1e-13)
-        kernel = fft.rfftn(centered, self.fft_shape, axes=(1, 2))
-        numerator = fft.irfftn((self.spectrum * kernel.conj()).sum(axis=0), self.fft_shape)
-        numerator = numerator[:self.shape[0] - h + 1, :self.shape[1] - w + 1]
-        return np.clip(numerator / np.sqrt(norm * self.energy[h, w]), -1, 1)
+    def correlate(self, templates):
+        # FFTs operate on each template and channel separately. Pack a bounded
+        # batch with the same zero padding the individual FFT calls use.
+        batch = np.zeros((len(templates), self.spectrum.shape[0], *self.fft_shape), dtype=np.float32)
+        metadata = []
+        for index, template in enumerate(templates):
+            h, w = template.shape[1:]
+            centered = template - template.mean(axis=(1, 2), keepdims=True)
+            norm = np.square(centered).sum(dtype=np.float64)
+            metadata.append((h, w, norm))
+            if norm > h * w * 1e-13:
+                batch[index, :, :h, :w] = centered
+        kernel = fft.rfftn(batch, self.fft_shape, axes=(-2, -1), workers=4)
+        numerator = fft.irfftn((self.spectrum * kernel.conj()).sum(axis=1), self.fft_shape,
+                              axes=(-2, -1), workers=4)
+        for values, (h, w, norm) in zip(numerator, metadata, strict=True):
+            if norm <= h * w * 1e-13:
+                yield None
+                continue
+            if (h, w) not in self.energy:
+                totals = self._sums(self.total, h, w)
+                energy = self._sums(self.squares, h, w)[0] - np.square(totals).sum(axis=0) / (h * w)
+                self.energy[h, w] = np.maximum(energy, h * w * 1e-13)
+            values = values[:self.shape[0] - h + 1, :self.shape[1] - w + 1]
+            yield np.clip(values / np.sqrt(norm * self.energy[h, w]), -1, 1)
 
 
 def _coarse_candidates(crop, reference, dimensions, scales, angles):
@@ -328,7 +366,9 @@ def _coarse_candidates(crop, reference, dimensions, scales, angles):
     corr = _Correlation(reference.values)
     peaks, attempted = [], 0
     anchors = _anchor_points(crop)
-    for anchor, scale, angle in product(anchors, scales, angles):
+
+    @lru_cache(maxsize=None)
+    def template_offsets(scale, angle):
         pose = Pose(0, 0, angle, scale)
         # Keep the template inside one of the fit cells. Neither the
         # translation proposals nor the optimizer use the held-out cells.
@@ -338,27 +378,36 @@ def _coarse_candidates(crop, reference, dimensions, scales, angles):
         half = np.floor(half * shrink / reference.step).astype(int)
         hy, hx = np.minimum(np.minimum(half, (np.array([ref_h, ref_w]) - 1) // 2), 20)
         if min(hy, hx) < 2:
-            continue
+            return None
         yy, xx = np.mgrid[-hy:hy + 1, -hx:hx + 1]
         displacements = np.array([yy.ravel(), xx.ravel()]) * reference.step[:, None]
-        coords = np.linalg.solve(pose.matrix, displacements) + anchor[:, None]
-        template = crop.sample(coords).reshape(3, 2 * hy + 1, 2 * hx + 1)
-        agreement = corr.correlate(template)
-        attempted += 1
-        if agreement is None:
-            continue
-        for _ in range(2):
-            y, x = np.unravel_index(agreement.argmax(), agreement.shape)
-            value = float(agreement[y, x])
-            if value < 0.18:
-                break
-            center = (np.array([y + hy, x + hx]) + 0.5) * reference.step - 0.5
-            peak = center - pose.matrix @ anchor
-            # Tiny templates produce isolated high correlations by chance.
-            # Penalize their weaker support before coarse seed selection.
+        return pose, hy, hx, np.linalg.solve(pose.matrix, displacements)
+
+    def templates():
+        for anchor, scale, angle in product(anchors, scales, angles):
+            offsets = template_offsets(scale, angle)
+            if offsets is not None:
+                pose, hy, hx, coords = offsets
+                template = crop.sample(coords + anchor[:, None]).reshape(3, 2 * hy + 1, 2 * hx + 1)
+                yield anchor, pose, hy, hx, template
+
+    for batch in batched(templates(), 12):
+        attempted += len(batch)
+        agreements = corr.correlate([template for *_, template in batch])
+        for (anchor, pose, hy, hx, template), agreement in zip(batch, agreements, strict=True):
+            if agreement is None:
+                continue
             reliability = 0.30 * exp(-template[0].size / 100)
-            peaks.append((value - reliability, Pose(*peak, angle, scale)))
-            agreement[max(0, y - 3):y + 4, max(0, x - 3):x + 4] = -1
+            for _ in range(2):
+                y, x = np.unravel_index(agreement.argmax(), agreement.shape)
+                value = float(agreement[y, x])
+                if value < 0.18:
+                    break
+                center = (np.array([y + hy, x + hx]) + 0.5) * reference.step - 0.5
+                peak = center - pose.matrix @ anchor
+                # Tiny templates can produce high correlations by chance.
+                peaks.append((value - reliability, Pose(*peak, pose.angle, pose.scale)))
+                agreement[max(0, y - 3):y + 4, max(0, x - 3):x + 4] = -1
     return peaks, attempted, [point.tolist() for point in anchors]
 
 
@@ -402,26 +451,28 @@ class _EvidenceSampler:
                              np.linspace(margin_x, w - 1 - margin_x, min(w, count)), indexing="ij")
         if native:
             yy, xx = np.rint(yy), np.rint(xx)
-        self.points = np.stack((yy.ravel(), xx.ravel()))
-        self.values = crop.sample(self.points)
+        points = np.stack((yy.ravel(), xx.ravel()))
+        values = crop.sample(points)
         ry = np.minimum(3, (yy.ravel() * 4 / h).astype(int))
         rx = np.minimum(3, (xx.ravel() * 4 / w).astype(int))
-        self.regions = 4 * ry + rx
-        self.fit = (ry + rx) % 2 == 0
+        regions = 4 * ry + rx
+        fit = (ry + rx) % 2 == 0
+        self.subsets = ((points[:, fit], values[:, fit], regions[fit]),
+                        (points[:, ~fit], values[:, ~fit], regions[~fit]))
 
     def __call__(self, pose, subset="fit", *, regional=False):
-        keep = self.fit if subset == "fit" else ~self.fit
-        points = pose.matrix @ self.points[:, keep] + pose.offset[:, None]
+        points, values, region_ids = self.subsets[subset != "fit"]
+        points = pose.matrix @ points + pose.offset[:, None]
         valid = np.all((points >= 0) & (points <= self.shape[:, None] - 1), axis=0)
         support = float(valid.mean()) if valid.size else 0.0
         if valid.sum() < 4:
             return _Evidence(0.0, support, ())
         samples = self.reference.sample(points[:, valid])
-        values = self.values[:, keep][:, valid]
+        values = values[:, valid]
         agreement = _pearson(values, samples)
         regions = []
         if regional:
-            cells = self.regions[keep][valid]
+            cells = region_ids[valid]
             for index in np.unique(cells):
                 cell = cells == index
                 a, b = values[:, cell], samples[:, cell]
@@ -530,8 +581,8 @@ def _scales(crop_shape, ref_shape):
 def _approximate(crop, target, trace, native, origin):
     shape, ref_shape = np.asarray(crop.shape[:2]), np.asarray(target.shape[:2])
     centered = Pose(*np.floor((ref_shape - shape) / 2))
-    coarse_crop, crop_contrast = _texture(crop, _COARSE_SIDE)
-    coarse_ref, ref_contrast = _texture(target, _COARSE_SIDE)
+    pair = _texture_pair(crop, target)
+    (coarse_crop, crop_contrast), (coarse_ref, ref_contrast) = pair(_COARSE_SIDE)
     trace["coarse_rgb_contrast"] = {"delivery": crop_contrast, "reference": ref_contrast}
     if (max(crop_contrast, ref_contrast) < 0.006 or min(*shape, *ref_shape) < 3
             or (ref_contrast < 1e-6 and _same_uniform(target))):
@@ -565,11 +616,10 @@ def _approximate(crop, target, trace, native, origin):
     coarse_fits = [_refine(p, coarse_sampler, shape, step, bounds, wide=True) for p in seeds]
     ranked = sorted(coarse_fits, key=lambda p: -coarse_sampler(p).objective)
     refined = _distinct(ranked, shape, max(1.8, step), 5)
-    fine_crop, _ = _texture(crop, _FINE_SIDE)
-    fine_ref, _ = _texture(target, _FINE_SIDE)
+    (fine_crop, _), (fine_ref, _) = pair(_FINE_SIDE)
     fine_sampler = _EvidenceSampler(fine_crop, fine_ref, shape, ref_shape, 44)
-    broad_crop, _ = _texture(crop, 96)
-    broad_ref, _ = _texture(target, 96)
+    (broad_crop, _), (broad_ref, _) = pair(96)
+    del pair
     broad_sampler = _EvidenceSampler(broad_crop, broad_ref, shape, ref_shape, 28)
     step = float(max(fine_ref.step))
     fine = [_refine(p, fine_sampler, shape, max(step, max(coarse_ref.step) * 0.55), bounds) for p in refined]

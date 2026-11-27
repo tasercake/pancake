@@ -6,6 +6,8 @@ from typing import Literal
 import numpy as np
 from scipy import ndimage as ndi
 
+from ._device import Device, use_cuda_damage, validate_device
+from ._workers import alignment_worker, workers
 from .alignment import _xyxy, align, native_overlap, overlap, project
 
 SCORE_VERSION = "reference-fidelity-v3"
@@ -164,7 +166,7 @@ def _detail(candidate, target, blur, support):
     return lost, extra
 
 
-def _maps(candidate, target, support=None):
+def _damage(candidate, target, support):
     cl, ca, cb = _lab(candidate)
     tl, ta, tb = _lab(target)
     delta = cl - tl
@@ -188,9 +190,13 @@ def _maps(candidate, target, support=None):
     overshoot = _visibility(np.maximum.reduce([cl - upper, lower - cl, np.zeros_like(cl)]), 6.0)
     boundary = np.maximum(shape, overshoot * near_edge)
 
+    return (tone, color, lost, extra, boundary, _range_damage(candidate, target)), (delta, ca - ta, cb - tb)
+
+
+def _range_damage(candidate, target):
     # Work in float64 before subtraction so all finite float32 samples stay finite.
     # Work on one channel at a time to limit peak memory at native resolution.
-    range_error = np.zeros_like(cl)
+    range_error = np.zeros(candidate.shape[:2], dtype=np.float32)
     for start in range(0, candidate.shape[0], 128):
         rows = slice(start, start + 128)
         channels = zip(np.moveaxis(candidate[rows], -1, 0), np.moveaxis(target[rows], -1, 0), strict=True)
@@ -201,13 +207,66 @@ def _maps(candidate, target, support=None):
             at_endpoint = 1 - np.clip(np.minimum(c_display, 1 - c_display) / 0.012, 0, 1)
             clipping = abs(c_display - t_display) * at_endpoint
             np.maximum(range_error[rows], _visibility(np.maximum(headroom, clipping), 0.075), out=range_error[rows])
-    c_exposure = np.maximum(_supported_mean(candidate, support, axis=(0, 1)), 0) @ _XYZ[1]
-    t_exposure = np.maximum(_supported_mean(target, support, axis=(0, 1)), 0) @ _XYZ[1]
-    return (tone, color, lost, extra, boundary, range_error), {
+    return range_error
+
+
+def _rgb_exposure(pixels, support):
+    return np.maximum(_supported_mean(pixels, support, axis=(0, 1)), 0) @ _XYZ[1]
+
+
+def _cuda_maps(candidate, target, support):
+    from ._cuda_damage import damage_maps
+
+    height, width = target.shape[:2]
+    cl, tl, delta, delta_a, delta_b, color = np.empty((6, height, width), dtype=np.float32)
+
+    def prepare(start):
+        rows = slice(start, start + 192)
+        c, a, b = _lab(candidate[rows])
+        t, ta, tb = _lab(target[rows])
+        cl[rows], tl[rows] = c, t
+        delta[rows] = c - t
+        np.subtract(a, ta, out=delta_a[rows])
+        np.subtract(b, tb, out=delta_b[rows])
+        color[rows] = _visibility(np.hypot(delta_a[rows], delta_b[rows]), 10.)
+
+    list(workers().map(prepare, range(0, height, 192)))
+    tone, lost, extra, boundary, rgb_range = damage_maps(candidate, target, cl, tl, delta, support)
+    return (tone, color, lost, extra, boundary, rgb_range), (delta, delta_a, delta_b)
+
+
+def _maps(candidate, target, support=None, *, cuda=False):
+    height, width = target.shape[:2]
+    large = height * width >= 1_000_000
+    exposure = [workers().submit(_rgb_exposure, image, support) for image in (candidate, target)] if large else None
+    if cuda:
+        maps, (delta, delta_a, delta_b) = _cuda_maps(candidate, target, support)
+    elif height >= 192 and large:
+        arrays = np.empty((len(FAMILY_WEIGHTS) + 3, height, width), dtype=np.float32)
+
+        def strip(start):
+            # All filters are local. The widest is the radius-40 tone filter.
+            # The halo keeps reflection at the actual reference border.
+            end = min(start + 192, height)
+            first, last = max(0, start - 40), min(height, end + 40)
+            maps, signed = _damage(candidate[first:last], target[first:last],
+                                   None if support is None else support[first:last])
+            for output, values in zip(arrays, (*maps, *signed), strict=True):
+                output[start:end] = values[start - first:end - first]
+
+        list(workers().map(strip, range(0, height, 192)))
+        maps, (delta, delta_a, delta_b) = arrays[:len(FAMILY_WEIGHTS)], arrays[len(FAMILY_WEIGHTS):]
+    else:
+        maps, (delta, delta_a, delta_b) = _damage(candidate, target, support)
+    if exposure is None:
+        c_exposure, t_exposure = (_rgb_exposure(image, support) for image in (candidate, target))
+    else:
+        c_exposure, t_exposure = (future.result() for future in exposure)
+    return maps, {
         "mean_delta_lightness": float(_supported_mean(delta, support)),
         "global_exposure_delta_stops": float(np.log2((c_exposure + 1e-5) / (t_exposure + 1e-5))),
-        "mean_delta_lab_a": float(_supported_mean(ca - ta, support)),
-        "mean_delta_lab_b": float(_supported_mean(cb - tb, support)),
+        "mean_delta_lab_a": float(_supported_mean(delta_a, support)),
+        "mean_delta_lab_b": float(_supported_mean(delta_b, support)),
     }
 
 
@@ -223,6 +282,24 @@ def _integral(image):
 def _tile_totals(integral, y0, y1, x0, x1):
     return (integral[np.ix_(y1, x1)] - integral[np.ix_(y0, x1)]
             - integral[np.ix_(y1, x0)] + integral[np.ix_(y0, x0)])
+
+
+def _tile_integral(image, support, edges):
+    """Compute the original vertical-then-horizontal sums at tile corners."""
+    ys, xs = edges
+    vertical = np.zeros(image.shape[1], dtype=np.float64)
+    sampled = np.zeros((len(ys), image.shape[1]), dtype=np.float64)
+    start = 0
+    for index, stop in enumerate(ys[1:], 1):
+        for row in range(start, stop):
+            values = image[row] if support is None else image[row] * support[row]
+            np.add(vertical, values, out=vertical)
+        sampled[index] = vertical
+        start = stop
+    compact = np.zeros((len(ys), len(xs)), dtype=np.float64)
+    sampled.cumsum(axis=1, out=sampled)
+    compact[:, 1:] = sampled[:, xs[1:] - 1]
+    return compact
 
 
 @dataclass(frozen=True)
@@ -273,17 +350,21 @@ def _tile_grids(height, width, support, exact_box=None):
     return grids
 
 
-def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=None, damage_max=1):
+def _pool(damage, support, grids, edges, *, explain=False, tiles_by_grid=None, family=None, damage_max=1):
     """Compute the metric and optionally retain the evidence from those same tiles."""
     exact = damage is None
     mean = 0.0 if exact else float(_supported_mean(damage, support))
-    integral = None if exact else _integral(damage if support is None else damage * support)
+    integral = None if exact else _tile_integral(damage, support, edges)
     worst, tail, region = 0.0, 0.0, None
     worst_tile, tail_selection, winning_tiles = None, None, None
     for grid in grids:
         # Even a short edge tile uses the full nominal area as its denominator.
-        tiles = (np.zeros((grid.x.size - 1) * (grid.y.size - 1)) if exact else
-                 np.clip(grid.totals(integral) / grid.nominal_pixels, 0, damage_max).ravel())
+        if exact:
+            tiles = np.zeros((grid.x.size - 1) * (grid.y.size - 1))
+        else:
+            y, x = (np.searchsorted(axis, grid_axis) for axis, grid_axis in zip(edges, (grid.y, grid.x), strict=True))
+            totals = _tile_totals(integral, y[:-1], y[1:], x[:-1], x[1:])
+            tiles = np.clip(totals / grid.nominal_pixels, 0, damage_max).ravel()
         index = int(np.argmax(tiles))
         if tiles[index] > worst:
             worst = float(tiles[index])
@@ -332,10 +413,20 @@ def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=N
     return burden, summary, components
 
 
-def _measure(candidate, target, support=None, *, details=None, exact_box=None, inspection=None):
+def _rgb_rmse(candidate, target, support):
+    mse = np.mean([_supported_mean(np.square(np.subtract(c, t, dtype=np.float64)), support)
+                   for c, t in zip(np.moveaxis(candidate, -1, 0), np.moveaxis(target, -1, 0), strict=True)])
+    return float(np.sqrt(mse))
+
+
+def _measure(candidate, target, support=None, *, details=None, exact_box=None, inspection=None, cuda=False):
     height, width = target.shape[:2]
+    large = height * width >= 1_000_000
+    rmse_work = None
     if exact_box is None:
-        maps, signed = _maps(candidate, target, support)
+        if large:
+            rmse_work = workers().submit(_rgb_rmse, candidate, target, support)
+        maps, signed = _maps(candidate, target, support, cuda=cuda)
         measured_pixels = height * width if support is None else int(support.sum())
     else:
         top, left, bottom, right = exact_box
@@ -344,17 +435,25 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None, i
         signed = dict.fromkeys(("mean_delta_lightness", "global_exposure_delta_stops",
                                 "mean_delta_lab_a", "mean_delta_lab_b"), 0.0)
     grids = _tile_grids(height, width, support, exact_box) if exact_box is None or details is not None else []
+    edges = tuple(np.unique(np.concatenate([getattr(grid, axis) for grid in grids])) for axis in ("y", "x")) \
+        if exact_box is None else None
     tile_data = {grid.id: grid.describe_tiles() for grid in grids} if details == "tiles" else None
     features = {}
     rows = {}
     families = {}
     weights, mix = inspection or (None, 0.0)
     damage_max = 1 if inspection is None else INSPECTION_MAX_MULTIPLIER
-    for (name, weight), damage in zip(FAMILY_WEIGHTS.items(), maps, strict=True):
+
+    def pool_family(item):
+        name, damage = item
         if damage is not None and weights is not None:
             damage *= weights
-        burden, summary, components = _pool(damage, support, grids, explain=details is not None,
-                                             tiles_by_grid=tile_data, family=name, damage_max=damage_max)
+        return _pool(damage, support, grids, edges, explain=details is not None,
+                     tiles_by_grid=tile_data, family=name, damage_max=damage_max)
+
+    dispatch = workers().map if large and exact_box is None and tile_data is None else map
+    pooled = dispatch(pool_family, zip(FAMILY_WEIGHTS, maps, strict=True))
+    for (name, weight), (burden, summary, components) in zip(FAMILY_WEIGHTS.items(), pooled, strict=True):
         if region := summary["worst_box_view_xyxy"]:
             summary["worst_box_native_xyxy"] = region
         features[f"native.{name}"] = burden
@@ -368,11 +467,9 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None, i
               "families": rows, **signed}
     if measured_pixels < height * width:
         native["covered_fraction"] = measured_pixels / (height * width)
-    rmse = 0.0
-    if exact_box is None:
-        mse = np.mean([_supported_mean(np.square(np.subtract(c, t, dtype=np.float64)), support)
-                       for c, t in zip(np.moveaxis(candidate, -1, 0), np.moveaxis(target, -1, 0), strict=True)])
-        rmse = float(np.sqrt(mse))
+    rmse = 0.0 if exact_box is not None else (
+        _rgb_rmse(candidate, target, support) if rmse_work is None else rmse_work.result()
+    )
     explanation = None
     if details is not None:
         explanation = {
@@ -388,7 +485,8 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None, i
     return Measurement(features, {"views": {"native": [native]}, "linear_rgb_rmse": rmse}, explanation)
 
 
-def measure(candidate, target, *, details: ScoreDetails | None = None, inspection_heatmap=None, attention=True):
+def measure(candidate, target, *, details: ScoreDetails | None = None, inspection_heatmap=None, attention=True,
+            device: Device = "auto"):
     """Score one delivered RGB image against the reference at its native resolution.
 
     Alignment and per-placement score terms are always available in `.alignment`.
@@ -399,16 +497,34 @@ def measure(candidate, target, *, details: ScoreDetails | None = None, inspectio
     _validate_details(details)
     validate_rgb(target)
     validate_rgb(candidate)
+    generate = None
     if not attention:
         inspection_heatmap = None
     elif inspection_heatmap is None:
-        from .inspection import default_inspection
+        from .inspection import inspection_for
 
-        inspection_heatmap, _ = default_inspection.generate(target)
-    inspection = None if inspection_heatmap is None else (
-        _inspection_weights(validate_heatmap(inspection_heatmap, target.shape[:2]))
-    )
-    placements, alignment = align(candidate, target)
+        def generate(reference):
+            return inspection_for(device).generate(reference)[0]
+
+    return _measure_delivery(candidate, target, details=details, device=device,
+                             heatmap=inspection_heatmap, generate=generate)
+
+
+def _measure_delivery(candidate, target, *, details, device, heatmap=None, generate=None):
+    """Score images already checked against the RGB input contract."""
+    validate_device(device)
+    large = target.shape[0] * target.shape[1] >= 1_000_000
+    cuda = (large or device == "gpu") and use_cuda_damage(device)
+    pending = alignment_worker().submit(align, candidate, target) if large and generate is not None else None
+    try:
+        if generate is not None:
+            heatmap = generate(target)
+        inspection = None if heatmap is None else _inspection_weights(validate_heatmap(heatmap, target.shape[:2]))
+    except BaseException:
+        if pending is not None and not pending.cancel():
+            pending.exception()
+        raise
+    placements, alignment = align(candidate, target) if pending is None else pending.result()
     rows, explanations = [], []
     leading = None
     for placement in placements:
@@ -421,8 +537,17 @@ def measure(candidate, target, *, details: ScoreDetails | None = None, inspectio
             else:
                 aligned, support = project(candidate, target.shape, placement)
                 if support is None or support.any():
-                    comparison = _measure(aligned, target, support, details=details,
-                                          inspection=inspection)
+                    if cuda and device == "auto":
+                        from torch import OutOfMemoryError
+
+                        try:
+                            comparison = _measure(aligned, target, support, details=details,
+                                                  inspection=inspection, cuda=True)
+                        except OutOfMemoryError:
+                            cuda = False
+                    if comparison is None:
+                        comparison = _measure(aligned, target, support, details=details,
+                                              inspection=inspection, cuda=cuda)
         quality = 0.0 if comparison is None else comparison.score
         coverage = min(geometry, resolution)
         weighted = placement.weight * coverage * quality
