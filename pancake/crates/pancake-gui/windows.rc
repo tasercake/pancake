@@ -12,8 +12,12 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "FileDescription", "Pancake Stacker"
-            VALUE "ProductName", "Pancake Stacker"
+            VALUE "FileDescription", "Pancake Stacker\0"
+            VALUE "FileVersion", PANCAKE_VERSION_TEXT
+            VALUE "InternalName", "pancake-gui\0"
+            VALUE "OriginalFilename", "pancake-gui.exe\0"
+            VALUE "ProductName", "Pancake Stacker\0"
+            VALUE "ProductVersion", PANCAKE_VERSION_TEXT
         END
     END
     BLOCK "VarFileInfo"

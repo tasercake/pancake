@@ -41,14 +41,37 @@ jobs:
         if: inputs.candidate_sha != ''
         with:
           sha: ${{ inputs.candidate_sha }}
-      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        id: registry
+      - name: Identify headless build inputs
+        id: build-inputs
+        run: |
+          rustc_info=$(rustc -vV)
+          host=$(printf '%s\n' "${ImageOS:?}" "${ImageVersion:?}" "$GITHUB_WORKSPACE" \
+            "${CARGO_HOME:-$HOME/.cargo}" "$rustc_info" | git hash-object --stdin)
+          printf 'host=%s\n' "$host" >> "$GITHUB_OUTPUT"
+          python3 -B scripts/release_cache.py keys --checks "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+      - name: Restore compiled headless checks
+        id: build-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
-            ~/.cargo/registry/cache
-            ~/.cargo/registry/index
-          key: pancake-registry-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pancake/Cargo.lock') }}
-          restore-keys: pancake-registry-${{ runner.os }}-${{ runner.arch }}-
+            pancake/target/debug
+            ~/.cargo/registry
+            ~/.cache/tracel
+            ~/.local/share/tracel
+          key: pancake-checks-v1-${{ steps.build-inputs.outputs.host }}-${{ steps.build-inputs.outputs.graph }}-${{ steps.build-inputs.outputs.inputs }}
+          restore-keys: pancake-checks-v1-${{ steps.build-inputs.outputs.host }}-${{ steps.build-inputs.outputs.graph }}-
+      - name: Reuse unchanged Cargo inputs
+        if: steps.build-cache.outputs.cache-matched-key != ''
+        env:
+          EXACT: ${{ steps.build-cache.outputs.cache-hit }}
+        run: |
+          args=()
+          if [[ "$EXACT" == true ]]; then
+            args+=(--exact)
+          else
+            cargo clean --offline --locked --profile dev --workspace
+          fi
+          python3 -B scripts/release_cache.py restore-mtimes --checks "${args[@]}"
       - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519 # v2
         with:
           tool: cargo-nextest@0.9.152,shellcheck@0.11.0
@@ -56,10 +79,13 @@ jobs:
         run: bash scripts/install-actionlint.sh "$RUNNER_TEMP/pancake-lint-tools"
       - run: bash scripts/check.sh lint
       - run: bash scripts/check.sh test
-      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: github.event_name == 'push' && steps.registry.outputs.cache-hit != 'true'
+      - name: Save compiled headless checks
+        if: (github.event_name == 'push' || inputs.candidate_sha != '') && steps.build-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
-            ~/.cargo/registry/cache
-            ~/.cargo/registry/index
-          key: ${{ steps.registry.outputs.cache-primary-key }}
+            pancake/target/debug
+            ~/.cargo/registry
+            ~/.cache/tracel
+            ~/.local/share/tracel
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}

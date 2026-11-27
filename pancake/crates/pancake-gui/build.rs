@@ -42,7 +42,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(|directory| directory.join("rc.exe"))
         .find(|file| file.is_file())
         .ok_or(io::Error::other("Could not find rc.exe in the Windows SDK"))?;
-    fs::copy("windows.rc", out.join("windows.rc"))?;
     let resource = out.join("pancake.res");
     let version = format!(
         "{},{},{},0",
@@ -50,10 +49,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         env!("CARGO_PKG_VERSION_MINOR"),
         env!("CARGO_PKG_VERSION_PATCH")
     );
+    let version_text = env!("CARGO_PKG_VERSION");
+    let script = include_str!("windows.rc");
+    fs::write(
+        out.join("windows.rc"),
+        format!(
+            "#define PANCAKE_VERSION {version}\n#define PANCAKE_VERSION_TEXT \"{version_text}\\0\"\n{script}"
+        ),
+    )?;
     let status = Command::new(compiler)
         .current_dir(&out)
-        .args(["/nologo", "/d", &format!("PANCAKE_VERSION={version}")])
-        .args(["/fo", "pancake.res", "windows.rc"])
+        .args(["/nologo", "/fo", "pancake.res", "windows.rc"])
         .status()?;
     if !status.success() {
         return Err(io::Error::other(format!("rc.exe failed: {status}")).into());

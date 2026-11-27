@@ -33,6 +33,13 @@ see per-crate compile times in the generated HTML report.
 
 For packaged builds, use the [release guide](docs/releases.md).
 
+GitHub Actions caches compiled dependencies by the dispatched source's Cargo
+graph and native toolchain. An exact candidate build-input match also reuses
+workspace outputs. A new candidate version can still reuse its dependencies.
+Cargo checks the lockfile and fingerprints on every run, and each package is
+staged and smoke-tested again. Change the cache key version in the workflow
+when changing how build outputs are produced or stored.
+
 ## Tests and assurance
 
 Run the Lightroom plug-in contract checks from `pancake/` with `luajit lightroom/test_open_stack.lua` or Lua 5.1.

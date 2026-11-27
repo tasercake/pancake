@@ -278,9 +278,8 @@ def prepare_source(source, version):
         expected_lock = expected_lock.replace(before, after, 1)
 
     expected = update_manifests(source, version)
-    subprocess.run(["cargo", "update", "--workspace"], cwd=source, check=True)
-    if lock.read_text(encoding="utf-8") != expected_lock:
-        raise ValueError("Cargo changed dependency resolution while updating the workspace version")
+    # Every downstream Cargo invocation uses --locked to verify the candidate graph.
+    lock.write_text(expected_lock, encoding="utf-8")
     expected[lock] = expected_lock
     for path, content in expected.items():
         actual = path.read_bytes()
