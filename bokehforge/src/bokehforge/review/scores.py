@@ -6,7 +6,7 @@ from threading import Condition, Thread
 
 from ..alignment import ALIGNMENT_VERSION
 from ..bench import score_saved_output
-from ..inspection import map_path
+from ..inspection import Inspection
 from ..scoring import FAMILY_WEIGHTS, INSPECTION_SCORE_VERSION, SCORE_EXPLANATION_VERSION, SCORE_VERSION
 from .images import output_identity, output_revision
 
@@ -15,10 +15,10 @@ _OVERLAY_GRIDS = {8: "8:0:0", 32: "32:0:0"}
 
 
 class Scores:
-    def __init__(self, on_change, inspection_maps=None):
+    def __init__(self, on_change, *, attention=True):
         self.on_change = on_change
-        self.inspection_maps = inspection_maps
-        self.profile = SCORE_VERSION if inspection_maps is None else INSPECTION_SCORE_VERSION
+        self.inspection = Inspection() if attention else None
+        self.profile = INSPECTION_SCORE_VERSION if attention else SCORE_VERSION
         self.revision = 0
         self.condition = Condition()
         self.pending = OrderedDict()
@@ -30,9 +30,7 @@ class Scores:
 
     def get(self, catalog, scene, directory, result, *, detail="summary", expected_revision=None):
         image = directory / result["image"]
-        receipt = directory / result["stacker"] / (
-            "scores" if self.inspection_maps is None else "inspection-scores"
-        ) / f"{scene.id}.json"
+        receipt = directory / result["stacker"] / "scores" / f"{scene.id}.json"
         try:
             artifact = output_identity(image)
         except OSError as exc:
@@ -41,26 +39,20 @@ class Scores:
         fields = {"profile": self.profile, "score": None, "artifact_revision": revision}
         if expected_revision is not None and expected_revision != revision:
             return {**fields, "status": "stale"}
-        map_artifact = ()
-        if self.inspection_maps is not None:
-            try:
-                map_artifact = output_identity(map_path(self.inspection_maps, scene))
-            except OSError as exc:
-                return {**fields, "status": "scoring_error", "error": str(exc)}
         identity = (self.profile, ALIGNMENT_VERSION, scene.metadata["recipe_sha256"], result["scene_fingerprint"],
-                    *artifact[1:], *map_artifact)
+                    *artifact[1:])
         key = (receipt, identity, detail)
         cache = self.recent if detail == "summary" else self.spatial
         with self.condition:
             if key in cache:
                 cache.move_to_end(key)
                 return {**cache[key], "artifact_revision": revision}
-            if detail == "summary":
+            if detail == "summary" and self.inspection is None:
                 saved = self._read_summary(receipt, identity)
                 if saved is not None:
                     return {**saved, "artifact_revision": revision}
             if not self.closed and self.active != key:
-                self.pending[key] = (catalog, scene, image, artifact, map_artifact)
+                self.pending[key] = (catalog, scene, image, artifact)
                 self.pending.move_to_end(key)
                 if self.worker is None:
                     self.worker = Thread(target=self._work, name="bokehforge-review-scores", daemon=True)
@@ -102,21 +94,19 @@ class Scores:
                     return
                 # Score the currently requested scene before older ones. Run
                 # one native comparison at a time to limit memory use.
-                key, (catalog, scene, image, artifact, map_artifact) = self.pending.popitem()
+                key, (catalog, scene, image, artifact) = self.pending.popitem()
                 self.active = key
             detail = key[2]
             try:
-                options = {} if self.inspection_maps is None else {"inspection_maps": self.inspection_maps}
-                result = score_saved_output(catalog, scene, image, details=detail, **options)
-                if output_identity(image) != artifact or (
-                    map_artifact and output_identity(map_path(self.inspection_maps, scene)) != map_artifact
-                ):
+                result = score_saved_output(catalog, scene, image, details=detail,
+                                            attention=self.inspection is not None, inspection=self.inspection)
+                if output_identity(image) != artifact:
                     result = {"profile": self.profile, "status": "stale", "score": None}
                 elif detail == "tiles":
                     result = self._spatial_result(result)
             except Exception as exc:
                 result = {"profile": self.profile, "status": "scoring_error", "score": None, "error": str(exc)}
-            if detail == "summary" and result["status"] in {"ok", "invalid_output"}:
+            if detail == "summary" and self.inspection is None and result["status"] in {"ok", "invalid_output"}:
                 self._save(key, result)
             with self.condition:
                 cache, limit = (self.recent, 128) if detail == "summary" else (self.spatial, 2)

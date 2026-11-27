@@ -77,7 +77,7 @@ def open_review(root, store):
     store.mkdir(exist_ok=True)
     config = root / "sources.json"
     config.write_text(json.dumps({"datasets": [{"id": "Demo"}]}))
-    app = Review(Namespace(root=root, store=store, dataset=None, config=config, lock=None,
+    app = Review(Namespace(root=root, store=store, dataset=None, config=config, lock=None, no_attention=True,
                            pancake=sys.executable, focus_stack=sys.executable,
                            openfocus=None, shine_python=None))
     with app.events.subscribe() as (reader, writer):
@@ -301,7 +301,7 @@ def test_review_downloads_missing_data_while_existing_scenes_remain_open(tmp_pat
              "files": [{"path": f"stack/{name}.tif", "url": url, "size": len(source),
                         "sha256": sha256(source).hexdigest()} for name in ("near", "far")]},
         ]}))
-        server.app = Review(Namespace(root=root, store=store, dataset=["Demo", "New"], config=config, lock=None,
+        server.app = Review(Namespace(root=root, store=store, dataset=["Demo", "New"], config=config, lock=None, no_attention=True,
                                       pancake=None, focus_stack=None, openfocus=None, shine_python=None))
         origin_thread = Thread(target=origin.serve_forever, daemon=True)
         review_thread = Thread(target=server.serve_forever, daemon=True)
@@ -490,7 +490,7 @@ def test_zerene_uses_a_local_batch_and_normalizes_the_output(tmp_path, monkeypat
     assert result["rating"]["grade"] == 4
 
 
-def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypatch):
+def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monkeypatch):
     root, store = tmp_path / "data", tmp_path / "review"
     raw = root / "raw/Demo"
     folder = raw / "a1_0"
@@ -515,10 +515,10 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
     calls = []
     score_saved = scores.score_saved_output
 
-    def delayed_score(catalog, scene, path, *, details):
+    def delayed_score(catalog, scene, path, *, details, **options):
         calls.append(details)
         assert gate.wait(5)
-        return score_saved(catalog, scene, path, details=details)
+        return score_saved(catalog, scene, path, details=details, **options)
 
     monkeypatch.setattr(runs, "_render", render)
     monkeypatch.setattr(scores, "score_saved_output", delayed_score)
@@ -550,7 +550,7 @@ def test_review_pushes_and_caches_the_default_benchmark_score(tmp_path, monkeypa
         path = app.artifact({"run": run, "scene": scene, "stacker": "pancake"}, "image")
         report = tmp_path / "benchmark"
         assert bench(["--root", str(root), "--config", str(root / "sources.json"), "--candidate-dir",
-                      str(path.parents[1]), "--output", str(report)]) == 0
+                      str(path.parents[1]), "--output", str(report), "--no-attention"]) == 0
         benchmark_row, = json.loads((report / "report.json").read_text())["scenes"]
         assert benchmark_row["scene_score"] == score
         assert benchmark_row["alignment"] == result["benchmark"]["alignment"]

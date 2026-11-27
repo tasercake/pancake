@@ -22,7 +22,7 @@ from .data._files import digest
 from .data._config import DEFAULT_CONFIG, data_root, read_config
 from .data.download import save_json
 from .data.lazy import SceneCatalog
-from .inspection import INSPECTION_MAP_VERSION, map_path, read_map, reference_key, reference_preview
+from .inspection import INSPECTION_MAP_VERSION, Inspection, default_inspection
 from .scoring import (
     FAMILY_WEIGHTS, INSPECTION_MAX_MULTIPLIER, INSPECTION_MIX, INSPECTION_SCORE_VERSION,
     SCORE_DAMAGE_SCALE, SCORE_DETAIL_LEVELS, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
@@ -176,7 +176,7 @@ def _load_candidate(path, row, *, fingerprint=False):
     return None
 
 
-def _score_delivery(result, reference, row, catalog, scene, *, details=None, inspection_maps=None):
+def _score_delivery(result, reference, row, *, details=None, inspection=None):
     try:
         validate_rgb(result)
     except ValueError as exc:
@@ -186,12 +186,10 @@ def _score_delivery(result, reference, row, catalog, scene, *, details=None, ins
     scoring_start = perf_counter()
     try:
         heatmap = None
-        if inspection_maps is not None:
-            key = reference_key(catalog, scene, reference_preview(reference))
-            heatmap, row["inspection_map_sha256"] = read_map(
-                map_path(inspection_maps, scene), reference, key
-            )
-        measurement = measure(result, reference, details=details, inspection_heatmap=heatmap)
+        if inspection is not None:
+            heatmap, row["inspection_map_sha256"] = inspection.generate(reference)
+        measurement = measure(result, reference, details=details, inspection_heatmap=heatmap,
+                              attention=inspection is not None)
         row.update(scene_score=measurement.score, alignment=measurement.alignment)
         if measurement.features:
             row.update(score_features=measurement.features, artifact_diagnostics=measurement.diagnostics)
@@ -203,19 +201,19 @@ def _score_delivery(result, reference, row, catalog, scene, *, details=None, ins
         row["scoring_seconds"] = perf_counter() - scoring_start
 
 
-def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = None, inspection_maps=None):
+def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = None, attention=True, inspection=None):
     """Compare a canonical TIFF with the scene's required RGB ground truth."""
     _validate_details(details)
     _require_benchmark_reference(scene)
+    inspection = (inspection or default_inspection) if attention else None
     row = {"status": "ok", "scene_score": None}
     explanation = None
     reference = _reference(catalog, scene, row)
     if reference is not None:
         result = _load_candidate(path, row)
         if result is not None:
-            explanation = _score_delivery(result, reference, row, catalog, scene, details=details,
-                                          inspection_maps=inspection_maps)
-    profile = SCORE_VERSION if inspection_maps is None else INSPECTION_SCORE_VERSION
+            explanation = _score_delivery(result, reference, row, details=details, inspection=inspection)
+    profile = SCORE_VERSION if inspection is None else INSPECTION_SCORE_VERSION
     response = {"profile": profile, "score": row["scene_score"], "status": row["status"]}
     for field in ("error", "alignment", "inspection_map_sha256"):
         if field in row:
@@ -245,7 +243,7 @@ def _save_explanation(output, scene, row, explanation):
         row["score_explanation_path"] = path.relative_to(output).as_posix()
 
 
-def _run_scene(catalog, scene, row, algorithm, args):
+def _run_scene(catalog, scene, row, algorithm, args, inspection):
     row.update(frames_read=0, scene_score=None, status="ok")
     reference = _reference(catalog, scene, row)
     if reference is None:
@@ -268,8 +266,8 @@ def _run_scene(catalog, scene, row, algorithm, args):
 
     if row["status"] != "ok":
         return
-    explanation = _score_delivery(result, reference, row, catalog, scene, details=args.explain_score,
-                                  inspection_maps=args.inspection_maps)
+    with redirect_stdout(sys.stderr):
+        explanation = _score_delivery(result, reference, row, details=args.explain_score, inspection=inspection)
     if row["status"] != "ok":
         return
     if args.save_images:
@@ -325,7 +323,7 @@ def main(argv=None):
     selection.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
     selection.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
     score_options = parser.add_argument_group("Scoring")
-    score_options.add_argument("--inspection-maps", type=Path, help="Reference maps made by bokehforge inspection")
+    score_options.add_argument("--no-attention", action="store_true", help="Disable inspection heatmaps and damage weighting")
     score_options.add_argument(
         "--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)",
     )
@@ -338,8 +336,6 @@ def main(argv=None):
     report_options.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     report_options.add_argument("--progress", action="store_true", help="Write progress to stderr")
     args = parser.parse_args(argv)
-    if args.inspection_maps is not None and not args.inspection_maps.is_dir():
-        raise ValueError(f"Inspection maps directory does not exist: {args.inspection_maps}")
     if args.output.exists():
         raise ValueError(f"Output directory already exists: {args.output}")
     root = args.root or data_root(args.config, read_config(args.config).get("defaults", {}))
@@ -363,6 +359,7 @@ def main(argv=None):
         algorithm, implementation = _load_algorithm(args.algorithm)
     rows = [_describe_scene(catalog, scene) for scene in scenes]
     cohort_hash = _hash(rows)
+    inspection = None if args.no_attention else Inspection()
     args.output.mkdir(parents=True)
     if args.progress:
         print(f"Benchmarking {len(scenes)} scenes from {root.resolve()}", file=sys.stderr, flush=True)
@@ -372,7 +369,7 @@ def main(argv=None):
         if args.progress and (dataset != last_dataset or index % 25 == 0):
             print(f"{index}/{len(scenes)} {scene.id} ({row['frame_count']} frames)", file=sys.stderr, flush=True)
         last_dataset = dataset
-        _run_scene(catalog, scene, row, algorithm, args)
+        _run_scene(catalog, scene, row, algorithm, args, inspection)
     aggregation = {} if args.explain_score is not None else None
     score, scored_groups = _score(rows, explanation=aggregation)
     statuses = Counter(row["status"] for row in rows)
@@ -384,7 +381,7 @@ def main(argv=None):
     scoring["alignment"] = {"schema_version": ALIGNMENT_VERSION, "max_rotation_degrees": MAX_ROTATION_DEGREES,
                             "coverage_penalty": "minimum of relative intersection area and contributing delivery samples"}
     profile = SCORE_VERSION
-    if args.inspection_maps is not None:
+    if inspection is not None:
         profile = INSPECTION_SCORE_VERSION
         scoring["inspection"] = {"map_version": INSPECTION_MAP_VERSION, "max_mix": INSPECTION_MIX,
                                  "max_multiplier": INSPECTION_MAX_MULTIPLIER}

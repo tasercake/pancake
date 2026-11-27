@@ -9,8 +9,8 @@ import pytest
 
 @pytest.mark.parametrize("arguments,expected", [
     (["--help"], ["bokehforge", "data", "bench", "review"]),
-    (["review", "--help"], ["bokehforge review", "--root", "--store", "--host"]),
-    (["bench", "--help"], ["bokehforge bench", "--algorithm", "--candidate-dir"]),
+    (["review", "--help"], ["bokehforge review", "--root", "--store", "--host", "--no-attention"]),
+    (["bench", "--help"], ["bokehforge bench", "--algorithm", "--candidate-dir", "--no-attention"]),
     (["data", "--help"], ["download"]),
     (["data", "download", "--help"], ["bokehforge data download", "--dataset"]),
 ])
@@ -44,7 +44,7 @@ def test_cli_groups_controls_by_task(arguments, heading, option):
 
 
 
-@pytest.mark.parametrize("arguments", [["unknown"], ["data", "unknown"], ["data", "process"]])
+@pytest.mark.parametrize("arguments", [["unknown"], ["inspection"], ["data", "unknown"], ["data", "process"]])
 def test_unknown_command_fails(arguments):
     result = subprocess.run([sys.executable, "-m", "bokehforge", *arguments], capture_output=True, text=True)
     assert result.returncode == 2

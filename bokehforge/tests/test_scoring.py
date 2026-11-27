@@ -20,7 +20,7 @@ def test_exact_match_preserves_grain_bokeh_and_headroom():
     random = np.random.default_rng(4)
     target = random.uniform(-0.03, 1.4, (112, 150, 3)).astype(np.float32)
     target[:55] = gaussian_filter(target[:55], (4, 4, 0))
-    measurement = measure(target.copy(), target)
+    measurement = measure(target.copy(), target, attention=False)
     assert scene_score(measurement) == 100
     assert set(measurement.features.values()) == {0}
     assert measurement.diagnostics["linear_rgb_rmse"] == 0
@@ -43,7 +43,7 @@ def test_color_and_exposure_both_penalize_uniform_fields():
     target = np.full((42, 67, 3), 0.3, dtype=np.float32)
     tone = target + np.float32(0.07)
     tint = np.array([0.04, -0.04 * (0.2126729 / 0.7151522), 0], dtype=np.float32)
-    baseline, tinted, both = [measure(delivery, target) for delivery in (tone, target + tint, tone + tint)]
+    baseline, tinted, both = [measure(delivery, target, attention=False) for delivery in (tone, target + tint, tone + tint)]
     assert tinted.features["native.color"] > 0
     assert both.features["native.color"] > baseline.features["native.color"]
     assert both.features["native.tone"] == pytest.approx(baseline.features["native.tone"], abs=2e-6)
@@ -73,7 +73,7 @@ def test_range_loss_does_not_hide_in_display_clipping():
     scores = [score(np.full_like(target, level), target) for level in (0.98, 1, 1.02, 4)]
     assert scores == sorted(scores, reverse=True)
     white = np.ones_like(target)
-    error = measure(white * 4, white)
+    error = measure(white * 4, white, attention=False)
     assert error.features["native.range"] > 0
     assert error.features["native.tone"] == 0
     extreme = np.finfo(np.float32).max
@@ -84,7 +84,7 @@ def test_native_coverage_finds_localized_defects_and_preserves_coordinates():
     target = np.full((151, 740, 3), 0.28, dtype=np.float32)
     candidate = target.copy()
     candidate[28:44, 196:208] = 0.62
-    measurement = measure(candidate, target)
+    measurement = measure(candidate, target, attention=False)
     views = measurement.diagnostics["views"]
     assert set(views) == {"native"}
     view, = views["native"]
@@ -109,9 +109,9 @@ def test_explanation_recomposes_score_from_real_tiles():
     target = np.full((113, 151, 3), 0.28, dtype=np.float32)
     candidate = target.copy()
     candidate[3:31, 131:151] = (0.61, 0.43, 0.30)
-    baseline = measure(candidate, target)
-    summary = measure(candidate, target, details="summary")
-    detailed = measure(candidate, target, details="tiles")
+    baseline = measure(candidate, target, attention=False)
+    summary = measure(candidate, target, details="summary", attention=False)
+    detailed = measure(candidate, target, details="tiles", attention=False)
     assert baseline.explanation is None
     assert summary.score == detailed.score == baseline.score
     assert summary.features == detailed.features == baseline.features
@@ -178,9 +178,23 @@ def test_inspection_weights_match_the_formula_and_bound_sparse_maps():
     sparse[0, 0] = 1
     weights, mix = _inspection_weights(sparse)
     assert mix < 0.5
-    assert weights.max() == 2
+    assert 1.9 < weights.max() < 2
     assert weights.mean() == pytest.approx(1)
     assert weights.min() >= 0.5
+
+
+def test_inspection_cap_has_a_smooth_shoulder():
+    def peak_weight(ratio):
+        background = (4 / ratio - 1) / 3
+        heatmap = np.array([1, background, background, background], np.float32)
+        return float(_inspection_weights(heatmap)[0].max())
+
+    step = 0.001
+    at_shoulder = peak_weight(2)
+    assert at_shoulder == pytest.approx(1.5)
+    assert (at_shoulder - peak_weight(2 - step)) / step == pytest.approx(.5, abs=.002)
+    assert (peak_weight(2 + step) - at_shoulder) / step == pytest.approx(.5, abs=.002)
+    assert at_shoulder < peak_weight(3) < peak_weight(4) < 2
 
 
 def test_inspection_weights_feed_the_score_and_its_tiles(monkeypatch):
@@ -202,7 +216,7 @@ def test_inspection_weights_feed_the_score_and_its_tiles(monkeypatch):
 def test_flat_inspection_maps_are_neutral_and_perfect_outputs_stay_perfect():
     target = np.full((16, 24, 3), .3, np.float32)
     candidate = target + .04
-    baseline = measure(candidate, target).score
+    baseline = measure(candidate, target, attention=False).score
     for level in (0, .3):
         heatmap = np.full(target.shape[:2], level, np.float32)
         result = measure(candidate, target, inspection_heatmap=heatmap, details="summary")

@@ -92,7 +92,7 @@ class Review:
         self.events = Events()
         self.runs = Runs(args.store, configured_stackers(args), self.publish_runs)
         self.ratings = Ratings(args.store)
-        self.scores = Scores(self.publish_scores, getattr(args, "inspection_maps", None))
+        self.scores = Scores(self.publish_scores, attention=not getattr(args, "no_attention", False))
         self.image_version = token_hex(8)
         self.previews = PreviewCache(args.store)
         self.decoded = DecodedFrames()
@@ -513,7 +513,7 @@ def main(argv=None):
     workspace.add_argument("--dataset", action="append", help="Limit to a dataset ID, repeatable")
     workspace.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
     workspace.add_argument("--lock", type=Path, help="Optional source snapshot")
-    workspace.add_argument("--inspection-maps", type=Path, help="Reference maps made by bokehforge inspection")
+    workspace.add_argument("--no-attention", action="store_true", help="Disable inspection heatmaps and damage weighting")
     connection = parser.add_argument_group("Connection")
     connection.add_argument("--host", default=ALL_INTERFACES,
                             help="IPv4 bind address (default: 0.0.0.0, all interfaces)")
@@ -528,10 +528,6 @@ def main(argv=None):
     args.config = args.config.resolve()
     if args.lock is not None:
         args.lock = args.lock.resolve()
-    if args.inspection_maps is not None:
-        args.inspection_maps = args.inspection_maps.resolve()
-        if not args.inspection_maps.is_dir():
-            raise ValueError(f"Inspection maps directory does not exist: {args.inspection_maps}")
     args.store = args.store.resolve()
     with lock_store(args.store), ReviewServer((args.host, args.port)) as server:
         server.app = Review(args)

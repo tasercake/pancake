@@ -9,7 +9,7 @@ from scipy import ndimage as ndi
 from .alignment import _xyxy, align, native_overlap, overlap, project
 
 SCORE_VERSION = "reference-fidelity-v3"
-INSPECTION_SCORE_VERSION = "reference-fidelity-v3-inspection-v1"
+INSPECTION_SCORE_VERSION = "reference-fidelity-v3-inspection-v2"
 INSPECTION_MIX = 0.5
 INSPECTION_MAX_MULTIPLIER = 2.0
 SCORE_DAMAGE_SCALE = 5
@@ -114,8 +114,15 @@ def _inspection_weights(heatmap):
     peak = float(heatmap.max())
     if peak == mean or not mean:
         return None, 0.0
-    # Reduce the mix for sparse maps, keeping the mean multiplier at one.
-    gain = INSPECTION_MIX / max(mean, INSPECTION_MIX * (peak - mean) / (INSPECTION_MAX_MULTIPLIER - 1))
+    # Ease toward the upper bound with matching slopes on either side of the shoulder.
+    headroom = INSPECTION_MAX_MULTIPLIER - 1
+    shoulder = headroom / 2
+    peak_boost = INSPECTION_MIX * (peak - mean) / mean
+    if peak_boost > shoulder:
+        excess = peak_boost - shoulder
+        remaining = headroom - shoulder
+        peak_boost = shoulder + remaining * excess / (remaining + excess)
+    gain = peak_boost / (peak - mean)
     weights = (1 + (heatmap.astype(np.float64) - mean) * gain).astype(np.float32)
     return weights, gain * mean
 
@@ -381,16 +388,23 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None, i
     return Measurement(features, {"views": {"native": [native]}, "linear_rgb_rmse": rmse}, explanation)
 
 
-def measure(candidate, target, *, details: ScoreDetails | None = None, inspection_heatmap=None):
+def measure(candidate, target, *, details: ScoreDetails | None = None, inspection_heatmap=None, attention=True):
     """Score one delivered RGB image against the reference at its native resolution.
 
     Alignment and per-placement score terms are always available in `.alignment`.
     Request `summary` for damage pooling components or `tiles` for local values.
-    An optional inspection heatmap contains finite values in [0, 1] on the reference grid.
+    Attention is generated from the reference unless disabled. A supplied heatmap
+    replaces generation and must contain finite values in [0, 1] on the reference grid.
     """
     _validate_details(details)
     validate_rgb(target)
     validate_rgb(candidate)
+    if not attention:
+        inspection_heatmap = None
+    elif inspection_heatmap is None:
+        from .inspection import default_inspection
+
+        inspection_heatmap, _ = default_inspection.generate(target)
     inspection = None if inspection_heatmap is None else (
         _inspection_weights(validate_heatmap(inspection_heatmap, target.shape[:2]))
     )
