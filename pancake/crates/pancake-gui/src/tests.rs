@@ -453,20 +453,20 @@ fn observe_zoom_limits(
         )
         .into());
     }
-    for _ in 0..3 {
+    for _ in 0..3_u8 {
         let _scrolled = scroll(-1.0)?;
     }
     if photo_width(&render(adapter)?)? != fit {
         return Err("Scrolling out must stop at fit-to-viewer.".into());
     }
 
-    for _ in 0..16 {
+    for _ in 0..16_u8 {
         press("+")?;
     }
     if photo_width(&render(adapter)?)? != 160 {
         return Err("Zooming in must stop at 400% of the 40 pixel image width.".into());
     }
-    for _ in 0..16 {
+    for _ in 0..16_u8 {
         press("-")?;
     }
     if photo_width(&render(adapter)?)? != fit {
