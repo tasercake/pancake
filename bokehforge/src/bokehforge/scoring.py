@@ -9,6 +9,9 @@ from scipy import ndimage as ndi
 from .alignment import _xyxy, align, native_overlap, overlap, project
 
 SCORE_VERSION = "reference-fidelity-v3"
+INSPECTION_SCORE_VERSION = "reference-fidelity-v3-inspection-v1"
+INSPECTION_MIX = 0.5
+INSPECTION_MAX_MULTIPLIER = 2.0
 SCORE_DAMAGE_SCALE = 5
 FAMILY_WEIGHTS = {
     "tone": 0.17, "color": 0.16, "lost_detail": 0.18,
@@ -104,6 +107,17 @@ def _supported_mean(values, support, axis=None):
         return values.mean(axis=axis, dtype=np.float64)
     valid = support[..., None] if values.ndim == 3 else support
     return values.mean(axis=axis, dtype=np.float64, where=valid)
+
+
+def _inspection_weights(heatmap):
+    mean = float(heatmap.mean(dtype=np.float64))
+    peak = float(heatmap.max())
+    if peak == mean or not mean:
+        return None, 0.0
+    # Reduce the mix for sparse maps, keeping the mean multiplier at one.
+    gain = INSPECTION_MIX / max(mean, INSPECTION_MIX * (peak - mean) / (INSPECTION_MAX_MULTIPLIER - 1))
+    weights = (1 + (heatmap.astype(np.float64) - mean) * gain).astype(np.float32)
+    return weights, gain * mean
 
 
 def _visibility(error, scale):
@@ -252,7 +266,7 @@ def _tile_grids(height, width, support, exact_box=None):
     return grids
 
 
-def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=None):
+def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=None, damage_max=1):
     """Compute the metric and optionally retain the evidence from those same tiles."""
     exact = damage is None
     mean = 0.0 if exact else float(_supported_mean(damage, support))
@@ -262,7 +276,7 @@ def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=N
     for grid in grids:
         # Even a short edge tile uses the full nominal area as its denominator.
         tiles = (np.zeros((grid.x.size - 1) * (grid.y.size - 1)) if exact else
-                 np.clip(grid.totals(integral) / grid.nominal_pixels, 0, 1).ravel())
+                 np.clip(grid.totals(integral) / grid.nominal_pixels, 0, damage_max).ravel())
         index = int(np.argmax(tiles))
         if tiles[index] > worst:
             worst = float(tiles[index])
@@ -311,7 +325,7 @@ def _pool(damage, support, grids, *, explain=False, tiles_by_grid=None, family=N
     return burden, summary, components
 
 
-def _measure(candidate, target, support=None, *, details=None, exact_box=None):
+def _measure(candidate, target, support=None, *, details=None, exact_box=None, inspection=None):
     height, width = target.shape[:2]
     if exact_box is None:
         maps, signed = _maps(candidate, target, support)
@@ -327,9 +341,13 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None):
     features = {}
     rows = {}
     families = {}
+    weights, mix = inspection or (None, 0.0)
+    damage_max = 1 if inspection is None else INSPECTION_MAX_MULTIPLIER
     for (name, weight), damage in zip(FAMILY_WEIGHTS.items(), maps, strict=True):
+        if damage is not None and weights is not None:
+            damage *= weights
         burden, summary, components = _pool(damage, support, grids, explain=details is not None,
-                                             tiles_by_grid=tile_data, family=name)
+                                             tiles_by_grid=tile_data, family=name, damage_max=damage_max)
         if region := summary["worst_box_view_xyxy"]:
             summary["worst_box_native_xyxy"] = region
         features[f"native.{name}"] = burden
@@ -351,25 +369,31 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None):
     explanation = None
     if details is not None:
         explanation = {
-            "reference_size_wh": [width, height], "damage_range": [0, 1], "affected_threshold": _AFFECTED_THRESHOLD,
+            "reference_size_wh": [width, height], "damage_range": [0, damage_max], "affected_threshold": _AFFECTED_THRESHOLD,
             "weighted_damage": _weighted_damage(features), "families": families,
             "measured_pixels": measured_pixels,
             "diagnostics": {**signed, "linear_rgb_rmse": rmse},
         }
+        if inspection is not None:
+            explanation["inspection_mix"] = mix
         if tile_data is not None:
             explanation["tile_grids"] = tile_data
     return Measurement(features, {"views": {"native": [native]}, "linear_rgb_rmse": rmse}, explanation)
 
 
-def measure(candidate, target, *, details: ScoreDetails | None = None):
+def measure(candidate, target, *, details: ScoreDetails | None = None, inspection_heatmap=None):
     """Score one delivered RGB image against the reference at its native resolution.
 
     Alignment and per-placement score terms are always available in `.alignment`.
     Request `summary` for damage pooling components or `tiles` for local values.
+    An optional inspection heatmap contains finite values in [0, 1] on the reference grid.
     """
     _validate_details(details)
     validate_rgb(target)
     validate_rgb(candidate)
+    inspection = None if inspection_heatmap is None else (
+        _inspection_weights(validate_heatmap(inspection_heatmap, target.shape[:2]))
+    )
     placements, alignment = align(candidate, target)
     rows, explanations = [], []
     leading = None
@@ -378,11 +402,13 @@ def measure(candidate, target, *, details: ScoreDetails | None = None):
         comparison = None
         if geometry > 0:
             if placement.evidence["source"] in {"exact_native_delivery_in_reference", "exact_reference_in_native_delivery"}:
-                comparison = _measure(None, target, details=details, exact_box=native_overlap(placement, target.shape))
+                comparison = _measure(None, target, details=details, exact_box=native_overlap(placement, target.shape),
+                                      inspection=inspection)
             else:
                 aligned, support = project(candidate, target.shape, placement)
                 if support is None or support.any():
-                    comparison = _measure(aligned, target, support, details=details)
+                    comparison = _measure(aligned, target, support, details=details,
+                                          inspection=inspection)
         quality = 0.0 if comparison is None else comparison.score
         coverage = min(geometry, resolution)
         weighted = placement.weight * coverage * quality
@@ -402,7 +428,8 @@ def measure(candidate, target, *, details: ScoreDetails | None = None):
     explanation = None
     if details is not None:
         explanation = {
-            "schema_version": SCORE_EXPLANATION_VERSION, "profile": SCORE_VERSION, "detail_level": details,
+            "schema_version": SCORE_EXPLANATION_VERSION,
+            "profile": SCORE_VERSION if inspection is None else INSPECTION_SCORE_VERSION, "detail_level": details,
             "score": score, "damage_scale": SCORE_DAMAGE_SCALE,
             "reference_size_wh": alignment["reference_size_wh"], "candidate_size_wh": alignment["candidate_size_wh"],
             "confidence": alignment["confidence"], "alignment_status": alignment["status"],
@@ -410,6 +437,13 @@ def measure(candidate, target, *, details: ScoreDetails | None = None):
         }
     return Measurement(leading.features if leading else {}, leading.diagnostics if leading else {},
                        explanation, alignment)
+
+
+def validate_heatmap(values, shape):
+    if (not isinstance(values, np.ndarray) or values.shape != shape or values.dtype.kind != "f"
+            or not np.isfinite(values).all() or values.min() < 0 or values.max() > 1):
+        raise ValueError(f"Expected a finite floating-point inspection map in [0, 1] with shape {shape}")
+    return values.astype(np.float32, copy=False)
 
 
 def _weighted_damage(features):

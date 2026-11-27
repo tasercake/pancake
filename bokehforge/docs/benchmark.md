@@ -52,6 +52,41 @@ The scorer requires two images, the stacker's delivery and the ground-truth refe
 
 `report.json` uses schema version 4 and records the family weights and the curve's `damage_scale` under `scoring`. It also contains the cohort fingerprint, runtime versions, eligibility and exit details, six `native.*` score features, and diagnostics. For each family it gives the affected fraction and the worst tile on the reference grid. Boxes use half-open `[left, top, right, bottom]` pixel coordinates. RGB RMSE and signed lightness, Lab chroma, and exposure offsets are diagnostic.
 
+## Inspection-weighted scoring
+
+Pass `--inspection-maps DIR` to `bokehforge bench` or `bokehforge review` to opt into `reference-fidelity-v3-inspection-v1`. The preparation command computes the raw Inspection blend from each clean all-in-focus reference and saves it once. Each map is bound to the reference asset, image page, and decoded preview pixels. The scorer uses that same map for every candidate and every placement. The report records the map SHA-256 for each scored scene. Compare weighted runs using the same cohort, score version, and map hashes.
+
+The raw map is the soft union of **ReLIQS**, **Texture & light**, **SAM 2.1 Hiera Large**, and **TempSAL overall**. Each model reads an sRGB preview with a long edge of at most 640 pixels. The scorer resizes the resulting map to the native reference grid before applying it. Texture & light measures local detail, lighting variation, and color contrast. SAM contributes a zero map when no region meets the mask size criteria, so the other three inputs can still contribute.
+
+For relevance `H` and each damage-family value `D`, the scorer uses `D × (1 + α × (H / mean(H) − 1))`. The mean is over the entire reference. At `α = 0.5` this is the average of ordinary and attention-weighted damage. Constant maps, including all-zero maps, give every pixel a multiplier of 1. A concentrated map can otherwise produce huge multipliers where its value is much higher than its mean. The scorer reduces `α` as needed to keep the largest multiplier at 2 while preserving a mean multiplier of 1. This keeps the floor at 0.5 or higher, so damage in quiet areas still counts. Weighted damage can range from 0 to 2 and feeds the same mean, tail, and worst-tile calculations. The overlap and coverage calculations still apply. The boost changes how severe an observed defect is scored depending on where it falls. A 50% mix does not imply a maximum 50% boost.
+
+### Prepare reference maps
+
+Use a separate Python 3.12 environment with CUDA-enabled PyTorch 2.6.0 and torchvision 0.21.0, Transformers 4.57.6, timm, pandas, ftfy, einops, and OpenCV, plus BokehForge installed from this checkout. Only preparing maps requires the model environment. The regular benchmark and Review environment can read the resulting files. Prepare the maps before grading the cohort and keep the directory fixed across compared runs.
+
+The local model directory has this layout. Obtain the upstream code and weights under the applicable terms. BokehForge does not bundle or transfer them. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS code and checkpoint](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
+
+```text
+inspection-models/
+  reliqs/                    ReLIQS source checkout
+  reliqs-weights-ready.pth   KonIQ/model_weights.pth
+  tempsal-code/              TempSAL src/ containing model.py and PNAS/
+  tempsal-ready.pt           PNAS checkpoint from the upstream inference notebook
+  sam2/                      Hugging Face snapshot with configuration and model.safetensors
+```
+
+The loader verifies the three checkpoint fingerprints. Use the same dataset and scene selection when preparing maps and grading. Missing, invalid, or stale maps for otherwise valid deliveries are evaluation errors.
+
+```sh
+/path/to/model-environment/bin/bokehforge inspection \
+  --dataset D29 --models /path/to/inspection-models --output artifacts/inspection-maps
+uv run --project bokehforge --frozen bokehforge bench \
+  --dataset D29 --candidate-dir artifacts/bench-mean/images \
+  --inspection-maps artifacts/inspection-maps --output artifacts/bench-inspection
+```
+
+In Python, pass a finite `[0, 1]` array on the native reference grid as `measure(candidate, target, inspection_heatmap=heatmap)`. For a saved TIFF, pass the prepared map directory to `score_saved_output(..., inspection_maps=Path(...))`.
+
 ## Alignment evidence
 
 The stacker supplies a single image. BokehForge first looks for a pixel-identical crop on the native grid. Otherwise it searches for a single translation, rotation and uniform scale. Coarse patch correlation proposes translations across the reference, and fine fitting compares local luma and two color-opponent signals. Fit and confirmation use alternating regions in a four-by-four delivery grid. A broader band can confirm the same scene when damage obscures fine detail. A native integer placement is preferred when the evidence is similar. Up to three distinct placements contribute to the score, and weak agreement reduces confidence smoothly toward a zero-score no-match.
@@ -77,10 +112,10 @@ Add `--explain-score summary` to save the damage pooling terms for each scene. U
 
 In Python, `measure(candidate, target)` returns an object with `.score` and `.alignment`. Pass `details="summary"` or `details="tiles"` to add the corresponding `.explanation`. For an existing canonical TIFF, use `score_saved_output(catalog, scene, path, details="summary")` from `bokehforge.bench`. This returns a dictionary with the same score and alignment, the delivery status, and the requested explanation. It raises `ValueError` if the scene lacks exactly one supported reference.
 
-- **Damage terms.** The `comparison` in each explained placement gives weighted damage and each family’s burden, weight and weighted damage. Its `pool` entries give the mean, worst-1% average, and worst tile with their values, weights and contributions. Damage and burden range from 0 to 1. A family with zero local damage has no worst box.
+- **Damage terms.** The `comparison` in each explained placement gives weighted damage and each family’s burden, weight and weighted damage. Its `pool` entries give the mean, worst-1% average, and worst tile with their values, weights and contributions. `damage_range` gives the valid range. The inspection profile also reports its effective `inspection_mix`. A family with zero local damage has no worst box.
 - **Tile layout.** The `tile_grids` object in a `tiles` explanation contains eight grids. Consecutive `x_edges` and `y_edges` define each tile. Values, counts, and selected tile indices follow row-major order. Each value is supported damage summed over a tile and divided by `nominal_pixels`. Tiles with zero support are excluded from the worst-1% selection. A null `covered_pixels` field means the entire actual area of each tile was measured.
 - **Overlay coordinates.** Boxes use zero-based, half-open `[left, top, right, bottom]` edge coordinates. The two-row `candidate_to_reference_xy` matrix maps the saved delivery’s `[x, y, 1]` pixel centers to reference pixel centers, with the upper-left center at `[0, 0]`. To draw a reference box on the delivery, subtract 0.5 from each edge coordinate, apply the inverse placement, add 0.5, then clip to `candidate_content_box_xyxy`. The overlap polygon uses the same reference coordinate system as the centers, so its pixel edges can start at −0.5. Use one grid at a time. A no-match delivery has a reason and no damage overlay.
 
 ## Comparing older runs
 
-The `--score-profile` CLI option and Python `profile` argument have been removed. Every benchmark, replay and Review score now uses the same scorer. Older JSON keeps its original `score_version` or `profile` label. Compare scores with matching scorer versions and cohort fingerprints. To compare an older saved delivery with a new run, replay the original TIFF into a new output directory. Review refreshes its derived score cache for the new version.
+Older JSON keeps its original `score_version` or `profile` label. Compare scores with matching scorer versions and cohort fingerprints. To compare an older saved delivery with a new run, replay the original TIFF into a new output directory. Review stores inspection-weighted results in a separate cache tied to the map file.
