@@ -232,7 +232,7 @@ jobs:
         env:
           EXACT: ${{ steps.build-cache.outputs.cache-hit }}
         run: |
-          args=()
+          args=(--llvm-data "$TRACEL_LLVM_DATA")
           if [[ "$EXACT" == true ]]; then
             args+=(--exact)
           else

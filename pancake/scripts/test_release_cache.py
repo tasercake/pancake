@@ -103,3 +103,19 @@ class ReleaseCacheTests(unittest.TestCase):
         with patch("release_cache.os.utime", portable_utime):
             restore_mtimes(self.root, exact=True)
         self.assertLess(vendor.stat().st_mtime, previous)
+
+    def test_reused_native_install_does_not_invalidate_cargo_build_script(self):
+        llvm = self.root / "runner" / "tracel"
+        marker = llvm / "tracel-llvm-23.1.0-4" / ".tracel-llvm-installed"
+        library = marker.parent / "lib" / "libLLVMCore.a"
+        marker.parent.mkdir(parents=True)
+        marker.touch()
+        library.parent.mkdir()
+        library.write_bytes(b"native fixture")
+        previous_marker = marker.stat().st_mtime
+        previous_library = library.stat().st_mtime
+
+        restore_mtimes(self.root, exact=True, llvm_data=llvm)
+
+        self.assertLess(marker.stat().st_mtime, previous_marker)
+        self.assertEqual(library.stat().st_mtime, previous_library)
