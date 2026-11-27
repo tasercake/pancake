@@ -511,12 +511,13 @@ def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monke
         tifffile.imwrite(delivery, np.full((6, 8, 3), 32000, dtype=np.uint16), photometric="rgb")
         return delivery
 
-    gate = Event()
+    started, gate = Event(), Event()
     calls = []
     score_saved = scores.score_saved_output
 
     def delayed_score(catalog, scene, path, *, details, **options):
         calls.append(details)
+        started.set()
         assert gate.wait(5)
         return score_saved(catalog, scene, path, details=details, **options)
 
@@ -527,24 +528,28 @@ def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monke
     try:
         scene = app.scenes[0]["id"]
         run = app.start({"scope": "scene", "scene": scene, "stackers": ["pancake"]})
+        assert started.wait(5)
+        active, = app.runs.list()
+        assert active["status"] == "running" and active["scoring"] == "pancake"
+        assert active["explain_score"]
+        gate.set()
         app.runs.worker.join(timeout=5)
         assert not app.runs.worker.is_alive()
-        with app.events.subscribe() as (reader, writer):
-            reader.settimeout(5)
-            result, = app.scene_details(scene, run)["outputs"]
-            assert result["status"] == "ready"
-            assert result["benchmark"]["status"] == "pending"
-            assert app.scene_details(scene, run)["outputs"][0]["benchmark"]["status"] == "pending"
-            gate.set()
-            while ("scores", 1) not in map(event_payload, app.events.take(reader, writer)):
-                pass
+        completed, = app.runs.list()
+        assert completed["status"] == "completed" and completed["diagnostics_failed"] == 0
 
         result, = app.scene_details(scene, run)["outputs"]
+        assert result["status"] == "ready"
+        assert result["benchmark"]["status"] == "ok"
+        assert "recorded_benchmark" not in result
+        saved_explanation = json.loads((app.runs.directory(run) / result["score_explanation_path"]).read_text())
+        assert len(saved_explanation["placements"][0]["comparison"]["tile_grids"]) == 8
+        assert saved_explanation["detail_level"] == "full"
         score = result["benchmark"]["score"]
         assert 0 < score < 100
         assert result["benchmark"]["profile"] == SCORE_VERSION
         assert result["artifact_revision"] == result["benchmark"]["artifact_revision"]
-        assert calls == ["summary"]
+        assert calls == ["full"]
         comparison = result["benchmark"]["explanation"]["placements"][0]["comparison"]
         assert len(comparison["families"]) == 6 and "tile_grids" not in comparison
         path = app.artifact({"run": run, "scene": scene, "stacker": "pancake"}, "image")
@@ -573,7 +578,7 @@ def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monke
         assert "grids" not in tiles and "explanation" not in tiles
         other = reopened.score_tiles({**query, "family": "color", "side": "32"})
         assert other["family"] == "color" and other["grid"]["tile_size"] == 32
-        assert calls == ["summary", "tiles"]
+        assert calls == ["full"]
 
         crop = path.with_suffix(".replacement.tif")
         tifffile.imwrite(crop, tifffile.imread(path)[:, :-1], photometric="rgb")
@@ -590,7 +595,7 @@ def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monke
         assert cropped["benchmark"]["status"] == "ok"
         assert 0 < cropped["benchmark"]["score"] < score
         assert cropped["benchmark"]["alignment"]["placements"][0]["coverage"] == 7 / 8
-        assert calls == ["summary", "tiles", "summary"]
+        assert calls == ["full", "summary"]
 
         reopened.scores.close()
         receipt = path.parents[2] / "scores" / f"{scene}.json"
@@ -605,7 +610,7 @@ def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monke
             while ("scores", 1) not in map(event_payload, reopened.events.take(reader, writer)):
                 pass
         assert reopened.scene_details(scene, run)["outputs"][0]["benchmark"] == cropped["benchmark"]
-        assert calls == ["summary", "tiles", "summary", "summary"]
+        assert calls == ["full", "summary", "summary"]
     finally:
         gate.set()
         app.scores.close()
