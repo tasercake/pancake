@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BokehForge image interest</title>
+<style>
+:root { color-scheme:dark; color:#f2f2f2; background:#191919; font:14px system-ui,sans-serif }
+* { box-sizing:border-box }
+body { margin:0 }
+header { position:sticky; top:0; z-index:1; background:#232323; border-bottom:1px solid #565656 }
+.toolbar,.context { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:10px 14px }
+.toolbar { border-bottom:1px solid #565656 }
+h1 { font-size:15px; margin:0 4px 0 0; font-weight:650 }
+nav,label,.scale { display:flex; align-items:center; gap:6px; min-width:0 }
+label span,.context,small { color:#c2c2c2 }
+button,select { color:inherit; font:inherit; background:#343434; border:1px solid #7f7f7f; border-radius:4px; min-height:32px; padding:4px 8px }
+select { max-width:100%; min-width:0 }
+button:disabled,select:disabled { color:#a0a0a0 }
+:focus-visible { outline:2px solid white; outline-offset:2px }
+.context { justify-content:space-between; min-height:38px; padding-block:6px }
+.scale i { display:block; width:112px; height:8px; background:linear-gradient(90deg,#0f1427,#22306e 18%,#245c96 40%,#3995b2 58%,#5acdb4 78%,#fcea79) }
+main { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 310px),1fr)); gap:1px; margin:1px; background:#565656 }
+main[data-count="2"] { grid-template-columns:repeat(2,minmax(0,1fr)) }
+main[data-count="3"] { grid-template-columns:repeat(3,minmax(0,1fr)) }
+figure { margin:0; min-width:0; background:#191919 }
+figcaption { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; padding:8px 10px; background:#2b2b2b; min-height:36px }
+strong { font-weight:620 }
+figure a { display:block }
+figure img { display:block; width:100%; height:auto; aspect-ratio:attr(width type(<number>)) / attr(height type(<number>)) }
+@media (max-width:680px) {
+  main[data-count="2"],main[data-count="3"] { grid-template-columns:minmax(0,1fr) }
+  h1 { width:100% }
+  .toolbar,.context { padding-inline:9px }
+  label { max-width:100% }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="toolbar">
+    <h1>BokehForge image interest</h1>
+    <nav aria-label="Photo navigation">
+      <button id="prev" type="button" aria-label="Previous photo">←</button>
+      <button id="next" type="button" aria-label="Next photo">→</button>
+    </nav>
+    <label><span>Photo</span><select id="scene"></select></label>
+    <label><span>Heatmaps</span><select id="mode"><option value="raw">Raw</option><option value="processed">Dilated + levels · 50%</option></select></label>
+    <label><span>Model</span><select id="model"></select></label>
+    <label><span>Compare with</span><select id="compare"></select></label>
+  </div>
+  <div class="context"><span id="status" aria-live="polite"></span><span class="scale" aria-label="Heatmap colors from low to high relevance">Low <i></i> High</span></div>
+</header>
+<main id="panels"></main>
+<script>
+function showGallery({scenes, models}) {
+    const field = id => document.getElementById(id);
+    const [scene, mode, model, compare, panels, status, prev, next] =
+        ['scene', 'mode', 'model', 'compare', 'panels', 'status', 'prev', 'next'].map(field);
+    for (const group of [...new Set(scenes.map(photo => photo.group))]) {
+        const options = document.createElement('optgroup');
+        options.label = group;
+        for (const photo of scenes.filter(photo => photo.group === group)) {
+            options.append(new Option(photo.title, photo.id));
+        }
+        scene.append(options);
+    }
+
+    let primary = 'all';
+    let secondary = '';
+
+    function panel(photo, key, lazy) {
+        const [title, description] = key ? models[key] : ['Reference photo', photo.group];
+        const href = key ? photo.maps[key][mode.value] : photo.photo;
+        const url = new URL(href, location.origin + '/');
+        if (url.origin !== location.origin || !/^\/interest-v1\/[\w-]+\.png$/.test(url.pathname)) {
+            throw new Error('Unexpected gallery image path');
+        }
+        const figure = document.createElement('figure');
+        const caption = document.createElement('figcaption');
+        const label = document.createElement('strong');
+        label.textContent = title;
+        const detail = document.createElement('small');
+        detail.textContent = description;
+        caption.append(label, detail);
+        const link = document.createElement('a');
+        link.href = url.href;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.setAttribute('aria-label', 'Open full-size ' + title);
+        const image = document.createElement('img');
+        image.width = photo.width;
+        image.height = photo.height;
+        image.loading = lazy ? 'lazy' : 'eager';
+        image.alt = key ? title + ' heatmap for ' + photo.title : photo.title;
+        image.src = url.href;
+        link.append(image);
+        figure.append(caption, link);
+        return figure;
+    }
+
+    function render() {
+        const photo = scenes[scene.selectedIndex];
+        const keys = Object.keys(models);
+        const available = keys.filter(key => Object.hasOwn(photo.maps, key));
+        const missing = keys.filter(key => !Object.hasOwn(photo.maps, key)).map(key => models[key][0]);
+        model.replaceChildren(new Option('All models', 'all'), ...available.map(key => new Option(models[key][0], key)));
+        model.value = available.includes(primary) ? primary : 'all';
+        const alternatives = available.filter(key => key !== model.value);
+        compare.replaceChildren(new Option('None', ''), ...alternatives.map(key => new Option(models[key][0], key)));
+        compare.disabled = model.value === 'all';
+        compare.value = !compare.disabled && alternatives.includes(secondary) ? secondary : '';
+        const selection = model.value === 'all' ? available : [model.value, compare.value].filter(Boolean);
+        panels.dataset.count = selection.length + 1;
+        panels.replaceChildren(panel(photo, '', false), ...selection.map((key, i) => panel(photo, key, i > 1)));
+        status.textContent = photo.title + '  ·  ' + (scene.selectedIndex + 1) + ' / ' + scenes.length;
+        if (missing.length) status.textContent += '  ·  No heatmap from ' + missing.join(', ');
+        prev.disabled = scene.selectedIndex === 0;
+        next.disabled = scene.selectedIndex === scenes.length - 1;
+        history.replaceState(null, '', '#' + new URLSearchParams({photo:photo.id, view:mode.value,
+                             model:model.value, compare:compare.value}));
+    }
+
+    function restore() {
+        const hash = location.hash.slice(1);
+        const state = new URLSearchParams(hash);
+        const identifier = state.get('photo');
+        scene.value = scenes.some(photo => photo.id === identifier) ? identifier : scenes[0].id;
+        primary = state.get('model') || (hash.includes('/') ? hash.split('/')[1] : 'all');
+        secondary = state.get('compare') || '';
+        mode.value = state.get('view') === 'processed' ? 'processed' : 'raw';
+        render();
+    }
+    function move(delta) {
+        const index = scene.selectedIndex + delta;
+        if (index < 0 || index >= scenes.length) return;
+        scene.selectedIndex = index;
+        render();
+    }
+    prev.addEventListener('click', () => move(-1));
+    next.addEventListener('click', () => move(1));
+    scene.addEventListener('change', render);
+    mode.addEventListener('change', render);
+    model.addEventListener('change', () => { primary = model.value; render(); });
+    compare.addEventListener('change', () => { secondary = compare.value; render(); });
+    window.addEventListener('hashchange', restore);
+    window.addEventListener('keydown', event => {
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.target.closest('select,button,a')) return;
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            move(event.key === 'ArrowLeft' ? -1 : 1);
+        }
+    });
+    restore();
+}
+
+async function loadGallery() {
+    try {
+        const response = await fetch('/gallery.json');
+        if (!response.ok) throw new Error('Gallery request failed');
+        showGallery(await response.json());
+    } catch (error) {
+        document.getElementById('status').textContent = 'Could not load the heatmap gallery.';
+        console.error(error);
+    }
+}
+loadGallery();
+</script>
+</body>
+</html>

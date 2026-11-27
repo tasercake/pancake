@@ -33,6 +33,16 @@ bokehforge/.venv/bin/bokehforge review
 
 See the [Stackroom guide](docs/review.md) for dataset selection, stacker setup, and rating export.
 
+## Compare image-interest heatmaps
+
+Open a rendered image-interest gallery in your browser. Select a photo to see its reference and compare models in raw or processed mode.
+
+```sh
+uv run --frozen bokehforge heatmaps /path/to/gallery
+```
+
+Point the command at the directory containing the generated `interest-data.js` manifest and the PNGs in `interest-v1/`. Open the printed URL, normally `http://127.0.0.1:8765/`. Use `--port` to choose a different port. Press Ctrl+C to stop the server.
+
 ## Use from Python
 
 Install BokehForge in your Python 3.12 environment from this project directory or a wheel. For example, run `python -m pip install /path/to/focus-stacking/bokehforge`. The package includes the source configuration and file hashes. `load_dataset` downloads missing originals with live progress and decodes scenes as you iterate.
