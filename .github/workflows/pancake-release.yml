@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: pancake-packages
+  group: pancake-packages-${{ inputs.mode == 'build-only' && github.ref || 'publish' }}
   cancel-in-progress: false
 
 defaults:
@@ -104,7 +104,6 @@ jobs:
           mkdir -p "$output"
           python3 -B scripts/release_plan.py prepare "$plan" "$GH_REPO" > "$plan/prepared.txt"
           version=$(python3 -B scripts/release_support.py version)
-          cargo metadata --locked --format-version 1 > /dev/null
           git add -- Cargo.toml Cargo.lock assurance-platforms.json \
             crates/pancake-cli/Cargo.toml crates/pancake-gui/Cargo.toml
           timestamp=$(git show -s --format=%cI "$GITHUB_SHA")
@@ -173,27 +172,48 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
+      - name: Install Ubuntu packaging and native build dependencies
+        if: runner.os == 'Linux'
+        run: bash scripts/ci-linux-native-deps.sh dpkg-dev binutils
+
       - name: Prepare the platform toolchain
         id: toolchain
         run: |
-          cargo --version
           target="$RUNNER_TEMP/pancake-target"
           dist="$RUNNER_TEMP/pancake-dist"
           mkdir -p "$dist"
           case "$RUNNER_OS" in
-            Linux) llvm_data="${XDG_DATA_HOME:-$HOME/.local/share}/tracel" ;;
-            macOS) llvm_data="$HOME/Library/Application Support/tracel" ;;
-            Windows) llvm_data="$(cygpath -m "$LOCALAPPDATA")/tracel" ;;
+            Linux)
+              llvm_data="${XDG_DATA_HOME:-$HOME/.local/share}/tracel"
+              native_tools=$(cc --version && ld --version && dpkg-query -W \
+                libc6 libc6-dev libssl-dev libgtk-3-dev libfontconfig1-dev libxkbcommon-dev \
+                libxcb-shape0-dev libxcb-xfixes0-dev)
+              ;;
+            macOS)
+              llvm_data="$HOME/Library/Application Support/tracel"
+              native_tools=$(xcode-select --print-path && xcodebuild -version -sdk macosx &&
+                xcrun clang --version && sw_vers)
+              ;;
+            Windows)
+              llvm_data="$(cygpath -m "$LOCALAPPDATA")/tracel"
+              native_tools="${ImageVersion:?}"
+              ;;
           esac
           printf 'CARGO_TARGET_DIR=%s\nDIST=%s\nTRACEL_LLVM_DATA=%s\n' \
             "$target" "$dist" "$llvm_data" >> "$GITHUB_ENV"
           # Cargo build scripts can record absolute native paths and use the runner's SDK.
-          identity=$(printf '%s\n' "${ImageOS:?}" "${ImageVersion:?}" "$GITHUB_WORKSPACE" \
-            "$target" "$llvm_data" | git hash-object --stdin)
+          rustc_info=$(rustc -vV)
+          identity=$(printf '%s\n' "${ImageOS:?}" "$GITHUB_WORKSPACE" "$target" "$llvm_data" \
+            "${CARGO_HOME:-$HOME/.cargo}" "$rustc_info" "$native_tools" \
+            "${SDKROOT:-}" "${MACOSX_DEPLOYMENT_TARGET:-}" | git hash-object --stdin)
           printf 'identity=%s\n' "$identity" >> "$GITHUB_OUTPUT"
 
-      - name: Restore compiled release dependencies
-        id: dependencies
+      - name: Identify the dependency graph and candidate build inputs
+        id: build-inputs
+        run: python -B scripts/release_cache.py keys "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Restore compiled release outputs
+        id: build-cache
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
@@ -201,32 +221,30 @@ jobs:
             ~/.cargo/registry
             ~/.cache/tracel
             ${{ env.TRACEL_LLVM_DATA }}
-          # Linux provenance expects a single CubeCL build variant. Restore only exact matches.
-          key: >-
-            pancake-release-${{ matrix.target }}-${{ steps.toolchain.outputs.identity }}-${{
-              hashFiles('pancake/Cargo.lock', 'pancake/Cargo.toml', 'pancake/crates/*/Cargo.toml',
-                        'pancake/.cargo/config.toml', 'pancake/rust-toolchain.toml', 'pancake/vendor/**',
-                        'pancake/notices/llvm/manifest.json', 'pancake/scripts/ci-linux-native-deps.sh',
-                        'pancake/scripts/package_macos.py', 'pancake/scripts/macos-release-linker.sh',
-                        '.github/workflows/pancake-release.yml')
-            }}
+            ${{ runner.temp }}/pancake-zstd
+          # Bump v2 when changing the release build configuration in this workflow.
+          key: pancake-release-v2-${{ matrix.target }}-${{ steps.toolchain.outputs.identity }}-${{ steps.build-inputs.outputs.graph }}-${{ steps.build-inputs.outputs.inputs }}
+          # The same graph preserves a single CubeCL build variant for Linux provenance.
+          restore-keys: pancake-release-v2-${{ matrix.target }}-${{ steps.toolchain.outputs.identity }}-${{ steps.build-inputs.outputs.graph }}-
 
-      - name: Reuse unchanged vendored dependencies
-        if: steps.dependencies.outputs.cache-hit == 'true'
-        # Cargo checks path dependencies by mtime. The exact key includes their content.
-        run: find vendor -type f -exec touch -t 200001010000 {} +
+      - name: Reuse unchanged Cargo inputs
+        if: steps.build-cache.outputs.cache-matched-key != ''
+        env:
+          EXACT: ${{ steps.build-cache.outputs.cache-hit }}
+        run: |
+          args=()
+          if [[ "$EXACT" == true ]]; then args+=(--exact); fi
+          python -B scripts/release_cache.py restore-mtimes "${args[@]}"
 
       - name: Fetch the locked package graph
-        if: steps.dependencies.outputs.cache-hit != 'true'
+        if: steps.build-cache.outputs.cache-matched-key == ''
         # Notice collection resolves the locked graph offline.
         run: cargo fetch --locked --target "$RUST_TARGET"
 
       - name: Build and verify the Ubuntu Debian package
         if: runner.os == 'Linux'
         run: |
-          bash scripts/ci-linux-native-deps.sh
-          sudo apt-get install --yes --no-install-recommends dpkg-dev binutils
-          cargo build --locked --release --workspace --bins
+          time -p cargo build --locked --release --workspace --bins
           release="$CARGO_TARGET_DIR/release"
           llvm_build="$release/build/cubecl-llvm"
           shopt -s nullglob
@@ -259,12 +277,17 @@ jobs:
           tarball="zstd-$version.tar.gz"
           source_url="https://github.com/meta/zstd/releases/download/v$version/$tarball"
           digest=eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3
-          curl --fail --silent --show-error --location "$source_url" --output "$RUNNER_TEMP/$tarball"
-          printf '%s  %s\n' "$digest" "$RUNNER_TEMP/$tarball" | shasum -a 256 --check
-          tar -xzf "$RUNNER_TEMP/$tarball" -C "$RUNNER_TEMP"
-          zstd="$RUNNER_TEMP/zstd-$version"
-          make -C "$zstd/lib" -j "$CARGO_BUILD_JOBS" libzstd.a
-          printf 'PANCAKE_ZSTD_ARCHIVE=%s/lib/libzstd.a\nPANCAKE_ZSTD_SOURCE=%s\n' "$zstd" "$zstd" >> "$GITHUB_ENV"
+          native="$RUNNER_TEMP/pancake-zstd"
+          if [[ ! -s "$native/libzstd.a" || ! -s "$native/LICENSE" ]]; then
+            curl --fail --silent --show-error --location "$source_url" --output "$RUNNER_TEMP/$tarball"
+            printf '%s  %s\n' "$digest" "$RUNNER_TEMP/$tarball" | shasum -a 256 --check
+            tar -xzf "$RUNNER_TEMP/$tarball" -C "$RUNNER_TEMP"
+            zstd="$RUNNER_TEMP/zstd-$version"
+            make -C "$zstd/lib" -j "$CARGO_BUILD_JOBS" libzstd.a
+            mkdir -p "$native"
+            cp "$zstd/lib/libzstd.a" "$zstd/LICENSE" "$native/"
+          fi
+          printf 'PANCAKE_ZSTD_ARCHIVE=%s/libzstd.a\n' "$native" >> "$GITHUB_ENV"
           printf 'CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=%s/scripts/macos-release-linker.sh\n' "$PWD" >> "$GITHUB_ENV"
           printf 'Source: %s\nSource SHA-256: %s\n' "$source_url" "$digest" > "$RUNNER_TEMP/zstd-source.txt"
 
@@ -275,8 +298,8 @@ jobs:
           notices="$RUNNER_TEMP/pancake-macos-notices"
           python -B scripts/release_support.py notices "$notices" "$RUST_TARGET" --features cubecl/metal-native
           mkdir "$notices/native-zstd"
-          cp "$PANCAKE_ZSTD_SOURCE/LICENSE" "$RUNNER_TEMP/zstd-source.txt" "$notices/native-zstd/"
-          python -B scripts/package_macos.py --output "$payload" \
+          cp "$RUNNER_TEMP/pancake-zstd/LICENSE" "$RUNNER_TEMP/zstd-source.txt" "$notices/native-zstd/"
+          time -p python -B scripts/package_macos.py --output "$payload" \
             --target-dir "$CARGO_TARGET_DIR" --release-notices "$notices" \
             --bundle-identifier com.github.tasercake.pancake --build-number "$GITHUB_RUN_NUMBER"
           mv "$payload/build.log" "$DIST/pancake-macos-arm64-build.log"
@@ -322,7 +345,7 @@ jobs:
       - name: Build and verify the Windows executables
         if: runner.os == 'Windows'
         run: |
-          cargo build --locked --release --workspace --bins --target "$RUST_TARGET"
+          time -p cargo build --locked --release --workspace --bins --target "$RUST_TARGET"
           payload="$RUNNER_TEMP/windows"
           python -B scripts/release_support.py notices "$payload" "$RUST_TARGET"
           python -B scripts/release_support.py windows-assets \
@@ -353,14 +376,8 @@ jobs:
           if-no-files-found: error
           compression-level: 0
 
-      - name: Remove workspace outputs before caching
-        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && steps.dependencies.outputs.cache-hit != 'true'
-        run: |
-          target=()
-          if [[ "$RUNNER_OS" != Linux ]]; then target=(--target "$RUST_TARGET"); fi
-          cargo clean --locked --release "${target[@]}" --workspace
-      - name: Save compiled release dependencies
-        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && steps.dependencies.outputs.cache-hit != 'true'
+      - name: Save compiled release outputs
+        if: steps.build-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
@@ -368,7 +385,8 @@ jobs:
             ~/.cargo/registry
             ~/.cache/tracel
             ${{ env.TRACEL_LLVM_DATA }}
-          key: ${{ steps.dependencies.outputs.cache-primary-key }}
+            ${{ runner.temp }}/pancake-zstd
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}
 
   publish:
     name: Publish to GitHub Releases

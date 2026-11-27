@@ -136,8 +136,8 @@ class ReleasePlanTests(unittest.TestCase):
                     self.assertIn('version = "=0.2.0-rc.1"', path.read_text())
 
     def test_release_source_preserves_reviewed_dependency_resolution(self):
-        for extra_lock_edit in ("", '\nchecksum = "unexpected"\n'):
-            with self.subTest(extra_lock_edit=extra_lock_edit), tempfile.TemporaryDirectory() as temporary:
+        for workspace_lock_version in ("0.1.0", "0.1.1"):
+            with self.subTest(workspace_lock_version=workspace_lock_version), tempfile.TemporaryDirectory() as temporary:
                 source = Path(temporary)
                 manifest = source / "Cargo.toml"
                 scripts = source / "scripts"
@@ -152,7 +152,7 @@ class ReleasePlanTests(unittest.TestCase):
                     file.write_text(content)
                 lock = source / "Cargo.lock"
                 old_lock = 'version = 4\n' + "".join(
-                    f'\n[[package]]\nname = "{name}"\nversion = "0.1.0"\n'
+                    f'\n[[package]]\nname = "{name}"\nversion = "{workspace_lock_version}"\n'
                     for name in ("pancake", "pancake-cli", "pancake-gui")
                 ) + '\n[[package]]\nname = "external"\nversion = "0.1.0"\n'
                 lock.write_text(old_lock)
@@ -165,18 +165,17 @@ class ReleasePlanTests(unittest.TestCase):
                 }
                 receipt.write_text(json.dumps(old_receipt))
 
-                def cargo_update(*args, **kwargs):
-                    lock.write_text(old_lock.replace('"0.1.0"', '"0.2.0-rc.1"', 3) + extra_lock_edit)
-
-                with patch("release_plan.subprocess.run", side_effect=cargo_update):
-                    if extra_lock_edit:
-                        with self.assertRaisesRegex(ValueError, "dependency resolution"):
+                with patch("release_plan.subprocess.run", side_effect=AssertionError("Cargo must run in the build jobs")):
+                    if workspace_lock_version != "0.1.0":
+                        with self.assertRaisesRegex(ValueError, "Missing reviewed workspace package"):
                             prepare_source(source, "0.2.0-rc.1")
+                        self.assertEqual(lock.read_text(), old_lock)
                         self.assertEqual(json.loads(receipt.read_text()), old_receipt)
+                        self.assertIn('version = "0.1.0"\n', manifest.read_text())
                     else:
                         prepare_source(source, "0.2.0-rc.1")
                         validate(source)
-                        self.assertIn('name = "external"\nversion = "0.1.0"', lock.read_text())
+                        self.assertIn('name = "external"\nversion = "0.1.0"\n', lock.read_text())
                         self.assertIn('version = "0.2.0-rc.1"', manifest.read_text())
 
 

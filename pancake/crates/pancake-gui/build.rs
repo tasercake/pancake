@@ -42,7 +42,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(|directory| directory.join("rc.exe"))
         .find(|file| file.is_file())
         .ok_or(io::Error::other("Could not find rc.exe in the Windows SDK"))?;
-    fs::copy("windows.rc", out.join("windows.rc"))?;
+    fs::write(out.join("windows.rc"), include_bytes!("windows.rc"))?;
     let resource = out.join("pancake.res");
     let version = format!(
         "{},{},{},0",

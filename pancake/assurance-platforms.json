@@ -11,7 +11,7 @@
     "crates/pancake-cli/src/main.rs": "75a13c6d3acb491c94304502c58dcf88e8aa9fc7da38dfa35fa01700a0b0ec8c",
     "crates/pancake-cli/src/tests.rs": "706708dfe172328478ade337b387aa6e271a23f38a4955913cc972afb601deab",
     "crates/pancake-gui/Cargo.toml": "aabd7f2e241b5905aa202f9f40ff785dd8b049a29cfbe3afd638076c0bfa01b6",
-    "crates/pancake-gui/build.rs": "6aec025c67ac92dbe955b144616cb4f4654b4d14ab0bde34b564b99b962376c9",
+    "crates/pancake-gui/build.rs": "5137f06fc73aaebdcba3f2b04253a7a13d46f2532261a45e582a2a9c6ff77bd8",
     "crates/pancake-gui/src/branding.rs": "8b5072454120c36e3600515182b1f26a4b5d0f768181a4cf3468005b17d98a65",
     "crates/pancake-gui/src/delivery/mod.rs": "a2b9fbab29214a230cd0ef5081ac1020320a382387932b1c1eff2283f209061a",
     "crates/pancake-gui/src/delivery/tests.rs": "8628bc32ca0d34ee6430a463b1c1edb633448f03b15fab8849768bc425b71684",
