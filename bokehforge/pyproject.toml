@@ -44,6 +44,7 @@ where = ["src"]
 namespaces = false
 
 [tool.setuptools.package-data]
+bokehforge = ["heatmaps.html"]
 "bokehforge.data" = ["sources.json"]
 "bokehforge.review" = ["static/*", "static/fonts/*"]
 
