@@ -10,10 +10,10 @@ import pytest
 import tifffile
 from PIL import Image
 
-from bokehforge.bench import _score, score_saved_output
+from bokehforge.bench import _score, main, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
 from bokehforge.data.lazy import Scene, SceneCatalog
-from bokehforge.inspection import INSPECTION_MAP_VERSION, reference_key, reference_preview, write_map
+from bokehforge.inspection import INSPECTION_MAP_VERSION, Inspection, reference_preview
 from bokehforge.review.scores import Scores
 from bokehforge.scoring import (
     FAMILY_WEIGHTS, FEATURES, INSPECTION_SCORE_VERSION, SCORE_DAMAGE_SCALE, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
@@ -57,7 +57,7 @@ def corpus(tmp_path):
 def run_bench(root, output, *args, env=None):
     return subprocess.run(
         [sys.executable, "-m", "bokehforge", "bench", "--root", str(root), "--config", str(root / "sources.json"),
-         "--output", str(output), *args],
+         "--output", str(output), "--no-attention", *args],
         capture_output=True, text=True, env=env,
     )
 
@@ -108,8 +108,8 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert len(placement["comparison"]["tile_grids"]) == 8
     catalog = SceneCatalog(corpus, config=corpus / "sources.json")
     scene = catalog.scene(target["scene_id"])
-    assert score_saved_output(catalog, scene, output / target["image"], details="tiles")["explanation"] == explanation
-    assert "explanation" not in score_saved_output(catalog, scene, output / target["image"])
+    assert score_saved_output(catalog, scene, output / target["image"], details="tiles", attention=False)["explanation"] == explanation
+    assert "explanation" not in score_saved_output(catalog, scene, output / target["image"], attention=False)
 
     missing = tmp_path / "empty"
     missing.mkdir()
@@ -123,64 +123,78 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert "already exists" in existing.stderr
 
 
-def test_inspection_scores_a_saved_delivery_with_a_reference_bound_map(corpus, tmp_path):
+def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monkeypatch, capsys):
     catalog = SceneCatalog(corpus, config=corpus / "sources.json", datasets=["referenced"])
     scene = catalog.scene(catalog.scene_ids[0])
     reference = catalog.decode(scene.reference_ids[0]).data
     heatmap = np.repeat(np.array([[.25, .25, .75, .75]], dtype=np.float32), reference.shape[0], axis=0)
     candidates = tmp_path / "candidates"
-    candidates.mkdir()
     path = candidates / (scene.id + ".tif")
     path.parent.mkdir(parents=True)
     candidate = reference.copy()
     candidate[:, 2:] += .07
     tifffile.imwrite(path, candidate, photometric="rgb")
-    maps = tmp_path / "maps"
-    maps.mkdir()
-    heatmap_path = maps / (scene.id + ".npz")
-    write_map(heatmap_path, reference_key(catalog, scene, reference_preview(reference)), reference.shape[:2], heatmap)
+    seen = []
 
+    def predict(preview):
+        seen.append(np.asarray(preview).copy())
+        return heatmap
+
+    monkeypatch.setattr(Inspection, "_load", staticmethod(lambda: predict))
+    args = ["--root", str(corpus), "--config", str(corpus / "sources.json"),
+            "--dataset", "referenced", "--candidate-dir", str(candidates)]
     output = tmp_path / "attention"
-    args = ("--dataset", "referenced", "--candidate-dir", str(candidates), "--inspection-maps", str(maps))
-    result = run_bench(corpus, output, *args, "--explain-score", "tiles")
-    assert result.returncode == 0, result.stderr
+    assert main([*args, "--output", str(output), "--explain-score", "tiles"]) == 0
     report = json.loads((output / "report.json").read_text())
     assert report["score_version"] == INSPECTION_SCORE_VERSION
     assert report["scoring"]["inspection"]["map_version"] == INSPECTION_MAP_VERSION
     row, = report["scenes"]
-    assert row["inspection_map_sha256"] == sha256(heatmap_path.read_bytes()).hexdigest()
+    assert row["inspection_map_sha256"] == sha256(heatmap.astype("<f4").tobytes()).hexdigest()
+    assert len(seen) == 1
+    np.testing.assert_array_equal(seen[0], reference_preview(reference))
     assert row["scene_score"] == measure(candidate, reference, inspection_heatmap=heatmap).score
-    assert row["scene_score"] < measure(candidate, reference).score
-    saved = score_saved_output(catalog, scene, path, details="tiles", inspection_maps=maps)
+    baseline = measure(candidate, reference, attention=False).score
+    assert row["scene_score"] < baseline
+    saved = score_saved_output(catalog, scene, path, details="tiles", inspection=Inspection())
     assert saved["score"] == row["scene_score"]
     assert saved["explanation"] == json.loads((output / row["score_explanation_path"]).read_text())
 
     updated = Event()
-    review = Scores(updated.set, maps)
+    review = Scores(updated.set)
     delivery = {"image": path.relative_to(tmp_path).as_posix(), "stacker": "test", "scene_fingerprint": scene.id}
     try:
         pending = review.get(catalog, scene, tmp_path, delivery)
         assert pending["status"] == "pending"
         assert updated.wait(5)
-        assert review.get(catalog, scene, tmp_path, delivery)["score"] == saved["score"]
+        result = review.get(catalog, scene, tmp_path, delivery)
+        assert result["score"] == saved["score"]
         updated.clear()
-        write_map(heatmap_path, reference_key(catalog, scene, reference_preview(reference)),
-                  reference.shape[:2], np.zeros_like(heatmap))
-        assert review.get(catalog, scene, tmp_path, delivery)["status"] == "pending"
+        assert review.tiles(catalog, scene, tmp_path, delivery, result["artifact_revision"], "tone", 8)["status"] == "pending"
         assert updated.wait(5)
-        neutral = review.get(catalog, scene, tmp_path, delivery)
-        assert neutral["inspection_map_sha256"] != saved["inspection_map_sha256"]
-        assert neutral["score"] == measure(candidate, reference).score
+        tiles = review.tiles(catalog, scene, tmp_path, delivery, result["artifact_revision"], "tone", 8)
+        assert tiles["inspection_map_sha256"] == saved["inspection_map_sha256"]
+        assert len(seen) == 3
     finally:
         review.close()
 
-    write_map(heatmap_path, "other-reference", reference.shape[:2], heatmap)
-    result = run_bench(corpus, tmp_path / "stale", *args)
-    assert result.returncode == 1
-    assert result.stdout == "unscored\n"
-    stale, = json.loads((tmp_path / "stale" / "report.json").read_text())["scenes"]
-    assert stale["status"] == "scoring_error"
-    assert "does not match the reference" in stale["error"]
+    def missing_models():
+        raise RuntimeError("test model loading failed")
+
+    monkeypatch.setattr(Inspection, "_load", staticmethod(missing_models))
+    disabled = tmp_path / "disabled"
+    assert main([*args, "--output", str(disabled), "--no-attention"]) == 0
+    report = json.loads((disabled / "report.json").read_text())
+    assert report["score"] == baseline
+    assert report["score_version"] == SCORE_VERSION
+    assert "inspection" not in report["scoring"]
+    capsys.readouterr()
+
+    broken = tmp_path / "model-error"
+    assert main([*args, "--output", str(broken)]) == 1
+    assert capsys.readouterr().out == "unscored\n"
+    failed, = json.loads((broken / "report.json").read_text())["scenes"]
+    assert failed["status"] == "scoring_error"
+    assert "test model loading failed" in failed["error"]
 
 
 def test_external_stacker_failure_counts_and_cohort_is_stable(corpus, tmp_path):
@@ -236,8 +250,8 @@ def test_default_scores_original_crop_and_replays_it(corpus, tmp_path):
     catalog = SceneCatalog(corpus, datasets=["referenced"], config=corpus / "sources.json")
     catalog_scene = catalog.scene(scene["scene_id"])
     reference = catalog.decode(catalog_scene.reference_ids[0]).data
-    assert measure(tifffile.imread(saved), reference).alignment == replay_row["alignment"]
-    assert score_saved_output(catalog, catalog_scene, saved)["alignment"] == replay_row["alignment"]
+    assert measure(tifffile.imread(saved), reference, attention=False).alignment == replay_row["alignment"]
+    assert score_saved_output(catalog, catalog_scene, saved, attention=False)["alignment"] == replay_row["alignment"]
 
     removed = run_bench(corpus, tmp_path / "removed", "--dataset", "referenced", "--candidate-dir", str(output / "images"),
                         "--score-profile", "reference-fidelity-crop-v2")

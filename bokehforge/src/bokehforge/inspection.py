@@ -1,70 +1,25 @@
-"""Prepare and read reference maps for inspection-weighted scores."""
+"""Generate inspection maps from clean references during scoring."""
 
-import argparse
-from contextlib import redirect_stdout
 from hashlib import sha256
-from io import BytesIO
-import json
+import os
 from pathlib import Path
-import sys
-from tempfile import NamedTemporaryFile
+from threading import Lock
 
 import numpy as np
 from PIL import Image
 
-from .data._config import DEFAULT_CONFIG, data_root, read_config
-from .data.lazy import SceneCatalog
 from .scoring import validate_heatmap, validate_rgb
 
 INSPECTION_MAP_VERSION = "inspection-blend-v1"
 _MAX_SIDE = 640
 
 
-def reference_key(catalog, scene, preview):
-    frame = catalog.frame(scene.reference_ids[0])
-    identity = (frame.asset_sha256, frame.source_sha256, frame.page, preview.size)
-    key = sha256(json.dumps(identity).encode())
-    key.update(preview.tobytes())
-    return key.hexdigest()
-
-
-def map_path(directory, scene):
-    return directory / (scene.id + ".npz")
-
-
-def _map_size(shape):
-    height, width = shape
-    scale = min(1, _MAX_SIDE / max(shape))
-    return max(1, round(width * scale)), max(1, round(height * scale))
-
-
-def read_map(path, reference, key):
-    """Read one verified, reference-bound map and interpolate to native pixel centers."""
-    payload = path.read_bytes()
-    height, width = reference.shape[:2]
-    size = _map_size((height, width))
-    with np.load(BytesIO(payload), allow_pickle=False) as data:
-        if (data["version"].item() != INSPECTION_MAP_VERSION or data["reference"].item() != key
-                or tuple(data["shape"]) != (height, width)):
-            raise ValueError(f"Inspection map does not match the reference or map version: {path}")
-        heatmap = validate_heatmap(data["heatmap"], size[::-1])
-    if size != (width, height):
-        heatmap = np.asarray(Image.fromarray(heatmap).resize((width, height), Image.Resampling.BILINEAR))
-    return heatmap, sha256(payload).hexdigest()
-
-
-def write_map(path, key, shape, heatmap):
-    heatmap = validate_heatmap(heatmap, _map_size(shape)[::-1])
-    path.parent.mkdir(parents=True, exist_ok=True)
-    staged = None
-    try:
-        with NamedTemporaryFile(dir=path.parent, suffix=".npz", delete=False) as temporary:
-            staged = Path(temporary.name)
-            np.savez_compressed(temporary, version=INSPECTION_MAP_VERSION, reference=key, shape=shape, heatmap=heatmap)
-        staged.replace(path)
-    finally:
-        if staged is not None:
-            staged.unlink(missing_ok=True)
+def _model_directory():
+    override = os.environ.get("BOKEHFORGE_INSPECTION_MODELS")
+    if override:
+        return Path(override).expanduser().resolve()
+    cache_dir = Path(os.environ.get("XDG_CACHE_HOME") or (Path.home() / ".cache"))
+    return cache_dir / "bokehforge" / "inspection-models"
 
 
 def reference_preview(reference):
@@ -75,42 +30,50 @@ def reference_preview(reference):
         linear = np.clip(reference[rows], 0, 1)
         srgb = np.where(linear <= 0.0031308, 12.92 * linear, 1.055 * linear ** (1 / 2.4) - .055)
         pixels[rows] = np.rint(srgb * 255)
-    image = Image.fromarray(pixels)
-    return image.resize(_map_size(reference.shape[:2]), Image.Resampling.LANCZOS)
+    height, width = reference.shape[:2]
+    scale = min(1, _MAX_SIDE / max(height, width))
+    size = max(1, round(width * scale)), max(1, round(height * scale))
+    return Image.fromarray(pixels).resize(size, Image.Resampling.LANCZOS)
 
 
-def main(argv=None):
-    from .bench import _require_benchmark_reference
+class Inspection:
+    """Load the blend once and reuse the last reference map in this scoring session."""
 
-    parser = argparse.ArgumentParser(prog="bokehforge inspection",
-                                     description="Prepare inspection blend maps from clean catalog references")
-    parser.add_argument("--models", type=Path, required=True, help="Local inspection model files and upstream code")
-    parser.add_argument("--output", type=Path, required=True, help="Directory for the generated reference maps")
-    parser.add_argument("--root", type=Path, help="Dataset root")
-    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
-    parser.add_argument("--lock", type=Path, help="Optional source snapshot")
-    parser.add_argument("--dataset", action="append", help="Dataset ID, repeatable")
-    parser.add_argument("--scene", action="append", help="Exact catalog scene ID, repeatable")
-    args = parser.parse_args(argv)
-    root = args.root or data_root(args.config, read_config(args.config).get("defaults", {}))
-    catalog = SceneCatalog(root, datasets=args.dataset, config=args.config, lock=args.lock)
-    scenes = [catalog.scene(key) for key in dict.fromkeys(args.scene or catalog.scene_ids)]
-    if not scenes:
-        raise ValueError("No reference scenes selected")
-    for scene in scenes:
-        _require_benchmark_reference(scene)
+    def __init__(self):
+        self._predict = None
+        self._last = None
+        self._lock = Lock()
 
-    from .inspection_models import inspection_blend
+    @staticmethod
+    def _load():
+        from .inspection_models import inspection_blend
 
-    with redirect_stdout(sys.stderr):
-        predict = inspection_blend(args.models.resolve())
-    args.output.mkdir(parents=True, exist_ok=True)
-    for scene in scenes:
-        reference = catalog.decode(scene.reference_ids[0])
-        if reference.alpha is not None:
-            raise ValueError(f"The RGB benchmark reference cannot have native alpha: {scene.id}")
-        preview = reference_preview(reference.data)
-        with redirect_stdout(sys.stderr):
-            heatmap = predict(preview)
-        write_map(map_path(args.output, scene), reference_key(catalog, scene, preview), reference.data.shape[:2], heatmap)
-    return 0
+        directory = _model_directory()
+        if not directory.is_dir():
+            raise ValueError(f"Inspection models were not found in {directory}. "
+                             "See the benchmark guide for model setup or use --no-attention.")
+        try:
+            return inspection_blend(directory)
+        except (ImportError, OSError, RuntimeError) as exc:
+            raise RuntimeError(f"Could not load the Inspection blend: {exc}. "
+                               "See the benchmark guide for model setup or use --no-attention.") from exc
+
+    def generate(self, reference):
+        preview = reference_preview(reference)
+        key = (preview.size, sha256(preview.tobytes()).digest())
+        with self._lock:
+            if self._last is None or self._last[0] != key:
+                if self._predict is None:
+                    self._predict = self._load()
+                raw = validate_heatmap(self._predict(preview), preview.size[::-1])
+                digest = sha256(raw.astype("<f4", copy=False).tobytes()).hexdigest()
+                raw.setflags(write=False)
+                self._last = key, raw, digest
+            _, raw, digest = self._last
+        height, width = reference.shape[:2]
+        if raw.shape != (height, width):
+            raw = np.asarray(Image.fromarray(raw).resize((width, height), Image.Resampling.BILINEAR))
+        return raw, digest
+
+
+default_inspection = Inspection()

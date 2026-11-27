@@ -1,3 +1,4 @@
+from functools import partial
 import json
 from math import cos, radians, sin
 
@@ -6,7 +7,10 @@ import pytest
 from scipy.ndimage import affine_transform, gaussian_filter
 
 from bokehforge.alignment import ALIGNMENT_VERSION
-from bokehforge.scoring import measure
+from bokehforge.scoring import measure as _measure
+
+
+measure = partial(_measure, attention=False)
 
 
 @pytest.fixture

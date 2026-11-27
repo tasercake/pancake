@@ -119,9 +119,9 @@ def inspection_blend(directory):
     try:
         import torch
     except ImportError as exc:
-        raise RuntimeError("Preparing inspection maps requires the optional CUDA model environment") from exc
+        raise RuntimeError("The Inspection blend requires the inspection dependencies") from exc
     if not torch.cuda.is_available():
-        raise RuntimeError("Preparing inspection maps with the released TempSAL checkpoint requires CUDA")
+        raise RuntimeError("The released TempSAL checkpoint requires CUDA")
     device = "cuda"
     with torch.inference_mode():
         reliqs = _reliqs(directory, device, torch)

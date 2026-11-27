@@ -15,10 +15,10 @@ The downloader, catalog, benchmark, and review app all select datasets from the 
 
 ## Benchmark stacks
 
-Run a Python stacker against the downloaded all-in-focus targets or score rendered TIFFs from an external tool. The benchmark prints one reference-fidelity score and saves artifact diagnostics for investigation.
+Run a Python stacker against the downloaded all-in-focus targets or score rendered TIFFs from an external tool. The benchmark prints one reference-fidelity score and saves artifact diagnostics for investigation. [Set up the inspection models](docs/benchmark.md#install-the-inspection-models) once for the default score, or use `--no-attention` with the base installation.
 
 ```sh
-uv run --frozen bokehforge bench --algorithm mean --output ../artifacts/bench-mean
+.venv/bin/bokehforge bench --algorithm mean --output ../artifacts/bench-mean
 ```
 
 See the [benchmark guide](docs/benchmark.md) for the stacker contract, scoring profile, and saved-output replay.
@@ -28,7 +28,7 @@ See the [benchmark guide](docs/benchmark.md) for the stacker contract, scoring p
 Run the local review app from the repository root:
 
 ```sh
-uv run --project bokehforge --frozen bokehforge review
+bokehforge/.venv/bin/bokehforge review
 ```
 
 See the [review guide](docs/review.md) for dataset selection, stacker setup, and rating export.

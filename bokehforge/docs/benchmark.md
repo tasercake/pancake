@@ -1,10 +1,10 @@
 # Focus-stacking benchmark
 
-Run the mean-blend pilot on the InfinigenDefocus dataset from the repository root. Use a new output directory for each run.
+Run the mean-blend pilot on the InfinigenDefocus dataset from the repository root. Set up the [inspection models](#install-the-inspection-models) once and use a new output directory for each run.
 
 ```sh
-uv run --project bokehforge --frozen bokehforge data download
-uv run --project bokehforge --frozen bokehforge bench \
+bokehforge/.venv/bin/bokehforge data download
+bokehforge/.venv/bin/bokehforge bench \
   --algorithm mean --output artifacts/bench-mean --save-images --progress
 ```
 
@@ -25,13 +25,13 @@ def first_frame(stack: StackInput) -> np.ndarray:
 For external tools, generate one canonical interleaved RGB float32 TIFF per scene using the path `<candidate-dir>/<scene-id>.tif`. Use orientation 1 and convert the original colors and transfer to linear sRGB before writing. A TIFF from `--save-images` already meets the contract. The candidate-directory path evaluates delivered files without decoding the focal frames.
 
 ```sh
-uv run --project bokehforge --frozen bokehforge bench \
+bokehforge/.venv/bin/bokehforge bench \
   --candidate-dir artifacts/bench-mean/images --dataset D29 --output artifacts/bench-replay
 ```
 
 ## The score
 
-Standard output contains one cohort score from 0 to 100, computed using `reference-fidelity-v3`. A pixel-identical full view scores 100. An exact native-scale crop covering 81% of the reference scores 81, wherever it lies. Enlarging that crop back to the original file dimensions still leaves 19% of the reference missing. A half-size full view can cover the whole reference, but its delivery samples cap its score at 25 before any quality loss.
+Standard output contains one cohort score from 0 to 100. The default score version is `reference-fidelity-v3-inspection-v2`. With `--no-attention` the score version is `reference-fidelity-v3`. A pixel-identical full view scores 100. An exact native-scale crop covering 81% of the reference scores 81, wherever it lies. Enlarging that crop back to the original file dimensions still leaves 19% of the reference missing. A half-size full view can cover the whole reference, but its delivery samples cap its score at 25 before any quality loss.
 
 Each plausible placement contributes **match weight × effective coverage × overlap quality**. Effective coverage is the smaller of the reference area reached by the delivery and the fraction supported by contributing delivery samples. Area comes from the intersection of the transformed delivery footprint and the reference, including fractional edges. A square delivery sample covers `scale²` reference-pixel areas, so dividing the intersection area by `scale²` estimates the contributing sample count. Pixels beyond the reference earn no credit. Match weights sum to the confidence in correspondence. When multiple distinct placements have similar support, the score combines them using their image agreement.
 
@@ -54,17 +54,23 @@ The scorer requires two images, the stacker's delivery and the ground-truth refe
 
 ## Inspection-weighted scoring
 
-Pass `--inspection-maps DIR` to `bokehforge bench` or `bokehforge review` to opt into `reference-fidelity-v3-inspection-v1`. The preparation command computes the raw Inspection blend from each clean all-in-focus reference and saves it once. Each map is bound to the reference asset, image page, and decoded preview pixels. The scorer uses that same map for every candidate and every placement. The report records the map SHA-256 for each scored scene. Compare weighted runs using the same cohort, score version, and map hashes.
+Bench and Review generate an Inspection blend from the clean all-in-focus reference as part of scoring each valid delivery. Every alignment uses the same reference map. The report records the SHA-256 of the generated map. The scorer keeps the last reference map in memory to reuse across repeated comparisons. Use `--no-attention` to disable model loading, map generation, and attention weighting. For a valid delivery, an inference error withholds the score.
 
-The raw map is the soft union of **ReLIQS**, **Texture & light**, **SAM 2.1 Hiera Large**, and **TempSAL overall**. Each model reads an sRGB preview with a long edge of at most 640 pixels. The scorer resizes the resulting map to the native reference grid before applying it. Texture & light measures local detail, lighting variation, and color contrast. SAM contributes a zero map when no region meets the mask size criteria, so the other three inputs can still contribute.
+The raw map is the soft union of **ReLIQS**, **Texture & light**, **SAM 2.1 Hiera Large**, and **TempSAL overall**. The inputs use the same sRGB preview with a long edge of at most 640 pixels. The scorer resizes the blend to the native reference grid. Texture & light measures local detail, lighting variation, and color contrast. SAM contributes a zero map when no region meets the mask size criteria.
 
-For relevance `H` and each damage-family value `D`, the scorer uses `D × (1 + α × (H / mean(H) − 1))`. The mean is over the entire reference. At `α = 0.5` this is the average of ordinary and attention-weighted damage. Constant maps, including all-zero maps, give every pixel a multiplier of 1. A concentrated map can otherwise produce huge multipliers where its value is much higher than its mean. The scorer reduces `α` as needed to keep the largest multiplier at 2 while preserving a mean multiplier of 1. This keeps the floor at 0.5 or higher, so damage in quiet areas still counts. Weighted damage can range from 0 to 2 and feeds the same mean, tail, and worst-tile calculations. The overlap and coverage calculations still apply. The boost changes how severe an observed defect is scored depending on where it falls. A 50% mix does not imply a maximum 50% boost.
+For relevance `H` and each damage-family value `D`, the scorer uses `D × (1 + α × (H / mean(H) − 1))`. The mean is over the entire reference. The mix is 50/50 while the brightest relevance value is at most twice the mean. As the peak rises above that point, the boost bends smoothly from 1.5× toward a limit of 2×. The adjustment preserves a mean multiplier of 1 and a minimum multiplier of 0.5. Constant maps give a multiplier of 1. The resulting damage values, up to 2, feed the existing mean, worst-1% and worst-tile calculations.
 
-### Prepare reference maps
+### Install the inspection models
 
-Use a separate Python 3.12 environment with CUDA-enabled PyTorch 2.6.0 and torchvision 0.21.0, Transformers 4.57.6, timm, pandas, ftfy, einops, and OpenCV, plus BokehForge installed from this checkout. Only preparing maps requires the model environment. The regular benchmark and Review environment can read the resulting files. Prepare the maps before grading the cohort and keep the directory fixed across compared runs.
+From the repository root, install the pinned inference dependencies once. This profile requires CUDA for TempSAL.
 
-The local model directory has this layout. Obtain the upstream code and weights under the applicable terms. BokehForge does not bundle or transfer them. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS code and checkpoint](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
+```sh
+uv sync --project bokehforge --frozen --extra inspection
+```
+
+Place the upstream files in `~/.cache/bokehforge/inspection-models`. If `XDG_CACHE_HOME` is set, use its `bokehforge/inspection-models` subdirectory. Set `BOKEHFORGE_INSPECTION_MODELS` to use an existing model directory elsewhere. Obtain the upstream code and weights under the applicable terms.
+
+The model directory has this layout. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS code and checkpoint](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
 
 ```text
 inspection-models/
@@ -75,17 +81,9 @@ inspection-models/
   sam2/                      Hugging Face snapshot with configuration and model.safetensors
 ```
 
-The loader verifies the three checkpoint fingerprints. Use the same dataset and scene selection when preparing maps and grading. Missing, invalid, or stale maps for otherwise valid deliveries are evaluation errors.
+The loader verifies the three checkpoint fingerprints. To run on a machine without the models, append `--no-attention` to the benchmark or review command.
 
-```sh
-/path/to/model-environment/bin/bokehforge inspection \
-  --dataset D29 --models /path/to/inspection-models --output artifacts/inspection-maps
-uv run --project bokehforge --frozen bokehforge bench \
-  --dataset D29 --candidate-dir artifacts/bench-mean/images \
-  --inspection-maps artifacts/inspection-maps --output artifacts/bench-inspection
-```
-
-In Python, pass a finite `[0, 1]` array on the native reference grid as `measure(candidate, target, inspection_heatmap=heatmap)`. For a saved TIFF, pass the prepared map directory to `score_saved_output(..., inspection_maps=Path(...))`.
+In Python, `measure(candidate, target)` and `score_saved_output(catalog, scene, path)` also generate attention by default. Pass `attention=False` to use the unweighted score. `measure` can also accept an explicit finite `[0, 1]` heatmap on the native reference grid through `inspection_heatmap`.
 
 ## Alignment evidence
 
@@ -118,4 +116,4 @@ In Python, `measure(candidate, target)` returns an object with `.score` and `.al
 
 ## Comparing older runs
 
-Older JSON keeps its original `score_version` or `profile` label. Compare scores with matching scorer versions and cohort fingerprints. To compare an older saved delivery with a new run, replay the original TIFF into a new output directory. Review stores inspection-weighted results in a separate cache tied to the map file.
+Older JSON keeps its original `score_version` or `profile` label. Compare scores with matching scorer versions and cohort fingerprints. To compare an older saved delivery with a new run, replay the original TIFF into a new output directory. Inspection-weighted Review scores are cached in memory for the current session. Compare inspection-weighted benchmark runs with matching map hashes as well.
