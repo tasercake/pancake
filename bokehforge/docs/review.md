@@ -25,7 +25,9 @@ For scenes with one supported RGB ground-truth image, each ready output shows th
 
 Open **Explain score** to see the inferred area, resolution cap, overlap quality, and match confidence. **How alignment was inferred** shows search evidence and the score contribution of each retained placement. An unmatched delivery still has an explanation with the reason.
 
-Expand a damage family to see the pooling values and weights. Turn on **Show damage overlay**, choose the 8- or 32-pixel grid, and use the 0–1 legend. The overlay uses the leading placement. Zero-damage and unmeasured tiles are transparent. In the lightbox, the overlay follows zoom and pan, clips to the output side of a swipe, and disappears when you show only the reference. Stackroom calculates the tile data when you request the overlay.
+Under **Explain score**, choose **Damage** or **Attention** from **Overlay**. Damage shows differences for the selected family on an 8- or 32-pixel grid. Expand a family to see the pooling values and weights. Attention shows which reference regions the scorer emphasizes, on a 0–1 scale. It is available for attention-weighted scores with an aligned output.
+
+Both overlays use the leading placement and load on demand. The lightbox keeps them aligned during zoom and pan and confines them to the output side of a reference swipe. The full reference stays clear for comparison.
 
 ## Set up the stackers
 

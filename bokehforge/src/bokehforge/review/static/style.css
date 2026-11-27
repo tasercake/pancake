@@ -337,10 +337,10 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
   box-shadow: 0 .4rem 1.5rem #0008;
 }
 .score-explanation-heading { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
-.damage-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem .75rem; margin-top: .65rem; }
+.damage-controls, .damage-options { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem .75rem; }
+.damage-controls { margin-top: .65rem; }
 .damage-controls label { display: inline-flex; align-items: center; gap: .3rem; }
 .damage-controls select { min-height: 1.8rem; padding-block: .15rem; max-width: 10rem; }
-.damage-switch input { accent-color: var(--accent); }
 .damage-help, .damage-status { color: var(--muted); margin: .6rem 0; }
 .damage-column-headings, .damage-family summary {
   display: grid;
@@ -391,6 +391,7 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
   z-index: 2;
 }
 .damage-legend-ramp { height: .36rem; background: linear-gradient(90deg, #5a50e1, #ffc930); border-radius: 2px; }
+.damage-legend[data-mode="attention"] .damage-legend-ramp { background: linear-gradient(90deg, #1d84a5, #6cdef5); }
 .damage-legend-values { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
 .candidate-viewport { position: relative; display: grid; min-height: 0; }
 .candidate-benchmark {

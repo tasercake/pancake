@@ -1,8 +1,11 @@
 """Score saved review outputs at native resolution without blocking scene loading."""
 
+from base64 import b64encode
 from collections import OrderedDict
 import json
 from threading import Condition, Thread
+
+import numpy as np
 
 from ..alignment import ALIGNMENT_VERSION
 from ..bench import score_saved_output
@@ -24,11 +27,19 @@ class Scores:
         self.pending = OrderedDict()
         self.recent = OrderedDict()
         self.spatial = OrderedDict()
+        self.attention_maps = OrderedDict()
         self.active = None
         self.closed = False
         self.worker = None
 
-    def get(self, catalog, scene, directory, result, *, detail="summary", expected_revision=None):
+    def _cache(self, detail):
+        if detail == "summary":
+            return self.recent, 128
+        if detail == "tiles":
+            return self.spatial, 2
+        return self.attention_maps, 4
+
+    def get(self, catalog, scene, directory, result, *, detail="summary", expected_revision=None, map_digest=None):
         image = directory / result["image"]
         receipt = directory / result["stacker"] / "scores" / f"{scene.id}.json"
         try:
@@ -41,8 +52,10 @@ class Scores:
             return {**fields, "status": "stale"}
         identity = (self.profile, ALIGNMENT_VERSION, scene.metadata["recipe_sha256"], result["scene_fingerprint"],
                     *artifact[1:])
+        if map_digest is not None:
+            identity = (*identity, map_digest)
         key = (receipt, identity, detail)
-        cache = self.recent if detail == "summary" else self.spatial
+        cache, _ = self._cache(detail)
         with self.condition:
             if key in cache:
                 cache.move_to_end(key)
@@ -52,7 +65,7 @@ class Scores:
                 if saved is not None:
                     return {**saved, "artifact_revision": revision}
             if not self.closed and self.active != key:
-                self.pending[key] = (catalog, scene, image, artifact)
+                self.pending[key] = (catalog, scene, image, artifact, map_digest)
                 self.pending.move_to_end(key)
                 if self.worker is None:
                     self.worker = Thread(target=self._work, name="bokehforge-review-scores", daemon=True)
@@ -86,6 +99,34 @@ class Scores:
         return {**spatial, "family": family,
                 "grid": {**grid, "values": grid["values"][family]}}
 
+    def attention_overlay(self, catalog, scene, directory, result, revision):
+        summary = self.get(catalog, scene, directory, result, expected_revision=revision)
+        if summary["status"] != "ok":
+            return summary
+        explanation = summary.get("explanation") or {}
+        placements = explanation.get("placements", [])
+        digest = summary.get("inspection_map_sha256")
+        if not (self.inspection is not None and digest and explanation.get("attention") and placements):
+            return {"status": "no_overlay"}
+        response = self.get(catalog, scene, directory, result, detail="attention",
+                            expected_revision=revision, map_digest=digest)
+        if response["status"] != "ok":
+            return response
+        return {**response, **self._overlay_geometry(explanation, placements[0])}
+
+    def _attention_map(self, catalog, scene, expected_digest):
+        raw = self.inspection.cached_map(expected_digest)
+        if raw is None:
+            reference = catalog.decode(scene.reference_ids[0]).data
+            raw, digest = self.inspection.preview_map(reference)
+            if digest != expected_digest:
+                return {"status": "stale"}
+        # The scorer interpolates this grid on the native reference. Quantize only for display.
+        values = np.rint(raw * 255).astype(np.uint8)
+        return {"status": "ok", "inspection_map_sha256": expected_digest,
+                "attention": {"size_wh": list(values.shape[::-1]), "encoding": "base64+uint8",
+                              "data": b64encode(values.tobytes()).decode("ascii")}}
+
     def _work(self):
         while True:
             with self.condition:
@@ -94,12 +135,15 @@ class Scores:
                     return
                 # Score the currently requested scene before older ones. Run
                 # one native comparison at a time to limit memory use.
-                key, (catalog, scene, image, artifact) = self.pending.popitem()
+                key, (catalog, scene, image, artifact, map_digest) = self.pending.popitem()
                 self.active = key
             detail = key[2]
             try:
-                result = score_saved_output(catalog, scene, image, details=detail,
-                                            attention=self.inspection is not None, inspection=self.inspection)
+                if detail == "attention":
+                    result = self._attention_map(catalog, scene, map_digest)
+                else:
+                    result = score_saved_output(catalog, scene, image, details=detail,
+                                                attention=self.inspection is not None, inspection=self.inspection)
                 if output_identity(image) != artifact:
                     result = {"profile": self.profile, "status": "stale", "score": None}
                 elif detail == "tiles":
@@ -109,13 +153,21 @@ class Scores:
             if detail == "summary" and self.inspection is None and result["status"] in {"ok", "invalid_output"}:
                 self._save(key, result)
             with self.condition:
-                cache, limit = (self.recent, 128) if detail == "summary" else (self.spatial, 2)
+                cache, limit = self._cache(detail)
                 cache[key] = result
                 if len(cache) > limit:
                     cache.popitem(last=False)
                 self.active = None
                 self.revision += 1
             self.on_change()
+
+    @staticmethod
+    def _overlay_geometry(explanation, placement):
+        return {"reference_id": explanation["reference_id"],
+                "reference_size_wh": explanation["reference_size_wh"],
+                "candidate_size_wh": explanation["candidate_size_wh"],
+                "candidate_to_reference_xy": placement["candidate_to_reference_xy"],
+                "candidate_content_box_xyxy": placement["candidate_content_box_xyxy"]}
 
     @staticmethod
     def _spatial_result(result):
@@ -127,12 +179,8 @@ class Scores:
             return {**result, "status": "no_overlay"}
         placement = placements[0]
         grids = placement["comparison"]["tile_grids"]
-        return {**result, "reference_id": explanation["reference_id"],
+        return {**result, **Scores._overlay_geometry(explanation, placement),
                 "damage_range": placement["comparison"]["damage_range"],
-                "reference_size_wh": explanation["reference_size_wh"],
-                "candidate_size_wh": explanation["candidate_size_wh"],
-                "candidate_to_reference_xy": placement["candidate_to_reference_xy"],
-                "candidate_content_box_xyxy": placement["candidate_content_box_xyxy"],
                 "grids": {key: grids[key] for key in _OVERLAY_GRIDS.values()}}
 
     @staticmethod

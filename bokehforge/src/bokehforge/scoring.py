@@ -1,7 +1,9 @@
 """Reference coverage and native-grid image quality measurements for BokehForge."""
 
+from base64 import b64encode
 from dataclasses import dataclass
 from typing import Literal
+from zlib import compress
 
 import numpy as np
 from scipy import ndimage as ndi
@@ -21,8 +23,8 @@ FAMILY_WEIGHTS = {
 }
 FEATURES = tuple(f"native.{family}" for family in FAMILY_WEIGHTS)
 SCORE_EXPLANATION_VERSION = 2
-SCORE_DETAIL_LEVELS = ("summary", "tiles")
-ScoreDetails = Literal["summary", "tiles"]
+SCORE_DETAIL_LEVELS = ("summary", "tiles", "attention")
+ScoreDetails = Literal["summary", "tiles", "attention"]
 _POOL_WEIGHTS = {"mean": 0.40, "tail": 0.35, "worst": 0.25}
 _POOL_LABELS = {"mean": "Average damage", "tail": "Average of the worst 1% of tiles",
                 "worst": "Worst single tile"}
@@ -58,7 +60,7 @@ class Measurement:
 
 def _validate_details(details):
     if details is not None and details not in SCORE_DETAIL_LEVELS:
-        raise ValueError(f"Expected score details to be None, 'summary', or 'tiles', got {details!r}")
+        raise ValueError(f"Expected score details to be None or one of {SCORE_DETAIL_LEVELS}, got {details!r}")
 
 
 def validate_rgb(pixels):
@@ -519,7 +521,9 @@ def _measure_delivery(candidate, target, *, details, device, heatmap=None, gener
     try:
         if generate is not None:
             heatmap = generate(target)
-        inspection = None if heatmap is None else _inspection_weights(validate_heatmap(heatmap, target.shape[:2]))
+        if heatmap is not None:
+            heatmap = validate_heatmap(heatmap, target.shape[:2])
+        inspection = None if heatmap is None else _inspection_weights(heatmap)
     except BaseException:
         if pending is not None and not pending.cancel():
             pending.exception()
@@ -574,6 +578,20 @@ def _measure_delivery(candidate, target, *, details, device, heatmap=None, gener
             "confidence": alignment["confidence"], "alignment_status": alignment["status"],
             "reason": alignment["reason"], "placements": explanations,
         }
+        if heatmap is not None:
+            weights, mix = inspection
+            diagnostic = {
+                "size_wh": [heatmap.shape[1], heatmap.shape[0]],
+                "range": [0, 1],
+                "mean": float(heatmap.mean(dtype=np.float64)),
+                "mix": mix,
+                "damage_multiplier_range": [1.0, 1.0] if weights is None
+                else [float(weights.min()), float(weights.max())],
+            }
+            if details == "attention":
+                pixels = heatmap.astype("<f4", copy=False).tobytes()
+                diagnostic.update(encoding="base64+zlib+float32-le", data=b64encode(compress(pixels, 1)).decode("ascii"))
+            explanation["attention"] = diagnostic
     return Measurement(leading.features if leading else {}, leading.diagnostics if leading else {},
                        explanation, alignment)
 

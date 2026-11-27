@@ -337,7 +337,7 @@ def main(argv=None):
     report_options.add_argument("--output", required=True, type=Path, help="New directory for the report and optional images")
     report_options.add_argument(
         "--explain-score", choices=SCORE_DETAIL_LEVELS,
-        help="Save per-scene score components and optionally all scoring tiles",
+        help="Save score components, with exact scoring tiles or the native attention map on request",
     )
     report_options.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     report_options.add_argument("--progress", action="store_true", help="Write progress to stderr")

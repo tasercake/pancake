@@ -64,7 +64,8 @@ class Inspection:
             raise RuntimeError(f"Could not load the Inspection blend: {exc}. "
                                "See the benchmark guide for model setup or use --no-attention.") from exc
 
-    def generate(self, reference):
+    def preview_map(self, reference):
+        """Return the original model grid and its digest, before native interpolation."""
         preview = reference_preview(reference)
         key = (preview.size, sha256(preview.tobytes()).digest())
         with self._lock:
@@ -76,6 +77,16 @@ class Inspection:
                 raw.setflags(write=False)
                 self._last = key, raw, digest
             _, raw, digest = self._last
+        return raw, digest
+
+    def cached_map(self, digest):
+        with self._lock:
+            if self._last is not None and self._last[2] == digest:
+                return self._last[1]
+        return None
+
+    def generate(self, reference):
+        raw, digest = self.preview_map(reference)
         height, width = reference.shape[:2]
         if raw.shape != (height, width):
             raw = np.asarray(Image.fromarray(raw).resize((width, height), Image.Resampling.BILINEAR))
