@@ -1,9 +1,11 @@
 """Exercise the file identities used by the release build cache."""
 
+import os
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from release_cache import dependency_keys, restore_mtimes
 
@@ -89,3 +91,15 @@ class ReleaseCacheTests(unittest.TestCase):
         restore_mtimes(self.root, exact=True)
         self.assertLess(workspace.stat().st_mtime, previous[1])
         self.assertEqual(docs.stat().st_mtime, previous[2])
+
+    def test_cache_restore_works_without_a_no_follow_utime_option(self):
+        vendor = self.root / "pancake/vendor/patch/src/lib.rs"
+        previous = vendor.stat().st_mtime
+        native_utime = os.utime
+
+        def portable_utime(path, times):
+            native_utime(path, times)
+
+        with patch("release_cache.os.utime", portable_utime):
+            restore_mtimes(self.root, exact=True)
+        self.assertLess(vendor.stat().st_mtime, previous)

@@ -46,7 +46,9 @@ def restore_mtimes(root, *, exact, checks=False):
     for record in filter(None, tracked_tree(root, "HEAD", paths).split(b"\0")):
         metadata, name = record.split(b"\t", maxsplit=1)
         if metadata.startswith((b"100644 ", b"100755 ")):
-            os.utime(root / name.decode("utf-8"), (SOURCE_MTIME, SOURCE_MTIME), follow_symlinks=False)
+            path = root / name.decode("utf-8")
+            if not path.is_symlink():
+                os.utime(path, (SOURCE_MTIME, SOURCE_MTIME))
 
 
 def main():
