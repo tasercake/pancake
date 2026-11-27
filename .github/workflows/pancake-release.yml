@@ -115,7 +115,7 @@ jobs:
           cp "$plan/changelog.md" "$output/changelog.md"
           printf 'version=%s\nsha=%s\n' "$version" "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           {
-            printf 'Candidate **v%s** on `%s`\n\n' "$version" "$(git rev-parse HEAD)"
+            printf 'Candidate **v%s** at commit %s\n\n' "$version" "$(git rev-parse HEAD)"
             cat "$plan/prepared.txt"
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Report that there are no new changes
