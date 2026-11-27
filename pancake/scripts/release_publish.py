@@ -89,7 +89,7 @@ def release_notes(repository, revision, version, changelog):
         + changelog.rstrip()
         + "\n\n## Installation\n\n"
         + "- **Apple Silicon** — Open the DMG and drag Pancake.app into Applications. "
-        + "The app is ad-hoc signed and has no Apple notarization. The image also includes pancake-cli.\n"
+        + "The app is ad-hoc signed and has no Apple notarization.\n"
         + f"- **Ubuntu 24.04 x86-64** — Install the DEB with `sudo apt install ./{deb}`.\n"
         + "- **Windows x64** — Run the standalone desktop or CLI executable. Both are unsigned.\n\n"
         + f"[Installation and first-launch help]({repo_url}/blob/{revision}/pancake/docs/install.md) · "

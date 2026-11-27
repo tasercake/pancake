@@ -5,7 +5,7 @@ Choose the newest release and expand **Assets** to find the download for your co
 ## macOS (Apple Silicon)
 
 1. Download `pancake-<version>-macos-arm64.dmg` and double-click it in Finder.
-2. Drag `Pancake.app` to the **Applications** shortcut in the disk image. You can also copy it into your user **Applications** folder.
+2. In the **Pancake Stacker** Finder window, drag **Pancake** to the **Applications** shortcut. You can also copy the app into your user **Applications** folder.
 3. Open Pancake from **Applications**. Eject the disk image in Finder when you're done with it.
 
 To tell whether your Mac uses Apple Silicon, open **Apple menu → About This Mac** and look for an Apple chip.

@@ -19,6 +19,7 @@ from package_notices import GUI_FONT_NOTICES, file_sha256
 
 TARGET = "aarch64-apple-darwin"
 BINARIES = ("pancake-cli", "pancake-gui")
+APP_ICON = "Pancake.icns"
 SYSTEM_LOCATIONS = ("/System/Library/Frameworks/", "/usr/lib/")
 BUILD_OVERRIDES = (
     "DEVELOPER_DIR", "SDKROOT", "MACOSX_DEPLOYMENT_TARGET",
@@ -69,6 +70,7 @@ def _bundle_metadata(source, identifier, build_number):
         "CFBundleDevelopmentRegion": "en",
         "CFBundleDisplayName": "Pancake",
         "CFBundleExecutable": "pancake-gui",
+        "CFBundleIconFile": APP_ICON,
         "CFBundleIdentifier": identifier,
         "CFBundleInfoDictionaryVersion": "6.0",
         "CFBundleName": "Pancake",
@@ -98,10 +100,11 @@ def _inspect_binary(source, binary):
 
 
 def _sign_and_verify(source, executable, identifier, *, bundle=False):
-    """Sign the staged copy and verify the disclosed ad-hoc signing identity."""
+    """Sign the staged copy and verify its ad-hoc identity and nested code."""
     explicit = () if bundle else ("--identifier", identifier)
     _apple(source, "codesign", "--force", "--sign", "-", "--timestamp=none", *explicit, executable)
-    verified = _apple(source, "codesign", "--verify", "--strict", "--verbose=2", executable)
+    deep = ("--deep",) if bundle else ()
+    verified = _apple(source, "codesign", "--verify", "--strict", "--verbose=2", *deep, executable)
     display = _apple(source, "codesign", "--display", "--verbose=4", executable)
     details = set(display.splitlines())
     if f"Identifier={identifier}" not in details or "Signature=adhoc" not in details:
@@ -109,7 +112,20 @@ def _sign_and_verify(source, executable, identifier, *, bundle=False):
     return {"verification": verified, "display": display}
 
 
-def build_package(source, output, identifier, build_number, *, target_dir=None):
+def _stage_app_icon(source, temporary, resources):
+    """Convert the original artwork to a macOS icon with standard and Retina sizes."""
+    original = source.parent / "assets/pancake-stacker-icon.png"
+    iconset = temporary / "Pancake.iconset"
+    iconset.mkdir()
+    for size in (16, 32, 128, 256, 512):
+        for scale, suffix in ((1, ""), (2, "@2x")):
+            pixels = str(size * scale)
+            resized = iconset / f"icon_{size}x{size}{suffix}.png"
+            _apple(source, "sips", "-z", pixels, pixels, original, "--out", resized)
+    _apple(source, "iconutil", "-c", "icns", "-o", resources / APP_ICON, iconset)
+
+
+def build_package(source, output, identifier, build_number, *, target_dir=None, release_notices=None):
     """Build, stage, and verify one private package on native Apple Silicon."""
     if platform.system() != "Darwin" or platform.machine() != "arm64":
         raise ValueError("Package on an Apple Silicon macOS host running an arm64 process")
@@ -137,8 +153,8 @@ def build_package(source, output, identifier, build_number, *, target_dir=None):
         payload = temporary / "package"
         app = payload / "Pancake.app"
         contents = app / "Contents"
-        gui_dir = contents / "MacOS"
-        gui_dir.mkdir(parents=True)
+        macos = contents / "MacOS"
+        macos.mkdir(parents=True)
         build = ["cargo", toolchain, "build", "--locked", "--release", "--workspace", "--bins",
                  "--target", TARGET, "--features", "cubecl/metal-native", "--target-dir", str(build_dir)]
         sdk = ("xcrun", "--no-cache", "--sdk", "macosx")
@@ -159,8 +175,8 @@ def build_package(source, output, identifier, build_number, *, target_dir=None):
         plist.write_bytes(plistlib.dumps(metadata, fmt=plistlib.FMT_XML))
         plist_check = _apple(source, "plutil", "-lint", plist)
         executables = {}
-        for name, directory in zip(BINARIES, (payload, gui_dir), strict=True):
-            original, staged = release / name, directory / name
+        for name in BINARIES:
+            original, staged = release / name, macos / name
             digest = file_sha256(original)
             shutil.copyfile(original, staged)
             staged.chmod(0o755)
@@ -171,8 +187,9 @@ def build_package(source, output, identifier, build_number, *, target_dir=None):
                 "source_sha256": digest,
                 **_inspect_binary(source, staged),
             }
-        # Keep the notices with the app when it is moved out of the ZIP.
-        font_notices = contents / "Resources/font-notices"
+        # Seal the icon and notices before the app is signed and copied into the disk image.
+        resources = contents / "Resources"
+        font_notices = resources / "font-notices"
         font_notices.mkdir(parents=True)
         for relative in GUI_FONT_NOTICES:
             original = source / "crates/pancake-gui" / relative
@@ -180,8 +197,11 @@ def build_package(source, output, identifier, build_number, *, target_dir=None):
             shutil.copyfile(original, staged)
             if file_sha256(staged) != file_sha256(original):
                 raise ValueError(f"Font notice changed while copying {relative.name}")
+        _stage_app_icon(source, temporary, resources)
+        if release_notices is not None:
+            shutil.copytree(release_notices, resources / "Notices")
         executables["pancake-cli"]["signature"] = _sign_and_verify(
-            source, payload / "pancake-cli", f"{identifier}.cli",
+            source, macos / "pancake-cli", f"{identifier}.cli",
         )
         executables["pancake-gui"]["signature"] = _sign_and_verify(source, app, identifier, bundle=True)
         if plistlib.loads(plist.read_bytes()) != metadata:
@@ -225,10 +245,13 @@ def main(argv=None):
     parser.add_argument("--build-number", required=True)
     parser.add_argument("--target-dir", type=Path,
                         help="Reuse a Cargo target directory for this checkout (default: a temporary directory)")
+    parser.add_argument("--release-notices", type=Path,
+                        help="Verified dependency and native notices to seal inside the app")
     options = parser.parse_args(argv)
     try:
         build_package(Path(__file__).resolve().parents[1], options.output,
-                      options.bundle_identifier, options.build_number, target_dir=options.target_dir)
+                      options.bundle_identifier, options.build_number, target_dir=options.target_dir,
+                      release_notices=options.release_notices)
     except (ValueError, OSError, subprocess.CalledProcessError) as error:
         parser.exit(1, f"{error}\n")
 
