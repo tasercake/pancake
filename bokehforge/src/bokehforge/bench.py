@@ -16,17 +16,18 @@ from time import perf_counter
 import numpy as np
 import tifffile
 
+from ._device import DEVICES, Device
 from .alignment import ALIGNMENT_VERSION, MAX_ROTATION_DEGREES
 from .data._canonical import encode_tiff
 from .data._files import digest
 from .data._config import DEFAULT_CONFIG, data_root, read_config
 from .data.download import save_json
 from .data.lazy import SceneCatalog
-from .inspection import INSPECTION_MAP_VERSION, Inspection, default_inspection
+from .inspection import INSPECTION_MAP_VERSION, Inspection, inspection_for
 from .scoring import (
     FAMILY_WEIGHTS, INSPECTION_MAX_MULTIPLIER, INSPECTION_MIX, INSPECTION_SCORE_VERSION,
     SCORE_DAMAGE_SCALE, SCORE_DETAIL_LEVELS, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
-    ScoreDetails, _validate_details, measure, validate_rgb,
+    ScoreDetails, _measure_delivery, _validate_details, validate_rgb,
 )
 from .stacking import StackFrame, StackInput
 
@@ -176,7 +177,7 @@ def _load_candidate(path, row, *, fingerprint=False):
     return None
 
 
-def _score_delivery(result, reference, row, *, details=None, inspection=None):
+def _score_delivery(result, reference, row, *, details=None, inspection=None, device: Device = "auto"):
     try:
         validate_rgb(result)
     except ValueError as exc:
@@ -185,11 +186,12 @@ def _score_delivery(result, reference, row, *, details=None, inspection=None):
 
     scoring_start = perf_counter()
     try:
-        heatmap = None
-        if inspection is not None:
-            heatmap, row["inspection_map_sha256"] = inspection.generate(reference)
-        measurement = measure(result, reference, details=details, inspection_heatmap=heatmap,
-                              attention=inspection is not None)
+        def generate(target):
+            heatmap, row["inspection_map_sha256"] = inspection.generate(target)
+            return heatmap
+
+        measurement = _measure_delivery(result, reference, details=details, device=device,
+                                        generate=generate if inspection is not None else None)
         row.update(scene_score=measurement.score, alignment=measurement.alignment)
         if measurement.features:
             row.update(score_features=measurement.features, artifact_diagnostics=measurement.diagnostics)
@@ -201,18 +203,19 @@ def _score_delivery(result, reference, row, *, details=None, inspection=None):
         row["scoring_seconds"] = perf_counter() - scoring_start
 
 
-def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = None, attention=True, inspection=None):
+def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = None, attention=True, inspection=None,
+                       device: Device = "auto"):
     """Compare a canonical TIFF with the scene's required RGB ground truth."""
     _validate_details(details)
     _require_benchmark_reference(scene)
-    inspection = (inspection or default_inspection) if attention else None
+    inspection = (inspection or inspection_for(device)) if attention else None
     row = {"status": "ok", "scene_score": None}
     explanation = None
     reference = _reference(catalog, scene, row)
     if reference is not None:
         result = _load_candidate(path, row)
         if result is not None:
-            explanation = _score_delivery(result, reference, row, details=details, inspection=inspection)
+            explanation = _score_delivery(result, reference, row, details=details, inspection=inspection, device=device)
     profile = SCORE_VERSION if inspection is None else INSPECTION_SCORE_VERSION
     response = {"profile": profile, "score": row["scene_score"], "status": row["status"]}
     for field in ("error", "alignment", "inspection_map_sha256"):
@@ -267,7 +270,8 @@ def _run_scene(catalog, scene, row, algorithm, args, inspection):
     if row["status"] != "ok":
         return
     with redirect_stdout(sys.stderr):
-        explanation = _score_delivery(result, reference, row, details=args.explain_score, inspection=inspection)
+        explanation = _score_delivery(result, reference, row, details=args.explain_score, inspection=inspection,
+                                      device=args.device)
     if row["status"] != "ok":
         return
     if args.save_images:
@@ -324,6 +328,8 @@ def main(argv=None):
     selection.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
     score_options = parser.add_argument_group("Scoring")
     score_options.add_argument("--no-attention", action="store_true", help="Disable inspection heatmaps and damage weighting")
+    score_options.add_argument("--device", choices=DEVICES, default="auto",
+                               help="Scoring device (default: auto, prefer CUDA when available)")
     score_options.add_argument(
         "--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)",
     )
@@ -336,6 +342,8 @@ def main(argv=None):
     report_options.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     report_options.add_argument("--progress", action="store_true", help="Write progress to stderr")
     args = parser.parse_args(argv)
+    if args.device == "cpu" and not args.no_attention:
+        parser.error("--device cpu requires --no-attention because the Inspection profile requires CUDA")
     if args.output.exists():
         raise ValueError(f"Output directory already exists: {args.output}")
     root = args.root or data_root(args.config, read_config(args.config).get("defaults", {}))

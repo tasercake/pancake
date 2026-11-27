@@ -2,9 +2,10 @@ import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
 
+from bokehforge._device import cuda_available, use_cuda_damage
 from bokehforge.scoring import (
     FAMILY_WEIGHTS, FEATURES, INSPECTION_SCORE_VERSION, SCORE_DAMAGE_SCALE, Measurement,
-    _inspection_weights, _measure, measure, scene_score,
+    _damage, _inspection_weights, _integral, _maps, _measure, _tile_integral, measure, scene_score,
 )
 
 
@@ -14,6 +15,50 @@ def rgb(pixels):
 
 def score(candidate, target):
     return scene_score(_measure(candidate, target))
+
+
+def test_device_selection_falls_back_only_in_auto(monkeypatch):
+    monkeypatch.setattr("bokehforge._device.cuda_available", lambda: False)
+    assert use_cuda_damage("auto") is False
+    assert use_cuda_damage("cpu") is False
+    with pytest.raises(RuntimeError, match="--device gpu requires CUDA"):
+        use_cuda_damage("gpu")
+
+
+def test_tile_prefix_keeps_rounding_order_and_support():
+    rng = np.random.default_rng(129)
+    damage = np.exp2(-rng.integers(0, 128, (67, 83)).astype(np.float32))
+    support = rng.random(damage.shape) > 0.2
+    y, x = np.r_[0:67:4, 67], np.r_[0:83:4, 83]
+    expected = _integral(damage * support)[np.ix_(y, x)]
+    np.testing.assert_array_equal(_tile_integral(damage, support, (y, x)), expected)
+
+
+def test_parallel_damage_uses_full_image_halos():
+    rng = np.random.default_rng(67)
+    candidate, target = (rng.uniform(-.05, 1.1, size=(517, 1941, 3)).astype(np.float32) for _ in range(2))
+    support = rng.random(target.shape[:2]) > 0.08
+    expected, _ = _damage(candidate, target, support)
+    actual, _ = _maps(candidate, target, support)
+    for left, right in zip(actual, expected, strict=True):
+        np.testing.assert_array_equal(left, right)
+
+
+@pytest.mark.parametrize("masked", [False, True])
+def test_gpu_preserves_tile_values_diagnostics_and_scores(masked):
+    if not cuda_available() or not use_cuda_damage("auto"):
+        pytest.skip("Requires CUDA and Triton")
+    rng = np.random.default_rng(65)
+    target = rng.uniform(-.05, 1.1, size=(29, 43, 3)).astype(np.float32)
+    candidate = target.copy()
+    candidate[:, 5:16, 1] *= .65
+    candidate[23, 20, 0], target[23, 20, 0] = -np.finfo(np.float32).max, np.finfo(np.float32).max
+    support = (rng.random(target.shape[:2]) > .08) if masked else None
+    attention = _inspection_weights(rng.random(target.shape[:2], dtype=np.float32))
+    cpu = _measure(candidate, target, support, details="tiles", inspection=attention)
+    gpu = _measure(candidate, target, support, details="tiles", inspection=attention, cuda=True)
+    assert cpu == gpu
+    assert cpu.score == gpu.score
 
 
 def test_exact_match_preserves_grain_bokeh_and_headroom():
@@ -202,7 +247,7 @@ def test_inspection_weights_feed_the_score_and_its_tiles(monkeypatch):
     candidate = target + np.float32(0.5)
     heatmap = np.zeros(target.shape[:2], np.float32)
     heatmap[:, :8] = 1
-    monkeypatch.setattr("bokehforge.scoring._maps", lambda *_: (
+    monkeypatch.setattr("bokehforge.scoring._maps", lambda *_, **__: (
         (np.ones(target.shape[:2], np.float32), *[np.zeros(target.shape[:2], np.float32) for _ in range(5)]), {}
     ))
     weights = _inspection_weights(heatmap)

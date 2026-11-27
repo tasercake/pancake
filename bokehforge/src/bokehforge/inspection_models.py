@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 from scipy.ndimage import gaussian_filter
 
+from ._workers import workers
 from .inspection_assets import ensure_inspection_assets
 
 
@@ -85,25 +86,60 @@ def _tempsal(directory, device, torch):
 
 
 def _sam2(directory, device):
+    import torch
+    from torchvision.ops import batched_nms
     from transformers import pipeline
+    from transformers.models.sam2.image_processing_sam2_fast import _batched_mask_to_box, _compute_stability_score
 
     folder = directory / "sam2"
     generate = pipeline("mask-generation", model=str(folder), device=device, trust_remote_code=False,
                         model_kwargs={"use_safetensors": True})
 
-    def predict(image, detail):
-        data = generate(image, points_per_crop=16, points_per_batch=32,
-                        pred_iou_thresh=.8, stability_score_thresh=.9)
-        heat = np.zeros_like(detail)
-        for mask, score in zip(data["masks"], data["scores"], strict=True):
-            mask = np.asarray(mask, dtype=bool)
-            if not .001 <= mask.mean() <= .65:
+    def predict(image):
+        # Use the same image embedding, prompts, and prompt batch size as the
+        # pipeline. Quality is independent of upsampling and stability, so
+        # discard low-IoU masks before expanding them to preview resolution.
+        masks, boxes, scores = [], [], []
+        for inputs in generate.preprocess(image, points_per_crop=16, points_per_batch=32):
+            sizes = inputs.pop("original_sizes").tolist()
+            inputs.pop("reshaped_input_sizes")
+            inputs.pop("input_boxes")  # SAM 2 only sees point prompts on the full image.
+            inputs.pop("is_last")
+            inputs = generate._ensure_tensor_on_device(inputs, device=generate.device)
+            output = generate.model(**inputs)
+            quality = output.iou_scores[0].flatten()
+            eligible = quality > .8
+            low = output.pred_masks[0].flatten(0, 1)[eligible]
+            if low.numel() == 0:
                 continue
-            strength = min(1, float(score)) * (.25 + .75 * float(np.quantile(detail[mask], .75)))
-            heat[mask] = np.maximum(heat[mask], strength * (.75 + .25 * detail[mask]))
-        return heat
+            full, = generate.image_processor.post_process_masks([low[None]], sizes, binarize=False)
+            full = full[0]
+            stable = _compute_stability_score(full, 0, 1) > .9
+            binary = full[stable] > 0
+            masks.append(binary)
+            boxes.append(_batched_mask_to_box(binary).cpu())
+            scores.append(quality[eligible][stable].cpu())
+        if not masks:
+            return (), ()
+        boxes = torch.cat(boxes).float()
+        scores = torch.cat(scores)
+        # The original pipeline suppresses boxes on CPU in prompt order.
+        # Keep that tie-breaking and transfer only the selected binary masks.
+        keep = batched_nms(boxes, scores, torch.zeros(len(boxes)), .7)
+        return torch.cat(masks)[keep.to(device)].cpu().numpy(), scores[keep].numpy()
 
     return predict
+
+
+def _mask_heat(masks, scores, detail):
+    heat = np.zeros_like(detail)
+    for mask, score in zip(masks, scores, strict=True):
+        if not .001 <= mask.mean() <= .65:
+            continue
+        values = detail[mask]
+        strength = min(1, float(score)) * (.25 + .75 * float(np.quantile(values, .75)))
+        heat[mask] = np.maximum(heat[mask], strength * (.75 + .25 * values))
+    return heat
 
 
 def inspection_blend(directory):
@@ -122,8 +158,12 @@ def inspection_blend(directory):
 
     @torch.inference_mode()
     def predict(image):
-        detail = _detail_light(image)
-        maps = np.stack([reliqs(image), detail, sam2(image, detail), tempsal(image)])
+        detail_work = workers().submit(_detail_light, image)
+        saliency = reliqs(image)
+        masks, scores = sam2(image)
+        temporal = tempsal(image)
+        detail = detail_work.result()
+        maps = np.stack([saliency, detail, _mask_heat(masks, scores, detail), temporal])
         return (1 - np.prod(1 - .5 * maps, axis=0)) / (1 - .5 ** len(maps))
 
     return predict
