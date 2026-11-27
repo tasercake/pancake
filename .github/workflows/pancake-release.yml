@@ -68,7 +68,7 @@ jobs:
             "$RUNNER_TEMP/pancake-releases.json" "${args[@]}" >> "$GITHUB_OUTPUT"
       - name: Ask Copilot for release highlights and a version bump
         if: >-
-          steps.history.outputs.ready == 'true' && vars.PANCAKE_COPILOT_ENABLED == 'true' &&
+          steps.history.outputs.ready == 'true' &&
           github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         run: |
           install_dir="$RUNNER_TEMP/pancake-copilot"
