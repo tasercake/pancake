@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -155,6 +156,46 @@ def test_checksum_failure_never_publishes_final_file(tmp_path, origin):
     assert result.returncode != 0
     assert not (tmp_path / "data/raw/fixture/source.bin").exists()
     assert "checksum" in (result.stdout + result.stderr).lower()
+
+
+def test_inspection_assets_are_shared_and_only_missing_files_are_downloaded(tmp_path, origin, monkeypatch):
+    from bokehforge import inspection_assets
+
+    url, state = origin
+    payload = state["body"]
+    checksum = hashlib.sha256(payload).hexdigest()
+    installed = inspection_assets._asset("model/installed.bin", url, len(payload), checksum)
+    missing = inspection_assets._asset("model/missing.bin", url, len(payload), checksum)
+    monkeypatch.setattr(inspection_assets, "_ASSETS", (installed, missing))
+    cache = tmp_path / "cache"
+    (cache / "model").mkdir(parents=True)
+    installed_path = cache / installed["path"]
+    installed_path.write_bytes(payload)
+    original_mtime = installed_path.stat().st_mtime_ns
+    (cache / (missing["path"] + ".part")).write_bytes(payload[:77])
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        list(pool.map(inspection_assets.ensure_inspection_assets, (cache, cache)))
+    assert state["requests"] == ["bytes=77-"]
+    assert installed_path.stat().st_mtime_ns == original_mtime
+    assert (cache / missing["path"]).read_bytes() == payload
+    assert not list(cache.rglob("*.part"))
+
+    inspection_assets.ensure_inspection_assets(cache)
+    assert state["requests"] == ["bytes=77-"]
+
+
+def test_inspection_cache_rejects_unverified_bytes(tmp_path, origin, monkeypatch):
+    from bokehforge import inspection_assets
+
+    url, state = origin
+    item = inspection_assets._asset("sam2/model.safetensors", url, len(state["body"]), "0" * 64)
+    monkeypatch.setattr(inspection_assets, "_ASSETS", (item,))
+    cache = tmp_path / "cache"
+    with pytest.raises(RuntimeError, match="Could not cache inspection asset sam2/model.safetensors: Checksum mismatch"):
+        inspection_assets.ensure_inspection_assets(cache)
+    assert not (cache / item["path"]).exists()
+    assert not list(cache.rglob("*.part"))
 
 
 def test_refresh_preserves_other_dataset_pins(tmp_path, origin):

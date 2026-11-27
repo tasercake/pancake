@@ -15,7 +15,7 @@ The downloader, catalog, benchmark, and review app all select datasets from the 
 
 ## Benchmark stacks
 
-Run a Python stacker against the downloaded all-in-focus targets or score rendered TIFFs from an external tool. The benchmark prints one reference-fidelity score and saves artifact diagnostics for investigation. [Set up the inspection models](docs/benchmark.md#install-the-inspection-models) once for the default score, or use `--no-attention` with the base installation.
+Run a Python stacker against the downloaded all-in-focus targets or score rendered TIFFs from an external tool. The benchmark prints one reference-fidelity score and saves artifact diagnostics for investigation. With the [inspection dependencies](docs/benchmark.md#install-the-inspection-models) installed, the default scorer downloads missing model files on first use. Use `--no-attention` with the base installation.
 
 ```sh
 .venv/bin/bokehforge bench --algorithm mean --output ../artifacts/bench-mean

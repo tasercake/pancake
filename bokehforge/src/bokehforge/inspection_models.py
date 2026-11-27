@@ -1,6 +1,5 @@
-"""Local inference for inspection-blend-v1. Model assets are supplied separately."""
+"""Local inference for inspection-blend-v1."""
 
-from hashlib import file_digest
 from runpy import run_path
 import sys
 from unittest.mock import patch
@@ -9,12 +8,7 @@ import numpy as np
 from PIL import Image
 from scipy.ndimage import gaussian_filter
 
-
-def _verified(path, expected):
-    with path.open("rb") as source:
-        if file_digest(source, "sha256").hexdigest() != expected:
-            raise ValueError(f"Unexpected checkpoint SHA-256: {path}")
-    return path
+from .inspection_assets import ensure_inspection_assets
 
 
 def _scale(values):
@@ -34,8 +28,7 @@ def _detail_light(image):
 
 
 def _reliqs(directory, device, torch):
-    weights = _verified(directory / "reliqs-weights-ready.pth",
-                        "6ab0acc9c39a616875b01b18a9665abfdab560290955ea27ccd94350d4f6dd83")
+    weights = directory / "reliqs-weights-ready.pth"
     with patch.object(sys, "path", [str(directory / "reliqs"), *sys.path]):
         import tiny_clip
         from patch_sampling.Patch_Sampler import SaliencyPatchSampler, resize_shorter_edge
@@ -74,8 +67,7 @@ def _reliqs(directory, device, torch):
 
 
 def _tempsal(directory, device, torch):
-    weights = _verified(directory / "tempsal-ready.pt",
-                        "04d9d80f77ed2fcd7b4461440f5715a8a78e418f83bc7adbc658a991e04be9e9")
+    weights = directory / "tempsal-ready.pt"
     code = directory / "tempsal-code"
     with patch.object(sys, "path", [str(code), str(code / "PNAS"), *sys.path]):
         constructor = run_path(str(code / "model.py"))["PNASBoostedModelMultiLevel"]
@@ -96,7 +88,6 @@ def _sam2(directory, device):
     from transformers import pipeline
 
     folder = directory / "sam2"
-    _verified(folder / "model.safetensors", "dc407dce21301fd94abb395c5099b4f2c455fdc8a8f261ac3d0ea6d4cd197230")
     generate = pipeline("mask-generation", model=str(folder), device=device, trust_remote_code=False,
                         model_kwargs={"use_safetensors": True})
 
@@ -122,6 +113,7 @@ def inspection_blend(directory):
         raise RuntimeError("The Inspection blend requires the inspection dependencies") from exc
     if not torch.cuda.is_available():
         raise RuntimeError("The released TempSAL checkpoint requires CUDA")
+    ensure_inspection_assets(directory)
     device = "cuda"
     with torch.inference_mode():
         reliqs = _reliqs(directory, device, torch)

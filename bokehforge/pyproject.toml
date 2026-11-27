@@ -13,7 +13,8 @@ dependencies = [
   "rawpy>=0.24,<0.27",
   "requests>=2.32,<3",
   "beautifulsoup4>=4.13,<5",
-  "libarchive-c>=5.1,<6"
+  "libarchive-c>=5.1,<6",
+  "filelock>=3,<5",
 ]
 
 [project.scripts]
