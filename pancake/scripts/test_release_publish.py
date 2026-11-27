@@ -30,6 +30,10 @@ class ReleasePublishTests(unittest.TestCase):
         ):
             self.assertIn(f"]({download}{filename})", table)
         self.assertIn("## Installation", changelog)
+        mac_install = next(line for line in changelog.splitlines() if line.startswith("- **Apple Silicon**"))
+        self.assertIn("Privacy & Security", mac_install)
+        self.assertIn("Open Anyway", mac_install)
+        self.assertIn("https://support.apple.com/en-us/102445", mac_install)
 
     def test_upload_posts_raw_binary_to_github_asset_url(self):
         with tempfile.TemporaryDirectory() as directory:

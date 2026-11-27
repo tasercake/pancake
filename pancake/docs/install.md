@@ -10,7 +10,15 @@ Choose the newest release and expand **Assets** to find the download for your co
 
 To tell whether your Mac uses Apple Silicon, open **Apple menu → About This Mac** and look for an Apple chip.
 
-The app is ad-hoc signed and has no Apple notarization. If macOS blocks the first launch, check that you downloaded from the project's Releases page, then follow [Apple's instructions for opening the app](https://support.apple.com/en-us/102445) under **System Settings → Privacy & Security**.
+### If macOS blocks the first launch
+
+Pancake Stacker uses ad-hoc signing, so macOS may ask you to approve it. Confirm you downloaded it from [Pancake Stacker's GitHub Releases](https://github.com/tasercake/pancake/releases) before continuing.
+
+1. Try opening Pancake Stacker from **Applications** once.
+2. Open **System Settings → Privacy & Security**, then scroll down to **Security**.
+3. Click **Open Anyway** for Pancake Stacker and confirm when prompted. If you see **Open** first, click it to get to **Open Anyway**.
+
+The disk image shows these steps and includes **First Launch Help**, with a link to open **Privacy & Security**. [Apple's illustrated instructions](https://support.apple.com/en-us/102445)
 
 ## Windows x64
 

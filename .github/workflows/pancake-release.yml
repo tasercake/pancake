@@ -283,19 +283,21 @@ jobs:
           mv "$payload/package-receipt.json" "$DIST/pancake-macos-arm64-receipt.json"
 
           python -m pip install --require-hashes --only-binary=:all: -r scripts/macos-dmg-requirements.txt
+          installer_assets="$PWD/scripts/macos-dmg"
           package="$DIST/pancake-$RELEASE_VERSION-macos-arm64.dmg"
           app_name="Pancake Stacker.app"
           python -B -m dmgbuild -s scripts/macos-dmg-settings.py -D "app=$payload/$app_name" \
-            "Pancake Stacker" "$package"
+            -D "assets=$installer_assets" "Pancake Stacker" "$package"
           hdiutil verify "$package"
 
           mounted=$(mktemp -d "$RUNNER_TEMP/pancake-dmg.XXXXXX")
           hdiutil attach -readonly -nobrowse -mountpoint "$mounted" "$package"
           trap 'hdiutil detach "$mounted"' EXIT
           visible=("$mounted"/*)
-          test "${#visible[@]}" -eq 2
+          test "${#visible[@]}" -eq 3
           test "$(readlink "$mounted/Applications")" = /Applications
-          test -f "$mounted/.background.tiff"
+          test -s "$mounted/.background.tiff"
+          cmp "$installer_assets/First Launch Help.html" "$mounted/First Launch Help.html"
           python -B - "$mounted/.DS_Store" "$app_name" <<'PY'
           import sys
           from ds_store import DSStore
@@ -304,6 +306,9 @@ jobs:
               left, right = layout[sys.argv[2]]["Iloc"], layout["Applications"]["Iloc"]
               if left[0] >= right[0] or left[1] != right[1]:
                   raise SystemExit("Expected the app to the left of Applications in Finder")
+              help_position = layout["First Launch Help.html"]["Iloc"]
+              if help_position[1] <= left[1] or not layout["."]["icvp"].get("backgroundImageAlias"):
+                  raise SystemExit("Expected the first-launch guide below the install icons")
           PY
 
           installed="$RUNNER_TEMP/pancake-install/$app_name"

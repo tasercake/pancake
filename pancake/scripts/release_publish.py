@@ -88,8 +88,11 @@ def release_notes(repository, revision, version, changelog):
         f"[SHA-256 checksums]({download}/{CHECKSUMS})\n\n"
         + changelog.rstrip()
         + "\n\n## Installation\n\n"
-        + "- **Apple Silicon** — Open the DMG and drag Pancake Stacker.app into Applications. "
-        + "The app is ad-hoc signed and has no Apple notarization.\n"
+        + "- **Apple Silicon** — Open the DMG and drag **Pancake Stacker** into **Applications**. "
+        + "This build uses ad-hoc signing. "
+        + "If macOS blocks the first launch, go to **System Settings → Privacy & Security**, "
+        + "scroll to **Security**, and click **Open Anyway**. The DMG includes **First Launch Help** "
+        + "with a Settings link. [Apple's illustrated instructions](https://support.apple.com/en-us/102445)\n"
         + f"- **Ubuntu 24.04 x86-64** — Install the DEB with `sudo apt install ./{deb}`.\n"
         + "- **Windows x64** — Run the standalone desktop or CLI executable. Both are unsigned.\n\n"
         + f"[Installation and first-launch help]({repo_url}/blob/{revision}/pancake/docs/install.md) · "
