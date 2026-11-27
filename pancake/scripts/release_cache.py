@@ -38,7 +38,7 @@ def dependency_keys(root, dispatched, *, checks=False):
     return hashlib.sha256(graph).hexdigest(), hashlib.sha256(candidate).hexdigest()
 
 
-def restore_mtimes(root, *, exact, checks=False):
+def restore_mtimes(root, *, exact, checks=False, llvm_data=None):
     """Let Cargo reuse path inputs whose tracked contents match the restored cache."""
     paths = (VENDOR,)
     if exact:
@@ -46,7 +46,14 @@ def restore_mtimes(root, *, exact, checks=False):
     for record in filter(None, tracked_tree(root, "HEAD", paths).split(b"\0")):
         metadata, name = record.split(b"\t", maxsplit=1)
         if metadata.startswith((b"100644 ", b"100755 ")):
-            os.utime(root / name.decode("utf-8"), (SOURCE_MTIME, SOURCE_MTIME), follow_symlinks=False)
+            path = root / name.decode("utf-8")
+            if not path.is_symlink():
+                os.utime(path, (SOURCE_MTIME, SOURCE_MTIME))
+    if llvm_data is not None:
+        # The bundle build script creates and tracks this marker on a cold run.
+        for marker in llvm_data.glob("tracel-llvm-*/.tracel-llvm-installed"):
+            if marker.is_file() and not marker.is_symlink():
+                os.utime(marker, (SOURCE_MTIME, SOURCE_MTIME))
 
 
 def main():
@@ -59,13 +66,14 @@ def main():
     restore = commands.add_parser("restore-mtimes")
     restore.add_argument("--exact", action="store_true")
     restore.add_argument("--checks", action="store_true")
+    restore.add_argument("--llvm-data", type=Path)
     args = parser.parse_args()
     if args.command == "keys":
         graph, inputs = dependency_keys(ROOT, args.dispatched, checks=args.checks)
         print(f"graph={graph}")
         print(f"inputs={inputs}")
     else:
-        restore_mtimes(ROOT, exact=args.exact, checks=args.checks)
+        restore_mtimes(ROOT, exact=args.exact, checks=args.checks, llvm_data=args.llvm_data)
 
 
 if __name__ == "__main__":
