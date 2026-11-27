@@ -47,8 +47,9 @@ Pancake Stacker and Stackroom.
   [LLVM notices](pancake/notices/llvm/) are release inputs.
 - [Engineering records](pancake/docs/archive/) contain historical test evidence
   and plans. Check the current source and CI when a historical recipe differs.
-  Put generated experiment outputs under the ignored `artifacts/` directory
-  and downloaded datasets under `datasets/`.
+  Put generated experiment outputs under the ignored `artifacts/` directory.
+  Use the shared BokehForge data location for downloaded datasets. Set
+  `BOKEHFORGE_DATA_ROOT` to use an existing dataset directory across worktrees.
 
 ## Zerene Stacker experiments
 

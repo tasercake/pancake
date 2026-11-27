@@ -88,6 +88,19 @@ def test_nested_project_runs_from_repository_root():
                              "bokehforge", "data", "--help"], cwd=repository, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert "download" in result.stdout and "process" not in result.stdout
-    config = project / "config/data/sources.json"
-    default_root = json.loads(config.read_text())["defaults"]["data_root"]
-    assert (config.parent / default_root).resolve() == repository / "datasets"
+
+
+def test_default_download_target_is_independent_of_checkout(tmp_path):
+    executable = Path(sys.executable).with_name("bokehforge")
+    target = tmp_path / "shared"
+    environment = {**os.environ, "BOKEHFORGE_DATA_ROOT": str(target)}
+    environment.pop("PYTHONPATH", None)
+    for directory in (tmp_path / "worktree-a", tmp_path / "worktree-b"):
+        directory.mkdir()
+        result = subprocess.run([str(executable), "data", "download", "--resolve-only"],
+                                cwd=directory, env=environment, capture_output=True, text=True)
+        assert result.returncode == 0, result.stderr
+        assert not list(directory.iterdir())
+    sources = json.loads((target / ".bokehforge/sources.lock.json").read_text())["datasets"]
+    assert [source["id"] for source in sources] == ["D29"]
+    assert all(file["sha256"] for file in sources[0]["files"])

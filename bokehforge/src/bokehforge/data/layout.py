@@ -1,11 +1,40 @@
 """Hidden runtime files and command logging."""
 
 import contextlib
+import json
 import os
 import sys
 import threading
 
+from ._files import safe_path
+
 METADATA = ".bokehforge"
+
+
+def matches_pins(source, policy):
+    if source.get("revision") != policy.get("revision"):
+        return False
+    return {item["path"]: item.get("sha256") for item in source.get("files", ())} == {
+        item["path"]: item.get("sha256") for item in policy["files"]
+    }
+
+
+def local_source(root, dataset_id, *, snapshot=None, pins=None):
+    """Find a published source with all its native files present."""
+    raw = safe_path(root / "raw", dataset_id)
+    if snapshot is None:
+        manifest = raw / "download-manifest.json"
+        if not manifest.is_file():
+            return None
+        snapshot = json.loads(manifest.read_text())
+    files = snapshot.get("files", ())
+    if (snapshot.get("id") != dataset_id or snapshot.get("status") != "available" or not files
+            or (pins is not None and not matches_pins(snapshot, pins))):
+        return None
+    if all((asset := safe_path(raw, item["path"])).is_file()
+           and (item.get("size") is None or asset.stat().st_size == item["size"]) for item in files):
+        return snapshot
+    return None
 
 
 @contextlib.contextmanager
@@ -52,9 +81,8 @@ def data_run(root, action):
         with (private / "logs" / f"{action}.log").open("a", encoding="utf-8", buffering=1) as log:
             log.write(f"\n=== bokehforge data {action} ===\n")
             mutex = threading.Lock()
-            with contextlib.redirect_stdout(_Tee(sys.stdout, log, mutex)), contextlib.redirect_stderr(_Tee(sys.stderr, log, mutex)):
-                try:
-                    yield private
-                except Exception as exc:
-                    log.write(f"ERROR: {exc}\n")
-                    raise
+            try:
+                yield _Tee(sys.stdout, log, mutex), _Tee(sys.stderr, log, mutex)
+            except Exception as exc:
+                log.write(f"ERROR: {exc}\n")
+                raise

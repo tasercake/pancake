@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "reserve_gib": 15,
+    "standard_format": "float32_RGB_TIFF"
+  },
+  "datasets": [
+    {
+      "id": "D29",
+      "name": "InfinigenDefocus",
+      "provider": "huggingface",
+      "repository": "venkatsubra/InfinigenDefocus",
+      "revision": "79aadc918e7a96a1544f324fc675a4734649455e",
+      "include": [
+        "InfinigenDefocus.zip",
+        "LICENSE",
+        "README.md"
+      ],
+      "layout": "infinigen_defocus",
+      "transfer": "srgb_assumed",
+      "evaluation_domain": "synthetic_indoor",
+      "primary_url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus",
+      "rights_evidence": "BSD-3-Clause in the pinned dataset release",
+      "original_split": "Hugging Face train split; no new split assigned",
+      "reference_type": "rendered_all_in_focus",
+      "reference_semantics": "Provider all-in-focus RGB render at the same camera view; synthetic indoor reference",
+      "files": [
+        {
+          "path": "InfinigenDefocus.zip",
+          "sha256": "b38d7749d519385ed907836cc1d1f7f8bc1f0775e0df47d767a28a081dff29f8",
+          "size": 9092311161,
+          "url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus/resolve/79aadc918e7a96a1544f324fc675a4734649455e/InfinigenDefocus.zip"
+        },
+        {
+          "git_blob_sha1": "9645f09fff91f8a367aa2103392246dd391aff89",
+          "path": "LICENSE",
+          "sha256": "5d0e29e3fb749d71ecdf9316e422b68861d6ebadbacd2e88fa37960fdf5b9991",
+          "size": 1506,
+          "url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus/resolve/79aadc918e7a96a1544f324fc675a4734649455e/LICENSE"
+        },
+        {
+          "git_blob_sha1": "55677736a01dc7823db2278089df6dbcbb30e124",
+          "path": "README.md",
+          "sha256": "ad5d1deac6a97972d8faf5018559bea256d40321afa67664a80e1e4523adfa25",
+          "size": 3739,
+          "url": "https://huggingface.co/datasets/venkatsubra/InfinigenDefocus/resolve/79aadc918e7a96a1544f324fc675a4734649455e/README.md"
+        }
+      ]
+    }
+  ]
+}
