@@ -267,13 +267,23 @@ fn observe_comparison(
 /// Returns a window, input, or rendered-image regression.
 #[test]
 fn viewer_fit_updates_without_decorative_animation() -> Result<(), Box<dyn Error>> {
-    run_offscreen_test(exercise_viewer_fit)
+    run_offscreen_test(|| exercise_viewer(observe_fit_command))
 }
 
-/// Observe the fit command and verify that its workspace is released.
+/// Observe zoom limits and scroll sensitivity on the displayed photograph.
 /// # Errors
 /// Returns a window, input, or rendered-image regression.
-fn exercise_viewer_fit() -> Result<(), Box<dyn Error>> {
+#[test]
+fn viewer_zoom_is_bounded_and_scroll_is_slowed() -> Result<(), Box<dyn Error>> {
+    run_offscreen_test(|| exercise_viewer(observe_zoom_limits))
+}
+
+/// Run a viewer exercise and verify that its workspace is released.
+/// # Errors
+/// Returns a window, input, or rendered-image regression.
+fn exercise_viewer(
+    observe: impl FnOnce(&ComponentInstance, &MinimalSoftwareWindow) -> Result<(), Box<dyn Error>>,
+) -> Result<(), Box<dyn Error>> {
     let adapter = MinimalSoftwareWindow::new(RepaintBufferType::NewBuffer);
     let platform_window = Rc::downgrade(&adapter);
     slint::platform::set_platform(Box::new(Offscreen(platform_window.clone())))?;
@@ -284,22 +294,22 @@ fn exercise_viewer_fit() -> Result<(), Box<dyn Error>> {
     super::branding::register_fonts()?;
     let workspace = super::compile_workspace()?.create()?;
     workspace.set_property("native-menu-bar", false.into())?;
-    let mut portrait = SharedPixelBuffer::new(40, 320);
+    let mut portrait = SharedPixelBuffer::new(40, 640);
     portrait.make_mut_slice().fill(RESULT);
     workspace.set_property("preview", Image::from_rgb8(portrait).into())?;
     workspace.set_property("preview-width", 40_i32.into())?;
-    workspace.set_property("preview-height", 320_i32.into())?;
+    workspace.set_property("preview-height", 640_i32.into())?;
     let component = workspace.as_weak();
     let observed = workspace
         .show()
         .map_err(Box::<dyn Error>::from)
-        .and_then(|()| observe_fit_command(&workspace, &adapter));
+        .and_then(|()| observe(&workspace, &adapter));
     let hidden = workspace.hide().map_err(Box::<dyn Error>::from);
     drop(workspace);
     drop(adapter);
     observed.and(hidden)?;
     if component.upgrade().is_some() || platform_window.upgrade().is_some() {
-        return Err("The finished fit command retained its offscreen workspace.".into());
+        return Err("The finished viewer exercise retained its offscreen workspace.".into());
     }
     Ok(())
 }
@@ -392,11 +402,80 @@ fn observe_fit_command(
     }
     let actual =
         render(adapter).map_err(|error| format!("After toolbar keyboard access: {error}"))?;
-    if !(12_000..=13_600).contains(&photo_pixels(&actual)) || window.has_active_animations() {
+    if photo_width(&actual)? != 40 || window.has_active_animations() {
         return Err(
-            "Keyboard activation must show the 40 × 320 photograph at 1:1 without animation."
-                .into(),
+            "Keyboard activation must show the photograph at 1:1 without animation.".into(),
         );
+    }
+    Ok(())
+}
+
+/// Count photograph pixels across the middle row of the viewer fixture.
+/// # Errors
+/// Returns an error if the image probe row is missing.
+fn photo_width(pixels: &[Rgb8Pixel]) -> Result<usize, &'static str> {
+    pixels
+        .as_chunks::<WIDTH>()
+        .0
+        .get(HEIGHT / 2)
+        .map(|row| row.iter().filter(|&&pixel| pixel == RESULT).count())
+        .ok_or("Missing the viewer's image probe row.")
+}
+
+/// Exercise scroll and keyboard zoom through both limits.
+/// # Errors
+/// Returns an input or rendered-image error.
+fn observe_zoom_limits(
+    workspace: &ComponentInstance,
+    adapter: &MinimalSoftwareWindow,
+) -> Result<(), Box<dyn Error>> {
+    let fit = photo_width(&render(adapter)?)?;
+    let window = workspace.window();
+    let scroll = |delta_y| {
+        window.dispatch_event_with_result(WindowEvent::PointerScrolled {
+            position: LogicalPosition::new(100.0, 300.0),
+            delta_x: 0.0,
+            delta_y,
+        })
+    };
+    let press = |text: &str| -> Result<(), PlatformError> {
+        let _pressed =
+            window.dispatch_event_with_result(WindowEvent::KeyPressed { text: text.into() })?;
+        let _released =
+            window.dispatch_event_with_result(WindowEvent::KeyReleased { text: text.into() })?;
+        Ok(())
+    };
+    let _scrolled = scroll(1.0)?;
+    let zoomed = photo_width(&render(adapter)?)?;
+    if !(fit.saturating_mul(102)..=fit.saturating_mul(107)).contains(&zoomed.saturating_mul(100)) {
+        return Err(format!(
+            "One scroll event must grow the image by about 4%, got {fit} to {zoomed} pixels."
+        )
+        .into());
+    }
+    for _ in 0..3_u8 {
+        let _scrolled = scroll(-1.0)?;
+    }
+    if photo_width(&render(adapter)?)? != fit {
+        return Err("Scrolling out must stop at fit-to-viewer.".into());
+    }
+
+    for _ in 0..16_u8 {
+        press("+")?;
+    }
+    if photo_width(&render(adapter)?)? != 160 {
+        return Err("Zooming in must stop at 400% of the 40 pixel image width.".into());
+    }
+    for _ in 0..16_u8 {
+        press("-")?;
+    }
+    if photo_width(&render(adapter)?)? != fit {
+        return Err("Keyboard zoom-out must stop at fit-to-viewer.".into());
+    }
+
+    workspace.set_property("preview-height", 80_i32.into())?;
+    if photo_width(&render(adapter)?)? != 160 {
+        return Err("Fit-to-viewer must respect 400% for small photos.".into());
     }
     Ok(())
 }
