@@ -358,14 +358,29 @@ jobs:
             "$CARGO_TARGET_DIR/$RUST_TARGET/release" "$payload" "$DIST" "$RELEASE_VERSION"
           python -B scripts/release_support.py smoke "$DIST/pancake-cli-$RELEASE_VERSION-windows-x64.exe"
 
+      - name: Save compiled release outputs
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ env.CARGO_TARGET_DIR }}
+            ~/.cargo/registry
+            ~/.cache/tracel
+            ${{ env.TRACEL_LLVM_DATA }}
+            ${{ runner.temp }}/pancake-zstd
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}
+
       - name: Verify the Windows Explorer branding
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $app = Join-Path $env:DIST "pancake-gui-${env:RELEASE_VERSION}-windows-x64.exe"
           $info = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($app)
+          if ($info.FileVersion -cne $env:RELEASE_VERSION -or $info.ProductVersion -cne $env:RELEASE_VERSION) {
+            throw "Expected Windows version ${env:RELEASE_VERSION}, got FileVersion '$($info.FileVersion)' and ProductVersion '$($info.ProductVersion)'"
+          }
           if ($info.ProductName -cne "Pancake Stacker" -or $info.FileDescription -cne "Pancake Stacker") {
-            throw "The Windows executable is missing Pancake Stacker product metadata"
+            throw "Unexpected Windows ProductName '$($info.ProductName)' and FileDescription '$($info.FileDescription)'"
           }
           Add-Type -Name ShellIcons -Namespace Pancake -MemberDefinition @'
           [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
@@ -381,18 +396,6 @@ jobs:
           path: ${{ runner.temp }}/pancake-dist/*
           if-no-files-found: error
           compression-level: 0
-
-      - name: Save compiled release outputs
-        if: steps.build-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: |
-            ${{ env.CARGO_TARGET_DIR }}
-            ~/.cargo/registry
-            ~/.cache/tracel
-            ${{ env.TRACEL_LLVM_DATA }}
-            ${{ runner.temp }}/pancake-zstd
-          key: ${{ steps.build-cache.outputs.cache-primary-key }}
 
   publish:
     name: Publish to GitHub Releases
