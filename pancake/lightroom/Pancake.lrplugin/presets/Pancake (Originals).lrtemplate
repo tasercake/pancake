@@ -1,11 +1,11 @@
 s = {
     id = 'DD4D8B20-C811-4A05-A311-9183BA9350F5',
     internalName = 'Pancake (Originals)',
-    title = 'Pancake (Originals)',
+    title = 'Pancake Stacker (Originals)',
     type = 'Export',
     value = {
         exportServiceProvider = 'me.penukonda.pancake.lightroom',
-        exportServiceProviderTitle = 'Pancake',
+        exportServiceProviderTitle = 'Pancake Stacker',
         ['me.penukonda.pancake.lightroom_withEdits'] = false,
         export_destinationType = 'tempFolder',
         format = 'TIFF',

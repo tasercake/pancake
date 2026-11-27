@@ -102,6 +102,9 @@ class LinuxPackageTests(unittest.TestCase):
                 subprocess.run(["cc", "-o", release / name, source], check=True)
             output = root / "package"
             source_root, revision = _workspace(root)
+            icon = Path(__file__).resolve().parents[2] / "assets/pancake-stacker-icon.png"
+            (root / "assets").mkdir()
+            (root / "assets" / icon.name).write_bytes(icon.read_bytes())
             lock_digest = file_sha256(source_root / "Cargo.lock")
             native_receipt = root / "native-build.json"
             native_receipt.write_text(json.dumps({
@@ -120,6 +123,11 @@ class LinuxPackageTests(unittest.TestCase):
             artifact = output / receipt["archive"]["file"]
             self.assertEqual(receipt["archive"]["sha256"], file_sha256(artifact))
             subprocess.run(["dpkg-deb", "--extract", artifact, root / "unpack"], check=True)
+            share = root / "unpack/usr/share"
+            launcher = (share / "applications/pancake.desktop").read_text().splitlines()
+            self.assertIn("Name=Pancake Stacker", launcher)
+            self.assertIn("Icon=pancake", launcher)
+            self.assertEqual(file_sha256(share / "pixmaps/pancake.png"), file_sha256(icon))
             for name in ("pancake-cli", "pancake-gui"):
                 self.assertEqual(file_sha256(release / name), file_sha256(root / "unpack/usr/bin" / name))
             launched = subprocess.check_output([root / "unpack/usr/bin/pancake-cli"], text=True, timeout=5)

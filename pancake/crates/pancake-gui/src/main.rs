@@ -1,4 +1,4 @@
-//! Native Pancake desktop application.
+//! Native Pancake Stacker desktop application.
 
 use std::cell::Cell;
 use std::error::Error;
@@ -168,8 +168,10 @@ fn configure_lightroom(window: &ComponentInstance) -> Result<(), Box<dyn Error>>
         Err(error) => {
             window.set_property(
                 "lightroom-status",
-                SharedString::from(format!("Could not locate the Pancake executable: {error}"))
-                    .into(),
+                SharedString::from(format!(
+                    "Could not locate the Pancake Stacker executable: {error}"
+                ))
+                .into(),
             )?;
             return Ok(());
         }
@@ -179,7 +181,7 @@ fn configure_lightroom(window: &ComponentInstance) -> Result<(), Box<dyn Error>>
             let status = if installed {
                 "Plug-in installed. In Lightroom Classic, right-click photos and choose Export."
             } else {
-                "Install the plug-in to open selected Lightroom photos in Pancake."
+                "Install the plug-in to open selected Lightroom photos in Pancake Stacker."
             };
             window.set_property("lightroom-status", SharedString::from(status).into())?;
             window.set_property("lightroom-installed", installed.into())?;
@@ -215,9 +217,12 @@ fn configure_lightroom(window: &ComponentInstance) -> Result<(), Box<dyn Error>>
 fn main() -> Result<(), Box<dyn Error>> {
     let mut options = pancake::job::Options::from_env()?;
     configure_backend(&mut options)?;
+    #[cfg(target_os = "linux")]
+    slint::set_xdg_app_id("pancake")?;
     branding::register_fonts()?;
     let window = compile_workspace()?.create()?;
     window.set_property("native-menu-bar", cfg!(not(target_os = "linux")).into())?;
+    window.set_property("app-icon", branding::app_icon()?.into())?;
     window.set_property("wordmark", branding::wordmark()?.into())?;
     window.set_property(
         "app-version",

@@ -25,9 +25,9 @@ pub fn batch(
     quality: u8,
 ) -> Result<(), String> {
     let pending = [
-        ("Pancake.jpg", BitDepth::Eight),
-        ("Pancake.png", BitDepth::Sixteen),
-        ("Pancake.tif", BitDepth::Sixteen),
+        ("Pancake Stacker.jpg", BitDepth::Eight),
+        ("Pancake Stacker.png", BitDepth::Sixteen),
+        ("Pancake Stacker.tif", BitDepth::Sixteen),
     ]
     .into_iter()
     .map(|(name, depth)| prepare_export(&directory.join(name), image, depth, quality, sources))

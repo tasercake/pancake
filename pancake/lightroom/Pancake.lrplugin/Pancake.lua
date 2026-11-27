@@ -20,7 +20,7 @@ local function installedApp()
             return { path = path, bundle = true }
         end
     end
-    error('Install the plug-in again from Pancake Preferences to reconnect the app.', 0)
+    error('Install the plug-in again from Pancake Stacker Preferences to reconnect the app.', 0)
 end
 
 -- Each path is a single literal shell argument, including embedded apostrophes.
@@ -46,7 +46,7 @@ local function launch(app, paths, edited)
         command = '/bin/test -x ' .. target .. ' && (' .. command .. ' </dev/null >/dev/null 2>&1 &)'
     end
     if LrTasks.execute(command) ~= 0 then
-        error('Could not open Pancake. Check that it opens from its installed location.', 0)
+        error('Could not open Pancake Stacker. Check that it opens from its installed location.', 0)
     end
 end
 
@@ -58,7 +58,7 @@ local function originalPaths(photos)
             error('An original is offline. Reconnect it in Lightroom and try again.', 0)
         end
         if seen[path] then
-            error('Selected photos share an original. Use Pancake (With Lightroom Edits) for virtual copies.', 0)
+            error('Selected photos share an original. Use Pancake Stacker (With Lightroom Edits) for virtual copies.', 0)
         end
         seen[path] = true
         paths[#paths + 1] = path
@@ -112,7 +112,7 @@ local function openEdited(app, photos)
     local created, reason = LrFileUtils.createDirectory(folder)
     if not created then error(reason or 'Could not create a folder for temporary TIFFs.', 0) end
     local ok, message = LrTasks.pcall(function()
-        local progress = LrProgressScope { title = 'Rendering TIFFs for Pancake' }
+        local progress = LrProgressScope { title = 'Rendering TIFFs for Pancake Stacker' }
         local paths = collectRenders(#photos, progress, function()
             local settings = {}
             M.configurePreset(settings)
@@ -130,14 +130,14 @@ local function openEdited(app, photos)
 end
 
 local function appForSelection(count)
-    if not MAC_ENV then error('The Pancake plug-in requires macOS.', 0) end
+    if not MAC_ENV then error('The Pancake Stacker plug-in requires macOS.', 0) end
     if count < 2 then error('Select at least two photos to stack.', 0) end
     return installedApp()
 end
 
 local function reportFailure(action)
     local ok, message = LrTasks.pcall(action)
-    if not ok then LrDialogs.message('Could not open photos in Pancake', tostring(message), 'critical') end
+    if not ok then LrDialogs.message('Could not open photos in Pancake Stacker', tostring(message), 'critical') end
 end
 
 function M.openSelected(edited)
@@ -160,7 +160,7 @@ function M.processPreset(_, context)
         local count = session:countRenditions()
         local app = appForSelection(count)
         if context.propertyTable.withEdits then
-            local progress = context:configureProgress { title = 'Rendering TIFFs for Pancake' }
+            local progress = context:configureProgress { title = 'Rendering TIFFs for Pancake Stacker' }
             local paths = collectRenders(count, progress, function()
                 return context:renditions { stopIfCanceled = true }
             end)

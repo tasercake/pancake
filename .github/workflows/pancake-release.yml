@@ -1,4 +1,4 @@
-name: Pancake packages
+name: Pancake Stacker packages
 
 on:
   workflow_dispatch:
@@ -284,7 +284,8 @@ jobs:
 
           python -m pip install --require-hashes --only-binary=:all: -r scripts/macos-dmg-requirements.txt
           package="$DIST/pancake-$RELEASE_VERSION-macos-arm64.dmg"
-          python -B -m dmgbuild -s scripts/macos-dmg-settings.py -D "app=$payload/Pancake.app" \
+          app_name="Pancake Stacker.app"
+          python -B -m dmgbuild -s scripts/macos-dmg-settings.py -D "app=$payload/$app_name" \
             "Pancake Stacker" "$package"
           hdiutil verify "$package"
 
@@ -295,21 +296,21 @@ jobs:
           test "${#visible[@]}" -eq 2
           test "$(readlink "$mounted/Applications")" = /Applications
           test -f "$mounted/.background.tiff"
-          python -B - "$mounted/.DS_Store" <<'PY'
+          python -B - "$mounted/.DS_Store" "$app_name" <<'PY'
           import sys
           from ds_store import DSStore
 
           with DSStore.open(sys.argv[1], "r") as layout:
-              left, right = layout["Pancake.app"]["Iloc"], layout["Applications"]["Iloc"]
+              left, right = layout[sys.argv[2]]["Iloc"], layout["Applications"]["Iloc"]
               if left[0] >= right[0] or left[1] != right[1]:
                   raise SystemExit("Expected the app to the left of Applications in Finder")
           PY
 
-          installed="$RUNNER_TEMP/pancake-install/Pancake.app"
-          ditto "$mounted/Pancake.app" "$installed"
+          installed="$RUNNER_TEMP/pancake-install/$app_name"
+          ditto "$mounted/$app_name" "$installed"
           codesign --verify --strict --deep "$installed"
           test -x "$installed/Contents/MacOS/pancake-gui"
-          diff -qr "$payload/Pancake.app" "$installed"
+          diff -qr "$payload/$app_name" "$installed"
           diff -qr "$notices" "$installed/Contents/Resources/Notices"
           python -B scripts/release_support.py smoke "$installed/Contents/MacOS/pancake-cli"
 
@@ -322,6 +323,23 @@ jobs:
           python -B scripts/release_support.py windows-assets \
             "$CARGO_TARGET_DIR/$RUST_TARGET/release" "$payload" "$DIST" "$RELEASE_VERSION"
           python -B scripts/release_support.py smoke "$DIST/pancake-cli-$RELEASE_VERSION-windows-x64.exe"
+
+      - name: Verify the Windows Explorer branding
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $app = Join-Path $env:DIST "pancake-gui-${env:RELEASE_VERSION}-windows-x64.exe"
+          $info = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($app)
+          if ($info.ProductName -cne "Pancake Stacker" -or $info.FileDescription -cne "Pancake Stacker") {
+            throw "The Windows executable is missing Pancake Stacker product metadata"
+          }
+          Add-Type -Name ShellIcons -Namespace Pancake -MemberDefinition @'
+          [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+          public static extern uint ExtractIconEx(string file, int index, IntPtr large, IntPtr small, uint count);
+          '@
+          if ([Pancake.ShellIcons]::ExtractIconEx($app, -1, [IntPtr]::Zero, [IntPtr]::Zero, 0) -ne 1) {
+            throw "The Windows executable must contain one application icon group"
+          }
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -380,4 +398,4 @@ jobs:
           if [[ "$MODE" == prerelease ]]; then flags+=(--prerelease); fi
           url=$(python3 -B scripts/release_publish.py "$RUNNER_TEMP/pancake-dist" \
             "$RUNNER_TEMP/pancake-release-candidate" "${flags[@]}")
-          printf '[Published Pancake release](%s)\n' "$url" >> "$GITHUB_STEP_SUMMARY"
+          printf '[Published Pancake Stacker release](%s)\n' "$url" >> "$GITHUB_STEP_SUMMARY"

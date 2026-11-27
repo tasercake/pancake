@@ -1,12 +1,12 @@
 # Install Pancake Stacker
 
-Choose the newest release and expand **Assets** to find the download for your computer. For releases that offer ZIP downloads, follow the installation instructions linked from the release notes. [Pancake releases](https://github.com/tasercake/pancake/releases)
+Choose the newest release and expand **Assets** to find the download for your computer. For releases that offer ZIP downloads, follow the installation instructions linked from the release notes. [Pancake Stacker releases](https://github.com/tasercake/pancake/releases)
 
 ## macOS (Apple Silicon)
 
 1. Download `pancake-<version>-macos-arm64.dmg` and double-click it in Finder.
-2. In the **Pancake Stacker** Finder window, drag **Pancake** to the **Applications** shortcut. You can also copy the app into your user **Applications** folder.
-3. Open Pancake from **Applications**. Eject the disk image in Finder when you're done with it.
+2. In the **Pancake Stacker** Finder window, drag **Pancake Stacker** to the **Applications** shortcut. You can also copy the app into your user **Applications** folder.
+3. Open Pancake Stacker from **Applications**. Eject the disk image in Finder when you're done with it.
 
 To tell whether your Mac uses Apple Silicon, open **Apple menu → About This Mac** and look for an Apple chip.
 
@@ -20,7 +20,7 @@ The command-line tool is available as `pancake-cli-<version>-windows-x64.exe`. L
 
 To check your architecture, open **Settings → System → About** and look for an x64-based processor under **System type**.
 
-The executables are unsigned, so Windows may show a warning. If Pancake reports a missing Visual C++ runtime DLL, install the [Microsoft Visual C++ Redistributable for x64](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist#latest-supported-redistributable-version), then try again.
+The executables are unsigned, so Windows may show a warning. If Pancake Stacker reports a missing Visual C++ runtime DLL, install the [Microsoft Visual C++ Redistributable for x64](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist#latest-supported-redistributable-version), then try again.
 
 ## Ubuntu 24.04 x86-64
 
@@ -32,6 +32,6 @@ The executables are unsigned, so Windows may show a warning. If Pancake reports 
    sudo apt install ./pancake_0.1.0_amd64.deb
    ```
 
-3. Open **Pancake** from the application menu.
+3. Open **Pancake Stacker** from the application menu.
 
-Once Pancake opens, [stack your first photos](desktop.md#make-a-focus-stack).
+Once Pancake Stacker opens, [stack your first photos](desktop.md#make-a-focus-stack).

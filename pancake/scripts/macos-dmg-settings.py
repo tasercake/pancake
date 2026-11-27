@@ -1,5 +1,7 @@
 """Finder layout for the drag-to-Applications disk image."""
 
+from pathlib import Path
+
 # dmgbuild supplies defines from its -D arguments.
 files = [defines["app"]]
 symlinks = {"Applications": "/Applications"}
@@ -13,6 +15,6 @@ show_toolbar = False
 show_status_bar = False
 show_pathbar = False
 show_tab_view = False
-icon_locations = {"Pancake.app": (140, 120), "Applications": (500, 120)}
+icon_locations = {Path(defines["app"]).name: (140, 120), "Applications": (500, 120)}
 icon_size = 112
 text_size = 16

@@ -28,7 +28,7 @@ class MacDiskImageTests(unittest.TestCase):
     """Keep the Finder install window focused on the app and its drop target."""
 
     def test_finder_layout_stages_only_app_and_applications(self):
-        app = "/tmp/Pancake Stacker/Pancake.app"
+        app = "/tmp/Pancake Stacker/Pancake Stacker.app"
         settings = runpy.run_path(str(Path(__file__).with_name("macos-dmg-settings.py")),
                                   init_globals={"defines": {"app": app}})
         self.assertEqual(settings["files"], [app])
@@ -36,8 +36,8 @@ class MacDiskImageTests(unittest.TestCase):
         self.assertEqual(settings["default_view"], "icon-view")
         self.assertEqual(settings["background"], "builtin-arrow")
         positions = settings["icon_locations"]
-        self.assertEqual(positions.keys(), {"Pancake.app", "Applications"})
-        left, right = positions["Pancake.app"], positions["Applications"]
+        self.assertEqual(positions.keys(), {"Pancake Stacker.app", "Applications"})
+        left, right = positions["Pancake Stacker.app"], positions["Applications"]
         self.assertLess(left[0], right[0])
         self.assertEqual(left[1], right[1])
 
@@ -177,9 +177,11 @@ class MacPackageTests(unittest.TestCase):
             "UNRELATED_FIXTURE": "discard this value",
         }):
             self.package()
-        app = self.output / "Pancake.app"
+        app = self.output / "Pancake Stacker.app"
         plist_path = app / "Contents" / "Info.plist"
         plist = plistlib.loads(plist_path.read_bytes())
+        self.assertEqual(plist["CFBundleDisplayName"], "Pancake Stacker")
+        self.assertEqual(plist["CFBundleName"], "Pancake Stacker")
         self.assertEqual(plist["CFBundleExecutable"], "pancake-gui")
         self.assertEqual(plist["CFBundleIconFile"], "Pancake.icns")
         self.assertEqual(plist["CFBundleIdentifier"], IDENTIFIER)
@@ -205,15 +207,15 @@ class MacPackageTests(unittest.TestCase):
         self.assertEqual(overrides["MACOSX_DEPLOYMENT_TARGET"], "15.0")
         self.assertEqual(overrides["CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER"], "/test/custom-linker")
         self.assertNotIn("UNRELATED_FIXTURE", overrides)
-        self.assertEqual(receipt["files_sha256"]["Pancake.app/Contents/Info.plist"], file_sha256(plist_path))
-        self.assertIn("Pancake.app/Contents/_CodeSignature/CodeResources", receipt["files_sha256"])
+        self.assertEqual(receipt["files_sha256"]["Pancake Stacker.app/Contents/Info.plist"], file_sha256(plist_path))
+        self.assertIn("Pancake Stacker.app/Contents/_CodeSignature/CodeResources", receipt["files_sha256"])
         for name in FONT_LICENSES:
-            relative = f"Pancake.app/Contents/Resources/font-notices/{name}"
+            relative = f"Pancake Stacker.app/Contents/Resources/font-notices/{name}"
             self.assertEqual(receipt["files_sha256"][relative], file_sha256(self.output / relative))
         self.assertEqual({item.name for item in self.output.iterdir()},
-                         {"Pancake.app", "build.log", "package-receipt.json"})
+                         {"Pancake Stacker.app", "build.log", "package-receipt.json"})
         for name in BINARIES:
-            path = f"Pancake.app/Contents/MacOS/{name}"
+            path = f"Pancake Stacker.app/Contents/MacOS/{name}"
             binary = self.output / path
             self.assertEqual(binary.read_bytes(), f"{name} signed".encode())
             self.assertEqual(binary.stat().st_mode & 0o777, 0o755)
@@ -233,7 +235,7 @@ class MacPackageTests(unittest.TestCase):
         build_package(self.source, self.output, IDENTIFIER, "17", release_notices=self.notices)
         receipt = json.loads((self.output / "package-receipt.json").read_bytes())
         for relative in RELEASE_NOTICES:
-            staged = f"Pancake.app/Contents/Resources/Notices/{relative}"
+            staged = f"Pancake Stacker.app/Contents/Resources/Notices/{relative}"
             self.assertEqual(receipt["files_sha256"][staged], file_sha256(self.notices / relative))
 
     def test_reuses_a_cargo_target_without_signing_its_binaries(self):

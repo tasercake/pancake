@@ -240,7 +240,7 @@ impl PreviewDevice {
             depth_or_array_layers: 1,
         };
         let texture = self.device.create_texture(&wgpu::TextureDescriptor {
-            label: Some("Pancake viewer preview"),
+            label: Some("Pancake Stacker viewer preview"),
             size,
             mip_level_count: 1,
             sample_count: 1,

@@ -55,10 +55,9 @@ impl Installation {
     /// Returns filesystem errors or an error if the executable path cannot be encoded.
     pub(super) fn new(executable: &Path, modules: &Path) -> io::Result<Self> {
         let executable = executable.canonicalize()?;
-        let executable = executable
-            .into_os_string()
-            .into_string()
-            .map_err(|_| io::Error::other("The Pancake executable path is not valid UTF-8."))?;
+        let executable = executable.into_os_string().into_string().map_err(|_| {
+            io::Error::other("The Pancake Stacker executable path is not valid UTF-8.")
+        })?;
         Ok(Self {
             executable,
             plugin: modules.join("Pancake.lrplugin"),

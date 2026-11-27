@@ -102,11 +102,13 @@ package.path = plugin .. '?.lua;' .. package.path
 local function runPreset(menu)
     events, failure = {}, nil
     local env = {}
-    local preset = assert(loadfile(plugin .. service.builtInPresetsDir .. '/' .. commands[menu].title .. '.lrtemplate'))
+    local filename = menu == 2 and 'Pancake (With Lightroom Edits).lrtemplate' or 'Pancake (Originals).lrtemplate'
+    local preset = assert(loadfile(plugin .. service.builtInPresetsDir .. '/' .. filename))
     setfenv(preset, env)()
     assert(env.s.title == commands[menu].title)
     local settings = env.s.value
     assert(settings.exportServiceProvider == info.LrToolkitIdentifier)
+    assert(settings.exportServiceProviderTitle == info.LrPluginName)
     local edited = menu == 2
     assert(settings[info.LrToolkitIdentifier .. '_withEdits'] == edited)
     local provider = dofile(plugin .. service.file)
@@ -164,7 +166,7 @@ assert(table.concat(events, '|') == 'mkdir|render|render|done|' .. table.concat(
 
 renderFailure = true
 run(2)
-assert(failureTitle == 'Could not open photos in Pancake' and failureSeverity == 'critical')
+assert(failureTitle == 'Could not open photos in Pancake Stacker' and failureSeverity == 'critical')
 assert(failure:find('Render failure', 1, true))
 assert(table.concat(events, '|') == 'mkdir|render|done|delete')
 renderFailure = false
@@ -177,13 +179,13 @@ cancel = false
 
 launchFailure = true
 run(2)
-assert(failure:find('Could not open Pancake', 1, true))
+assert(failure:find('Could not open Pancake Stacker', 1, true))
 assert(events[#events] == 'delete')
 launchFailure = false
 
 appMissing = true
 run(1)
-assert(failure:find('Pancake Preferences', 1, true))
+assert(failure:find('Pancake Stacker Preferences', 1, true))
 assert(#events == 0)
 appMissing = false
 
@@ -228,7 +230,7 @@ assert(table.concat(events, '|') == 'render|render|done|' .. table.concat({
 
 renderFailure = true
 runPreset(2)
-assert(failureTitle == 'Could not open photos in Pancake' and failureSeverity == 'critical')
+assert(failureTitle == 'Could not open photos in Pancake Stacker' and failureSeverity == 'critical')
 assert(failure:find('Render failure', 1, true))
 assert(table.concat(events, '|') == 'render|done')
 renderFailure = false
@@ -257,7 +259,7 @@ assert(#events == 1 and events[1] == originalsCommand, 'Standalone originals mus
 
 launchFailure = true
 run(1)
-assert(failure:find('Could not open Pancake', 1, true))
+assert(failure:find('Could not open Pancake Stacker', 1, true))
 launchFailure = false
 
 runPreset(1)
@@ -275,7 +277,7 @@ assert(table.concat(events, '|') == 'render|render|done|' .. editedArgs)
 
 appMissing = true
 run(1)
-assert(failure:find('Pancake Preferences', 1, true))
+assert(failure:find('Pancake Stacker Preferences', 1, true))
 assert(#events == 0)
 
 print('Lightroom export tests passed')
