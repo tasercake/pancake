@@ -15,9 +15,9 @@ fn failed_batch_keeps_previous_files() -> Result<(), Box<dyn Error>> {
     let path = directory.path();
     let image = RgbImage::new(2, 1, vec![0.25, 0.5, 0.75, 0.5, 0.25, 1.0])?;
     super::batch(path, &image, &[], 95)?;
-    let png = path.join("Pancake.png");
-    let tiff = path.join("Pancake.tif");
-    let jpeg = path.join("Pancake.jpg");
+    let png = path.join("Pancake Stacker.png");
+    let tiff = path.join("Pancake Stacker.tif");
+    let jpeg = path.join("Pancake Stacker.jpg");
     let previous_png = fs::read(&png)?;
     let previous_tiff = fs::read(&tiff)?;
     fs::remove_file(&jpeg)?;

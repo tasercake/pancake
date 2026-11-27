@@ -158,7 +158,7 @@ def configured_stackers(args):
     openfocus = "openfocus" + EXE
     python = "python" + EXE
     tools = [
-        Stacker("pancake", "Pancake", "Hybrid",
+        Stacker("pancake", "Pancake Stacker", "Hybrid",
                 (args.pancake,) if args.pancake else (REPO / "pancake/target/release" / pancake, pancake)),
         Stacker("focus-stack", "focus-stack", "Complex wavelet",
                 (args.focus_stack,) if args.focus_stack else (modules / "focus-stack/build" / focus, focus)),

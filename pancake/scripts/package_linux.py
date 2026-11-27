@@ -90,7 +90,7 @@ def build_package(release, output, version, maintainer, revision, lock_digest, *
     headers = {name: _elf_header(release / name) for name in BINARIES}
     control = (f"Package: pancake\nVersion: {version}\nArchitecture: amd64\n"
                f"Maintainer: {maintainer}\nSection: graphics\nPriority: optional\n"
-               "Description: Focus stacking and exposure fusion\n")
+               "Description: Pancake Stacker focus stacking and exposure fusion\n")
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".pancake-package-", dir=output.parent) as scratch:
         staging = Path(scratch)
@@ -109,11 +109,15 @@ def build_package(release, output, version, maintainer, revision, lock_digest, *
                            "dynamic": _run("readelf", "--wide", "--dynamic", binary).stdout,
                            "symbols": _run("readelf", "--wide", "--version-info", binary).stdout}
         dependencies, diagnostics = _dependency_report(staging, [bindir / name for name in BINARIES], control)
-        applications = payload / "usr" / "share" / "applications"
+        share = payload / "usr" / "share"
+        applications = share / "applications"
         applications.mkdir(parents=True)
         (applications / "pancake.desktop").write_text(
-            "[Desktop Entry]\nType=Application\nName=Pancake\n"
-            "Exec=pancake-gui %F\nCategories=Graphics;Photography;\n", encoding="utf-8")
+            "[Desktop Entry]\nType=Application\nName=Pancake Stacker\n"
+            "Exec=pancake-gui %F\nIcon=pancake\nCategories=Graphics;Photography;\n", encoding="utf-8")
+        pixmaps = share / "pixmaps"
+        pixmaps.mkdir()
+        shutil.copyfile(source_root.parent / "assets/pancake-stacker-icon.png", pixmaps / "pancake.png")
         notices = stage_notices(payload, source_root, revision, lock_digest)
         native_notices = None
         if native_llvm_receipt is not None:

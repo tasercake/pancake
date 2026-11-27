@@ -5568,8 +5568,10 @@ version = "0.1.0"
 dependencies = [
  "atk",
  "dirs",
+ "find-msvc-tools",
  "gdkx11",
  "gtk",
+ "image",
  "num-traits",
  "pancake",
  "rfd",

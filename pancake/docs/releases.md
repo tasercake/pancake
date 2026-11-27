@@ -1,16 +1,16 @@
-# Build and publish Pancake packages
+# Build and publish Pancake Stacker packages
 
-In GitHub Actions, open **Pancake packages** and choose **Run workflow**. Select **prerelease** or **stable** on the default branch to publish. The default **build-only** mode uploads the packages to the Actions run. [Pancake packages workflow](https://github.com/tasercake/pancake/actions/workflows/pancake-release.yml)
+In GitHub Actions, open **Pancake Stacker packages** and choose **Run workflow**. Select **prerelease** or **stable** on the default branch to publish. The default **build-only** mode uploads the packages to the Actions run. [Pancake Stacker packages workflow](https://github.com/tasercake/pancake/actions/workflows/pancake-release.yml)
 
 | Platform | Package | How to run |
 | --- | --- | --- |
-| macOS on Apple Silicon | `pancake-<version>-macos-arm64.dmg` with `Pancake.app` and an **Applications** shortcut | Open the DMG and drag the app to **Applications**. The app is ad-hoc signed and has no Apple notarization. |
-| Ubuntu 24.04 x86-64 | `pancake_<version>_amd64.deb` | Install with `sudo apt install ./pancake_<version>_amd64.deb`. Launch Pancake from the application menu or run `pancake-cli` in a terminal. |
+| macOS on Apple Silicon | `pancake-<version>-macos-arm64.dmg` with `Pancake Stacker.app` and an **Applications** shortcut | Open the DMG and drag the app to **Applications**. The app is ad-hoc signed and has no Apple notarization. |
+| Ubuntu 24.04 x86-64 | `pancake_<version>_amd64.deb` | Install with `sudo apt install ./pancake_<version>_amd64.deb`. Launch Pancake Stacker from the application menu or run `pancake-cli` in a terminal. |
 | Windows x64 | `pancake-gui-<version>-windows-x64.exe` and `pancake-cli-<version>-windows-x64.exe` | Run either executable directly. Both are unsigned and use the x64 Microsoft Visual C++ runtime. The release includes a separate Windows notices archive. |
 
 Each builder uses the committed Rust toolchain and Cargo lockfile. Before uploading, each builder runs a two-frame CPU stack with the packaged CLI. The macOS release build links a pinned static copy of Zstandard, checks the disk image layout, and tests a copy of the app bundle from the mounted image. The CLI and release notices are packaged inside that bundle. The Linux and macOS jobs retain package receipts on the Actions run. Desktop and accelerator verification is covered separately in the [developer guide](../DEVELOPING.md).
 
-Successful runs on the default branch save compiled dependencies for subsequent runs with matching build inputs and runner images. Each run builds and verifies its own Pancake binaries.
+Successful runs on the default branch save compiled dependencies for subsequent runs with matching build inputs and runner images. Each run builds and verifies its own Pancake Stacker binaries.
 
 When packaging repeatedly on an Apple Silicon Mac, pass `--target-dir "$PWD/target"` to `scripts/package_macos.py` from the `pancake/` directory to reuse Cargo build output. Use a target directory for that checkout and its native linker configuration, and give each package a fresh output path.
 

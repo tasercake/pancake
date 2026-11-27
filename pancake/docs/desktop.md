@@ -1,6 +1,6 @@
-# Stack your photos in Pancake
+# Stack your photos in Pancake Stacker
 
-[Install Pancake](install.md), then open the desktop app.
+[Install Pancake Stacker](install.md), then open the desktop app.
 
 ## Make a focus stack
 
@@ -12,7 +12,7 @@
 
 If you have no stack handy, save both sample frames ([near focus](../../assets/quickstart/focus-near.png) and [far focus](../../assets/quickstart/focus-far.png)) and open them together.
 
-![Pancake workspace showing a finished Hybrid stack from the near and far sample frames](../../assets/quickstart/pancake-desktop.png)
+![Pancake Stacker workspace showing a finished Hybrid stack from the near and far sample frames](../../assets/quickstart/pancake-desktop.png)
 
 ## Browse sources and adjust the workspace
 
@@ -21,8 +21,8 @@ inspect that frame, or use the arrow keys with the viewer focused. The current
 frame has an outlined thumbnail and a numbered marker. Use **Files** to
 reveal the full source list or manage the selection.
 
-Pancake starts in the graphite theme. In **Preferences**, you can choose the
-light theme or enter an accent as a six-digit color such as `#dabb91`. Pancake
+Pancake Stacker starts in the graphite theme. In **Preferences**, you can choose the
+light theme or enter an accent as a six-digit color such as `#dabb91`. Pancake Stacker
 adjusts the displayed shade for contrast and saves your original choice. The
 default accent is white.
 
@@ -38,15 +38,15 @@ default accent is white.
 
 ## File formats
 
-Pancake opens JPEG, PNG, TIFF, BMP, OpenEXR, NumPy arrays (`.npy`), and supported DNG and Canon CR3 raw files. If your camera files fail to open, export the frames from your raw editor as matching 16-bit TIFFs and use those.
+Pancake Stacker opens JPEG, PNG, TIFF, BMP, OpenEXR, NumPy arrays (`.npy`), and supported DNG and Canon CR3 raw files. If your camera files fail to open, export the frames from your raw editor as matching 16-bit TIFFs and use those.
 
 The app exports 8- or 16-bit TIFF and PNG, JPEG, and OpenEXR. TIFF export can retain an embedded ICC profile when the profile is identical across all frames.
 
 ## Lightroom Classic on macOS
 
-1. Keep Pancake in a stable location. For a packaged `Pancake.app`, use **Applications**. For a local build, you can use the standalone `pancake-gui` executable.
-2. Open Pancake and choose **Preferences → Install Lightroom plug-in**. Restart Lightroom Classic if it was open.
-3. Select at least two photos in Lightroom Classic. Right-click the selection and open **Export**. Choose **Pancake (Originals)** for supported source files or **Pancake (With Lightroom Edits)** for full-size 16-bit sRGB TIFFs. Both commands are also available under **File → Plug-in Extras**.
+1. Keep Pancake Stacker in a stable location. For a packaged `Pancake Stacker.app`, use **Applications**. For a local build, you can use the standalone `pancake-gui` executable.
+2. Open Pancake Stacker and choose **Preferences → Install Lightroom plug-in**. Restart Lightroom Classic if it was open.
+3. Select at least two photos in Lightroom Classic. Right-click the selection and open **Export**. Choose **Pancake Stacker (Originals)** for supported source files or **Pancake Stacker (With Lightroom Edits)** for full-size 16-bit sRGB TIFFs. Both commands are also available under **File → Plug-in Extras**.
 4. Stack and export in Pancake. Use Lightroom Classic's **Import** command to bring the result back into your catalog.
 
-If you move Pancake to a different location, open it there and reinstall the plug-in from **Preferences**. Pancake removes the temporary TIFFs from **With Lightroom Edits** when the instance that uses them closes.
+If you move Pancake Stacker to a different location, open it there and reinstall the plug-in from **Preferences**. Pancake Stacker removes the temporary TIFFs from **With Lightroom Edits** when the instance that uses them closes.

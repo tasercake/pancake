@@ -13,6 +13,13 @@ use slint::fontique_012::{fontique, shared_collection};
 )]
 const WORDMARK: &[u8] = include_bytes!("../../../../assets/pancake-stacker-wordmark.png");
 
+/// Graphic-only artwork used by desktop window managers.
+#[expect(
+    clippy::large_include_file,
+    reason = "the app icon is embedded for standalone builds"
+)]
+const APP_ICON: &[u8] = include_bytes!("../../../../assets/pancake-stacker-icon.png");
+
 /// The regular and semibold weights used by the two workspace type roles.
 const FONTS: [(&str, &[u8]); 4] = [
     (
@@ -52,4 +59,12 @@ pub fn register_fonts() -> Result<(), Box<dyn Error>> {
 /// Returns a decoder error for invalid embedded art.
 pub fn wordmark() -> Result<Image, Box<dyn Error>> {
     Ok(Image::load_from_data(WORDMARK, Some("png"))?)
+}
+
+/// Load the graphic-only desktop icon.
+///
+/// # Errors
+/// Returns a decoder error for invalid embedded art.
+pub fn app_icon() -> Result<Image, Box<dyn Error>> {
+    Ok(Image::load_from_data(APP_ICON, Some("png"))?)
 }

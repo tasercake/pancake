@@ -756,7 +756,8 @@ component ViewCanvas inherits Rectangle {
 }
 
 export component Workspace inherits Window {
-    title: "Pancake";
+    title: "Pancake Stacker";
+    icon: app-icon;
     min-width: 850px;
     min-height: 600px;
     preferred-width: 1170px;
@@ -776,6 +777,7 @@ export component Workspace inherits Window {
     in property <color> accent-surface: #ffffff;
     in property <color> accent-ink: #000000;
     in property <image> wordmark;
+    in property <image> app-icon;
     in-out property <int> device-index: 0;
     in-out property <int> method-index: 1;
     in-out property <int> alignment-index: 0;
@@ -1370,7 +1372,7 @@ export component Workspace inherits Window {
                 background: Desk.pane;
                 accessible-id: "dialog.error";
                 accessible-role: groupbox;
-                accessible-label: "Pancake error";
+                accessible-label: "Pancake Stacker error";
                 HorizontalLayout {
                     padding: 10px;
                     spacing: 8px;
@@ -1541,7 +1543,7 @@ export component Workspace inherits Window {
             padding: 20px;
             alignment: start;
             spacing: 12px;
-            SectionLabel { text: "About Pancake"; accessible-id: "about.window"; }
+            SectionLabel { text: "About Pancake Stacker"; accessible-id: "about.window"; }
             if root.wordmark.width > 0: Image {
                 source: root.wordmark;
                 width: 216px;

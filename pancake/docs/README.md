@@ -1,6 +1,6 @@
-# Pancake documentation
+# Pancake Stacker documentation
 
-- [Install Pancake](install.md) on macOS, Windows, or Ubuntu.
+- [Install Pancake Stacker](install.md) on macOS, Windows, or Ubuntu.
 - [Stack your photos](desktop.md) in the desktop app, with tips for alignment, export, and Lightroom Classic.
 - [Use the command line](cli.md) to run a stack or script a workflow.
 

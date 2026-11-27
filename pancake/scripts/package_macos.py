@@ -19,6 +19,7 @@ from package_notices import GUI_FONT_NOTICES, file_sha256
 
 TARGET = "aarch64-apple-darwin"
 BINARIES = ("pancake-cli", "pancake-gui")
+APP_NAME = "Pancake Stacker"
 APP_ICON = "Pancake.icns"
 SYSTEM_LOCATIONS = ("/System/Library/Frameworks/", "/usr/lib/")
 BUILD_OVERRIDES = (
@@ -68,12 +69,12 @@ def _bundle_metadata(source, identifier, build_number):
         raise ValueError("Use a three-component Cargo release version for the app bundle")
     return {
         "CFBundleDevelopmentRegion": "en",
-        "CFBundleDisplayName": "Pancake",
+        "CFBundleDisplayName": APP_NAME,
         "CFBundleExecutable": "pancake-gui",
         "CFBundleIconFile": APP_ICON,
         "CFBundleIdentifier": identifier,
         "CFBundleInfoDictionaryVersion": "6.0",
-        "CFBundleName": "Pancake",
+        "CFBundleName": APP_NAME,
         "CFBundlePackageType": "APPL",
         "CFBundleShortVersionString": version.partition("-")[0],
         "CFBundleVersion": build_number,
@@ -151,7 +152,7 @@ def build_package(source, output, identifier, build_number, *, target_dir=None, 
         temporary = Path(scratch)
         build_dir = temporary / "target" if target_dir is None else target_dir
         payload = temporary / "package"
-        app = payload / "Pancake.app"
+        app = payload / f"{APP_NAME}.app"
         contents = app / "Contents"
         macos = contents / "MacOS"
         macos.mkdir(parents=True)

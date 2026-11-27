@@ -1,9 +1,9 @@
-# Pancake and BokehForge design specification
+# Pancake Stacker and BokehForge design specification
 
 Frame Desk is the shared design for Pancake Stacker and BokehForge. The apps
 look like tools for working with photographs. A neutral graphite workspace
 keeps the image central, compact controls make repeated work easy, and the
-original Pancake artwork gives welcome, About, and release surfaces their
+original Pancake Stacker artwork gives welcome, About, and release surfaces their
 identity.
 
 ## Workspace
@@ -16,7 +16,7 @@ identity.
   divider. Keep frequent commands near the view they affect. Use short labels
   for unfamiliar symbols and expose names and shortcuts to assistive
   technology.
-- In Pancake, keep stack method, alignment, and output controls in the
+- In Pancake Stacker, keep stack method, alignment, and output controls in the
   inspector. Put the stack action at the bottom of the inspector. Keep
   retained results and the complete source list accessible. Open Preferences,
   About, and export options using the same surfaces and control styles.
@@ -79,7 +79,7 @@ accent for actions and states.
   numerals for comparisons and frame counts.
 - **Decide and commit.** Use Space Grotesk semibold for the short instruction
   that advances the current task. In the workspace that is **Start stack** in
-  Pancake and **Save rating** in BokehForge when a rating can be saved. In a
+  Pancake Stacker and **Save rating** in BokehForge when a rating can be saved. In a
   dialog the confirmation action takes that role. A short heading that asks
   the user to resolve a blocking decision can use the same emphasis.
 - Assign the role by the task. **Export** in the workspace toolbar is a peer

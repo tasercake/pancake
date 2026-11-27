@@ -1,9 +1,9 @@
-# Pancake command line
+# Pancake Stacker command line
 
-Get the command-line executable for your platform. [Pancake downloads](install.md)
+Get the command-line executable for your platform. [Pancake Stacker downloads](install.md)
 
 - On Ubuntu, install the DEB and run `pancake-cli`.
-- On macOS, install the app and run `/Applications/Pancake.app/Contents/MacOS/pancake-cli` in Terminal. Adjust the path if you installed the app elsewhere.
+- On macOS, install the app and run `"/Applications/Pancake Stacker.app/Contents/MacOS/pancake-cli"` in Terminal. Adjust the path if you installed the app elsewhere.
 - On Windows, download `pancake-cli-<version>-windows-x64.exe` and run it from PowerShell in the download folder. Use `.\pancake-cli-<version>-windows-x64.exe` with the version in your downloaded filename, or `.\pancake-cli.exe` if you renamed it.
 
 ## Stack files

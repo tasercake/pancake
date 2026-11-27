@@ -88,7 +88,7 @@ def release_notes(repository, revision, version, changelog):
         f"[SHA-256 checksums]({download}/{CHECKSUMS})\n\n"
         + changelog.rstrip()
         + "\n\n## Installation\n\n"
-        + "- **Apple Silicon** — Open the DMG and drag Pancake.app into Applications. "
+        + "- **Apple Silicon** — Open the DMG and drag Pancake Stacker.app into Applications. "
         + "The app is ad-hoc signed and has no Apple notarization.\n"
         + f"- **Ubuntu 24.04 x86-64** — Install the DEB with `sudo apt install ./{deb}`.\n"
         + "- **Windows x64** — Run the standalone desktop or CLI executable. Both are unsigned.\n\n"

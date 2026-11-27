@@ -31,9 +31,9 @@ Expand a damage family to see the pooling values and weights. Turn on **Show dam
 
 Choose the stackers in **New evaluation**. When you start the run, Review uses the available open-source stackers and prepares any others you selected before processing scenes. First-time setup may download dependencies. The run banner shows what is being installed, and setup failures include a log for the affected stacker. Other selected stackers can continue when one setup fails.
 
-Review builds Pancake with its pinned Rust toolchain and lockfile. The host needs [Rust with rustup and the platform's build tools](../../pancake/DEVELOPING.md#build-from-source) for this step. Focus-stack uses the publisher's checksum-verified release where it matches the pinned submodule and host platform. The source-build fallback uses the host's C++ tools and OpenCV development files. OpenFocus and ShineStacker install from their pinned submodules into separate Python environments under the review store's `tools/` folder. Review reuses completed setups on subsequent runs.
+Review builds Pancake Stacker with its pinned Rust toolchain and lockfile. The host needs [Rust with rustup and the platform's build tools](../../pancake/DEVELOPING.md#build-from-source) for this step. Focus-stack uses the publisher's checksum-verified release where it matches the pinned submodule and host platform. The source-build fallback uses the host's C++ tools and OpenCV development files. OpenFocus and ShineStacker install from their pinned submodules into separate Python environments under the review store's `tools/` folder. Review reuses completed setups on subsequent runs.
 
-Use `--pancake`, `--focus-stack`, `--openfocus`, or `--shine-python` to use an existing executable or the Python interpreter with ShineStacker installed. Review also recognizes the repository's standard build and submodule environment paths, and looks for the Pancake, focus-stack, and OpenFocus commands on `PATH`.
+Use `--pancake`, `--focus-stack`, `--openfocus`, or `--shine-python` to use an existing executable or the Python interpreter with ShineStacker installed. Review also recognizes the repository's standard build and submodule environment paths, and looks for the Pancake Stacker, focus-stack, and OpenFocus commands on `PATH`.
 
 On macOS and Windows, **Zerene Stacker** uses the licensed or trial installation on the computer running Review. Sign in to the desktop on that computer, open Zerene once to record its launch settings, then quit the interactive app before starting an evaluation. Review runs its local Java batch process and saves the result alongside the other stackers. The Zerene option is hidden on Linux. See the [Zerene Batch API](https://zerenesystems.com/cms/stacker/docs/batchapi).
 
@@ -43,7 +43,7 @@ Select the current scene, its dataset, or all indexed datasets. Each stacker has
 
 | Stacker | Quick-run settings | Options |
 | --- | --- | --- |
-| Pancake | Hybrid fusion, alignment off, automatic device | Fusion method, alignment, cropping, CPU or GPU selection |
+| Pancake Stacker | Hybrid fusion, alignment off, automatic device | Fusion method, alignment, cropping, CPU or GPU selection |
 | focus-stack | Aligned complex-wavelet fusion, OpenCL when available | Alignment, cropping, consistency filter, denoise strength, CPU or automatic OpenCL |
 | OpenFocus | StackMFF V3 with soft blending and exposure matching, alignment off, automatic device | Fusion method, alignment, exposure matching, V3 blend mode, CPU or automatic acceleration for supported methods |
 | ShineStacker | Aligned pyramid fusion | Pyramid or depth map fusion, alignment, pyramid window size |

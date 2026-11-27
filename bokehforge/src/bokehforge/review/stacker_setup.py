@@ -211,10 +211,10 @@ class StackerSetup:
         cargo = _require("cargo", "Install Rust with rustup for this host.")
         work = self.repo / "pancake"
         if not (work / "Cargo.toml").is_file():
-            raise RuntimeError("Run Review from the Pancake repository to build Pancake")
-        tell("Building Pancake with its pinned toolchain")
+            raise RuntimeError("Run Review from the Pancake Stacker repository to build Pancake Stacker")
+        tell("Building Pancake Stacker with its pinned toolchain")
         run_logged([cargo, "build", "--locked", "--release", "--package", "pancake-cli",
-                    "--target-dir", str(work / "target")], work, log, stop, "Building Pancake")
+                    "--target-dir", str(work / "target")], work, log, stop, "Building Pancake Stacker")
         return work / "target/release" / ("pancake-cli" + EXE)
 
     def _python_stacker(self, tool, directory, log, stop, tell):
