@@ -4,9 +4,9 @@ from math import cos, radians, sin
 
 import numpy as np
 import pytest
-from scipy.ndimage import affine_transform, gaussian_filter
+from scipy.ndimage import affine_transform, gaussian_filter, map_coordinates
 
-from bokehforge.alignment import ALIGNMENT_VERSION
+from bokehforge.alignment import ALIGNMENT_VERSION, _Texture, _exact_offsets, _sample_rgb
 from bokehforge.scoring import measure as _measure
 
 
@@ -25,6 +25,39 @@ def render(target, shape, offset, scale=1, angle=0):
     matrix = scale * np.array([[c, -s], [s, c]])
     return np.stack([affine_transform(plane, matrix, offset, output_shape=shape, order=3, mode="reflect")
                      for plane in np.moveaxis(target, -1, 0)], axis=-1)
+
+
+@pytest.mark.parametrize("shape", [(13, 17), (13, 1), (1, 17), (1, 1)])
+def test_alignment_sampling_matches_scipy_at_integer_and_fractional_positions(shape):
+    rng = np.random.default_rng(2409)
+    image = rng.uniform(-1.0, 1.0, (2 * shape[0], 2 * shape[1], 3)).astype(np.float32)
+    image[::2, ::3] = -0.0
+    image[1::3, ::2] = np.nextafter(np.float32(0), np.float32(-1))
+    image[::3, 1::3] = np.finfo(np.float32).max
+    image = image[::-2, ::2, ::-1]
+    points = rng.uniform((-3, -3), np.asarray(shape) + 2, (900, 2))
+    points[::3] = np.rint(points[::3])
+    points[1::9] = np.nextafter(np.rint(points[1::9]), -np.inf)
+    points = points.T
+
+    def expected(planes, coords):
+        return np.stack([map_coordinates(plane, coords, order=1, mode="nearest", prefilter=False)
+                         for plane in planes])
+
+    planes = np.moveaxis(image, -1, 0)
+    assert _sample_rgb(image, points).tobytes() == expected(planes, points).T.astype(np.float64).tobytes()
+    step = np.array([1.25, 2.5])
+    coordinates = (points + 0.5) / step[:, None] - 0.5
+    assert _Texture(planes, step).sample(points).tobytes() == expected(planes, coordinates).tobytes()
+
+
+def test_same_size_exact_search_checks_pixels_between_its_screening_samples():
+    target = np.full((512, 512, 3), 0.5, dtype=np.float32)
+    delivery = target.copy()
+    delivery[1, 1, 2] = np.nextafter(np.float32(0.5), np.float32(1))
+    trace = {}
+    assert _exact_offsets(delivery, target, trace) == []
+    assert trace == {"result": "different_samples", "verified_offsets": 1}
 
 
 @pytest.mark.parametrize("texture", ["textured", "near-flat", "flat"])

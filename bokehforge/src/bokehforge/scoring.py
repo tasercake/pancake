@@ -12,6 +12,11 @@ from ._device import DamageBackend, Device, damage_backend
 from ._workers import alignment_worker, workers
 from .alignment import _xyxy, align, native_overlap, overlap, project
 
+try:
+    from . import _scoring_native
+except ImportError:
+    _scoring_native = None
+
 SCORE_VERSION = "reference-fidelity-v3"
 INSPECTION_SCORE_VERSION = "reference-fidelity-v3-inspection-v2"
 INSPECTION_MIX = 0.5
@@ -32,6 +37,7 @@ _TAIL_FRACTION = 0.01
 _AFFECTED_THRESHOLD = 0.25
 _STRIP_ROWS = 192
 _FILTER_HALO = 40
+_DIAGONAL_SPACING = float(np.hypot(1, 1))
 _FAMILY_LABELS = {
     "tone": ("Tone", "Brightness and contrast differences"),
     "color": ("Color", "Differences in tint or color intensity"),
@@ -79,7 +85,40 @@ def validate_rgb(pixels):
         raise ValueError("The image contains non-finite pixel values (NaN or infinity).")
 
 
+def _native_lab(output, *images):
+    length = images[0].shape[0] * images[0].shape[1]
+    planes = output.reshape(len(output), length)
+    # The XYZ and cube-root scratch buffers are reused within each worker.
+    count = len(images)
+    block = min(length, 16_384)
+    xyz_buffer = np.empty(count * 3 * block, dtype=np.float32)
+    cube_buffer = np.empty_like(xyz_buffer)
+    for start in range(0, length, block):
+        stop = min(start + block, length)
+        size = stop - start
+        scratch = slice(count * 3 * size)
+        xyz = xyz_buffer[scratch].reshape(count, 3, size)
+        cubes = cube_buffer[scratch].reshape(xyz.shape)
+        # Keep NumPy's platform-specific float32 cube root and hypot.
+        for rgb, tristimulus, cube in zip(images, xyz, cubes, strict=True):
+            _scoring_native.lab_xyz(rgb, _XYZ, start, tristimulus)
+            np.cbrt(tristimulus, out=cube)
+        current = planes[:, start:stop]
+        lab = current[:-1] if count == 2 else current
+        _scoring_native.lab_planes(xyz, cubes, lab)
+        if count == 2:
+            color, denominator = current[5], xyz[0, 0]
+            np.hypot(current[3], current[4], out=color)
+            np.add(color, 10.0, out=denominator)
+            np.divide(color, denominator, out=color)
+
+
 def _lab(rgb):
+    if _scoring_native is not None and rgb.size and _native_rgb_input(rgb):
+        output = np.empty((3, *rgb.shape[:2]), dtype=np.float32)
+        _native_lab(output, rgb)
+        return tuple(output)
+
     # The display clips at SDR black and white. Native range evidence is measured separately.
     channels = np.empty((3, *rgb.shape[:2]), dtype=np.float32)
     np.clip(np.moveaxis(rgb, -1, 0), 0, 1, out=channels)
@@ -155,9 +194,15 @@ def _orientation(image, dy, dx):
 
 def _detail(candidate, target, blur, support):
     lost, extra = np.zeros_like(target), np.zeros_like(target)
+    native = (_scoring_native is not None and _native_input(candidate, np.float32)
+              and _native_input(target, np.float32)
+              and (support is None or _native_input(support, np.bool_)))
     for sigma in (0, 1.1, 2.5):
         c = blur(candidate, sigma) if sigma else candidate
         t = blur(target, sigma) if sigma else target
+        if native:
+            _scoring_native.contrast_damage(c, t, support, lost, extra, _DIAGONAL_SPACING)
+            continue
         for dy, dx in ((0, 1), (1, 0), (1, 1), (-1, 1)):
             # Flipping the rows lets the same forward operator cover both diagonals.
             cs, ts = (c[::-1], t[::-1]) if dy < 0 else (c, t)
@@ -197,12 +242,14 @@ def _lightness_damage(cl, tl, delta, support, extrema=None):
     # Residual grain is useful evidence in smooth backgrounds. At an existing
     # transition, the signed detail bank and edge neighborhood carry the signal.
     grain = _visibility(abs(delta - blur(delta, 0.85)), 5.0) * (1 - edge_weight)
-    extra = np.maximum(extra, grain)
+    np.maximum(extra, grain, out=extra)
     shape = _visibility(abs(delta - local_delta), 6.0) * near_edge
-    overshoot = _visibility(np.maximum.reduce([cl - upper, lower - cl, np.zeros_like(cl)]), 6.0)
-    boundary = np.maximum(shape, overshoot * near_edge)
+    overshoot = cl - upper
+    np.maximum(overshoot, lower - cl, out=overshoot)
+    np.maximum(overshoot, 0, out=overshoot)
+    np.maximum(shape, _visibility(overshoot, 6.0) * near_edge, out=shape)
 
-    return tone, lost, extra, boundary
+    return tone, lost, extra, shape
 
 
 def _damage(candidate, target, support):
@@ -216,6 +263,12 @@ def _damage(candidate, target, support):
 
 
 def _range_damage(candidate, target):
+    if (_scoring_native is not None and _native_input(candidate, np.float32)
+            and _native_input(target, np.float32)):
+        range_error = np.empty(candidate.shape[:2], dtype=np.float32)
+        _scoring_native.range_damage(candidate, target, range_error)
+        return range_error
+
     # Work in float64 before subtraction so all finite float32 samples stay finite.
     # Work on one channel at a time to limit peak memory at native resolution.
     range_error = np.zeros(candidate.shape[:2], dtype=np.float32)
@@ -232,18 +285,46 @@ def _range_damage(candidate, target):
     return range_error
 
 
+def _native_input(values, dtype):
+    return (type(values) is np.ndarray and values.dtype == dtype
+            and values.flags.c_contiguous and values.flags.aligned)
+
+
+def _native_rgb_input(pixels):
+    # Row padding is common when alignment selects a crop from a larger canvas.
+    height, width, _ = pixels.shape
+    row_stride, pixel_stride, channel_stride = pixels.strides
+    pixel_bytes = 3 * pixels.itemsize
+    return (type(pixels) is np.ndarray and pixels.dtype == np.float32 and pixels.flags.aligned
+            and channel_stride == pixels.itemsize
+            and (width == 1 or pixel_stride == pixel_bytes)
+            and (height == 1 or row_stride >= width * pixel_bytes))
+
+
 def _rgb_exposure(pixels, support):
-    return np.maximum(_supported_mean(pixels, support, axis=(0, 1)), 0) @ _XYZ[1]
+    means = None
+    if (_scoring_native is not None and _native_rgb_input(pixels)
+            and (support is None or _native_input(support, np.bool_))):
+        means = _scoring_native.rgb_means(pixels, support)
+    if means is None:
+        means = _supported_mean(pixels, support, axis=(0, 1))
+    return np.maximum(means, 0) @ _XYZ[1]
 
 
 def _lab_comparison(candidate, target):
     height, width = target.shape[:2]
-    cl, tl, delta, delta_a, delta_b, color = np.empty((6, height, width), dtype=np.float32)
+    output = np.empty((6, height, width), dtype=np.float32)
+    cl, tl, delta, delta_a, delta_b, color = output
 
     def prepare(start):
         rows = slice(start, start + _STRIP_ROWS)
-        c, a, b = _lab(candidate[rows])
-        t, ta, tb = _lab(target[rows])
+        crgb, trgb = candidate[rows], target[rows]
+        if (_scoring_native is not None and width and _native_rgb_input(crgb)
+                and _native_rgb_input(trgb)):
+            _native_lab(output[:, rows], crgb, trgb)
+            return
+        c, a, b = _lab(crgb)
+        t, ta, tb = _lab(trgb)
         cl[rows], tl[rows] = c, t
         delta[rows] = c - t
         np.subtract(a, ta, out=delta_a[rows])
@@ -302,23 +383,29 @@ def _maps(candidate, target, support=None, *, backend: DamageBackend = "cpu"):
     height, width = target.shape[:2]
     large = height * width >= 1_000_000
     exposure = [workers().submit(_rgb_exposure, image, support) for image in (candidate, target)] if large else None
-    if backend == "cuda":
-        maps, (delta, delta_a, delta_b) = _cuda_maps(candidate, target, support)
-    elif backend == "mps":
-        maps, (delta, delta_a, delta_b) = _mps_maps(candidate, target, support)
-    elif height >= _STRIP_ROWS and large:
-        def calculate(rows):
-            maps, signed = _damage(candidate[rows], target[rows], None if support is None else support[rows])
-            return (*maps, *signed)
+    try:
+        if backend == "cuda":
+            maps, (delta, delta_a, delta_b) = _cuda_maps(candidate, target, support)
+        elif backend == "mps":
+            maps, (delta, delta_a, delta_b) = _mps_maps(candidate, target, support)
+        elif height >= _STRIP_ROWS and large:
+            def calculate(rows):
+                maps, signed = _damage(candidate[rows], target[rows], None if support is None else support[rows])
+                return (*maps, *signed)
 
-        arrays = _damage_strips((height, width), len(FAMILY_WEIGHTS) + 3, calculate)
-        maps, (delta, delta_a, delta_b) = arrays[:len(FAMILY_WEIGHTS)], arrays[len(FAMILY_WEIGHTS):]
-    else:
-        maps, (delta, delta_a, delta_b) = _damage(candidate, target, support)
-    if exposure is None:
-        c_exposure, t_exposure = (_rgb_exposure(image, support) for image in (candidate, target))
-    else:
-        c_exposure, t_exposure = (future.result() for future in exposure)
+            arrays = _damage_strips((height, width), len(FAMILY_WEIGHTS) + 3, calculate)
+            maps, (delta, delta_a, delta_b) = arrays[:len(FAMILY_WEIGHTS)], arrays[len(FAMILY_WEIGHTS):]
+        else:
+            maps, (delta, delta_a, delta_b) = _damage(candidate, target, support)
+        if exposure is None:
+            c_exposure, t_exposure = (_rgb_exposure(image, support) for image in (candidate, target))
+        else:
+            c_exposure, t_exposure = (future.result() for future in exposure)
+    except BaseException:
+        for future in exposure or ():
+            if not future.cancel():
+                future.exception()
+        raise
     return maps, {
         "mean_delta_lightness": float(_supported_mean(delta, support)),
         "global_exposure_delta_stops": float(np.log2((c_exposure + 1e-5) / (t_exposure + 1e-5))),
@@ -337,13 +424,26 @@ def _integral(image):
 
 
 def _tile_totals(integral, y0, y1, x0, x1):
-    return (integral[np.ix_(y1, x1)] - integral[np.ix_(y0, x1)]
-            - integral[np.ix_(y1, x0)] + integral[np.ix_(y0, x0)])
+    totals = integral[np.ix_(y1, x1)]
+    totals -= integral[np.ix_(y0, x1)]
+    totals -= integral[np.ix_(y1, x0)]
+    totals += integral[np.ix_(y0, x0)]
+    return totals
 
 
-def _tile_integral(image, support, edges):
-    """Compute the original vertical-then-horizontal sums at tile corners."""
+def _tile_prefix(image, support, edges):
+    """Sample the original vertical-then-horizontal sums, and count affected pixels if fused."""
     ys, xs = edges
+    if (_scoring_native is not None
+            and (_native_input(image, np.float32) or (support is None and _native_input(image, np.bool_)))
+            and (support is None or _native_input(support, np.bool_))):
+        compact = np.empty((len(ys), len(xs)), dtype=np.float64)
+        affected = _scoring_native.tile_integral(image, support, np.ascontiguousarray(ys, dtype=np.intp),
+                                                np.ascontiguousarray(xs, dtype=np.intp), compact,
+                                                _AFFECTED_THRESHOLD)
+        if affected is not None:
+            return compact, affected
+
     height, width = image.shape
     slab_rows = 96
     buffer = np.zeros((min(height, slab_rows) + 1, width), dtype=np.float64)
@@ -363,7 +463,11 @@ def _tile_integral(image, support, edges):
     compact = np.zeros((len(ys), len(xs)), dtype=np.float64)
     sampled.cumsum(axis=1, out=sampled)
     compact[:, 1:] = sampled[:, xs[1:] - 1]
-    return compact
+    return compact, None
+
+
+def _tile_integral(image, support, edges):
+    return _tile_prefix(image, support, edges)[0]
 
 
 @dataclass(frozen=True)
@@ -372,6 +476,8 @@ class _TileGrid:
     offset_yx: tuple[int, int]
     x: np.ndarray
     y: np.ndarray
+    sample_x: np.ndarray
+    sample_y: np.ndarray
     nominal_pixels: int
     covered: np.ndarray | None
 
@@ -380,7 +486,8 @@ class _TileGrid:
         return f"{self.side}:{self.offset_yx[0]}:{self.offset_yx[1]}"
 
     def totals(self, integral):
-        return _tile_totals(integral, self.y[:-1], self.y[1:], self.x[:-1], self.x[1:])
+        x, y = self.sample_x, self.sample_y
+        return _tile_totals(integral, y[:-1], y[1:], x[:-1], x[1:])
 
     def box(self, index):
         iy, ix = divmod(index, self.x.size - 1)
@@ -396,29 +503,46 @@ class _TileGrid:
                 "values": {}}
 
 
+def _tile_axis(length):
+    coordinates = {(side, offset): _axis_tiles(length, side, offset)
+                   for side in (8, 32) for offset in (0, side // 2)}
+    edges = np.unique(np.concatenate(tuple(coordinates.values())))
+    return edges, {key: (values, np.searchsorted(edges, values)) for key, values in coordinates.items()}
+
+
 def _tile_grids(height, width, support, exact_box=None):
-    support_integral = None if support is None else _integral(support)
+    y_edges, y_axes = _tile_axis(height)
+    x_edges, x_axes = _tile_axis(width)
+    edges = y_edges, x_edges
+    support_integral = None if support is None else _tile_integral(support, None, edges)
     grids = []
     for side in (8, 32):
         for y_offset, x_offset in ((0, 0), (0, side // 2), (side // 2, 0), (side // 2, side // 2)):
-            y = _axis_tiles(height, side, y_offset)
-            x = _axis_tiles(width, side, x_offset)
+            y, sample_y = y_axes[side, y_offset]
+            x, sample_x = x_axes[side, x_offset]
             covered = None if support_integral is None else _tile_totals(
-                support_integral, y[:-1], y[1:], x[:-1], x[1:]).astype(np.int32)
+                support_integral, sample_y[:-1], sample_y[1:], sample_x[:-1], sample_x[1:]).astype(np.int32)
             if exact_box is not None and exact_box != (0, 0, height, width):
                 top, left, bottom, right = exact_box
                 rows = np.maximum(0, np.minimum(y[1:], bottom) - np.maximum(y[:-1], top))
                 columns = np.maximum(0, np.minimum(x[1:], right) - np.maximum(x[:-1], left))
                 covered = rows[:, None] * columns
-            grids.append(_TileGrid(side, (y_offset, x_offset), x, y, min(side, height) * min(side, width), covered))
-    return grids
+            grids.append(_TileGrid(side, (y_offset, x_offset), x, y, sample_x, sample_y,
+                                   min(side, height) * min(side, width), covered))
+    return grids, edges
 
 
-def _pool(damage, support, grids, edges, *, explain=False, tiles_by_grid=None, family=None, damage_max=1):
+def _pool(damage, support, grids, edges, *, measured_pixels, explain=False, tiles_by_grid=None,
+          family=None, damage_max=1):
     """Compute the metric and optionally retain the evidence from those same tiles."""
     exact = damage is None
-    mean = 0.0 if exact else float(_supported_mean(damage, support))
-    integral = None if exact else _tile_integral(damage, support, edges)
+    mean = affected_fraction = 0.0
+    if not exact:
+        mean = (float(damage.mean(dtype=np.float64)) if support is None else
+                float(damage.sum(dtype=np.float64, where=support) / measured_pixels))
+        integral, affected = _tile_prefix(damage, support, edges)
+        affected_fraction = (float(_supported_mean(damage >= _AFFECTED_THRESHOLD, support))
+                             if affected is None else affected / measured_pixels)
     worst, tail, region = 0.0, 0.0, None
     worst_tile, tail_selection, winning_tiles = None, None, None
     for grid in grids:
@@ -426,9 +550,9 @@ def _pool(damage, support, grids, edges, *, explain=False, tiles_by_grid=None, f
         if exact:
             tiles = np.zeros((grid.x.size - 1) * (grid.y.size - 1))
         else:
-            y, x = (np.searchsorted(axis, grid_axis) for axis, grid_axis in zip(edges, (grid.y, grid.x), strict=True))
-            totals = _tile_totals(integral, y[:-1], y[1:], x[:-1], x[1:])
-            tiles = np.clip(totals / grid.nominal_pixels, 0, damage_max).ravel()
+            totals = grid.totals(integral)
+            totals /= grid.nominal_pixels
+            tiles = np.clip(totals, 0, damage_max, out=totals).ravel()
         index = int(np.argmax(tiles))
         if tiles[index] > worst:
             worst = float(tiles[index])
@@ -454,7 +578,7 @@ def _pool(damage, support, grids, edges, *, explain=False, tiles_by_grid=None, f
     contributions = {key: _POOL_WEIGHTS[key] * value for key, value in values.items()}
     summary = {
         "mean": mean, "tail": tail, "worst": worst, "worst_box_view_xyxy": region,
-        "affected_fraction": 0.0 if exact else float(_supported_mean(damage >= _AFFECTED_THRESHOLD, support)),
+        "affected_fraction": affected_fraction,
     }
     components = None
     if explain:
@@ -478,8 +602,14 @@ def _pool(damage, support, grids, edges, *, explain=False, tiles_by_grid=None, f
 
 
 def _rgb_rmse(candidate, target, support):
-    mse = np.mean([_supported_mean(np.square(np.subtract(c, t, dtype=np.float64)), support)
-                   for c, t in zip(np.moveaxis(candidate, -1, 0), np.moveaxis(target, -1, 0), strict=True)])
+    if _scoring_native is not None and _native_rgb_input(candidate) and _native_rgb_input(target):
+        squares = np.empty((3, *target.shape[:2]), dtype=np.float64)
+        _scoring_native.rgb_square_difference(candidate, target, squares)
+        means = [_supported_mean(channel, support) for channel in squares]
+    else:
+        means = [_supported_mean(np.square(np.subtract(c, t, dtype=np.float64)), support)
+                 for c, t in zip(np.moveaxis(candidate, -1, 0), np.moveaxis(target, -1, 0), strict=True)]
+    mse = np.mean(means)
     return float(np.sqrt(mse))
 
 
@@ -491,7 +621,12 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None, i
     if exact_box is None:
         if large:
             rmse_work = workers().submit(_rgb_rmse, candidate, target, support)
-        maps, signed = _maps(candidate, target, support, backend=backend)
+        try:
+            maps, signed = _maps(candidate, target, support, backend=backend)
+        except BaseException:
+            if rmse_work is not None and not rmse_work.cancel():
+                rmse_work.exception()
+            raise
         measured_pixels = height * width if support is None else int(support.sum())
     else:
         top, left, bottom, right = exact_box
@@ -499,9 +634,7 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None, i
         maps = (None,) * len(FAMILY_WEIGHTS)
         signed = dict.fromkeys(("mean_delta_lightness", "global_exposure_delta_stops",
                                 "mean_delta_lab_a", "mean_delta_lab_b"), 0.0)
-    grids = _tile_grids(height, width, support, exact_box) if exact_box is None or details is not None else []
-    edges = tuple(np.unique(np.concatenate([getattr(grid, axis) for grid in grids])) for axis in ("y", "x")) \
-        if exact_box is None else None
+    grids, edges = _tile_grids(height, width, support, exact_box) if exact_box is None or details is not None else ([], None)
     tile_data = {grid.id: grid.describe_tiles() for grid in grids} if details in ("tiles", "full") else None
     features = {}
     rows = {}
@@ -513,7 +646,7 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None, i
         name, damage = item
         if damage is not None and weights is not None:
             damage *= weights
-        return _pool(damage, support, grids, edges, explain=details is not None,
+        return _pool(damage, support, grids, edges, measured_pixels=measured_pixels, explain=details is not None,
                      tiles_by_grid=tile_data, family=name, damage_max=damage_max)
 
     dispatch = workers().map if large and exact_box is None and tile_data is None else map
@@ -558,6 +691,7 @@ def measure(candidate, target, *, details: ScoreDetails | None = None, inspectio
     Request `summary` for damage pooling components or `tiles` for local values.
     Attention is generated from the reference unless disabled. A supplied heatmap
     replaces generation and must contain finite values in [0, 1] on the reference grid.
+    Device selection applies to damage measurement. Generated attention requires CUDA.
     """
     _validate_details(details)
     validate_rgb(target)
@@ -568,17 +702,19 @@ def measure(candidate, target, *, details: ScoreDetails | None = None, inspectio
     elif inspection_heatmap is None:
         from .inspection import inspection_for
 
+        inspection = inspection_for(device)
+
         def generate(reference):
-            return inspection_for(device).generate(reference)[0]
+            return inspection.generate(reference)[0]
 
     return _measure_delivery(candidate, target, details=details, device=device,
                              heatmap=inspection_heatmap, generate=generate)
 
 
-def _measure_delivery(candidate, target, *, details, device, heatmap=None, generate=None):
+def _measure_delivery(candidate, target, *, details, device, heatmap=None, generate=None, retry_on_oom=True):
     """Score images already checked against the RGB input contract."""
     large = target.shape[0] * target.shape[1] >= 1_000_000
-    backend = damage_backend(device) if large or device != "auto" else "cpu"
+    backend = None if device == "auto" else damage_backend(device)
     pending = alignment_worker().submit(align, candidate, target) if large and generate is not None else None
     try:
         if generate is not None:
@@ -603,11 +739,13 @@ def _measure_delivery(candidate, target, *, details, device, heatmap=None, gener
             else:
                 aligned, support = project(candidate, target.shape, placement)
                 if support is None or support.any():
+                    if backend is None:
+                        backend = damage_backend(device)
                     try:
                         comparison = _measure(aligned, target, support, details=details,
                                               inspection=inspection, backend=backend)
                     except RuntimeError as exc:
-                        if backend == "cpu" or device != "auto":
+                        if backend == "cpu" or device != "auto" or not retry_on_oom:
                             raise
                         from torch import OutOfMemoryError
 

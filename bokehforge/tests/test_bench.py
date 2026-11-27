@@ -4,7 +4,8 @@ import json
 import os
 import subprocess
 import sys
-from threading import Event
+from threading import Barrier, Event, get_ident
+from types import SimpleNamespace
 from zlib import decompress
 
 import numpy as np
@@ -12,6 +13,7 @@ import pytest
 import tifffile
 from PIL import Image
 
+from bokehforge import bench
 from bokehforge.bench import _score, main, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
 from bokehforge.data.lazy import Scene, SceneCatalog
@@ -64,12 +66,13 @@ def run_bench(root, output, *args, env=None):
     )
 
 
-def test_cpu_cli_requires_disabling_inspection(tmp_path, capsys):
+@pytest.mark.parametrize("device", ["cpu", "mps"])
+def test_cpu_and_mps_cli_require_disabling_inspection(device, tmp_path, capsys):
     output = tmp_path / "benchmark"
     with pytest.raises(SystemExit) as exc:
-        main(["--algorithm", "mean", "--output", str(output), "--device", "cpu"])
+        main(["--algorithm", "mean", "--output", str(output), "--device", device])
     assert exc.value.code == 2
-    assert "--device cpu requires --no-attention" in capsys.readouterr().err
+    assert f"--device {device} requires --no-attention" in capsys.readouterr().err
     assert not output.exists()
 
 
@@ -134,6 +137,35 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert "already exists" in existing.stderr
 
 
+@pytest.mark.parametrize("device", ["cpu", "mps"])
+def test_saved_output_accepts_precomputed_inspection_provider(corpus, tmp_path, monkeypatch, device):
+    catalog = SceneCatalog(corpus, config=corpus / "sources.json", datasets=["referenced"])
+    scene = catalog.scene(catalog.scene_ids[0])
+    reference = catalog.decode(scene.reference_ids[0]).data
+    path = tmp_path / "reference.tif"
+    tifffile.imwrite(path, reference, photometric="rgb")
+    heatmap = np.full(reference.shape[:2], .5, dtype="<f4")
+    digest = sha256(heatmap.tobytes()).hexdigest()
+
+    class PrecomputedInspection:
+        def generate(self, target):
+            np.testing.assert_array_equal(target, reference)
+            return heatmap, digest
+
+    def select_backend(requested):
+        assert requested == device
+        return device
+
+    # The exact TIFF match skips damage measurement, so only selection is stubbed.
+    monkeypatch.setattr("bokehforge.scoring.damage_backend", select_backend)
+    saved = score_saved_output(catalog, scene, path, details="summary", inspection=PrecomputedInspection(), device=device)
+    assert saved["status"] == "ok"
+    assert saved["score"] == 100
+    assert saved["profile"] == INSPECTION_SCORE_VERSION
+    assert saved["inspection_map_sha256"] == digest
+    assert saved["explanation"]["attention"]["mean"] == .5
+
+
 def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monkeypatch, capsys):
     catalog = SceneCatalog(corpus, config=corpus / "sources.json", datasets=["referenced"])
     scene = catalog.scene(catalog.scene_ids[0])
@@ -171,6 +203,8 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     assert saved["explanation"] == json.loads((output / row["score_explanation_path"]).read_text())
     assert len(saved["explanation"]["placements"][0]["comparison"]["tile_grids"]) == 8
     attention = saved["explanation"]["attention"]
+    with pytest.raises(RuntimeError, match="Inspection profile requires CUDA"):
+        score_saved_output(catalog, scene, path, inspection=Inspection(), device="mps")
     assert attention["encoding"] == "base64+zlib+float32-le"
     assert attention["size_wh"] == list(reference.shape[1::-1])
     pixels = np.frombuffer(decompress(b64decode(attention["data"])), dtype="<f4").reshape(heatmap.shape)
@@ -248,6 +282,121 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     failed, = json.loads((broken / "report.json").read_text())["scenes"]
     assert failed["status"] == "scoring_error"
     assert "test model loading failed" in failed["error"]
+
+
+def test_cuda_saved_replay_batches_score_and_retries_exhaustion_in_order(tmp_path, monkeypatch, capsys):
+    levels = {"first": .125, "invalid": .25, "second": .5, "last": .75}
+    candidates = tmp_path / "candidates"
+    candidates.mkdir()
+    for scene_id, level in levels.items():
+        dtype = np.float64 if scene_id == "invalid" else np.float32
+        tifffile.imwrite(candidates / f"{scene_id}.tif", np.full((4, 4, 3), level, dtype), photometric="rgb")
+    caller = get_ident()
+
+    class Catalog:
+        scene_ids = tuple(levels)
+        quarantine = {}
+
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def scene(self, scene_id):
+            return SimpleNamespace(id=scene_id, frame_ids=(), reference_ids=(scene_id,), metadata={
+                "dataset_id": "fixture", "leakage_group_id": scene_id, "recipe_sha256": "fixture",
+                "reference_type": "rendered_all_in_focus",
+            })
+
+        def frame(self, frame_id):
+            return SimpleNamespace(id=frame_id, source_sha256="fixture", asset_sha256="fixture", page=0)
+
+        def decode(self, frame_id):
+            assert get_ident() == caller
+            return SimpleNamespace(data=np.full((4, 4, 3), levels[frame_id], np.float32), alpha=None)
+
+    barrier = Barrier(2, timeout=5)
+    second_finished = Event()
+    checked = []
+    committed = []
+
+    def fits(batch, device):
+        assert device == "cuda"
+        checked.append([item.scene.id for item in batch])
+        return True
+
+    def measure_delivery(result, reference, *, details, device, generate, retry_on_oom):
+        level = float(result[0, 0, 0])
+        assert result.dtype == np.float32 and (result == reference).all()
+        if details == "full":
+            assert retry_on_oom and get_ident() == caller
+        elif not retry_on_oom:
+            assert get_ident() != caller and level in (.125, .5)
+            barrier.wait()
+            if level == .125:
+                try:
+                    raise MemoryError("parallel exhaustion")
+                except MemoryError as exc:
+                    raise RuntimeError("inspection failed") from exc
+        else:
+            assert get_ident() == caller and second_finished.is_set() and level in (.125, .75)
+        generate(reference)
+        if not retry_on_oom:
+            second_finished.set()
+        explanation = None if details is None else {"level": level}
+        return SimpleNamespace(score=level * 100, alignment={}, features={}, explanation=explanation)
+
+    original_save = bench._save_scene
+
+    def save(prepared, args, explanation):
+        assert get_ident() == caller
+        committed.append(prepared.scene.id)
+        original_save(prepared, args, explanation)
+
+    def generate(self, reference):
+        print("model stdout")
+        return reference[..., 0], sha256(reference.tobytes()).hexdigest()
+
+    monkeypatch.setattr(bench, "SceneCatalog", Catalog)
+    monkeypatch.setattr(bench, "_MIN_PARALLEL_PIXELS", 1)
+    monkeypatch.setattr(bench, "_cuda_replay_fits", fits)
+    monkeypatch.setattr(bench, "_measure_delivery", measure_delivery)
+    monkeypatch.setattr(bench, "_save_scene", save)
+    monkeypatch.setattr(Inspection, "generate", generate)
+    args = ["--root", str(tmp_path), "--candidate-dir", str(candidates), "--device", "cuda", "--save-images"]
+    output = tmp_path / "report"
+    assert main([*args, "--output", str(output)]) == 1
+    captured = capsys.readouterr()
+    assert captured.out == "34.375000\n"
+    assert captured.err.count("model stdout") == 3
+    assert checked == [["first"], ["first", "second"], ["last"]]
+    assert committed == ["first", "second", "last"]
+    rows = json.loads((output / "report.json").read_text())["scenes"]
+    assert [row["scene_id"] for row in rows] == list(levels)
+    assert [row["status"] for row in rows] == ["ok", "invalid_output", "ok", "ok"]
+    for row in rows:
+        scene_id = row["scene_id"]
+        if row["status"] == "ok":
+            assert row["scene_score"] == levels[scene_id] * 100
+            assert (output / row["image"]).is_file()
+
+    checked.clear()
+    committed.clear()
+    explained = tmp_path / "explained"
+    assert main([*args, "--output", str(explained), "--explain-score"]) == 1
+    assert checked == []
+    assert committed == ["first", "second", "last"]
+    rows = json.loads((explained / "report.json").read_text())["scenes"]
+    for row in rows:
+        if row["status"] == "ok":
+            detail = json.loads((explained / row["score_explanation_path"]).read_text())
+            assert detail["level"] == levels[row["scene_id"]]
+    assert capsys.readouterr().out == "34.375000\n"
+
+    for path in candidates.glob("*.tif"):
+        path.unlink()
+    checked.clear()
+    assert main([*args, "--output", str(tmp_path / "missing")]) == 1
+    assert checked == []
+    assert capsys.readouterr().out == "0.000000\n"
 
 
 def test_external_stacker_failure_counts_and_cohort_is_stable(corpus, tmp_path):

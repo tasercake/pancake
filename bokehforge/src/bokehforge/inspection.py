@@ -26,24 +26,41 @@ def _model_directory():
 
 def reference_preview(reference):
     validate_rgb(reference)
-    pixels = np.empty(reference.shape, np.uint8)
+    height, width = reference.shape[:2]
+    scale = min(1, _MAX_SIDE / max(height, width))
+    size = max(1, round(width * scale)), max(1, round(height * scale))
+    pool = workers() if height * width >= 1_000_000 else None
+    if pool is None:
+        pixels = np.empty(reference.shape, np.uint8)
+    else:
+        planes = np.empty((3, height, width), np.uint8)
+        pixels = np.moveaxis(planes, 0, -1)
 
     def encode(start):
         rows = slice(start, start + 128)
         linear = np.clip(reference[rows], 0, 1)
-        srgb = np.where(linear <= 0.0031308, 12.92 * linear, 1.055 * linear ** (1 / 2.4) - .055)
-        pixels[rows] = np.rint(srgb * 255)
+        srgb = linear ** (1 / 2.4)
+        srgb *= 1.055
+        srgb -= .055
+        np.multiply(linear, 12.92, out=srgb, where=linear <= 0.0031308)
+        srgb *= 255
+        np.rint(srgb, out=srgb)
+        pixels[rows] = srgb
 
-    strips = range(0, reference.shape[0], 128)
-    if reference.shape[0] * reference.shape[1] >= 1_000_000:
-        list(workers().map(encode, strips))
-    else:
+    strips = range(0, height, 128)
+    if pool is None:
         for start in strips:
             encode(start)
-    height, width = reference.shape[:2]
-    scale = min(1, _MAX_SIDE / max(height, width))
-    size = max(1, round(width * scale)), max(1, round(height * scale))
-    return Image.fromarray(pixels).resize(size, Image.Resampling.LANCZOS)
+        return Image.fromarray(pixels).resize(size, Image.Resampling.LANCZOS)
+
+    list(pool.map(encode, strips))
+
+    def resize(plane):
+        return Image.fromarray(plane).resize(size, Image.Resampling.LANCZOS)
+
+    # Pillow applies the same fixed-point Lanczos filter independently to
+    # each RGB channel. Run the three passes on contiguous planes in parallel.
+    return Image.merge("RGB", tuple(pool.map(resize, planes)))
 
 
 class Inspection:
@@ -97,6 +114,6 @@ default_inspection = Inspection()
 
 
 def inspection_for(device: Device):
-    if device == "cpu":
+    if device in ("cpu", "mps"):
         raise RuntimeError("The Inspection profile requires CUDA. Disable attention or supply a heatmap.")
     return default_inspection

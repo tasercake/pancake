@@ -33,8 +33,20 @@ inspection = [
 ]
 
 [build-system]
-requires = ["uv_build>=0.12.17,<0.13.0"]
-build-backend = "uv_build"
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+[tool.setuptools.package-data]
+bokehforge = ["heatmaps.html"]
+"bokehforge.data" = ["sources.json"]
+"bokehforge.review" = ["static/*", "static/fonts/*"]
 
 [dependency-groups]
 dev = ["pytest>=8.3,<10"]

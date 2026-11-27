@@ -11,3 +11,5 @@ artifacts/
 .worktrees/
 datasets/
 /bokehforge/config/data/sources.lock.json
+/bokehforge/src/bokehforge/_*_native.*.so
+/bokehforge/src/bokehforge/_*_native.*.pyd
