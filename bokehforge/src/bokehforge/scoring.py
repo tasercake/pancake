@@ -23,8 +23,8 @@ FAMILY_WEIGHTS = {
 }
 FEATURES = tuple(f"native.{family}" for family in FAMILY_WEIGHTS)
 SCORE_EXPLANATION_VERSION = 2
-SCORE_DETAIL_LEVELS = ("summary", "tiles", "attention")
-ScoreDetails = Literal["summary", "tiles", "attention"]
+SCORE_DETAIL_LEVELS = ("summary", "tiles", "attention", "full")
+ScoreDetails = Literal["summary", "tiles", "attention", "full"]
 _POOL_WEIGHTS = {"mean": 0.40, "tail": 0.35, "worst": 0.25}
 _POOL_LABELS = {"mean": "Average damage", "tail": "Average of the worst 1% of tiles",
                 "worst": "Worst single tile"}
@@ -502,7 +502,7 @@ def _measure(candidate, target, support=None, *, details=None, exact_box=None, i
     grids = _tile_grids(height, width, support, exact_box) if exact_box is None or details is not None else []
     edges = tuple(np.unique(np.concatenate([getattr(grid, axis) for grid in grids])) for axis in ("y", "x")) \
         if exact_box is None else None
-    tile_data = {grid.id: grid.describe_tiles() for grid in grids} if details == "tiles" else None
+    tile_data = {grid.id: grid.describe_tiles() for grid in grids} if details in ("tiles", "full") else None
     features = {}
     rows = {}
     families = {}
@@ -655,7 +655,7 @@ def _measure_delivery(candidate, target, *, details, device, heatmap=None, gener
                 "damage_multiplier_range": [1.0, 1.0] if weights is None
                 else [float(weights.min()), float(weights.max())],
             }
-            if details == "attention":
+            if details in ("attention", "full"):
                 pixels = heatmap.astype("<f4", copy=False).tobytes()
                 diagnostic.update(encoding="base64+zlib+float32-le", data=b64encode(compress(pixels, 1)).decode("ascii"))
             explanation["attention"] = diagnostic

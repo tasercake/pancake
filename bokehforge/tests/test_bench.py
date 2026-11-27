@@ -100,7 +100,7 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
 
     replay_dir = tmp_path / "replay"
     replay = run_bench(corpus, replay_dir, "--scene", target["scene_id"],
-                       "--candidate-dir", str(output / "images"), "--explain-score", "tiles", "--device", "cpu")
+                       "--candidate-dir", str(output / "images"), "--explain-score", "--device", "cpu")
     assert replay.returncode == 0, replay.stderr
     assert replay.stdout == result.stdout
     replay_report = json.loads((replay_dir / "report.json").read_text())
@@ -119,7 +119,7 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert len(placement["comparison"]["tile_grids"]) == 8
     catalog = SceneCatalog(corpus, config=corpus / "sources.json")
     scene = catalog.scene(target["scene_id"])
-    assert score_saved_output(catalog, scene, output / target["image"], details="tiles", attention=False)["explanation"] == explanation
+    assert score_saved_output(catalog, scene, output / target["image"], details="full", attention=False)["explanation"] == explanation
     assert "explanation" not in score_saved_output(catalog, scene, output / target["image"], attention=False)
 
     missing = tmp_path / "empty"
@@ -155,7 +155,7 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     args = ["--root", str(corpus), "--config", str(corpus / "sources.json"),
             "--dataset", "referenced", "--candidate-dir", str(candidates)]
     output = tmp_path / "attention"
-    assert main([*args, "--output", str(output), "--explain-score", "tiles"]) == 0
+    assert main([*args, "--output", str(output), "--explain-score"]) == 0
     report = json.loads((output / "report.json").read_text())
     assert report["score_version"] == INSPECTION_SCORE_VERSION
     assert report["scoring"]["inspection"]["map_version"] == INSPECTION_MAP_VERSION
@@ -166,13 +166,11 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     assert row["scene_score"] == measure(candidate, reference, inspection_heatmap=heatmap).score
     baseline = measure(candidate, reference, attention=False).score
     assert row["scene_score"] < baseline
-    saved = score_saved_output(catalog, scene, path, details="tiles", inspection=Inspection())
+    saved = score_saved_output(catalog, scene, path, details="full", inspection=Inspection())
     assert saved["score"] == row["scene_score"]
     assert saved["explanation"] == json.loads((output / row["score_explanation_path"]).read_text())
-    assert "data" not in saved["explanation"]["attention"]
-    diagnostic = measure(candidate, reference, inspection_heatmap=heatmap, details="attention")
-    assert diagnostic.score == saved["score"]
-    attention = diagnostic.explanation["attention"]
+    assert len(saved["explanation"]["placements"][0]["comparison"]["tile_grids"]) == 8
+    attention = saved["explanation"]["attention"]
     assert attention["encoding"] == "base64+zlib+float32-le"
     assert attention["size_wh"] == list(reference.shape[1::-1])
     pixels = np.frombuffer(decompress(b64decode(attention["data"])), dtype="<f4").reshape(heatmap.shape)
@@ -207,6 +205,10 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
         assert b64decode(overlay["attention"]["data"]) == np.rint(heatmap * 255).astype(np.uint8).tobytes()
         assert review.attention_overlay(catalog, scene, tmp_path, delivery, "outdated")["status"] == "stale"
         assert len(seen) == 3
+        delivery.update(review.record(catalog, scene, tmp_path, delivery))
+        persisted = json.loads((tmp_path / delivery["score_explanation_path"]).read_text())
+        assert persisted == saved["explanation"]
+        assert len(seen) == 3
     finally:
         review.close()
 
@@ -214,6 +216,24 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
         raise RuntimeError("test model loading failed")
 
     monkeypatch.setattr(Inspection, "_load", staticmethod(missing_models))
+    updated.clear()
+    reopened = Scores(updated.set)
+    try:
+        summary = reopened.get(catalog, scene, tmp_path, delivery)
+        assert summary["score"] == saved["score"] and reopened.worker is None
+        assert "data" not in summary["explanation"]["attention"]
+        for fetch in (
+            lambda: reopened.tiles(catalog, scene, tmp_path, delivery, revision, "tone", 8),
+            lambda: reopened.attention_overlay(catalog, scene, tmp_path, delivery, revision),
+        ):
+            updated.clear()
+            assert fetch()["status"] == "pending"
+            assert updated.wait(5)
+            persisted_overlay = fetch()
+            assert persisted_overlay["status"] == "ok"
+            assert persisted_overlay["inspection_map_sha256"] == saved["inspection_map_sha256"]
+    finally:
+        reopened.close()
     disabled = tmp_path / "disabled"
     assert main([*args, "--output", str(disabled), "--no-attention"]) == 0
     report = json.loads((disabled / "report.json").read_text())

@@ -1149,7 +1149,8 @@ function renderRuns() {
     const settingUp = setup && banner.status === "running";
     const setupLabel = stackerLabel(setup?.stacker);
     $("run-status").textContent = stopped ? "Stopping evaluation…" :
-      settingUp ? `Setting up ${setupLabel}` : runStates[banner.status];
+      settingUp ? `Setting up ${setupLabel}` :
+      banner.scoring ? `Scoring ${stackerLabel(banner.scoring)}` : runStates[banner.status];
     $("run-detail").textContent = (settingUp ? setup.message : banner.error) ??
       `${banner.scope.label} · ${banner.ready + banner.failed} of ${banner.total} outputs processed${banner.failed ? ` · ${banner.failed} failed` : ""}`;
     $("run-progress").max = banner.total;

@@ -12,6 +12,7 @@ from tempfile import TemporaryDirectory
 from threading import Lock, Thread
 from uuid import uuid4
 
+from ..bench import has_benchmark_reference
 from . import _zerene
 from .images import normalize_output, stage_frame
 from .stacker_setup import RunSignal, RunStopped, StackerSetup, run_logged
@@ -96,7 +97,7 @@ def _render(tool, frames, work, log, stop):
 
 
 class Runs:
-    def __init__(self, store, stackers, on_change=lambda: None):
+    def __init__(self, store, stackers, on_change=lambda: None, *, record_score=None):
         self.root = store / "runs"
         self.stackers = stackers
         self.setup = StackerSetup(store)
@@ -104,6 +105,7 @@ class Runs:
         self.active = None
         self.stop = RunSignal()
         self.on_change = on_change
+        self.record_score = record_score
         self.lock = Lock()
         for path in self.root.glob("*/progress.json"):
             progress = _read(path)
@@ -179,9 +181,11 @@ class Runs:
                    "methods": {tool.id: tool.method for tool in tools},
                    "options": {tool.id: tool.options for tool in tools},
                    "input_format": "16-bit SDR sRGB TIFF",
-                   "output_format": "float32 linear-sRGB RGB TIFF"}
+                   "output_format": "float32 linear-sRGB RGB TIFF",
+                   "explain_score": self.record_score is not None}
             progress = {"status": "running", "total": len(scene_ids) * len(tools),
-                        "ready": 0, "failed": 0, "current_scene": None, "setup_errors": {}, "prepared": []}
+                        "ready": 0, "failed": 0, "diagnostics_failed": 0, "current_scene": None,
+                        "setup_errors": {}, "prepared": []}
             _write(base / "progress.json", progress)
             _write(base / "run.json", run)
             self.on_change()
@@ -219,13 +223,13 @@ class Runs:
                 progress["current_scene"] = scene_id
                 self._save_progress(base, progress)
                 self._evaluate_scene(base, catalog, catalog.scene(scene_id), tools, progress)
-            progress["status"] = "completed_with_errors" if progress["failed"] else "completed"
+            progress["status"] = "completed_with_errors" if progress["failed"] or progress["diagnostics_failed"] else "completed"
         except RunStopped:
             progress["status"] = "cancelled"
         except Exception as exc:
             progress.update(status="error", error=str(exc))
         finally:
-            progress.update(finished_at=_now().isoformat(), current_scene=None, setup=None)
+            progress.update(finished_at=_now().isoformat(), current_scene=None, setup=None, scoring=None)
             self._save_progress(base, progress)
 
     def _prepare_tools(self, base, tools, scene_count, progress):
@@ -294,6 +298,12 @@ class Runs:
                         row.update(status="failed", error=str(exc))
                     if log.is_file():
                         row["log"] = log.relative_to(base).as_posix()
+                if self.record_score and row["status"] == "ready" and has_benchmark_reference(scene):
+                    progress["scoring"] = tool.id
+                    self._save_progress(base, progress)
+                    row.update(self.record_score(catalog, scene, base, row))
+                    progress["scoring"] = None
+                    progress["diagnostics_failed"] += int("score_explanation_error" in row)
                 _write(base / tool.id / "results" / f"{scene.id}.json", row)
                 progress[row["status"]] += 1
                 self._save_progress(base, progress)

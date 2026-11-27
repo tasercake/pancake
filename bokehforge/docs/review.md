@@ -21,7 +21,7 @@ Use the **Evaluation** inspector to select a run and a stacker. Stackroom places
 
 Use **Appearance** to set the accent. Stackroom remembers it in your browser and adjusts dark colors for contrast. **Reset accent** restores white.
 
-For scenes with one supported RGB ground-truth image, each ready output shows the benchmark’s per-scene score out of 100 below its image, on its stacker tab, and in the lightbox header while you view or preview the output. Stackroom uses the [benchmark scorer](benchmark.md#the-score). It infers where the output belongs on the sharp reference and grades retained area and native-resolution fidelity. Exact crops earn their share of the reference area. Select the **i** beside **Invalid delivery** for the reason. In the lightbox, press **I** to open it while previewing a thumbnail. Scores are computed in the background when you open a scene and cached for subsequent visits.
+For scenes with one supported RGB ground-truth image, each ready output shows the benchmark’s per-scene score out of 100 below its image, on its stacker tab, and in the lightbox header while you view or preview the output. Stackroom uses the [benchmark scorer](benchmark.md#the-score). It infers where the output belongs on the sharp reference and grades retained area and native-resolution fidelity. Exact crops earn their share of the reference area. Select the **i** beside **Invalid delivery** for the reason. In the lightbox, press **I** to open it while previewing a thumbnail. New evaluations save complete score diagnostics as each scorable output finishes. Older deliveries are scored on demand when opened.
 
 Open **Explain score** to see the inferred area, resolution cap, overlap quality, and match confidence. **How alignment was inferred** shows search evidence and the score contribution of each retained placement. An unmatched delivery still has an explanation with the reason.
 
@@ -68,7 +68,8 @@ runs/<run-id>/
     setup.log                                  # First-run setup output, when needed
     images/<scene-id>.tif                       # Full-resolution float32 linear-sRGB RGB
     results/<scene-id>.json                     # Outcome, input fingerprint, and relative file paths
-    scores/<scene-id>.json                      # Cached per-scene benchmark result
+    score-explanations/<scene-id>.json          # Full diagnostics for new evaluations
+    scores/<scene-id>.json                      # On-demand benchmark cache for older evaluations
     logs/<scene-id>.log                         # Tool command and output
 ```
 

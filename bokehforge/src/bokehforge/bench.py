@@ -26,7 +26,7 @@ from .data.lazy import SceneCatalog
 from .inspection import INSPECTION_MAP_VERSION, Inspection, inspection_for
 from .scoring import (
     FAMILY_WEIGHTS, INSPECTION_MAX_MULTIPLIER, INSPECTION_MIX, INSPECTION_SCORE_VERSION,
-    SCORE_DAMAGE_SCALE, SCORE_DETAIL_LEVELS, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
+    SCORE_DAMAGE_SCALE, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
     ScoreDetails, _measure_delivery, _validate_details, validate_rgb,
 )
 from .stacking import StackFrame, StackInput
@@ -222,23 +222,36 @@ def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = N
         if field in row:
             response[field] = row[field]
     if explanation is not None:
-        response["explanation"] = {**explanation, "scene_id": scene.id, "reference_id": scene.reference_ids[0]}
+        response["explanation"] = _scene_explanation(scene, row, explanation)
     return response
 
 
-def _save_explanation(output, scene, row, explanation):
-    path = output / "score-explanations" / (scene.id + ".json")
+def _scene_explanation(scene, row, explanation):
+    result = {**explanation, "scene_id": scene.id, "reference_id": scene.reference_ids[0]}
+    if "inspection_map_sha256" in row:
+        result["inspection_map_sha256"] = row["inspection_map_sha256"]
+    return result
+
+
+def write_score_explanation(path, explanation):
+    """Write a complete explanation without exposing a partially written export."""
     temporary = path.with_suffix(".tmp")
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         with temporary.open("w", encoding="utf-8") as stream:
-            json.dump({**explanation, "scene_id": scene.id, "reference_id": scene.reference_ids[0]},
-                      stream, separators=(",", ":"), allow_nan=False)
+            json.dump(explanation, stream, separators=(",", ":"), allow_nan=False)
             stream.write("\n")
         temporary.replace(path)
-    except (OSError, ValueError) as exc:
+    finally:
         with suppress(OSError):
             temporary.unlink(missing_ok=True)
+
+
+def _save_explanation(output, scene, row, explanation):
+    path = output / "score-explanations" / (scene.id + ".json")
+    try:
+        write_score_explanation(path, _scene_explanation(scene, row, explanation))
+    except (OSError, ValueError) as exc:
         row["score_explanation_error"] = _error_text(exc)
         if row["status"] == "ok":
             row["status"] = "score_explanation_error"
@@ -270,7 +283,8 @@ def _run_scene(catalog, scene, row, algorithm, args, inspection):
     if row["status"] != "ok":
         return
     with redirect_stdout(sys.stderr):
-        explanation = _score_delivery(result, reference, row, details=args.explain_score, inspection=inspection,
+        explanation = _score_delivery(result, reference, row, details="full" if args.explain_score else None,
+                                      inspection=inspection,
                                       device=args.device)
     if row["status"] != "ok":
         return
@@ -337,8 +351,8 @@ def main(argv=None):
     report_options = parser.add_argument_group("Report")
     report_options.add_argument("--output", required=True, type=Path, help="New directory for the report and optional images")
     report_options.add_argument(
-        "--explain-score", choices=SCORE_DETAIL_LEVELS,
-        help="Save score components, with exact scoring tiles or the native attention map on request",
+        "--explain-score", action="store_true",
+        help="Save all score diagnostics, including scoring tiles and the attention map when enabled",
     )
     report_options.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     report_options.add_argument("--progress", action="store_true", help="Write progress to stderr")
@@ -379,7 +393,7 @@ def main(argv=None):
             print(f"{index}/{len(scenes)} {scene.id} ({row['frame_count']} frames)", file=sys.stderr, flush=True)
         last_dataset = dataset
         _run_scene(catalog, scene, row, algorithm, args, inspection)
-    aggregation = {} if args.explain_score is not None else None
+    aggregation = {} if args.explain_score else None
     score, scored_groups = _score(rows, explanation=aggregation)
     statuses = Counter(row["status"] for row in rows)
     references = Counter(row["reference_status"] for row in rows)

@@ -88,9 +88,9 @@ class Review:
         self.indexing = False
         self.refresh_requested = False
         self.events = Events()
-        self.runs = Runs(args.store, configured_stackers(args), self.publish_runs)
-        self.ratings = Ratings(args.store)
         self.scores = Scores(self.publish_scores, attention=not getattr(args, "no_attention", False))
+        self.runs = Runs(args.store, configured_stackers(args), self.publish_runs, record_score=self.scores.record)
+        self.ratings = Ratings(args.store)
         self.image_version = token_hex(8)
         self.previews = PreviewCache(args.store)
         self.decoded = DecodedFrames()
@@ -203,6 +203,7 @@ class Review:
             else:
                 with suppress(OSError):
                     result["artifact_revision"] = output_revision(output_identity(directory / result["image"]))
+            result.pop("recorded_benchmark", None)
         return {"frames": [self.frame_info(catalog, frame_id) for frame_id in scene.frame_ids],
                 "references": [self.frame_info(catalog, frame_id) for frame_id in scene.reference_ids],
                 "reference_type": scene.metadata["reference_type"],
