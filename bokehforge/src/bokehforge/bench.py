@@ -330,7 +330,7 @@ def main(argv=None):
     score_options = parser.add_argument_group("Scoring")
     score_options.add_argument("--no-attention", action="store_true", help="Disable inspection heatmaps and damage weighting")
     score_options.add_argument("--device", choices=DEVICES, default="auto",
-                               help="Scoring device (default: auto, prefer CUDA when available)")
+                               help="Damage scoring device (default: auto, prefer CUDA or Apple MPS when available)")
     score_options.add_argument(
         "--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)",
     )
