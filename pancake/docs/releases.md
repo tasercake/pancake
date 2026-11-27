@@ -34,8 +34,8 @@ gh workflow run pancake-release.yml --ref main -f mode=prerelease
 gh workflow run pancake-release.yml --ref main -f mode=stable
 ```
 
-## Enable Copilot with included credits
+## Copilot usage
 
-Set your personal Copilot **Additional usage** budget to **$0** before enabling the repository variable. The workflow uses the repository owner’s included Copilot credits through the built-in Actions token. [Copilot account settings](https://github.com/settings/copilot/features) · [Billing and usage](https://github.com/settings/billing)
+Copilot runs automatically when the workflow prepares a release candidate on the default branch. The workflow uses the repository owner's Copilot allowance through the built-in Actions token. Set your personal Copilot **Additional usage** budget to **$0** to prevent overage charges. [Copilot account settings](https://github.com/settings/copilot/features) · [Billing and usage](https://github.com/settings/billing)
 
-With the $0 limit confirmed, set the Actions repository variable `PANCAKE_COPILOT_ENABLED` to `true`. This is a one-time setting. Run **build-only** on the default branch and check the run summary for the notes source to confirm Copilot is working. [Actions variables](https://github.com/tasercake/pancake/settings/variables/actions)
+Run **build-only** on the default branch and check the run summary for the notes source to confirm Copilot is working.
