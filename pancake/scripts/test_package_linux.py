@@ -122,6 +122,8 @@ class LinuxPackageTests(unittest.TestCase):
             self.assertEqual(receipt["source_commit"], revision)
             artifact = output / receipt["archive"]["file"]
             self.assertEqual(receipt["archive"]["sha256"], file_sha256(artifact))
+            members = subprocess.check_output(["ar", "t", artifact], text=True).splitlines()
+            self.assertEqual(members, ["debian-binary", "control.tar.zst", "data.tar.zst"])
             subprocess.run(["dpkg-deb", "--extract", artifact, root / "unpack"], check=True)
             share = root / "unpack/usr/share"
             launcher = (share / "applications/pancake.desktop").read_text().splitlines()

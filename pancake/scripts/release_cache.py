@@ -17,7 +17,11 @@ GRAPH = (
 )
 WORKSPACE = (
     "pancake/Cargo.lock", "pancake/Cargo.toml", "pancake/src", "pancake/build.rs", "pancake/crates",
-    "assets/pancake-stacker-icon.png",
+    "assets", "pancake/lightroom",
+)
+CHECKS = (
+    "pancake/tests", "pancake/.config", "pancake/clippy.toml", "pancake/deny.toml",
+    "pancake/dependency-policy.json", "pancake/scripts/check.sh", "pancake/scripts/dependency_policy.py",
 )
 SOURCE_MTIME = 946684800  # 2000-01-01 UTC
 
@@ -27,16 +31,18 @@ def tracked_tree(root, revision, paths):
     return subprocess.check_output(["git", "ls-tree", "-rz", revision, "--", *paths], cwd=root)
 
 
-def dependency_keys(root, dispatched):
+def dependency_keys(root, dispatched, *, checks=False):
     """Use the dispatched graph for shared dependencies and the candidate for workspace outputs."""
     graph = tracked_tree(root, dispatched, GRAPH)
-    candidate = tracked_tree(root, "HEAD", WORKSPACE)
+    candidate = tracked_tree(root, "HEAD", (*WORKSPACE, *CHECKS) if checks else WORKSPACE)
     return hashlib.sha256(graph).hexdigest(), hashlib.sha256(candidate).hexdigest()
 
 
-def restore_mtimes(root, *, exact):
+def restore_mtimes(root, *, exact, checks=False):
     """Let Cargo reuse path inputs whose tracked contents match the restored cache."""
-    paths = (VENDOR, *WORKSPACE) if exact else (VENDOR,)
+    paths = (VENDOR,)
+    if exact:
+        paths += (*WORKSPACE, *CHECKS) if checks else WORKSPACE
     for record in filter(None, tracked_tree(root, "HEAD", paths).split(b"\0")):
         metadata, name = record.split(b"\t", maxsplit=1)
         if metadata.startswith((b"100644 ", b"100755 ")):
@@ -49,15 +55,17 @@ def main():
     commands = parser.add_subparsers(dest="command", required=True)
     keys = commands.add_parser("keys")
     keys.add_argument("dispatched")
+    keys.add_argument("--checks", action="store_true")
     restore = commands.add_parser("restore-mtimes")
     restore.add_argument("--exact", action="store_true")
+    restore.add_argument("--checks", action="store_true")
     args = parser.parse_args()
     if args.command == "keys":
-        graph, inputs = dependency_keys(ROOT, args.dispatched)
+        graph, inputs = dependency_keys(ROOT, args.dispatched, checks=args.checks)
         print(f"graph={graph}")
         print(f"inputs={inputs}")
     else:
-        restore_mtimes(ROOT, exact=args.exact)
+        restore_mtimes(ROOT, exact=args.exact, checks=args.checks)
 
 
 if __name__ == "__main__":

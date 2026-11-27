@@ -233,7 +233,13 @@ jobs:
           EXACT: ${{ steps.build-cache.outputs.cache-hit }}
         run: |
           args=()
-          if [[ "$EXACT" == true ]]; then args+=(--exact); fi
+          if [[ "$EXACT" == true ]]; then
+            args+=(--exact)
+          else
+            target=()
+            if [[ "$RUNNER_OS" != Linux ]]; then target=(--target "$RUST_TARGET"); fi
+            cargo clean --offline --locked --release --workspace "${target[@]}"
+          fi
           python -B scripts/release_cache.py restore-mtimes "${args[@]}"
 
       - name: Fetch the locked package graph

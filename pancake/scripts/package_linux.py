@@ -129,7 +129,9 @@ def build_package(release, output, version, maintainer, revision, lock_digest, *
         (metadata / "control").write_text(f"{control}Depends: {dependencies}\n", encoding="utf-8")
         archive_name = f"pancake_{archive_version or version}_amd64.deb"
         archive = staging / archive_name
-        _run("dpkg-deb", "--root-owner-group", "--build", payload, archive)
+        # Ubuntu defaults to Zstandard level 19. Level 6 keeps the same
+        # package format and avoids spending release time on a slightly smaller archive.
+        _run("dpkg-deb", "-Zzstd", "-z6", "--root-owner-group", "--build", payload, archive)
         extracted = staging / "verify"
         _run("dpkg-deb", "--extract", archive, extracted)
         verify_notices(extracted, notices)

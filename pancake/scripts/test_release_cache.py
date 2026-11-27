@@ -59,6 +59,25 @@ class ReleaseCacheTests(unittest.TestCase):
         self.assertEqual(graph, original[0])
         self.assertNotEqual(inputs, original[1])
 
+    def test_tests_change_check_cache_and_leave_release_cache_intact(self):
+        packages = dependency_keys(self.root, self.source)
+        checks = dependency_keys(self.root, self.source, checks=True)
+        self.write("pancake/tests/smoke.rs", "#[test] fn smoke() {}\n")
+        self.commit()
+        self.assertEqual(dependency_keys(self.root, self.source), packages)
+        self.assertNotEqual(dependency_keys(self.root, self.source, checks=True), checks)
+
+    def test_embedded_external_assets_invalidate_release_binaries(self):
+        original = dependency_keys(self.root, self.source)
+        for name in ("assets/pancake-stacker-wordmark.png", "pancake/lightroom/Pancake.lrplugin/Info.lua"):
+            with self.subTest(name=name):
+                self.write(name, "New embedded content\n")
+                self.commit()
+                graph, inputs = dependency_keys(self.root, self.source)
+                self.assertEqual(graph, original[0])
+                self.assertNotEqual(inputs, original[1])
+                original = graph, inputs
+
     def test_mtime_reset_only_covers_files_validated_by_the_matching_key(self):
         vendor = self.root / "pancake/vendor/patch/src/lib.rs"
         workspace = self.root / "pancake/src/lib.rs"
