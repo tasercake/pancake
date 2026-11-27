@@ -22,8 +22,10 @@ from .data._files import digest
 from .data._config import DEFAULT_CONFIG, data_root, read_config
 from .data.download import save_json
 from .data.lazy import SceneCatalog
+from .inspection import INSPECTION_MAP_VERSION, map_path, read_map, reference_key, reference_preview
 from .scoring import (
-    FAMILY_WEIGHTS, SCORE_DAMAGE_SCALE, SCORE_DETAIL_LEVELS, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
+    FAMILY_WEIGHTS, INSPECTION_MAX_MULTIPLIER, INSPECTION_MIX, INSPECTION_SCORE_VERSION,
+    SCORE_DAMAGE_SCALE, SCORE_DETAIL_LEVELS, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
     ScoreDetails, _validate_details, measure, validate_rgb,
 )
 from .stacking import StackFrame, StackInput
@@ -174,7 +176,7 @@ def _load_candidate(path, row, *, fingerprint=False):
     return None
 
 
-def _score_delivery(result, reference, row, *, details=None):
+def _score_delivery(result, reference, row, catalog, scene, *, details=None, inspection_maps=None):
     try:
         validate_rgb(result)
     except ValueError as exc:
@@ -183,7 +185,13 @@ def _score_delivery(result, reference, row, *, details=None):
 
     scoring_start = perf_counter()
     try:
-        measurement = measure(result, reference, details=details)
+        heatmap = None
+        if inspection_maps is not None:
+            key = reference_key(catalog, scene, reference_preview(reference))
+            heatmap, row["inspection_map_sha256"] = read_map(
+                map_path(inspection_maps, scene), reference, key
+            )
+        measurement = measure(result, reference, details=details, inspection_heatmap=heatmap)
         row.update(scene_score=measurement.score, alignment=measurement.alignment)
         if measurement.features:
             row.update(score_features=measurement.features, artifact_diagnostics=measurement.diagnostics)
@@ -195,7 +203,7 @@ def _score_delivery(result, reference, row, *, details=None):
         row["scoring_seconds"] = perf_counter() - scoring_start
 
 
-def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = None):
+def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = None, inspection_maps=None):
     """Compare a canonical TIFF with the scene's required RGB ground truth."""
     _validate_details(details)
     _require_benchmark_reference(scene)
@@ -205,9 +213,11 @@ def score_saved_output(catalog, scene, path, *, details: ScoreDetails | None = N
     if reference is not None:
         result = _load_candidate(path, row)
         if result is not None:
-            explanation = _score_delivery(result, reference, row, details=details)
-    response = {"profile": SCORE_VERSION, "score": row["scene_score"], "status": row["status"]}
-    for field in ("error", "alignment"):
+            explanation = _score_delivery(result, reference, row, catalog, scene, details=details,
+                                          inspection_maps=inspection_maps)
+    profile = SCORE_VERSION if inspection_maps is None else INSPECTION_SCORE_VERSION
+    response = {"profile": profile, "score": row["scene_score"], "status": row["status"]}
+    for field in ("error", "alignment", "inspection_map_sha256"):
         if field in row:
             response[field] = row[field]
     if explanation is not None:
@@ -258,7 +268,8 @@ def _run_scene(catalog, scene, row, algorithm, args):
 
     if row["status"] != "ok":
         return
-    explanation = _score_delivery(result, reference, row, details=args.explain_score)
+    explanation = _score_delivery(result, reference, row, catalog, scene, details=args.explain_score,
+                                  inspection_maps=args.inspection_maps)
     if row["status"] != "ok":
         return
     if args.save_images:
@@ -314,6 +325,7 @@ def main(argv=None):
     selection.add_argument("--config", type=Path, default=DEFAULT_CONFIG, help="Dataset source configuration")
     selection.add_argument("--lock", type=Path, help="Optional source snapshot instead of download manifests")
     score_options = parser.add_argument_group("Scoring")
+    score_options.add_argument("--inspection-maps", type=Path, help="Reference maps made by bokehforge inspection")
     score_options.add_argument(
         "--decode-workers", type=_positive_int, default=1, help="Concurrent focal decodes per scene (default: 1)",
     )
@@ -326,6 +338,8 @@ def main(argv=None):
     report_options.add_argument("--save-images", action="store_true", help="Save full-resolution float32 TIFFs")
     report_options.add_argument("--progress", action="store_true", help="Write progress to stderr")
     args = parser.parse_args(argv)
+    if args.inspection_maps is not None and not args.inspection_maps.is_dir():
+        raise ValueError(f"Inspection maps directory does not exist: {args.inspection_maps}")
     if args.output.exists():
         raise ValueError(f"Output directory already exists: {args.output}")
     root = args.root or data_root(args.config, read_config(args.config).get("defaults", {}))
@@ -369,8 +383,13 @@ def main(argv=None):
                "aggregation": "equal datasets; equal leakage groups within each dataset"}
     scoring["alignment"] = {"schema_version": ALIGNMENT_VERSION, "max_rotation_degrees": MAX_ROTATION_DEGREES,
                             "coverage_penalty": "minimum of relative intersection area and contributing delivery samples"}
+    profile = SCORE_VERSION
+    if args.inspection_maps is not None:
+        profile = INSPECTION_SCORE_VERSION
+        scoring["inspection"] = {"map_version": INSPECTION_MAP_VERSION, "max_mix": INSPECTION_MIX,
+                                 "max_multiplier": INSPECTION_MAX_MULTIPLIER}
     report = {
-        "schema_version": 4, "score": score, "score_version": SCORE_VERSION,
+        "schema_version": 4, "score": score, "score_version": profile,
         "scoring": scoring,
         "scored_groups": scored_groups, "cohort_sha256": cohort_hash, "algorithm": implementation,
         "data_root": str(root.resolve()), "decode_workers": args.decode_workers, "seconds": perf_counter() - start,

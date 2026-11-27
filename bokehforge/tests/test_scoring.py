@@ -2,7 +2,10 @@ import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
 
-from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, Measurement, _measure, measure, scene_score
+from bokehforge.scoring import (
+    FAMILY_WEIGHTS, FEATURES, INSPECTION_SCORE_VERSION, SCORE_DAMAGE_SCALE, Measurement,
+    _inspection_weights, _measure, measure, scene_score,
+)
 
 
 def rgb(pixels):
@@ -163,3 +166,49 @@ def test_explanation_recomposes_score_from_real_tiles():
 def test_bad_deliveries_fail_before_measurement(delivery, reason):
     with pytest.raises(ValueError, match=reason):
         measure(delivery, np.zeros((5, 4, 3), np.float32))
+
+
+def test_inspection_weights_match_the_formula_and_bound_sparse_maps():
+    heatmap = np.array([[0.2, 0.4], [0.8, 1]], dtype=np.float32)
+    weights, mix = _inspection_weights(heatmap)
+    assert mix == 0.5
+    np.testing.assert_allclose(weights, (1 + heatmap / heatmap.mean()) / 2, rtol=1e-6)
+
+    sparse = np.zeros((4, 4), np.float32)
+    sparse[0, 0] = 1
+    weights, mix = _inspection_weights(sparse)
+    assert mix < 0.5
+    assert weights.max() == 2
+    assert weights.mean() == pytest.approx(1)
+    assert weights.min() >= 0.5
+
+
+def test_inspection_weights_feed_the_score_and_its_tiles(monkeypatch):
+    target = np.full((8, 16, 3), 0.2, np.float32)
+    candidate = target + np.float32(0.5)
+    heatmap = np.zeros(target.shape[:2], np.float32)
+    heatmap[:, :8] = 1
+    monkeypatch.setattr("bokehforge.scoring._maps", lambda *_: (
+        (np.ones(target.shape[:2], np.float32), *[np.zeros(target.shape[:2], np.float32) for _ in range(5)]), {}
+    ))
+    weights = _inspection_weights(heatmap)
+    result = _measure(candidate, target, details="tiles", inspection=weights)
+    assert result.explanation["inspection_mix"] == 0.5
+    assert result.explanation["tile_grids"]["8:0:0"]["values"]["tone"] == [1.5, 0.5]
+    assert result.features["native.tone"] == pytest.approx(.4 * 1 + .6 * 1.5)
+    assert result.score == pytest.approx(100 * np.exp(-5 * FAMILY_WEIGHTS["tone"] * result.features["native.tone"]))
+
+
+def test_flat_inspection_maps_are_neutral_and_perfect_outputs_stay_perfect():
+    target = np.full((16, 24, 3), .3, np.float32)
+    candidate = target + .04
+    baseline = measure(candidate, target).score
+    for level in (0, .3):
+        heatmap = np.full(target.shape[:2], level, np.float32)
+        result = measure(candidate, target, inspection_heatmap=heatmap, details="summary")
+        assert result.score == baseline
+        assert result.explanation["profile"] == INSPECTION_SCORE_VERSION
+    heatmap[0, 0] = 1
+    assert measure(target, target, inspection_heatmap=heatmap, details="tiles").score == 100
+    with pytest.raises(ValueError, match="finite floating-point inspection map"):
+        measure(candidate, target, inspection_heatmap=heatmap[:-1])

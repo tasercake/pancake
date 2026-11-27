@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import sys
+from threading import Event
 
 import numpy as np
 import pytest
@@ -12,7 +13,12 @@ from PIL import Image
 from bokehforge.bench import _score, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
 from bokehforge.data.lazy import Scene, SceneCatalog
-from bokehforge.scoring import FAMILY_WEIGHTS, FEATURES, SCORE_DAMAGE_SCALE, SCORE_EXPLANATION_VERSION, SCORE_VERSION, measure
+from bokehforge.inspection import INSPECTION_MAP_VERSION, reference_key, reference_preview, write_map
+from bokehforge.review.scores import Scores
+from bokehforge.scoring import (
+    FAMILY_WEIGHTS, FEATURES, INSPECTION_SCORE_VERSION, SCORE_DAMAGE_SCALE, SCORE_EXPLANATION_VERSION, SCORE_VERSION,
+    measure,
+)
 
 _FIXTURE_REFERENCE = np.float32(20 / 255)
 
@@ -115,6 +121,66 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     existing = run_bench(corpus, output, "--algorithm", "mean")
     assert existing.returncode == 2
     assert "already exists" in existing.stderr
+
+
+def test_inspection_scores_a_saved_delivery_with_a_reference_bound_map(corpus, tmp_path):
+    catalog = SceneCatalog(corpus, config=corpus / "sources.json", datasets=["referenced"])
+    scene = catalog.scene(catalog.scene_ids[0])
+    reference = catalog.decode(scene.reference_ids[0]).data
+    heatmap = np.repeat(np.array([[.25, .25, .75, .75]], dtype=np.float32), reference.shape[0], axis=0)
+    candidates = tmp_path / "candidates"
+    candidates.mkdir()
+    path = candidates / (scene.id + ".tif")
+    path.parent.mkdir(parents=True)
+    candidate = reference.copy()
+    candidate[:, 2:] += .07
+    tifffile.imwrite(path, candidate, photometric="rgb")
+    maps = tmp_path / "maps"
+    maps.mkdir()
+    heatmap_path = maps / (scene.id + ".npz")
+    write_map(heatmap_path, reference_key(catalog, scene, reference_preview(reference)), reference.shape[:2], heatmap)
+
+    output = tmp_path / "attention"
+    args = ("--dataset", "referenced", "--candidate-dir", str(candidates), "--inspection-maps", str(maps))
+    result = run_bench(corpus, output, *args, "--explain-score", "tiles")
+    assert result.returncode == 0, result.stderr
+    report = json.loads((output / "report.json").read_text())
+    assert report["score_version"] == INSPECTION_SCORE_VERSION
+    assert report["scoring"]["inspection"]["map_version"] == INSPECTION_MAP_VERSION
+    row, = report["scenes"]
+    assert row["inspection_map_sha256"] == sha256(heatmap_path.read_bytes()).hexdigest()
+    assert row["scene_score"] == measure(candidate, reference, inspection_heatmap=heatmap).score
+    assert row["scene_score"] < measure(candidate, reference).score
+    saved = score_saved_output(catalog, scene, path, details="tiles", inspection_maps=maps)
+    assert saved["score"] == row["scene_score"]
+    assert saved["explanation"] == json.loads((output / row["score_explanation_path"]).read_text())
+
+    updated = Event()
+    review = Scores(updated.set, maps)
+    delivery = {"image": path.relative_to(tmp_path).as_posix(), "stacker": "test", "scene_fingerprint": scene.id}
+    try:
+        pending = review.get(catalog, scene, tmp_path, delivery)
+        assert pending["status"] == "pending"
+        assert updated.wait(5)
+        assert review.get(catalog, scene, tmp_path, delivery)["score"] == saved["score"]
+        updated.clear()
+        write_map(heatmap_path, reference_key(catalog, scene, reference_preview(reference)),
+                  reference.shape[:2], np.zeros_like(heatmap))
+        assert review.get(catalog, scene, tmp_path, delivery)["status"] == "pending"
+        assert updated.wait(5)
+        neutral = review.get(catalog, scene, tmp_path, delivery)
+        assert neutral["inspection_map_sha256"] != saved["inspection_map_sha256"]
+        assert neutral["score"] == measure(candidate, reference).score
+    finally:
+        review.close()
+
+    write_map(heatmap_path, "other-reference", reference.shape[:2], heatmap)
+    result = run_bench(corpus, tmp_path / "stale", *args)
+    assert result.returncode == 1
+    assert result.stdout == "unscored\n"
+    stale, = json.loads((tmp_path / "stale" / "report.json").read_text())["scenes"]
+    assert stale["status"] == "scoring_error"
+    assert "does not match the reference" in stale["error"]
 
 
 def test_external_stacker_failure_counts_and_cohort_is_stable(corpus, tmp_path):

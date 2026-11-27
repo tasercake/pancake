@@ -48,6 +48,7 @@ function familyRow(family) {
 
 function drawGrid(canvas, payload) {
   const [width, height] = payload.candidate_size_wh;
+  const maximum = payload.damage_range?.[1] ?? 1;
   const { x_edges: xs, y_edges: ys, values, covered_pixels: coverage } = payload.grid;
   const [[a, b, tx], [c, d, ty]] = payload.candidate_to_reference_xy;
   const determinant = a * d - b * c;
@@ -72,7 +73,7 @@ function drawGrid(canvas, payload) {
     for (let col = 0; col < xs.length - 1; col += 1, index += 1) {
       const value = values[index];
       if (!value || coverage?.[index] === 0) continue;
-      ctx.fillStyle = colors[Math.round(255 * Math.min(value, 1))];
+      ctx.fillStyle = colors[Math.round(255 * Math.min(value / maximum, 1))];
       ctx.fillRect(xs[col], ys[row], xs[col + 1] - xs[col], ys[row + 1] - ys[row]);
     }
   }
@@ -131,7 +132,8 @@ export class ScoreExplanation {
     const placement = explanation?.placements[0];
     const p = context?.params;
     const key = explanation && p?.rev && p.rev === benchmark.artifact_revision
-      ? JSON.stringify([p.run, p.scene, p.stacker, p.rev, explanation.reference_id, benchmark.profile]) : "";
+      ? JSON.stringify([p.run, p.scene, p.stacker, p.rev, explanation.reference_id, benchmark.profile,
+        benchmark.inspection_map_sha256]) : "";
     this.context = key ? context : null;
     if (key !== this.key) {
       this.key = key;
@@ -170,7 +172,8 @@ export class ScoreExplanation {
     }
     this.root.querySelector("[data-damage-curve]").textContent = comparison
       ? "Weighted damage " + damage(comparison.weighted_damage) +
-        " · Overlap quality = 100 × exp(−" + number.format(explanation.damage_scale) + " × weighted damage)"
+        " · Overlap quality = 100 × exp(−" + number.format(explanation.damage_scale) + " × weighted damage)" +
+        (comparison.inspection_mix == null ? "" : " · Inspection mix " + percent.format(comparison.inspection_mix))
       : "";
     this.family.replaceChildren(...families.map(([id, info]) => new Option(info.label, id)));
     if (Object.hasOwn(comparison?.families ?? {}, previousFamily)) this.family.value = previousFamily;
@@ -198,6 +201,7 @@ export class ScoreExplanation {
         if (this.eventRevision !== revision) this.request(key);
       } else if (result.status === "ok" && result.artifact_revision === params.rev &&
                  result.reference_id === benchmark.explanation.reference_id &&
+                 result.inspection_map_sha256 === benchmark.inspection_map_sha256 &&
                  result.family === family && String(result.grid?.tile_size) === side) {
         tileCache.set(key, result);
         if (tileCache.size > 12) tileCache.delete(tileCache.keys().next().value);
@@ -242,6 +246,10 @@ export class ScoreExplanation {
       this.drawn = payload;
       this.legend.firstElementChild.textContent = this.family.selectedOptions[0].text +
         " · " + this.grid.value + " px tile damage";
+      const maximum = payload.damage_range?.[1] ?? 1;
+      Array.from(this.legend.querySelector(".damage-legend-values").children).forEach((tick, index) => {
+        tick.textContent = number.format(maximum * index / 4);
+      });
     }
     this.placeOverlay(context);
   }
