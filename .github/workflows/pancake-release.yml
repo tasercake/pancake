@@ -272,29 +272,46 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           payload="$RUNNER_TEMP/macos"
+          notices="$RUNNER_TEMP/pancake-macos-notices"
+          python -B scripts/release_support.py notices "$notices" "$RUST_TARGET" --features cubecl/metal-native
+          mkdir "$notices/native-zstd"
+          cp "$PANCAKE_ZSTD_SOURCE/LICENSE" "$RUNNER_TEMP/zstd-source.txt" "$notices/native-zstd/"
           python -B scripts/package_macos.py --output "$payload" \
-            --target-dir "$CARGO_TARGET_DIR" \
+            --target-dir "$CARGO_TARGET_DIR" --release-notices "$notices" \
             --bundle-identifier com.github.tasercake.pancake --build-number "$GITHUB_RUN_NUMBER"
-          python -B scripts/release_support.py notices "$payload" "$RUST_TARGET" --features cubecl/metal-native
-          mkdir "$payload/native-zstd"
-          cp "$PANCAKE_ZSTD_SOURCE/LICENSE" "$RUNNER_TEMP/zstd-source.txt" "$payload/native-zstd/"
           mv "$payload/build.log" "$DIST/pancake-macos-arm64-build.log"
           mv "$payload/package-receipt.json" "$DIST/pancake-macos-arm64-receipt.json"
+
+          python -m pip install --require-hashes --only-binary=:all: -r scripts/macos-dmg-requirements.txt
           package="$DIST/pancake-$RELEASE_VERSION-macos-arm64.dmg"
-          ln -s /Applications "$payload/Applications"
-          hdiutil create -srcfolder "$payload" -volname "Pancake Stacker" -fs HFS+ -format UDZO "$package"
+          python -B -m dmgbuild -s scripts/macos-dmg-settings.py -D "app=$payload/Pancake.app" \
+            "Pancake Stacker" "$package"
           hdiutil verify "$package"
+
           mounted=$(mktemp -d "$RUNNER_TEMP/pancake-dmg.XXXXXX")
           hdiutil attach -readonly -nobrowse -mountpoint "$mounted" "$package"
           trap 'hdiutil detach "$mounted"' EXIT
+          visible=("$mounted"/*)
+          test "${#visible[@]}" -eq 2
           test "$(readlink "$mounted/Applications")" = /Applications
-          codesign --verify --strict "$mounted/Pancake.app"
-          test -x "$mounted/Pancake.app/Contents/MacOS/pancake-gui"
-          cmp "$payload/LICENSE" "$mounted/LICENSE"
-          diff -qr "$payload/dependency-notices" "$mounted/dependency-notices"
-          diff -qr "$payload/native-llvm" "$mounted/native-llvm"
-          diff -qr "$payload/native-zstd" "$mounted/native-zstd"
-          python -B scripts/release_support.py smoke "$mounted/pancake-cli"
+          test -f "$mounted/.background.tiff"
+          python -B - "$mounted/.DS_Store" <<'PY'
+          import sys
+          from ds_store import DSStore
+
+          with DSStore.open(sys.argv[1], "r") as layout:
+              left, right = layout["Pancake.app"]["Iloc"], layout["Applications"]["Iloc"]
+              if left[0] >= right[0] or left[1] != right[1]:
+                  raise SystemExit("Expected the app to the left of Applications in Finder")
+          PY
+
+          installed="$RUNNER_TEMP/pancake-install/Pancake.app"
+          ditto "$mounted/Pancake.app" "$installed"
+          codesign --verify --strict --deep "$installed"
+          test -x "$installed/Contents/MacOS/pancake-gui"
+          diff -qr "$payload/Pancake.app" "$installed"
+          diff -qr "$notices" "$installed/Contents/Resources/Notices"
+          python -B scripts/release_support.py smoke "$installed/Contents/MacOS/pancake-cli"
 
       - name: Build and verify the Windows executables
         if: runner.os == 'Windows'

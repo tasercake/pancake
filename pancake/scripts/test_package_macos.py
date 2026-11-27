@@ -2,6 +2,7 @@
 
 import json
 import plistlib
+import runpy
 import subprocess
 import tempfile
 import unittest
@@ -19,6 +20,26 @@ BUILD = (
 )
 BINARIES = ("pancake-cli", "pancake-gui")
 FONT_LICENSES = ("IBMPlexMono-OFL.txt", "SpaceGrotesk-OFL.txt")
+RELEASE_NOTICES = ("LICENSE", "dependency-notices/inventory.json", "native-llvm/LICENSE.TXT",
+                   "native-zstd/LICENSE", "native-zstd/zstd-source.txt")
+
+
+class MacDiskImageTests(unittest.TestCase):
+    """Keep the Finder install window focused on the app and its drop target."""
+
+    def test_finder_layout_stages_only_app_and_applications(self):
+        app = "/tmp/Pancake Stacker/Pancake.app"
+        settings = runpy.run_path(str(Path(__file__).with_name("macos-dmg-settings.py")),
+                                  init_globals={"defines": {"app": app}})
+        self.assertEqual(settings["files"], [app])
+        self.assertEqual(settings["symlinks"], {"Applications": "/Applications"})
+        self.assertEqual(settings["default_view"], "icon-view")
+        self.assertEqual(settings["background"], "builtin-arrow")
+        positions = settings["icon_locations"]
+        self.assertEqual(positions.keys(), {"Pancake.app", "Applications"})
+        left, right = positions["Pancake.app"], positions["Applications"]
+        self.assertLess(left[0], right[0])
+        self.assertEqual(left[1], right[1])
 
 
 class MacPackageTests(unittest.TestCase):
@@ -39,6 +60,9 @@ class MacPackageTests(unittest.TestCase):
         fonts.mkdir(parents=True)
         for name in FONT_LICENSES:
             (fonts / name).write_text(f"Original {name} font license.\n")
+        icon = self.root / "assets/pancake-stacker-icon.png"
+        icon.parent.mkdir()
+        icon.write_bytes(b"packaged app icon fixture")
         self.git("init", "--quiet")
         self.git("add", ".")
         self.git("-c", "user.name=Fixture", "-c", "user.email=test@localhost",
@@ -48,6 +72,7 @@ class MacPackageTests(unittest.TestCase):
         self.dependency = SYSTEM_DEPENDENCY
         self.failure = ""
         self.identity = IDENTIFIER
+        self.notices = None
         self.enterContext(patch("package_macos.platform.system", return_value="Darwin"))
         self.enterContext(patch("package_macos.platform.machine", return_value="arm64"))
         self.enterContext(patch("package_macos._apple", side_effect=self.apple))
@@ -100,9 +125,27 @@ class MacPackageTests(unittest.TestCase):
             with Path(argv[-1]).open("rb") as plist:
                 self.assertEqual(plistlib.load(plist)["CFBundleIdentifier"], IDENTIFIER)
             return "Info.plist: OK\n"
+        if argv[:2] == ("sips", "-z"):
+            self.assertEqual(Path(argv[-3]).read_bytes(), b"packaged app icon fixture")
+            Path(argv[-1]).write_bytes(b"resized icon")
+            return ""
+        if argv[0] == "iconutil":
+            self.assertEqual({path.name for path in Path(argv[-1]).iterdir()}, {
+                f"icon_{size}x{size}{scale}.png"
+                for size in (16, 32, 128, 256, 512) for scale in ("", "@2x")
+            })
+            Path(argv[argv.index("-o") + 1]).write_bytes(b"app icns")
+            return ""
         if argv[:2] == ("codesign", "--force"):
             signed = Path(argv[-1])
             if signed.suffix == ".app":
+                resources = signed / "Contents/Resources"
+                self.assertEqual((resources / "Pancake.icns").read_bytes(), b"app icns")
+                self.assertEqual((signed / "Contents/MacOS/pancake-cli").read_bytes(), b"pancake-cli signed")
+                if self.notices is not None:
+                    for relative in RELEASE_NOTICES:
+                        self.assertEqual((resources / "Notices" / relative).read_bytes(),
+                                         (self.notices / relative).read_bytes())
                 for name in FONT_LICENSES:
                     self.assertEqual((signed / "Contents/Resources/font-notices" / name).read_bytes(),
                                      (self.source / "crates/pancake-gui/assets/fonts" / name).read_bytes())
@@ -138,6 +181,7 @@ class MacPackageTests(unittest.TestCase):
         plist_path = app / "Contents" / "Info.plist"
         plist = plistlib.loads(plist_path.read_bytes())
         self.assertEqual(plist["CFBundleExecutable"], "pancake-gui")
+        self.assertEqual(plist["CFBundleIconFile"], "Pancake.icns")
         self.assertEqual(plist["CFBundleIdentifier"], IDENTIFIER)
         self.assertEqual(plist["CFBundlePackageType"], "APPL")
         self.assertEqual(plist["CFBundleShortVersionString"], "0.1.0")
@@ -166,7 +210,10 @@ class MacPackageTests(unittest.TestCase):
         for name in FONT_LICENSES:
             relative = f"Pancake.app/Contents/Resources/font-notices/{name}"
             self.assertEqual(receipt["files_sha256"][relative], file_sha256(self.output / relative))
-        for name, path in zip(BINARIES, ("pancake-cli", "Pancake.app/Contents/MacOS/pancake-gui"), strict=True):
+        self.assertEqual({item.name for item in self.output.iterdir()},
+                         {"Pancake.app", "build.log", "package-receipt.json"})
+        for name in BINARIES:
+            path = f"Pancake.app/Contents/MacOS/{name}"
             binary = self.output / path
             self.assertEqual(binary.read_bytes(), f"{name} signed".encode())
             self.assertEqual(binary.stat().st_mode & 0o777, 0o755)
@@ -176,6 +223,18 @@ class MacPackageTests(unittest.TestCase):
             self.assertEqual(receipt["files_sha256"][path], file_sha256(binary))
         self.assertEqual((self.output / "build.log").read_text(), "locked build output\n")
         self.assertEqual(sum(cmd[:3] == ("codesign", "--verify", "--strict") for cmd in self.commands), 2)
+
+    def test_release_notices_are_sealed_inside_the_app_and_recorded(self):
+        self.notices = self.root / "release-notices"
+        for relative in RELEASE_NOTICES:
+            notice = self.notices / relative
+            notice.parent.mkdir(parents=True, exist_ok=True)
+            notice.write_text(f"Original notice for {relative}\n")
+        build_package(self.source, self.output, IDENTIFIER, "17", release_notices=self.notices)
+        receipt = json.loads((self.output / "package-receipt.json").read_bytes())
+        for relative in RELEASE_NOTICES:
+            staged = f"Pancake.app/Contents/Resources/Notices/{relative}"
+            self.assertEqual(receipt["files_sha256"][staged], file_sha256(self.notices / relative))
 
     def test_reuses_a_cargo_target_without_signing_its_binaries(self):
         target = self.root / "cargo-target"
@@ -190,7 +249,7 @@ class MacPackageTests(unittest.TestCase):
                 self.assertEqual(binary.read_bytes(), name.encode())
                 self.assertEqual(item["source_sha256"], file_sha256(binary))
                 self.assertEqual((output / item["file"]).read_bytes(), f"{name} signed".encode())
-        self.assertEqual(set(self.root.iterdir()), {self.source, target, *outputs})
+        self.assertEqual(set(self.root.iterdir()), {self.source, self.root / "assets", target, *outputs})
 
     def test_refuses_a_target_within_the_package_output(self):
         with self.assertRaisesRegex(ValueError, "outside the package output"):
@@ -216,7 +275,7 @@ class MacPackageTests(unittest.TestCase):
                 finally:
                     setattr(self, field, before)
                 self.assertFalse(self.output.exists())
-                self.assertEqual(set(self.root.iterdir()), {self.source})
+                self.assertEqual(set(self.root.iterdir()), {self.source, self.root / "assets"})
 
     def test_refuses_source_copy_mismatch_before_signing(self):
         def corrupt_copy(source, destination):
