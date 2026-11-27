@@ -11,7 +11,7 @@ uv sync --frozen
 uv run --frozen bokehforge data download
 ```
 
-The downloader, catalog, benchmark, and review app all select datasets from the active source configuration. Older downloads and lock entries stay on disk. To use other datasets, pass a configuration that lists them. Repeat `--dataset` to select specific configured sources. `--root` selects the dataset directory, which defaults to `datasets/` at the repository root. For a wheel installation, supply `--config /path/to/sources.json` on the command line or `config="/path/to/sources.json"` in Python.
+The downloader, catalog, benchmark, and Stackroom all select datasets from the active source configuration. Older downloads and lock entries stay on disk. To use other datasets, pass a configuration that lists them. Repeat `--dataset` to select specific configured sources. `--root` selects the dataset directory, which defaults to `datasets/` at the repository root. For a wheel installation, supply `--config /path/to/sources.json` on the command line or `config="/path/to/sources.json"` in Python.
 
 ## Benchmark stacks
 
@@ -23,15 +23,15 @@ Run a Python stacker against the downloaded all-in-focus targets or score render
 
 See the [benchmark guide](docs/benchmark.md) for the stacker contract, scoring profile, and saved-output replay.
 
-## Browse and rate stacks
+## Browse and rate stacks in Stackroom
 
-Run the local review app from the repository root:
+Stackroom is BokehForge’s local focus stack review app. Launch it from the repository root.
 
 ```sh
 bokehforge/.venv/bin/bokehforge review
 ```
 
-See the [review guide](docs/review.md) for dataset selection, stacker setup, and rating export.
+See the [Stackroom guide](docs/review.md) for dataset selection, stacker setup, and rating export.
 
 ## Use from Python
 

@@ -11,7 +11,7 @@ def main(argv=None):
     actions = data.add_subparsers(dest="action", required=True, title="Data commands", metavar="COMMAND")
     actions.add_parser("download", add_help=False, help="Download verified originals")
     groups.add_parser("bench", add_help=False, help="Score a stacker against RGB ground truth")
-    groups.add_parser("review", add_help=False, help="Browse and rate focus stacks locally")
+    groups.add_parser("review", add_help=False, help="Open Stackroom to browse and rate focus stacks")
     args, remaining = parser.parse_known_args(argv)
     if args.group == "bench":
         from .bench import main as command

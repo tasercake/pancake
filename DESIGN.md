@@ -1,6 +1,6 @@
-# Pancake Stacker and BokehForge design specification
+# Pancake Stacker and Stackroom design specification
 
-Frame Desk is the shared design for Pancake Stacker and BokehForge. The apps
+Frame Desk is the shared design for Pancake Stacker and Stackroom. The apps
 look like tools for working with photographs. A neutral graphite workspace
 keeps the image central, compact controls make repeated work easy, and the
 original Pancake Stacker artwork gives welcome, About, and release surfaces their
@@ -20,7 +20,7 @@ identity.
   inspector. Put the stack action at the bottom of the inspector. Keep
   retained results and the complete source list accessible. Open Preferences,
   About, and export options using the same surfaces and control styles.
-- In BokehForge, keep the source frame, stacker output, and available
+- In Stackroom, keep the source frame, stacker output, and available
   ground-truth comparison aligned on the same matte. Put evaluation and rating
   controls in the inspector. Keep scene navigation, evaluation progress,
   result details, and review overlays accessible. At narrow browser widths,
@@ -79,7 +79,7 @@ accent for actions and states.
   numerals for comparisons and frame counts.
 - **Decide and commit.** Use Space Grotesk semibold for the short instruction
   that advances the current task. In the workspace that is **Start stack** in
-  Pancake Stacker and **Save rating** in BokehForge when a rating can be saved. In a
+  Pancake Stacker and **Save rating** in Stackroom when a rating can be saved. In a
   dialog the confirmation action takes that role. A short heading that asks
   the user to resolve a blocking decision can use the same emphasis.
 - Assign the role by the task. **Export** in the workspace toolbar is a peer
@@ -125,8 +125,8 @@ accent for actions and states.
   at a readable size on welcome, About, or release surfaces. Leave its
   illustration and lettering intact. Use the supplied app icon where a
   platform expects one. Keep everyday working chrome plain.
-- Use the BokehForge name and the same typography, palette, and components
-  for review. Its workflow determines the labels and panes.
+- Use **Stackroom** as the review app’s name and **Focus stack review by
+  BokehForge** as its subtitle. Use the shared typography, palette, and components.
 - In terminals, use the terminal's type and colors. Apply the hierarchy
   through concise sections, readable labels, and aligned values. Preserve
   machine-readable output, error streams, and redirection semantics.

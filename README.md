@@ -41,4 +41,4 @@ See the [desktop guide](pancake/docs/desktop.md) for capture tips, alignment set
 
 See the [developer guide](pancake/DEVELOPING.md#build-from-source) for build prerequisites, test commands, and the Rust workspace. Pancake Stacker is licensed under the [GPL-3.0-or-later](pancake/LICENSE).
 
-The repository also houses [BokehForge](bokehforge/), a companion toolkit for datasets and benchmarking, and [focus-stacking research](research/).
+The repository also houses [BokehForge](bokehforge/), a companion toolkit for datasets and benchmarking, [Stackroom](bokehforge/docs/review.md) for reviewing and rating focus stacks, and [focus-stacking research](research/).

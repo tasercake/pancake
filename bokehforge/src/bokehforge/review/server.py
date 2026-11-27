@@ -1,4 +1,4 @@
-"""Serve the BokehForge rating app over HTTP."""
+"""Serve Stackroom over HTTP."""
 
 import argparse
 from contextlib import suppress
@@ -177,7 +177,7 @@ class Review:
 
     def start_download(self):
         if self.indexing:
-            raise RuntimeError("Wait for Review to check the local datasets")
+            raise RuntimeError("Wait for Stackroom to check the local datasets")
         self.downloads.start(tuple(self.catalog_status["missing"]))
         return self.download_status()
 
@@ -388,7 +388,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send(200, "text/plain; charset=utf-8", body)
         elif path == "/api/ratings.csv":
             self.send(200, "text/csv; charset=utf-8", app.ratings.export_csv().encode(),
-                      filename="bokehforge-ratings.csv")
+                      filename="stackroom-ratings.csv")
         else:
             raise KeyError("Page not found")
 
@@ -504,7 +504,7 @@ class ReviewServer(ThreadingHTTPServer):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="bokehforge review",
-                                     description="Browse and rate focus stacks on this computer")
+                                     description="Stackroom, focus stack review by BokehForge")
     workspace = parser.add_argument_group("Workspace")
     workspace.add_argument("--root", type=Path, default=REPO / "datasets",
                            help="BokehForge dataset root (default: datasets/ in the repository)")
@@ -533,9 +533,9 @@ def main(argv=None):
         server.app = Review(args)
         port = server.server_port
         if args.host == ALL_INTERFACES:
-            print(f"BokehForge Review · http://{server.hostname}:{port} · http://127.0.0.1:{port}", flush=True)
+            print(f"Stackroom · http://{server.hostname}:{port} · http://127.0.0.1:{port}", flush=True)
         else:
-            print(f"BokehForge Review · http://{args.host}:{port}", flush=True)
+            print(f"Stackroom · http://{args.host}:{port}", flush=True)
         try:
             server.serve_forever()
         except KeyboardInterrupt:

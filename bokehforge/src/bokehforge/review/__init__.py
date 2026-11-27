@@ -1,1 +1,1 @@
-"""Local scene and focus-stack review."""
+"""Stackroom, the local focus stack review app by BokehForge."""

@@ -73,7 +73,7 @@ def lock_store(directory):
                 import fcntl
                 fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except OSError as exc:
-            raise RuntimeError(f"Another review server is using {directory}") from exc
+            raise RuntimeError(f"Another Stackroom server is using {directory}") from exc
         yield
 
 

@@ -1,4 +1,4 @@
-"""Local Zerene Stacker Batch API shared by Review and the research runner."""
+"""Local Zerene Stacker Batch API shared by Stackroom and the research runner."""
 
 from codecs import BOM_UTF16_BE, BOM_UTF16_LE
 from contextlib import contextmanager
@@ -24,8 +24,8 @@ def preferences_directory():
     if system == "Windows" and (appdata := os.environ.get("APPDATA")):
         return Path(appdata) / "ZereneStacker"
     if system == "Windows":
-        raise ValueError("Run Review from a Windows desktop session with APPDATA set.")
-    raise ValueError("Zerene Stacker evaluation requires a macOS or Windows Review server.")
+        raise ValueError("Run Stackroom from a Windows desktop session with APPDATA set.")
+    raise ValueError("Zerene Stacker evaluation requires Stackroom to run on macOS or Windows.")
 
 
 def _windows_argv(recorded):
