@@ -40,35 +40,27 @@ const PAYLOAD: &[(&str, &[u8])] = &[
     ),
 ];
 
-/// One user-level installation connected to an absolute app bundle path.
+/// One user-level installation connected to an absolute executable path.
 #[derive(Debug)]
 pub(super) struct Installation {
-    /// App path read as literal data by Lua.
-    app: String,
+    /// Executable path read as literal data by Lua.
+    executable: String,
     /// Lightroom plug-in directory.
     plugin: PathBuf,
 }
 
 impl Installation {
-    /// Resolve the real bundle path, even when launched through a symlink.
+    /// Resolve the executable path, even when launched through a symlink.
     /// # Errors
-    /// Returns an error when the executable is outside a macOS bundle.
+    /// Returns filesystem errors or an error if the executable path cannot be encoded.
     pub(super) fn new(executable: &Path, modules: &Path) -> io::Result<Self> {
         let executable = executable.canonicalize()?;
-        let app = executable
-            .ancestors()
-            .nth(3)
-            .filter(|app| {
-                app.extension() == Some("app".as_ref())
-                    && executable == app.join("Contents/MacOS/pancake-gui")
-                    && app.join("Contents/Info.plist").is_file()
-            })
-            .and_then(Path::to_str)
-            .ok_or_else(|| {
-                io::Error::other("Open the Pancake.app bundle to install the plug-in.")
-            })?;
+        let executable = executable
+            .into_os_string()
+            .into_string()
+            .map_err(|_| io::Error::other("The Pancake executable path is not valid UTF-8."))?;
         Ok(Self {
-            app: app.into(),
+            executable,
             plugin: modules.join("Pancake.lrplugin"),
         })
     }
@@ -107,6 +99,7 @@ impl Installation {
 
     /// Emit the connection and plug-in payload in publish order.
     fn files(&self) -> impl Iterator<Item = (&str, &[u8])> {
-        std::iter::once(("Connection.txt", self.app.as_bytes())).chain(PAYLOAD.iter().copied())
+        std::iter::once(("Connection.txt", self.executable.as_bytes()))
+            .chain(PAYLOAD.iter().copied())
     }
 }

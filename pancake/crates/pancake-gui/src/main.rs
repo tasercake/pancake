@@ -148,9 +148,9 @@ fn configure_preferences(window: &ComponentInstance, store: Store) -> Result<(),
     bind_preference(window, &profile, "save-accent", change_accent)
 }
 
-/// Bind the Lightroom installer to the current macOS app bundle.
+/// Bind the Lightroom installer to the running macOS executable.
 /// # Errors
-/// Returns executable resolution or UI binding errors.
+/// Returns UI binding errors.
 #[cfg(target_os = "macos")]
 fn configure_lightroom(window: &ComponentInstance) -> Result<(), Box<dyn Error>> {
     let Some(home) = dirs::home_dir() else {
@@ -161,12 +161,18 @@ fn configure_lightroom(window: &ComponentInstance) -> Result<(), Box<dyn Error>>
         return Ok(());
     };
     let modules = home.join("Library/Application Support/Adobe/Lightroom/Modules");
-    let Ok(install) = lightroom::Installation::new(&std::env::current_exe()?, &modules) else {
-        window.set_property(
-            "lightroom-status",
-            SharedString::from("Open the Pancake.app bundle to install the plug-in.").into(),
-        )?;
-        return Ok(());
+    let install = match std::env::current_exe()
+        .and_then(|executable| lightroom::Installation::new(&executable, &modules))
+    {
+        Ok(install) => install,
+        Err(error) => {
+            window.set_property(
+                "lightroom-status",
+                SharedString::from(format!("Could not locate the Pancake executable: {error}"))
+                    .into(),
+            )?;
+            return Ok(());
+        }
     };
     let update_status =
         |window: &ComponentInstance, installed: bool| -> Result<(), Box<dyn Error>> {

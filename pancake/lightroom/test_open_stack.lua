@@ -9,6 +9,8 @@ local service = assert(info.LrExportServiceProvider, 'Pancake must register cont
 local photoPath = "/Photos/first's photo.dng"
 local renderPath = "/tmp/Pancake-UUID/00001-first's photo.tif"
 local app = "/Applications/Pancake's Copy.app"
+local executable = "/Builds/Pancake's local build"
+local connection = app
 local secondPhotoPath = '/Photos/second.dng'
 local secondRenderPath = '/tmp/Pancake-UUID/00002-second.tif'
 local targetPhotos = {}
@@ -57,11 +59,14 @@ local sdk = {
     end,
     LrFileUtils = {
         exists = function(path)
-            if path == app .. '/Contents/MacOS/pancake-gui' and appMissing then return false end
+            if path == app then return 'directory' end
+            if path == app .. '/Contents/MacOS/pancake-gui' or path == executable then
+                return not appMissing and 'file'
+            end
             if path == photoPath and offline then return false end
             return 'file'
         end,
-        readFile = function(path) assert(path == '/Installed/Pancake.lrplugin/Connection.txt'); return app end,
+        readFile = function(path) assert(path == '/Installed/Pancake.lrplugin/Connection.txt'); return connection end,
         createDirectory = function(path) assert(path == '/tmp/Pancake-UUID'); record('mkdir'); return true end,
         delete = function(path) assert(path == '/tmp/Pancake-UUID'); record('delete'); return true end,
     },
@@ -77,6 +82,10 @@ local sdk = {
         startAsyncTask = function(task) task() end,
         execute = function(command)
             -- Let the real POSIX shell parse every argument, including apostrophes.
+            if connection == executable and command:match(' &%)$') then
+                record(command)
+                return launchFailure and 1 or 0
+            end
             local args = assert(io.popen("printf '%s\\n' " .. command)):read('*a')
             record(args)
             return launchFailure and 1 or 0
@@ -234,5 +243,39 @@ cancel = true
 runPreset(2)
 assert(not failure, failure)
 assert(table.concat(events, '|') == 'done')
+
+cancel = false
+connection = executable
+local quotedExecutable = [=['/Builds/Pancake'\''s local build']=]
+local quotedPhoto = [=['/Photos/first'\''s photo.dng']=]
+local originalsCommand = '/bin/test -x ' .. quotedExecutable .. ' && (' .. quotedExecutable
+    .. ' ' .. quotedPhoto .. " '/Photos/second.dng' </dev/null >/dev/null 2>&1 &)"
+
+run(1)
+assert(not failure, failure)
+assert(#events == 1 and events[1] == originalsCommand, 'Standalone originals must launch asynchronously')
+
+launchFailure = true
+run(1)
+assert(failure:find('Could not open Pancake', 1, true))
+launchFailure = false
+
+runPreset(1)
+assert(not failure, failure)
+assert(table.concat(events, '|') == 'skip|skip|' .. originalsCommand)
+
+local editedArgs = table.concat({ executable, '--lightroom-renders', renderPath, secondRenderPath, '' }, '\n')
+run(2)
+assert(not failure, failure)
+assert(table.concat(events, '|') == 'mkdir|render|render|done|' .. editedArgs .. '|delete')
+
+runPreset(2)
+assert(not failure, failure)
+assert(table.concat(events, '|') == 'render|render|done|' .. editedArgs)
+
+appMissing = true
+run(1)
+assert(failure:find('Pancake Preferences', 1, true))
+assert(#events == 0)
 
 print('Lightroom export tests passed')

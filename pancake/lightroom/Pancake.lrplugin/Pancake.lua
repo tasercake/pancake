@@ -11,11 +11,16 @@ local M = {}
 
 local function installedApp()
     local ok, path = LrTasks.pcall(LrFileUtils.readFile, LrPathUtils.child(_PLUGIN.path, 'Connection.txt'))
-    if not ok or type(path) ~= 'string' or path:sub(1, 1) ~= '/' or path:sub(-4) ~= '.app'
-        or LrFileUtils.exists(LrPathUtils.child(path, 'Contents/MacOS/pancake-gui')) ~= 'file' then
-        error('Install the plug-in again from Pancake Preferences to reconnect the app.', 0)
+    if ok and type(path) == 'string' and path:sub(1, 1) == '/' then
+        local kind = LrFileUtils.exists(path)
+        if kind == 'file' then return { path = path } end
+        -- Older versions stored the enclosing bundle instead of the executable.
+        if kind == 'directory' and path:sub(-4) == '.app'
+            and LrFileUtils.exists(LrPathUtils.child(path, 'Contents/MacOS/pancake-gui')) == 'file' then
+            return { path = path, bundle = true }
+        end
     end
-    return path
+    error('Install the plug-in again from Pancake Preferences to reconnect the app.', 0)
 end
 
 -- Each path is a single literal shell argument, including embedded apostrophes.
@@ -24,15 +29,24 @@ local function quote(path)
 end
 
 local function launch(app, paths, edited)
-    local args = { '/usr/bin/open', '-n' }
-    if edited then args[#args + 1] = '-W' end
-    args[#args + 1] = '-a'
-    args[#args + 1] = quote(app)
-    args[#args + 1] = '--args'
+    local target = quote(app.path)
+    local args = { target }
+    if app.bundle then
+        args = { '/usr/bin/open', '-n' }
+        if edited then args[#args + 1] = '-W' end
+        args[#args + 1] = '-a'
+        args[#args + 1] = target
+        args[#args + 1] = '--args'
+    end
     if edited then args[#args + 1] = '--lightroom-renders' end
     for _, path in ipairs(paths) do args[#args + 1] = quote(path) end
-    if LrTasks.execute(table.concat(args, ' ')) ~= 0 then
-        error('Could not open Pancake. Check that the app opens from Finder.', 0)
+    local command = table.concat(args, ' ')
+    if not app.bundle and not edited then
+        -- Check execute permission before detaching and release Lightroom's standard streams.
+        command = '/bin/test -x ' .. target .. ' && (' .. command .. ' </dev/null >/dev/null 2>&1 &)'
+    end
+    if LrTasks.execute(command) ~= 0 then
+        error('Could not open Pancake. Check that it opens from its installed location.', 0)
     end
 end
 

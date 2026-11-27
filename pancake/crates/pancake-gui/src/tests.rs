@@ -523,16 +523,13 @@ fn observe_accent_preferences(
     Ok(())
 }
 
-/// The installed plug-in owns its scripts and points to the app bundle.
+/// The installed plug-in owns its scripts and points to a standalone executable.
 /// # Errors
 /// Returns filesystem errors or a mismatch in the installed payload.
 #[test]
 fn lightroom_install_can_repair_an_installed_copy() -> Result<(), Box<dyn Error>> {
     let sandbox = tempfile::tempdir()?;
-    let app = sandbox.path().join("Applications/Pancake's Copy.app");
-    let executable = app.join("Contents/MacOS/pancake-gui");
-    fs::create_dir_all(executable.parent().ok_or("Missing executable parent")?)?;
-    fs::write(app.join("Contents/Info.plist"), b"bundle")?;
+    let executable = sandbox.path().join("Pancake's build");
     fs::write(&executable, b"executable")?;
     let modules = sandbox.path().join("Adobe/Lightroom/Modules");
     let plugin = modules.join("Pancake.lrplugin");
@@ -545,8 +542,8 @@ fn lightroom_install_can_repair_an_installed_copy() -> Result<(), Box<dyn Error>
         return Err("Lightroom needs a real copy of the complete plug-in".into());
     }
     let connection = fs::read_to_string(plugin.join("Connection.txt"))?;
-    if Path::new(&connection) != app.canonicalize()? {
-        return Err("The plug-in must point to the installed app bundle".into());
+    if Path::new(&connection) != executable.canonicalize()? {
+        return Err("The plug-in must point to the standalone executable".into());
     }
     let presets = plugin.join("presets");
     let edited = presets.join("Pancake (With Lightroom Edits).lrtemplate");
@@ -560,11 +557,6 @@ fn lightroom_install_can_repair_an_installed_copy() -> Result<(), Box<dyn Error>
     install.write()?;
     if !install.is_current() || !edited.is_file() {
         return Err("Reinstall must restore the missing preset".into());
-    }
-    let loose = sandbox.path().join("pancake-gui");
-    fs::write(&loose, b"executable")?;
-    if super::lightroom::Installation::new(&loose, &modules).is_ok() {
-        return Err("A loose build executable cannot install a Lightroom connection".into());
     }
     Ok(())
 }
