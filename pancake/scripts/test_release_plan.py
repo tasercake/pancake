@@ -1,14 +1,17 @@
 """Release history, version allocation, and Copilot input/output contracts."""
 
+import hashlib
 import json
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
+from miri_host_policy import validate
 from release_plan import (
     Change, PublishedRelease, allocate_version, baseline, inventory, notes,
-    read_advice, release_prompt, update_manifests,
+    read_advice, release_prompt, prepare_source, update_manifests,
 )
 
 
@@ -131,6 +134,50 @@ class ReleasePlanTests(unittest.TestCase):
                 self.assertIn('[package.metadata.test]\nversion = "0.1.0"', path.read_text())
                 if path.parent != root:
                     self.assertIn('version = "=0.2.0-rc.1"', path.read_text())
+
+    def test_release_source_preserves_reviewed_dependency_resolution(self):
+        for extra_lock_edit in ("", '\nchecksum = "unexpected"\n'):
+            with self.subTest(extra_lock_edit=extra_lock_edit), tempfile.TemporaryDirectory() as temporary:
+                source = Path(temporary)
+                manifest = source / "Cargo.toml"
+                scripts = source / "scripts"
+                scripts.mkdir()
+                (scripts / "tool-versions.sh").write_text("PANCAKE_NIGHTLY=nightly-fixture\n")
+                for relative in ("Cargo.toml", "crates/pancake-cli/Cargo.toml", "crates/pancake-gui/Cargo.toml"):
+                    file = source / relative
+                    file.parent.mkdir(parents=True, exist_ok=True)
+                    content = '[package]\nversion = "0.1.0"\n'
+                    if relative != "Cargo.toml":
+                        content += '[dependencies]\npancake = { path = "../..", version = "=0.1.0" }\n'
+                    file.write_text(content)
+                lock = source / "Cargo.lock"
+                old_lock = 'version = 4\n' + "".join(
+                    f'\n[[package]]\nname = "{name}"\nversion = "0.1.0"\n'
+                    for name in ("pancake", "pancake-cli", "pancake-gui")
+                ) + '\n[[package]]\nname = "external"\nversion = "0.1.0"\n'
+                lock.write_text(old_lock)
+                receipt = source / "assurance-platforms.json"
+                old_receipt = {
+                    "schema_version": 1, "canonical_miri_host": "Darwin", "required_ci_job": "nightly",
+                    "nightly": "nightly-fixture",
+                    "reviewed_files": {path.relative_to(source).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                                       for path in [*source.rglob("Cargo.toml"), lock]},
+                }
+                receipt.write_text(json.dumps(old_receipt))
+
+                def cargo_update(*args, **kwargs):
+                    lock.write_text(old_lock.replace('"0.1.0"', '"0.2.0-rc.1"', 3) + extra_lock_edit)
+
+                with patch("release_plan.subprocess.run", side_effect=cargo_update):
+                    if extra_lock_edit:
+                        with self.assertRaisesRegex(ValueError, "dependency resolution"):
+                            prepare_source(source, "0.2.0-rc.1")
+                        self.assertEqual(json.loads(receipt.read_text()), old_receipt)
+                    else:
+                        prepare_source(source, "0.2.0-rc.1")
+                        validate(source)
+                        self.assertIn('name = "external"\nversion = "0.1.0"', lock.read_text())
+                        self.assertIn('version = "0.2.0-rc.1"', manifest.read_text())
 
 
 if __name__ == "__main__":

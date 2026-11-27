@@ -104,9 +104,9 @@ jobs:
           mkdir -p "$output"
           python3 -B scripts/release_plan.py prepare "$plan" "$GH_REPO" > "$plan/prepared.txt"
           version=$(python3 -B scripts/release_support.py version)
-          cargo update --workspace
           cargo metadata --locked --format-version 1 > /dev/null
-          git add -- Cargo.toml Cargo.lock crates/pancake-cli/Cargo.toml crates/pancake-gui/Cargo.toml
+          git add -- Cargo.toml Cargo.lock assurance-platforms.json \
+            crates/pancake-cli/Cargo.toml crates/pancake-gui/Cargo.toml
           timestamp=$(git show -s --format=%cI "$GITHUB_SHA")
           GIT_AUTHOR_DATE="$timestamp" GIT_COMMITTER_DATE="$timestamp" \
             git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \

@@ -1,6 +1,7 @@
 """Plan a Pancake release from Git history and optional Copilot advice."""
 
 import argparse
+import hashlib
 import html
 import json
 import re
@@ -10,6 +11,7 @@ import tomllib
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from miri_host_policy import validate as validate_assurance
 from package_notices import ROOTS
 from release_support import VERSION_PATTERN, release_version
 
@@ -259,6 +261,36 @@ def update_manifests(source, version):
         changes[path] = updated
     for path, updated in changes.items():
         path.write_text(updated, encoding="utf-8")
+    return changes
+
+
+def prepare_source(source, version):
+    """Carry the reviewed assurance hashes across a version-only Cargo change."""
+    policy = validate_assurance(source)
+    previous = release_version(source)
+    lock = source / "Cargo.lock"
+    expected_lock = lock.read_text(encoding="utf-8")
+    for name in ("pancake", *ROOTS):
+        before = f'[[package]]\nname = "{name}"\nversion = "{previous}"\n'
+        after = f'[[package]]\nname = "{name}"\nversion = "{version}"\n'
+        if expected_lock.count(before) != 1:
+            raise ValueError(f"Missing reviewed workspace package {name} in Cargo.lock")
+        expected_lock = expected_lock.replace(before, after, 1)
+
+    expected = update_manifests(source, version)
+    subprocess.run(["cargo", "update", "--workspace"], cwd=source, check=True)
+    if lock.read_text(encoding="utf-8") != expected_lock:
+        raise ValueError("Cargo changed dependency resolution while updating the workspace version")
+    expected[lock] = expected_lock
+    for path, content in expected.items():
+        actual = path.read_bytes()
+        if actual != content.encode("utf-8"):
+            raise ValueError(f"Unexpected release change in {path}")
+        policy["reviewed_files"][path.relative_to(source).as_posix()] = hashlib.sha256(actual).hexdigest()
+
+    receipt = source / "assurance-platforms.json"
+    receipt.write_text(json.dumps(policy, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    validate_assurance(source)
 
 
 def inspect(output, revision, channel, releases, *, build_only):
@@ -294,7 +326,7 @@ def prepare(output, repository):
     bump, highlights = advice if advice is not None else ("patch", [])
     bump = max(bump, fallback_bump(version_changes), key=BUMPS.index)
     version = allocate_version(releases, set(plan["occupied"]), bump, plan["channel"])
-    update_manifests(SOURCE, version)
+    prepare_source(SOURCE, version)
     scope = {change.revision for change in changes}
     highlights = [(change, summary) for change, summary in highlights if change.revision in scope]
     previous = baseline(releases, plan["channel"])
