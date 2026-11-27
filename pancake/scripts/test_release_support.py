@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from package_notices import file_sha256, stage_notices, verify_notices
-from release_support import package_windows, release_version, smoke_stack
+from release_support import debian_version, package_windows, release_version, smoke_stack
 from test_package_linux import FONT_LICENSES, _workspace
 
 
@@ -30,6 +30,13 @@ class ReleaseSupportTests(unittest.TestCase):
             cli.write_text(cli.read_text().replace('version = "0.1.0"', 'version = "0.2.0"'))
             with self.assertRaisesRegex(ValueError, "same three-component version"):
                 release_version(source)
+
+    def test_debian_release_candidate_sorts_before_stable(self):
+        self.assertEqual(debian_version("0.2.0-rc.1"), "0.2.0~rc.1")
+        self.assertEqual(debian_version("0.2.0"), "0.2.0")
+        if os.name == "posix" and Path("/usr/bin/dpkg").is_file():
+            subprocess.run(["dpkg", "--compare-versions", debian_version("0.2.0-rc.1"),
+                            "lt", "0.2.0"], check=True)
 
     def test_windows_assets_publish_both_executables_and_original_notices(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from package_macos import build_package, file_sha256
+from package_macos import _bundle_metadata, build_package, file_sha256
 
 
 IDENTIFIER = "test.example.pancake"
@@ -51,6 +51,14 @@ class MacPackageTests(unittest.TestCase):
         self.enterContext(patch("package_macos.platform.system", return_value="Darwin"))
         self.enterContext(patch("package_macos.platform.machine", return_value="arm64"))
         self.enterContext(patch("package_macos._apple", side_effect=self.apple))
+
+    def test_rc_uses_numeric_bundle_version(self):
+        for name in BINARIES:
+            manifest = self.source / "crates" / name / "Cargo.toml"
+            manifest.write_text(manifest.read_text().replace("0.1.0", "0.2.0-rc.1"))
+        metadata = _bundle_metadata(self.source, IDENTIFIER, "17")
+        self.assertEqual(metadata["CFBundleShortVersionString"], "0.2.0")
+        self.assertEqual(metadata["CFBundleVersion"], "17")
 
     def git(self, *command):
         return subprocess.check_output(["git", *command], cwd=self.source, text=True).strip()

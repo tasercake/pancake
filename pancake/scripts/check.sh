@@ -97,7 +97,7 @@ case $gate in
         python3 -m unittest scripts/test_dependency_policy.py scripts/test_guardrail_manifest.py \
             scripts/test_assurance_targets.py scripts/test_assurance_coverage.py scripts/test_miri_host_policy.py scripts/test_pre_commit.py \
             scripts/test_headless_dependencies.py
-        python3 -B -m unittest discover -s scripts -p test_release_support.py
+        python3 -B -m unittest discover -s scripts -p 'test_release*.py'
         python3 -B -m unittest discover -s scripts -p test_package_macos.py
         python3 scripts/miri_host_policy.py "$root" validate
         dependency_policy
@@ -113,7 +113,9 @@ case $gate in
             scripts/bootstrap.sh scripts/check.sh scripts/test-guardrails.sh \
             scripts/install-actionlint.sh scripts/ci-linux-native-deps.sh \
             scripts/macos-release-linker.sh .githooks/*
-        actionlint "$root/../.github/workflows/pancake.yml" "$root/../.github/workflows/pancake-assurance.yml" \
+        actionlint "$root/../.github/workflows/pancake.yml" "$root/../.github/workflows/pancake-assurance.yml"
+        # GitHub supports this permission; actionlint 1.7.12 predates it.
+        actionlint -ignore '^unknown permission scope "copilot-requests"\.' \
             "$root/../.github/workflows/pancake-release.yml"
         ;;
     test | test-cpu | test-gui | test-release | test-full | gpu)
