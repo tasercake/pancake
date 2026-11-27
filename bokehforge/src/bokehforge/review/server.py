@@ -226,18 +226,23 @@ class Review:
                 return self.runs.directory(run_id) / row[key]
         raise KeyError(f"Evaluation {key} unavailable")
 
-    def score_tiles(self, query):
+    def _score_output(self, query):
         catalog = self.require_catalog()
         scene = catalog.scene(query["scene"])
         if not has_benchmark_reference(scene):
-            raise KeyError("Benchmark tiles require a supported RGB ground-truth image")
+            raise KeyError("Benchmark overlays require a supported RGB ground-truth image")
         run_id = query["run"]
         result = next((row for row in self.runs.scene_results(run_id, catalog, scene)
                        if row["stacker"] == query["stacker"] and row["status"] == "ready"), None)
         if result is None:
             raise KeyError("Evaluation output unavailable")
-        return self.scores.tiles(catalog, scene, self.runs.directory(run_id), result,
-                                 query["rev"], query["family"], int(query["side"]))
+        return catalog, scene, self.runs.directory(run_id), result
+
+    def score_tiles(self, query):
+        return self.scores.tiles(*self._score_output(query), query["rev"], query["family"], int(query["side"]))
+
+    def score_attention(self, query):
+        return self.scores.attention_overlay(*self._score_output(query), query["rev"])
 
     def image_target(self, query):
         catalog = self.require_catalog()
@@ -377,6 +382,9 @@ class Handler(BaseHTTPRequestHandler):
             self.json(200, app.scene_details(query["scene"], query.get("run")))
         elif path == "/api/score-tiles":
             result = app.score_tiles(query)
+            self.json(202 if result["status"] == "pending" else 200, result)
+        elif path == "/api/score-attention":
+            result = app.score_attention(query)
             self.json(202 if result["status"] == "pending" else 200, result)
         elif path == "/api/image":
             self.send_image(app, query)

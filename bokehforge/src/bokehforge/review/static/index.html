@@ -228,13 +228,20 @@
       <pre data-alignment-evidence></pre>
     </details>
     <div class="damage-controls" data-damage-controls>
-      <label class="damage-switch"><input data-overlay type="checkbox"> Show damage overlay</label>
-      <label>Family <select data-family></select></label>
-      <label>Grid <select data-grid>
-        <option value="8">8 px tiles</option>
-        <option value="32">32 px tiles</option>
+      <label>Overlay <select data-overlay>
+        <option value="off">Off</option>
+        <option value="damage">Damage</option>
+        <option value="attention">Attention</option>
       </select></label>
+      <div class="damage-options" data-damage-options hidden>
+        <label>Family <select data-family></select></label>
+        <label>Grid <select data-grid>
+          <option value="8">8 px tiles</option>
+          <option value="32">32 px tiles</option>
+        </select></label>
+      </div>
     </div>
+    <p class="damage-help" data-attention-help hidden>Attention shows which regions of the reference the scorer emphasizes. Higher values indicate more attention.</p>
     <p class="damage-status" data-damage-status role="status" hidden></p>
     <p class="damage-help" data-damage-curve></p>
     <div class="damage-column-headings" data-damage-columns aria-hidden="true">
@@ -243,7 +250,7 @@
     <div data-damage-families></div>
     <details class="damage-method" data-damage-method>
       <summary>How to read damage</summary>
-      <p>Damage ranges from 0 (no difference from the reference) to 1 (highest damage). The six families separate different ways an output can lose fidelity, such as shifting tones or smoothing away detail.</p>
+      <p>Zero damage means no measured difference from the reference. Damage can reach 1 before attention weighting and up to 2 with weighting. The six families separate different ways an output can lose fidelity, such as shifting tones or smoothing away detail.</p>
       <p>Each contribution is observed damage multiplied by its weight. Overlap quality decays exponentially as their sum increases. The overlay shows the selected family’s measured tiles on one grid at a time.</p>
     </details>
   </template>

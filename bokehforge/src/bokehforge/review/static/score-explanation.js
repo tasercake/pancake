@@ -1,11 +1,9 @@
 const number = new Intl.NumberFormat(undefined, { maximumFractionDigits: 4 });
 const points = new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const percent = new Intl.NumberFormat(undefined, { style: "percent", maximumFractionDigits: 1 });
-const tileCache = new Map();
-const tileStatus = {
-  loading: "Preparing damage tiles…",
-  pending: "Preparing damage tiles…",
-  error: "Damage overlay unavailable. Toggle it off and on to try again.",
+const overlayCache = new Map();
+const overlayStatus = {
+  error: "Overlay unavailable. Choose Off and reselect the overlay to try again.",
   stale: "This output changed. Reload the scene to see its current overlay.",
 };
 
@@ -46,10 +44,8 @@ function familyRow(family) {
   return row;
 }
 
-function drawGrid(canvas, payload) {
+function overlayContext(canvas, payload) {
   const [width, height] = payload.candidate_size_wh;
-  const maximum = payload.damage_range?.[1] ?? 1;
-  const { x_edges: xs, y_edges: ys, values, covered_pixels: coverage } = payload.grid;
   const [[a, b, tx], [c, d, ty]] = payload.candidate_to_reference_xy;
   const determinant = a * d - b * c;
   const [ia, ib, ic, id] = [d, -b, -c, a].map((value) => value / determinant);
@@ -63,6 +59,13 @@ function drawGrid(canvas, payload) {
   ctx.clip();
   ctx.setTransform(ia, ic, ib, id, 0.5 - ia * (tx + 0.5) - ib * (ty + 0.5),
     0.5 - ic * (tx + 0.5) - id * (ty + 0.5));
+  return ctx;
+}
+
+function drawGrid(canvas, payload) {
+  const ctx = overlayContext(canvas, payload);
+  const maximum = payload.damage_range?.[1] ?? 1;
+  const { x_edges: xs, y_edges: ys, values, covered_pixels: coverage } = payload.grid;
   const colors = Array.from({ length: 256 }, (_, index) => {
     const t = index / 255;
     return "rgba(" + Math.round(90 + 165 * t) + "," + Math.round(80 + 121 * t) + "," +
@@ -79,13 +82,35 @@ function drawGrid(canvas, payload) {
   }
 }
 
+function drawAttention(canvas, payload) {
+  const [width, height] = payload.attention.size_wh;
+  const values = atob(payload.attention.data);
+  const source = element("canvas");
+  source.width = width;
+  source.height = height;
+  const sourceContext = source.getContext("2d");
+  const image = sourceContext.createImageData(width, height);
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values.charCodeAt(index) / 255;
+    const offset = index * 4;
+    image.data[offset] = 29 + 79 * value;
+    image.data[offset + 1] = 132 + 90 * value;
+    image.data[offset + 2] = 165 + 80 * value;
+    image.data[offset + 3] = 210 * value;
+  }
+  sourceContext.putImageData(image, 0, 0);
+  overlayContext(canvas, payload).drawImage(source, 0, 0, ...payload.reference_size_wh);
+}
+
 export class ScoreExplanation {
-  constructor(root, trigger, legendHost, requestTiles) {
+  constructor(root, trigger, legendHost, requestOverlay) {
     this.root = root;
     this.trigger = trigger;
-    this.requestTiles = requestTiles;
+    this.requestOverlay = requestOverlay;
     root.append(document.querySelector("#score-explanation-template").content.cloneNode(true));
-    this.toggle = root.querySelector("[data-overlay]");
+    this.mode = root.querySelector("[data-overlay]");
+    this.damageOptions = root.querySelector("[data-damage-options]");
+    this.attentionHelp = root.querySelector("[data-attention-help]");
     this.family = root.querySelector("[data-family]");
     this.grid = root.querySelector("[data-grid]");
     this.status = root.querySelector("[data-damage-status]");
@@ -97,6 +122,7 @@ export class ScoreExplanation {
     this.key = "";
     this.open = false;
     this.overlayFor = "";
+    this.overlayMode = "off";
     this.tile = null;
     this.drawn = null;
     this.context = null;
@@ -106,8 +132,9 @@ export class ScoreExplanation {
       this.setOpen(false);
       trigger.focus();
     };
-    this.toggle.onchange = () => {
-      this.overlayFor = this.toggle.checked ? this.key : "";
+    this.mode.onchange = () => {
+      this.overlayFor = this.key;
+      this.overlayMode = this.mode.value;
       this.paintOverlay();
     };
     this.family.onchange = this.grid.onchange = () => this.paintOverlay();
@@ -141,13 +168,17 @@ export class ScoreExplanation {
       this.setOpen(this.open);
       if (key) this.showSummary(explanation, placement, benchmark.alignment);
     }
-    this.toggle.checked = Boolean(placement?.comparison && key && this.overlayFor === key);
-    this.toggle.disabled = !context?.image || !placement?.comparison;
+    this.mode.selectedIndex = 0;
+    if (key && this.overlayFor === key && !this.mode.querySelector(`[value="${this.overlayMode}"]`).disabled) {
+      this.mode.value = this.overlayMode;
+    }
+    this.mode.disabled = !context?.image;
     this.paintOverlay();
   }
 
   showSummary(explanation, placement, alignment) {
     const comparison = placement?.comparison;
+    const canShowAttention = Boolean(placement && explanation.attention);
     const families = Object.entries(comparison?.families ?? {});
     const previousFamily = this.family.value;
     this.root.querySelector("[data-score-heading]").textContent =
@@ -167,7 +198,12 @@ export class ScoreExplanation {
     }
     this.root.querySelector("[data-alignment-details]").hidden = !alignment;
     this.root.querySelector("[data-alignment-evidence]").textContent = JSON.stringify(alignment, null, 2) ?? "";
-    for (const id of ["controls", "columns", "method", "curve"]) {
+    this.root.querySelector("[data-damage-controls]").hidden = !comparison && !canShowAttention;
+    for (const [mode, available] of [["damage", Boolean(comparison)], ["attention", canShowAttention]]) {
+      const option = this.mode.querySelector(`[value="${mode}"]`);
+      option.disabled = option.hidden = !available;
+    }
+    for (const id of ["columns", "method", "curve"]) {
       this.root.querySelector("[data-damage-" + id + "]").hidden = !comparison;
     }
     this.root.querySelector("[data-damage-curve]").textContent = comparison
@@ -192,9 +228,11 @@ export class ScoreExplanation {
     this.tile = tile;
     const revision = this.eventRevision;
     const { params, benchmark } = this.context;
+    const mode = this.mode.value;
     const family = this.family.value;
     const side = this.grid.value;
-    this.requestTiles({ ...params, family, side }, controller.signal).then((result) => {
+    const query = mode === "attention" ? params : { ...params, family, side };
+    this.requestOverlay(mode, query, controller.signal).then((result) => {
       if (this.tile !== tile || controller.signal.aborted) return;
       if (result.status === "pending") {
         tile.state = "pending";
@@ -202,9 +240,10 @@ export class ScoreExplanation {
       } else if (result.status === "ok" && result.artifact_revision === params.rev &&
                  result.reference_id === benchmark.explanation.reference_id &&
                  result.inspection_map_sha256 === benchmark.inspection_map_sha256 &&
-                 result.family === family && String(result.grid?.tile_size) === side) {
-        tileCache.set(key, result);
-        if (tileCache.size > 12) tileCache.delete(tileCache.keys().next().value);
+                 (mode === "attention" ? result.attention?.encoding === "base64+uint8"
+                   : result.family === family && String(result.grid?.tile_size) === side)) {
+        overlayCache.set(key, result);
+        if (overlayCache.size > 12) overlayCache.delete(overlayCache.keys().next().value);
         tile.payload = result;
         tile.state = "ready";
       } else {
@@ -220,16 +259,20 @@ export class ScoreExplanation {
 
   paintOverlay() {
     const context = this.context;
-    const enabled = this.toggle.checked && Boolean(context?.image);
-    this.family.disabled = this.grid.disabled = !enabled;
-    const key = enabled ? JSON.stringify([this.key, this.family.value, this.grid.value]) : "";
+    const mode = this.mode.value;
+    const attention = mode === "attention";
+    this.damageOptions.hidden = mode !== "damage";
+    this.attentionHelp.hidden = !attention;
+    const key = mode !== "off" && context?.image
+      ? JSON.stringify([this.key, mode, ...(attention ? [] : [this.family.value, this.grid.value])]) : "";
     if (this.tile?.key !== key) {
       this.tile?.controller?.abort();
       this.tile = null;
-      if (key && !tileCache.has(key)) this.request(key);
+      if (key && !overlayCache.has(key)) this.request(key);
     }
-    const payload = key ? this.tile?.payload ?? tileCache.get(key) : null;
-    const text = key && !payload ? tileStatus[this.tile?.state] ?? "" : "";
+    const payload = key ? this.tile?.payload ?? overlayCache.get(key) : null;
+    const preparing = attention ? "Preparing attention map…" : "Preparing damage tiles…";
+    const text = key && !payload ? overlayStatus[this.tile?.state] ?? preparing : "";
     if (text !== this.status.textContent) this.status.textContent = text;
     this.status.hidden = !text;
     if (!payload) {
@@ -242,10 +285,12 @@ export class ScoreExplanation {
       return;
     }
     if (this.drawn !== payload) {
-      drawGrid(this.canvas, payload);
+      if (attention) drawAttention(this.canvas, payload);
+      else drawGrid(this.canvas, payload);
       this.drawn = payload;
-      this.legend.firstElementChild.textContent = this.family.selectedOptions[0].text +
-        " · " + this.grid.value + " px tile damage";
+      this.legend.dataset.mode = mode;
+      this.legend.firstElementChild.textContent = attention ? "Reference attention"
+        : this.family.selectedOptions[0].text + " · " + this.grid.value + " px tile damage";
       const maximum = payload.damage_range?.[1] ?? 1;
       Array.from(this.legend.querySelector(".damage-legend-values").children).forEach((tick, index) => {
         tick.textContent = number.format(maximum * index / 4);

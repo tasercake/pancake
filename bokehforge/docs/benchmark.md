@@ -99,6 +99,8 @@ An interrupted transfer can resume on the next scoring attempt.
 
 In Python, `measure(candidate, target)` and `score_saved_output(catalog, scene, path)` also generate attention by default. Pass `attention=False` to use the unweighted score. `measure` can also accept an explicit finite `[0, 1]` heatmap on the native reference grid through `inspection_heatmap`.
 
+Use `--explain-score attention` to export the exact attention values used to weight damage. The Python APIs accept `details="attention"`. The explanation’s `attention` field records native width and height, the 0–1 range, map mean, effective mix, and the range of damage multipliers. This detail level adds `data` encoded as Base64 over zlib-compressed, little-endian float32 samples in row-major order. Decode and reshape to height × width to recover the native reference grid. Summary and tile explanations include the compact metadata.
+
 ## Alignment evidence
 
 The stacker supplies a single image. BokehForge first looks for a pixel-identical crop on the native grid. Otherwise it searches for a single translation, rotation and uniform scale. Coarse patch correlation proposes translations across the reference, and fine fitting compares local luma and two color-opponent signals. Fit and confirmation use alternating regions in a four-by-four delivery grid. A broader band can confirm the same scene when damage obscures fine detail. A native integer placement is preferred when the evidence is similar. Up to three distinct placements contribute to the score, and weak agreement reduces confidence smoothly toward a zero-score no-match.
