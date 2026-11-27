@@ -3,9 +3,9 @@
 import json
 import os
 import subprocess
+import tarfile
 import tempfile
 import unittest
-import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -15,7 +15,7 @@ from test_package_linux import FONT_LICENSES, _workspace
 
 
 class ReleaseSupportTests(unittest.TestCase):
-    """Verify release versions, archived bytes and smoke-test failure handling."""
+    """Verify release versions, published assets and smoke-test failure handling."""
 
     def test_versions_must_match_and_use_three_numeric_components(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -31,7 +31,7 @@ class ReleaseSupportTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "same three-component version"):
                 release_version(source)
 
-    def test_windows_zip_contains_both_programs_and_preserves_staged_notices(self):
+    def test_windows_assets_publish_both_executables_and_original_notices(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             binaries = root / "binaries"
@@ -42,13 +42,29 @@ class ReleaseSupportTests(unittest.TestCase):
             notices = payload / "dependency-notices"
             notices.mkdir(parents=True)
             (notices / "inventory.json").write_text("{}")
-            archive = root / "pancake-win.zip"
-            package_windows(binaries, payload, archive)
-            with zipfile.ZipFile(archive) as package:
-                self.assertIsNone(package.testzip())
-                self.assertEqual(package.read("pancake-cli.exe"), b"CLI bytes")
-                self.assertEqual(package.read("pancake-gui.exe"), b"desktop bytes")
-                self.assertEqual(package.read("dependency-notices/inventory.json"), b"{}")
+            (payload / "LICENSE").write_bytes(b"Project license\r\n")
+            llvm = payload / "native-llvm"
+            llvm.mkdir()
+            (llvm / "LICENSE.TXT").write_bytes(b"LLVM license\n")
+            dist = root / "dist"
+            dist.mkdir()
+
+            package_windows(binaries, payload, dist, "1.2.3")
+
+            for name, content in (("pancake-gui", b"desktop bytes"), ("pancake-cli", b"CLI bytes")):
+                self.assertEqual((dist / f"{name}-1.2.3-windows-x64.exe").read_bytes(), content)
+            archive = dist / "pancake-notices-1.2.3-windows-x64.tar.gz"
+            self.assertEqual(len(list(dist.iterdir())), 3)
+            with tarfile.open(archive, "r:gz") as package:
+                expected = {
+                    "LICENSE": b"Project license\r\n",
+                    "dependency-notices/inventory.json": b"{}",
+                    "native-llvm/LICENSE.TXT": b"LLVM license\n",
+                }
+                self.assertEqual({member.name for member in package if member.isfile()}, expected.keys())
+                for name, content in expected.items():
+                    with package.extractfile(name) as notice:
+                        self.assertEqual(notice.read(), content)
 
     def test_notice_staging_records_explicit_target_and_features(self):
         with tempfile.TemporaryDirectory() as temporary:

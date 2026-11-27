@@ -10,9 +10,11 @@ Pancake Stacker is a free, open-source desktop app for focus stacking. Combine p
 
 | Your computer | Download and launch |
 | --- | --- |
-| **Mac with Apple Silicon** | Download `pancake-<version>-macos-arm64.zip`. Unzip it, move `Pancake.app` to **Applications**, and open it. [macOS first-launch help](pancake/docs/install.md#macos-apple-silicon) |
-| **Windows x64** | Download `pancake-<version>-windows-x64.zip`. Choose **Extract All**, then open `pancake-gui.exe` in the extracted folder. [Windows first-launch help](pancake/docs/install.md#windows-x64) |
+| **Mac with Apple Silicon** | Open `pancake-<version>-macos-arm64.dmg`, drag `Pancake.app` into **Applications**, and open it. [macOS first-launch help](pancake/docs/install.md#macos-apple-silicon) |
+| **Windows x64** | Download and run `pancake-gui-<version>-windows-x64.exe`. [Windows first-launch help](pancake/docs/install.md#windows-x64) |
 | **Ubuntu 24.04 x86-64** | Download `pancake_<version>_amd64.deb`. Install it with APT and open **Pancake** from the application menu. [Ubuntu install command](pancake/docs/install.md#ubuntu-2404-x86-64) |
+
+For releases that offer ZIP downloads, use the installation instructions linked from the release notes.
 
 ## Stack your first photos
 

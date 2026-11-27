@@ -4,9 +4,9 @@ import argparse
 import re
 import shutil
 import subprocess
+import tarfile
 import tempfile
 import tomllib
-import zipfile
 from pathlib import Path
 
 from package_notices import ROOTS, file_sha256, stage_notices, verify_notices
@@ -27,14 +27,14 @@ def release_version(source):
     return version
 
 
-def package_windows(binaries, payload, archive):
-    """Write both Windows executables and the staged notices to a portable ZIP."""
+def package_windows(binaries, payload, dist, version):
+    """Publish the built Windows executables directly, with a separate notices archive."""
+    suffix = f"{version}-windows-x64"
     for name in ROOTS:
-        shutil.copy2(binaries / f"{name}.exe", payload)
-    with zipfile.ZipFile(archive, "x", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as package:
-        for path in sorted(payload.rglob("*")):
-            if path.is_file():
-                package.write(path, path.relative_to(payload))
+        shutil.copy2(binaries / f"{name}.exe", dist / f"{name}-{suffix}.exe")
+    with tarfile.open(dist / f"pancake-notices-{suffix}.tar.gz", "x:gz") as archive:
+        for name in ("LICENSE", "dependency-notices", "native-llvm"):
+            archive.add(payload / name, arcname=name)
 
 
 def smoke_stack(executable, frames):
@@ -62,10 +62,11 @@ def main():
     notices.add_argument("payload", type=Path)
     notices.add_argument("target")
     notices.add_argument("--features")
-    windows = commands.add_parser("windows-zip")
+    windows = commands.add_parser("windows-assets")
     windows.add_argument("binaries", type=Path)
     windows.add_argument("payload", type=Path)
-    windows.add_argument("archive", type=Path)
+    windows.add_argument("dist", type=Path)
+    windows.add_argument("version")
     smoke = commands.add_parser("smoke")
     smoke.add_argument("executable", type=Path)
     args = parser.parse_args()
@@ -82,8 +83,8 @@ def main():
         native.mkdir()
         for name in ("LICENSE.TXT", "BLAKE3-LICENSE"):
             shutil.copy2(SOURCE / "notices/llvm" / name, native)
-    elif args.command == "windows-zip":
-        package_windows(args.binaries, args.payload, args.archive)
+    elif args.command == "windows-assets":
+        package_windows(args.binaries, args.payload, args.dist, args.version)
     else:
         smoke_stack(args.executable.resolve(strict=True), SOURCE.parent / "assets/quickstart")
 

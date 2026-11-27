@@ -1,6 +1,10 @@
 # Pancake command line
 
-The [Pancake packages](install.md) include the command-line executable. On Ubuntu, run `pancake-cli` after installing the package. On macOS or Windows, open a terminal in the extracted folder and use `./pancake-cli` or `.\pancake-cli.exe`, respectively.
+Get the command-line executable for your platform. [Pancake downloads](install.md)
+
+- On Ubuntu, install the DEB and run `pancake-cli`.
+- On macOS, copy `pancake-cli` from the mounted disk image to a folder of your choice and run `./pancake-cli` from that folder.
+- On Windows, download `pancake-cli-<version>-windows-x64.exe` and run it from PowerShell in the download folder. Use `.\pancake-cli-<version>-windows-x64.exe` with the version in your downloaded filename, or `.\pancake-cli.exe` if you renamed it.
 
 ## Stack files
 

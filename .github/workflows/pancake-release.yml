@@ -174,7 +174,7 @@ jobs:
           printf 'CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=%s/scripts/macos-release-linker.sh\n' "$PWD" >> "$GITHUB_ENV"
           printf 'Source: %s\nSource SHA-256: %s\n' "$source_url" "$digest" > "$RUNNER_TEMP/zstd-source.txt"
 
-      - name: Build and verify the Apple Silicon app archive
+      - name: Build and verify the Apple Silicon disk image
         if: runner.os == 'macOS'
         run: |
           payload="$RUNNER_TEMP/macos"
@@ -186,24 +186,31 @@ jobs:
           cp "$PANCAKE_ZSTD_SOURCE/LICENSE" "$RUNNER_TEMP/zstd-source.txt" "$payload/native-zstd/"
           mv "$payload/build.log" "$DIST/pancake-macos-arm64-build.log"
           mv "$payload/package-receipt.json" "$DIST/pancake-macos-arm64-receipt.json"
-          package="$DIST/pancake-$RELEASE_VERSION-macos-arm64.zip"
-          ditto -c -k --sequesterRsrc "$payload" "$package"
-          ditto -x -k "$package" "$RUNNER_TEMP/macos-unpacked"
-          codesign --verify --strict "$RUNNER_TEMP/macos-unpacked/Pancake.app"
-          test -x "$RUNNER_TEMP/macos-unpacked/Pancake.app/Contents/MacOS/pancake-gui"
-          python -B scripts/release_support.py smoke "$RUNNER_TEMP/macos-unpacked/pancake-cli"
+          package="$DIST/pancake-$RELEASE_VERSION-macos-arm64.dmg"
+          ln -s /Applications "$payload/Applications"
+          hdiutil create -srcfolder "$payload" -volname "Pancake Stacker" -fs HFS+ -format UDZO "$package"
+          hdiutil verify "$package"
+          mounted=$(mktemp -d "$RUNNER_TEMP/pancake-dmg.XXXXXX")
+          hdiutil attach -readonly -nobrowse -mountpoint "$mounted" "$package"
+          trap 'hdiutil detach "$mounted"' EXIT
+          test "$(readlink "$mounted/Applications")" = /Applications
+          codesign --verify --strict "$mounted/Pancake.app"
+          test -x "$mounted/Pancake.app/Contents/MacOS/pancake-gui"
+          cmp "$payload/LICENSE" "$mounted/LICENSE"
+          diff -qr "$payload/dependency-notices" "$mounted/dependency-notices"
+          diff -qr "$payload/native-llvm" "$mounted/native-llvm"
+          diff -qr "$payload/native-zstd" "$mounted/native-zstd"
+          python -B scripts/release_support.py smoke "$mounted/pancake-cli"
 
-      - name: Build and verify the Windows ZIP
+      - name: Build and verify the Windows executables
         if: runner.os == 'Windows'
         run: |
           cargo build --locked --release --workspace --bins --target "$RUST_TARGET"
           payload="$RUNNER_TEMP/windows"
-          package="$DIST/pancake-$RELEASE_VERSION-windows-x64.zip"
           python -B scripts/release_support.py notices "$payload" "$RUST_TARGET"
-          python -B scripts/release_support.py windows-zip "$CARGO_TARGET_DIR/$RUST_TARGET/release" "$payload" "$package"
-          python -m zipfile -e "$package" "$RUNNER_TEMP/windows-unpacked"
-          test -f "$RUNNER_TEMP/windows-unpacked/pancake-gui.exe"
-          python -B scripts/release_support.py smoke "$RUNNER_TEMP/windows-unpacked/pancake-cli.exe"
+          python -B scripts/release_support.py windows-assets \
+            "$CARGO_TARGET_DIR/$RUST_TARGET/release" "$payload" "$DIST" "$RELEASE_VERSION"
+          python -B scripts/release_support.py smoke "$DIST/pancake-cli-$RELEASE_VERSION-windows-x64.exe"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -243,7 +250,7 @@ jobs:
           pattern: pancake-*
           merge-multiple: true
           path: ${{ runner.temp }}/pancake-dist
-      - name: Publish the tag and all three verified packages
+      - name: Publish the tag and verified release assets
         working-directory: ${{ runner.temp }}/pancake-dist
         env:
           GH_TOKEN: ${{ github.token }}
@@ -254,17 +261,19 @@ jobs:
           tag="v$RELEASE_VERSION"
           packages=(
             "pancake_${RELEASE_VERSION}_amd64.deb"
-            "pancake-$RELEASE_VERSION-macos-arm64.zip"
-            "pancake-$RELEASE_VERSION-windows-x64.zip"
+            "pancake-$RELEASE_VERSION-macos-arm64.dmg"
+            "pancake-gui-$RELEASE_VERSION-windows-x64.exe"
+            "pancake-cli-$RELEASE_VERSION-windows-x64.exe"
+            "pancake-notices-$RELEASE_VERSION-windows-x64.tar.gz"
           )
           sha256sum "${packages[@]}" > SHA256SUMS.txt
           notes="$RUNNER_TEMP/pancake-release-notes.md"
           cat > "$notes" <<NOTES
-          - **macOS Apple Silicon** — Extract the ZIP and open Pancake.app. The app is ad-hoc signed and has no Apple notarization.
+          - **macOS Apple Silicon** — Open the DMG, drag Pancake.app into Applications, then open the app. The app is ad-hoc signed and has no Apple notarization. The disk image also contains pancake-cli.
           - **Ubuntu 24.04 x86-64** — Install the DEB with \`sudo apt install ./${packages[0]}\`.
-          - **Windows x64** — Extract the ZIP and run pancake-gui.exe. The executables are unsigned.
+          - **Windows x64** — Download and run the pancake-gui executable. The pancake-cli executable and the license notices are separate downloads. Both executables are unsigned.
 
-          Each package includes the desktop app and CLI. Use SHA256SUMS.txt to verify the downloads.
+          Use SHA256SUMS.txt to verify the downloads.
 
           [Installation and first-launch help](https://github.com/$GH_REPO/blob/$GITHUB_SHA/pancake/docs/install.md) · [Stack your first photos](https://github.com/$GH_REPO/blob/$GITHUB_SHA/pancake/docs/desktop.md)
 
