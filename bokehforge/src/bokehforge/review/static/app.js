@@ -41,7 +41,7 @@ let catalogRevision = -1, lastDownload, rateTimeout, startingDownload = false;
 let catalogProgress = { phase: "connecting" }, catalogNotice = null;
 let outputLoading = false;
 let runOptions = "", outputState = "", candidateState = "";
-let candidateScore = null;
+let candidateScore = null, candidatePreview = null;
 let activeImage = null, imageVersion = "";
 const readyThumbs = new Map();
 const panelImages = new WeakMap();
@@ -203,6 +203,7 @@ function prefetchImage(params) {
 }
 
 function clearImageRequest(well) {
+  if (well === $("candidate-image")) candidateOverlay.cancelPresentation("image");
   const request = panelImages.get(well);
   panelImages.delete(well);
   if (request && !request.image.isConnected) request.image.removeAttribute("src");
@@ -241,37 +242,47 @@ function showImage(well, title, params, priority = "high") {
     well.append(button);
   }
   const image = previewElement(params, "panel", { title, priority });
-  const request = { src, button, image, title, params, shown: null };
+  const request = { src, button, image, title, shown: null, decoded: false };
   panelImages.set(well, request);
+  const candidate = well === $("candidate-image");
   const reveal = (ready) => {
     if (panelImages.get(well) !== request) return;
-    ready.classList.add("pane-preview");
-    ready.alt = request.title;
-    const old = button.querySelector("img");
-    if (old) old.replaceWith(ready);
-    else button.prepend(ready);
-    request.shown = ready;
-    button.classList.add("image-ready");
-    button.removeAttribute("aria-disabled");
-    button.setAttribute("aria-label", "Inspect " + request.title);
-    button.onclick = () => openLightbox(request.title, params, request.shown);
-    if (well === $("candidate-image")) paintCandidateOverlay();
+    request.decoded = true;
+    const show = () => {
+      ready.classList.add("pane-preview");
+      ready.alt = request.title;
+      const old = button.querySelector("img");
+      if (old) old.replaceWith(ready);
+      else button.prepend(ready);
+      request.shown = ready;
+      button.classList.add("image-ready");
+      button.removeAttribute("aria-disabled");
+      button.setAttribute("aria-label", "Inspect " + request.title);
+      button.onclick = () => openLightbox(request.title, params, request.shown);
+      if (candidate) {
+        candidatePreview = { src, params, image: ready, host: button, contain: true };
+        paintCandidateOverlay();
+      }
+    };
+    if (candidate) candidateOverlay.stage("image", () => candidateScore, show);
+    else show();
   };
   const thumbnail = readyThumbs.get(imageURL(params, "thumb"));
   if (thumbnail) {
     const fallback = copyPreview(thumbnail);
     fallback.decode().then(() => {
-      if (!request.shown) reveal(fallback);
+      if (!request.decoded) reveal(fallback);
     }, () => {});
   }
   image.decode().then(() => reveal(image), () => {
-    if (panelImages.get(well) === request && !request.shown) {
+    if (panelImages.get(well) === request && !request.decoded) {
       placeholder(well, "Image unavailable", "Stackroom could not render this image.");
     }
   });
 }
 
 function cancelLightboxRequests(state) {
+  lightboxOverlay.cancelPresentation("image");
   for (const image of state.requests) image.removeAttribute("src");
   state.requests.clear();
 }
@@ -420,19 +431,18 @@ function scheduleLightboxHoverReset(gallery) {
   if (!gallery.hover) return;
   gallery.hoverTimer = setTimeout(() => {
     if (activeImage?.gallery !== gallery || !$("image-dialog").open) return;
-    clearLightboxHover(gallery);
-    paintLightboxOverlays();
+    restoreLightboxBase(gallery);
   }, LIGHTBOX_HOVER_EXIT_DELAY);
 }
 
 function previewLightboxEntry(entry, thumbnail) {
   const { gallery } = activeImage;
-  const shown = gallery.hover?.shown;
-  clearLightboxHover(gallery);
   if (lightboxImageKey(entry) === lightboxImageKey(activeImage)) {
-    paintLightboxOverlays();
+    if (gallery.hover) restoreLightboxBase(gallery);
     return;
   }
+  const shown = gallery.hover?.shown;
+  clearLightboxHover(gallery);
   const hover = { entry, shown, request: null, events: new AbortController(), unavailable: false };
   gallery.hover = hover;
   const { signal } = hover.events;
@@ -440,9 +450,8 @@ function previewLightboxEntry(entry, thumbnail) {
     if (hover.shown?.entry === entry || !thumbnail.naturalWidth) return;
     const image = copyPreview(thumbnail.currentSrc || thumbnail.src);
     image.decode().then(() => {
-      if (signal.aborted || hover.shown?.entry === entry) return;
-      hover.shown = { entry, image };
-      paintLightboxOverlays();
+      if (signal.aborted || hover.decoded || hover.shown?.entry === entry) return;
+      stageLightboxHover(gallery, hover, image);
     }, () => {});
   };
   if (thumbnail.complete) useThumbnail();
@@ -454,7 +463,7 @@ function previewLightboxEntry(entry, thumbnail) {
 function requestLightboxHover() {
   const state = activeImage;
   const hover = state.gallery.hover;
-  if (!hover) return;
+  if (!hover || hover.events.signal.aborted) return;
   const variant = state.actual || state.scale > 1 ? "native" : "fit";
   if (hover.variant === variant || hover.variant === "native") return;
   hover.variant = variant;
@@ -465,8 +474,8 @@ function requestLightboxHover() {
   const { signal } = hover.events;
   image.decode().then(() => {
     if (signal.aborted || hover.request !== image) return;
-    hover.shown = { entry: hover.entry, image };
-    paintLightboxOverlays();
+    hover.decoded = true;
+    stageLightboxHover(state.gallery, hover, image);
   }, () => {
     if (signal.aborted || hover.request !== image) return;
     hover.unavailable = true;
@@ -474,12 +483,32 @@ function requestLightboxHover() {
   });
 }
 
-function clearLightboxHover(gallery) {
-  const hover = gallery.hover;
-  if (!hover) return;
+function stageLightboxHover(gallery, hover, image) {
+  lightboxOverlay.stage("hover", () => lightboxScore(gallery, hover.entry), () => {
+    hover.shown = { entry: hover.entry, image };
+    paintLightboxOverlays();
+  });
+}
+
+function stopLightboxHover(hover) {
+  lightboxOverlay.cancelPresentation("hover");
   hover.events.abort();
   if (hover.request && !hover.request.complete) hover.request.removeAttribute("src");
+}
+
+function clearLightboxHover(gallery) {
+  if (!gallery.hover) return;
+  stopLightboxHover(gallery.hover);
   gallery.hover = null;
+}
+
+function restoreLightboxBase(gallery) {
+  if (!gallery.hover) return;
+  stopLightboxHover(gallery.hover);
+  lightboxOverlay.stage("hover", () => lightboxScore(gallery, gallery.baseEntry), () => {
+    gallery.hover = null;
+    paintLightboxOverlays();
+  });
 }
 
 function setLightboxTitle(title) {
@@ -490,13 +519,23 @@ function setLightboxTitle(title) {
   }
 }
 
+function lightboxScore(gallery, { params }) {
+  const recorded = gallery.benchmarks.get(params.stacker);
+  return { params, benchmark: recorded?.artifact_revision === params.rev ? recorded : null };
+}
+
 function setLightboxImage(state, image) {
-  if (state.image) state.image.replaceWith(image);
-  else state.gallery.surface.prepend(image);
-  state.image = image;
-  state.gallery.baseEntry = state.entry;
-  const hover = state.gallery.hover;
-  if (hover && lightboxImageKey(hover.entry) === lightboxImageKey(state)) clearLightboxHover(state.gallery);
+  const { gallery, entry } = state;
+  lightboxOverlay.stage("image", () => lightboxScore(gallery, entry), () => {
+    const anchor = lightboxAnchor();
+    if (state.image) state.image.replaceWith(image);
+    else gallery.surface.prepend(image);
+    state.image = image;
+    gallery.baseEntry = entry;
+    const hover = gallery.hover;
+    if (hover && lightboxImageKey(hover.entry) === lightboxImageKey(state)) clearLightboxHover(gallery);
+    paintLightbox(anchor);
+  });
 }
 
 function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
@@ -519,7 +558,6 @@ function showLightboxImage(entry, gallery, stage, previewImage, viewport = {}) {
       state.requests.delete(image);
       if (activeImage !== state || state.image) return;
       setLightboxImage(state, image);
-      paintLightbox();
     }, () => state.requests.delete(image));
   }
   requestLightbox(state.actual || state.scale > 1 ? "native" : "fit");
@@ -580,11 +618,9 @@ function requestLightbox(variant) {
   image.decode().then(() => {
     state.requests.delete(image);
     if (activeImage !== state || (!native && state.nativeLoaded)) return;
-    const anchor = lightboxAnchor();
     if (native) state.nativeLoaded = true;
     state.error = "";
     setLightboxImage(state, image);
-    paintLightbox(anchor);
   }, () => {
     state.requests.delete(image);
     if (activeImage !== state || (!native && state.nativeLoaded)) return;
@@ -651,10 +687,9 @@ function paintLightboxOverlays() {
   divider.hidden = !showing || held;
   const entry = previewing ? shown.entry : gallery.baseEntry;
   const viewingReference = held && showing;
-  const recorded = gallery.benchmarks.get(entry.params.stacker);
-  const benchmark = recorded?.artifact_revision === entry.params.rev ? recorded : null;
+  const score = lightboxScore(gallery, entry);
   setLightboxTitle(viewingReference ? referenceTitle(reference) : entry.title);
-  renderLightboxBenchmark(viewingReference ? null : benchmark);
+  renderLightboxBenchmark(viewingReference ? null : score.benchmark);
   let status = state.error;
   if (hover) status = hover.unavailable && shown?.entry !== hover.entry ? "Preview unavailable" : "";
   if (comparing && !overlay && fit?.failed && (!native || native.failed)) status = "Reference unavailable";
@@ -676,11 +711,9 @@ function paintLightboxOverlays() {
       clipLeft = edge;
     }
   }
-  const output = state.params.stacker ? {
-    params: state.params, benchmark: gallery.benchmarks.get(state.params.stacker),
-  } : null;
+  const output = state.params.stacker ? lightboxScore(gallery, state.entry) : null;
   const context = viewingReference ? null : {
-    params: entry.params, benchmark, host: gallery.surface,
+    ...score, host: gallery.surface,
     image: previewing ? shown.image : state.image, contain: previewing, clipLeft,
   };
   lightboxExplanation.update(context);
@@ -1050,12 +1083,11 @@ function showBenchmarkReason(button) {
 }
 
 function paintCandidateOverlay() {
-  const request = panelImages.get($("candidate-image"));
-  const matches = candidateScore && request?.shown && imageURL(candidateScore.params, "panel") === request.src;
-  const context = matches && $("comparison-reference").hidden ? {
-    ...candidateScore, image: request.shown, host: request.button, contain: true,
-  } : null;
-  candidateOverlay.update(candidateScore, context);
+  if (!candidatePreview?.image.isConnected) candidatePreview = null;
+  if (candidatePreview && candidateScore && candidatePreview.src === imageURL(candidateScore.params, "panel")) {
+    candidatePreview.benchmark = candidateScore.benchmark;
+  }
+  candidateOverlay.update(candidateScore, $("comparison-reference").hidden ? candidatePreview : null);
 }
 
 function renderOutput() {

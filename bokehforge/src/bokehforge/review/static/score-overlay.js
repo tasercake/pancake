@@ -71,6 +71,23 @@ function drawAttention(canvas, payload) {
   overlayContext(canvas, payload).drawImage(source, 0, 0, ...payload.reference_size_wh);
 }
 
+function heatmapSpec(output, { mode, family, side }) {
+  const identity = mode === "off" ? "" : scoreExplanationKey(output);
+  if (!identity) return null;
+  const { params, benchmark } = output;
+  const { explanation } = benchmark;
+  const placement = explanation.placements[0];
+  const comparison = placement?.comparison;
+  const label = family === "all" && comparison ? "All damage" : comparison?.families[family]?.label;
+  if (mode === "attention" ? !placement || !explanation.attention : !label) return null;
+  const key = JSON.stringify([identity, mode, ...(mode === "attention" ? [] : [family, side])]);
+  return { key, identity, params, benchmark, mode, family, side, label };
+}
+
+function loading(tile) {
+  return tile?.state === "loading" || tile?.state === "pending";
+}
+
 export class ScoreOverlay {
   constructor(root, legendHost, settings, changeSettings, requestOverlay) {
     this.root = root;
@@ -91,8 +108,10 @@ export class ScoreOverlay {
     this.canvas.hidden = true;
     this.canvas.setAttribute("aria-hidden", "true");
     this.families = null;
-    this.tile = null;
+    this.requests = new Map();
+    this.presentations = new Map();
     this.drawn = null;
+    this.painting = false;
 
     this.picker.id = root.id + "-damage-types";
     this.damage.setAttribute("popovertarget", this.picker.id);
@@ -191,25 +210,35 @@ export class ScoreOverlay {
     }
   }
 
-  scoresChanged(revision) {
-    this.eventRevision = revision;
-    if (this.tile?.state === "pending") this.request(this.tile.key);
+  stage(slot, output, reveal) {
+    this.presentations.set(slot, { output, reveal });
+    this.paintHeatmap();
   }
 
-  request(key) {
-    this.tile?.controller.abort();
+  cancelPresentation(slot) {
+    this.presentations.delete(slot);
+  }
+
+  scoresChanged(revision) {
+    this.eventRevision = revision;
+    for (const tile of this.requests.values()) {
+      if (tile.state === "pending") this.request(tile.spec);
+    }
+  }
+
+  request(spec) {
+    const { key, params, benchmark, mode, family, side } = spec;
+    this.requests.get(key)?.controller.abort();
     const controller = new AbortController();
-    const tile = { key, state: "loading", controller };
-    this.tile = tile;
+    const tile = { spec, state: "loading", controller };
+    this.requests.set(key, tile);
     const revision = this.eventRevision;
-    const { params, benchmark } = this.context;
-    const { mode, family, side } = this.settings;
     const query = mode === "attention" ? params : { ...params, family, side };
     this.requestOverlay(mode, query, controller.signal).then((result) => {
-      if (this.tile !== tile || controller.signal.aborted) return;
+      if (controller.signal.aborted) return;
       if (result.status === "pending") {
         tile.state = "pending";
-        if (this.eventRevision !== revision) this.request(key);
+        if (this.eventRevision !== revision) this.request(spec);
       } else if (result.status === "ok" && result.artifact_revision === params.rev &&
                  result.reference_id === benchmark.explanation.reference_id &&
                  result.inspection_map_sha256 === benchmark.inspection_map_sha256 &&
@@ -217,17 +246,26 @@ export class ScoreOverlay {
                    : result.family === family && result.grid?.tile_size === side)) {
         overlayCache.set(key, result);
         if (overlayCache.size > 12) overlayCache.delete(overlayCache.keys().next().value);
-        tile.payload = result;
         tile.state = "ready";
       } else {
         tile.state = result.status === "stale" ? "stale" : "error";
       }
       this.paintHeatmap();
     }, () => {
-      if (this.tile !== tile || controller.signal.aborted) return;
+      if (controller.signal.aborted) return;
       tile.state = "error";
       this.paintHeatmap();
     });
+    return tile;
+  }
+
+  load(spec, needed) {
+    if (!spec) return null;
+    const { key } = spec;
+    const cached = overlayCache.get(key) ?? (this.drawn?.key === key ? this.drawn.payload : null);
+    if (cached) return { spec, state: "ready", payload: cached };
+    needed.add(key);
+    return this.requests.get(key) ?? this.request(spec);
   }
 
   paint() {
@@ -236,26 +274,57 @@ export class ScoreOverlay {
   }
 
   paintHeatmap() {
-    const { context } = this;
-    const { mode, family, side, opacity } = this.settings;
-    const attention = mode === "attention";
-    const identity = context?.image && mode !== "off" ? scoreExplanationKey(context) : "";
-    const explanation = identity ? context.benchmark.explanation : null;
-    const placement = explanation?.placements[0];
-    const comparison = placement?.comparison;
-    const familyLabel = family === "all" && comparison ? "All damage" : comparison?.families[family]?.label;
-    const available = attention ? placement && explanation.attention : familyLabel;
-    const key = available ? JSON.stringify([identity, mode, ...(attention ? [] : [family, side])]) : "";
-    if (this.tile?.key !== key) {
-      this.tile?.controller.abort();
-      this.tile = null;
-      if (key && !overlayCache.has(key)) this.request(key);
+    // Revealing a staged image updates the display context synchronously.
+    if (this.painting) return;
+    this.painting = true;
+    try {
+      const needed = new Set();
+      let stagedTile = null;
+      for (const [slot, { output, reveal }] of this.presentations) {
+        const keepVisible = this.context?.image && this.drawn && !this.canvas.hidden && this.settings.opacity > 0;
+        const tile = keepVisible ? this.load(heatmapSpec(output(), this.settings), needed) : null;
+        if (loading(tile)) {
+          stagedTile = tile;
+        } else {
+          this.presentations.delete(slot);
+          reveal();
+        }
+      }
+      const context = this.context;
+      const spec = context?.image ? heatmapSpec(context, this.settings) : null;
+      const tile = this.load(spec, needed);
+      for (const [key, pending] of this.requests) {
+        if (needed.has(key)) continue;
+        pending.controller.abort();
+        this.requests.delete(key);
+      }
+      const statusTile = stagedTile ?? tile;
+      const preparing = statusTile?.spec.mode === "attention" ? "Preparing attention map…" : "Preparing damage tiles…";
+      const text = statusTile && !statusTile.payload ? overlayStatus[statusTile.state] ?? preparing : "";
+      if (text !== this.status.textContent) this.status.textContent = text;
+      this.drawHeatmap(context, tile, stagedTile);
+    } finally {
+      this.painting = false;
     }
-    const payload = key ? this.tile?.payload ?? overlayCache.get(key) : null;
-    const preparing = attention ? "Preparing attention map…" : "Preparing damage tiles…";
-    const text = key && !payload ? overlayStatus[this.tile?.state] ?? preparing : "";
-    if (text !== this.status.textContent) this.status.textContent = text;
-    if (!payload) {
+  }
+
+  drawHeatmap(context, tile, stagedTile) {
+    const { spec, payload } = tile ?? {};
+    if (payload) {
+      if (this.drawn?.key !== spec.key || this.drawn.payload !== payload) {
+        const { mode, label, side } = spec;
+        const attention = mode === "attention";
+        if (attention) drawAttention(this.canvas, payload);
+        else drawGrid(this.canvas, payload);
+        this.drawn = { key: spec.key, identity: spec.identity, payload };
+        this.legend.dataset.mode = mode;
+        this.legend.firstElementChild.textContent = attention ? "Reference attention" : label + " · " + side + " px tiles";
+        const maximum = payload.damage_range?.[1] ?? 1;
+        Array.from(this.legend.querySelector(".damage-legend-values").children).forEach((tick, index) => {
+          tick.textContent = number.format(maximum * index / 4);
+        });
+      }
+    } else if ((!loading(tile) && !stagedTile) || this.drawn?.identity !== scoreExplanationKey(context)) {
       this.canvas.hidden = this.legend.hidden = true;
       if (this.drawn) {
         this.canvas.remove();
@@ -264,18 +333,7 @@ export class ScoreOverlay {
       }
       return;
     }
-    if (this.drawn !== payload) {
-      if (attention) drawAttention(this.canvas, payload);
-      else drawGrid(this.canvas, payload);
-      this.drawn = payload;
-      this.legend.dataset.mode = mode;
-      this.legend.firstElementChild.textContent = attention ? "Reference attention" : familyLabel + " · " + side + " px tiles";
-      const maximum = payload.damage_range?.[1] ?? 1;
-      Array.from(this.legend.querySelector(".damage-legend-values").children).forEach((tick, index) => {
-        tick.textContent = number.format(maximum * index / 4);
-      });
-    }
-    this.canvas.style.opacity = opacity / 100;
+    this.canvas.style.opacity = this.settings.opacity / 100;
     this.placeOverlay(context);
   }
 
