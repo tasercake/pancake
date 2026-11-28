@@ -23,11 +23,12 @@ identity.
 - In Stackroom, align the selected source image and stacker output on the
   same matte. Put the reference first in the filmstrip and let reviewers hold
   the period key to show it in the output pane. Put scene details and
-  the evaluation run in a bar below the command bar. Place the stacker
-  buttons below the output image and the rating controls directly above the
-  filmstrip. Keep scene navigation, evaluation progress, result details, and
-  review overlays accessible. At narrow browser widths, stack the panes in
-  reading order and let the filmstrip scroll horizontally.
+  the evaluation run in a bar below the command bar. Put stacker selection,
+  heatmap controls, and score details in a sidebar to the right of the
+  output pane. Put the rating controls beneath the output pane and span the
+  workspace with the filmstrip. At narrower widths, move the sidebar below
+  the image panes, then stack the panes on small screens. Keep the filmstrip
+  horizontally scrollable.
 - Use real data and real application states. Give empty and loading
   workspaces a clear next step. Preserve selection, focus, shortcuts,
   cancellation, and progress through layout changes. Deliver state updates

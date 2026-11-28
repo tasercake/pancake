@@ -73,7 +73,7 @@ function drawAttention(canvas, payload) {
 }
 
 export class ScoreOverlay {
-  constructor(root, settings, changeSettings, requestOverlay) {
+  constructor(root, legendHost, settings, changeSettings, requestOverlay) {
     this.root = root;
     this.settings = settings;
     this.changeSettings = changeSettings;
@@ -87,7 +87,7 @@ export class ScoreOverlay {
     this.picker = root.querySelector(".overlay-picker");
     this.status = root.querySelector(".overlay-status");
     this.legend = document.querySelector("#damage-legend-template").content.firstElementChild.cloneNode(true);
-    root.parentElement.append(this.legend);
+    legendHost.append(this.legend);
     this.canvas = element("canvas", undefined, "damage-canvas");
     this.canvas.hidden = true;
     this.canvas.setAttribute("aria-hidden", "true");
@@ -111,7 +111,7 @@ export class ScoreOverlay {
         if (this.picker.matches(":popover-open")) this.positionPicker();
       };
       window.addEventListener("resize", reposition);
-      window.addEventListener("scroll", reposition, { passive: true });
+      window.addEventListener("scroll", reposition, { capture: true, passive: true });
     }
     this.picker.addEventListener("toggle", ({ newState }) => {
       if (newState === "open") {

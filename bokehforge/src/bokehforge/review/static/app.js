@@ -654,7 +654,7 @@ function paintLightboxOverlays() {
   const recorded = gallery.benchmarks.get(entry.params.stacker);
   const benchmark = recorded?.artifact_revision === entry.params.rev ? recorded : null;
   setLightboxTitle(viewingReference ? referenceTitle(reference) : entry.title);
-  renderBenchmark($("lightbox-benchmark"), viewingReference ? null : benchmark, true);
+  renderLightboxBenchmark(viewingReference ? null : benchmark);
   let status = state.error;
   if (hover) status = hover.unavailable && shown?.entry !== hover.entry ? "Preview unavailable" : "";
   if (comparing && !overlay && fit?.failed && (!native || native.failed)) status = "Reference unavailable";
@@ -1007,7 +1007,10 @@ function releaseComparisonReference(event) {
 
 const benchmarkNumber = new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-function renderBenchmark(label, benchmark, compact = false) {
+const invalidDeliveryReason = "The delivery failed the benchmark's image requirements.";
+
+function renderLightboxBenchmark(benchmark) {
+  const label = $("lightbox-benchmark");
   const line = label.parentElement;
   const info = label.nextElementSibling;
   const invalid = benchmark?.status === "invalid_output" && benchmark.score === 0;
@@ -1017,17 +1020,28 @@ function renderBenchmark(label, benchmark, compact = false) {
   let text = "";
   if (scored) {
     const value = benchmarkNumber.format(benchmark.score);
-    text = compact ? `Score ${value} / 100` : `Benchmark score ${value} / 100`;
+    text = `Score ${value} / 100`;
     if (invalid) text += " · Invalid delivery";
   } else if (benchmark) {
-    text = benchmark.status === "pending"
-      ? (compact ? "Scoring…" : "Calculating benchmark score…")
-      : "Benchmark score unavailable";
+    text = benchmark.status === "pending" ? "Scoring…" : "Benchmark score unavailable";
   }
   if (label.textContent !== text) label.textContent = text;
   line.dataset.scored = scored;
   label.title = [benchmark?.profile, invalid ? null : benchmark?.error].filter(Boolean).join(" · ");
-  info.dataset.reason = invalid ? benchmark.error || "The delivery failed the benchmark's image requirements." : "";
+  info.dataset.reason = invalid ? benchmark.error || invalidDeliveryReason : "";
+}
+
+function renderCandidateScoreStatus(benchmark) {
+  let text = "";
+  if (benchmark?.status === "invalid_output") {
+    text = "Invalid delivery. " + (benchmark.error || invalidDeliveryReason);
+  } else if (benchmark?.status === "pending") {
+    text = "Calculating benchmark score…";
+  } else if (benchmark && benchmark.score == null) {
+    text = "Benchmark score unavailable.";
+  }
+  const status = $("candidate-score-status");
+  if (status.textContent !== text) status.textContent = text;
 }
 
 function showBenchmarkReason(button) {
@@ -1058,8 +1072,9 @@ function renderOutput() {
     const tabStrip = $("output-tabs");
     const focused = tabStrip.contains(document.activeElement) ? document.activeElement.dataset.stacker : null;
     const tabs = outputs.map((output) => {
-      const button = part("button", stackerLabel(output.stacker));
+      const button = part("button");
       button.type = "button";
+      button.append(part("span", stackerLabel(output.stacker)));
       button.dataset.stacker = output.stacker;
       button.title = unavailable[output.status]?.[0] ?? "View stacker output";
       button.setAttribute("aria-pressed", output === row);
@@ -1105,7 +1120,7 @@ function renderOutput() {
     }
     candidateState = currentImage;
   }
-  renderBenchmark($("candidate-benchmark"), row?.benchmark);
+  renderCandidateScoreStatus(candidateScore?.benchmark);
   candidateExplanation.update(candidateScore);
   paintCandidateOverlay();
   renderRating(row);
@@ -1522,7 +1537,7 @@ const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
 const filmRail = new VirtualRail($("filmstrip"), "x", 112, sourceEntry, { itemPadding: 5 });
 const requestScoreOverlay = (mode, params, signal) =>
   api(url(mode === "attention" ? "/api/score-attention" : "/api/score-tiles", params), undefined, { signal });
-const candidateExplanation = new ScoreExplanation($("candidate-explanation"), $("candidate-explain"));
+const candidateExplanation = new ScoreExplanation($("candidate-explanation"));
 const lightboxExplanation = new ScoreExplanation($("lightbox-explanation"), $("lightbox-explain"));
 const overlaySettings = { mode: "off", family: "all", side: 8, opacity: 100 };
 function changeOverlaySettings(changes) {
@@ -1530,8 +1545,12 @@ function changeOverlaySettings(changes) {
   candidateOverlay.paint();
   lightboxOverlay.paint();
 }
-const candidateOverlay = new ScoreOverlay($("candidate-overlay"), overlaySettings, changeOverlaySettings, requestScoreOverlay);
-const lightboxOverlay = new ScoreOverlay($("lightbox-overlay"), overlaySettings, changeOverlaySettings, requestScoreOverlay);
+const candidateOverlay = new ScoreOverlay(
+  $("candidate-overlay"), $("candidate-image").parentElement, overlaySettings, changeOverlaySettings, requestScoreOverlay,
+);
+const lightboxOverlay = new ScoreOverlay(
+  $("lightbox-overlay"), $("image-view").parentElement, overlaySettings, changeOverlaySettings, requestScoreOverlay,
+);
 new ResizeObserver(paintCandidateOverlay).observe($("candidate-image"));
 const lightboxStrip = $("lightbox-strip");
 const lightboxRail = new VirtualRail(lightboxStrip, "x", 100, lightboxStripEntry, { itemPadding: 4 });
@@ -1696,7 +1715,7 @@ for (const button of document.querySelectorAll(".benchmark-info")) button.onclic
 for (const button of document.querySelectorAll("[data-close]")) button.onclick = () => $(button.dataset.close).close();
 document.addEventListener("keydown", (event) => {
   if (!scene || document.querySelector("dialog[open]") ||
-      event.target.closest?.("input,textarea,select,[contenteditable]") ||
+      event.target.closest?.("input, textarea, select, [contenteditable], .overlay-picker") ||
       event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
   if (event.key === "." && comparisonReference && !event.repeat) {
     event.preventDefault();
