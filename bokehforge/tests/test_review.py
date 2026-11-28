@@ -4,6 +4,7 @@ from hashlib import sha256
 from http.client import HTTPConnection
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO, StringIO
+from itertools import count
 from pathlib import Path
 import json
 from shutil import copyfile
@@ -11,6 +12,7 @@ import sys
 from threading import Event, Thread
 from time import sleep
 import xml.etree.ElementTree as ET
+from zipfile import ZipFile
 
 import numpy as np
 from PIL import Image
@@ -18,6 +20,7 @@ import pytest
 import tifffile
 
 from bokehforge.bench import main as bench
+from bokehforge.data import lazy
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
 from bokehforge.review import _zerene, runs, scores
 from bokehforge.scoring import SCORE_VERSION
@@ -164,21 +167,37 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     result_path = store / "runs" / job / "pancake/results" / (scene + ".json")
     saved = json.loads(result_path.read_text())
 
-    def reopen_with_recipe(converter, loader):
-        recipe = {**catalog_scene.metadata["recipe"], "converter_sha256": converter, "loader_sha256": loader}
+    reopened = open_review(root, store)
+
+    def output_with_recipe(converter, loader, helpers):
+        recipe = {**catalog_scene.metadata["recipe"], "converter_sha256": converter,
+                  "loader_sha256": loader, "shared_helpers_sha256": helpers}
         recipe_hash = sha256(json.dumps(recipe, sort_keys=True).encode()).hexdigest()
         fingerprint = runs.scene_fingerprint(app.catalog, catalog_scene, recipe_sha256=recipe_hash)
         result_path.write_text(json.dumps({**saved, "scene_fingerprint": fingerprint}))
-        reopened = open_review(root, store)
-        return reopened, reopened.scene_details(scene, job)["outputs"][0]
+        return reopened.scene_details(scene, job)["outputs"][0]
 
     old_converter = "f0b9ebf6223225b9ebd0810cbe450a5bd2ecbf3c38955a8be025745f118fc20b"
+    old_helpers = "809aeadd11408d266ca92ced254ee61e45a4bf4d2f1ffbb588e456e2f8ca97b6"
     legacy_loader = "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6"
     rust_scorer_loader = "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7"
-    _, unrelated = reopen_with_recipe("0" * 64, rust_scorer_loader)
-    assert unrelated["status"] == "different_source" and unrelated["rating"] is None
-    for loader in (legacy_loader, rust_scorer_loader):
-        reopened, output = reopen_with_recipe(old_converter, loader)
+    progress_loader = "e086629e6a1963b5eb89f647dcb19c0326b97adf00fa53d952f980bb0af36ce1"
+    progress_helpers = "473e4a8473d1422e9d94638e1c4b18e35984c822c40edddab84c08bff0ee154d"
+    native_converter = "2cb7a404d768a107fc03f2f54049559cae6127af8924190f5bd21aca42f377ac"
+    native_loader = "9af934c6991ea96d9935d43b932644c38f0a64aae7b927ad37522b6cb3e3061d"
+    for identity in (
+        ("0" * 64, rust_scorer_loader, old_helpers),
+        (old_converter, progress_loader, old_helpers),
+    ):
+        unrelated = output_with_recipe(*identity)
+        assert unrelated["status"] == "different_source" and unrelated["rating"] is None
+    for identity in (
+        (old_converter, legacy_loader, old_helpers),
+        (old_converter, rust_scorer_loader, old_helpers),
+        (old_converter, progress_loader, progress_helpers),
+        (native_converter, native_loader, old_helpers),
+    ):
+        output = output_with_recipe(*identity)
         assert output["status"] == "ready"
         rating = output["rating"]
         assert rating["grade"] == 4 and rating["comment"] == comment
@@ -273,6 +292,81 @@ def test_review_image_caches_and_revalidates_without_decoding(tmp_path, monkeypa
     write_scene(root, 0.5)
     changed = open_review(root, store)
     assert changed.image(query)[1] != original
+
+
+@pytest.mark.parametrize("valid_checksum", [True, False])
+def test_review_pushes_catalog_progress_and_replays_the_current_step(tmp_path, monkeypatch, valid_checksum):
+    root = tmp_path / "data"
+    native = root / "raw/Demo/source.zip"
+    native.parent.mkdir(parents=True)
+    chunk = 4 * 1024 * 1024
+    with BytesIO() as frame:
+        Image.new("RGB", (4, 3)).save(frame, "PNG")
+        with ZipFile(native, "w") as archive:
+            archive.writestr("readme.txt", b" " * chunk)
+            archive.writestr("stack/1.png", frame.getvalue())
+            archive.writestr("stack/2.png", frame.getvalue())
+    checksum = sha256(native.read_bytes()) if valid_checksum else sha256(b"wrong")
+    native.with_name("download-manifest.json").write_text(json.dumps({
+        "id": "Demo", "status": "available", "layout": "archive_stacks", "reference_type": "none",
+        "files": [{"path": native.name, "sha256": checksum.hexdigest()}],
+    }))
+    config = tmp_path / "sources.json"
+    config.write_text(json.dumps({"datasets": [{"id": "Demo"}]}))
+    store = tmp_path / "review"
+    store.mkdir()
+
+    finish_verification, finish_archive = Event(), Event()
+    digest, inventory = lazy.digest, lazy._archive_inventory
+
+    def pause_after_first_chunk(path, *, progress):
+        def update(received):
+            progress(received)
+            if received == chunk:
+                assert finish_verification.wait(6), "Checksum test did not release the reader"
+        return digest(path, progress=update)
+
+    def pause_after_first_entry(asset, relative, progress):
+        def update(*, completed, total):
+            progress(completed=completed, total=total)
+            if completed == 1:
+                assert finish_archive.wait(6), "Archive test did not release the reader"
+        yield from inventory(asset, relative, update)
+
+    monkeypatch.setattr(lazy, "digest", pause_after_first_chunk)
+    monkeypatch.setattr(lazy, "_archive_inventory", pause_after_first_entry)
+    monkeypatch.setattr(review_server, "monotonic", count().__next__)
+    with ReviewServer(("127.0.0.1", 0)) as server:
+        server.app = Review(Namespace(root=root, store=store, dataset=["Demo"], config=config, lock=None,
+                                      no_attention=True, pancake=None, focus_stack=None, openfocus=None,
+                                      shine_python=None))
+        worker = Thread(target=server.serve_forever)
+        worker.start()
+        try:
+            with ReviewStream(server.server_port) as events:
+                verifying = events.expect("catalog-progress", lambda item: item and item["completed"] == chunk)
+                assert verifying == {"phase": "verifying", "dataset": "Demo", "file": "source.zip",
+                                     "completed": chunk, "total": native.stat().st_size}
+
+            with ReviewStream(server.server_port) as events:
+                assert events.expect("catalog-progress", lambda item: bool(item)) == verifying
+                finish_verification.set()
+                if valid_checksum:
+                    inspecting = events.expect("catalog-progress", lambda item: item and item["phase"] == "archive"
+                                               and item["completed"] == 1)
+                    assert inspecting["total"] == 3
+                    finish_archive.set()
+                final = events.expect("catalog", lambda item: item["status"] != "indexing")
+                assert events.expect("catalog-progress", lambda item: item is None) is None
+                if valid_checksum:
+                    assert final["status"] == "ready" and len(final["scenes"]) == 1
+                else:
+                    assert final["status"] == "error" and "mismatched source SHA-256" in final["error"]
+        finally:
+            finish_verification.set()
+            finish_archive.set()
+            server.shutdown()
+            worker.join()
 
 
 def test_review_downloads_missing_data_while_existing_scenes_remain_open(tmp_path):

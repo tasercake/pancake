@@ -35,18 +35,30 @@ def _write(path, payload):
     pending.replace(path)
 
 
-# These converter/loader revisions produce equivalent canonical frames. Match
-# exact pairs so a future decoder change still invalidates previous results.
+# These source revisions produce equivalent canonical frames. Match exact
+# triples so unverified converter, loader, or helper changes invalidate old runs.
+_RECIPE_CODE_FIELDS = ("converter_sha256", "loader_sha256", "shared_helpers_sha256")
 _COMPATIBLE_RECIPE_CODE = (
     # First full-reference benchmark release.
     ("f0b9ebf6223225b9ebd0810cbe450a5bd2ecbf3c38955a8be025745f118fc20b",
-     "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6"),
+     "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6",
+     "809aeadd11408d266ca92ced254ee61e45a4bf4d2f1ffbb588e456e2f8ca97b6"),
     # Catalog selection update, also shipped in the initial Rust scorer.
     ("f0b9ebf6223225b9ebd0810cbe450a5bd2ecbf3c38955a8be025745f118fc20b",
-     "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7"),
-    # Native runtime with the equivalent PNG fast path.
+     "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7",
+     "809aeadd11408d266ca92ced254ee61e45a4bf4d2f1ffbb588e456e2f8ca97b6"),
+    # Live catalog progress on main.
+    ("f0b9ebf6223225b9ebd0810cbe450a5bd2ecbf3c38955a8be025745f118fc20b",
+     "e086629e6a1963b5eb89f647dcb19c0326b97adf00fa53d952f980bb0af36ce1",
+     "473e4a8473d1422e9d94638e1c4b18e35984c822c40edddab84c08bff0ee154d"),
+    # Native runtime with the equivalent PNG fast path, before catalog progress.
     ("2cb7a404d768a107fc03f2f54049559cae6127af8924190f5bd21aca42f377ac",
-     "9af934c6991ea96d9935d43b932644c38f0a64aae7b927ad37522b6cb3e3061d"),
+     "9af934c6991ea96d9935d43b932644c38f0a64aae7b927ad37522b6cb3e3061d",
+     "809aeadd11408d266ca92ced254ee61e45a4bf4d2f1ffbb588e456e2f8ca97b6"),
+    # Native runtime and live catalog progress together.
+    ("2cb7a404d768a107fc03f2f54049559cae6127af8924190f5bd21aca42f377ac",
+     "9b1b4ac560112b38254a3ff44d9a072dbd0a3865608c2d81aa20a7933592f85a",
+     "473e4a8473d1422e9d94638e1c4b18e35984c822c40edddab84c08bff0ee154d"),
 )
 
 
@@ -59,12 +71,12 @@ def scene_fingerprint(catalog, scene, *, recipe_sha256=None):
 def compatible_scene_fingerprints(catalog, scene):
     fingerprints = {scene_fingerprint(catalog, scene)}
     recipe = scene.metadata["recipe"]
-    current = recipe.get("converter_sha256"), recipe.get("loader_sha256")
+    current = tuple(recipe.get(key) for key in _RECIPE_CODE_FIELDS)
     if current in _COMPATIBLE_RECIPE_CODE:
-        for converter, loader in _COMPATIBLE_RECIPE_CODE:
-            if (converter, loader) == current:
+        for previous in _COMPATIBLE_RECIPE_CODE:
+            if previous == current:
                 continue
-            old_recipe = {**recipe, "converter_sha256": converter, "loader_sha256": loader}
+            old_recipe = recipe | dict(zip(_RECIPE_CODE_FIELDS, previous, strict=True))
             old_sha256 = sha256(json.dumps(old_recipe, sort_keys=True).encode()).hexdigest()
             fingerprints.add(scene_fingerprint(catalog, scene, recipe_sha256=old_sha256))
     return fingerprints

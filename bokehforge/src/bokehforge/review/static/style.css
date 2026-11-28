@@ -180,6 +180,9 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
 .scene-navigation input::-webkit-inner-spin-button { appearance: none; }
 .notice { padding: 1.35rem 1rem; }
 .notice p { margin-top: .4rem; color: var(--muted); max-width: 75ch; overflow-wrap: anywhere; }
+.catalog-meter { display: grid; gap: .25rem; width: min(100%, 22rem); margin-top: .6rem; color: var(--muted); font-size: .875rem; }
+.catalog-meter progress { width: 100%; }
+#catalog-count:empty { display: none; }
 .workspace {
   display: grid;
   flex: 1;
