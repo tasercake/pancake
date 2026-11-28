@@ -131,10 +131,11 @@ def test_measure_uses_native_accelerator_on_small_images(score_device, small_del
     (expected_placement,) = expected.explanation["placements"]
     expected_comparison = expected_placement["comparison"]
     requested_devices = (device, "gpu", "auto") if damage_backend("auto") == device else (device,)
+    tolerance = 1e-6 if device == "cuda" else 1e-4
     for requested in requested_devices:
         actual = measure(candidate, target, device=requested, **options)
-        assert actual.features == pytest.approx(expected.features, abs=1e-4, rel=0)
-        assert actual.score / 100 == pytest.approx(expected.score / 100, abs=1e-4, rel=0)
+        assert actual.features == pytest.approx(expected.features, abs=tolerance, rel=0)
+        assert actual.score / 100 == pytest.approx(expected.score / 100, abs=tolerance, rel=0)
         assert actual.alignment["status"] == "matched"
         (placement,) = actual.explanation["placements"]
         comparison = placement["comparison"]
@@ -146,7 +147,7 @@ def test_measure_uses_native_accelerator_on_small_images(score_device, small_del
             for key in ("x_edges", "y_edges", "covered_pixels"):
                 assert grid[key] == expected_grid[key]
             for family, values in grid["values"].items():
-                assert values == pytest.approx(expected_grid["values"][family], abs=1e-4, rel=0)
+                assert values == pytest.approx(expected_grid["values"][family], abs=tolerance, rel=0)
 
 
 def test_supplied_attention_is_reported_for_unmatched_delivery():
@@ -214,7 +215,9 @@ def test_native_lightness_matches_independent_cpu_maps(score_device, shape, cove
     expected = lightness_damage(cl, tl, delta, support)
     mask = None if support is None else support.view(np.uint8)
     device = score_device
-    tolerance = 0 if coverage == "exact" else 1e-4
+    tolerance = 1e-4 if device == "mps" else 1e-5
+    if coverage == "exact":
+        tolerance = 0
     actual = _rust._accelerated_lightness(cl, tl, delta, mask, device)
     for observed, reference in zip(actual, expected, strict=True):
         np.testing.assert_allclose(observed, reference, atol=tolerance, rtol=0, err_msg=device)

@@ -8,7 +8,8 @@ import pytest
 
 
 @pytest.mark.hardware_accelerator
-def test_native_coreml_executes_onnx(tmp_path):
+def test_native_coreml_executes_onnx(tmp_path, request):
+    request.node.user_properties.append(("hardware_accelerator", "Core ML"))
     if sys.platform != "darwin":
         pytest.skip("Core ML requires macOS")
 
