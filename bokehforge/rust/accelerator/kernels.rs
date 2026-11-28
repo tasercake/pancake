@@ -354,6 +354,34 @@ pub(super) fn nearby(
     }
 }
 
+#[cube(expand_only)]
+fn final_damage(
+    source: &Tensor<f32>,
+    residuals: &Tensor<f32>,
+    edges: &Tensor<f32>,
+    index: usize,
+    area: usize,
+    directional_extra: f32,
+) -> (f32, f32, f32) {
+    let candidate = source[index];
+    let delta = source[2 * area + index];
+    let fine = residuals[index];
+    let local = residuals[area + index];
+    let broad = residuals[2 * area + index];
+    let upper = edges[index];
+    let lower = edges[area + index];
+    let strength = edges[2 * area + index];
+    let neighborhood = edges[3 * area + index];
+    let grain = visibility((delta - fine).abs(), 5.) * (1. - strength);
+    let edge_shape = visibility((delta - local).abs(), 6.) * neighborhood;
+    let overshoot = (candidate - upper).max(lower - candidate).max(0.);
+    (
+        visibility(local.abs().max(broad.abs()), 8.),
+        directional_extra.max(grain),
+        edge_shape.max(visibility(overshoot, 6.) * neighborhood),
+    )
+}
+
 #[cube(launch, expand_only)]
 pub(super) fn finish(
     source: &Tensor<f32>,
@@ -365,20 +393,115 @@ pub(super) fn finish(
 ) {
     let (first, end) = work_span(area, span);
     for index in first..end {
-        let candidate = source[index];
-        let delta = source[2 * area + index];
-        let fine = residuals[index];
-        let local = residuals[area + index];
-        let broad = residuals[2 * area + index];
-        let upper = edges[index];
-        let lower = edges[area + index];
-        let strength = edges[2 * area + index];
-        let neighborhood = edges[3 * area + index];
-        let grain = visibility((delta - fine).abs(), 5.) * (1. - strength);
-        let edge_shape = visibility((delta - local).abs(), 6.) * neighborhood;
-        let overshoot = (candidate - upper).max(lower - candidate).max(0.);
-        output[index] = visibility(local.abs().max(broad.abs()), 8.);
-        output[2 * area + index] = output[2 * area + index].max(grain);
-        output[3 * area + index] = edge_shape.max(visibility(overshoot, 6.) * neighborhood);
+        let (tone, added, boundary) = final_damage(
+            source,
+            residuals,
+            edges,
+            index,
+            area,
+            output[2 * area + index],
+        );
+        output[index] = tone;
+        output[2 * area + index] = added;
+        output[3 * area + index] = boundary;
+    }
+}
+
+// Retain low-order bits in each cell sum with portable float32 arithmetic.
+#[cube(expand_only)]
+fn add_cell(high: f32, low: f32, value: f32) -> (f32, f32) {
+    let next = high + value;
+    let rounded = next - high;
+    let error = (high - (next - rounded)) + (value - rounded);
+    (next, low + error)
+}
+
+#[cube(launch, expand_only)]
+pub(super) fn finish_cells(
+    source: &Tensor<f32>,
+    residuals: &Tensor<f32>,
+    edges: &Tensor<f32>,
+    directions: &Tensor<f32>,
+    heat: &Tensor<f32>,
+    output: &mut Tensor<f32>,
+    width: usize,
+    area: usize,
+    top: usize,
+    left: usize,
+    height: usize,
+    core_width: usize,
+    threshold: f32,
+    #[comptime] masked: bool,
+    #[comptime] weighted: bool,
+    #[comptime] finalized: bool,
+    #[comptime] span: usize,
+) {
+    let columns = core_width.div_ceil(4usize);
+    let count = height.div_ceil(4usize) * columns;
+    let (first, end) = work_span(count, span);
+    for cell in first..end {
+        let y0 = (cell / columns) * 4usize;
+        let x0 = (cell % columns) * 4usize;
+        let y1 = (y0 + 4usize).min(height);
+        let x1 = (x0 + 4usize).min(core_width);
+        let mut high = Array::<f32>::new(4usize);
+        let mut low = Array::<f32>::new(4usize);
+        let mut affected = Array::<f32>::new(4usize);
+        let mut damage = Array::<f32>::new(4usize);
+        for y in y0..y1 {
+            for x in x0..x1 {
+                let index = (top + y) * width + left + x;
+                let mut covered = true;
+                if masked {
+                    if finalized {
+                        covered = source[index] != 0.0;
+                    } else {
+                        covered = source[3 * area + index] != 0.0;
+                    }
+                }
+                if covered {
+                    if finalized {
+                        #[unroll]
+                        for family in 0usize..4usize {
+                            damage[family] = directions[family * area + index];
+                        }
+                    } else {
+                        let (tone, added, boundary) = final_damage(
+                            source,
+                            residuals,
+                            edges,
+                            index,
+                            area,
+                            directions[2 * area + index],
+                        );
+                        damage[0] = tone;
+                        damage[1] = directions[area + index];
+                        damage[2] = added;
+                        damage[3] = boundary;
+                    }
+                    let mut multiplier = 1.0f32;
+                    if weighted {
+                        multiplier = heat[y * core_width + x];
+                    }
+                    #[unroll]
+                    for family in 0usize..4usize {
+                        let value = damage[family] * multiplier;
+                        let (sum, error) = add_cell(high[family], low[family], value);
+                        high[family] = sum;
+                        low[family] = error;
+                        if value >= threshold {
+                            affected[family] += 1.0;
+                        }
+                    }
+                }
+            }
+        }
+        #[unroll]
+        for family in 0usize..4usize {
+            let index = 3 * (count * family + cell);
+            output[index] = high[family];
+            output[index + 1] = low[family];
+            output[index + 2] = affected[family];
+        }
     }
 }

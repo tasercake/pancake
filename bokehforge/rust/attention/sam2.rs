@@ -157,43 +157,78 @@ fn stable_mask(
         return Err("SAM2 decoder returned non-finite logits for an eligible mask");
     }
 
+    let width = xs.len();
+    let mut upper = vec![0.0; width];
+    let mut lower = vec![0.0; width];
+    let mut upper_index = usize::MAX;
+    let mut lower_index = usize::MAX;
     let mut intersection = 0;
     let mut union = 0;
-    let mut foreground = Vec::with_capacity(xs.len() * ys.len());
+    let mut foreground = vec![false; width * ys.len()];
+
+    // Adjacent output rows reuse the same horizontal interpolation. Cache
+    // the two source rows so the vertical pass scans contiguous slices.
+    for (row, sample) in foreground.chunks_exact_mut(width).zip(ys) {
+        if upper_index != sample.low {
+            if lower_index == sample.low {
+                std::mem::swap(&mut upper, &mut lower);
+                std::mem::swap(&mut upper_index, &mut lower_index);
+            } else {
+                interpolate_row(raw, sample.low, xs, &mut upper);
+                upper_index = sample.low;
+            }
+        }
+        let lower = if sample.high == sample.low {
+            &upper
+        } else {
+            if lower_index != sample.high {
+                interpolate_row(raw, sample.high, xs, &mut lower);
+                lower_index = sample.high;
+            }
+            &lower
+        };
+        let low_weight = 1.0 - sample.fraction;
+        let high_weight = sample.fraction;
+        for ((included, &low), &high) in row.iter_mut().zip(&upper).zip(lower) {
+            let value = low_weight * low + high_weight * high;
+            *included = value > 0.0;
+            intersection += usize::from(value > 1.0);
+            union += usize::from(value > -1.0);
+        }
+    }
+
+    if union == 0 || intersection as f32 / union as f32 <= 0.9 {
+        return Ok(None);
+    }
+
     let mut bounds = Bounds {
-        left: xs.len(),
+        left: width,
         top: ys.len(),
         right: 0,
         bottom: 0,
     };
-
-    for (y, &sample_y) in ys.iter().enumerate() {
-        let row0 = &raw[sample_y.low * MASK_SIDE..][..MASK_SIDE];
-        let row1 = &raw[sample_y.high * MASK_SIDE..][..MASK_SIDE];
-        for (x, &sample_x) in xs.iter().enumerate() {
-            let upper = interpolate(sample_x, row0[sample_x.low], row0[sample_x.high]);
-            let lower = interpolate(sample_x, row1[sample_x.low], row1[sample_x.high]);
-            let value = interpolate(sample_y, upper, lower);
-            intersection += usize::from(value > 1.0);
-            union += usize::from(value > -1.0);
-            let included = value > 0.0;
-            if included {
-                bounds.left = bounds.left.min(x);
-                bounds.top = bounds.top.min(y);
-                bounds.right = bounds.right.max(x);
-                bounds.bottom = bounds.bottom.max(y);
-            }
-            foreground.push(included);
+    for (y, row) in foreground.chunks_exact(width).enumerate() {
+        if let Some(left) = row.iter().position(|&included| included) {
+            let right = row.iter().rposition(|&included| included).unwrap();
+            bounds.left = bounds.left.min(left);
+            bounds.top = bounds.top.min(y);
+            bounds.right = bounds.right.max(right);
+            bounds.bottom = y;
         }
     }
 
-    Ok(
-        (union != 0 && intersection as f32 / union as f32 > 0.9).then_some(Mask {
-            foreground,
-            bounds,
-            quality,
-        }),
-    )
+    Ok(Some(Mask {
+        foreground,
+        bounds,
+        quality,
+    }))
+}
+
+fn interpolate_row(raw: &[f32], y: usize, xs: &[AxisSample], output: &mut [f32]) {
+    let source = &raw[y * MASK_SIDE..][..MASK_SIDE];
+    for (value, &sample) in output.iter_mut().zip(xs) {
+        *value = interpolate(sample, source[sample.low], source[sample.high]);
+    }
 }
 
 fn suppress(mut candidates: Vec<Mask>) -> (Vec<Vec<bool>>, Vec<f32>) {
@@ -219,8 +254,9 @@ fn suppress(mut candidates: Vec<Mask>) -> (Vec<Vec<bool>>, Vec<f32>) {
 impl Sam2 {
     pub(super) fn load(models: &Path, backend: Backend) -> Result<Self, String> {
         Ok(Self {
-            encoder: load_session(&models.join("sam_encoder.onnx"), backend)?,
-            decoder: load_session(&models.join("sam_decoder.onnx"), backend)?,
+            // The CUDA provider can use its tensor cores for SAM2 projections.
+            encoder: load_session(&models.join("sam_encoder.onnx"), backend, true)?,
+            decoder: load_session(&models.join("sam_decoder.onnx"), backend, true)?,
         })
     }
 
@@ -303,6 +339,57 @@ mod tests {
             prompt_batch(427, 640, 224)[60..],
             [618.96875, 992.0, 661.65625, 992.0]
         );
+    }
+
+    #[test]
+    fn stable_mask_matches_per_pixel_interpolation_at_thresholds() {
+        let raw = (0..MASK_SIDE * MASK_SIDE)
+            .map(|i| {
+                let x = i % MASK_SIDE;
+                let y = i / MASK_SIDE;
+                if x > 9 && y > 7 {
+                    match i % 41 {
+                        0 => 1.0,
+                        1 => 1.0_f32.next_down(),
+                        2 => 1.0_f32.next_up(),
+                        3 => 0.0,
+                        4 => -1.0,
+                        _ => 6.0,
+                    }
+                } else {
+                    -6.0
+                }
+            })
+            .collect::<Vec<_>>();
+        for (width, height) in [(23, 19), (640, 427), (640, 640)] {
+            let xs = sample_axis(MASK_SIDE, width);
+            let ys = sample_axis(MASK_SIDE, height);
+            let mask = stable_mask(&raw, 0.9, &xs, &ys).unwrap().unwrap();
+            let mut coords = Vec::new();
+            for (y, &vertical) in ys.iter().enumerate() {
+                for (x, &horizontal) in xs.iter().enumerate() {
+                    let sample = |row: usize| {
+                        interpolate(
+                            horizontal,
+                            raw[row * MASK_SIDE + horizontal.low],
+                            raw[row * MASK_SIDE + horizontal.high],
+                        )
+                    };
+                    let value = interpolate(vertical, sample(vertical.low), sample(vertical.high));
+                    assert_eq!(mask.foreground[y * width + x], value > 0.0);
+                    if value > 0.0 {
+                        coords.push((x, y));
+                    }
+                }
+            }
+            assert_eq!(mask.bounds.left, coords.iter().map(|c| c.0).min().unwrap());
+            assert_eq!(mask.bounds.right, coords.iter().map(|c| c.0).max().unwrap());
+            assert_eq!(mask.bounds.top, coords.iter().map(|c| c.1).min().unwrap());
+            assert_eq!(
+                mask.bounds.bottom,
+                coords.iter().map(|c| c.1).max().unwrap()
+            );
+        }
     }
 
     #[test]

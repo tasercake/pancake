@@ -7,7 +7,7 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 use crate::c_slice;
 
 mod overlap;
-pub(crate) use overlap::{OverlapDiagnostics, pool_overlap};
+pub(crate) use overlap::{AFFECTED_THRESHOLD, FamilyInput, OverlapDiagnostics, pool_overlap};
 
 type Edges<'py> = (PyReadonlyArray1<'py, isize>, PyReadonlyArray1<'py, isize>);
 type GridInput<'py> = (Edges<'py>, Option<PyReadonlyArray2<'py, i32>>, usize);

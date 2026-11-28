@@ -4,11 +4,11 @@ use std::collections::{HashMap, HashSet};
 use std::fs::{self, File};
 use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, MutexGuard};
 
 use numpy::ndarray::Array2;
 use numpy::{IntoPyArray, PyArray2, PyReadonlyArray3, PyUntypedArrayMethods};
-use ort::ep::{CUDA, CoreML, ExecutionProvider, coreml::ComputeUnits};
+use ort::ep::{ArenaExtendStrategy, CUDA, CoreML, ExecutionProvider, coreml::ComputeUnits};
 use ort::session::{Session, builder::SessionBuilder};
 use pyo3::exceptions::{PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
@@ -22,7 +22,7 @@ mod sam2;
 #[cfg(test)]
 mod tests;
 
-const EXPORT_VERSION: &str = "onnx-v2";
+const EXPORT_VERSION: &str = "onnx-v3";
 const GRAPH_FILES: &[&str] = &[
     "reliqs.onnx",
     "tempsal.onnx",
@@ -31,6 +31,15 @@ const GRAPH_FILES: &[&str] = &[
 ];
 
 static ATTENTION: Mutex<Option<Runtime>> = Mutex::new(None);
+
+fn lock_runtime() -> Result<MutexGuard<'static, Option<Runtime>>, &'static str> {
+    if crate::WORKERS.current_thread_index().is_some() {
+        return Err("Inspection inference requires an external caller thread");
+    }
+    ATTENTION
+        .lock()
+        .map_err(|_| "Inspection runtime lock was poisoned")
+}
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 enum Backend {
@@ -139,8 +148,8 @@ impl Runtime {
         }
         let path = self.exports.as_ref().expect("model paths initialized");
         let models = Models {
-            reliqs: load_session(&path.join("reliqs.onnx"), backend)?,
-            tempsal: load_session(&path.join("tempsal.onnx"), backend)?,
+            reliqs: load_session(&path.join("reliqs.onnx"), backend, false)?,
+            tempsal: load_session(&path.join("tempsal.onnx"), backend, false)?,
             sam2: sam2::Sam2::load(path, backend)?,
             last: None,
         };
@@ -148,7 +157,7 @@ impl Runtime {
         Ok(())
     }
 
-    fn models(&mut self, device: &str) -> Result<&mut Models, String> {
+    fn models(&mut self, device: &str) -> Result<(&mut Models, Backend), String> {
         self.initialize()?;
         let backend = if device == "auto" {
             if let Some(backend) = self.auto_backend {
@@ -171,11 +180,14 @@ impl Runtime {
             self.load(backend)?;
             backend
         };
-        Ok(self.models.get_mut(&backend).expect("models loaded"))
+        Ok((
+            self.models.get_mut(&backend).expect("models loaded"),
+            backend,
+        ))
     }
 }
 
-fn session_builder(backend: Backend) -> ort::Result<SessionBuilder> {
+fn session_builder(backend: Backend, allow_tf32: bool) -> ort::Result<SessionBuilder> {
     let workers = std::thread::available_parallelism()
         .map_or(1, usize::from)
         .min(8);
@@ -185,7 +197,8 @@ fn session_builder(backend: Backend) -> ort::Result<SessionBuilder> {
     Ok(match backend {
         Backend::Cpu => builder,
         Backend::Cuda => builder.with_execution_providers([CUDA::default()
-            .with_tf32(false)
+            .with_tf32(allow_tf32)
+            .with_arena_extend_strategy(ArenaExtendStrategy::SameAsRequested)
             .build()
             .error_on_failure()])?,
         Backend::CoreMl => builder.with_execution_providers([CoreML::default()
@@ -195,8 +208,8 @@ fn session_builder(backend: Backend) -> ort::Result<SessionBuilder> {
     })
 }
 
-fn load_session(path: &Path, backend: Backend) -> Result<Session, String> {
-    let build = || session_builder(backend)?.commit_from_file(path);
+fn load_session(path: &Path, backend: Backend, allow_tf32: bool) -> Result<Session, String> {
+    let build = || session_builder(backend, allow_tf32)?.commit_from_file(path);
     build().map_err(|error| {
         format!(
             "Could not load {} using {backend:?}: {error}",
@@ -309,11 +322,106 @@ fn verify_files(folder: &Path) -> Result<(), String> {
     Ok(())
 }
 
+type SamMasks = (Vec<Vec<bool>>, Vec<f32>);
+type Predictions = (Vec<f32>, SamMasks, Vec<f32>);
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum InferenceLane {
+    Shared,
+    External,
+    Serial,
+}
+
+pub(crate) fn cuda_allocation_failure(error: &str) -> bool {
+    let lower = error.to_ascii_lowercase();
+    [
+        "cuda_error_out_of_memory",
+        "out of device memory",
+        "out of memory",
+        "failed to allocate memory for requested buffer",
+        "cudnn_status_alloc_failed",
+    ]
+    .iter()
+    .any(|marker| lower.contains(marker))
+}
+
+fn run_predictions(
+    reliqs: impl FnOnce() -> Result<Vec<f32>, String> + Send,
+    sam: impl FnOnce() -> Result<SamMasks, String> + Send,
+    tempsal: impl FnOnce() -> Result<Vec<f32>, String> + Send,
+    concurrent: bool,
+) -> Result<Predictions, String> {
+    run_model_lanes(
+        reliqs,
+        sam,
+        tempsal,
+        if concurrent {
+            InferenceLane::Shared
+        } else {
+            InferenceLane::Serial
+        },
+    )
+}
+
+fn run_model_lanes(
+    reliqs: impl FnOnce() -> Result<Vec<f32>, String> + Send,
+    sam: impl FnOnce() -> Result<SamMasks, String> + Send,
+    tempsal: impl FnOnce() -> Result<Vec<f32>, String> + Send,
+    lane: InferenceLane,
+) -> Result<Predictions, String> {
+    if lane == InferenceLane::Serial {
+        return Ok((reliqs()?, sam()?, tempsal()?));
+    }
+    let saliency = || reliqs().map(|reliqs| (reliqs, tempsal()));
+    let (saliency, masks) = if lane == InferenceLane::External {
+        std::thread::scope(|scope| {
+            let masks = scope.spawn(sam);
+            (
+                saliency(),
+                masks
+                    .join()
+                    .unwrap_or_else(|_| Err("Inspection SAM lane panicked".to_owned())),
+            )
+        })
+    } else {
+        rayon::join(saliency, sam)
+    };
+    // Resolve errors in model order after both branches finish.
+    let (reliqs, temporal) = saliency?;
+    Ok((reliqs, masks?, temporal?))
+}
+
+fn model_predictions(
+    models: &mut Models,
+    view: &image::Rgb8,
+    concurrent: bool,
+    lane: InferenceLane,
+) -> Result<Predictions, String> {
+    let reliqs = || saliency::reliqs(&mut models.reliqs, view);
+    let sam = || models.sam2.masks(view);
+    let tempsal = || saliency::tempsal(&mut models.tempsal, view);
+    if concurrent && lane == InferenceLane::External {
+        run_model_lanes(reliqs, sam, tempsal, lane)
+    } else {
+        run_predictions(reliqs, sam, tempsal, concurrent)
+    }
+}
+
 fn preview(
     target: &[f32],
     height: usize,
     width: usize,
     device: &str,
+) -> Result<PreviewMap, String> {
+    preview_on_lane(target, height, width, device, InferenceLane::Shared)
+}
+
+fn preview_on_lane(
+    target: &[f32],
+    height: usize,
+    width: usize,
+    device: &str,
+    lane: InferenceLane,
 ) -> Result<PreviewMap, String> {
     if width == 0
         || height == 0
@@ -327,31 +435,45 @@ fn preview(
     hasher.update(view.height.to_le_bytes());
     hasher.update(&view.pixels);
     let preview_key = hasher.finalize().into();
-    let mut runtime = ATTENTION
-        .lock()
-        .map_err(|_| "Inspection runtime lock was poisoned")?;
+    let mut runtime = lock_runtime()?;
     let runtime = runtime
         .as_mut()
         .ok_or("Inspection runtime has not been configured")?;
-    let models = runtime.models(device)?;
+    let (models, backend) = runtime.models(device)?;
     if let Some(cached) = &models.last
         && cached.preview_key == preview_key
     {
         return Ok(cached.map.clone());
     }
 
-    let (detail, predictions) = parallel(|| {
-        rayon::join(
-            || image::detail_light(&view),
-            || {
-                let reliqs = saliency::reliqs(&mut models.reliqs, &view)?;
-                let (masks, scores) = models.sam2.masks(&view)?;
-                let temporal = saliency::tempsal(&mut models.tempsal, &view)?;
-                Ok::<_, String>((reliqs, masks, scores, temporal))
-            },
-        )
-    });
-    let (reliqs, masks, scores, temporal) = predictions?;
+    let concurrent = lane != InferenceLane::Serial
+        && backend == Backend::Cuda
+        && crate::WORKERS.current_num_threads() >= 4;
+    let (detail, predictions) = if lane == InferenceLane::External {
+        let mut detail = None;
+        let predictions = crate::WORKERS.in_place_scope(|cpu| {
+            cpu.spawn(|_| detail = Some(image::detail_light(&view)));
+            model_predictions(models, &view, concurrent, lane)
+        });
+        (detail.expect("Inspection detail completed"), predictions)
+    } else {
+        parallel(|| {
+            rayon::join(
+                || image::detail_light(&view),
+                || model_predictions(models, &view, concurrent, lane),
+            )
+        })
+    };
+    let (reliqs, (masks, scores), temporal) = match predictions {
+        Err(error)
+            if concurrent && lane != InferenceLane::External && cuda_allocation_failure(&error) =>
+        {
+            // The paired calls have ended and dropped their transient outputs.
+            // Keep the same provider and graphs on the serial retry.
+            model_predictions(models, &view, false, InferenceLane::Serial)?
+        }
+        result => result?,
+    };
     let pixels = view.width * view.height;
     if [reliqs.len(), temporal.len(), detail.len()]
         .into_iter()
@@ -361,10 +483,7 @@ fn preview(
     {
         return Err("Inspection models produced an invalid output shape".into());
     }
-    let mut mask_heat = vec![0.0; pixels];
-    for (mask, score) in masks.iter().zip(scores) {
-        image::accumulate_mask_heat(&mut mask_heat, mask, score, &detail);
-    }
+    let mask_heat = image::mask_heat(&masks, &scores, &detail);
     let raw = image::blend_components([&reliqs, &detail, &mask_heat, &temporal]);
     if raw.iter().any(|value| !(0.0..=1.0).contains(value)) {
         return Err("Inspection models produced values outside the valid range".into());
@@ -386,13 +505,59 @@ fn preview(
     Ok(map)
 }
 
+pub(crate) fn cuda_warmed(device: &str, width: usize, height: usize) -> bool {
+    let Ok(runtime) = ATTENTION.try_lock() else {
+        return false;
+    };
+    let Some(runtime) = runtime.as_ref() else {
+        return false;
+    };
+    if !(device == "cuda" || (device == "auto" && runtime.auto_backend == Some(Backend::Cuda))) {
+        return false;
+    }
+    let [width, height] = image::reference_dimensions(width, height);
+    runtime
+        .models
+        .get(&Backend::Cuda)
+        .and_then(|models| models.last.as_ref())
+        .is_some_and(|cached| cached.map.width == width && cached.map.height == height)
+}
+
 pub(crate) fn generate(
     target: &[f32],
     height: usize,
     width: usize,
     device: &str,
 ) -> Result<(Vec<f32>, String), String> {
-    let map = preview(target, height, width, device)?;
+    generate_on_lane(target, height, width, device, InferenceLane::Shared)
+}
+
+pub(crate) fn generate_external(
+    target: &[f32],
+    height: usize,
+    width: usize,
+    device: &str,
+) -> Result<(Vec<f32>, String), String> {
+    generate_on_lane(target, height, width, device, InferenceLane::External)
+}
+
+pub(crate) fn generate_serial(
+    target: &[f32],
+    height: usize,
+    width: usize,
+    device: &str,
+) -> Result<(Vec<f32>, String), String> {
+    generate_on_lane(target, height, width, device, InferenceLane::Serial)
+}
+
+fn generate_on_lane(
+    target: &[f32],
+    height: usize,
+    width: usize,
+    device: &str,
+    lane: InferenceLane,
+) -> Result<(Vec<f32>, String), String> {
+    let map = preview_on_lane(target, height, width, device, lane)?;
     let pixels = if (map.width, map.height) == (width, height) {
         map.pixels.to_vec()
     } else {
@@ -413,9 +578,7 @@ fn configure_attention(
         library,
         python,
     };
-    let mut runtime = ATTENTION
-        .lock()
-        .map_err(|_| PyRuntimeError::new_err("Inspection runtime lock was poisoned"))?;
+    let mut runtime = lock_runtime().map_err(PyRuntimeError::new_err)?;
     if let Some(runtime) = runtime.as_ref() {
         if runtime.config != config {
             return Err(PyRuntimeError::new_err(
@@ -482,9 +645,7 @@ fn cached_attention<'py>(
 ) -> PyResult<Option<Bound<'py, PyArray2<f32>>>> {
     let map = py
         .detach(|| {
-            let runtime = ATTENTION
-                .lock()
-                .map_err(|_| "Inspection runtime lock was poisoned")?;
+            let runtime = lock_runtime()?;
             let cached = runtime.as_ref().and_then(|runtime| {
                 runtime
                     .models
