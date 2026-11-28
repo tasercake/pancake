@@ -7,6 +7,7 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use rayon::prelude::*;
 
+use crate::accelerator::TilePlan;
 use crate::parallel;
 
 type RgbPixel = [f32; 3];
@@ -202,7 +203,12 @@ fn lab_curve(xyz: f32, cube: f32) -> f32 {
 
 #[inline]
 fn lab_components([x, y, z]: RgbPixel) -> RgbPixel {
-    [116.0 * y - 16.0, 500.0 * (x - y), 200.0 * (y - z)]
+    [lab_lightness(y), 500.0 * (x - y), 200.0 * (y - z)]
+}
+
+#[inline]
+fn lab_lightness(y: f32) -> f32 {
+    116.0 * y - 16.0
 }
 
 struct LabInput<'a> {
@@ -572,15 +578,17 @@ fn lab_root(value: f32) -> f32 {
 }
 
 #[inline]
+fn lab_transfer(value: f32) -> f32 {
+    if value > LAB_THRESHOLD {
+        lab_root(value)
+    } else {
+        lab_curve(value, 0.0)
+    }
+}
+
+#[inline]
 fn lab_pixel(rgb: RgbPixel) -> RgbPixel {
-    let xyz = xyz_pixel(rgb, &XYZ);
-    lab_components(xyz.map(|value| {
-        if value > LAB_THRESHOLD {
-            lab_root(value)
-        } else {
-            lab_curve(value, 0.0)
-        }
-    }))
+    lab_components(xyz_pixel(rgb, &XYZ).map(lab_transfer))
 }
 
 #[derive(Default)]
@@ -595,6 +603,10 @@ impl PixelSums {
             delta: add(self.delta, other.delta),
             count: self.count + other.count,
         }
+    }
+
+    fn mean_delta(self) -> Channels {
+        self.delta.map(|value| value / self.count as f64)
     }
 }
 
@@ -633,12 +645,25 @@ pub(crate) struct Comparison {
 }
 
 pub(crate) fn compare(candidate: &[f32], target: &[f32], support: Option<&[u8]>) -> Comparison {
-    const BLOCK: usize = 16_384;
     let candidate = candidate.as_chunks::<3>().0;
     let target = target.as_chunks::<3>().0;
     let mut planes = std::array::from_fn(|_| vec![0.0; target.len()]);
     let [cl, tl, delta, color, range] = &mut planes;
-    let sums = if target.len() >= 2 * BLOCK {
+    let sums = compare_into(candidate, target, support, [cl, tl, delta, color, range]);
+    Comparison {
+        planes,
+        mean_delta: sums.mean_delta(),
+    }
+}
+
+fn compare_into(
+    candidate: &[RgbPixel],
+    target: &[RgbPixel],
+    support: Option<&[u8]>,
+    [cl, tl, delta, color, range]: [&mut [f32]; 5],
+) -> PixelSums {
+    const BLOCK: usize = 16_384;
+    if target.len() >= 2 * BLOCK {
         parallel(|| {
             cl.par_chunks_mut(BLOCK)
                 .zip(tl.par_chunks_mut(BLOCK))
@@ -662,12 +687,147 @@ pub(crate) fn compare(candidate: &[f32], target: &[f32], support: Option<&[u8]>)
         .fold(PixelSums::default(), PixelSums::combine)
     } else {
         compare_chunk(candidate, target, support, [cl, tl, delta, color, range])
-    };
-    let count = sums.count as f64;
-    Comparison {
-        planes,
-        mean_delta: sums.delta.map(|value| value / count),
     }
+}
+
+pub(crate) struct PackedLightness {
+    samples: Vec<f32>,
+}
+
+impl PackedLightness {
+    fn new(area: usize, reserve_mask: bool) -> Self {
+        let samples_len = 3 * area;
+        let mut samples = vec![0.0; samples_len + if reserve_mask { area } else { 0 }];
+        samples.truncate(samples_len);
+        Self { samples }
+    }
+
+    pub(crate) fn into_samples(self) -> Vec<f32> {
+        self.samples
+    }
+
+    fn planes_mut(&mut self) -> [&mut [f32]; 3] {
+        let area = self.samples.len() / 3;
+        let (candidate, tail) = self.samples.split_at_mut(area);
+        let (target, delta) = tail.split_at_mut(area);
+        [candidate, target, delta]
+    }
+}
+
+pub(crate) struct PreparedComparison {
+    pub(crate) tiles: Vec<PackedLightness>,
+    pub(crate) color: Vec<f32>,
+    pub(crate) range: Vec<f32>,
+    pub(crate) mean_delta: Channels,
+}
+
+fn fill_lightness(candidate: &[RgbPixel], target: &[RgbPixel], [cl, tl, delta]: [&mut [f32]; 3]) {
+    let lightness = |rgb| lab_lightness(lab_transfer(xyz_pixel(rgb, &XYZ)[1]));
+    for (i, (&candidate, &target)) in candidate.iter().zip(target).enumerate() {
+        cl[i] = lightness(candidate);
+        tl[i] = lightness(target);
+        delta[i] = cl[i] - tl[i];
+    }
+}
+
+pub(crate) fn compare_prepared(
+    candidate: &[f32],
+    target: &[f32],
+    height: usize,
+    width: usize,
+    support: Option<&[u8]>,
+    plan: &[TilePlan],
+) -> Option<PreparedComparison> {
+    // Disjoint full-width cores can write the final color and range planes
+    // in place. A horizontal split uses the bounded row-slice packing path.
+    if plan.is_empty()
+        || plan
+            .iter()
+            .any(|tile| tile.core[1] != 0 || tile.core[3] != width)
+    {
+        return None;
+    }
+    let candidate = candidate.as_chunks::<3>().0;
+    let target = target.as_chunks::<3>().0;
+    let mut color = vec![0.0; height * width];
+    let mut range = vec![0.0; height * width];
+    let mut color_left = color.as_mut_slice();
+    let mut range_left = range.as_mut_slice();
+    let mut tasks = Vec::with_capacity(plan.len());
+    let mut row = 0;
+    for tile in plan {
+        let [top, _, bottom, _] = tile.core;
+        let [first, _, last, _] = tile.halo;
+        debug_assert_eq!(top, row);
+        let length = (bottom - top) * width;
+        let color_out;
+        let range_out;
+        (color_out, color_left) = color_left.split_at_mut(length);
+        (range_out, range_left) = range_left.split_at_mut(length);
+        tasks.push((
+            first * width..last * width,
+            top * width..bottom * width,
+            color_out,
+            range_out,
+        ));
+        row = bottom;
+    }
+    debug_assert_eq!(row, height);
+
+    let prepare = |(halo, core, color, range): (
+        std::ops::Range<usize>,
+        std::ops::Range<usize>,
+        &mut [f32],
+        &mut [f32],
+    )| {
+        let mask = support.map(|support| &support[core.clone()]);
+        let reserve_mask = support.is_some_and(|support| support[halo.clone()].contains(&0));
+        let mut tile = PackedLightness::new(halo.len(), reserve_mask);
+        let [cl, tl, delta] = tile.planes_mut();
+        let start = core.start - halo.start;
+        let end = core.end - halo.start;
+
+        let sums = compare_into(
+            &candidate[core.clone()],
+            &target[core],
+            mask,
+            [
+                &mut cl[start..end],
+                &mut tl[start..end],
+                &mut delta[start..end],
+                color,
+                range,
+            ],
+        );
+        for rows in [0..start, end..halo.len()] {
+            let input = halo.start + rows.start..halo.start + rows.end;
+            fill_lightness(
+                &candidate[input.clone()],
+                &target[input],
+                [
+                    &mut cl[rows.clone()],
+                    &mut tl[rows.clone()],
+                    &mut delta[rows],
+                ],
+            );
+        }
+        (tile, sums)
+    };
+    let prepared: Vec<_> = if tasks.len() > 1 {
+        parallel(|| tasks.into_par_iter().map(prepare).collect())
+    } else {
+        tasks.into_iter().map(prepare).collect()
+    };
+    let (tiles, stats): (Vec<_>, Vec<_>) = prepared.into_iter().unzip();
+    let sums = stats
+        .into_iter()
+        .fold(PixelSums::default(), PixelSums::combine);
+    Some(PreparedComparison {
+        tiles,
+        color,
+        range,
+        mean_delta: sums.mean_delta(),
+    })
 }
 
 pub fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -681,7 +841,8 @@ pub fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use super::{XYZ, rgb_diagnostics};
+    use super::{XYZ, compare, compare_prepared, rgb_diagnostics};
+    use crate::accelerator::TilePlan;
 
     #[test]
     fn exposure_preserves_row_major_cancellation_at_image_scale() {
@@ -698,5 +859,48 @@ mod tests {
         let exposure_t = 0.25 * XYZ[1].iter().copied().map(f64::from).sum::<f64>();
         let exposure_c = exposure_t * (width * height / 2 - 1) as f64 / (width * height) as f64;
         assert!((exposure - ((exposure_c + 1e-5) / (exposure_t + 1e-5)).log2()).abs() < 1e-12);
+    }
+
+    #[test]
+    fn prepared_payload_matches_full_image_planes_and_counts_only_cores() {
+        let (height, width) = (173, 477);
+        let count = height * width;
+        let candidate = (0..3 * count)
+            .map(|i| (i % 313) as f32 / 257.0 - 0.05)
+            .collect::<Vec<_>>();
+        let target = (0..3 * count)
+            .map(|i| (i % 249) as f32 / 211.0)
+            .collect::<Vec<_>>();
+        let support = (0..count)
+            .map(|i| if i % 17 == 0 { 0 } else { 255 })
+            .collect::<Vec<_>>();
+        let plan = [
+            TilePlan {
+                core: [0, 0, 71, width],
+                halo: [0, 0, 111, width],
+            },
+            TilePlan {
+                core: [71, 0, height, width],
+                halo: [31, 0, height, width],
+            },
+        ];
+        let baseline = compare(&candidate, &target, Some(&support));
+        let packed = compare_prepared(&candidate, &target, height, width, Some(&support), &plan)
+            .expect("full-width tiles are prepared");
+
+        for (tile, plan) in packed.tiles.into_iter().zip(&plan) {
+            let rows = plan.halo[0] * width..plan.halo[2] * width;
+            let samples = tile.into_samples();
+            assert_eq!(samples.len(), 3 * rows.len());
+            assert!(samples.capacity() >= 4 * rows.len());
+            for (samples, image) in samples.chunks_exact(rows.len()).zip(&baseline.planes[..3]) {
+                assert_eq!(samples, &image[rows.clone()]);
+            }
+        }
+        assert_eq!(packed.color, baseline.planes[3]);
+        assert_eq!(packed.range, baseline.planes[4]);
+        for (prepared, full_image) in packed.mean_delta.into_iter().zip(baseline.mean_delta) {
+            assert!((prepared - full_image).abs() < 1e-12);
+        }
     }
 }

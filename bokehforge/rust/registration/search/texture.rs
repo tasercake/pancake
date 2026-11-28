@@ -119,52 +119,62 @@ fn box_footprints(input: usize, output: usize) -> Vec<(Range<usize>, f64)> {
         .collect()
 }
 
+fn resize_row(source: &[f32], row: &mut [[f32; 3]], horizontal: &[(Range<usize>, f64)]) {
+    let source = source.as_chunks::<3>().0;
+    if row.len() == source.len() {
+        for (out, rgb) in row.iter_mut().zip(source) {
+            *out = rgb.map(|v| v.clamp(0.0, 1.0));
+        }
+        return;
+    }
+    for (out, (range, weight)) in row.iter_mut().zip(horizontal) {
+        let mut total = [0.0; 3];
+        for pixel in &source[range.clone()] {
+            for c in 0..3 {
+                total[c] += f64::from(pixel[c].clamp(0.0, 1.0)) * weight;
+            }
+        }
+        *out = total.map(|v| v as f32);
+    }
+}
+
 pub(super) fn resize(image: ImageView<'_>, [height, width]: [usize; 2]) -> Vec<[f32; 3]> {
     let [source_h, source_w] = image.shape();
     let horizontal = box_footprints(source_w, width);
-    let mut rows = vec![[0.0f32; 3]; source_h * width];
-    rows.par_chunks_mut(width).enumerate().for_each(|(y, row)| {
-        let source = image.row(y);
-        if width == source_w {
-            for (out, rgb) in row.iter_mut().zip(source.as_chunks::<3>().0) {
-                *out = rgb.map(|v| v.clamp(0.0, 1.0));
-            }
-            return;
-        }
-        for (out, (range, weight)) in row.iter_mut().zip(&horizontal) {
-            let mut total = [0.0; 3];
-            for pixel in source[range.start * 3..range.end * 3].as_chunks::<3>().0 {
-                for c in 0..3 {
-                    total[c] += f64::from(pixel[c].clamp(0.0, 1.0)) * weight;
-                }
-            }
-            *out = total.map(|v| v as f32);
-        }
-    });
+    let mut output = vec![[0.0; 3]; height * width];
     if height == source_h {
-        return rows;
+        output
+            .par_chunks_mut(width)
+            .enumerate()
+            .for_each(|(y, row)| resize_row(image.row(y), row, &horizontal));
+        return output;
     }
+    // Consume the rounded horizontal rows within each vertical footprint.
+    // The full intermediate image would add a memory pass.
     let vertical = box_footprints(source_h, height);
-    let mut out = vec![[0.0; 3]; height * width];
-    out.par_chunks_mut(width)
+    output
+        .par_chunks_mut(width)
         .zip(vertical.into_par_iter())
         .for_each_init(
-            || vec![[0.0; 3]; width],
-            |total, (row, (range, weight))| {
-                total.fill([0.0; 3]);
+            || (vec![[0.0; 3]; width], vec![[0.0; 3]; width]),
+            |(scratch, totals), (row, (range, weight))| {
+                totals.fill([0.0; 3]);
                 for y in range {
-                    for (acc, pixel) in total.iter_mut().zip(&rows[y * width..(y + 1) * width]) {
-                        for c in 0..3 {
-                            acc[c] += f64::from(pixel[c]) * weight;
-                        }
+                    resize_row(image.row(y), scratch, &horizontal);
+                    for (total, &pixel) in totals
+                        .as_flattened_mut()
+                        .iter_mut()
+                        .zip(scratch.as_flattened())
+                    {
+                        *total += f64::from(pixel) * weight;
                     }
                 }
-                for (out, total) in row.iter_mut().zip(total.iter()) {
-                    *out = total.map(|v| v as f32);
+                for (out, &total) in row.as_flattened_mut().iter_mut().zip(totals.as_flattened()) {
+                    *out = total as f32;
                 }
             },
         );
-    out
+    output
 }
 
 #[inline]

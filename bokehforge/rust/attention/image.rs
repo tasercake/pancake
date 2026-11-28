@@ -1,4 +1,5 @@
 use std::f64::consts::PI;
+use std::ops::Range;
 
 use rayon::prelude::*;
 
@@ -92,20 +93,22 @@ fn byte_taps(source: usize, dest: usize, filter: Filter) -> Vec<Taps<i32>> {
     })
 }
 
-fn sample_rgb(pixels: &[u8], stride: usize, weights: &[i32]) -> [u8; 3] {
+fn round_rgb_sample(sum: i32) -> u8 {
     // Pillow rounds each pass to uint8 before filtering the next axis.
-    let mut accum = [WEIGHT_SCALE / 2; 3];
-    for (pixel, &weight) in pixels.chunks(stride).zip(weights) {
-        for c in 0..3 {
-            accum[c] += i32::from(pixel[c]) * weight;
-        }
-    }
-    accum.map(|v| ((v >> WEIGHT_BITS).clamp(0, 255)) as u8)
+    (sum >> WEIGHT_BITS).clamp(0, 255) as u8
 }
 
 fn horizontal_rgb(source: &[u8], dest: &mut [u8], cols: &[Taps<i32>]) {
+    let source = source.as_chunks::<3>().0;
     for (pixel, taps) in dest.as_chunks_mut::<3>().0.iter_mut().zip(cols) {
-        pixel.copy_from_slice(&sample_rgb(&source[3 * taps.start..], 3, &taps.weights));
+        let mut sums = [WEIGHT_SCALE / 2; 3];
+        let samples = &source[taps.start..taps.start + taps.weights.len()];
+        for (&[r, g, b], &weight) in samples.iter().zip(&taps.weights) {
+            sums[0] += i32::from(r) * weight;
+            sums[1] += i32::from(g) * weight;
+            sums[2] += i32::from(b) * weight;
+        }
+        *pixel = sums.map(round_rgb_sample);
     }
 }
 
@@ -118,15 +121,23 @@ fn vertical_rgb(image: Rgb8, height: usize, filter: Filter) -> Rgb8 {
     let stride = 3 * width;
     let mut pixels = vec![0; stride * height];
     parallel(|| {
-        pixels
-            .par_chunks_exact_mut(stride)
-            .zip(rows)
-            .for_each(|(out, taps)| {
+        pixels.par_chunks_exact_mut(stride).zip(rows).for_each_init(
+            || vec![0; stride],
+            |sums, (out, taps)| {
+                sums.fill(WEIGHT_SCALE / 2);
                 let source = &image.pixels[stride * taps.start..];
-                for (x, pixel) in out.as_chunks_mut::<3>().0.iter_mut().enumerate() {
-                    pixel.copy_from_slice(&sample_rgb(&source[3 * x..], stride, &taps.weights));
+                // Traverse each source row contiguously and keep the same
+                // tap order for every destination channel.
+                for (row, weight) in source.chunks_exact(stride).zip(taps.weights) {
+                    for (sum, &value) in sums.iter_mut().zip(row) {
+                        *sum += i32::from(value) * weight;
+                    }
                 }
-            });
+                for (value, &sum) in out.iter_mut().zip(sums.iter()) {
+                    *value = round_rgb_sample(sum);
+                }
+            },
+        );
     });
     Rgb8 {
         width,
@@ -135,11 +146,16 @@ fn vertical_rgb(image: Rgb8, height: usize, filter: Filter) -> Rgb8 {
     }
 }
 
-pub(crate) fn reference_preview(reference: &[f32], width: usize, height: usize) -> Rgb8 {
-    assert!(width != 0 && height != 0 && reference.len() == 3 * width * height);
+pub(super) fn reference_dimensions(width: usize, height: usize) -> [usize; 2] {
     let scale = (PREVIEW_LONG_EDGE as f64 / width.max(height) as f64).min(1.0);
     let out_width = ((width as f64 * scale).round_ties_even() as usize).max(1);
     let out_height = ((height as f64 * scale).round_ties_even() as usize).max(1);
+    [out_width, out_height]
+}
+
+pub(crate) fn reference_preview(reference: &[f32], width: usize, height: usize) -> Rgb8 {
+    assert!(width != 0 && height != 0 && reference.len() == 3 * width * height);
+    let [out_width, out_height] = reference_dimensions(width, height);
     let mut pixels = vec![0; 3 * out_width * height];
     let encoder = &*CANONICAL_SRGB;
     parallel(|| {
@@ -262,25 +278,56 @@ pub(crate) fn blend_components([a, b, c, d]: [&[f32]; 4]) -> Vec<f32> {
         .collect()
 }
 
-pub(crate) fn accumulate_mask_heat(heat: &mut [f32], mask: &[bool], score: f32, detail: &[f32]) {
-    assert!(heat.len() == mask.len() && heat.len() == detail.len());
+pub(crate) fn mask_heat(masks: &[Vec<bool>], scores: &[f32], detail: &[f32]) -> Vec<f32> {
+    assert_eq!(masks.len(), scores.len());
+    parallel(|| {
+        let mut heat = vec![0.0_f32; detail.len()];
+        let group_size = rayon::current_num_threads();
+        // Each mask's percentile is independent. Bound the temporary runs
+        // to one group, then apply them to the shared heatmap in mask order.
+        for (masks, scores) in masks.chunks(group_size).zip(scores.chunks(group_size)) {
+            let prepared = masks
+                .par_iter()
+                .zip(scores)
+                .filter_map(|(mask, &score)| prepare_mask_heat(mask, score, detail))
+                .collect::<Vec<_>>();
+            for (strength, ranges) in prepared {
+                for range in ranges {
+                    for (pixel, &relevance) in heat[range.clone()].iter_mut().zip(&detail[range]) {
+                        *pixel = pixel.max(strength * (0.75 + 0.25 * relevance));
+                    }
+                }
+            }
+        }
+        heat
+    })
+}
+
+fn prepare_mask_heat(
+    mask: &[bool],
+    score: f32,
+    detail: &[f32],
+) -> Option<(f32, Vec<Range<usize>>)> {
+    assert_eq!(mask.len(), detail.len());
     let area = mask.iter().filter(|&&member| member).count();
     let fraction = area as f64 / mask.len() as f64;
     if !(0.001..=0.65).contains(&fraction) {
-        return;
+        return None;
     }
-    let mut values = detail
-        .iter()
-        .zip(mask)
-        .filter_map(|(&value, &member)| member.then_some(value))
-        .collect::<Vec<_>>();
+    let mut values = Vec::with_capacity(area);
+    let mut ranges = Vec::new();
+    let mut start = 0;
+    for run in mask.chunk_by(|&a, &b| a == b) {
+        let end = start + run.len();
+        if run[0] {
+            values.extend_from_slice(&detail[start..end]);
+            ranges.push(start..end);
+        }
+        start = end;
+    }
     let quartile = f64::from(detail::mask_quantile(&mut values));
     let strength = (f64::from(score).min(1.0) * (0.25 + 0.75 * quartile)) as f32;
-    for (pixel, (&relevance, &member)) in heat.iter_mut().zip(detail.iter().zip(mask)) {
-        if member {
-            *pixel = pixel.max(strength * (0.75 + 0.25 * relevance));
-        }
-    }
+    Some((strength, ranges))
 }
 
 #[cfg(test)]
@@ -347,13 +394,12 @@ mod tests {
         let detail = (0..count)
             .map(|i| i as f32 / (count - 1) as f32)
             .collect::<Vec<_>>();
-        let mut heat = vec![0.0; count];
-        for (factor, limit, score) in [(2, 4, 0.2), (3, 5, 0.4), (5, 1, 0.7), (7, 16, 0.9)] {
-            let mask = (0..count)
+        let masks = [(2, 4), (3, 5), (5, 1), (7, 16)].map(|(factor, limit)| {
+            (0..count)
                 .map(|i| i * factor % 17 < limit)
-                .collect::<Vec<_>>();
-            accumulate_mask_heat(&mut heat, &mask, score, &detail);
-        }
+                .collect::<Vec<_>>()
+        });
+        let heat = mask_heat(&masks, &[0.2, 0.4, 0.7, 0.9], &detail);
         assert_eq!(
             float_digest(&heat),
             "a321ee234f810baa60054281e66571780dad1567ac88de033501a5b0f0968e0a"
@@ -366,6 +412,50 @@ mod tests {
         assert_eq!(
             float_digest(&blend_components([&detail, &square, &heat, &temporal])),
             "257fd2e48b93297a0ca2051aab53aabbaa8b44b9cfa56ef57adb3b093e06b0ae"
+        );
+    }
+
+    #[test]
+    fn mask_heat_preserves_coverage_limits_and_group_maxima() {
+        let detail = vec![0.5_f32; 1000];
+        for population in [0, 1, 650, 651] {
+            let mask = (0..detail.len())
+                .map(|i| i < population)
+                .collect::<Vec<_>>();
+            let heat = mask_heat(&[mask], &[0.5], &detail);
+            let included = (1..=650).contains(&population);
+            assert!(heat.iter().enumerate().all(|(i, &value)| {
+                value
+                    == if i < population && included {
+                        0.2734375
+                    } else {
+                        0.0
+                    }
+            }));
+        }
+
+        let masks = (0..24)
+            .map(|start| {
+                (0..detail.len())
+                    .map(|i| ((i + start) % 17) < 5)
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+        let scores = (1..=24).map(|i| i as f32 / 24.0).collect::<Vec<_>>();
+        let mut expected = vec![0.0_f32; detail.len()];
+        for (mask, &score) in masks.iter().zip(&scores) {
+            for (value, &included) in expected.iter_mut().zip(mask) {
+                if included {
+                    *value = value.max((f64::from(score) * 0.625) as f32 * 0.875);
+                }
+            }
+        }
+        assert_eq!(mask_heat(&masks, &scores, &detail), expected);
+        let reversed_masks = masks.into_iter().rev().collect::<Vec<_>>();
+        let reversed_scores = scores.into_iter().rev().collect::<Vec<_>>();
+        assert_eq!(
+            mask_heat(&reversed_masks, &reversed_scores, &detail),
+            expected
         );
     }
 }

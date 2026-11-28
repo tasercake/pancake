@@ -9,7 +9,7 @@ from filelock import FileLock
 
 from .inspection_assets import _prepare_cache, ensure_inspection_assets
 
-_EXPORT_VERSION = "onnx-v2"
+_EXPORT_VERSION = "onnx-v3"
 _GRAPHS = {"reliqs.onnx", "tempsal.onnx", "sam_encoder.onnx", "sam_decoder.onnx"}
 _MANIFEST = "files.sha256"
 
@@ -31,12 +31,13 @@ def _complete(path):
 
 def _export(source, output):
     from ._export_saliency import export_reliqs, export_tempsal
-    from .sam_export import export_sam2
+    from .sam_export import _validate_encoder, export_sam2
 
     ensure_inspection_assets(source)
     export_reliqs(source, output / "reliqs.onnx")
     export_tempsal(source, output / "tempsal.onnx")
     export_sam2(source, output)
+    _validate_encoder(output / "sam_encoder.onnx")
 
 
 def prepare_models(source):

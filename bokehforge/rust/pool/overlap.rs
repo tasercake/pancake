@@ -4,7 +4,7 @@ use serde_json::{Map, Value, json};
 use super::{Grid, coverage_prefix, damage_prefix, damage_sum, tail_tile_count};
 use crate::score::compensated_sum;
 
-const AFFECTED_THRESHOLD: f32 = 0.25;
+pub(crate) const AFFECTED_THRESHOLD: f32 = 0.25;
 const TAIL_FRACTION: f64 = 0.01;
 const POOL_WEIGHTS: [f64; 3] = [0.40, 0.35, 0.25];
 const FAMILIES: [(&str, f64, &str, &str); 6] = [
@@ -313,12 +313,24 @@ struct PoolGeometry<'a> {
     keep_tiles: bool,
 }
 
+#[derive(Clone, Copy)]
+pub(crate) enum FamilyInput<'a> {
+    Pixels(&'a [f32]),
+    Cells(&'a [[f32; 3]]),
+}
+
 impl PoolGeometry<'_> {
-    fn pool(&self, image: &[f32]) -> FamilyPool {
-        let (integral, affected) =
-            damage_prefix(image, self.support, self.y, self.x, AFFECTED_THRESHOLD);
+    fn pool(&self, data: FamilyInput<'_>) -> FamilyPool {
+        let (integral, sum, affected) = match data {
+            FamilyInput::Pixels(image) => {
+                let (integral, affected) =
+                    damage_prefix(image, self.support, self.y, self.x, AFFECTED_THRESHOLD);
+                (integral, damage_sum(image, self.support, 8_192), affected)
+            }
+            FamilyInput::Cells(cells) => self.cells_prefix(cells),
+        };
         let mut family = FamilyPool {
-            mean: damage_sum(image, self.support, 8_192) / self.measured_pixels as f64,
+            mean: sum / self.measured_pixels as f64,
             affected_fraction: affected as f64 / self.measured_pixels as f64,
             ..FamilyPool::default()
         };
@@ -353,6 +365,27 @@ impl PoolGeometry<'_> {
             }
         }
         family
+    }
+
+    fn cells_prefix(&self, cells: &[[f32; 3]]) -> (Vec<f64>, f64, usize) {
+        let pitch = self.x.len();
+        let mut integral = vec![0.0f64; pitch * self.y.len()];
+        let mut sum = 0.0f64;
+        let mut affected = 0;
+        for (row, cell_row) in cells.chunks_exact(pitch - 1).enumerate() {
+            let (previous, current) = integral.split_at_mut((row + 1) * pitch);
+            let before = &previous[row * pitch + 1..];
+            let after = &mut current[1..pitch];
+            let mut subtotal = 0.0f64;
+            for ((&above, output), &[high, low, count]) in before.iter().zip(after).zip(cell_row) {
+                let value = f64::from(high) + f64::from(low);
+                subtotal += value;
+                *output = above + subtotal;
+                sum += value;
+                affected += count as usize;
+            }
+        }
+        (integral, sum, affected)
     }
 }
 
@@ -452,7 +485,7 @@ impl PooledOverlap {
 pub(crate) fn pool_overlap(
     height: usize,
     width: usize,
-    damage: Option<&[Vec<f32>; 6]>,
+    damage: Option<&[FamilyInput<'_>; 6]>,
     support: Option<&[u8]>,
     exact_box: Option<[usize; 4]>,
     inspection_mix: Option<f64>,
@@ -461,7 +494,12 @@ pub(crate) fn pool_overlap(
     let pixels = height.checked_mul(width)?;
     if pixels == 0
         || support.is_some_and(|mask| mask.len() != pixels)
-        || damage.is_some_and(|maps| maps.iter().any(|map| map.len() != pixels))
+        || damage.is_some_and(|maps| {
+            maps.iter().any(|map| match map {
+                FamilyInput::Pixels(samples) => samples.len() != pixels,
+                FamilyInput::Cells(cells) => cells.len() != height.div_ceil(4) * width.div_ceil(4),
+            })
+        })
     {
         return None;
     }
@@ -503,9 +541,9 @@ pub(crate) fn pool_overlap(
         };
         let families = if let Some(maps) = damage {
             if pixels >= 1_000_000 && !keep_tiles {
-                crate::parallel(|| maps.par_iter().map(|image| geometry.pool(image)).collect())
+                crate::parallel(|| maps.par_iter().map(|&image| geometry.pool(image)).collect())
             } else {
-                maps.iter().map(|image| geometry.pool(image)).collect()
+                maps.iter().map(|&image| geometry.pool(image)).collect()
             }
         } else {
             (0..FAMILIES.len())
@@ -565,7 +603,16 @@ mod tests {
         let maps = std::array::from_fn(|_| vec![0.5; height * width]);
         let mut support = vec![0; height * width];
         assert!(
-            pool_overlap(height, width, Some(&maps), Some(&support), None, None, None).is_none()
+            pool_overlap(
+                height,
+                width,
+                Some(&maps.each_ref().map(|plane| FamilyInput::Pixels(plane))),
+                Some(&support),
+                None,
+                None,
+                None
+            )
+            .is_none()
         );
         support.fill(7);
         for row in support.chunks_exact_mut(width).take(8) {
@@ -574,7 +621,7 @@ mod tests {
         let pooled = pool_overlap(
             height,
             width,
-            Some(&maps),
+            Some(&maps.each_ref().map(|plane| FamilyInput::Pixels(plane))),
             Some(&support),
             None,
             None,

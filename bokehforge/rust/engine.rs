@@ -287,6 +287,95 @@ impl<'a> InspectionWeights<'a> {
     }
 }
 
+static RESIDENT_DAMAGE: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+struct PendingQuality {
+    index: usize,
+    support: Option<Vec<u8>>,
+    quality: quality::DeferredQuality,
+}
+
+fn exact_placement(placement: &registration::Placement) -> bool {
+    matches!(
+        placement.evidence["source"].as_str(),
+        Some("exact_native_delivery_in_reference" | "exact_reference_in_native_delivery")
+    )
+}
+
+fn resident_result<T>(result: Result<T, String>) -> Option<T> {
+    match result {
+        Ok(value) => Some(value),
+        Err(error) => {
+            if attention::cuda_allocation_failure(&error) {
+                accelerator::release_idle_cuda_memory();
+            }
+            None
+        }
+    }
+}
+
+fn stage_first_placement(
+    placements: &[registration::Placement],
+    candidate: ImageView<'_>,
+    target: ImageView<'_>,
+) -> Option<PendingQuality> {
+    let shape = [target.h, target.w];
+    let (index, placement) = placements.iter().enumerate().find(|(_, placement)| {
+        !exact_placement(placement) && registration::overlap(placement, shape).0 > 0.0
+    })?;
+    let (projected, support) = registration::project(candidate, shape, placement);
+    if support
+        .as_ref()
+        .is_some_and(|mask| !mask.iter().any(|&valid| valid != 0))
+    {
+        return None;
+    }
+    let quality = resident_result(quality::defer(
+        shape,
+        &projected,
+        target.data,
+        support.as_deref(),
+    ))??;
+    Some(PendingQuality {
+        index,
+        support,
+        quality,
+    })
+}
+
+type Alignment = (Vec<registration::Placement>, Value);
+type GeneratedInspection = (Vec<f32>, String);
+type AlignmentAndInspection = (
+    Alignment,
+    Result<GeneratedInspection, Error>,
+    Option<PendingQuality>,
+);
+
+fn align_while_generating(
+    align: impl FnOnce() -> Alignment,
+    generate: impl Fn() -> Result<GeneratedInspection, Error> + Sync,
+    stage: impl FnOnce(&[registration::Placement]) -> Option<PendingQuality>,
+) -> AlignmentAndInspection {
+    std::thread::scope(|scope| {
+        // Acquire the Inspection runtime lock off the Rayon pool. Model
+        // preprocessing needs that pool even when several calls are queued.
+        let Ok(pending) = std::thread::Builder::new().spawn_scoped(scope, &generate) else {
+            let generated = generate();
+            return (align(), generated, None);
+        };
+        let aligned = align();
+        let staged = (!pending.is_finished())
+            .then(|| stage(&aligned.0))
+            .flatten();
+        let generated = pending.join().unwrap_or_else(|_| {
+            Err(Error::Runtime(
+                "Inspection inference lane panicked".to_owned(),
+            ))
+        });
+        (aligned, generated, staged)
+    })
+}
+
 pub(crate) fn measure(
     candidate: ImageView<'_>,
     target: ImageView<'_>,
@@ -322,16 +411,73 @@ pub(crate) fn measure(
         attention::generate(target.data, target.h, target.w, inference_device)
             .map_err(Error::operation)
     };
-    let ((placements, mut alignment), generated) = if generate_attention {
-        if target.h * target.w >= 1_000_000 {
-            let (aligned, generated) = parallel(|| rayon::join(align, generate));
-            (aligned, Some(generated?))
+    let pixels = target.h * target.w;
+    let resident = (generate_attention
+        && (1_000_000..=accelerator::MAX_RESIDENT_PIXELS).contains(&pixels)
+        && rayon::current_thread_index().is_none()
+        && attention::cuda_warmed(inference_device, target.w, target.h))
+    .then(|| RESIDENT_DAMAGE.try_lock().ok())
+    .flatten()
+    .filter(|_| {
+        backend
+            .map_or_else(|| select_backend(options.device), Ok)
+            .is_ok_and(|device| device == "cuda")
+            && accelerator::cuda_resident_headroom()
+    });
+    let ((placements, mut alignment), generated, mut staged) = if generate_attention {
+        if pixels >= 1_000_000 {
+            let can_stage = resident.is_some();
+            if can_stage {
+                backend = Some("cuda");
+            }
+            let (aligned, generated, staged) = align_while_generating(
+                align,
+                || {
+                    if can_stage {
+                        attention::generate_external(
+                            target.data,
+                            target.h,
+                            target.w,
+                            inference_device,
+                        )
+                        .map_err(Error::operation)
+                    } else {
+                        generate()
+                    }
+                },
+                |placements| {
+                    can_stage
+                        .then(|| stage_first_placement(placements, candidate, target))
+                        .flatten()
+                },
+            );
+            match generated {
+                Ok(generated) => (aligned, Some(generated), staged),
+                Err(error)
+                    if can_stage
+                        && (error.is_out_of_memory()
+                            || attention::cuda_allocation_failure(&error.to_string())) =>
+                {
+                    // Release our buffers before repeating with one model lane.
+                    drop(staged);
+                    accelerator::release_idle_cuda_memory();
+                    let generated = attention::generate_serial(
+                        target.data,
+                        target.h,
+                        target.w,
+                        inference_device,
+                    )
+                    .map_err(Error::operation)?;
+                    (aligned, Some(generated), None)
+                }
+                Err(error) => return Err(error),
+            }
         } else {
             let generated = generate()?;
-            (align(), Some(generated))
+            (align(), Some(generated), None)
         }
     } else {
-        (align(), None)
+        (align(), None, None)
     };
     let (generated_map, digest) = generated.unzip();
     let inspection = match generated_map.as_deref() {
@@ -346,14 +492,27 @@ pub(crate) fn measure(
     let mut explanations = Vec::new();
     let mut leading = None;
     let mut contributions = Vec::with_capacity(placements.len());
-    for placement in placements {
+    for (index, placement) in placements.into_iter().enumerate() {
         let (geometry, resolution, polygon) = registration::overlap(&placement, target_shape);
-        let mut comparison = if geometry <= 0.0 {
+        let prepared = if staged
+            .as_ref()
+            .is_some_and(|pending| pending.index == index)
+            && let Some(pending) = staged.take()
+        {
+            resident_result(pending.quality.finish(
+                target_shape,
+                pending.support.as_deref(),
+                weights,
+                options.details,
+            ))
+        } else {
             None
-        } else if matches!(
-            placement.evidence["source"].as_str(),
-            Some("exact_native_delivery_in_reference" | "exact_reference_in_native_delivery")
-        ) {
+        };
+        let mut comparison = if prepared.is_some() {
+            prepared
+        } else if geometry <= 0.0 {
+            None
+        } else if exact_placement(&placement) {
             Some(
                 quality::measure(
                     &[],
@@ -704,7 +863,33 @@ fn _measure_overlap(
 
 #[cfg(test)]
 mod tests {
-    use super::{Error, damage_with_retry};
+    use super::{Error, align_while_generating, damage_with_retry};
+
+    #[test]
+    fn concurrent_inference_waits_outside_the_shared_worker_pool() {
+        use std::sync::Mutex;
+
+        let runtime = Mutex::new(());
+        let callers = 2 * crate::WORKERS.current_num_threads();
+        std::thread::scope(|scope| {
+            for _ in 0..callers {
+                scope.spawn(|| {
+                    let (_, generated, _) = align_while_generating(
+                        || (Vec::new(), serde_json::Value::Null),
+                        || {
+                            assert!(crate::WORKERS.current_thread_index().is_none());
+                            let _runtime = runtime.lock().unwrap();
+                            // A session may hold its lock while waiting on CPU preprocessing.
+                            let pixels = crate::parallel(|| vec![0.5]);
+                            Ok((pixels, String::new()))
+                        },
+                        |_| None,
+                    );
+                    assert_eq!(generated.unwrap().0, [0.5]);
+                });
+            }
+        });
+    }
 
     #[test]
     fn accelerator_exhaustion_retries_on_cpu_when_enabled() {

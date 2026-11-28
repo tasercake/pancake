@@ -174,17 +174,13 @@ impl FourierGrid {
                 work.values[x * self.height + y] = value;
             }
         }
-        for column in work.values.chunks_exact_mut(self.height) {
-            self.columns_forward
-                .process_with_scratch(column, &mut work.scratch);
-        }
+        self.columns_forward
+            .process_with_scratch(&mut work.values, &mut work.scratch);
     }
 
     fn inverse(&self, work: &mut FftWork, shape: [usize; 2], result: &mut Vec<f32>) {
-        for column in work.product.chunks_exact_mut(self.height) {
-            self.columns_inverse
-                .process_with_scratch(column, &mut work.scratch);
-        }
+        self.columns_inverse
+            .process_with_scratch(&mut work.product, &mut work.scratch);
         let multiplier = (1.0 / (self.height * self.width) as f64) as f32;
         result.clear();
         for y in 0..shape[0] {
@@ -315,8 +311,8 @@ pub(super) fn candidates(
     let all_peaks: Vec<_> = tasks
         .par_iter()
         .map_init(
-            || (grid.workspace(), Vec::new(), Vec::new()),
-            |(work, template, correlations), (anchor, offsets)| {
+            || (grid.workspace(), Vec::new(), Vec::new(), Vec::new()),
+            |(work, template, correlations, agreements), (anchor, offsets)| {
                 template.clear();
                 template.extend(
                     offsets
@@ -348,25 +344,37 @@ pub(super) fn candidates(
                 }
                 let (reach, normalization) = &energies[&offsets.shape];
                 grid.inverse(work, *reach, correlations);
+                // Both peaks use the same normalization. Retain the f64
+                // values and visit the unsuppressed windows in row-major order.
+                agreements.clear();
+                agreements.extend(correlations.iter().zip(normalization).map(
+                    |(&value, &reference)| {
+                        if value <= 0.0 {
+                            return -1.0;
+                        }
+                        (f64::from(value) / (energy * reference).sqrt()).clamp(-1.0, 1.0)
+                    },
+                ));
                 let mut selected = None;
                 for _ in 0..2 {
                     let mut peak = 0.18;
                     let mut peak_at = None;
-                    for (index, (&value, &reference)) in
-                        correlations.iter().zip(normalization).enumerate()
-                    {
-                        let y = index / reach[1];
-                        let x = index % reach[1];
-                        if selected.is_some_and(|(py, px): (usize, usize)| {
-                            y.abs_diff(py) <= 3 && x.abs_diff(px) <= 3
-                        }) {
-                            continue;
-                        }
-                        let agreement =
-                            (f64::from(value) / (energy * reference).sqrt()).clamp(-1.0, 1.0);
-                        if agreement > peak || (peak_at.is_none() && agreement == peak) {
-                            peak = agreement;
-                            peak_at = Some((y, x));
+                    for (y, row) in agreements.chunks_exact(reach[1]).enumerate() {
+                        let [left, right] = if let Some((_, px)) =
+                            selected.filter(|(py, _): &(usize, usize)| y.abs_diff(*py) <= 3)
+                        {
+                            [px.saturating_sub(3), (px + 4).min(row.len())]
+                        } else {
+                            [row.len(), row.len()]
+                        };
+                        for range in [0..left, right..row.len()] {
+                            let start = range.start;
+                            for (x, &agreement) in row[range].iter().enumerate() {
+                                if agreement > peak || (peak_at.is_none() && agreement == peak) {
+                                    peak = agreement;
+                                    peak_at = Some((y, start + x));
+                                }
+                            }
                         }
                     }
                     let Some((y, x)) = peak_at else { break };

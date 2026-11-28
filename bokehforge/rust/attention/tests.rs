@@ -4,7 +4,33 @@ use std::path::PathBuf;
 use ort::value::Tensor;
 use serde_json::Value;
 
-use super::{Backend, session_builder};
+use super::{Backend, run_predictions, session_builder};
+
+#[test]
+fn inspection_schedules_report_the_first_model_failure() {
+    fn output<T: Default>(error: Option<&str>) -> Result<T, String> {
+        match error {
+            Some(message) => Err(message.to_owned()),
+            None => Ok(T::default()),
+        }
+    }
+
+    for concurrent in [false, true] {
+        for (reliqs, sam, tempsal, first) in [
+            (Some("ReLIQS"), Some("SAM"), Some("TempSAL"), "ReLIQS"),
+            (None, Some("SAM"), Some("TempSAL"), "SAM"),
+            (None, None, Some("TempSAL"), "TempSAL"),
+        ] {
+            let predictions = run_predictions(
+                || output(reliqs),
+                || output(sam),
+                || output(tempsal),
+                concurrent,
+            );
+            assert_eq!(predictions.unwrap_err(), first);
+        }
+    }
+}
 
 #[test]
 #[ignore = "requires a generated ONNX fixture and the ONNX Runtime library"]
@@ -19,7 +45,7 @@ fn configured_provider_executes_onnx_fixture() {
     };
     let library = fs::read_to_string(fixture.join("runtime-path.txt")).unwrap();
     ort::init_from(library.trim()).unwrap().commit();
-    let mut builder = session_builder(backend)
+    let mut builder = session_builder(backend, false)
         .unwrap()
         .with_profiling(fixture.join("profile"))
         .unwrap();

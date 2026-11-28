@@ -25,7 +25,7 @@ mod srgb;
 static WORKERS: LazyLock<ThreadPool> = LazyLock::new(|| {
     let available = std::thread::available_parallelism().map_or(1, usize::from);
     ThreadPoolBuilder::new()
-        .num_threads(available.min(8))
+        .num_threads(available.min(16))
         .thread_name(|index| format!("bokehforge-{index}"))
         .build()
         .expect("failed to start BokehForge worker threads")
