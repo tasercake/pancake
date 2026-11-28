@@ -126,7 +126,8 @@ def _stage_app_icon(source, temporary, resources):
     _apple(source, "iconutil", "-c", "icns", "-o", resources / APP_ICON, iconset)
 
 
-def build_package(source, output, identifier, build_number, *, target_dir=None, release_notices=None):
+def build_package(source, output, identifier, build_number, *, target_dir=None, release_notices=None,
+                  timings=False):
     """Build, stage, and verify one private package on native Apple Silicon."""
     if platform.system() != "Darwin" or platform.machine() != "arm64":
         raise ValueError("Package on an Apple Silicon macOS host running an arm64 process")
@@ -138,6 +139,8 @@ def build_package(source, output, identifier, build_number, *, target_dir=None, 
         raise FileExistsError(f"Package output already exists: {output}")
     source = source.resolve(strict=True)
     output = output.resolve()
+    if timings and target_dir is None:
+        raise ValueError("Use a persistent Cargo target directory to retain the timing report")
     if target_dir is not None:
         target_dir = target_dir.resolve()
         if target_dir.is_relative_to(output):
@@ -157,7 +160,10 @@ def build_package(source, output, identifier, build_number, *, target_dir=None, 
         macos = contents / "MacOS"
         macos.mkdir(parents=True)
         build = ["cargo", toolchain, "build", "--locked", "--release", "--workspace", "--bins",
-                 "--target", TARGET, "--features", "cubecl/metal-native", "--target-dir", str(build_dir)]
+                 "--target", TARGET, "--features", "cubecl/metal-native"]
+        if timings:
+            build.append("--timings")
+        build.extend(("--target-dir", str(build_dir)))
         sdk = ("xcrun", "--no-cache", "--sdk", "macosx")
         provenance = {
             "cargo": _apple(source, "cargo", toolchain, "--version"),
@@ -248,11 +254,12 @@ def main(argv=None):
                         help="Reuse a Cargo target directory for this checkout (default: a temporary directory)")
     parser.add_argument("--release-notices", type=Path,
                         help="Verified dependency and native notices to seal inside the app")
+    parser.add_argument("--timings", action="store_true", help="Write a Cargo timing report under --target-dir")
     options = parser.parse_args(argv)
     try:
         build_package(Path(__file__).resolve().parents[1], options.output,
                       options.bundle_identifier, options.build_number, target_dir=options.target_dir,
-                      release_notices=options.release_notices)
+                      release_notices=options.release_notices, timings=options.timings)
     except (ValueError, OSError, subprocess.CalledProcessError) as error:
         parser.exit(1, f"{error}\n")
 
