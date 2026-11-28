@@ -16,6 +16,7 @@ dependencies = [
   "beautifulsoup4>=4.13,<5",
   "libarchive-c>=5.1,<6",
   "filelock>=3,<5",
+  "wsproto>=1.2,<2",
 ]
 
 [project.scripts]

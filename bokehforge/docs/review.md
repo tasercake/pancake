@@ -18,11 +18,11 @@ Open **Scenes** in the command bar to scroll through scene previews and filter b
 
 While Stackroom opens the scene catalog, it reports the current step in the workspace. Checksum progress shows bytes read from the current file. Archive inspection and scene indexing show counts as the server processes them.
 
-Choose an **Evaluation run** in the scene bar below the command bar, then select a stacker below the **Stacker output** image. Stackroom places its output beside the source frame and the available reference. The scene bar indicates when ground truth is unavailable.
+Choose an **Evaluation run** in the scene bar below the command bar, then select a stacker below the **Stacker output** image. The left pane follows your selection in **Sources**. The available reference comes first, followed by the input frames. Use Left and Right to move through the strip. Hold the period key (`.`) to view the reference in the right pane, then release it to return to the stacker output. The scene bar indicates when ground truth is unavailable.
 
 Click any comparison image or the expand control on a thumbnail to open it in the zoomable lightbox. Scroll the lightbox strip to browse the source frames, ready outputs from the selected evaluation, and any references. Hover over a thumbnail to preview it and move away to return to the selected image. Click or tap a thumbnail to select it, or use Left and Right to wrap through the strip. Zoom and pan stay fixed as you browse. Select **Swipe reference** and drag the divider to compare the image with its reference, or hold the period key (`.`) to see the reference across the whole view. You can pan while holding the key and the image resumes at the same position when you release it.
 
-Use the rating section above **Source frames** to grade an output from 1 to 5, with 5 best, and save it with an optional comment. **Export ratings** downloads the saved grades and comments for every run as CSV.
+Use the rating section above **Sources** to grade an output from 1 to 5, with 5 best, and add an optional comment. Stackroom saves both automatically, including comments entered before a grade. The status shows when the server confirms the save. Pending edits resume when the connection returns. If a save fails, the edit stays in the form and **Retry save** appears. **Export ratings** downloads saved grades and comments for every run as CSV, with a blank grade for comments saved on their own.
 
 Use **Appearance** to set the accent. Stackroom remembers it in your browser and adjusts dark colors for contrast. **Reset accent** restores white.
 

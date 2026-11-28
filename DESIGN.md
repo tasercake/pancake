@@ -20,8 +20,9 @@ identity.
   action at the bottom of the inspector. Keep retained results and the
   complete source list accessible. Open Preferences, About, and export
   options using the same surfaces and control styles.
-- In Stackroom, keep the source frame, stacker output, and available
-  ground-truth comparison aligned on the same matte. Put scene details and
+- In Stackroom, align the selected source image and stacker output on the
+  same matte. Put the reference first in the filmstrip and let reviewers hold
+  the period key to show it in the output pane. Put scene details and
   the evaluation run in a bar below the command bar. Place the stacker
   buttons below the output image and the rating controls directly above the
   filmstrip. Keep scene navigation, evaluation progress, result details, and
@@ -80,9 +81,9 @@ accent for actions and states.
   weight 600 for pane headings and selected identifiers. Use tabular
   numerals for comparisons and frame counts.
 - **Decide and commit.** Use Space Grotesk semibold for the short instruction
-  that advances the current task. In the workspace that is **Start stack** in
-  Pancake Stacker and **Save rating** in Stackroom when a rating can be saved. In a
-  dialog the confirmation action takes that role. A short heading that asks
+  that advances the current task. Use it for **Start stack** in Pancake Stacker
+  and for confirmation actions in dialogs. Stackroom saves rating edits
+  automatically and shows their save status beside the controls. A short heading that asks
   the user to resolve a blocking decision can use the same emphasis.
 - Assign the role by the task. **Export** in the workspace toolbar is a peer
   command. **Export** in the export confirmation is the decision. Keep the

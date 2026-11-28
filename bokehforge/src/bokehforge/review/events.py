@@ -19,13 +19,12 @@ class Events:
             if self.closed:
                 return
             data = json.dumps(snapshot(), ensure_ascii=True, allow_nan=False)
-            payload = f"event: {name}\ndata: {data}\n\n".encode()
-            if self.latest.get(name) == payload:
+            if self.latest.get(name) == data:
                 return
-            self.latest[name] = payload
+            self.latest[name] = data
             for writer, pending in self.subscribers.items():
                 wake = not pending
-                pending[name] = payload
+                pending[name] = data
                 if wake:
                     writer.sendall(b"\0")
 
@@ -55,26 +54,27 @@ class Events:
                 return ()
             pending = self.subscribers[writer]
             # Preserve the initial event order even after coalescing updates.
-            events = tuple(pending[name] for name in self.latest if name in pending)
+            events = tuple((name, pending[name]) for name in self.latest if name in pending)
             pending.clear()
             return events
 
     def stream(self, connection, write):
+        self.stream_snapshots(connection, lambda name, data: write(f"event: {name}\ndata: {data}\n\n".encode()))
+
+    def stream_snapshots(self, connection, write, receive=None):
         with self.subscribe() as (reader, writer), DefaultSelector() as selector:
             selector.register(reader, EVENT_READ)
             selector.register(connection, EVENT_READ)
             while True:
                 ready = {key.fileobj for key, _ in selector.select()}
-                if connection in ready:
-                    # Close when the peer disconnects or sends more data on
-                    # this connection, which is dedicated to the response.
+                if connection in ready and (receive is None or not receive()):
                     return
                 if reader in ready:
                     events = self.take(reader, writer)
                     if not events:
                         return
-                    for event in events:
-                        write(event)
+                    for name, data in events:
+                        write(name, data)
 
     def close(self):
         with self.lock:
