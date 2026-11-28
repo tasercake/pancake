@@ -44,7 +44,7 @@ let candidateScore = null;
 let activeImage = null, imageVersion = "";
 const readyThumbs = new Map();
 const panelImages = new WeakMap();
-const LIGHTBOX_HOVER_EXIT_DELAY = 250;
+const LIGHTBOX_HOVER_EXIT_DELAY = 100;
 const ACCENT_KEY = "bokehforge.review.accent";
 const DEFAULT_ACCENT = "#ffffff";
 const CHANNEL_WEIGHTS = [0.2126, 0.7152, 0.0722];
