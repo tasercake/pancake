@@ -7,7 +7,7 @@ use numpy::{
 use pyo3::{exceptions::PyValueError, prelude::*};
 use rayon::prelude::*;
 
-fn compensated_sum(values: impl IntoIterator<Item = f64>) -> f64 {
+pub(crate) fn compensated_sum(values: impl IntoIterator<Item = f64>) -> f64 {
     let mut sum = 0.0_f64;
     let mut residual = 0.0;
     for value in values {
@@ -32,7 +32,12 @@ fn weighted_damage(terms: Vec<(f64, f64)>) -> f64 {
 }
 
 #[pyfunction]
-fn placement_score(geometry: f64, resolution: f64, weight: f64, quality: f64) -> (f64, f64) {
+pub(crate) fn placement_score(
+    geometry: f64,
+    resolution: f64,
+    weight: f64,
+    quality: f64,
+) -> (f64, f64) {
     let coverage = geometry.min(resolution);
     (coverage, weight * coverage * quality)
 }
@@ -43,7 +48,12 @@ fn placement_total(contributions: Vec<f64>) -> f64 {
 }
 
 #[pyfunction]
-fn inspection_gain(mean: f64, peak: f64, max_mix: f64, max_multiplier: f64) -> Option<(f64, f64)> {
+pub(crate) fn inspection_gain(
+    mean: f64,
+    peak: f64,
+    max_mix: f64,
+    max_multiplier: f64,
+) -> Option<(f64, f64)> {
     if mean == 0.0 || peak == mean {
         return None;
     }
@@ -113,7 +123,7 @@ type DatasetDetail = (String, f64, f64, Vec<GroupDetail>);
 type CohortScore = (Option<f64>, usize, Vec<DatasetDetail>);
 
 #[pyfunction]
-fn cohort_score(
+pub(crate) fn cohort_score(
     entries: Vec<(String, String, f64)>,
     unavailable: bool,
     explain: bool,

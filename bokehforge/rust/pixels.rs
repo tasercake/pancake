@@ -21,14 +21,26 @@ fn aligned<T: Element, D: Dimension>(array: &Bound<'_, PyArray<T, D>>) -> bool {
             .all(|(stride, &len)| len <= 1 || stride.unsigned_abs().is_multiple_of(size_of::<T>()))
 }
 
+enum RgbLayout<'a> {
+    Packed(&'a [RgbPixel]),
+    Padded(ArrayView3<'a, f32>),
+}
+
 struct Rgb<'a> {
-    view: ArrayView3<'a, f32>,
-    packed: Option<&'a [RgbPixel]>,
+    layout: RgbLayout<'a>,
     height: usize,
     width: usize,
 }
 
 impl<'a> Rgb<'a> {
+    fn from_packed(samples: &'a [f32], height: usize, width: usize) -> Self {
+        Self {
+            layout: RgbLayout::Packed(samples.as_chunks::<3>().0),
+            height,
+            width,
+        }
+    }
+
     fn new(array: &'a PyReadonlyArray3<'_, f32>) -> PyResult<Self> {
         let &[height, width, channels] = array.shape() else {
             unreachable!("PyReadonlyArray3 has exactly three axes")
@@ -51,10 +63,12 @@ impl<'a> Rgb<'a> {
             ));
         }
         let view = array.as_array();
-        let packed = view.to_slice().map(|samples| samples.as_chunks::<3>().0);
+        let layout = match view.to_slice() {
+            Some(samples) => RgbLayout::Packed(samples.as_chunks::<3>().0),
+            None => RgbLayout::Padded(view),
+        };
         Ok(Self {
-            view,
-            packed,
+            layout,
             height,
             width,
         })
@@ -65,16 +79,20 @@ impl<'a> Rgb<'a> {
     }
 
     fn row(&self, y: usize) -> &'a [RgbPixel] {
-        self.view
-            .index_axis_move(Axis(0), y)
-            .to_slice()
-            .expect("RGB rows are packed")
-            .as_chunks::<3>()
-            .0
+        match self.layout {
+            RgbLayout::Packed(pixels) => &pixels[y * self.width..(y + 1) * self.width],
+            RgbLayout::Padded(view) => {
+                view.index_axis_move(Axis(0), y)
+                    .to_slice()
+                    .expect("RGB rows are packed")
+                    .as_chunks::<3>()
+                    .0
+            }
+        }
     }
 
     fn span(&self, start: usize, len: usize) -> &'a [RgbPixel] {
-        if let Some(pixels) = self.packed {
+        if let RgbLayout::Packed(pixels) = self.layout {
             return &pixels[start..start + len];
         }
         let col = start % self.width;
@@ -182,6 +200,11 @@ fn lab_curve(xyz: f32, cube: f32) -> f32 {
     }
 }
 
+#[inline]
+fn lab_components([x, y, z]: RgbPixel) -> RgbPixel {
+    [116.0 * y - 16.0, 500.0 * (x - y), 200.0 * (y - z)]
+}
+
 struct LabInput<'a> {
     x: &'a [f32],
     y: &'a [f32],
@@ -212,7 +235,7 @@ impl<'a> LabInput<'a> {
         let x = lab_curve(self.x[i], self.cx[i]);
         let y = lab_curve(self.y[i], self.cy[i]);
         let z = lab_curve(self.z[i], self.cz[i]);
-        [116.0 * y - 16.0, 500.0 * (x - y), 200.0 * (y - z)]
+        lab_components([x, y, z])
     }
 }
 
@@ -302,12 +325,17 @@ fn channel_range_damage(c: f32, t: f32) -> f64 {
     error / (error + 0.075)
 }
 
+#[inline]
+fn range_pixel([cr, cg, cb]: RgbPixel, [tr, tg, tb]: RgbPixel) -> f32 {
+    let red = channel_range_damage(cr, tr);
+    let green = channel_range_damage(cg, tg);
+    let blue = channel_range_damage(cb, tb);
+    select_max(select_max(red, green), blue) as f32
+}
+
 fn range_row(candidate: &[RgbPixel], target: &[RgbPixel], output: &mut [f32]) {
-    for (([cr, cg, cb], [tr, tg, tb]), result) in candidate.iter().zip(target).zip(output) {
-        let red = channel_range_damage(*cr, *tr);
-        let green = channel_range_damage(*cg, *tg);
-        let blue = channel_range_damage(*cb, *tb);
-        *result = select_max(select_max(red, green), blue) as f32;
+    for ((&c, &t), result) in candidate.iter().zip(target).zip(output) {
+        *result = range_pixel(c, t);
     }
 }
 
@@ -346,6 +374,30 @@ fn means(sums: Channels, count: usize) -> Option<(f64, f64, f64)> {
     })
 }
 
+fn channel_means(image: &Rgb<'_>, support: Option<&[u8]>) -> Option<(f64, f64, f64)> {
+    // Preserve the row-major sum per channel when extended-range terms cancel.
+    let mut sums = [0.0; 3];
+    let mut count = 0;
+    if let Some(mask) = support {
+        for (y, covered) in mask.chunks_exact(image.width).enumerate() {
+            for (&pixel, &valid) in image.row(y).iter().zip(covered) {
+                if valid != 0 {
+                    sums = add(sums, pixel.map(f64::from));
+                    count += 1;
+                }
+            }
+        }
+    } else {
+        for y in 0..image.height {
+            for &pixel in image.row(y) {
+                sums = add(sums, pixel.map(f64::from));
+            }
+        }
+        count = image.len();
+    }
+    means(sums, count)
+}
+
 #[pyfunction]
 fn rgb_means(
     py: Python<'_>,
@@ -354,29 +406,7 @@ fn rgb_means(
 ) -> PyResult<Option<(f64, f64, f64)>> {
     let image = Rgb::new(&image)?;
     let support = support_slice(&support, &image)?;
-    Ok(py.detach(move || {
-        // NumPy's HWC sum over H and W is linear in row-major order per channel.
-        let mut sums = [0.0; 3];
-        let mut count = 0;
-        if let Some(mask) = support {
-            for (y, covered) in mask.chunks_exact(image.width).enumerate() {
-                for (&pixel, &valid) in image.row(y).iter().zip(covered) {
-                    if valid != 0 {
-                        sums = add(sums, pixel.map(f64::from));
-                        count += 1;
-                    }
-                }
-            }
-        } else {
-            for y in 0..image.height {
-                for &pixel in image.row(y) {
-                    sums = add(sums, pixel.map(f64::from));
-                }
-            }
-            count = image.len();
-        }
-        means(sums, count)
-    }))
+    Ok(py.detach(move || channel_means(&image, support)))
 }
 
 #[inline]
@@ -446,6 +476,57 @@ fn pairwise_square_sum(
     sum
 }
 
+fn mse(candidate: &Rgb<'_>, target: &Rgb<'_>, support: Option<&[u8]>) -> Option<(f64, f64, f64)> {
+    let calculate = || {
+        if let Some(mask) = support {
+            let mut sums = [0.0; 3];
+            let mut count = 0;
+            let mut start = 0;
+            // A masked reduction adds the sum of each consecutive run of covered pixels.
+            for run in mask.chunk_by(|a, b| (*a == 0) == (*b == 0)) {
+                if run[0] != 0 {
+                    sums = add(
+                        sums,
+                        pairwise_square_sum(candidate, target, start, run.len()),
+                    );
+                    count += run.len();
+                }
+                start += run.len();
+            }
+            means(sums, count)
+        } else {
+            let count = target.len();
+            means(pairwise_square_sum(candidate, target, 0, count), count)
+        }
+    };
+    if target.len() >= 65_536 {
+        parallel(calculate)
+    } else {
+        calculate()
+    }
+}
+
+pub(crate) fn rgb_diagnostics(
+    height: usize,
+    width: usize,
+    candidate: &[f32],
+    target: &[f32],
+    support: Option<&[u8]>,
+) -> (f64, f64) {
+    let candidate = Rgb::from_packed(candidate, height, width);
+    let target = Rgb::from_packed(target, height, width);
+    let (r, g, b) = mse(&candidate, &target, support).expect("nonempty measured support");
+    let rms = (((r + g) + b) / 3.0).sqrt();
+    let exposure = |image| {
+        let (r, g, b) = channel_means(image, support).expect("nonempty measured support");
+        let [yr, yg, yb] = XYZ[1].map(f64::from);
+        (r.max(0.0) * yr + g.max(0.0) * yg) + b.max(0.0) * yb
+    };
+    let c = exposure(&candidate);
+    let t = exposure(&target);
+    (rms, ((c + 1e-5) / (t + 1e-5)).log2())
+}
+
 #[pyfunction]
 fn rgb_mse(
     py: Python<'_>,
@@ -457,36 +538,136 @@ fn rgb_mse(
     let target = Rgb::new(&target)?;
     validate_pair(&candidate, &target)?;
     let support = support_slice(&support, &target)?;
-    Ok(py.detach(move || {
-        let calculate = || {
-            if let Some(mask) = support {
-                let mut sums = [0.0; 3];
-                let mut count = 0;
-                let mut start = 0;
-                // NumPy's where reduction adds the result of one reduction
-                // per consecutive run of covered samples.
-                for run in mask.chunk_by(|a, b| (*a == 0) == (*b == 0)) {
-                    if run[0] != 0 {
-                        sums = add(
-                            sums,
-                            pairwise_square_sum(&candidate, &target, start, run.len()),
-                        );
-                        count += run.len();
-                    }
-                    start += run.len();
-                }
-                means(sums, count)
-            } else {
-                let count = target.len();
-                means(pairwise_square_sum(&candidate, &target, 0, count), count)
-            }
-        };
-        if target.len() >= 65_536 {
-            parallel(calculate)
+    Ok(py.detach(move || mse(&candidate, &target, support)))
+}
+
+// Linear sRGB to D65 XYZ, normalized to the reference white.
+const XYZ: [RgbPixel; 3] = [
+    [
+        0.4124564 / 0.95047,
+        0.3575761 / 0.95047,
+        0.1804375 / 0.95047,
+    ],
+    [0.2126729, 0.7151522, 0.0721750],
+    [
+        0.0193339 / 1.08883,
+        0.119_192 / 1.08883,
+        0.9503041 / 1.08883,
+    ],
+];
+
+#[inline]
+fn lab_root(value: f32) -> f32 {
+    // On the positive normal XYZ range, the float bits approximate log2.
+    // This seed is within 3.5% there. Two Halley refinements in double
+    // precision reduce the error below a float32 rounding unit.
+    const CUBE_ROOT_SEED: u32 = 709_921_077;
+    let sample = f64::from(value);
+    let mut root = f64::from(f32::from_bits(value.to_bits() / 3 + CUBE_ROOT_SEED));
+    for _ in 0..2 {
+        let cube = root * root * root;
+        root *= (cube + 2.0 * sample) / (2.0 * cube + sample);
+    }
+    root as f32
+}
+
+#[inline]
+fn lab_pixel(rgb: RgbPixel) -> RgbPixel {
+    let xyz = xyz_pixel(rgb, &XYZ);
+    lab_components(xyz.map(|value| {
+        if value > LAB_THRESHOLD {
+            lab_root(value)
         } else {
-            calculate()
+            lab_curve(value, 0.0)
         }
     }))
+}
+
+#[derive(Default)]
+struct PixelSums {
+    delta: Channels,
+    count: usize,
+}
+
+impl PixelSums {
+    fn combine(self, other: Self) -> Self {
+        Self {
+            delta: add(self.delta, other.delta),
+            count: self.count + other.count,
+        }
+    }
+}
+
+fn compare_chunk(
+    candidate: &[RgbPixel],
+    target: &[RgbPixel],
+    support: Option<&[u8]>,
+    [cl, tl, delta, color, range]: [&mut [f32]; 5],
+) -> PixelSums {
+    let mut sums = PixelSums::default();
+    let length = target.len();
+    for i in 0..length {
+        let c = candidate[i];
+        let t = target[i];
+        let [lc, ac, bc] = lab_pixel(c);
+        let [lt, at, bt] = lab_pixel(t);
+        let [dl, da, db] = [lc - lt, ac - at, bc - bt];
+        let [a64, b64] = [f64::from(da), f64::from(db)];
+        let chroma = (a64 * a64 + b64 * b64).sqrt() as f32;
+        cl[i] = lc;
+        tl[i] = lt;
+        delta[i] = dl;
+        color[i] = chroma / (chroma + 10.0);
+        range[i] = range_pixel(c, t);
+        if support.is_none_or(|mask| mask[i] != 0) {
+            sums.delta = add(sums.delta, [dl, da, db].map(f64::from));
+            sums.count += 1;
+        }
+    }
+    sums
+}
+
+pub(crate) struct Comparison {
+    pub(crate) planes: [Vec<f32>; 5],
+    pub(crate) mean_delta: [f64; 3],
+}
+
+pub(crate) fn compare(candidate: &[f32], target: &[f32], support: Option<&[u8]>) -> Comparison {
+    const BLOCK: usize = 16_384;
+    let candidate = candidate.as_chunks::<3>().0;
+    let target = target.as_chunks::<3>().0;
+    let mut planes = std::array::from_fn(|_| vec![0.0; target.len()]);
+    let [cl, tl, delta, color, range] = &mut planes;
+    let sums = if target.len() >= 2 * BLOCK {
+        parallel(|| {
+            cl.par_chunks_mut(BLOCK)
+                .zip(tl.par_chunks_mut(BLOCK))
+                .zip(delta.par_chunks_mut(BLOCK))
+                .zip(color.par_chunks_mut(BLOCK))
+                .zip(range.par_chunks_mut(BLOCK))
+                .enumerate()
+                .map(|(i, ((((cl, tl), delta), color), range))| {
+                    let first = i * BLOCK;
+                    let rows = first..first + cl.len();
+                    compare_chunk(
+                        &candidate[rows.clone()],
+                        &target[rows.clone()],
+                        support.map(|mask| &mask[rows]),
+                        [cl, tl, delta, color, range],
+                    )
+                })
+                .collect::<Vec<_>>()
+        })
+        .into_iter()
+        .fold(PixelSums::default(), PixelSums::combine)
+    } else {
+        compare_chunk(candidate, target, support, [cl, tl, delta, color, range])
+    };
+    let count = sums.count as f64;
+    Comparison {
+        planes,
+        mean_delta: sums.delta.map(|value| value / count),
+    }
 }
 
 pub fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -496,4 +677,26 @@ pub fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(rgb_means, module)?)?;
     module.add_function(wrap_pyfunction!(rgb_mse, module)?)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{XYZ, rgb_diagnostics};
+
+    #[test]
+    fn exposure_preserves_row_major_cancellation_at_image_scale() {
+        let width = 256;
+        let height = 256;
+        let target = vec![0.25; 3 * width * height];
+        let mut candidate = target.clone();
+        let halfway = 3 * width * height / 2;
+        candidate[..3].fill(f32::MAX);
+        candidate[halfway..halfway + 3].fill(-f32::MAX);
+
+        let (_, exposure) = rgb_diagnostics(height, width, &candidate, &target, None);
+        // Terms before the cancellation vanish in a linear reduction.
+        let exposure_t = 0.25 * XYZ[1].iter().copied().map(f64::from).sum::<f64>();
+        let exposure_c = exposure_t * (width * height / 2 - 1) as f64 / (width * height) as f64;
+        assert!((exposure - ((exposure_c + 1e-5) / (exposure_t + 1e-5)).log2()).abs() < 1e-12);
+    }
 }

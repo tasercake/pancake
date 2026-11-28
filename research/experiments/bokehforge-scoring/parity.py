@@ -90,6 +90,24 @@ def _file_sha256(path):
         return file_digest(file, "sha256").hexdigest()
 
 
+def _cohort(bench, rows):
+    aggregation = {}
+    if aggregate := getattr(bench, "_score", None):
+        score, groups = aggregate(rows, explanation=aggregation)
+    else:
+        from bokehforge import _rust
+
+        entries = [(row["dataset_id"], row["leakage_group_id"], row["scene_score"]) for row in rows]
+        score, groups, datasets = _rust.cohort_score(entries, False, True)
+        aggregation = {"score": score, "status": "ok", "datasets": {
+            dataset: {"score": value, "weight": weight, "groups": {
+                group: {"score": value, "weight": weight, "scene_count": count}
+                for group, value, weight, count in details
+            }} for dataset, value, weight, details in datasets
+        }}
+    return {"score": score, "scored_groups": groups, "aggregation": aggregation}
+
+
 def _check_fixture(fixture, measurement, saved):
     if saved["status"] != "ok":
         raise ValueError(f"{fixture.name} benchmark returned {saved['status']}: {saved.get('error')}")
@@ -177,14 +195,13 @@ def _run(args):
             print(f"{fixture.name} {saved['status']} {measurement.alignment['status']} score {saved['score']:.9f}",
                   flush=True)
 
-    aggregation = {}
-    score, groups = bench._score(rows, explanation=aggregation)
+    cohort = _cohort(bench, rows)
     report = {"schema_version": 1, "fixture": "synthetic-scorer-v1", "device": args.device,
               "scoring_module": str(Path(scoring.__file__).resolve()), "samples": samples,
-              "cohort": {"score": score, "scored_groups": groups, "aggregation": aggregation}}
+              "cohort": cohort}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8")
-    print(f"Cohort score {score:.9f} from {report['scoring_module']}.")
+    print(f"Cohort score {cohort['score']:.9f} from {report['scoring_module']}.")
     return 0
 
 
@@ -195,7 +212,8 @@ def _compare(args):
             raise ValueError("Expected a synthetic scorer version 1 report with samples.")
     if first["device"] != second["device"]:
         raise ValueError("Use the same device selector for the baseline and candidate runs.")
-    parity = ResultComparison()
+    parity = ResultComparison(allow_alignment_trace_change=args.allow_alignment_trace_change,
+                              allow_native_rounding=args.allow_native_rounding)
     parity.check(first["samples"], second["samples"], "scenes")
     parity.check(first["cohort"], second["cohort"], "cohort")
     print(f"Cohort scores {first['cohort']['score']:.9f} and {second['cohort']['score']:.9f}.")
@@ -211,6 +229,10 @@ def main():
     compare = modes.add_parser("compare", help="Check structural parity and numeric tolerances.")
     compare.add_argument("before", type=Path)
     compare.add_argument("after", type=Path)
+    compare.add_argument("--allow-alignment-trace-change", action="store_true",
+                         help="Report numeric and hypothesis count changes in search traces.")
+    compare.add_argument("--allow-native-rounding", action="store_true",
+                         help="Allow bounded geometry and attention summary rounding.")
     args = parser.parse_args()
     try:
         return _run(args) if args.mode == "run" else _compare(args)

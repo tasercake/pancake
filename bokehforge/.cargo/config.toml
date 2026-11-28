@@ -1,0 +1,3 @@
+[env]
+# The Apple Silicon Tracel LLVM 23.1.0-4 archive was built for macOS 15.
+MACOSX_DEPLOYMENT_TARGET = "15.0"

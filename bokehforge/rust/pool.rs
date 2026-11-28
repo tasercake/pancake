@@ -6,6 +6,9 @@ use pyo3::{exceptions::PyValueError, prelude::*};
 
 use crate::c_slice;
 
+mod overlap;
+pub(crate) use overlap::{OverlapDiagnostics, pool_overlap};
+
 type Edges<'py> = (PyReadonlyArray1<'py, isize>, PyReadonlyArray1<'py, isize>);
 type GridInput<'py> = (Edges<'py>, Option<PyReadonlyArray2<'py, i32>>, usize);
 type Settings = (f32, f64, f64, bool, usize);
@@ -28,6 +31,21 @@ struct PooledGrid {
     tail: TailEstimate,
     tiles: Option<Vec<f64>>,
     partition_input: Option<Vec<f64>>,
+}
+
+struct GridSelection {
+    worst: f64,
+    worst_index: usize,
+    cutoff: f64,
+    tail_count: usize,
+    eligible_count: usize,
+    tiles: Option<Vec<f64>>,
+}
+
+impl GridSelection {
+    fn top<'a>(&self, eligible: &'a [f64]) -> &'a [f64] {
+        &eligible[self.eligible_count - self.tail_count..]
+    }
 }
 
 struct TailEstimate {
@@ -134,6 +152,15 @@ fn damage_prefix(
     (integral, affected)
 }
 
+fn coverage_prefix(mask: &[u8], y: &[isize], x: &[isize]) -> Vec<f64> {
+    compact_prefix(y, x, |start, columns| {
+        let stop = start + columns.len();
+        for (column, &valid) in columns.iter_mut().zip(&mask[start..stop]) {
+            *column += f64::from((valid != 0) as u8);
+        }
+    })
+}
+
 fn image_support<'a>(
     support: Option<&'a PyReadonlyArray2<'_, u8>>,
     shape: &[usize],
@@ -177,14 +204,7 @@ fn coverage_tile_prefix<'py>(
 ) -> PyResult<Bound<'py, PyArray2<f64>>> {
     let (y, x) = checked_edges(&edges, mask.shape()[0], mask.shape()[1])?;
     let mask = c_slice(&mask)?;
-    let integral = py.detach(|| {
-        compact_prefix(y, x, |start, columns| {
-            let stop = start + columns.len();
-            for (column, &valid) in columns.iter_mut().zip(&mask[start..stop]) {
-                *column += f64::from((valid != 0) as u8);
-            }
-        })
-    });
+    let integral = py.detach(|| coverage_prefix(mask, y, x));
     integral.into_pyarray(py).reshape([y.len(), x.len()])
 }
 
@@ -196,18 +216,15 @@ fn pairwise_sum(values: &[f32]) -> f64 {
             .iter()
             .fold(-0.0, |sum, &value| sum + f64::from(value)),
         8..=128 => {
-            let mut chunks = values.chunks_exact(8);
-            let mut lanes = std::array::from_fn::<_, 8, _>(|i| f64::from(values[i]));
-            chunks.next();
-            for chunk in chunks.by_ref() {
+            let (chunks, rest) = values.as_chunks::<8>();
+            let mut lanes = chunks[0].map(f64::from);
+            for chunk in &chunks[1..] {
                 for (sum, &value) in lanes.iter_mut().zip(chunk) {
                     *sum += f64::from(value);
                 }
             }
             let [a, b, c, d, e, f, g, h] = lanes;
-            chunks
-                .remainder()
-                .iter()
+            rest.iter()
                 .fold(((a + b) + (c + d)) + ((e + f) + (g + h)), |sum, &value| {
                     sum + f64::from(value)
                 })
@@ -250,7 +267,22 @@ fn damage_sum(image: &[f32], support: Option<&[u8]>, buffer_size: usize) -> f64 
     total
 }
 
+fn tail_tile_count(fraction: f64, eligible_count: usize) -> usize {
+    ((fraction * eligible_count as f64).ceil() as usize).max(1)
+}
+
 impl Grid<'_> {
+    fn totals<'a>(&'a self, integral: &'a [f64], stride: usize) -> impl Iterator<Item = f64> + 'a {
+        self.y.windows(2).flat_map(move |y| {
+            let top = &integral[y[0] as usize * stride..][..stride];
+            let bottom = &integral[y[1] as usize * stride..][..stride];
+            self.x.windows(2).map(move |x| {
+                let (left, right) = (x[0] as usize, x[1] as usize);
+                bottom[right] - top[right] - bottom[left] + top[left]
+            })
+        })
+    }
+
     fn values<'a>(
         &'a self,
         integral: &'a [f64],
@@ -259,22 +291,15 @@ impl Grid<'_> {
     ) -> impl Iterator<Item = f64> + 'a {
         // A short edge tile still uses the full nominal area.
         let denominator = self.nominal_pixels as f64;
-        self.y.windows(2).flat_map(move |y| {
-            let top = &integral[y[0] as usize * stride..][..stride];
-            let bottom = &integral[y[1] as usize * stride..][..stride];
-            self.x.windows(2).map(move |x| {
-                let (left, right) = (x[0] as usize, x[1] as usize);
-                let total = bottom[right] - top[right] - bottom[left] + top[left];
-                (total / denominator).clamp(0.0, damage_max)
-            })
-        })
+        self.totals(integral, stride)
+            .map(move |total| (total / denominator).clamp(0.0, damage_max))
     }
 
     fn contains(&self, index: usize) -> bool {
         self.coverage.is_none_or(|coverage| coverage[index] > 0)
     }
 
-    fn pool(
+    fn select(
         &self,
         integral: &[f64],
         stride: usize,
@@ -282,7 +307,7 @@ impl Grid<'_> {
         fraction: f64,
         keep_tiles: bool,
         eligible: &mut Vec<f64>,
-    ) -> Option<PooledGrid> {
+    ) -> Option<GridSelection> {
         let size = (self.y.len() - 1) * (self.x.len() - 1);
         let mut tiles = keep_tiles.then(|| Vec::with_capacity(size));
         let mut worst = f64::NEG_INFINITY;
@@ -304,15 +329,16 @@ impl Grid<'_> {
         if eligible_count == 0 {
             return None;
         }
-        let count = ((fraction * eligible_count as f64).ceil() as usize).max(1);
+        let count = tail_tile_count(fraction, eligible_count);
         let cutoff_index = eligible_count - count;
         eligible.select_nth_unstable_by(cutoff_index, f64::total_cmp);
-        let top = &eligible[cutoff_index..];
-        Some(PooledGrid {
-            stats: (worst, worst_index, None, top[0], count, eligible_count),
-            tail: tail_estimate(top),
+        Some(GridSelection {
+            worst,
+            worst_index,
+            cutoff: eligible[cutoff_index],
+            tail_count: count,
+            eligible_count,
             tiles,
-            partition_input: None,
         })
     }
 }
@@ -369,14 +395,27 @@ fn pool_grids(
     let mut pooled = grids
         .iter()
         .map(|grid| {
-            grid.pool(
+            let selected = grid.select(
                 integral,
                 stride,
                 damage_max,
                 fraction,
                 keep_tiles,
                 &mut scratch,
-            )
+            )?;
+            Some(PooledGrid {
+                stats: (
+                    selected.worst,
+                    selected.worst_index,
+                    None,
+                    selected.cutoff,
+                    selected.tail_count,
+                    selected.eligible_count,
+                ),
+                tail: tail_estimate(selected.top(&scratch)),
+                tiles: selected.tiles,
+                partition_input: None,
+            })
         })
         .collect::<Option<Vec<_>>>()?;
     let best_lower_bound = pooled

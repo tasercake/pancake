@@ -1,11 +1,12 @@
 from base64 import b64decode
+from functools import partial
 from hashlib import sha256
 import json
 import os
 import subprocess
 import sys
 from threading import Barrier, Event, get_ident
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 from zlib import decompress
 
 import numpy as np
@@ -13,7 +14,8 @@ import pytest
 import tifffile
 from PIL import Image
 
-from bokehforge import bench
+import bokehforge
+from bokehforge import _rust, bench, scoring
 from bokehforge.bench import _score, bench as run_benchmark, main, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
 from bokehforge.data.lazy import Scene, SceneCatalog
@@ -61,7 +63,7 @@ def corpus(tmp_path):
 def run_bench(root, output, *args, env=None):
     return subprocess.run(
         [sys.executable, "-m", "bokehforge", "bench", "--root", str(root), "--config", str(root / "sources.json"),
-         "--output", str(output), "--no-attention", *args],
+         "--output", str(output), "--device", "cpu", "--no-attention", *args],
         capture_output=True, text=True, env=env,
     )
 
@@ -73,9 +75,11 @@ def test_benchmark_callable_matches_cli(corpus, tmp_path, capsys):
     assert cli_result.returncode == 0, cli_result.stderr
 
     api_output = tmp_path / "api"
+    assert type(bench) is ModuleType
+    assert bokehforge.bench is bench
     assert bench.bench is run_benchmark
     assert run_benchmark([
-        "--root", str(corpus), "--config", str(corpus / "sources.json"), "--no-attention",
+        "--root", str(corpus), "--config", str(corpus / "sources.json"), "--device", "cpu", "--no-attention",
         "--output", str(api_output), *options,
     ]) == cli_result.returncode
     assert capsys.readouterr().out == cli_result.stdout
@@ -86,13 +90,20 @@ def test_benchmark_callable_matches_cli(corpus, tmp_path, capsys):
 
 
 @pytest.mark.parametrize("device", ["cpu", "mps"])
-def test_cpu_and_mps_cli_require_disabling_inspection(device, tmp_path, capsys):
+def test_weighted_benchmark_accepts_cpu_and_mps_selection(corpus, tmp_path, monkeypatch, capsys, device):
+    def missing_runtime():
+        raise RuntimeError("fixture native Inspection runtime is unavailable")
+
+    monkeypatch.setattr(bench, "prepare_attention", missing_runtime)
     output = tmp_path / "benchmark"
-    with pytest.raises(SystemExit) as exc:
-        main(["--algorithm", "mean", "--output", str(output), "--device", device])
-    assert exc.value.code == 2
-    assert f"--device {device} requires --no-attention" in capsys.readouterr().err
-    assert not output.exists()
+    assert main(["--algorithm", "mean", "--output", str(output), "--device", device,
+                 "--root", str(corpus), "--config", str(corpus / "sources.json"),
+                 "--dataset", "referenced"]) == 1
+    assert capsys.readouterr().out == "unscored\n"
+    report = json.loads((output / "report.json").read_text())
+    failed, = report["scenes"]
+    assert failed["status"] == "scoring_error"
+    assert "native Inspection runtime is unavailable" in failed["error"]
 
 
 def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
@@ -122,7 +133,7 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
 
     replay_dir = tmp_path / "replay"
     replay = run_bench(corpus, replay_dir, "--scene", target["scene_id"],
-                       "--candidate-dir", str(output / "images"), "--explain-score", "--device", "cpu")
+                       "--candidate-dir", str(output / "images"), "--explain-score")
     assert replay.returncode == 0, replay.stderr
     assert replay.stdout == result.stdout
     replay_report = json.loads((replay_dir / "report.json").read_text())
@@ -141,8 +152,9 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert len(placement["comparison"]["tile_grids"]) == 8
     catalog = SceneCatalog(corpus, config=corpus / "sources.json")
     scene = catalog.scene(target["scene_id"])
-    assert score_saved_output(catalog, scene, output / target["image"], details="full", attention=False)["explanation"] == explanation
-    assert "explanation" not in score_saved_output(catalog, scene, output / target["image"], attention=False)
+    saved = output / target["image"]
+    assert score_saved_output(catalog, scene, saved, details="full", attention=False, device="cpu")["explanation"] == explanation
+    assert "explanation" not in score_saved_output(catalog, scene, saved, attention=False, device="cpu")
 
     missing = tmp_path / "empty"
     missing.mkdir()
@@ -156,8 +168,10 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert "already exists" in existing.stderr
 
 
-@pytest.mark.parametrize("device", ["cpu", "mps"])
-def test_saved_output_accepts_precomputed_inspection_provider(corpus, tmp_path, monkeypatch, device):
+@pytest.mark.parametrize("score_device", [
+    "cpu", pytest.param("mps", marks=pytest.mark.hardware_accelerator, id="metal"),
+], indirect=True)
+def test_saved_output_accepts_precomputed_inspection_provider(score_device, corpus, tmp_path):
     catalog = SceneCatalog(corpus, config=corpus / "sources.json", datasets=["referenced"])
     scene = catalog.scene(catalog.scene_ids[0])
     reference = catalog.decode(scene.reference_ids[0]).data
@@ -171,18 +185,29 @@ def test_saved_output_accepts_precomputed_inspection_provider(corpus, tmp_path, 
             np.testing.assert_array_equal(target, reference)
             return heatmap, digest
 
-    def select_backend(requested):
-        assert requested == device
-        return device
-
-    # The exact TIFF match skips damage measurement, so only selection is stubbed.
-    monkeypatch.setattr("bokehforge.scoring.damage_backend", select_backend)
-    saved = score_saved_output(catalog, scene, path, details="summary", inspection=PrecomputedInspection(), device=device)
+    saved = score_saved_output(catalog, scene, path, details="summary", inspection=PrecomputedInspection(),
+                               device=score_device)
     assert saved["status"] == "ok"
     assert saved["score"] == 100
     assert saved["profile"] == INSPECTION_SCORE_VERSION
     assert saved["inspection_map_sha256"] == digest
     assert saved["explanation"]["attention"]["mean"] == .5
+
+
+def test_builtin_inspection_uses_native_measurement_and_records_digest(monkeypatch):
+    pixels = np.zeros((3, 4, 3), dtype=np.float32)
+
+    def measure_delivery(result, reference, *, details, device, generate, attention, on_digest):
+        assert device == "cpu"
+        assert attention and generate is None
+        on_digest("native-digest")
+        return SimpleNamespace(score=100.0, alignment={}, features={}, explanation=None)
+
+    monkeypatch.setattr(bench, "_measure_delivery", measure_delivery)
+    row = {}
+    bench._score_delivery(pixels, pixels, row, inspection=Inspection(), device="cpu")
+    assert row["scene_score"] == 100.0
+    assert row["inspection_map_sha256"] == "native-digest"
 
 
 def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monkeypatch, capsys):
@@ -198,12 +223,28 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     tifffile.imwrite(path, candidate, photometric="rgb")
     seen = []
 
-    def predict(preview):
-        seen.append(np.asarray(preview).copy())
-        return heatmap
+    expected_digest = sha256(heatmap.astype("<f4").tobytes()).hexdigest()
 
-    monkeypatch.setattr(Inspection, "_load", staticmethod(lambda: predict))
-    args = ["--root", str(corpus), "--config", str(corpus / "sources.json"),
+    class FixtureInspection:
+        def preview_map(self, reference):
+            if not hasattr(self, "_test_inspection_map"):
+                seen.append(np.asarray(reference_preview(reference)).copy())
+                self._test_inspection_map = heatmap, expected_digest
+            return self._test_inspection_map
+
+        def cached_map(self, digest):
+            cached, cached_digest = getattr(self, "_test_inspection_map", (None, None))
+            return cached if digest == cached_digest else None
+
+        generate = preview_map
+
+    def scoring_override(attention):
+        return (scoring._measure_delivery, FixtureInspection()) if attention else (None, None)
+
+    monkeypatch.setattr(bench, "_benchmark_override", scoring_override)
+    monkeypatch.setattr("bokehforge.review.scores.Inspection", FixtureInspection)
+    monkeypatch.setattr("bokehforge.review.scores.score_saved_output", partial(score_saved_output, device="cpu"))
+    args = ["--root", str(corpus), "--config", str(corpus / "sources.json"), "--device", "cpu",
             "--dataset", "referenced", "--candidate-dir", str(candidates)]
     output = tmp_path / "attention"
     assert main([*args, "--output", str(output), "--explain-score"]) == 0
@@ -214,16 +255,14 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     assert row["inspection_map_sha256"] == sha256(heatmap.astype("<f4").tobytes()).hexdigest()
     assert len(seen) == 1
     np.testing.assert_array_equal(seen[0], reference_preview(reference))
-    assert row["scene_score"] == measure(candidate, reference, inspection_heatmap=heatmap).score
-    baseline = measure(candidate, reference, attention=False).score
+    assert row["scene_score"] == measure(candidate, reference, inspection_heatmap=heatmap, device="cpu").score
+    baseline = measure(candidate, reference, attention=False, device="cpu").score
     assert row["scene_score"] < baseline
-    saved = score_saved_output(catalog, scene, path, details="full", inspection=Inspection())
+    saved = score_saved_output(catalog, scene, path, details="full", inspection=FixtureInspection(), device="cpu")
     assert saved["score"] == row["scene_score"]
     assert saved["explanation"] == json.loads((output / row["score_explanation_path"]).read_text())
     assert len(saved["explanation"]["placements"][0]["comparison"]["tile_grids"]) == 8
     attention = saved["explanation"]["attention"]
-    with pytest.raises(RuntimeError, match="Inspection profile requires CUDA"):
-        score_saved_output(catalog, scene, path, inspection=Inspection(), device="mps")
     assert attention["encoding"] == "base64+zlib+float32-le"
     assert attention["size_wh"] == list(reference.shape[1::-1])
     pixels = np.frombuffer(decompress(b64decode(attention["data"])), dtype="<f4").reshape(heatmap.shape)
@@ -265,10 +304,11 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     finally:
         review.close()
 
-    def missing_models():
+    def missing_models(self, reference):
         raise RuntimeError("test model loading failed")
 
-    monkeypatch.setattr(Inspection, "_load", staticmethod(missing_models))
+    monkeypatch.setattr(FixtureInspection, "preview_map", missing_models)
+    monkeypatch.setattr(FixtureInspection, "generate", missing_models)
     updated.clear()
     reopened = Scores(updated.set)
     try:
@@ -312,14 +352,9 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     pytest.param("MemAvailable: 0 kB\n", 12, None, False, id="no-available-memory"),
 ])
 def test_host_replay_memory_accounts_for_page_cache_and_cgroups(
-    tmp_path, monkeypatch, meminfo, free_gib, parent_headroom_gib, fits,
+    tmp_path, meminfo, free_gib, parent_headroom_gib, fits,
 ):
     gib = 1024 ** 3
-    page_size = 4096
-    sysconf = {"SC_AVPHYS_PAGES": free_gib * gib // page_size, "SC_PAGE_SIZE": page_size}
-    monkeypatch.setattr(bench.os, "sysconf", sysconf.__getitem__, raising=False)
-    monkeypatch.setattr(bench, "Path", lambda path: tmp_path / path.removeprefix("/"))
-
     proc = tmp_path / "proc"
     (proc / "self").mkdir(parents=True)
     (proc / "self" / "cgroup").write_text("0::/jobs/benchmark\n")
@@ -332,7 +367,7 @@ def test_host_replay_memory_accounts_for_page_cache_and_cgroups(
         (leaf.parent / "memory.max").write_text(str(16 * gib))
         (leaf.parent / "memory.current").write_text(str((16 - parent_headroom_gib) * gib))
 
-    assert bench._host_replay_fits() is fits
+    assert _rust.benchmark_host_replay_fits(proc, tmp_path / "sys/fs/cgroup", free_gib * gib) is fits
 
 
 def test_cuda_saved_replay_batches_score_and_retries_exhaustion_in_order(tmp_path, monkeypatch, capsys):
@@ -369,9 +404,9 @@ def test_cuda_saved_replay_batches_score_and_retries_exhaustion_in_order(tmp_pat
     checked = []
     committed = []
 
-    def fits(batch, device):
+    def fits(scene_ids, device):
         assert device == "cuda"
-        checked.append([item.scene.id for item in batch])
+        checked.append(scene_ids)
         return True
 
     def measure_delivery(result, reference, *, details, device, generate, retry_on_oom):
@@ -395,22 +430,26 @@ def test_cuda_saved_replay_batches_score_and_retries_exhaustion_in_order(tmp_pat
         explanation = None if details is None else {"level": level}
         return SimpleNamespace(score=level * 100, alignment={}, features={}, explanation=explanation)
 
-    original_save = bench._save_scene
+    original_encode = bench.encode_tiff
 
-    def save(prepared, args, explanation):
+    def encode(path, pixels):
         assert get_ident() == caller
-        committed.append(prepared.scene.id)
-        original_save(prepared, args, explanation)
+        committed.append(path.stem)
+        original_encode(path, pixels)
+
+    native_benchmark = _rust.benchmark
+
+    def benchmark_with_memory(args, bridge):
+        return native_benchmark(args, bridge, replay_guard=fits)
 
     def generate(self, reference):
         print("model stdout")
         return reference[..., 0], sha256(reference.tobytes()).hexdigest()
 
     monkeypatch.setattr(bench, "SceneCatalog", Catalog)
-    monkeypatch.setattr(bench, "_MIN_PARALLEL_PIXELS", 1)
-    monkeypatch.setattr(bench, "_cuda_replay_fits", fits)
+    monkeypatch.setattr(_rust, "benchmark", benchmark_with_memory)
     monkeypatch.setattr(bench, "_measure_delivery", measure_delivery)
-    monkeypatch.setattr(bench, "_save_scene", save)
+    monkeypatch.setattr(bench, "encode_tiff", encode)
     monkeypatch.setattr(Inspection, "generate", generate)
     args = ["--root", str(tmp_path), "--candidate-dir", str(candidates), "--device", "cuda", "--save-images"]
     output = tmp_path / "report"
@@ -503,8 +542,8 @@ def test_default_scores_original_crop_and_replays_it(corpus, tmp_path):
     catalog = SceneCatalog(corpus, datasets=["referenced"], config=corpus / "sources.json")
     catalog_scene = catalog.scene(scene["scene_id"])
     reference = catalog.decode(catalog_scene.reference_ids[0]).data
-    assert measure(tifffile.imread(saved), reference, attention=False).alignment == replay_row["alignment"]
-    assert score_saved_output(catalog, catalog_scene, saved, attention=False)["alignment"] == replay_row["alignment"]
+    assert measure(tifffile.imread(saved), reference, attention=False, device="cpu").alignment == replay_row["alignment"]
+    assert score_saved_output(catalog, catalog_scene, saved, attention=False, device="cpu")["alignment"] == replay_row["alignment"]
 
     removed = run_bench(corpus, tmp_path / "removed", "--dataset", "referenced", "--candidate-dir", str(output / "images"),
                         "--score-profile", "reference-fidelity-crop-v2")

@@ -37,6 +37,8 @@ and delivery. `scoring_seconds` comes from the bench scorer.
 `wall_seconds` also includes delivery contract validation. Both measure
 scoring with a summary explanation. ZIP reads, fixture preparation, hashing,
 and report writes happen outside the timed interval.
+Pass `--public-measure` to both runs to time the public `scoring.measure` call
+with the same fixtures. This mode includes validation in the scoring time.
 
 The comparison checks the score versions, profile, ordered cohort, input
 fingerprints, scoring and reference statuses, every functional result, and
@@ -53,6 +55,27 @@ for scene, overlap, and cohort scores. Family damage, diagnostic values,
 and per-tile damage use an absolute limit of 0.0001. It checks alignment,
 tile grid geometry and selection, statuses, and input and Inspection digests
 for equality and verifies each stored result against its own digest.
+
+When comparing an alternative Inspection inference runtime, pass
+`--include-inspection-maps` to both attention-weighted runs and
+`--tolerant --allow-generated-map-change` to `compare`. The reports store the
+original model-grid maps after timing. The comparison verifies each map
+against the digest in its own report and prints per-scene mean absolute error,
+maximum absolute error, and overlap among the highest-ranked 1% of pixels.
+The regular score and measurement limits still apply.
+
+Pass `--allow-alignment-trace-change` with `--tolerant` to investigate numeric
+changes in alignment search traces. The comparison reports trial hypothesis
+and regional sample count changes and the largest floating-point difference
+at corresponding positions in the traces. It continues to check alignment
+outcomes and selected hypotheses. Pass `--allow-native-rounding` with `--tolerant` to
+allow up to 0.0001 absolute difference in selected placement geometry and
+attention summaries. Embedded attention data must decode to identical bytes.
+
+The CLI's `input_sha256` and `cohort_sha256` include the canonical decoder
+recipe. Changes to the converter or loader produce new CLI provenance digests. When
+comparing such builds, verify the original source digests and decoded float32
+reference and delivery pixels alongside both fingerprints.
 
 ## Synthetic scorer parity
 
@@ -78,4 +101,6 @@ Repeat with `--device cuda` in both CUDA-equipped installations to check
 the accelerated damage path. The synthetic report retains the inputs,
 scores, explanations, and benchmark cohort aggregation. The comparator
 prints the largest absolute score and measurement differences and returns
-a nonzero exit status for a mismatch.
+a nonzero exit status for a mismatch. The synthetic comparison also accepts
+`--allow-alignment-trace-change` and `--allow-native-rounding`. Precomputed
+Inspection map digests remain part of its equality checks.

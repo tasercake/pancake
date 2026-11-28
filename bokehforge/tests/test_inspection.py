@@ -48,3 +48,32 @@ def test_native_preview_encoder_matches_float32_rounding_at_every_transition():
     encoder = _preview_encoder()
     assert isinstance(encoder, _rust.PreviewEncoder)
     np.testing.assert_array_equal(encoder.encode(samples), np.rint(srgb * 255).astype(np.uint8))
+
+
+def test_inspection_export_uses_current_version_and_repairs_corruption(tmp_path, monkeypatch):
+    from bokehforge import _inspection_export as exporter
+
+    tmp_path = tmp_path.resolve()
+    calls = []
+
+    def export(source, destination):
+        calls.append(source)
+        for name in exporter._GRAPHS:
+            (destination / name).write_bytes(b"graph")
+
+    old = tmp_path / "onnx-v1"
+    old.mkdir()
+    export(tmp_path, old)
+    (old / exporter._MANIFEST).write_text("".join(exporter._record(path) for path in sorted(old.iterdir())))
+    calls.clear()
+    monkeypatch.setattr(exporter, "_export", export)
+
+    current = exporter.prepare_models(tmp_path)
+    assert current != old
+    assert exporter.prepare_models(tmp_path) == current
+    assert calls == [tmp_path]
+
+    (current / "sam_encoder.onnx").write_bytes(b"stale")
+    assert exporter.prepare_models(tmp_path) == current
+    assert calls == [tmp_path, tmp_path]
+    assert (current / "sam_encoder.onnx").read_bytes() == b"graph"

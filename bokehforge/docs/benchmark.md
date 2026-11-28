@@ -1,11 +1,10 @@
 # Focus-stacking benchmark
 
-Run the mean-blend pilot on the InfinigenDefocus dataset from the repository root. Install the [inspection dependencies](#install-the-inspection-models) once and use a new output directory for each run.
+Run the mean-blend pilot on InfinigenDefocus from the repository root. Use a new output directory for each run. The Inspection extra enables the default attention-weighted score. With the base installation, add `--no-attention`. [Inspection setup](#install-the-inspection-models)
 
 ```sh
-bokehforge/.venv/bin/bokehforge data download
-bokehforge/.venv/bin/bokehforge bench \
-  --algorithm mean --output artifacts/bench-mean --save-images --progress
+uv run --project bokehforge --frozen bokehforge data download
+uv run --project bokehforge --frozen --extra inspection bokehforge bench --algorithm mean --output artifacts/bench-mean --save-images --progress
 ```
 
 Repeat `--dataset` or `--scene` to select a fixed cohort. By default the benchmark selects all scenes from the configured downloads. Every selected scene must declare exactly one supported all-in-focus RGB reference. If any scene fails this requirement, the command rejects the entire selection before it runs a stacker or creates a report. The shipped configuration selects D29. `--root`, `--config`, and `--lock` have the same meanings as in the catalog. Check that the cohort fingerprint and score version match before comparing runs. Candidate images depend on the stacker environment, so pin the stacker and its dependencies too.
@@ -22,11 +21,10 @@ def first_frame(stack: StackInput) -> np.ndarray:
     return next(stack.frames).pixels
 ```
 
-For external tools, generate one canonical interleaved RGB float32 TIFF per scene using the path `<candidate-dir>/<scene-id>.tif`. Use orientation 1 and convert the original colors and transfer to linear sRGB before writing. A TIFF from `--save-images` already meets the contract. The candidate-directory path evaluates delivered files without decoding the focal frames.
+For external tools, generate one canonical interleaved RGB float32 TIFF per scene using the path `<candidate-dir>/<scene-id>.tif`. Use orientation 1 and convert the original colors and transfer to linear sRGB before writing. A TIFF from `--save-images` already meets the contract. Replay decodes the delivered TIFFs and references directly. The native TIFF reader handles canonical deliveries and uses the existing Python TIFF adapter for compatible encodings that need it. Dataset and focal-frame decoding use the existing format adapters.
 
 ```sh
-bokehforge/.venv/bin/bokehforge bench \
-  --candidate-dir artifacts/bench-mean/images --dataset D29 --output artifacts/bench-replay
+uv run --project bokehforge --frozen --extra inspection bokehforge bench --candidate-dir artifacts/bench-mean/images --dataset D29 --output artifacts/bench-replay
 ```
 
 On Linux, saved deliveries with generated Inspection maps can score two scenes
@@ -53,23 +51,11 @@ exit_code = bench(["--candidate-dir", "deliveries", "--output", "results", "--no
 
 ## Scoring device
 
-`--device auto` (the default) prefers NVIDIA CUDA, then Apple Metal (MPS),
-then CPU for damage measurement. Auto retries damage measurement on CPU if
-the selected accelerator runs out of memory. CUDA requires PyTorch and
-Triton and runs most damage-map operations on the GPU. MPS requires an
-MPS-enabled PyTorch installation and runs the edge neighborhood filters on
-the GPU. The other MPS calculations stay on the CPU, including those that
-require double precision.
+`--device auto` selects CUDA, then Apple Metal, then CPU. The Rust scorer runs a shared CubeCL damage program across all three backends. Auto can retry damage measurement on CPU if the accelerator runs out of memory.
 
-`--device cuda` or `--device mps` requires that specific backend.
-`--device gpu` requires a supported accelerator and prefers CUDA when both
-are available. The device choices apply at every measured image size.
-Use `--device cpu --no-attention` to score on the CPU with the base installation.
-The flag controls scoring independently of the stacker.
+`--device cuda` selects NVIDIA CUDA on Linux or Windows. CubeCL compiles the damage kernels with its bundled LLVM and runs them through the NVIDIA driver. `--device mps` selects Metal 3 on Apple Silicon. `--device gpu` requires an available GPU, and `--device cpu` selects CPU scoring. Device selection is independent of the stacker.
 
-Inspection map generation requires CUDA. Use `--device mps --no-attention`
-to benchmark with MPS. Python callers can use MPS damage measurement with a
-supplied `inspection_heatmap`.
+Native Inspection uses the same exported model graphs through ONNX Runtime’s CPU, CUDA, or Core ML provider. With `auto`, the engine can use CPU inference if the accelerator provider is unavailable or its sessions fail to load. On Apple Silicon, the `mps` selector pairs Metal damage measurement with Core ML inference. CUDA inference uses CUDA 12 and cuDNN 9 libraries in addition to the NVIDIA driver. Use `--no-attention` to skip Inspection entirely.
 
 ## The score
 
@@ -104,26 +90,17 @@ For relevance `H` and each damage-family value `D`, the scorer uses `D × (1 + �
 
 ### Install the inspection models
 
-From the repository root, install the pinned inference dependencies once. This profile requires CUDA for TempSAL.
+From the repository root, install the pinned ONNX Runtime 1.24.4 and checkpoint conversion dependencies.
 
 ```sh
 uv sync --project bokehforge --frozen --extra inspection
 ```
 
-BokehForge downloads any missing files when it first scores with attention. A cold cache needs about 3.2 GB for the model files. The default cache is `~/.cache/bokehforge/inspection-models`, or `bokehforge/inspection-models` under `XDG_CACHE_HOME` when set. Set `BOKEHFORGE_INSPECTION_MODELS` to use a different directory, including an existing installation. If the model cache is a dangling symlink, BokehForge replaces it with a directory and downloads the models there. Files that pass the pinned checksums are reused offline. Downloads are verified before they replace incomplete or corrupted files.
+The first run with generated attention downloads and verifies the pinned checkpoints, converts them to ONNX with PyTorch, and stores the graphs under `onnx-v2/`. Conversion runs on CPU. Allow about 5 GB for the checkpoints and converted models. Each new process verifies the model cache and loads the native ONNX Runtime sessions on first use. Later scenes reuse the loaded sessions and compiled scoring kernels.
 
-The model directory has this layout. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS code and checkpoint](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
+The default model directory is `~/.cache/bokehforge/inspection-models`. Set `XDG_CACHE_HOME` to change the cache root or `BOKEHFORGE_INSPECTION_MODELS` to use a specific model directory. A complete verified cache can be reused offline, and interrupted downloads resume on the next attempt. Set `ORT_DYLIB_PATH` to point to a custom ONNX Runtime shared library that supports API 24. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS source](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
 
-```text
-inspection-models/
-  reliqs/                    ReLIQS inference source and tokenizer assets
-  reliqs-weights-ready.pth   KonIQ/model_weights.pth
-  tempsal-code/              TempSAL src/ containing model.py and PNAS/
-  tempsal-ready.pt           PNAS checkpoint from the upstream inference notebook
-  sam2/                      Transformers configuration and model.safetensors
-```
-
-An interrupted transfer can resume on the next scoring attempt.
+If the model cache is a dangling symlink, BokehForge replaces it with a directory and prepares the model files there.
 
 In Python, `measure(candidate, target)` and `score_saved_output(catalog, scene, path)` also generate attention by default. Pass `attention=False` to use the unweighted score. `measure` can also accept an explicit finite `[0, 1]` heatmap on the native reference grid through `inspection_heatmap`.
 
@@ -160,4 +137,4 @@ In Python, `measure(candidate, target)` returns an object with `.score` and `.al
 
 ## Comparing older runs
 
-Older JSON keeps its original `score_version` or `profile` label. Compare scores with matching scorer versions and cohort fingerprints. To compare an older saved delivery with a new run, replay the original TIFF into a new output directory. Stackroom saves diagnostics for new evaluations and scores older deliveries on demand. Compare inspection-weighted benchmark runs with matching map hashes as well.
+Older JSON keeps its original `score_version` or `profile` label. Compare scores with matching scorer versions and cohort fingerprints. To compare an older saved delivery with a new run, replay the original TIFF into a new output directory. Stackroom saves diagnostics for new evaluations and scores older deliveries on demand. For exact comparison of inspection-weighted runs, match the map hashes as well. Different inference providers can produce slightly different maps from the same model graphs.

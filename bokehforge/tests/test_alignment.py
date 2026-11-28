@@ -6,12 +6,12 @@ import numpy as np
 import pytest
 from scipy.ndimage import affine_transform, gaussian_filter, map_coordinates
 
-from bokehforge import alignment
-from bokehforge.alignment import ALIGNMENT_VERSION, _Texture, _exact_offsets, _sample_rgb
+from bokehforge import _rust, alignment
+from bokehforge.alignment import ALIGNMENT_VERSION
 from bokehforge.scoring import measure as _measure
 
 
-measure = partial(_measure, attention=False)
+measure = partial(_measure, attention=False, device="cpu")
 
 
 @pytest.fixture
@@ -28,10 +28,21 @@ def render(target, shape, offset, scale=1, angle=0):
                      for plane in np.moveaxis(target, -1, 0)], axis=-1)
 
 
+def scipy_samples(planes, points):
+    return np.stack([map_coordinates(plane, points, order=1, mode="nearest", prefilter=False)
+                     for plane in planes])
+
+
+def scipy_native_delta(image, points):
+    offsets = np.array([[0, 0], [-3, 0], [3, 0], [0, -3], [0, 3]]).T
+    neighbors = (points[:, None, :] + offsets[:, :, None]).reshape(2, -1)
+    samples = scipy_samples(np.moveaxis(image, -1, 0), neighbors)
+    rgb = np.clip(samples.T.astype(np.float64), 0, 1).reshape(5, -1, 3)
+    return rgb[0] - rgb[1:].mean(axis=0)
+
+
 @pytest.mark.parametrize("shape", [(13, 17), (13, 1), (1, 17), (1, 1)])
 def test_alignment_sampling_matches_scipy_at_integer_and_fractional_positions(shape):
-    rust = pytest.importorskip("bokehforge._rust")
-    assert alignment._sample_linear is rust.sample_linear
     rng = np.random.default_rng(2409)
     image = rng.uniform(-1.0, 1.0, (2 * shape[0], 2 * shape[1], 3)).astype(np.float32)
     image[::2, ::3] = -0.0
@@ -43,25 +54,25 @@ def test_alignment_sampling_matches_scipy_at_integer_and_fractional_positions(sh
     points[1::9] = np.nextafter(np.rint(points[1::9]), -np.inf)
     points = points.T
 
-    def expected(planes, coords):
-        return np.stack([map_coordinates(plane, coords, order=1, mode="nearest", prefilter=False)
-                         for plane in planes])
-
     planes = np.moveaxis(image, -1, 0)
-    assert _sample_rgb(image, points).tobytes() == expected(planes, points).T.astype(np.float64).tobytes()
+    rgb = np.empty((points.shape[1], 3), dtype=np.float32)
+    _rust.sample_linear(image, points, rgb, True)
+    assert rgb.tobytes() == scipy_samples(planes, points).T.tobytes()
     step = np.array([1.25, 2.5])
     coordinates = (points + 0.5) / step[:, None] - 0.5
-    assert _Texture(planes, step).sample(points).tobytes() == expected(planes, coordinates).tobytes()
+    texture = np.empty((3, points.shape[1]), dtype=np.float32)
+    _rust.sample_linear(planes, coordinates, texture, False)
+    assert texture.tobytes() == scipy_samples(planes, coordinates).tobytes()
 
 
 def test_rust_sampler_writes_strided_buffers_and_rejects_invalid_inputs():
-    rust = pytest.importorskip("bokehforge._rust")
+    rust = _rust
     image = np.arange(2 * 4 * 3, dtype=np.float32).reshape(2, 4, 3)[::-1, :, ::-1]
     points = np.array([[1, 0, 0.3], [3, 2.2, 0]])[:, ::-1]
     backing = np.full((6, 6), -1, dtype=np.float32)
     output = backing[::-2, ::2]
     rust.sample_linear(image, points, output, True)
-    np.testing.assert_array_equal(output, _sample_rgb(image, points))
+    np.testing.assert_array_equal(output, scipy_samples(np.moveaxis(image, -1, 0), points).T)
     assert np.all(backing[::2, :] == -1) and np.all(backing[:, 1::2] == -1)
     rust.sample_linear(image, points[:, :0], output[:0], True)
     extremes = np.array([[-1e300, 1e300], [1e300, -1e300]])
@@ -81,55 +92,72 @@ def test_rust_sampler_writes_strided_buffers_and_rejects_invalid_inputs():
         rust.sample_linear(image, points, output, True)
 
 
-def test_rust_native_texture_matches_numpy_across_float32_exponents(monkeypatch):
-    rust = pytest.importorskip("bokehforge._rust")
-    assert alignment._sample_native_delta is rust.sample_native_delta
+def test_rust_native_texture_matches_numpy_across_float32_exponents():
     rng = np.random.default_rng(17)
-    cases = []
     for _ in range(2):
         shape = (101, 119, 3)
         image = (rng.uniform(-0.1, 1.5, shape) * np.exp2(rng.uniform(-150, 120, shape))).astype(np.float32)
         points = rng.uniform((-3, -3), (104, 122), (10_000, 2)).T
         points[:, ::3] = np.rint(points[:, ::3])
-        texture = alignment._NativeTexture(image)
-        cases.append((texture, points, texture.sample(points)))
-    monkeypatch.setattr(alignment, "_sample_native_delta", None)
-    for texture, points, actual in cases:
-        assert actual.tobytes() == texture.sample(points).tobytes()
+        actual = _rust.sample_native_delta(image, points)
+        assert actual.tobytes() == scipy_native_delta(image, points).tobytes()
 
 
 @pytest.mark.parametrize("native", [False, True])
-def test_rust_pose_evidence_matches_numpy_on_full_and_partial_overlap(monkeypatch, native):
-    rust = pytest.importorskip("bokehforge._rust")
-    assert alignment._sample_pose_evidence is rust.sample_pose_evidence
+def test_rust_pose_evidence_matches_numpy_on_full_and_partial_overlap(native):
     rng = np.random.default_rng(5718)
     image = rng.uniform(-0.1, 1.2, (51, 42, 3)).astype(np.float32)[::-2, ::2, ::-1]
-    if native:
-        texture = alignment._NativeTexture(image)
-        shape = image.shape[:2]
-    else:
-        texture = _Texture(np.moveaxis(image * 0.08, -1, 0), np.array([1.5, 2.0]))
-        shape = (39, 42)
+    planes = np.moveaxis(image, -1, 0)
+    texture = image if native else planes
+    step = None if native else np.array([1.5, 2.0])
+    shape = image.shape[:2] if native else (39, 42)
+    points = rng.uniform((4, 4), np.array(shape) - 5, (400, 2)).T
+    values = rng.uniform(-1, 1, (3, 400)).astype(np.float32)
     poses = [alignment.Pose(0, 0), alignment.Pose(3.5, -6.7, -3.1, 1.1), alignment.Pose(43, 0)]
-
-    def evaluate():
-        sampler = alignment._EvidenceSampler(texture, texture, shape, shape, 19, native=native)
-        return [sampler(pose, subset) for pose in poses for subset in ("fit", "holdout")]
-
-    actual = evaluate()
-    monkeypatch.setattr(alignment, "_sample_pose_evidence", None)
-    monkeypatch.setattr(alignment, "_sample_native_delta", None)
-    monkeypatch.setattr(alignment, "_sample_linear", None)
-    assert actual == evaluate()
+    bounds = np.asarray(shape, dtype=float) - 1
+    for pose in poses:
+        reference_points = pose.matrix @ points + pose.offset[:, None]
+        keep = np.all((reference_points >= 0) & (reference_points <= bounds[:, None]), axis=0)
+        support, samples, selected = _rust.sample_pose_evidence(texture, reference_points, values, bounds, step)
+        assert support == keep.mean()
+        if keep.sum() < 4:
+            assert samples is selected is None
+            continue
+        valid_points = reference_points[:, keep]
+        expected = (scipy_native_delta(image, valid_points) if native
+                    else scipy_samples(planes, (valid_points + 0.5) / step[:, None] - 0.5))
+        assert samples.tobytes() == expected.tobytes()
+        if keep.all():
+            assert selected is None
+        else:
+            assert selected.flags.f_contiguous
+            np.testing.assert_array_equal(selected, values[:, keep])
 
 
 def test_same_size_exact_search_checks_pixels_between_its_screening_samples():
     target = np.full((512, 512, 3), 0.5, dtype=np.float32)
     delivery = target.copy()
     delivery[1, 1, 2] = np.nextafter(np.float32(0.5), np.float32(1))
-    trace = {}
-    assert _exact_offsets(delivery, target, trace) == []
-    assert trace == {"result": "different_samples", "verified_offsets": 1}
+    _, trace = alignment.align(delivery, target)
+    assert trace["stages"][0] == {"method": "exact_native_delivery_in_reference",
+                                  "result": "different_samples", "verified_offsets": 1}
+
+
+def test_alignment_geometry_api_projects_native_crop():
+    target = np.random.default_rng(128).random((9, 11, 3), dtype=np.float32)
+    delivery = target[2:6, 3:7]
+    (placement,), trace = alignment.align(delivery, target)
+    assert trace["status"] == "matched"
+    assert placement.pose == alignment.Pose(2, 3)
+    assert placement.box == (0, 0, 4, 4)
+    assert alignment.native_overlap(placement, target.shape) == (2, 3, 6, 7)
+    coverage, resolution, vertices = alignment.overlap(placement, target.shape[:2])
+    assert coverage == resolution == pytest.approx(16 / 99)
+    assert vertices == [[2.5, 1.5], [6.5, 1.5], [6.5, 5.5], [2.5, 5.5]]
+    projected, support = alignment.project(delivery, target.shape, placement)
+    assert support.dtype == np.bool_
+    assert support.sum() == 16
+    np.testing.assert_array_equal(projected[support], target[support])
 
 
 @pytest.mark.parametrize("texture", ["textured", "near-flat", "flat"])

@@ -1,0 +1,8 @@
+BokehForge uses CubeCL 0.11.4 and statically links the LLVM 23.1.0 libraries
+distributed by Tracel LLVM Bundler 23.1.0-4.
+
+Tracel release https://github.com/tracel-ai/tracel-llvm/releases/tag/v23.1.0-4
+LLVM source https://github.com/llvm/llvm-project/tree/ea7d852a70e8bdfaf601d6626a760f9771b2c4b4
+
+LICENSE.TXT and BLAKE3-LICENSE accompany the LLVM project and its BLAKE3 code.
+Support-NOTICE.TXT accompanies the LLVM System Interface Library.

@@ -168,16 +168,38 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     saved = json.loads(result_path.read_text())
 
     reopened = open_review(root, store)
-    for loader_hash in (
-        "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6",
-        "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7",
+
+    def output_with_recipe(converter, loader, helpers):
+        recipe = {**catalog_scene.metadata["recipe"], "converter_sha256": converter,
+                  "loader_sha256": loader, "shared_helpers_sha256": helpers}
+        recipe_hash = sha256(json.dumps(recipe, sort_keys=True).encode()).hexdigest()
+        fingerprint = runs.scene_fingerprint(app.catalog, catalog_scene, recipe_sha256=recipe_hash)
+        result_path.write_text(json.dumps({**saved, "scene_fingerprint": fingerprint}))
+        return reopened.scene_details(scene, job)["outputs"][0]
+
+    old_converter = "f0b9ebf6223225b9ebd0810cbe450a5bd2ecbf3c38955a8be025745f118fc20b"
+    old_helpers = "809aeadd11408d266ca92ced254ee61e45a4bf4d2f1ffbb588e456e2f8ca97b6"
+    legacy_loader = "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6"
+    rust_scorer_loader = "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7"
+    progress_loader = "e086629e6a1963b5eb89f647dcb19c0326b97adf00fa53d952f980bb0af36ce1"
+    progress_helpers = "473e4a8473d1422e9d94638e1c4b18e35984c822c40edddab84c08bff0ee154d"
+    native_converter = "2cb7a404d768a107fc03f2f54049559cae6127af8924190f5bd21aca42f377ac"
+    native_loader = "9af934c6991ea96d9935d43b932644c38f0a64aae7b927ad37522b6cb3e3061d"
+    for identity in (
+        ("0" * 64, rust_scorer_loader, old_helpers),
+        (old_converter, progress_loader, old_helpers),
     ):
-        legacy_recipe = {**catalog_scene.metadata["recipe"], "loader_sha256": loader_hash,
-                         "shared_helpers_sha256": "809aeadd11408d266ca92ced254ee61e45a4bf4d2f1ffbb588e456e2f8ca97b6"}
-        legacy_sha256 = sha256(json.dumps(legacy_recipe, sort_keys=True).encode()).hexdigest()
-        saved["scene_fingerprint"] = runs.scene_fingerprint(app.catalog, catalog_scene, recipe_sha256=legacy_sha256)
-        result_path.write_text(json.dumps(saved))
-        rating = reopened.scene_details(scene, job)["outputs"][0]["rating"]
+        unrelated = output_with_recipe(*identity)
+        assert unrelated["status"] == "different_source" and unrelated["rating"] is None
+    for identity in (
+        (old_converter, legacy_loader, old_helpers),
+        (old_converter, rust_scorer_loader, old_helpers),
+        (old_converter, progress_loader, progress_helpers),
+        (native_converter, native_loader, old_helpers),
+    ):
+        output = output_with_recipe(*identity)
+        assert output["status"] == "ready"
+        rating = output["rating"]
         assert rating["grade"] == 4 and rating["comment"] == comment
     exported, = csv.DictReader(StringIO(reopened.ratings.export_csv()))
     assert exported["run_id"] == job and exported["scene_id"] == scene
@@ -601,7 +623,7 @@ def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monke
         calls.append(details)
         started.set()
         assert gate.wait(5)
-        return score_saved(catalog, scene, path, details=details, **options)
+        return score_saved(catalog, scene, path, details=details, device="cpu", **options)
 
     monkeypatch.setattr(runs, "_render", render)
     monkeypatch.setattr(scores, "score_saved_output", delayed_score)
@@ -637,7 +659,7 @@ def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monke
         path = app.artifact({"run": run, "scene": scene, "stacker": "pancake"}, "image")
         report = tmp_path / "benchmark"
         assert bench(["--root", str(root), "--config", str(root / "sources.json"), "--candidate-dir",
-                      str(path.parents[1]), "--output", str(report), "--no-attention"]) == 0
+                      str(path.parents[1]), "--output", str(report), "--device", "cpu", "--no-attention"]) == 0
         benchmark_row, = json.loads((report / "report.json").read_text())["scenes"]
         assert benchmark_row["scene_score"] == score
         assert benchmark_row["alignment"] == result["benchmark"]["alignment"]
