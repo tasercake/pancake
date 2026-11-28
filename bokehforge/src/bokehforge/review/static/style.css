@@ -443,8 +443,9 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
 .overlay-action-bar input:disabled { opacity: .45; cursor: default; }
 .overlay-picker {
   position-area: bottom span-left;
-  position-try-fallbacks: flip-inline;
+  position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
   margin-block-start: .35rem;
+  max-inline-size: calc(100vw - 1rem);
   max-block-size: min(18rem, 65dvh);
   padding: .25rem;
   overflow: auto;
@@ -455,6 +456,9 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
   color: var(--ink);
   box-shadow: 0 .3rem .8rem #0008;
   pointer-events: auto;
+}
+@supports not (position-area: bottom span-left) {
+  .overlay-picker { position: fixed; inset: auto; inline-size: max-content; margin: 0; }
 }
 .overlay-picker:popover-open { display: grid; }
 .overlay-picker button {

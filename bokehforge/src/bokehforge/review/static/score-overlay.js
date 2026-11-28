@@ -105,11 +105,32 @@ export class ScoreOverlay {
     };
     this.grid.onclick = () => changeSettings({ side: settings.side === 8 ? 32 : 8 });
     this.opacity.oninput = () => changeSettings({ opacity: this.opacity.valueAsNumber });
+    const needsPickerPosition = !CSS.supports("position-area", "bottom span-left");
+    if (needsPickerPosition) {
+      const reposition = () => {
+        if (this.picker.matches(":popover-open")) this.positionPicker();
+      };
+      window.addEventListener("resize", reposition);
+      window.addEventListener("scroll", reposition, { passive: true });
+    }
     this.picker.addEventListener("toggle", ({ newState }) => {
       if (newState === "open") {
+        if (needsPickerPosition) this.positionPicker();
         (this.picker.querySelector('[aria-pressed="true"]') ?? this.picker.firstElementChild).focus();
       }
     });
+  }
+
+  positionPicker() {
+    const anchor = this.damage.getBoundingClientRect();
+    const { offsetWidth: width, offsetHeight: height } = this.picker;
+    const { clientWidth, clientHeight } = document.documentElement;
+    const gap = 5;
+    const below = anchor.bottom + gap;
+    const above = anchor.top - height - gap;
+    const top = below + height <= clientHeight || above < 0 ? below : above;
+    this.picker.style.left = Math.max(0, Math.min(clientWidth - width, anchor.right - width)) + "px";
+    this.picker.style.top = Math.max(0, Math.min(clientHeight - height, top)) + "px";
   }
 
   update(output, context) {
