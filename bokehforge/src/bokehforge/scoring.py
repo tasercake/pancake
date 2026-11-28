@@ -595,7 +595,7 @@ def _pool(damage, support, grids, edges, *, measured_pixels, explain=False, tile
         if tile_tail > tail or (explain and tail_selection is None):
             tail = tile_tail
             if explain:
-                tail_selection = {**grid.describe(), "tile_count": count, "eligible_tile_count": eligible_count,
+                tail_selection = {**grid.describe(), "tile_count": count, "eligible_tile_count": int(eligible_count),
                                   "cutoff": cutoff}
                 if tiles_by_grid is not None:
                     winning_tiles = (grid, tiles)

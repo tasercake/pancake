@@ -1,7 +1,9 @@
 use numpy::ndarray::Array3;
-use numpy::{IntoPyArray, PyArray3, PyArrayMethods, PyReadonlyArray3, PyUntypedArrayMethods};
+use numpy::{IntoPyArray, PyArray3, PyReadonlyArray3, PyUntypedArrayMethods};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
+
+use crate::c_slice;
 
 const BUCKET_BITS: u32 = 12;
 const BUCKET_SIZE: u32 = 1 << BUCKET_BITS;
@@ -18,6 +20,7 @@ impl PreviewEncoder {
     #[new]
     fn new(cutoffs: Vec<u32>) -> PyResult<Self> {
         if cutoffs.len() != 255
+            || cutoffs[0] == 0
             || cutoffs[254] > 1_f32.to_bits()
             || cutoffs
                 .windows(2)
@@ -25,7 +28,7 @@ impl PreviewEncoder {
         {
             return Err(PyValueError::new_err("Invalid sRGB preview cutoffs"));
         }
-        let first = cutoffs[0] & !(BUCKET_SIZE - 1);
+        let first = (cutoffs[0] - 1) & !(BUCKET_SIZE - 1);
         let last = cutoffs[254] | (BUCKET_SIZE - 1);
         let buckets = (first..=last)
             .step_by(BUCKET_SIZE as usize)
@@ -51,15 +54,10 @@ impl PreviewEncoder {
         py: Python<'py>,
         reference: PyReadonlyArray3<'py, f32>,
     ) -> PyResult<Bound<'py, PyArray3<u8>>> {
-        if !reference.is_c_contiguous() || !reference.data().is_aligned() {
-            return Err(PyValueError::new_err(
-                "Expected packed f32 RGB preview input",
-            ));
-        }
         let &[height, width, channels] = reference.shape() else {
             unreachable!("PyReadonlyArray3 has exactly three axes")
         };
-        let samples = reference.as_slice()?;
+        let samples = c_slice(&reference)?;
         let encoded = py.detach(|| {
             samples
                 .iter()

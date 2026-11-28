@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
@@ -259,6 +261,19 @@ def test_exact_match_preserves_grain_bokeh_and_headroom():
     assert set(measurement.features.values()) == {0}
     assert measurement.diagnostics["linear_rgb_rmse"] == 0
     assert set(measurement.diagnostics["views"]) == {"native"}
+
+
+def test_exact_crop_full_explanation_serializes_to_json():
+    reference = np.random.default_rng(201).random((72, 96, 3), dtype=np.float32)
+    candidate = reference[8:-6, 14:-12]
+    result = measure(candidate, reference, details="full", attention=False, device="cpu")
+    assert result.alignment["placements"][0]["evidence"]["source"] == "exact_native_delivery_in_reference"
+
+    explanation = json.loads(json.dumps(result.explanation, allow_nan=False))
+    comparison = explanation["placements"][0]["comparison"]
+    tail = comparison["families"]["tone"]["pool"]["tail"]
+    covered = comparison["tile_grids"][tail["grid_id"]]["covered_pixels"]
+    assert tail["eligible_tile_count"] == sum(pixels > 0 for pixels in covered)
 
 
 def test_missing_nyquist_detail_grows_continuously_in_four_directions():

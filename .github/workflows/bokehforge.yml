@@ -45,7 +45,7 @@ jobs:
       - name: Install the wheel with locked dependencies
         run: |
           python -m uv sync --frozen --no-install-project ${{ runner.os == 'macOS' && '--extra inspection' || '' }}
-          python -m uv pip install --no-deps dist/*.whl
+          python -m uv pip install --python .venv --no-deps dist/*.whl
       - name: Verify the installed Rust extension and resources
         run: |
           python -m uv run --no-sync python - <<'PY'
@@ -57,6 +57,7 @@ jobs:
           assert callable(_rust.sample_linear)
           assert callable(_rust.lightness_damage)
           assert callable(_rust.pool_tiles)
+          assert callable(_rust.PreviewEncoder)
           assert files("bokehforge").joinpath("heatmaps.html").is_file()
           assert files("bokehforge.data").joinpath("sources.json").is_file()
           assert files("bokehforge.review").joinpath("static", "index.html").is_file()

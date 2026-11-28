@@ -86,7 +86,7 @@ impl<'a> SampleGrid<'a> {
     fn sample(&self, y: f64, x: f64) -> [f32; 3] {
         let top = y.floor();
         let left = x.floor();
-        // Rust's float-to-integer cast saturates at zero for negative coordinates.
+        // A float-to-integer cast saturates at zero for negative coordinates.
         let y0 = (top as usize).min(self.height - 1) as isize * self.row;
         let x0 = (left as usize).min(self.width - 1) as isize * self.column;
         let load = |row, column, channel| {

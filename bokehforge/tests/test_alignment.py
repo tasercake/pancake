@@ -64,6 +64,9 @@ def test_rust_sampler_writes_strided_buffers_and_rejects_invalid_inputs():
     np.testing.assert_array_equal(output, _sample_rgb(image, points))
     assert np.all(backing[::2, :] == -1) and np.all(backing[:, 1::2] == -1)
     rust.sample_linear(image, points[:, :0], output[:0], True)
+    extremes = np.array([[-1e300, 1e300], [1e300, -1e300]])
+    rust.sample_linear(image, extremes, output[:2], True)
+    np.testing.assert_array_equal(output[:2], [image[0, -1], image[-1, 0]])
 
     with pytest.raises(ValueError, match="shapes do not match"):
         rust.sample_linear(image, points, output[:1], True)
@@ -76,6 +79,23 @@ def test_rust_sampler_writes_strided_buffers_and_rejects_invalid_inputs():
     output.setflags(write=False)
     with pytest.raises(ValueError, match="writeable"):
         rust.sample_linear(image, points, output, True)
+
+
+def test_rust_native_texture_matches_numpy_across_float32_exponents(monkeypatch):
+    rust = pytest.importorskip("bokehforge._rust")
+    assert alignment._sample_native_delta is rust.sample_native_delta
+    rng = np.random.default_rng(17)
+    cases = []
+    for _ in range(2):
+        shape = (101, 119, 3)
+        image = (rng.uniform(-0.1, 1.5, shape) * np.exp2(rng.uniform(-150, 120, shape))).astype(np.float32)
+        points = rng.uniform((-3, -3), (104, 122), (10_000, 2)).T
+        points[:, ::3] = np.rint(points[:, ::3])
+        texture = alignment._NativeTexture(image)
+        cases.append((texture, points, texture.sample(points)))
+    monkeypatch.setattr(alignment, "_sample_native_delta", None)
+    for texture, points, actual in cases:
+        assert actual.tobytes() == texture.sample(points).tobytes()
 
 
 @pytest.mark.parametrize("native", [False, True])
