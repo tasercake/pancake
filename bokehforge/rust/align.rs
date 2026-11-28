@@ -1,9 +1,16 @@
 use std::mem::size_of;
 
-use numpy::{IntoPyArray, PyArray2, ndarray::Array2};
+use numpy::{
+    IntoPyArray, PyArray2, PyArray3, PyUntypedArrayMethods,
+    ndarray::{Array2, Array3},
+};
 use pyo3::buffer::{Element, PyBuffer};
 use pyo3::exceptions::{PyBufferError, PyValueError};
 use pyo3::prelude::*;
+
+use crate::c_slice;
+use crate::engine::{python_value, rgb_buffer, valid_rgb};
+use crate::registration::{self, ImageView, Placement, Pose};
 
 struct Buffer<T, const N: usize> {
     buffer: PyBuffer<T>,
@@ -301,9 +308,131 @@ fn sample_pose_evidence<'py>(
     ))
 }
 
+type PoseValues = (f64, f64, f64, f64);
+type PlacementRow = (PoseValues, [usize; 4], f64, Py<PyAny>, Vec<Py<PyAny>>);
+
+fn geometry_placement((y, x, angle, scale): PoseValues, bounds: [usize; 4]) -> PyResult<Placement> {
+    if ![y, x, angle, scale].iter().all(|v| v.is_finite()) || scale <= 0.0 {
+        return Err(PyValueError::new_err(
+            "Expected a finite alignment pose with positive scale",
+        ));
+    }
+    Ok(Placement {
+        pose: Pose { y, x, angle, scale },
+        bounds,
+        weight: 1.0,
+        evidence: serde_json::Value::Null,
+        padding: Vec::new(),
+    })
+}
+
+#[pyfunction]
+fn registration_align(
+    py: Python<'_>,
+    candidate: &Bound<'_, PyAny>,
+    reference: &Bound<'_, PyAny>,
+) -> PyResult<(Vec<PlacementRow>, Py<PyAny>)> {
+    let candidate = rgb_buffer(candidate)?;
+    let reference = rgb_buffer(reference)?;
+    let view = |pixels, shape: &[usize]| ImageView::new(pixels, shape[0], shape[1]);
+    let crop = view(c_slice(&candidate)?, candidate.shape());
+    let target = view(c_slice(&reference)?, reference.shape());
+    let (placements, trace) = py.detach(|| {
+        valid_rgb(crop)?;
+        valid_rgb(target)?;
+        Ok::<_, crate::engine::Error>(registration::align(crop, target))
+    })?;
+    let rows = placements
+        .into_iter()
+        .map(|placement| {
+            let Pose { y, x, angle, scale } = placement.pose;
+            let padding = placement
+                .padding
+                .into_iter()
+                .map(|value| python_value(py, value, ""))
+                .collect::<PyResult<_>>()?;
+            Ok((
+                (y, x, angle, scale),
+                placement.bounds,
+                placement.weight,
+                python_value(py, placement.evidence, "")?,
+                padding,
+            ))
+        })
+        .collect::<PyResult<_>>()?;
+    Ok((rows, python_value(py, trace, "")?))
+}
+
+#[pyfunction]
+fn registration_overlap(
+    pose: PoseValues,
+    bounds: [usize; 4],
+    shape: [usize; 2],
+) -> PyResult<(f64, f64, Vec<[f64; 2]>)> {
+    if shape.contains(&0) || shape[0].checked_mul(shape[1]).is_none() {
+        return Err(PyValueError::new_err("Invalid reference grid"));
+    }
+    Ok(registration::overlap(
+        &geometry_placement(pose, bounds)?,
+        shape,
+    ))
+}
+
+type Projected<'py> = (
+    Bound<'py, PyArray3<f32>>,
+    Option<Bound<'py, PyArray2<bool>>>,
+);
+
+#[pyfunction]
+fn registration_project<'py>(
+    py: Python<'py>,
+    candidate: &Bound<'py, PyAny>,
+    shape: [usize; 2],
+    pose: PoseValues,
+    bounds: [usize; 4],
+) -> PyResult<Projected<'py>> {
+    let placement = geometry_placement(pose, bounds)?;
+    let candidate = rgb_buffer(candidate)?;
+    let crop = ImageView::new(
+        c_slice(&candidate)?,
+        candidate.shape()[0],
+        candidate.shape()[1],
+    );
+    let [top, left, bottom, right] = bounds;
+    let [height, width] = shape;
+    if shape.contains(&0)
+        || height
+            .checked_mul(width)
+            .and_then(|n| n.checked_mul(3))
+            .is_none()
+        || !(top < bottom && left < right && bottom <= crop.h && right <= crop.w)
+    {
+        return Err(PyValueError::new_err(
+            "Invalid delivery bounds or reference grid",
+        ));
+    }
+    let (pixels, support) = py.detach(|| registration::project(crop, shape, &placement));
+    let pixels = Array3::from_shape_vec((height, width, 3), pixels.into_owned())
+        .map_err(|error| PyValueError::new_err(error.to_string()))?;
+    let support = support
+        .map(|mask| {
+            Array2::from_shape_vec(
+                (height, width),
+                mask.into_iter().map(|value| value != 0).collect(),
+            )
+            .map(|mask| mask.into_pyarray(py))
+            .map_err(|error| PyValueError::new_err(error.to_string()))
+        })
+        .transpose()?;
+    Ok((pixels.into_pyarray(py), support))
+}
+
 pub fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(sample_linear, module)?)?;
     module.add_function(wrap_pyfunction!(sample_native_delta, module)?)?;
     module.add_function(wrap_pyfunction!(sample_pose_evidence, module)?)?;
+    module.add_function(wrap_pyfunction!(registration_align, module)?)?;
+    module.add_function(wrap_pyfunction!(registration_overlap, module)?)?;
+    module.add_function(wrap_pyfunction!(registration_project, module)?)?;
     Ok(())
 }

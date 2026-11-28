@@ -1,7 +1,5 @@
 """Independent NumPy and SciPy reference kernels used by scoring tests."""
 
-from functools import lru_cache
-
 import numpy as np
 from scipy import ndimage as ndi
 
@@ -96,31 +94,17 @@ def _detail(candidate, target, blur, support):
     return lost, extra
 
 
-@lru_cache(maxsize=1)
-def lightness_weights():
-    kernels = []
-    for sigma in (0.85, 1.1, 2.5, 10):
-        radius = int(4 * sigma + .5)
-        offsets = np.arange(-radius, radius + 1)
-        weights = np.exp(-.5 / (sigma * sigma) * offsets ** 2)
-        kernels.append((weights / weights.sum())[:radius + 1])
-    return tuple(kernels)
-
-
-def lightness_damage(cl, tl, delta, support, extrema=None):
+def lightness_damage(cl, tl, delta, support):
     blur = _supported_blur(support)
     local_delta = blur(delta, 2.5)
     # Tone carries broad gain, contrast, local lighting, and seam differences.
     tone = _visibility(np.maximum(abs(local_delta), abs(blur(delta, 10))), 8.0)
 
     lost, extra = _detail(cl, tl, blur, support)
-    if extrema is None:
-        upper = ndi.maximum_filter(tl, size=3, mode="reflect")
-        lower = ndi.minimum_filter(tl, size=3, mode="reflect")
-        edge_weight = _visibility(upper - lower, 6.0)
-        near_edge = ndi.maximum_filter(edge_weight, size=9, mode="reflect")
-    else:
-        upper, lower, edge_weight, near_edge = extrema
+    upper = ndi.maximum_filter(tl, size=3, mode="reflect")
+    lower = ndi.minimum_filter(tl, size=3, mode="reflect")
+    edge_weight = _visibility(upper - lower, 6.0)
+    near_edge = ndi.maximum_filter(edge_weight, size=9, mode="reflect")
     # Residual grain is useful evidence in smooth backgrounds. At an existing
     # transition, the signed detail bank and edge neighborhood carry the signal.
     grain = _visibility(abs(delta - blur(delta, 0.85)), 5.0) * (1 - edge_weight)
@@ -132,16 +116,6 @@ def lightness_damage(cl, tl, delta, support, extrema=None):
     np.maximum(shape, _visibility(overshoot, 6.0) * near_edge, out=shape)
 
     return tone, lost, extra, shape
-
-
-def damage(candidate, target, support):
-    cl, ca, cb = lab(candidate)
-    tl, ta, tb = lab(target)
-    delta, delta_a, delta_b = cl - tl, ca - ta, cb - tb
-    tone, lost, extra, boundary = lightness_damage(cl, tl, delta, support)
-    # CIELAB opponent-plane distance keeps a cast visible alongside a tone error.
-    color = _visibility(np.hypot(delta_a, delta_b), 10.0)
-    return (tone, color, lost, extra, boundary, range_damage(candidate, target)), (delta, delta_a, delta_b)
 
 
 def range_damage(candidate, target):

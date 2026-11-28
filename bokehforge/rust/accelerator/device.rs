@@ -50,7 +50,7 @@ fn cuda_device() -> Result<Device, String> {
 
 #[cfg(target_os = "macos")]
 fn metal_device() -> Result<Device, String> {
-    use cubecl::metal::{default_device, register_device};
+    use cubecl::metal::device::{default_device, register_device};
 
     let device = default_device().ok_or("no Metal GPU was found")?;
     Device::metal(register_device(device)).map_err(|error| error.to_string())
