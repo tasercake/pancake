@@ -34,27 +34,25 @@ dependencies = [
 bokehforge = "bokehforge.cli:main"
 
 [build-system]
-requires = ["setuptools>=80", "setuptools-rust>=1.12,<2"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin==1.16.0"]
+build-backend = "maturin"
 
-[tool.setuptools]
-include-package-data = false
+[tool.maturin]
+bindings = "pyo3"
+python-source = "src"
+module-name = "bokehforge._rust"
+locked = true
+compatibility = "linux"
+include = [
+  { path = "Cargo.toml", format = "sdist" },
+  { path = "Cargo.lock", format = "sdist" },
+  { path = "rust-toolchain.toml", format = "sdist" },
+  { path = ".cargo/config.toml", format = "sdist" },
+  { path = "rust/**/*.rs", format = "sdist" },
+]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-namespaces = false
-
-[tool.setuptools.package-data]
-bokehforge = ["heatmaps.html"]
-"bokehforge.data" = ["sources.json"]
-"bokehforge.review" = ["static/*", "static/fonts/*"]
-
-[[tool.setuptools-rust.ext-modules]]
-target = "bokehforge._rust"
-path = "Cargo.toml"
-binding = "PyO3"
-cargo-manifest-args = ["--locked"]
-debug = false
+[tool.maturin.target.aarch64-apple-darwin]
+macos-deployment-target = "15.0"
 
 [dependency-groups]
 dev = ["pytest>=8.3,<10"]
@@ -62,7 +60,6 @@ dev = ["pytest>=8.3,<10"]
 [tool.uv]
 cache-keys = [
   { file = "pyproject.toml" },
-  { file = "MANIFEST.in" },
   { file = "Cargo.toml" },
   { file = "Cargo.lock" },
   { file = "rust-toolchain.toml" },
