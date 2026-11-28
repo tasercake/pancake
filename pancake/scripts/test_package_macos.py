@@ -111,6 +111,10 @@ class MacPackageTests(unittest.TestCase):
         self.commands.append(argv)
         if argv[:len(BUILD)] == BUILD:
             self.assertEqual(argv[-2], "--target-dir")
+            if "--timings" in argv:
+                report = Path(argv[-1]) / "cargo-timings/cargo-timing.html"
+                report.parent.mkdir(parents=True)
+                report.write_text("Cargo timing report")
             release = Path(argv[-1]) / "aarch64-apple-darwin" / "release"
             release.mkdir(parents=True, exist_ok=True)
             for name in BINARIES:
@@ -241,6 +245,13 @@ class MacPackageTests(unittest.TestCase):
             self.assertEqual(receipt["files_sha256"][path], file_sha256(binary))
         self.assertEqual((self.output / "build.log").read_text(), "locked build output\n")
         self.assertEqual(sum(cmd[:3] == ("codesign", "--verify", "--strict") for cmd in self.commands), 2)
+
+    def test_cold_build_retains_cargo_timing_report_in_target_dir(self):
+        target = self.root / "cargo-target"
+        build_package(self.source, self.output, IDENTIFIER, "17", target_dir=target, timings=True)
+        receipt = json.loads((self.output / "package-receipt.json").read_bytes())
+        self.assertEqual(receipt["build_command"], [*BUILD, "--timings", "--target-dir", str(target)])
+        self.assertEqual((target / "cargo-timings/cargo-timing.html").read_text(), "Cargo timing report")
 
     def test_release_notices_are_sealed_inside_the_app_and_recorded(self):
         self.notices = self.root / "release-notices"
