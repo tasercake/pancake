@@ -30,9 +30,9 @@ For scenes with one supported RGB ground-truth image, each ready output shows th
 
 Open **Explain score** to see the inferred area, resolution cap, overlap quality, and match confidence. **How alignment was inferred** shows search evidence and the score contribution of each retained placement. An unmatched delivery still has an explanation with the reason.
 
-Under **Explain score**, choose **Damage** or **Attention** from **Overlay**. Damage shows differences for the selected family on an 8- or 32-pixel grid. Expand a family to see the pooling values and weights. Attention shows which reference regions the scorer emphasizes, on a 0–1 scale. It is available for attention-weighted scores with an aligned output.
+Use the heatmap controls in the upper-right corner of the output image or of the lightbox when an output is selected. **Attention** shows which reference regions the scorer emphasizes, on a 0–1 scale. It is available for attention-weighted scores with an aligned output. **Damage** starts with **All damage**, which combines the six damage types using the benchmark’s weights. Select the active Damage button again to choose a type or turn the heatmap off. Use the grid button to switch between 8- and 32-pixel tiles and the slider to adjust opacity. Expand a damage family under **Explain score** to see its pooling values and weights.
 
-Both overlays use the leading placement and load on demand. The lightbox keeps them aligned during zoom and pan and confines them to the output side of a reference swipe. The full reference stays clear for comparison.
+The overlay, damage type, tile size, and opacity carry over when you switch outputs or move between the main viewer and the lightbox. Heatmaps use the leading placement and load on demand. The lightbox keeps the heatmap aligned during zoom and pan and confines it to the output side of a reference swipe. The full reference stays clear for comparison.
 
 ## Set up the stackers
 

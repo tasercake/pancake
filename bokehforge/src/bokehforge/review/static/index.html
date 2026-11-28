@@ -88,6 +88,7 @@
             <div class="candidate-viewport">
               <div class="image-well" id="candidate-image"></div>
               <div class="image-well" id="comparison-reference" hidden></div>
+              <div class="overlay-tools" id="candidate-overlay" hidden></div>
             </div>
             <div class="candidate-controls">
               <div class="benchmark-line candidate-benchmark" hidden>
@@ -203,6 +204,7 @@
           aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
           title="Drag to reveal the reference"></button>
       </div>
+      <div class="overlay-tools" id="lightbox-overlay" hidden></div>
       <p id="lightbox-status" role="status"></p>
       <aside class="score-explanation lightbox-explanation" id="lightbox-explanation" aria-label="Score explanation" hidden></aside>
     </div>
@@ -229,22 +231,6 @@
       <summary>How alignment was inferred</summary>
       <pre data-alignment-evidence></pre>
     </details>
-    <div class="damage-controls" data-damage-controls>
-      <label>Overlay <select data-overlay>
-        <option value="off">Off</option>
-        <option value="damage">Damage</option>
-        <option value="attention">Attention</option>
-      </select></label>
-      <div class="damage-options" data-damage-options hidden>
-        <label>Family <select data-family></select></label>
-        <label>Grid <select data-grid>
-          <option value="8">8 px tiles</option>
-          <option value="32">32 px tiles</option>
-        </select></label>
-      </div>
-    </div>
-    <p class="damage-help" data-attention-help hidden>Attention shows which regions of the reference the scorer emphasizes. Higher values indicate more attention.</p>
-    <p class="damage-status" data-damage-status role="status" hidden></p>
     <p class="damage-help" data-damage-curve></p>
     <div class="damage-column-headings" data-damage-columns aria-hidden="true">
       <span>Damage family</span><span>Observed</span><span>Weight</span><span>Contribution</span>
@@ -253,8 +239,35 @@
     <details class="damage-method" data-damage-method>
       <summary>How to read damage</summary>
       <p>Zero damage means no measured difference from the reference. Damage can reach 1 before attention weighting and up to 2 with weighting. The six families separate different ways an output can lose fidelity, such as shifting tones or smoothing away detail.</p>
-      <p>Each contribution is observed damage multiplied by its weight. Overlap quality decays exponentially as their sum increases. The overlay shows the selected family’s measured tiles on one grid at a time.</p>
+      <p>Each contribution is observed damage multiplied by its weight. Overlap quality decays exponentially as their sum increases.</p>
     </details>
+  </template>
+  <template id="score-overlay-template">
+    <div class="overlay-action-bar" role="group" aria-label="Heatmap controls">
+      <button class="quiet" type="button" data-attention aria-label="Attention heatmap" aria-pressed="false">
+        <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M2 10s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5Z"/>
+          <circle cx="10" cy="10" r="2.35"/>
+        </svg>
+      </button>
+      <button class="quiet overlay-damage" type="button" data-damage aria-label="Damage heatmap" aria-pressed="false">
+        <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 16c2.5 0 3-1.2 4-4.5l1.5 1 2-7 2 9 1.5-3c1.2 3 1.8 4.5 3 4.5"/>
+        </svg>
+      </button>
+      <button class="quiet overlay-grid" type="button" data-overlay-grid aria-label="Damage tile size" disabled>
+        <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="3.5" y="3.5" width="13" height="13" rx="1"/>
+          <path d="M10 3.5v13m-6.5-6.5h13"/>
+        </svg>
+        <span aria-hidden="true">8</span>
+      </button>
+      <input type="range" data-overlay-opacity min="0" max="100" value="100"
+        aria-label="Overlay opacity" title="Overlay opacity" disabled>
+    </div>
+    <div class="overlay-picker" popover="auto" role="group" aria-label="Damage types"></div>
+    <p class="overlay-status" role="status"></p>
   </template>
   <template id="damage-legend-template">
     <div class="damage-legend" hidden>

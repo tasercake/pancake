@@ -283,6 +283,17 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
         assert updated.wait(5)
         tiles = review.tiles(catalog, scene, tmp_path, delivery, result["artifact_revision"], "tone", 8)
         assert tiles["inspection_map_sha256"] == saved["inspection_map_sha256"]
+        grids = saved["explanation"]["placements"][0]["comparison"]["tile_grids"]
+        for side in (8, 32):
+            combined = review.tiles(catalog, scene, tmp_path, delivery, result["artifact_revision"], "all", side)
+            expected = grids[f"{side}:0:0"]
+            assert combined["status"] == "ok" and combined["family"] == "all"
+            assert combined["grid"]["tile_size"] == side
+            assert combined["grid"]["covered_pixels"] == expected["covered_pixels"]
+            np.testing.assert_allclose(combined["grid"]["values"], [
+                sum(weight * expected["values"][name][index] for name, weight in FAMILY_WEIGHTS.items())
+                for index in range(len(expected["covered_pixels"]))
+            ])
         assert "data" not in result["explanation"]["attention"]
         updated.clear()
         revision = result["artifact_revision"]
