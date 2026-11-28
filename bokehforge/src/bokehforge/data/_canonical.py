@@ -7,10 +7,8 @@ from pathlib import Path
 import platform
 import re
 
-import imagecodecs
 import numpy as np
 from PIL import Image, ImageCms, ImageOps
-import tifffile
 
 from . import _files
 from ._files import digest, natural_key
@@ -29,6 +27,7 @@ INFINIGEN_DISTANCES = (0.8, 1.2, 1.7, 2.3, 3.0, 3.8, 4.7, 6.0, 8.0)
 
 
 def runtime_recipe(source, *, loader_sha256):
+    import imagecodecs
     import rawpy
     packages = {n: importlib.metadata.version(n) for n in ["numpy", "pillow", "tifffile", "imagecodecs", "rawpy", "libarchive-c"]}
     definition = {"version": 1, "converter_sha256": CONVERTER_SHA256, "packages": packages,
@@ -149,6 +148,8 @@ def decode(source, transfer, *, suffix=None, page=None):
         yield array.astype(np.float32) / 65535.0, None, metadata
         return
     if suffix in TIFF_IMAGES:
+        import tifffile
+
         with tifffile.TiffFile(source) as image:
             pages = enumerate(image.pages) if page is None else ((page, image.pages[page]),)
             for index, image_page in pages:
@@ -191,6 +192,8 @@ def normalize(array, transfer, profile, metadata):
         if array.shape[2] == 1:
             array = np.repeat(array, 3, axis=2)
     if profile:
+        import imagecodecs
+
         output_profile = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
         array = imagecodecs.cms_transform(np.ascontiguousarray(array), profile=profile, outprofile=output_profile,
                                          colorspace="cmyk" if cmyk else "rgb", outcolorspace="rgb", outdtype=np.float32, intent=1)
@@ -221,6 +224,8 @@ def normalize(array, transfer, profile, metadata):
 
 def encode_tiff(destination, array):
     """Encode an array to a path or binary stream using the canonical TIFF settings."""
+    import tifffile
+
     tifffile.imwrite(destination, np.ascontiguousarray(array, dtype=np.float32),
                      photometric="rgb" if array.ndim == 3 else "minisblack",
                      compression="deflate", compressionargs={"level": 6}, predictor=3,

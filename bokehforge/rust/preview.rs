@@ -4,49 +4,20 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 
 use crate::c_slice;
-
-const BUCKET_BITS: u32 = 12;
-const BUCKET_SIZE: u32 = 1 << BUCKET_BITS;
+use crate::srgb::SrgbEncoder;
 
 #[pyclass(frozen)]
 struct PreviewEncoder {
-    first: u32,
-    last: u32,
-    buckets: Vec<u32>,
+    encoder: SrgbEncoder,
 }
 
 #[pymethods]
 impl PreviewEncoder {
     #[new]
     fn new(cutoffs: Vec<u32>) -> PyResult<Self> {
-        if cutoffs.len() != 255
-            || cutoffs[0] == 0
-            || cutoffs[254] > 1_f32.to_bits()
-            || cutoffs
-                .windows(2)
-                .any(|pair| pair[0] >> BUCKET_BITS >= pair[1] >> BUCKET_BITS)
-        {
-            return Err(PyValueError::new_err("Invalid sRGB preview cutoffs"));
-        }
-        let first = (cutoffs[0] - 1) & !(BUCKET_SIZE - 1);
-        let last = cutoffs[254] | (BUCKET_SIZE - 1);
-        let buckets = (first..=last)
-            .step_by(BUCKET_SIZE as usize)
-            .map(|start| {
-                let code = cutoffs.partition_point(|&cutoff| cutoff <= start) as u32;
-                let bias = cutoffs
-                    .get(code as usize)
-                    .map_or(0, |&cutoff| (start + BUCKET_SIZE).saturating_sub(cutoff));
-                // A bucket spans at most one cutoff. Adding the low bits
-                // crosses into the next byte value exactly at that cutoff.
-                (code << BUCKET_BITS) + bias
-            })
-            .collect();
-        Ok(Self {
-            first,
-            last,
-            buckets,
-        })
+        let encoder = SrgbEncoder::new(&cutoffs)
+            .ok_or_else(|| PyValueError::new_err("Invalid sRGB preview cutoffs"))?;
+        Ok(Self { encoder })
     }
 
     fn encode<'py>(
@@ -61,14 +32,7 @@ impl PreviewEncoder {
         let encoded = py.detach(|| {
             samples
                 .iter()
-                .map(|sample| {
-                    // Positive finite f32 values sort by their bit patterns.
-                    // A signed comparison puts all negative values below black.
-                    let bits =
-                        (sample.to_bits() as i32).clamp(self.first as i32, self.last as i32) as u32;
-                    let bucket = self.buckets[((bits - self.first) >> BUCKET_BITS) as usize];
-                    ((bucket + (bits & (BUCKET_SIZE - 1))) >> BUCKET_BITS) as u8
-                })
+                .map(|&sample| self.encoder.encode(sample))
                 .collect::<Vec<_>>()
         });
         Ok(Array3::from_shape_vec((height, width, channels), encoded)

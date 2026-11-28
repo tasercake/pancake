@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 from scipy import fft, ndimage as ndi, optimize
 
+from ._score_contract import ALIGNMENT_VERSION, MAX_ROTATION_DEGREES
 from ._workers import workers
 
 try:
@@ -22,8 +23,6 @@ except ImportError:
     _sample_native_delta = None
     _sample_pose_evidence = None
 
-ALIGNMENT_VERSION = 1
-MAX_ROTATION_DEGREES = 5.0
 _COARSE_SIDE = 160
 _FINE_SIDE = 960
 _MAX_PLACEMENTS = 3

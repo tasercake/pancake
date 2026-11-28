@@ -1,30 +1,33 @@
-"""Download and load reproducible focus-stacking datasets."""
+"""Score focus stacks and load reproducible focus-stacking datasets."""
 
-from .data.datasets import DATASET_ALL, DATASET_INFINIGEN_DEFOCUS, Batch, Dataset, Sample, load_dataset
-from .data.lazy import DecodedFrame, Frame, FrameDecoder, FrameWindowDataset, FusionPairDataset, Scene, SceneCatalog
+from importlib import import_module
 
-__all__ = [
-    "DATASET_ALL",
-    "DATASET_INFINIGEN_DEFOCUS",
-    "Batch",
-    "Dataset",
-    "DecodedFrame",
-    "Frame",
-    "FrameDecoder",
-    "FrameWindowDataset",
-    "FusionPairDataset",
-    "Sample",
-    "Scene",
-    "SceneCatalog",
-    "load_dataset",
-    "measure",
-]
+_exports = {
+    "DATASET_ALL": ".data.datasets",
+    "DATASET_INFINIGEN_DEFOCUS": ".data.datasets",
+    "Batch": ".data.datasets",
+    "Dataset": ".data.datasets",
+    "DecodedFrame": ".data.lazy",
+    "Frame": ".data.lazy",
+    "FrameDecoder": ".data.lazy",
+    "FrameWindowDataset": ".data.lazy",
+    "FusionPairDataset": ".data.lazy",
+    "Sample": ".data.datasets",
+    "Scene": ".data.lazy",
+    "SceneCatalog": ".data.lazy",
+    "load_dataset": ".data.datasets",
+    "measure": ".scoring",
+}
+__all__ = list(_exports)
 
 
 def __getattr__(name):
-    if name == "measure":
-        from .scoring import measure
+    if name not in _exports:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    value = getattr(import_module(_exports[name], __name__), name)
+    globals()[name] = value
+    return value
 
-        globals()[name] = measure
-        return measure
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+def __dir__():
+    return sorted(globals().keys() | _exports.keys())

@@ -1,33 +1,22 @@
 """Generate inspection maps from clean references during scoring."""
 
 from functools import lru_cache
-from hashlib import sha256
-import os
-from pathlib import Path
-from threading import Lock
 
 import numpy as np
 from PIL import Image
 
+from ._attention_setup import model_directory as _model_directory, prepare_attention
 from ._device import Device
+from ._score_contract import INSPECTION_MAP_VERSION
 from ._workers import workers
-from .scoring import validate_heatmap, validate_rgb
+from .scoring import validate_rgb
 
 try:
     from . import _rust
 except ImportError:
     _rust = None
 
-INSPECTION_MAP_VERSION = "inspection-blend-v1"
 _MAX_SIDE = 640
-
-
-def _model_directory():
-    override = os.environ.get("BOKEHFORGE_INSPECTION_MODELS")
-    if override:
-        return Path(override).expanduser().resolve()
-    cache_dir = Path(os.environ.get("XDG_CACHE_HOME") or (Path.home() / ".cache"))
-    return cache_dir / "bokehforge" / "inspection-models"
 
 
 def _encode_srgb8(samples):
@@ -96,56 +85,40 @@ def reference_preview(reference):
 
 
 class Inspection:
-    """Load the blend once and reuse the last reference map in this scoring session."""
+    """Generate and cache the pretrained Inspection map in the native runtime."""
 
-    def __init__(self):
-        self._predict = None
-        self._last = None
-        self._lock = Lock()
+    def __init__(self, device: Device = "auto"):
+        self.device = device
 
     @staticmethod
-    def _load():
-        from .inspection_models import inspection_blend
-
-        try:
-            return inspection_blend(_model_directory())
-        except (ImportError, OSError, RuntimeError) as exc:
-            raise RuntimeError(f"Could not load the Inspection blend: {exc}. "
-                               "See the benchmark guide for model setup or use --no-attention.") from exc
+    def prepare():
+        prepare_attention()
 
     def preview_map(self, reference):
         """Return the original model grid and its digest, before native interpolation."""
-        preview = reference_preview(reference)
-        key = (preview.size, sha256(preview.tobytes()).digest())
-        with self._lock:
-            if self._last is None or self._last[0] != key:
-                if self._predict is None:
-                    self._predict = self._load()
-                raw = validate_heatmap(self._predict(preview), preview.size[::-1])
-                digest = sha256(raw.astype("<f4", copy=False).tobytes()).hexdigest()
-                raw.setflags(write=False)
-                self._last = key, raw, digest
-            _, raw, digest = self._last
+        validate_rgb(reference)
+        self.prepare()
+        pixels = np.require(reference, dtype=np.float32, requirements=("C", "A"))
+        raw, digest = _rust.inspection_preview(pixels, self.device)
+        raw.setflags(write=False)
         return raw, digest
 
     def cached_map(self, digest):
-        with self._lock:
-            if self._last is not None and self._last[2] == digest:
-                return self._last[1]
-        return None
+        raw = _rust.cached_attention(digest)
+        if raw is not None:
+            raw.setflags(write=False)
+        return raw
 
     def generate(self, reference):
-        raw, digest = self.preview_map(reference)
-        height, width = reference.shape[:2]
-        if raw.shape != (height, width):
-            raw = np.asarray(Image.fromarray(raw).resize((width, height), Image.Resampling.BILINEAR))
-        return raw, digest
+        validate_rgb(reference)
+        self.prepare()
+        pixels = np.require(reference, dtype=np.float32, requirements=("C", "A"))
+        return _rust.inspection_generate(pixels, self.device)
 
 
 default_inspection = Inspection()
 
 
+@lru_cache(maxsize=5)
 def inspection_for(device: Device):
-    if device in ("cpu", "mps"):
-        raise RuntimeError("The Inspection profile requires CUDA. Disable attention or supply a heatmap.")
-    return default_inspection
+    return default_inspection if device == "auto" else Inspection(device)

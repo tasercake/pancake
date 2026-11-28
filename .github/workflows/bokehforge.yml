@@ -46,10 +46,13 @@ jobs:
         run: |
           python -m uv sync --frozen --no-install-project ${{ runner.os == 'macOS' && '--extra inspection' || '' }}
           python -m uv pip install --python .venv --no-deps dist/*.whl
-      - name: Verify the installed Rust extension and resources
+      - name: Verify the installed Rust extension, backends, and resources
         run: |
-          python -m uv run --no-sync python - <<'PY'
+          python -m uv run --no-sync python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          from importlib.metadata import distribution
           from importlib.resources import files
+          import subprocess
+          import sys
 
           from bokehforge import _rust
 
@@ -58,23 +61,28 @@ jobs:
           assert callable(_rust.lightness_damage)
           assert callable(_rust.pool_tiles)
           assert callable(_rust.PreviewEncoder)
+          assert _rust.damage_backend("cpu") == "cpu"
+          selected = _rust.damage_backend("auto")
+          print(f"Native BokehForge scorer on {sys.platform}: selected {selected}")
+          if sys.platform == "darwin":
+              assert _rust.damage_available("mps") and selected == "mps"
+          else:
+              assert not _rust.damage_available("cuda") and selected == "cpu"
+          if sys.platform == "linux":
+              libraries = subprocess.check_output(["ldd", _rust.__file__], text=True)
+              for name in ("libLLVM", "libcuda.so", "libnvrtc", "libonnxruntime"):
+                  assert name not in libraries, libraries
+          license_files = {file.name for file in distribution("bokehforge").files
+                           if file.parent.name == "llvm" and "licenses" in file.parts}
+          assert {"LICENSE.TXT", "BLAKE3-LICENSE", "Support-NOTICE.TXT", "PROVENANCE.txt"} <= license_files
           assert files("bokehforge").joinpath("heatmaps.html").is_file()
           assert files("bokehforge.data").joinpath("sources.json").is_file()
           assert files("bokehforge.review").joinpath("static", "index.html").is_file()
           assert files("bokehforge.review").joinpath("static", "fonts", "SpaceGrotesk-Regular.ttf").is_file()
-          PY
-      - name: Report Apple Metal capability
-        if: runner.os == 'macOS'
-        run: |
-          python -m uv run --no-sync python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
-          import platform
-          import torch
-
-          mps = torch.backends.mps
-          print(f"PyTorch {torch.__version__} on {platform.machine()}. MPS built={mps.is_built()}, available={mps.is_available()}.")
           PY
       - name: Run scoring and parity tests
         run: >
           python -m uv run --no-sync python -m pytest -ra
           tests/test_scoring.py tests/test_alignment.py tests/test_native_damage.py
           tests/test_native_pooling.py tests/test_inspection.py tests/test_bench.py
+          tests/test_native_runtime.py

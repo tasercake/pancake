@@ -1,13 +1,28 @@
 # BokehForge
 
-BokehForge downloads verified focus-stacking datasets and loads their frames on demand from Python. It provides full-resolution float32 linear-sRGB pixels, optional TIFF bytes, and source provenance.
+BokehForge downloads verified focus-stacking datasets and benchmarks delivered stacks against all-in-focus references. The Rust engine handles alignment, damage measurement, scoring, and Inspection inference. The Python package provides the CLI, NumPy API, dataset loaders, and stacker plug-in interface.
 
-## Download data
+## Install from source
 
-Building BokehForge from source requires Rust 1.88 or later and Cargo. A platform wheel includes the compiled scorer. From this directory, use the pinned project environment to download InfinigenDefocus (D29), the shipped dataset.
+Use Python 3.12, `uv`, Rust 1.100 or later with Cargo, and a C++17-capable toolchain. A matching platform wheel includes the compiled engine.
+
+| Platform | Source build tools |
+| --- | --- |
+| Linux x86-64 | A C/C++ compiler and linker, such as GCC and binutils |
+| macOS on Apple Silicon | Xcode Command Line Tools |
+| Windows x64 | Rust’s MSVC toolchain, Visual Studio C++ Build Tools, and a Windows SDK |
+
+The source build downloads and statically links the pinned Tracel LLVM 23.1.0-4 bundle for CubeCL. From this directory, install the locked environment.
 
 ```sh
 uv sync --frozen
+```
+
+## Download data
+
+Download InfinigenDefocus (D29), the shipped dataset. The loaders provide full-resolution float32 linear-sRGB pixels, optional TIFF bytes, and source provenance.
+
+```sh
 uv run --frozen bokehforge data download
 ```
 
@@ -15,20 +30,20 @@ The downloader, Python library, benchmark, and Stackroom share one per-user data
 
 ## Benchmark stacks
 
-Run a Python stacker against the downloaded all-in-focus targets or score rendered TIFFs from an external tool. The benchmark prints one reference-fidelity score and saves artifact diagnostics for investigation. With the [inspection dependencies](docs/benchmark.md#install-the-inspection-models) installed, the default scorer downloads missing model files on first use. Use `--no-attention` with the base installation.
+Run a Python stacker against the downloaded targets or score rendered TIFFs from an external tool. BokehForge automatically selects CUDA, Apple Metal, or CPU. The benchmark prints one reference-fidelity score and saves per-scene diagnostics.
 
 ```sh
-.venv/bin/bokehforge bench --algorithm mean --output ../artifacts/bench-mean
+uv run --frozen bokehforge bench --algorithm mean --output ../artifacts/bench-mean --no-attention
 ```
 
-See the [benchmark guide](docs/benchmark.md) for the stacker contract, scoring profile, and saved-output replay.
+Install the Inspection extra and omit `--no-attention` to use the default attention weighting. The first Inspection run converts the pretrained models once, then later runs reuse the verified model cache. [Benchmark setup, stacker contract, and saved-output replay](docs/benchmark.md)
 
 ## Browse and rate stacks in Stackroom
 
 Stackroom is BokehForge’s local focus stack review app. Launch it from the repository root.
 
 ```sh
-bokehforge/.venv/bin/bokehforge review
+uv run --project bokehforge --frozen bokehforge review
 ```
 
 See the [Stackroom guide](docs/review.md) for dataset selection, stacker setup, and rating export.
@@ -43,7 +58,7 @@ uv run --frozen bokehforge heatmaps
 
 Open the printed URL, normally `http://127.0.0.1:8765/`. Select the datasets you want to browse and click **Generate heatmaps** if any are missing. The app downloads verified originals as needed and shows progress while it prepares the datasets and generates the maps. Completed galleries are cached under `<data-root>/.bokehforge/heatmaps/` in the [shared BokehForge data directory](docs/data.md). They open automatically on later launches from any worktree.
 
-The standard install generates **Texture & light** maps and a center-only comparison. Install the [inspection dependencies](docs/benchmark.md#install-the-inspection-models) on a CUDA machine to also generate the **Inspection models** group. It includes the Inspection blend and its component maps. BokehForge downloads missing model files on first use. Use `--port` to choose a different port and Ctrl+C to stop the server.
+The standard install generates **Texture & light** maps and a center-only comparison. The viewer’s **Inspection models** group uses its Python CUDA generator to display the blend and its component maps. Install the Inspection extra to enable that group on a CUDA machine. Use `--port` to choose a different port and Ctrl+C to stop the server. [Inspection setup](docs/benchmark.md#install-the-inspection-models)
 
 ## Use from Python
 

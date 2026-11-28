@@ -4,12 +4,12 @@ import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
 
-from bokehforge import scoring
+from bokehforge import _rust, scoring
 from bokehforge._device import cuda_available, damage_backend, mps_available
 from bokehforge.scoring import (
-    FAMILY_WEIGHTS, FEATURES, INSPECTION_SCORE_VERSION, SCORE_DAMAGE_SCALE, Measurement,
-    _damage, _inspection_weights, _integral, _maps, _measure, _tile_integral, measure, scene_score,
+    FAMILY_WEIGHTS, FEATURES, INSPECTION_SCORE_VERSION, SCORE_DAMAGE_SCALE, Measurement, measure, scene_score,
 )
+from scoring_reference import XYZ, integral, lab, lightness_damage
 
 
 def rgb(pixels):
@@ -17,12 +17,16 @@ def rgb(pixels):
 
 
 def score(candidate, target):
-    return scene_score(_measure(candidate, target))
+    return aligned_measure(candidate, target).score
+
+
+def aligned_measure(candidate, target):
+    return Measurement(*_rust._measure_overlap(candidate, target))
 
 
 @pytest.mark.parametrize("layout", ["packed", "readonly", "cropped", "strided", "byte-swapped", "unaligned"])
 @pytest.mark.parametrize("shape", [(1, 1), (193, 97)])
-def test_lab_preparation_keeps_numpy_rounding_and_layouts(layout, shape, monkeypatch):
+def test_lab_preparation_keeps_numpy_rounding_and_layouts(layout, shape):
     rng = np.random.default_rng(709)
     # Cross both a comparison strip and the native working buffer boundary.
     candidate = rng.uniform(-0.1, 1.1, (*shape, 3)).astype(np.float32)
@@ -51,46 +55,49 @@ def test_lab_preparation_keeps_numpy_rounding_and_layouts(layout, shape, monkeyp
 
     candidate, target = view(candidate), view(target)
 
-    def planes():
-        cl, tl, deltas, color = scoring._lab_comparison(candidate, target)
-        return *scoring._lab(candidate), cl, tl, *deltas, color
+    reference_candidate, reference_target = lab(candidate), lab(target)
+    size = candidate.shape[0] * candidate.shape[1]
+    deltas = [c - t for c, t in zip(reference_candidate, reference_target, strict=True)]
+    for images, expected in (
+        ((candidate,), reference_candidate),
+        ((candidate, target), (reference_candidate[0], reference_target[0], *deltas)),
+    ):
+        if layout in {"strided", "byte-swapped", "unaligned"}:
+            images = tuple(np.require(image, dtype=np.float32, requirements=("C", "A")) for image in images)
+        xyz = np.empty((len(images) * 3, size), dtype=np.float32)
+        actual = np.empty((len(expected), size), dtype=np.float32)
+        _rust.lab_xyz(images, XYZ, xyz, 0)
+        _rust.lab_planes(xyz, np.cbrt(xyz), tuple(actual))
+        for observed, reference in zip(actual, expected, strict=True):
+            np.testing.assert_array_equal(observed.view(np.uint32), reference.ravel().view(np.uint32))
 
-    actual = planes()
-    monkeypatch.setattr(scoring, "_rust", None)
-    for observed, expected in zip(actual, planes(), strict=True):
-        np.testing.assert_array_equal(observed.view(np.uint32), expected.view(np.uint32))
+    diagnostic = aligned_measure(candidate, target).diagnostics["views"]["native"][0]
+    for key, delta in zip(("mean_delta_lightness", "mean_delta_lab_a", "mean_delta_lab_b"), deltas, strict=True):
+        assert diagnostic[key] == pytest.approx(delta.mean(dtype=np.float64), abs=3e-5, rel=0)
 
 
-def test_device_selection_falls_back_only_in_auto(monkeypatch):
-    monkeypatch.setattr("bokehforge._device.cuda_available", lambda: False)
-    monkeypatch.setattr("bokehforge._device.mps_available", lambda: False)
-    assert damage_backend("auto") == "cpu"
+def test_device_selection_prioritizes_the_available_accelerators(small_delivery):
+    supported = {"cuda": cuda_available(), "mps": mps_available()}
+    expected = next((device for device, available in supported.items() if available), "cpu")
     assert damage_backend("cpu") == "cpu"
-    with pytest.raises(RuntimeError, match="--device gpu requires CUDA"):
-        damage_backend("gpu")
-    with pytest.raises(RuntimeError, match="--device cuda requires CUDA"):
-        damage_backend("cuda")
-    with pytest.raises(RuntimeError, match="--device mps requires Apple Metal"):
-        damage_backend("mps")
+    assert damage_backend("auto") == expected
+    if expected == "cpu":
+        with pytest.raises(RuntimeError, match="--device gpu requires CUDA"):
+            damage_backend("gpu")
+        with pytest.raises(RuntimeError, match="--device gpu requires CUDA"):
+            measure(*small_delivery, attention=False, device="gpu")
+    else:
+        assert damage_backend("gpu") == expected
 
-
-def test_device_selection_prefers_supported_gpu_backends(monkeypatch):
-    monkeypatch.setattr("bokehforge._device.cuda_available", lambda: True)
-    monkeypatch.setattr("bokehforge._device.find_spec", lambda _: None)
-    monkeypatch.setattr("bokehforge._device.mps_available", lambda: True)
-    assert damage_backend("auto") == "mps"
-    assert damage_backend("gpu") == "mps"
-    assert damage_backend("cpu") == "cpu"
-    with pytest.raises(RuntimeError, match="--device cuda requires CUDA"):
-        damage_backend("cuda")
-    monkeypatch.setattr("bokehforge._device.find_spec", lambda _: object())
-    assert damage_backend("auto") == "cuda"
-    assert damage_backend("gpu") == "cuda"
-    assert damage_backend("cuda") == "cuda"
-    assert damage_backend("mps") == "mps"
-    monkeypatch.setattr("bokehforge._device.mps_available", lambda: False)
-    with pytest.raises(RuntimeError, match="--device mps requires Apple Metal"):
-        damage_backend("mps")
+    for device, available in supported.items():
+        if available:
+            assert damage_backend(device) == device
+        else:
+            requirement = {"cuda": "CUDA", "mps": "Apple Metal"}[device]
+            with pytest.raises(RuntimeError, match=f"--device {device} requires {requirement}"):
+                damage_backend(device)
+            with pytest.raises(RuntimeError, match=f"--device {device} requires {requirement}"):
+                measure(*small_delivery, attention=False, device=device)
 
 
 @pytest.fixture
@@ -102,90 +109,49 @@ def small_delivery():
 
 
 @pytest.mark.parametrize("device", ["cuda", "mps"])
-def test_measure_uses_native_accelerator_on_small_images(device, small_delivery, monkeypatch):
-    try:
-        damage_backend(device)
-    except RuntimeError as exc:
-        pytest.skip(str(exc))
+def test_measure_uses_native_accelerator_on_small_images(device, small_delivery):
+    if not _rust.damage_available(device):
+        pytest.skip(f"Native {device} accelerator unavailable")
 
-    maps = getattr(scoring, f"_{device}_maps")
-    shapes = []
-
-    def record_maps(candidate, target, support):
-        shapes.append(target.shape)
-        return maps(candidate, target, support)
-
-    monkeypatch.setattr(scoring, f"_{device}_maps", record_maps)
     candidate, target = small_delivery
     heatmap = np.linspace(0, 1, target.shape[0] * target.shape[1], dtype=np.float32).reshape(target.shape[:2])
     options = {"details": "tiles", "inspection_heatmap": heatmap}
     expected = measure(candidate, target, device="cpu", **options)
-    assert measure(candidate, target, device=device, **options) == expected
-    assert target.shape in shapes
-    if damage_backend("auto") == device:
-        shapes.clear()
-        assert measure(candidate, target, **options) == expected
-        assert target.shape in shapes
+    assert expected.alignment["status"] == "matched"
+    assert 0 < expected.score < 100
+    (expected_placement,) = expected.explanation["placements"]
+    expected_comparison = expected_placement["comparison"]
+    requested_devices = (device, "gpu", "auto") if damage_backend("auto") == device else (device,)
+    for requested in requested_devices:
+        actual = measure(candidate, target, device=requested, **options)
+        if device == "cuda":
+            assert actual == expected
+            continue
+        assert actual.features == pytest.approx(expected.features, abs=1e-4, rel=0)
+        assert actual.score / 100 == pytest.approx(expected.score / 100, abs=1e-4, rel=0)
+        assert actual.alignment["status"] == "matched"
+        (placement,) = actual.explanation["placements"]
+        comparison = placement["comparison"]
+        assert comparison["diagnostics"] == expected_comparison["diagnostics"]
+        assert comparison["measured_pixels"] == expected_comparison["measured_pixels"]
+        assert comparison["tile_grids"].keys() == expected_comparison["tile_grids"].keys()
+        for name, grid in comparison["tile_grids"].items():
+            expected_grid = expected_comparison["tile_grids"][name]
+            for key in ("x_edges", "y_edges", "covered_pixels"):
+                assert grid[key] == expected_grid[key]
+            for family, values in grid["values"].items():
+                assert values == pytest.approx(expected_grid["values"][family], abs=1e-4, rel=0)
 
 
-@pytest.mark.parametrize("exhausted", [True, False])
-def test_only_auto_retries_accelerator_out_of_memory(small_delivery, monkeypatch, exhausted):
-    backend = damage_backend("auto")
-    if backend == "cpu":
-        pytest.skip("Requires a scoring accelerator")
+def test_supplied_attention_is_reported_for_unmatched_delivery():
+    rng = np.random.default_rng(7)
+    samples = gaussian_filter(rng.normal(size=(120, 150)), 2.8)
+    reference = rgb(np.clip(0.5 + 0.12 * samples / samples.std(), 0, 1))
+    delivery = np.random.default_rng(19).uniform(0.1, 0.9, size=(75, 112, 3)).astype(np.float32)
+    heatmap = np.full(reference.shape[:2], .5, dtype=np.float32)
 
-    if not exhausted:
-        failure = RuntimeError("Accelerator operation failed")
-    elif backend == "mps":
-        failure = RuntimeError("MPS backend out of memory")
-    else:
-        from torch import OutOfMemoryError
-
-        failure = OutOfMemoryError("CUDA out of memory")
-    attempts = []
-
-    def fail_maps(candidate, target, support):
-        attempts.append(target.shape)
-        raise failure
-
-    monkeypatch.setattr(scoring, f"_{backend}_maps", fail_maps)
-    candidate, target = small_delivery
-    baseline = measure(candidate, target, attention=False, device="cpu")
-    if exhausted:
-        assert measure(candidate, target, attention=False) == baseline
-    else:
-        with pytest.raises(type(failure), match=str(failure)):
-            measure(candidate, target, attention=False)
-    assert attempts == [target.shape]
-
-    for forced in (backend, "gpu"):
-        with pytest.raises(type(failure), match=str(failure)):
-            measure(candidate, target, attention=False, device=forced)
-    assert attempts == [target.shape] * 3
-
-
-def test_measure_rejects_cuda_inspection_for_mps(small_delivery):
-    with pytest.raises(RuntimeError, match="Inspection profile requires CUDA"):
-        measure(*small_delivery, device="mps")
-
-
-def test_generated_attention_is_reported_for_unmatched_delivery(monkeypatch):
-    pixels = rgb(np.zeros((1000, 1000), dtype=np.float32))
-    heatmap = np.full(pixels.shape[:2], .5, dtype=np.float32)
-
-    def align(candidate, reference):
-        return [], {
-            "status": "unmatched", "reason": "unmatched", "confidence": 0.,
-            "candidate_size_wh": [1000, 1000], "reference_size_wh": [1000, 1000],
-        }
-
-    def unexpected_backend(device):
-        pytest.fail("An unmatched delivery does not need a damage backend")
-
-    monkeypatch.setattr(scoring, "align", align)
-    monkeypatch.setattr(scoring, "damage_backend", unexpected_backend)
-    expected = scoring._measure_delivery(pixels, pixels, details="summary", device="auto", heatmap=heatmap)
-    actual = scoring._measure_delivery(pixels, pixels, details="summary", device="auto", generate=lambda _: heatmap)
+    expected = scoring._measure_delivery(delivery, reference, details="summary", device="cpu", heatmap=heatmap)
+    actual = scoring._measure_delivery(delivery, reference, details="summary", device="cpu", generate=lambda _: heatmap)
     assert actual == expected
     assert actual.explanation["attention"]["mean"] == .5
     assert actual.score == 0
@@ -197,59 +163,62 @@ def test_tile_prefix_keeps_rounding_order_and_support(masked):
     damage = np.exp2(-rng.integers(0, 128, (213, 83)).astype(np.float32))
     support = rng.random(damage.shape) > 0.2 if masked else None
     y, x = np.r_[0:213:4, 213], np.r_[0:83:4, 83]
-    expected = _integral(damage if support is None else damage * support)[np.ix_(y, x)]
-    np.testing.assert_array_equal(_tile_integral(damage, support, (y, x)), expected)
+    expected = integral(damage if support is None else damage * support)[np.ix_(y, x)]
+    mask = None if support is None else support.view(np.uint8)
+    actual, affected = _rust.damage_tile_prefix(damage, mask, (y, x), .25)
+    assert affected == np.count_nonzero(damage >= .25 if support is None else (damage >= .25) & support)
+    np.testing.assert_array_equal(actual, expected)
 
 
 def test_parallel_damage_uses_full_image_halos():
     rng = np.random.default_rng(67)
     candidate, target = (rng.uniform(-.05, 1.1, size=(517, 1941, 3)).astype(np.float32) for _ in range(2))
     support = rng.random(target.shape[:2]) > 0.08
-    expected, _ = _damage(candidate, target, support)
-    actual, _ = _maps(candidate, target, support)
+    cl, tl = lab(candidate)[0], lab(target)[0]
+    delta = cl - tl
+    expected = lightness_damage(cl, tl, delta, support)
+    actual = _rust._accelerated_lightness(cl, tl, delta, support.view(np.uint8), "cpu")
     for left, right in zip(actual, expected, strict=True):
-        np.testing.assert_array_equal(left, right)
+        np.testing.assert_allclose(left, right, rtol=2e-6, atol=8e-6)
 
 
-@pytest.mark.parametrize(("shape", "masked"), [((29, 43), False), ((509, 1967), True)])
-def test_gpu_preserves_tile_values_diagnostics_and_scores(shape, masked):
-    if damage_backend("auto") != "cuda":
-        pytest.skip("Requires CUDA and Triton")
-    rng = np.random.default_rng(65)
-    target = rng.uniform(-.05, 1.1, size=(*shape, 3)).astype(np.float32)
-    candidate = target.copy()
-    candidate[:, 5:16, 1] *= .65
-    candidate[23, 20, 0], target[23, 20, 0] = -np.finfo(np.float32).max, np.finfo(np.float32).max
-    support = (rng.random(target.shape[:2]) > .08) if masked else None
-    attention = _inspection_weights(rng.random(target.shape[:2], dtype=np.float32))
-    cpu = _measure(candidate, target, support, details="tiles", inspection=attention)
-    gpu = _measure(candidate, target, support, details="tiles", inspection=attention, backend="cuda")
-    assert cpu == gpu
-    assert cpu.score == gpu.score
-
-
-@pytest.mark.parametrize("shape", [(1, 2), (33, 43), (215, 89)])
-def test_mps_edge_path_preserves_scores_and_explanations(monkeypatch, shape):
-    pytest.importorskip("torch")
-    from bokehforge import _mps_damage
-
-    # Exercise the same tensor operations on MPS when present, and otherwise
-    # check their CPU or CUDA implementation against the reference scorer.
-    tensor_device = "mps" if mps_available() else "cuda" if cuda_available() else "cpu"
-    for name in ("lightness_extrema", "neighborhood_strength"):
-        operation = getattr(_mps_damage, name)
-        monkeypatch.setattr(_mps_damage, name, lambda values, operation=operation: operation(values, device=tensor_device))
+@pytest.mark.parametrize(("shape", "coverage"), [
+    ((1, 1), "exact"), ((1, 2), "full"), ((33, 43), "empty"),
+    ((509, 1967), "partial"), ((2048, 1957), "full"),
+])
+def test_native_lightness_matches_independent_cpu_maps(shape, coverage):
     rng = np.random.default_rng(135)
     target = rng.uniform(-.1, 1.1, (*shape, 3)).astype(np.float32)
     candidate = target.copy()
-    candidate[:, :shape[1] // 2, 2] -= np.float32(.24)
-    support = rng.random(shape) > .1
-    support[0, 0] = True
-    attention = _inspection_weights(rng.random(shape, dtype=np.float32))
-    expected = _measure(candidate, target, support, details="tiles", inspection=attention)
-    actual = _measure(candidate, target, support, details="tiles", inspection=attention, backend="mps")
-    assert actual == expected
-    assert actual.score == expected.score
+    if coverage != "exact":
+        candidate[:, :shape[1] // 2, 2] -= np.float32(.24)
+        extreme = np.finfo(np.float32).max
+        candidate[0, 0, 0], target[0, 0, 0] = -extreme, extreme
+    if coverage == "empty":
+        support = np.zeros(shape, dtype=bool)
+    elif coverage == "partial":
+        support = rng.random(shape) > .1
+        support[0, -1] = True
+    else:
+        support = None
+    cl = lab(candidate[:, ::-1])[0]
+    tl = lab(target[:, ::-1])[0]
+    delta = cl - tl
+    expected = lightness_damage(cl, tl, delta, support)
+    mask = None if support is None else support.view(np.uint8)
+    cpu = _rust._accelerated_lightness(cl, tl, delta, mask, "cpu")
+    tolerance = 0 if coverage == "exact" else 1e-4
+    for native, reference in zip(cpu, expected, strict=True):
+        np.testing.assert_allclose(native, reference, atol=tolerance, rtol=0, err_msg="CPU")
+    for device in ("cuda", "mps"):
+        if _rust.damage_available(device):
+            gpu = _rust._accelerated_lightness(cl, tl, delta, mask, device)
+            for observed, native, reference in zip(gpu, cpu, expected, strict=True):
+                if device == "cuda":
+                    np.testing.assert_array_equal(observed.view(np.uint32), native.view(np.uint32))
+                else:
+                    np.testing.assert_allclose(observed, native, atol=tolerance, rtol=0, err_msg=device)
+                np.testing.assert_allclose(observed, reference, atol=tolerance, rtol=0, err_msg=device)
 
 
 def test_exact_match_preserves_grain_bokeh_and_headroom():
@@ -282,7 +251,7 @@ def test_missing_nyquist_detail_grows_continuously_in_four_directions():
     for carrier in (x, y, x + y, x - y):
         values = []
         for amplitude in (0.014, 0.019, 0.021, 0.028):
-            lost = _measure(rgb(colors), rgb(colors + amplitude * (2 * (carrier % 2) - 1)))
+            lost = aligned_measure(rgb(colors), rgb(colors + amplitude * (2 * (carrier % 2) - 1)))
             assert lost.features["native.lost_detail"] > 0
             values.append(scene_score(lost))
         assert all(a > b for a, b in zip(values, values[1:]))
@@ -429,44 +398,52 @@ def test_bad_deliveries_fail_before_measurement(delivery, reason):
         measure(delivery, np.zeros((5, 4, 3), np.float32))
 
 
+def attention_description(heatmap):
+    reference = np.full((*heatmap.shape, 3), .3, dtype=np.float32)
+    return measure(reference, reference, inspection_heatmap=heatmap, details="summary",
+                   device="cpu").explanation["attention"]
+
+
 def test_inspection_weights_match_the_formula_and_bound_sparse_maps():
     heatmap = np.array([[0.2, 0.4], [0.8, 1]], dtype=np.float32)
-    weights, mix = _inspection_weights(heatmap)
-    assert mix == 0.5
-    np.testing.assert_allclose(weights, (1 + heatmap / heatmap.mean()) / 2, rtol=1e-6)
+    attention = attention_description(heatmap)
+    assert attention["mix"] == 0.5
+    expected = (1 + heatmap / heatmap.mean()) / 2
+    assert attention["damage_multiplier_range"] == pytest.approx([expected.min(), expected.max()])
 
     sparse = np.zeros((4, 4), np.float32)
     sparse[0, 0] = 1
-    weights, mix = _inspection_weights(sparse)
-    assert mix < 0.5
-    assert 1.9 < weights.max() < 2
-    assert weights.mean() == pytest.approx(1)
-    assert weights.min() >= 0.5
+    attention = attention_description(sparse)
+    assert attention["mix"] < 0.5
+    low, high = attention["damage_multiplier_range"]
+    assert 1.9 < high < 2
+    assert (15 * low + high) / 16 == pytest.approx(1)
+    assert low >= 0.5
 
 
 def test_inspection_weights_match_on_large_contiguous_and_strided_maps():
     heatmap = np.tile(np.array([0.0, 1.0], dtype=np.float32), (1024, 512))
-    contiguous, mix = _inspection_weights(heatmap)
-    strided, strided_mix = _inspection_weights(heatmap.T[::-1])
-    assert mix == strided_mix == 0.5
-    np.testing.assert_array_equal(contiguous, heatmap + 0.5)
-    np.testing.assert_array_equal(strided[::-1].T, contiguous)
+    contiguous = attention_description(heatmap)
+    strided = attention_description(heatmap.T[::-1])
+    assert contiguous == strided
+    assert contiguous["mix"] == 0.5
+    assert contiguous["damage_multiplier_range"] == [0.5, 1.5]
 
 
 def test_inspection_weights_accept_unaligned_float32_heatmaps():
     heatmap = np.ndarray((2, 2), np.float32, buffer=bytearray(17), offset=1)
     heatmap[:] = [[0, 1], [0, 1]]
     assert not heatmap.flags.aligned
-    weights, mix = _inspection_weights(heatmap)
-    assert mix == 0.5
-    np.testing.assert_array_equal(weights, heatmap + 0.5)
+    attention = attention_description(heatmap)
+    assert attention["mix"] == 0.5
+    assert attention["damage_multiplier_range"] == [0.5, 1.5]
 
 
 def test_inspection_cap_has_a_smooth_shoulder():
     def peak_weight(ratio):
         background = (4 / ratio - 1) / 3
-        heatmap = np.array([1, background, background, background], np.float32)
-        return float(_inspection_weights(heatmap)[0].max())
+        heatmap = np.array([[1, background, background, background]], np.float32)
+        return attention_description(heatmap)["damage_multiplier_range"][1]
 
     step = 0.001
     at_shoulder = peak_weight(2)
@@ -476,20 +453,19 @@ def test_inspection_cap_has_a_smooth_shoulder():
     assert at_shoulder < peak_weight(3) < peak_weight(4) < 2
 
 
-def test_inspection_weights_feed_the_score_and_its_tiles(monkeypatch):
+def test_inspection_weights_feed_the_score_and_its_tiles():
     target = np.full((8, 16, 3), 0.2, np.float32)
     candidate = target + np.float32(0.5)
     heatmap = np.zeros(target.shape[:2], np.float32)
     heatmap[:, :8] = 1
-    monkeypatch.setattr("bokehforge.scoring._maps", lambda *_, **__: (
-        (np.ones(target.shape[:2], np.float32), *[np.zeros(target.shape[:2], np.float32) for _ in range(5)]), {}
-    ))
-    weights = _inspection_weights(heatmap)
-    result = _measure(candidate, target, details="tiles", inspection=weights)
-    assert result.explanation["inspection_mix"] == 0.5
-    assert result.explanation["tile_grids"]["8:0:0"]["values"]["tone"] == [1.5, 0.5]
-    assert result.features["native.tone"] == pytest.approx(.4 * 1 + .6 * 1.5)
-    assert result.score == pytest.approx(100 * np.exp(-5 * FAMILY_WEIGHTS["tone"] * result.features["native.tone"]))
+    baseline = measure(candidate, target, attention=False, device="cpu")
+    result = measure(candidate, target, inspection_heatmap=heatmap, details="tiles", device="cpu")
+    comparison = result.explanation["placements"][0]["comparison"]
+    assert comparison["inspection_mix"] == 0.5
+    tone = baseline.features["native.tone"]
+    assert comparison["tile_grids"]["8:0:0"]["values"]["tone"] == pytest.approx([1.5 * tone, 0.5 * tone])
+    assert result.features["native.tone"] == pytest.approx(.4 * tone + .6 * 1.5 * tone)
+    assert result.score == pytest.approx(100 * np.exp(-5 * comparison["weighted_damage"]))
 
 
 def test_flat_inspection_maps_are_neutral_and_perfect_outputs_stay_perfect():

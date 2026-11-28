@@ -13,7 +13,7 @@ import pytest
 import tifffile
 from PIL import Image
 
-from bokehforge import bench
+from bokehforge import _rust, bench, scoring
 from bokehforge.bench import _score, bench as run_benchmark, main, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
 from bokehforge.data.lazy import Scene, SceneCatalog
@@ -86,13 +86,20 @@ def test_benchmark_callable_matches_cli(corpus, tmp_path, capsys):
 
 
 @pytest.mark.parametrize("device", ["cpu", "mps"])
-def test_cpu_and_mps_cli_require_disabling_inspection(device, tmp_path, capsys):
+def test_weighted_benchmark_accepts_cpu_and_mps_selection(corpus, tmp_path, monkeypatch, capsys, device):
+    def missing_runtime():
+        raise RuntimeError("fixture native Inspection runtime is unavailable")
+
+    monkeypatch.setattr(bench, "prepare_attention", missing_runtime)
     output = tmp_path / "benchmark"
-    with pytest.raises(SystemExit) as exc:
-        main(["--algorithm", "mean", "--output", str(output), "--device", device])
-    assert exc.value.code == 2
-    assert f"--device {device} requires --no-attention" in capsys.readouterr().err
-    assert not output.exists()
+    assert main(["--algorithm", "mean", "--output", str(output), "--device", device,
+                 "--root", str(corpus), "--config", str(corpus / "sources.json"),
+                 "--dataset", "referenced"]) == 1
+    assert capsys.readouterr().out == "unscored\n"
+    report = json.loads((output / "report.json").read_text())
+    failed, = report["scenes"]
+    assert failed["status"] == "scoring_error"
+    assert "native Inspection runtime is unavailable" in failed["error"]
 
 
 def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
@@ -157,7 +164,9 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
 
 
 @pytest.mark.parametrize("device", ["cpu", "mps"])
-def test_saved_output_accepts_precomputed_inspection_provider(corpus, tmp_path, monkeypatch, device):
+def test_saved_output_accepts_precomputed_inspection_provider(corpus, tmp_path, device):
+    if not _rust.damage_available(device) and device != "cpu":
+        pytest.skip("Requires a native Apple Metal device")
     catalog = SceneCatalog(corpus, config=corpus / "sources.json", datasets=["referenced"])
     scene = catalog.scene(catalog.scene_ids[0])
     reference = catalog.decode(scene.reference_ids[0]).data
@@ -171,18 +180,28 @@ def test_saved_output_accepts_precomputed_inspection_provider(corpus, tmp_path, 
             np.testing.assert_array_equal(target, reference)
             return heatmap, digest
 
-    def select_backend(requested):
-        assert requested == device
-        return device
-
-    # The exact TIFF match skips damage measurement, so only selection is stubbed.
-    monkeypatch.setattr("bokehforge.scoring.damage_backend", select_backend)
     saved = score_saved_output(catalog, scene, path, details="summary", inspection=PrecomputedInspection(), device=device)
     assert saved["status"] == "ok"
     assert saved["score"] == 100
     assert saved["profile"] == INSPECTION_SCORE_VERSION
     assert saved["inspection_map_sha256"] == digest
     assert saved["explanation"]["attention"]["mean"] == .5
+
+
+def test_builtin_inspection_uses_native_measurement_and_records_digest(monkeypatch):
+    pixels = np.zeros((3, 4, 3), dtype=np.float32)
+
+    def measure_delivery(result, reference, *, details, device, generate, attention, on_digest):
+        assert device == "cpu"
+        assert attention and generate is None
+        on_digest("native-digest")
+        return SimpleNamespace(score=100.0, alignment={}, features={}, explanation=None)
+
+    monkeypatch.setattr(bench, "_measure_delivery", measure_delivery)
+    row = {}
+    bench._score_delivery(pixels, pixels, row, inspection=Inspection(), device="cpu")
+    assert row["scene_score"] == 100.0
+    assert row["inspection_map_sha256"] == "native-digest"
 
 
 def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monkeypatch, capsys):
@@ -198,11 +217,26 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     tifffile.imwrite(path, candidate, photometric="rgb")
     seen = []
 
-    def predict(preview):
-        seen.append(np.asarray(preview).copy())
-        return heatmap
+    expected_digest = sha256(heatmap.astype("<f4").tobytes()).hexdigest()
 
-    monkeypatch.setattr(Inspection, "_load", staticmethod(lambda: predict))
+    class FixtureInspection:
+        def preview_map(self, reference):
+            if not hasattr(self, "_test_inspection_map"):
+                seen.append(np.asarray(reference_preview(reference)).copy())
+                self._test_inspection_map = heatmap, expected_digest
+            return self._test_inspection_map
+
+        def cached_map(self, digest):
+            cached, cached_digest = getattr(self, "_test_inspection_map", (None, None))
+            return cached if digest == cached_digest else None
+
+        generate = preview_map
+
+    def scoring_override(attention):
+        return (scoring._measure_delivery, FixtureInspection()) if attention else (None, None)
+
+    monkeypatch.setattr(bench, "_benchmark_override", scoring_override)
+    monkeypatch.setattr("bokehforge.review.scores.Inspection", FixtureInspection)
     args = ["--root", str(corpus), "--config", str(corpus / "sources.json"),
             "--dataset", "referenced", "--candidate-dir", str(candidates)]
     output = tmp_path / "attention"
@@ -217,13 +251,11 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     assert row["scene_score"] == measure(candidate, reference, inspection_heatmap=heatmap).score
     baseline = measure(candidate, reference, attention=False).score
     assert row["scene_score"] < baseline
-    saved = score_saved_output(catalog, scene, path, details="full", inspection=Inspection())
+    saved = score_saved_output(catalog, scene, path, details="full", inspection=FixtureInspection())
     assert saved["score"] == row["scene_score"]
     assert saved["explanation"] == json.loads((output / row["score_explanation_path"]).read_text())
     assert len(saved["explanation"]["placements"][0]["comparison"]["tile_grids"]) == 8
     attention = saved["explanation"]["attention"]
-    with pytest.raises(RuntimeError, match="Inspection profile requires CUDA"):
-        score_saved_output(catalog, scene, path, inspection=Inspection(), device="mps")
     assert attention["encoding"] == "base64+zlib+float32-le"
     assert attention["size_wh"] == list(reference.shape[1::-1])
     pixels = np.frombuffer(decompress(b64decode(attention["data"])), dtype="<f4").reshape(heatmap.shape)
@@ -265,10 +297,11 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     finally:
         review.close()
 
-    def missing_models():
+    def missing_models(self, reference):
         raise RuntimeError("test model loading failed")
 
-    monkeypatch.setattr(Inspection, "_load", staticmethod(missing_models))
+    monkeypatch.setattr(FixtureInspection, "preview_map", missing_models)
+    monkeypatch.setattr(FixtureInspection, "generate", missing_models)
     updated.clear()
     reopened = Scores(updated.set)
     try:

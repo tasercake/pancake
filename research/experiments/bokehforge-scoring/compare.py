@@ -1,7 +1,9 @@
 """Measure BokehForge's bench scoring stage and compare results across checkouts."""
 
 import argparse
+from base64 import b64decode, b64encode
 from hashlib import sha256
+from inspect import signature
 from io import BytesIO
 import json
 import os
@@ -11,6 +13,8 @@ import sys
 from time import perf_counter
 from unittest.mock import patch
 from zipfile import BadZipFile, ZipFile
+from zlib import compress, decompress
+from zlib import error as ZlibError
 
 
 _DETAILS = "summary"
@@ -20,6 +24,9 @@ _FAMILY_VALUES = {"burden", "mean", "tail", "worst", "affected_fraction", "weigh
 _DIAGNOSTIC_VALUES = {"mean_delta_lightness", "mean_delta_lab_a", "mean_delta_lab_b",
                       "global_exposure_delta_stops", "linear_rgb_rmse"}
 _TOLERANCES = {"score": .01, "measurement": .0001}
+_ALIGNMENT_TRACE_FIELDS = {"stages", "candidates", "coarse_rgb_contrast", "low_information_appearance_delta"}
+_PLACEMENT_GEOMETRY = {"candidate_to_reference_xy", "offset_yx", "rotation_degrees", "scale",
+                       "reference_overlap_polygon_xy", "geometric_coverage", "coverage", "resolution_cap", "weight"}
 
 
 def _json_sha256(value):
@@ -43,10 +50,43 @@ def _numeric_category(path):
     return None
 
 
+def _is_alignment_trace(path):
+    return any(left == "alignment" and right in _ALIGNMENT_TRACE_FIELDS for left, right in zip(path, path[1:]))
+
+
+def _is_geometry(path):
+    if path[-2:] in (("alignment", "confidence"), ("explanation", "confidence")):
+        return True
+    if "placements" in path:
+        index = path.index("placements")
+        return len(path) > index + 2 and path[index + 2] in _PLACEMENT_GEOMETRY
+    return False
+
+
 class ResultComparison:
-    def __init__(self):
+    def __init__(self, *, allow_alignment_trace_change=False, allow_generated_map_change=False,
+                 allow_native_rounding=False):
         self.mismatches = 0
-        self.maximum = {category: (0.0, ()) for category in _TOLERANCES}
+        self.tolerances = dict(_TOLERANCES)
+        if allow_native_rounding:
+            self.tolerances["geometry"] = .0001
+        self.maximum = {category: (0.0, ()) for category in self.tolerances}
+        self.allow_alignment_trace_change = allow_alignment_trace_change
+        self.allow_generated_map_change = allow_generated_map_change
+        self.allow_native_rounding = allow_native_rounding
+        self.trace_changes = 0
+        self.max_trace_change = (0.0, ())
+        self.trace_candidate_counts = []
+        self.trace_sample_changes = 0
+
+    def _numeric_category(self, path):
+        if self.allow_native_rounding and _is_geometry(path):
+            return "geometry"
+        if self.allow_generated_map_change or self.allow_native_rounding:
+            if (path[-1] == "inspection_mix"
+                    or "attention" in path and (path[-1] in {"mean", "mix"} or "damage_multiplier_range" in path)):
+                return "measurement"
+        return _numeric_category(path)
 
     def _mismatch(self, path, reason):
         self.mismatches += 1
@@ -55,7 +95,7 @@ class ResultComparison:
 
     def check(self, left, right, *path):
         if type(left) is not type(right) and not (
-            {type(left), type(right)} == {int, float} and _numeric_category(path) == "score"
+            {type(left), type(right)} == {int, float} and self._numeric_category(path) in {"score", "geometry"}
         ):
             self._mismatch(path, f"has different types ({type(left).__name__}, {type(right).__name__})")
         elif isinstance(left, dict):
@@ -65,24 +105,51 @@ class ResultComparison:
                 self.check(left[key], right[key], *path, key)
         elif isinstance(left, list):
             if len(left) != len(right):
-                self._mismatch(path, f"has different lengths ({len(left)}, {len(right)})")
+                reason = f"has different lengths ({len(left)}, {len(right)})"
+                if self.allow_alignment_trace_change and path[-2:] == ("alignment", "candidates"):
+                    self.trace_candidate_counts.append((path, reason))
+                    selected = [sum(row["decision"] == "selected" for row in rows) for rows in (left, right)]
+                    if selected[0] != selected[1]:
+                        self._mismatch(path, f"has different numbers of selected candidates ({selected[0]}, {selected[1]})")
+                else:
+                    self._mismatch(path, reason)
             for index, (first, second) in enumerate(zip(left, right)):
                 self.check(first, second, *path, index)
-        elif type(left) in (int, float) and (category := _numeric_category(path)):
+        elif type(left) in (int, float) and (category := self._numeric_category(path)):
             difference = abs(left - right)
-            tolerance = _TOLERANCES[category]
+            tolerance = self.tolerances[category]
             if difference > self.maximum[category][0]:
                 self.maximum[category] = (difference, path)
             if not difference <= tolerance:
                 self._mismatch(path, f"differs by {difference:.9g} (limit {tolerance:g})")
         elif left != right:
-            self._mismatch(path, f"differs ({repr(left)[:120]} vs {repr(right)[:120]})")
+            if self.allow_alignment_trace_change and type(left) is float and _is_alignment_trace(path):
+                self.trace_changes += 1
+                difference = abs(left - right)
+                if difference > self.max_trace_change[0]:
+                    self.max_trace_change = difference, path
+            elif (self.allow_alignment_trace_change and type(left) is int and "regions" in path
+                  and path[-1] == 1 and _is_alignment_trace(path)):
+                self.trace_sample_changes += 1
+            elif self.allow_native_rounding and path[-2:] == ("attention", "data"):
+                if decompress(b64decode(left, validate=True)) != decompress(b64decode(right, validate=True)):
+                    self._mismatch(path, "contains different decoded attention pixels")
+            elif not (self.allow_generated_map_change and path[-1] == "inspection_map_sha256"):
+                self._mismatch(path, f"differs ({repr(left)[:120]} vs {repr(right)[:120]})")
 
     def finish(self):
         for category, (difference, path) in self.maximum.items():
             location = f" at {'.'.join(map(str, path))}" if path else ""
             print(f"Maximum absolute {category} difference {difference:.9g}{location} "
-                  f"(limit {_TOLERANCES[category]:g}).")
+                  f"(limit {self.tolerances[category]:g}).")
+        if self.allow_alignment_trace_change:
+            for path, reason in self.trace_candidate_counts:
+                print(f"{'.'.join(map(str, path))} {reason}.")
+            difference, path = self.max_trace_change
+            location = f" at {'.'.join(map(str, path))}" if path else ""
+            print(f"Alignment trace changed in {self.trace_changes} floating-point values and "
+                  f"{self.trace_sample_changes} regional sample counts. Largest absolute floating-point "
+                  f"difference {difference:.9g}{location}.")
         if self.mismatches:
             print(f"{self.mismatches} parity mismatches.", file=sys.stderr)
         return int(bool(self.mismatches))
@@ -114,6 +181,53 @@ def _scored(sample):
             and sample["scoring_seconds"] is not None)
 
 
+def _capture_inspection_map(inspection, reference, digest):
+    import numpy as np
+
+    raw = inspection.cached_map(digest)
+    if raw is None:
+        raw, observed = inspection.preview_map(reference)
+        if observed != digest:
+            raise ValueError("The retained model-grid Inspection digest differs from the scoring result.")
+    pixels = np.ascontiguousarray(raw, dtype="<f4")
+    if _image_sha256(pixels) != digest:
+        raise ValueError("The retained model-grid Inspection pixels differ from the scoring digest.")
+    return {"size_wh": list(pixels.shape[::-1]), "data": b64encode(compress(pixels.tobytes(), 1)).decode("ascii")}
+
+
+def _inspection_pixels(sample):
+    import numpy as np
+
+    if "inspection_map" not in sample:
+        raise ValueError("Generated map comparison requires reports generated with --include-inspection-maps.")
+    metadata = sample["inspection_map"]
+    width, height = metadata["size_wh"]
+    payload = decompress(b64decode(metadata["data"], validate=True))
+    if min(width, height) < 1 or len(payload) != width * height * 4:
+        raise ValueError(f"{sample['name']} has an invalid Inspection map size.")
+    if sha256(payload).hexdigest() != sample["inspection_map_sha256"]:
+        raise ValueError(f"{sample['name']} has an invalid Inspection map digest.")
+    pixels = np.frombuffer(payload, dtype="<f4").reshape(height, width)
+    if not np.isfinite(pixels).all() or pixels.min() < 0 or pixels.max() > 1:
+        raise ValueError(f"{sample['name']} has Inspection map pixels outside [0, 1].")
+    return pixels
+
+
+def _compare_inspection_maps(left, right):
+    import numpy as np
+
+    left_pixels, right_pixels = (_inspection_pixels(sample) for sample in (left, right))
+    if left_pixels.shape != right_pixels.shape:
+        raise ValueError(f"{left['name']} has different Inspection map dimensions.")
+    difference = np.abs(left_pixels.astype(np.float64) - right_pixels)
+    count = max(1, (difference.size + 99) // 100)
+    first, second = (np.argsort(-pixels.ravel(), kind="stable")[:count]
+                     for pixels in (left_pixels, right_pixels))
+    overlap = np.intersect1d(first, second, assume_unique=True).size / count
+    print(f"{left['name']} model-grid Inspection MAE {difference.mean():.9g}, "
+          f"max {difference.max():.9g}, top-1% overlap {overlap:.3%}.")
+
+
 def _warm_statistics(samples, field):
     if not samples or not all(_scored(sample) for sample in samples):
         return None
@@ -130,6 +244,7 @@ def _run(args):
     if args.output.resolve() == args.d29_zip.resolve():
         raise ValueError("The report path must differ from the input ZIP path.")
     attention = not args.no_attention
+    native_attention = attention and "attention" in signature(bench._score_delivery).parameters
     samples = []
     previous_reference = None
     with (
@@ -158,9 +273,11 @@ def _run(args):
 
             row = {"status": "ok", "reference_status": "eligible"}
             start = perf_counter()
+            options = {"attention": True} if native_attention else {
+                "inspection": inspection_for(args.device) if attention else None,
+            }
             explanation = bench._score_delivery(
-                candidate, reference, row, details=_DETAILS, device=args.device,
-                inspection=inspection_for(args.device) if attention else None,
+                candidate, reference, row, details=_DETAILS, device=args.device, **options,
             )
             wall = perf_counter() - start
             scoring = row.pop("scoring_seconds", None)
@@ -178,6 +295,10 @@ def _run(args):
             }
             if args.include_results:
                 sample["result"] = {"row": row, "explanation": explanation}
+            if args.include_inspection_maps and _scored(sample):
+                sample["inspection_map"] = _capture_inspection_map(
+                    inspection_for(args.device), reference, sample["inspection_map_sha256"],
+                )
             samples.append(sample)
             phase = "warmup" if index == 0 else "warm"
             stage = f"{scoring * 1000:.1f} ms scoring" if scoring is not None else "scoring unavailable"
@@ -241,9 +362,16 @@ def _compare(args):
     if [sample["name"] for sample in first] != [sample["name"] for sample in second]:
         raise ValueError("Reports use different ordered scene cohorts.")
 
-    parity = ResultComparison() if args.tolerant else None
+    parity = (ResultComparison(allow_alignment_trace_change=args.allow_alignment_trace_change,
+                               allow_generated_map_change=args.allow_generated_map_change,
+                               allow_native_rounding=args.allow_native_rounding)
+              if args.tolerant else None)
     failed = False
-    fields = ("inputs", "status", "reference_status", "error", "inspection_map_sha256")
+    fields = ("inputs", "status", "reference_status", "error")
+    if not args.allow_generated_map_change:
+        fields += ("inspection_map_sha256",)
+    elif not before["settings"]["attention"]:
+        raise ValueError("Generated map comparison requires attention-weighted reports.")
     if parity is None:
         fields += ("output_sha256", "scene_score")
     for left, right in zip(first, second, strict=True):
@@ -262,8 +390,11 @@ def _compare(args):
                     raise ValueError("Tolerant comparison requires reports generated with --include-results.")
                 result = sample["result"]
                 if (_json_sha256([result["row"], result["explanation"]]) != sample["output_sha256"]
-                        or result["row"]["scene_score"] != sample["scene_score"]):
+                        or result["row"]["scene_score"] != sample["scene_score"]
+                        or result["row"].get("inspection_map_sha256") != sample["inspection_map_sha256"]):
                     raise ValueError(f"Stored results are inconsistent with the report for {name}.")
+            if args.allow_generated_map_change:
+                _compare_inspection_maps(left, right)
             parity.check(left["result"], right["result"], name)
     if parity is not None:
         if not failed:
@@ -295,18 +426,32 @@ def main():
     run.add_argument("--device", choices=("auto", "cpu", "gpu", "cuda", "mps"), default="auto")
     run.add_argument("--no-attention", action="store_true", help="Use unweighted scoring.")
     run.add_argument("--include-results", action="store_true", help="Store score rows and explanations for tolerant comparison.")
+    run.add_argument("--include-inspection-maps", action="store_true",
+                     help="Capture the model-grid Inspection maps after timing.")
     compare = modes.add_parser("compare", help="Check the fixtures and all functional outputs of two reports.")
     compare.add_argument("before", type=Path)
     compare.add_argument("after", type=Path)
     compare.add_argument("--allow-device-change", action="store_true",
                          help="Compare functional parity across different device selectors.")
     compare.add_argument("--tolerant", action="store_true", help="Allow bounded differences in numeric scoring results.")
+    compare.add_argument("--allow-alignment-trace-change", action="store_true",
+                         help="Report numeric and hypothesis count changes in search traces. Requires --tolerant.")
+    compare.add_argument("--allow-generated-map-change", action="store_true",
+                         help="Compare captured Inspection maps numerically. Requires --tolerant.")
+    compare.add_argument("--allow-native-rounding", action="store_true",
+                         help="Allow bounded geometry and attention summary rounding. Requires --tolerant.")
     args = parser.parse_args()
     if args.mode == "run" and args.device in ("cpu", "mps") and not args.no_attention:
         run.error(f"--device {args.device} requires --no-attention")
+    if args.mode == "run" and args.no_attention and args.include_inspection_maps:
+        run.error("--include-inspection-maps requires attention-weighted scoring")
+    if (args.mode == "compare" and (args.allow_alignment_trace_change or args.allow_generated_map_change
+                                    or args.allow_native_rounding)
+            and not args.tolerant):
+        compare.error("The native compatibility comparison options require --tolerant")
     try:
         return _run(args) if args.mode == "run" else _compare(args)
-    except (OSError, BadZipFile, KeyError, ValueError) as exc:
+    except (OSError, BadZipFile, KeyError, ValueError, ZlibError) as exc:
         parser.exit(1, f"{exc}\n")
 
 

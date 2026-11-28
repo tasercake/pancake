@@ -15,7 +15,6 @@ from stat import S_ISLNK
 from zipfile import ZipFile
 
 import numpy as np
-import tifffile
 
 from ._canonical import (
     ARCHIVES, CAMERA_RAW, IMAGES, RETIRED_LAYOUTS, TIFF_IMAGES, decode, encode_tiff,
@@ -89,6 +88,8 @@ class DecodedFrame:
 
 def _page_count(source, suffix):
     if suffix in TIFF_IMAGES:
+        import tifffile
+
         with tifffile.TiffFile(source) as image:
             return len(image.pages)
     return 1
