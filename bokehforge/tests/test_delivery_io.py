@@ -83,15 +83,18 @@ def test_invalid_delivery_records_error_and_path(tmp_path, shape, tiff_options, 
 
 def test_multipage_and_missing_delivery_report_distinct_statuses(tmp_path):
     path = tmp_path / "multi.tif"
+    missing = tmp_path / "missing.tif"
     with tifffile.TiffWriter(path) as writer:
         for _ in range(3):
             writer.write(np.zeros((2, 3, 3), dtype=np.float32), photometric="rgb")
-    for name, expected, message in ((path, "invalid_output", "3 TIFF pages"),
-                                    (tmp_path / "missing.tif", "missing_output", "FileNotFoundError")):
+    for name, expected, message, filename in (
+        (path, "invalid_output", "3 TIFF pages", str(path)),
+        (missing, "missing_output", "FileNotFoundError", repr(str(missing))),
+    ):
         row = {}
         assert _load_candidate(name, row) is None
         assert row["status"] == expected
-        assert message in row["error"] and str(name) in row["error"]
+        assert message in row["error"] and filename in row["error"]
 
 
 def test_standard_reference_and_delivery_read_without_python_tiff_codecs(tmp_path):
