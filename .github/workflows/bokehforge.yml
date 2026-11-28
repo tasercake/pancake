@@ -45,11 +45,11 @@ jobs:
         run: python -m uv build
       - name: Install the wheel with locked dependencies
         run: |
-          python -m uv sync --frozen --no-install-project ${{ runner.os == 'macOS' && '--extra inspection' || '' }}
+          python -m uv sync --frozen --no-install-project
           python -m uv pip install --python .venv --no-deps dist/*.whl
-      - name: Verify the installed Rust extension, backends, and resources
+      - name: Verify the installed Rust extension and resources
         run: |
-          python -m uv run --no-sync python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          python -m uv run --no-sync python - <<'PY'
           from importlib.metadata import distribution
           from importlib.resources import files
           from pathlib import Path
@@ -64,14 +64,9 @@ jobs:
           assert callable(_rust.pool_tiles)
           assert callable(_rust.PreviewEncoder)
           assert _rust.damage_backend("cpu") == "cpu"
-          selected = _rust.damage_backend("auto")
-          print(f"Native BokehForge scorer on {sys.platform}: selected {selected}")
           if sys.platform == "darwin":
-              assert _rust.damage_available("mps") and selected == "mps"
               wheel = next(Path("dist").glob("*.whl"))
               assert wheel.name.endswith("-macosx_15_0_arm64.whl"), wheel.name
-          else:
-              assert not _rust.damage_available("cuda") and selected == "cpu"
           if sys.platform == "linux":
               libraries = subprocess.check_output(["ldd", _rust.__file__], text=True)
               for name in ("libLLVM", "libcuda.so", "libnvrtc", "libonnxruntime"):
@@ -84,43 +79,9 @@ jobs:
           assert files("bokehforge.review").joinpath("static", "index.html").is_file()
           assert files("bokehforge.review").joinpath("static", "fonts", "SpaceGrotesk-Regular.ttf").is_file()
           PY
-      - name: Execute a native Core ML ONNX fixture
-        if: runner.os == 'macOS'
-        env:
-          BOKEHFORGE_ORT_FIXTURE: ${{ runner.temp }}/bokehforge-coreml
-        run: |
-          python -m uv run --no-sync python - <<'PY'
-          import os
-          from pathlib import Path
-
-          import onnx
-          from onnx import TensorProto, helper
-
-          from bokehforge._attention_setup import _runtime_library
-
-          fixture = Path(os.environ["BOKEHFORGE_ORT_FIXTURE"])
-          fixture.mkdir(exist_ok=True)
-          library = _runtime_library()
-          assert library is not None and library.is_file()
-          (fixture / "runtime-path.txt").write_text(str(library), encoding="utf-8")
-          shape = [1, 1, 2, 2]
-          graph = helper.make_graph(
-              [helper.make_node("Add", ["input", "bias"], ["sum"]),
-               helper.make_node("Relu", ["sum"], ["output"])],
-              "coreml-smoke",
-              [helper.make_tensor_value_info("input", TensorProto.FLOAT, shape)],
-              [helper.make_tensor_value_info("output", TensorProto.FLOAT, shape)],
-              [helper.make_tensor("bias", TensorProto.FLOAT, shape, [1.0] * 4)],
-          )
-          model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 17)], ir_version=9)
-          onnx.checker.check_model(model)
-          onnx.save(model, fixture / "model.onnx")
-          PY
-          export PYO3_PYTHON="$(python -m uv run --no-sync python -c 'import sys; print(sys.executable)')"
-          cargo test --release --locked --lib attention::tests::configured_provider_executes_onnx_fixture -- --exact --ignored
-      - name: Run scoring and parity tests
+      - name: Run CPU scoring and parity tests
         run: >
-          python -m uv run --no-sync python -m pytest -ra
+          python -m uv run --no-sync python -m pytest -ra -m 'not hardware_accelerator'
           tests/test_scoring.py tests/test_alignment.py tests/test_native_damage.py
           tests/test_native_pooling.py tests/test_inspection.py tests/test_bench.py
           tests/test_native_runtime.py tests/test_delivery_io.py

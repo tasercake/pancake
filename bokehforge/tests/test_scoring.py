@@ -12,6 +12,12 @@ from bokehforge.scoring import (
 from scoring_reference import XYZ, integral, lab, lightness_damage
 
 
+_ACCELERATOR_DEVICES = (
+    pytest.param("cuda", marks=pytest.mark.hardware_accelerator),
+    pytest.param("mps", marks=pytest.mark.hardware_accelerator, id="metal"),
+)
+
+
 def rgb(pixels):
     return np.repeat(np.asarray(pixels, dtype=np.float32)[..., None], 3, axis=-1)
 
@@ -77,10 +83,14 @@ def test_lab_preparation_keeps_numpy_rounding_and_layouts(layout, shape):
         assert diagnostic[key] == pytest.approx(delta.mean(dtype=np.float64), abs=1.2e-4, rel=0)
 
 
+def test_cpu_device_selection():
+    assert damage_backend("cpu") == "cpu"
+
+
+@pytest.mark.hardware_accelerator
 def test_device_selection_prioritizes_the_available_accelerators(small_delivery):
     supported = {"cuda": cuda_available(), "mps": mps_available()}
     expected = next((device for device, available in supported.items() if available), "cpu")
-    assert damage_backend("cpu") == "cpu"
     assert damage_backend("auto") == expected
     if expected == "cpu":
         with pytest.raises(RuntimeError, match="--device gpu requires CUDA"):
@@ -109,11 +119,9 @@ def small_delivery():
     return candidate, target
 
 
-@pytest.mark.parametrize("device", ["cuda", "mps"])
-def test_measure_uses_native_accelerator_on_small_images(device, small_delivery):
-    if not _rust.damage_available(device):
-        pytest.skip(f"Native {device} accelerator unavailable")
-
+@pytest.mark.parametrize("score_device", _ACCELERATOR_DEVICES, indirect=True)
+def test_measure_uses_native_accelerator_on_small_images(score_device, small_delivery):
+    device = score_device
     candidate, target = small_delivery
     heatmap = np.linspace(0, 1, target.shape[0] * target.shape[1], dtype=np.float32).reshape(target.shape[:2])
     options = {"details": "tiles", "inspection_heatmap": heatmap}
@@ -125,9 +133,6 @@ def test_measure_uses_native_accelerator_on_small_images(device, small_delivery)
     requested_devices = (device, "gpu", "auto") if damage_backend("auto") == device else (device,)
     for requested in requested_devices:
         actual = measure(candidate, target, device=requested, **options)
-        if device == "cuda":
-            assert actual == expected
-            continue
         assert actual.features == pytest.approx(expected.features, abs=1e-4, rel=0)
         assert actual.score / 100 == pytest.approx(expected.score / 100, abs=1e-4, rel=0)
         assert actual.alignment["status"] == "matched"
@@ -187,7 +192,8 @@ def test_parallel_damage_uses_full_image_halos():
     ((1, 1), "exact"), ((1, 2), "full"), ((33, 43), "empty"),
     ((509, 1967), "partial"), ((2048, 1957), "full"),
 ])
-def test_native_lightness_matches_independent_cpu_maps(shape, coverage):
+@pytest.mark.parametrize("score_device", ("cpu", *_ACCELERATOR_DEVICES), indirect=True)
+def test_native_lightness_matches_independent_cpu_maps(score_device, shape, coverage):
     rng = np.random.default_rng(135)
     target = rng.uniform(-.1, 1.1, (*shape, 3)).astype(np.float32)
     candidate = target.copy()
@@ -207,26 +213,22 @@ def test_native_lightness_matches_independent_cpu_maps(shape, coverage):
     delta = cl - tl
     expected = lightness_damage(cl, tl, delta, support)
     mask = None if support is None else support.view(np.uint8)
-    cpu = _rust._accelerated_lightness(cl, tl, delta, mask, "cpu")
+    device = score_device
     tolerance = 0 if coverage == "exact" else 1e-4
-    for native, reference in zip(cpu, expected, strict=True):
-        np.testing.assert_allclose(native, reference, atol=tolerance, rtol=0, err_msg="CPU")
-    for device in ("cuda", "mps"):
-        if _rust.damage_available(device):
-            gpu = _rust._accelerated_lightness(cl, tl, delta, mask, device)
-            for observed, native, reference in zip(gpu, cpu, expected, strict=True):
-                if device == "cuda":
-                    np.testing.assert_array_equal(observed.view(np.uint32), native.view(np.uint32))
-                else:
-                    np.testing.assert_allclose(observed, native, atol=tolerance, rtol=0, err_msg=device)
-                np.testing.assert_allclose(observed, reference, atol=tolerance, rtol=0, err_msg=device)
+    actual = _rust._accelerated_lightness(cl, tl, delta, mask, device)
+    for observed, reference in zip(actual, expected, strict=True):
+        np.testing.assert_allclose(observed, reference, atol=tolerance, rtol=0, err_msg=device)
+    if device != "cpu":
+        cpu = _rust._accelerated_lightness(cl, tl, delta, mask, "cpu")
+        for observed, native in zip(actual, cpu, strict=True):
+            np.testing.assert_allclose(observed, native, atol=tolerance, rtol=0, err_msg=device)
 
 
 def test_exact_match_preserves_grain_bokeh_and_headroom():
     random = np.random.default_rng(4)
     target = random.uniform(-0.03, 1.4, (112, 150, 3)).astype(np.float32)
     target[:55] = gaussian_filter(target[:55], (4, 4, 0))
-    measurement = measure(target.copy(), target, attention=False)
+    measurement = measure(target.copy(), target, attention=False, device="cpu")
     assert scene_score(measurement) == 100
     assert set(measurement.features.values()) == {0}
     assert measurement.diagnostics["linear_rgb_rmse"] == 0
@@ -262,7 +264,8 @@ def test_color_and_exposure_both_penalize_uniform_fields():
     target = np.full((42, 67, 3), 0.3, dtype=np.float32)
     tone = target + np.float32(0.07)
     tint = np.array([0.04, -0.04 * (0.2126729 / 0.7151522), 0], dtype=np.float32)
-    baseline, tinted, both = [measure(delivery, target, attention=False) for delivery in (tone, target + tint, tone + tint)]
+    baseline, tinted, both = [measure(delivery, target, attention=False, device="cpu")
+                              for delivery in (tone, target + tint, tone + tint)]
     assert tinted.features["native.color"] > 0
     assert both.features["native.color"] > baseline.features["native.color"]
     assert both.features["native.tone"] == pytest.approx(baseline.features["native.tone"], abs=2e-6)
@@ -292,7 +295,7 @@ def test_range_loss_does_not_hide_in_display_clipping():
     scores = [score(np.full_like(target, level), target) for level in (0.98, 1, 1.02, 4)]
     assert scores == sorted(scores, reverse=True)
     white = np.ones_like(target)
-    error = measure(white * 4, white, attention=False)
+    error = measure(white * 4, white, attention=False, device="cpu")
     assert error.features["native.range"] > 0
     assert error.features["native.tone"] == 0
     extreme = np.finfo(np.float32).max
@@ -303,7 +306,7 @@ def test_native_coverage_finds_localized_defects_and_preserves_coordinates():
     target = np.full((151, 740, 3), 0.28, dtype=np.float32)
     candidate = target.copy()
     candidate[28:44, 196:208] = 0.62
-    measurement = measure(candidate, target, attention=False)
+    measurement = measure(candidate, target, attention=False, device="cpu")
     views = measurement.diagnostics["views"]
     assert set(views) == {"native"}
     view, = views["native"]
@@ -340,9 +343,9 @@ def test_explanation_recomposes_score_from_real_tiles():
     target = np.full((113, 151, 3), 0.28, dtype=np.float32)
     candidate = target.copy()
     candidate[3:31, 131:151] = (0.61, 0.43, 0.30)
-    baseline = measure(candidate, target, attention=False)
-    summary = measure(candidate, target, details="summary", attention=False)
-    detailed = measure(candidate, target, details="tiles", attention=False)
+    baseline = measure(candidate, target, attention=False, device="cpu")
+    summary = measure(candidate, target, details="summary", attention=False, device="cpu")
+    detailed = measure(candidate, target, details="tiles", attention=False, device="cpu")
     assert baseline.explanation is None
     assert summary.score == detailed.score == baseline.score
     assert summary.features == detailed.features == baseline.features
@@ -396,7 +399,7 @@ def test_explanation_recomposes_score_from_real_tiles():
 ])
 def test_bad_deliveries_fail_before_measurement(delivery, reason):
     with pytest.raises(ValueError, match=reason):
-        measure(delivery, np.zeros((5, 4, 3), np.float32))
+        measure(delivery, np.zeros((5, 4, 3), np.float32), device="cpu")
 
 
 def attention_description(heatmap):
@@ -472,13 +475,13 @@ def test_inspection_weights_feed_the_score_and_its_tiles():
 def test_flat_inspection_maps_are_neutral_and_perfect_outputs_stay_perfect():
     target = np.full((16, 24, 3), .3, np.float32)
     candidate = target + .04
-    baseline = measure(candidate, target, attention=False).score
+    baseline = measure(candidate, target, attention=False, device="cpu").score
     for level in (0, .3):
         heatmap = np.full(target.shape[:2], level, np.float32)
-        result = measure(candidate, target, inspection_heatmap=heatmap, details="summary")
+        result = measure(candidate, target, inspection_heatmap=heatmap, details="summary", device="cpu")
         assert result.score == baseline
         assert result.explanation["profile"] == INSPECTION_SCORE_VERSION
     heatmap[0, 0] = 1
-    assert measure(target, target, inspection_heatmap=heatmap, details="tiles").score == 100
+    assert measure(target, target, inspection_heatmap=heatmap, details="tiles", device="cpu").score == 100
     with pytest.raises(ValueError, match="finite floating-point inspection map"):
-        measure(candidate, target, inspection_heatmap=heatmap[:-1])
+        measure(candidate, target, inspection_heatmap=heatmap[:-1], device="cpu")

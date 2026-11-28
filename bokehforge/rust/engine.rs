@@ -128,7 +128,7 @@ pub(crate) fn select_backend(device: &str) -> Result<&'static str, Error> {
         "cpu" => return Ok("cpu"),
         "auto" => return Ok(either().unwrap_or("cpu")),
         "gpu" => (either(), "CUDA or Apple Metal (MPS)"),
-        "cuda" => (probe("cuda"), "CUDA with an available driver and NVRTC"),
+        "cuda" => (probe("cuda"), "CUDA with a working NVIDIA driver and GPU"),
         "mps" => (probe("mps"), "Apple Metal (MPS) on Apple Silicon"),
         _ => unreachable!("validated device"),
     };
@@ -267,7 +267,12 @@ impl<'a> InspectionWeights<'a> {
                 let mut encoder = ZlibEncoder::new(Vec::new(), Compression::fast());
                 let mut buffer = [0_u8; 16 * 1024];
                 for chunk in self.heatmap.chunks(buffer.len() / size_of::<f32>()) {
-                    for (bytes, sample) in buffer.chunks_exact_mut(size_of::<f32>()).zip(chunk) {
+                    for (bytes, sample) in buffer
+                        .as_chunks_mut::<{ size_of::<f32>() }>()
+                        .0
+                        .iter_mut()
+                        .zip(chunk)
+                    {
                         bytes.copy_from_slice(&sample.to_le_bytes());
                     }
                     encoder.write_all(&buffer[..std::mem::size_of_val(chunk)])?;
@@ -676,7 +681,9 @@ fn _measure_overlap(
             .as_ref()
             .is_some_and(|mask| mask.shape() != [height, width])
     {
-        return Err(PyValueError::new_err("Images and support must share the overlap grid"));
+        return Err(PyValueError::new_err(
+            "Images and support must share the overlap grid",
+        ));
     }
     let candidate = c_slice(&candidate)?;
     let target = c_slice(&target)?;
@@ -684,10 +691,15 @@ fn _measure_overlap(
     let result = py.detach(|| {
         valid_rgb(ImageView::new(candidate, height, width))?;
         valid_rgb(ImageView::new(target, height, width))?;
-        quality::measure(candidate, target, height, width, support, None, None, None, "cpu")
-            .map_err(Error::operation)
+        quality::measure(
+            candidate, target, height, width, support, None, None, None, "cpu",
+        )
+        .map_err(Error::operation)
     })?;
-    Ok((python_value(py, result.features, "")?, python_value(py, result.diagnostics, "")?))
+    Ok((
+        python_value(py, result.features, "")?,
+        python_value(py, result.diagnostics, "")?,
+    ))
 }
 
 #[cfg(test)]

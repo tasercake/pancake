@@ -1,4 +1,5 @@
 from base64 import b64decode
+from functools import partial
 from hashlib import sha256
 import json
 import os
@@ -62,7 +63,7 @@ def corpus(tmp_path):
 def run_bench(root, output, *args, env=None):
     return subprocess.run(
         [sys.executable, "-m", "bokehforge", "bench", "--root", str(root), "--config", str(root / "sources.json"),
-         "--output", str(output), "--no-attention", *args],
+         "--output", str(output), "--device", "cpu", "--no-attention", *args],
         capture_output=True, text=True, env=env,
     )
 
@@ -78,7 +79,7 @@ def test_benchmark_callable_matches_cli(corpus, tmp_path, capsys):
     assert bokehforge.bench is bench
     assert bench.bench is run_benchmark
     assert run_benchmark([
-        "--root", str(corpus), "--config", str(corpus / "sources.json"), "--no-attention",
+        "--root", str(corpus), "--config", str(corpus / "sources.json"), "--device", "cpu", "--no-attention",
         "--output", str(api_output), *options,
     ]) == cli_result.returncode
     assert capsys.readouterr().out == cli_result.stdout
@@ -132,7 +133,7 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
 
     replay_dir = tmp_path / "replay"
     replay = run_bench(corpus, replay_dir, "--scene", target["scene_id"],
-                       "--candidate-dir", str(output / "images"), "--explain-score", "--device", "cpu")
+                       "--candidate-dir", str(output / "images"), "--explain-score")
     assert replay.returncode == 0, replay.stderr
     assert replay.stdout == result.stdout
     replay_report = json.loads((replay_dir / "report.json").read_text())
@@ -151,8 +152,9 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert len(placement["comparison"]["tile_grids"]) == 8
     catalog = SceneCatalog(corpus, config=corpus / "sources.json")
     scene = catalog.scene(target["scene_id"])
-    assert score_saved_output(catalog, scene, output / target["image"], details="full", attention=False)["explanation"] == explanation
-    assert "explanation" not in score_saved_output(catalog, scene, output / target["image"], attention=False)
+    saved = output / target["image"]
+    assert score_saved_output(catalog, scene, saved, details="full", attention=False, device="cpu")["explanation"] == explanation
+    assert "explanation" not in score_saved_output(catalog, scene, saved, attention=False, device="cpu")
 
     missing = tmp_path / "empty"
     missing.mkdir()
@@ -166,10 +168,10 @@ def test_bench_mean_runs_full_scene_and_scores_reference(corpus, tmp_path):
     assert "already exists" in existing.stderr
 
 
-@pytest.mark.parametrize("device", ["cpu", "mps"])
-def test_saved_output_accepts_precomputed_inspection_provider(corpus, tmp_path, device):
-    if not _rust.damage_available(device) and device != "cpu":
-        pytest.skip("Requires a native Apple Metal device")
+@pytest.mark.parametrize("score_device", [
+    "cpu", pytest.param("mps", marks=pytest.mark.hardware_accelerator, id="metal"),
+], indirect=True)
+def test_saved_output_accepts_precomputed_inspection_provider(score_device, corpus, tmp_path):
     catalog = SceneCatalog(corpus, config=corpus / "sources.json", datasets=["referenced"])
     scene = catalog.scene(catalog.scene_ids[0])
     reference = catalog.decode(scene.reference_ids[0]).data
@@ -183,7 +185,8 @@ def test_saved_output_accepts_precomputed_inspection_provider(corpus, tmp_path, 
             np.testing.assert_array_equal(target, reference)
             return heatmap, digest
 
-    saved = score_saved_output(catalog, scene, path, details="summary", inspection=PrecomputedInspection(), device=device)
+    saved = score_saved_output(catalog, scene, path, details="summary", inspection=PrecomputedInspection(),
+                               device=score_device)
     assert saved["status"] == "ok"
     assert saved["score"] == 100
     assert saved["profile"] == INSPECTION_SCORE_VERSION
@@ -240,7 +243,8 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
 
     monkeypatch.setattr(bench, "_benchmark_override", scoring_override)
     monkeypatch.setattr("bokehforge.review.scores.Inspection", FixtureInspection)
-    args = ["--root", str(corpus), "--config", str(corpus / "sources.json"),
+    monkeypatch.setattr("bokehforge.review.scores.score_saved_output", partial(score_saved_output, device="cpu"))
+    args = ["--root", str(corpus), "--config", str(corpus / "sources.json"), "--device", "cpu",
             "--dataset", "referenced", "--candidate-dir", str(candidates)]
     output = tmp_path / "attention"
     assert main([*args, "--output", str(output), "--explain-score"]) == 0
@@ -251,10 +255,10 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     assert row["inspection_map_sha256"] == sha256(heatmap.astype("<f4").tobytes()).hexdigest()
     assert len(seen) == 1
     np.testing.assert_array_equal(seen[0], reference_preview(reference))
-    assert row["scene_score"] == measure(candidate, reference, inspection_heatmap=heatmap).score
-    baseline = measure(candidate, reference, attention=False).score
+    assert row["scene_score"] == measure(candidate, reference, inspection_heatmap=heatmap, device="cpu").score
+    baseline = measure(candidate, reference, attention=False, device="cpu").score
     assert row["scene_score"] < baseline
-    saved = score_saved_output(catalog, scene, path, details="full", inspection=FixtureInspection())
+    saved = score_saved_output(catalog, scene, path, details="full", inspection=FixtureInspection(), device="cpu")
     assert saved["score"] == row["scene_score"]
     assert saved["explanation"] == json.loads((output / row["score_explanation_path"]).read_text())
     assert len(saved["explanation"]["placements"][0]["comparison"]["tile_grids"]) == 8
@@ -538,8 +542,8 @@ def test_default_scores_original_crop_and_replays_it(corpus, tmp_path):
     catalog = SceneCatalog(corpus, datasets=["referenced"], config=corpus / "sources.json")
     catalog_scene = catalog.scene(scene["scene_id"])
     reference = catalog.decode(catalog_scene.reference_ids[0]).data
-    assert measure(tifffile.imread(saved), reference, attention=False).alignment == replay_row["alignment"]
-    assert score_saved_output(catalog, catalog_scene, saved, attention=False)["alignment"] == replay_row["alignment"]
+    assert measure(tifffile.imread(saved), reference, attention=False, device="cpu").alignment == replay_row["alignment"]
+    assert score_saved_output(catalog, catalog_scene, saved, attention=False, device="cpu")["alignment"] == replay_row["alignment"]
 
     removed = run_bench(corpus, tmp_path / "removed", "--dataset", "referenced", "--candidate-dir", str(output / "images"),
                         "--score-profile", "reference-fidelity-crop-v2")

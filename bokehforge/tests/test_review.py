@@ -529,7 +529,7 @@ def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monke
         calls.append(details)
         started.set()
         assert gate.wait(5)
-        return score_saved(catalog, scene, path, details=details, **options)
+        return score_saved(catalog, scene, path, details=details, device="cpu", **options)
 
     monkeypatch.setattr(runs, "_render", render)
     monkeypatch.setattr(scores, "score_saved_output", delayed_score)
@@ -565,7 +565,7 @@ def test_review_pushes_and_caches_the_unweighted_benchmark_score(tmp_path, monke
         path = app.artifact({"run": run, "scene": scene, "stacker": "pancake"}, "image")
         report = tmp_path / "benchmark"
         assert bench(["--root", str(root), "--config", str(root / "sources.json"), "--candidate-dir",
-                      str(path.parents[1]), "--output", str(report), "--no-attention"]) == 0
+                      str(path.parents[1]), "--output", str(report), "--device", "cpu", "--no-attention"]) == 0
         benchmark_row, = json.loads((report / "report.json").read_text())["scenes"]
         assert benchmark_row["scene_score"] == score
         assert benchmark_row["alignment"] == result["benchmark"]["alignment"]

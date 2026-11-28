@@ -77,4 +77,5 @@ cache-keys = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q -rs"
+markers = ["hardware_accelerator: exercises local CUDA, Metal, or Core ML hardware"]

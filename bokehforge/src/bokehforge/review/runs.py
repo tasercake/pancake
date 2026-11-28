@@ -59,7 +59,7 @@ def scene_fingerprint(catalog, scene, *, recipe_sha256=None):
 def compatible_scene_fingerprints(catalog, scene):
     fingerprints = {scene_fingerprint(catalog, scene)}
     recipe = scene.metadata["recipe"]
-    current = recipe["converter_sha256"], recipe["loader_sha256"]
+    current = recipe.get("converter_sha256"), recipe.get("loader_sha256")
     if current in _COMPATIBLE_RECIPE_CODE:
         for converter, loader in _COMPATIBLE_RECIPE_CODE:
             if (converter, loader) == current:

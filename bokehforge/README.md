@@ -78,3 +78,8 @@ for batch in dataset.batches(8):
 Pass a list of dataset constants or `DATASET_ALL` to load multiple built-in sources. Set `download=False` to use only local data. The [data guide](docs/data.md) covers batch shapes and the lower-level catalog and PyTorch-compatible views.
 
 See the [data guide](docs/data.md) for sample fields, color and provenance contracts, and source configuration. Run the project tests with `uv run --frozen pytest`.
+
+Run local CUDA and Metal tests with `uv run --frozen pytest -m hardware_accelerator -v`.
+Add `--extra inspection` to the `uv run` command on an Apple Silicon Mac to include
+the Core ML ONNX fixture. These tests report which accelerators ran and why the
+others were skipped.

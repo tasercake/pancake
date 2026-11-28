@@ -36,5 +36,5 @@ cudarc = { version = "=0.19.9", default-features = false, features = ["cuda-1200
 libc = "0.2"
 
 [target.'cfg(target_os = "macos")'.dependencies]
-cubecl = { version = "=0.11.4", default-features = false, features = ["metal-native", "wgpu-msl"] }
+cubecl = { version = "=0.11.4", default-features = false, features = ["metal-native"] }
 objc2-metal = { version = "0.3", default-features = false, features = ["MTLDevice"] }

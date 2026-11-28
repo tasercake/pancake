@@ -50,17 +50,12 @@ fn cuda_device() -> Result<Device, String> {
 
 #[cfg(target_os = "macos")]
 fn metal_device() -> Result<Device, String> {
-    use cubecl::device::WgpuDeviceKind;
     use cubecl::metal::device::{default_device, register_device};
     use objc2_metal::{MTLDevice, MTLGPUFamily};
 
     let device = default_device().ok_or("no Metal GPU was found")?;
-    let selected = if device.supportsFamily(MTLGPUFamily::Metal3) {
-        Device::metal(register_device(device))
-    } else {
-        // WGPU's native MSL backend also validates Mac2 Metal adapters, such
-        // as Apple Paravirtual GPUs, that do not report the Metal3 family.
-        Device::metal_msl(WgpuDeviceKind::DefaultDevice)
-    };
-    selected.map_err(|error| error.to_string())
+    if !device.supportsFamily(MTLGPUFamily::Metal3) {
+        return Err("the Apple Metal accelerator requires a device with Metal 3 support".into());
+    }
+    Device::metal(register_device(device)).map_err(|error| error.to_string())
 }

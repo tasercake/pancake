@@ -11,7 +11,7 @@ from bokehforge.alignment import ALIGNMENT_VERSION
 from bokehforge.scoring import measure as _measure
 
 
-measure = partial(_measure, attention=False)
+measure = partial(_measure, attention=False, device="cpu")
 
 
 @pytest.fixture
