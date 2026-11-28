@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: bokehforge-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 defaults:
   run:
@@ -22,12 +22,13 @@ jobs:
   scoring:
     name: BokehForge scoring parity (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, macos-15, windows-2025]
     env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}/bokehforge/target
       RUSTUP_TOOLCHAIN: "1.100.0"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -83,9 +84,43 @@ jobs:
           assert files("bokehforge.review").joinpath("static", "index.html").is_file()
           assert files("bokehforge.review").joinpath("static", "fonts", "SpaceGrotesk-Regular.ttf").is_file()
           PY
+      - name: Execute a native Core ML ONNX fixture
+        if: runner.os == 'macOS'
+        env:
+          BOKEHFORGE_ORT_FIXTURE: ${{ runner.temp }}/bokehforge-coreml
+        run: |
+          python -m uv run --no-sync python - <<'PY'
+          import os
+          from pathlib import Path
+
+          import onnx
+          from onnx import TensorProto, helper
+
+          from bokehforge._attention_setup import _runtime_library
+
+          fixture = Path(os.environ["BOKEHFORGE_ORT_FIXTURE"])
+          fixture.mkdir(exist_ok=True)
+          library = _runtime_library()
+          assert library is not None and library.is_file()
+          (fixture / "runtime-path.txt").write_text(str(library), encoding="utf-8")
+          shape = [1, 1, 2, 2]
+          graph = helper.make_graph(
+              [helper.make_node("Add", ["input", "bias"], ["sum"]),
+               helper.make_node("Relu", ["sum"], ["output"])],
+              "coreml-smoke",
+              [helper.make_tensor_value_info("input", TensorProto.FLOAT, shape)],
+              [helper.make_tensor_value_info("output", TensorProto.FLOAT, shape)],
+              [helper.make_tensor("bias", TensorProto.FLOAT, shape, [1.0] * 4)],
+          )
+          model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 17)], ir_version=9)
+          onnx.checker.check_model(model)
+          onnx.save(model, fixture / "model.onnx")
+          PY
+          export PYO3_PYTHON="$(python -m uv run --no-sync python -c 'import sys; print(sys.executable)')"
+          cargo test --release --locked --lib attention::tests::configured_provider_executes_onnx_fixture -- --exact --ignored
       - name: Run scoring and parity tests
         run: >
           python -m uv run --no-sync python -m pytest -ra
           tests/test_scoring.py tests/test_alignment.py tests/test_native_damage.py
           tests/test_native_pooling.py tests/test_inspection.py tests/test_bench.py
-          tests/test_native_runtime.py
+          tests/test_native_runtime.py tests/test_delivery_io.py

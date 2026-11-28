@@ -126,14 +126,14 @@ pub(super) fn resize(image: ImageView<'_>, [height, width]: [usize; 2]) -> Vec<[
     rows.par_chunks_mut(width).enumerate().for_each(|(y, row)| {
         let source = image.row(y);
         if width == source_w {
-            for (out, rgb) in row.iter_mut().zip(source.chunks_exact(3)) {
-                *out = [rgb[0], rgb[1], rgb[2]].map(|v| v.clamp(0.0, 1.0));
+            for (out, rgb) in row.iter_mut().zip(source.as_chunks::<3>().0) {
+                *out = rgb.map(|v| v.clamp(0.0, 1.0));
             }
             return;
         }
         for (out, (range, weight)) in row.iter_mut().zip(&horizontal) {
             let mut total = [0.0; 3];
-            for pixel in source[range.start * 3..range.end * 3].chunks_exact(3) {
+            for pixel in source[range.start * 3..range.end * 3].as_chunks::<3>().0 {
                 for c in 0..3 {
                     total[c] += f64::from(pixel[c].clamp(0.0, 1.0)) * weight;
                 }
@@ -244,18 +244,15 @@ pub(super) fn contiguous_sum<T>(values: &[T], value: impl Fn(&T) -> f32 + Copy) 
     }
     if len <= 128 {
         let mut lanes: [f32; 8] = std::array::from_fn(|i| value(&values[i]));
-        let mut blocks = values[8..].chunks_exact(8);
-        for block in blocks.by_ref() {
+        let (blocks, rest) = values[8..].as_chunks::<8>();
+        for block in blocks {
             for (lane, item) in lanes.iter_mut().zip(block) {
                 *lane += value(item);
             }
         }
         let sum = ((lanes[0] + lanes[1]) + (lanes[2] + lanes[3]))
             + ((lanes[4] + lanes[5]) + (lanes[6] + lanes[7]));
-        return blocks
-            .remainder()
-            .iter()
-            .fold(sum, |sum, item| sum + value(item));
+        return rest.iter().fold(sum, |sum, item| sum + value(item));
     }
     let split = (len / 2) & !7;
     contiguous_sum(&values[..split], value) + contiguous_sum(&values[split..], value)

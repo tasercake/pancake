@@ -58,7 +58,12 @@ fn preprocess(image: &Rgb8) -> Vec<f32> {
             .enumerate()
             .for_each(|(channel, out)| {
                 let mut rows = vec![0.0; image.height * ENCODER_SIDE];
-                for (row, dest) in rows.chunks_exact_mut(ENCODER_SIDE).enumerate() {
+                for (row, dest) in rows
+                    .as_chunks_mut::<ENCODER_SIDE>()
+                    .0
+                    .iter_mut()
+                    .enumerate()
+                {
                     let base = row * image.width * 3 + channel;
                     for (dest, &x) in dest.iter_mut().zip(&horizontal) {
                         *dest = interpolate(
@@ -70,7 +75,12 @@ fn preprocess(image: &Rgb8) -> Vec<f32> {
                 }
                 let mean = mean[channel] * 255.0;
                 let std = std[channel] * 255.0;
-                for (row, &y) in out.chunks_exact_mut(ENCODER_SIDE).zip(&vertical) {
+                for (row, &y) in out
+                    .as_chunks_mut::<ENCODER_SIDE>()
+                    .0
+                    .iter_mut()
+                    .zip(&vertical)
+                {
                     for (x, dest) in row.iter_mut().enumerate() {
                         let value = interpolate(
                             y,
@@ -92,7 +102,7 @@ fn prompt_batch(width: usize, height: usize, first: usize) -> [f32; POINTS_PER_B
     let scale_x = ((width as f64 * scale).round() / width as f64) as f32;
     let scale_y = ((height as f64 * scale).round() / height as f64) as f32;
     let mut points = [0.0; POINTS_PER_BATCH * 2];
-    for (index, point) in points.chunks_exact_mut(2).enumerate() {
+    for (index, point) in points.as_chunks_mut::<2>().0.iter_mut().enumerate() {
         let grid = first + index;
         let x = (grid % POINTS_PER_SIDE) as f32 + 0.5;
         let y = (grid / POINTS_PER_SIDE) as f32 + 0.5;
@@ -131,9 +141,20 @@ struct Mask {
     quality: f32,
 }
 
-fn stable_mask(raw: &[f32], quality: f32, xs: &[AxisSample], ys: &[AxisSample]) -> Option<Mask> {
-    if quality <= 0.8 || !quality.is_finite() {
-        return None;
+fn stable_mask(
+    raw: &[f32],
+    quality: f32,
+    xs: &[AxisSample],
+    ys: &[AxisSample],
+) -> Result<Option<Mask>, &'static str> {
+    if !quality.is_finite() {
+        return Err("SAM2 decoder returned a non-finite quality score");
+    }
+    if quality <= 0.8 {
+        return Ok(None);
+    }
+    if raw.iter().any(|value| !value.is_finite()) {
+        return Err("SAM2 decoder returned non-finite logits for an eligible mask");
     }
 
     let mut intersection = 0;
@@ -166,11 +187,13 @@ fn stable_mask(raw: &[f32], quality: f32, xs: &[AxisSample], ys: &[AxisSample]) 
         }
     }
 
-    (union != 0 && intersection as f32 / union as f32 > 0.9).then_some(Mask {
-        foreground,
-        bounds,
-        quality,
-    })
+    Ok(
+        (union != 0 && intersection as f32 / union as f32 > 0.9).then_some(Mask {
+            foreground,
+            bounds,
+            quality,
+        }),
+    )
 }
 
 fn suppress(mut candidates: Vec<Mask>) -> (Vec<Vec<bool>>, Vec<f32>) {
@@ -240,7 +263,7 @@ impl Sam2 {
             };
             let (mask_shape, logits) = output("masks")?;
             let (quality_shape, scores) = output("quality")?;
-            if &**mask_shape
+            if **mask_shape
                 != [
                     1,
                     POINTS_PER_BATCH as i64,
@@ -248,19 +271,19 @@ impl Sam2 {
                     MASK_SIDE as i64,
                     MASK_SIDE as i64,
                 ]
-                || &**quality_shape != [1, POINTS_PER_BATCH as i64, MASKS_PER_POINT as i64]
+                || **quality_shape != [1, POINTS_PER_BATCH as i64, MASKS_PER_POINT as i64]
             {
                 return Err(format!(
                     "SAM2 decoder returned mask shape {mask_shape:?} and quality shape {quality_shape:?}"
                 ));
             }
-            let batch: Vec<_> = crate::parallel(|| {
+            let batch = crate::parallel(|| {
                 logits
                     .par_chunks_exact(MASK_SIDE * MASK_SIDE)
                     .zip(scores.par_iter())
                     .map(|(raw, &quality)| stable_mask(raw, quality, &xs, &ys))
-                    .collect()
-            });
+                    .collect::<Result<Vec<_>, _>>()
+            })?;
             debug_assert_eq!(batch.len(), masks_per_batch);
             candidates.extend(batch.into_iter().flatten());
         }
@@ -287,9 +310,15 @@ mod tests {
         let xs = sample_axis(MASK_SIDE, 11);
         let ys = sample_axis(MASK_SIDE, 9);
         let raw = vec![2.0; MASK_SIDE * MASK_SIDE];
-        assert!(stable_mask(&raw, 0.8, &xs, &ys).is_none());
-        assert!(stable_mask(&raw, 0.9, &xs, &ys).is_some());
-        assert!(stable_mask(&vec![0.0; raw.len()], 0.9, &xs, &ys).is_none());
+        assert!(stable_mask(&raw, 0.8, &xs, &ys).unwrap().is_none());
+        assert!(stable_mask(&raw, 0.9, &xs, &ys).unwrap().is_some());
+        assert!(
+            stable_mask(&vec![0.0; raw.len()], 0.9, &xs, &ys)
+                .unwrap()
+                .is_none()
+        );
+        assert!(stable_mask(&raw, f32::NAN, &xs, &ys).is_err());
+        assert!(stable_mask(&vec![f32::INFINITY; raw.len()], 0.9, &xs, &ys).is_err());
 
         let bounds = Bounds {
             left: 1,

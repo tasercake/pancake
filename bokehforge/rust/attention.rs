@@ -9,7 +9,7 @@ use std::sync::{Arc, Mutex};
 use numpy::ndarray::Array2;
 use numpy::{IntoPyArray, PyArray2, PyReadonlyArray3, PyUntypedArrayMethods};
 use ort::ep::{CUDA, CoreML, ExecutionProvider, coreml::ComputeUnits};
-use ort::session::Session;
+use ort::session::{Session, builder::SessionBuilder};
 use pyo3::exceptions::{PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
 use sha2::{Digest, Sha256};
@@ -19,8 +19,10 @@ use crate::{c_slice, parallel};
 pub(crate) mod image;
 mod saliency;
 mod sam2;
+#[cfg(test)]
+mod tests;
 
-const EXPORT_VERSION: &str = "onnx-v1";
+const EXPORT_VERSION: &str = "onnx-v2";
 const GRAPH_FILES: &[&str] = &[
     "reliqs.onnx",
     "tempsal.onnx",
@@ -173,27 +175,28 @@ impl Runtime {
     }
 }
 
+fn session_builder(backend: Backend) -> ort::Result<SessionBuilder> {
+    let workers = std::thread::available_parallelism()
+        .map_or(1, usize::from)
+        .min(8);
+    let builder = Session::builder()?
+        .with_intra_threads(workers)?
+        .with_intra_op_spinning(false)?;
+    Ok(match backend {
+        Backend::Cpu => builder,
+        Backend::Cuda => builder.with_execution_providers([CUDA::default()
+            .with_tf32(false)
+            .build()
+            .error_on_failure()])?,
+        Backend::CoreMl => builder.with_execution_providers([CoreML::default()
+            .with_compute_units(ComputeUnits::All)
+            .build()
+            .error_on_failure()])?,
+    })
+}
+
 fn load_session(path: &Path, backend: Backend) -> Result<Session, String> {
-    let build = || -> ort::Result<Session> {
-        let workers = std::thread::available_parallelism()
-            .map_or(1, usize::from)
-            .min(8);
-        let builder = Session::builder()?
-            .with_intra_threads(workers)?
-            .with_intra_op_spinning(false)?;
-        let mut builder = match backend {
-            Backend::Cpu => builder,
-            Backend::Cuda => builder.with_execution_providers([CUDA::default()
-                .with_tf32(false)
-                .build()
-                .error_on_failure()])?,
-            Backend::CoreMl => builder.with_execution_providers([CoreML::default()
-                .with_compute_units(ComputeUnits::All)
-                .build()
-                .error_on_failure()])?,
-        };
-        builder.commit_from_file(path)
-    };
+    let build = || session_builder(backend)?.commit_from_file(path);
     build().map_err(|error| {
         format!(
             "Could not load {} using {backend:?}: {error}",

@@ -576,7 +576,7 @@ pub(crate) fn python_value(py: Python<'_>, value: Value, key: &str) -> PyResult<
 }
 
 #[pyfunction]
-fn validate_rgb(py: Python<'_>, pixels: &Bound<'_, PyAny>) -> PyResult<()> {
+pub(crate) fn validate_rgb(py: Python<'_>, pixels: &Bound<'_, PyAny>) -> PyResult<()> {
     let pixels = rgb_buffer(pixels)?;
     let shape = pixels.shape();
     let image = ImageView::new(c_slice(&pixels)?, shape[0], shape[1]);

@@ -32,5 +32,9 @@ cudarc = { version = "=0.19.9", default-features = false, features = ["cuda-1200
 # CubeCL also reads the selected CUDA API version from cudarc at build time.
 cudarc = { version = "=0.19.9", default-features = false, features = ["cuda-12000", "fallback-dynamic-loading"] }
 
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+
 [target.'cfg(target_os = "macos")'.dependencies]
-cubecl = { version = "=0.11.4", default-features = false, features = ["metal-native"] }
+cubecl = { version = "=0.11.4", default-features = false, features = ["metal-native", "wgpu-msl"] }
+objc2-metal = { version = "0.3", default-features = false, features = ["MTLDevice"] }

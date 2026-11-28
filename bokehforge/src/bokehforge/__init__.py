@@ -17,6 +17,7 @@ _exports = {
     "SceneCatalog": ".data.lazy",
     "load_dataset": ".data.datasets",
     "measure": ".scoring",
+    "bench": ".bench",
 }
 __all__ = list(_exports)
 
@@ -24,7 +25,8 @@ __all__ = list(_exports)
 def __getattr__(name):
     if name not in _exports:
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-    value = getattr(import_module(_exports[name], __name__), name)
+    module = import_module(_exports[name], __name__)
+    value = module if name == "bench" else getattr(module, name)
     globals()[name] = value
     return value
 

@@ -4,10 +4,11 @@ import sys
 import numpy as np
 import pytest
 import tifffile
-from PIL import Image
+from PIL import Image, ImageCms
 
 from bokehforge import _rust
 from bokehforge.bench import _load_candidate
+from bokehforge.data._canonical import decode, normalize
 
 
 @pytest.mark.parametrize(
@@ -117,3 +118,54 @@ assert reference.shape == (2, 3, 3) and alpha is None and metadata["decoder"] ==
 assert (_read_candidate(Path(sys.argv[2])) == 0.25).all()
 """
     subprocess.run([sys.executable, "-c", script, str(reference), str(delivery)], check=True)
+
+
+@pytest.mark.parametrize("mode", ["L", "LA", "RGB", "RGBA"])
+@pytest.mark.parametrize("transfer", ["srgb", "srgb_assumed", "linear"])
+def test_png_reference_expansion_preserves_all_byte_values(tmp_path, mode, transfer):
+    codes = np.arange(256, dtype=np.uint8).reshape(16, 16)
+    channels = {"LA": (codes, codes.T), "RGB": (codes, 255 - codes, codes.T),
+                "RGBA": (codes, 255 - codes, codes.T, 255 - codes.T)}
+    pixels = codes if mode == "L" else np.stack(channels[mode], axis=-1)
+    path = tmp_path / "rgb.png"
+    Image.fromarray(pixels).save(path)
+    metadata = {"decoder": "Pillow", "original_orientation": 1, "source_mode": mode}
+    expected, expected_alpha, expected_metadata = normalize(pixels, transfer, None, metadata)
+    [(actual, alpha, actual_metadata)] = decode(path, transfer)
+    np.testing.assert_array_equal(actual.view(np.uint32), expected.view(np.uint32))
+    assert actual_metadata == expected_metadata
+    if expected_alpha is None:
+        assert alpha is None
+    else:
+        np.testing.assert_array_equal(alpha.view(np.uint32), expected_alpha.view(np.uint32))
+
+
+@pytest.mark.parametrize("use_icc", [False, True])
+def test_png_reference_preserves_color_managed_and_high_depth_path(tmp_path, monkeypatch, use_icc):
+    path = tmp_path / "legacy.png"
+    options = {}
+    if use_icc:
+        image = Image.new("RGB", (3, 2), (64, 128, 192))
+        options["icc_profile"] = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
+    else:
+        image = Image.fromarray(np.array([[0, 65535], [12000, 38000]], dtype=np.uint16))
+    image.save(path, **options)
+
+    def unexpected(*args):
+        pytest.fail("Unsupported PNG layout used the native byte conversion")
+
+    monkeypatch.setattr(_rust, "expand_png_rgb8", unexpected)
+    with Image.open(path) as source:
+        expected, _, metadata = normalize(np.asarray(source), "srgb", options.get("icc_profile"),
+                                          {"decoder": "Pillow", "original_orientation": 1, "source_mode": source.mode})
+    [(actual, alpha, actual_metadata)] = decode(path, "srgb")
+    np.testing.assert_array_equal(actual.view(np.uint32), expected.view(np.uint32))
+    assert actual_metadata == metadata
+    assert alpha is None
+
+
+def test_png_reference_still_rejects_unknown_transfer(tmp_path):
+    path = tmp_path / "unknown.png"
+    Image.new("RGB", (3, 2)).save(path)
+    with pytest.raises(RuntimeError, match="Unsupported transfer contract"):
+        list(decode(path, "unknown"))

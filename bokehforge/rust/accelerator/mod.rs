@@ -221,11 +221,20 @@ struct Job<'a> {
 }
 
 impl Job<'_> {
-    fn dispatch(&self, count: usize) -> (CubeCount, CubeDim) {
-        let dim = CubeDim::new(self.client, 128);
+    fn dispatch(&self, count: usize) -> (CubeCount, CubeDim, usize) {
+        // A CPU unit owns a contiguous span to amortize dispatch and avoid
+        // workers writing different lanes of the same cache line.
+        let span = if self.client.properties().hardware.num_cpu_cores.is_some() {
+            64
+        } else {
+            1
+        };
+        let units = count.div_ceil(span);
+        let dim = CubeDim::new(self.client, units.min(128));
         (
-            cubecl::calculate_cube_count_elemwise(self.client, count, dim),
+            cubecl::calculate_cube_count_elemwise(self.client, units, dim),
             dim,
+            span,
         )
     }
 
@@ -239,11 +248,20 @@ impl Job<'_> {
         radius: usize,
     ) {
         let [vertical, horizontal] = scratch;
+        // The stencil owns row-local spans so threads can share tap addresses
+        // across columns without crossing a reflected row boundary.
+        let span = if self.client.properties().hardware.num_cpu_cores.is_some() {
+            16
+        } else {
+            1
+        };
+        let units = self.width.div_ceil(span) * self.height * planes;
+        let dim = CubeDim::new(self.client, units.min(128));
         for (input, output, first_plane, pass_y) in [
             (source, vertical, first, true),
             (vertical, horizontal, 0, false),
         ] {
-            let (count, dim) = self.dispatch(self.area * planes);
+            let count = cubecl::calculate_cube_count_elemwise(self.client, units, dim);
             kernels::gaussian::launch(
                 self.client,
                 count,
@@ -257,10 +275,11 @@ impl Job<'_> {
                 first_plane,
                 radius,
                 pass_y,
+                span,
             );
         }
         if self.masked {
-            let (count, dim) = self.dispatch(self.area * (planes - 1));
+            let (count, dim, span) = self.dispatch(self.area * (planes - 1));
             kernels::normalize::launch(
                 self.client,
                 count,
@@ -268,12 +287,13 @@ impl Job<'_> {
                 horizontal.arg(),
                 self.area,
                 planes - 1,
+                span,
             );
         }
     }
 
     fn contrast(&self, samples: &Buffer, original: &Buffer, output: &Buffer, initial: bool) {
-        let (count, dim) = self.dispatch(self.area);
+        let (count, dim, span) = self.dispatch(self.area);
         kernels::directional::launch(
             self.client,
             count,
@@ -285,11 +305,12 @@ impl Job<'_> {
             self.height,
             self.masked,
             initial,
+            span,
         );
     }
 
     fn copy_residual(&self, source: &Buffer, residuals: &Buffer, plane: usize, destination: usize) {
-        let (count, dim) = self.dispatch(self.area);
+        let (count, dim, span) = self.dispatch(self.area);
         kernels::copy_plane::launch(
             self.client,
             count,
@@ -299,6 +320,7 @@ impl Job<'_> {
             self.area,
             plane,
             destination,
+            span,
         );
     }
 }
@@ -317,6 +339,9 @@ fn execute_tile(
     } = image;
     let (height, width) = (tile.height(), tile.width());
     let area = height * width;
+    // The normalized filters of an all-one support window are exactly one,
+    // including the reflected halo and the intermediate float32 pass.
+    let mask = mask.filter(|mask| tile.rows(image_width).any(|row| mask[row].contains(&0)));
     let masked = mask.is_some();
     let plane_count = if masked { 4 } else { 3 };
     let job = Job {
@@ -347,7 +372,7 @@ fn execute_tile(
     let masked_samples;
     let filter_source = if masked {
         masked_samples = Buffer::empty(client, area * plane_count);
-        let (count, dim) = job.dispatch(area * plane_count);
+        let (count, dim, span) = job.dispatch(area * plane_count);
         kernels::mask_samples::launch(
             client,
             count,
@@ -355,6 +380,7 @@ fn execute_tile(
             original.arg(),
             masked_samples.arg(),
             area,
+            span,
         );
         &masked_samples
     } else {
@@ -401,7 +427,7 @@ fn execute_tile(
     }
 
     let edges = Buffer::empty(client, 4 * area);
-    let (count, dim) = job.dispatch(area);
+    let (count, dim, span) = job.dispatch(area);
     kernels::extrema::launch(
         client,
         count,
@@ -410,8 +436,9 @@ fn execute_tile(
         edges.arg(),
         width,
         height,
+        span,
     );
-    let (count, dim) = job.dispatch(area);
+    let (count, dim, span) = job.dispatch(area);
     kernels::nearby::launch(
         client,
         count,
@@ -421,8 +448,9 @@ fn execute_tile(
         width,
         height,
         false,
+        span,
     );
-    let (count, dim) = job.dispatch(area);
+    let (count, dim, span) = job.dispatch(area);
     kernels::nearby::launch(
         client,
         count,
@@ -432,8 +460,9 @@ fn execute_tile(
         width,
         height,
         true,
+        span,
     );
-    let (count, dim) = job.dispatch(area);
+    let (count, dim, span) = job.dispatch(area);
     kernels::finish::launch(
         client,
         count,
@@ -443,6 +472,7 @@ fn execute_tile(
         edges.arg(),
         output.arg(),
         area,
+        span,
     );
     output.read(client)
 }

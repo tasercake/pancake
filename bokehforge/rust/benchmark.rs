@@ -6,13 +6,17 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use numpy::{IntoPyArray, PyReadonlyArray3, PyUntypedArrayMethods, ndarray::Array3};
+use numpy::{
+    IntoPyArray, PyReadonlyArray3, PyUntypedArray, PyUntypedArrayMethods, ndarray::Array3,
+};
 use pyo3::exceptions::{PyFileNotFoundError, PyOSError, PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::{PyCFunction, PyDict, PyList, PyTuple};
 use sha2::{Digest, Sha256};
 
 use crate::{c_slice, delivery_io, engine, registration::ImageView, score::cohort_score};
+
+mod memory;
 
 struct StdoutRedirect<'py> {
     sys: Bound<'py, PyModule>,
@@ -132,14 +136,26 @@ fn mean_stack<'py>(
 
 struct Driver<'py> {
     bridge: Bound<'py, PyModule>,
-    args: Bound<'py, PyAny>,
+    replay_guard: Option<Bound<'py, PyAny>>,
+    encode_tiff: Bound<'py, PyAny>,
     catalog: Bound<'py, PyAny>,
     scorer: Scorer,
     algorithm: Bound<'py, PyAny>,
     candidate_dir: Option<PathBuf>,
     output: PathBuf,
     decode_workers: usize,
+    save_images: bool,
     use_mean: bool,
+}
+
+struct PreparedScene {
+    id: String,
+    reference_id: String,
+    row: Py<PyDict>,
+    result: Py<PyAny>,
+    reference: Py<PyAny>,
+    target_pixels: usize,
+    candidate_pixels: usize,
 }
 
 impl<'py> Driver<'py> {
@@ -199,15 +215,14 @@ impl<'py> Driver<'py> {
 
     fn reference(
         &self,
-        scene: &Bound<'py, PyAny>,
+        reference_id: &str,
         row: &Bound<'py, PyDict>,
     ) -> PyResult<Option<Bound<'py, PyAny>>> {
+        let py = row.py();
         let read = || {
-            let decoded = self
-                .catalog
-                .call_method1("decode", (scene.getattr("reference_ids")?.get_item(0)?,))?;
+            let decoded = self.catalog.call_method1("decode", (reference_id,))?;
             let rgb = decoded.getattr("data")?;
-            self.bridge.getattr("validate_rgb")?.call1((&rgb,))?;
+            engine::validate_rgb(py, &rgb)?;
             if !decoded.getattr("alpha")?.is_none() {
                 return Err(PyValueError::new_err(
                     "The RGB benchmark reference cannot have native alpha",
@@ -218,12 +233,15 @@ impl<'py> Driver<'py> {
         match read() {
             Ok(rgb) => {
                 row.set_item("reference_status", "eligible")?;
-                row.set_item("target_shape", rgb.getattr("shape")?)?;
+                row.set_item(
+                    "target_shape",
+                    PyTuple::new(py, rgb.cast::<PyUntypedArray>()?.shape().iter().copied())?,
+                )?;
                 row.set_item("scene_score", 0.0)?;
                 Ok(Some(rgb))
             }
-            Err(error) if error.is_instance_of::<pyo3::exceptions::PyException>(scene.py()) => {
-                mark_error(row, "reference_error", text(&error, scene.py())?, true)?;
+            Err(error) if error.is_instance_of::<pyo3::exceptions::PyException>(py) => {
+                mark_error(row, "reference_error", text(&error, py)?, true)?;
                 Ok(None)
             }
             Err(error) => Err(error),
@@ -270,20 +288,21 @@ impl<'py> Driver<'py> {
         &self,
         scene: &Bound<'py, PyAny>,
         row: &Bound<'py, PyDict>,
-    ) -> PyResult<Option<Bound<'py, PyAny>>> {
+    ) -> PyResult<Option<PreparedScene>> {
         let py = row.py();
+        let id: String = scene.getattr("id")?.extract()?;
+        let reference_id: String = scene.getattr("reference_ids")?.get_item(0)?.extract()?;
         row.set_item("frames_read", 0)?;
         row.set_item("scene_score", py.None())?;
         row.set_item("status", "ok")?;
-        let Some(reference) = self.reference(scene, row)? else {
+        let Some(reference) = self.reference(&reference_id, row)? else {
             return Ok(None);
         };
         let start = Instant::now();
         let result = if let Some(directory) = &self.candidate_dir {
-            let id: String = scene.getattr("id")?.extract()?;
             self.candidate(&directory.join(format!("{id}.tif")), row)
         } else {
-            self.stack(scene, row, &reference.getattr("shape")?)
+            self.stack(scene, row, &field(row, "target_shape")?)
                 .map(Some)
         };
         row.set_item("seconds", start.elapsed().as_secs_f64())?;
@@ -300,7 +319,7 @@ impl<'py> Driver<'py> {
         if !field(row, "status")?.eq("ok")? {
             return Ok(None);
         }
-        if let Err(error) = self.bridge.getattr("validate_rgb")?.call1((&result,)) {
+        if let Err(error) = engine::validate_rgb(py, &result) {
             if !error.is_instance_of::<PyValueError>(py) {
                 return Err(error);
             }
@@ -312,50 +331,66 @@ impl<'py> Driver<'py> {
             )?;
             return Ok(None);
         }
-        Ok(Some(
-            self.bridge
-                .getattr("_PreparedScene")?
-                .call1((scene, row, result, reference))?,
-        ))
+        let grid_pixels = |image: &Bound<'_, PyAny>| {
+            let shape = image.cast::<PyUntypedArray>()?.shape();
+            Ok::<_, PyErr>(shape[0] * shape[1])
+        };
+        Ok(Some(PreparedScene {
+            id,
+            reference_id,
+            row: row.clone().unbind(),
+            target_pixels: grid_pixels(&reference)?,
+            candidate_pixels: grid_pixels(&result)?,
+            result: result.unbind(),
+            reference: reference.unbind(),
+        }))
     }
 
-    fn finish(&self, scene: &Bound<'py, PyAny>, outcome: Outcome) -> PyResult<()> {
-        let row = scene.getattr("row")?.cast_into::<PyDict>()?;
+    fn finish(&self, scene: &PreparedScene, outcome: Outcome) -> PyResult<()> {
+        let py = self.catalog.py();
         let explanation = match outcome {
-            Outcome::Retry => match self.scorer.attempt(scene, &row, false)? {
+            Outcome::Retry => match self.scorer.attempt(scene, scene.row.bind(py), false)? {
                 Outcome::Complete(explanation) => explanation,
                 Outcome::Retry => unreachable!("serial scores do not defer allocation failures"),
             },
             Outcome::Complete(explanation) => explanation,
         };
-        self.bridge
-            .getattr("_save_scene")?
-            .call1((scene, &self.args, explanation))?;
-        Ok(())
+        self.save_scene(scene, explanation.bind(py))
     }
 
-    fn replay_fits(&self, batch: &[Bound<'py, PyAny>]) -> PyResult<bool> {
-        self.bridge
-            .getattr("_cuda_replay_fits")?
-            .call1((PyList::new(self.args.py(), batch)?, &self.scorer.device))?
-            .extract()
+    fn replay_fits(&self, batch: &[PreparedScene]) -> PyResult<bool> {
+        let py = self.catalog.py();
+        if let Some(guard) = &self.replay_guard {
+            let ids = PyList::new(py, batch.iter().map(|scene| &scene.id))?;
+            return guard.call1((ids, &self.scorer.device))?.extract();
+        }
+        if batch.iter().any(|scene| {
+            !(memory::MIN_PIXELS..=memory::MAX_PIXELS).contains(&scene.target_pixels)
+                || scene.candidate_pixels > memory::MAX_PIXELS
+        }) {
+            return Ok(false);
+        }
+        let mut pixels = batch.iter().map(|scene| scene.target_pixels).sum();
+        if batch.len() == 1 {
+            pixels += memory::MAX_PIXELS;
+        }
+        let device = self.scorer.device.as_str();
+        Ok(py.detach(|| memory::replay_fits(device, pixels)))
     }
 
-    fn batch(&self, batch: &mut Vec<Bound<'py, PyAny>>) -> PyResult<()> {
+    fn batch(&self, batch: &mut Vec<PreparedScene>) -> PyResult<()> {
         if batch.len() == 2 && self.replay_fits(batch)? {
-            let py = self.args.py();
+            let py = self.catalog.py();
             let scorer = &self.scorer;
-            let scenes: Vec<_> = batch.iter().cloned().map(Bound::unbind).collect();
+            let scenes = batch.as_slice();
             let results = py.detach(move || {
                 std::thread::scope(|scope| {
                     let jobs: Vec<_> = scenes
-                        .into_iter()
+                        .iter()
                         .map(|scene| {
                             scope.spawn(move || {
                                 Python::attach(|py| {
-                                    let scene = scene.bind(py);
-                                    let row =
-                                        scene.getattr("row")?.cast_into::<PyDict>()?.copy()?;
+                                    let row = scene.row.bind(py).copy()?;
                                     let outcome = scorer.attempt(scene, &row, true)?;
                                     Ok::<_, PyErr>((row.unbind(), outcome))
                                 })
@@ -373,7 +408,7 @@ impl<'py> Driver<'py> {
             })?;
             for (scene, (row, outcome)) in batch.drain(..).zip(results) {
                 if matches!(outcome, Outcome::Complete(_)) {
-                    scene.getattr("row")?.call_method1("update", (row,))?;
+                    scene.row.bind(py).update(row.bind(py).as_mapping())?;
                 }
                 self.finish(&scene, outcome)?;
             }
@@ -404,7 +439,7 @@ struct Scorer {
 impl Scorer {
     fn native(
         &self,
-        scene: &Bound<'_, PyAny>,
+        scene: &PreparedScene,
         row: &Bound<'_, PyDict>,
         in_batch: bool,
     ) -> PyResult<Py<PyAny>> {
@@ -412,8 +447,8 @@ impl Scorer {
         if self.attention {
             self.prepare_attention.bind(py).call0()?;
         }
-        let candidate = engine::rgb_buffer(&scene.getattr("result")?)?;
-        let target = engine::rgb_buffer(&scene.getattr("reference")?)?;
+        let candidate = engine::rgb_buffer(scene.result.bind(py))?;
+        let target = engine::rgb_buffer(scene.reference.bind(py))?;
         let source = ImageView::new(
             c_slice(&candidate)?,
             candidate.shape()[0],
@@ -458,7 +493,7 @@ impl Scorer {
 
     fn overridden(
         &self,
-        scene: &Bound<'_, PyAny>,
+        scene: &PreparedScene,
         row: &Bound<'_, PyDict>,
         in_batch: bool,
     ) -> PyResult<Py<PyAny>> {
@@ -485,7 +520,7 @@ impl Scorer {
         kwargs.set_item("generate", generator)?;
         kwargs.set_item("retry_on_oom", !in_batch)?;
         let measured = self.override_delivery.bind(py).call(
-            (scene.getattr("result")?, scene.getattr("reference")?),
+            (scene.result.bind(py), scene.reference.bind(py)),
             Some(&kwargs),
         )?;
         row.set_item("scene_score", measured.getattr("score")?)?;
@@ -500,7 +535,7 @@ impl Scorer {
 
     fn attempt(
         &self,
-        scene: &Bound<'_, PyAny>,
+        scene: &PreparedScene,
         row: &Bound<'_, PyDict>,
         in_batch: bool,
     ) -> PyResult<Outcome> {
@@ -530,22 +565,6 @@ impl Scorer {
             Err(error) => Err(error),
         }
     }
-}
-
-#[pyfunction]
-fn benchmark_cuda_memory(_py: Python<'_>, _device: &str) -> Option<usize> {
-    #[cfg(any(target_os = "linux", target_os = "windows"))]
-    return _py.detach(|| {
-        if !matches!(_device, "cuda" | "gpu" | "auto")
-            || engine::select_backend(_device).ok()? != "cuda"
-        {
-            return None;
-        }
-        let cuda = cudarc::driver::CudaContext::new(0).ok()?;
-        cuda.mem_get_info().ok().map(|(free, _)| free)
-    });
-    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
-    None
 }
 
 fn hash_file(path: &Path) -> std::io::Result<String> {
@@ -603,77 +622,67 @@ fn write_json(
         if result.is_err() {
             let _ = fs::remove_file(temporary);
         }
-        Ok::<_, std::io::Error>(result?)
+        result
     })?;
     Ok(())
 }
 
-#[pyfunction]
-fn save_benchmark_scene(
-    scene: &Bound<'_, PyAny>,
-    args: &Bound<'_, PyAny>,
-    explanation: &Bound<'_, PyAny>,
-) -> PyResult<()> {
-    let py = scene.py();
-    let row = scene.getattr("row")?.cast_into::<PyDict>()?;
-    if !field(&row, "status")?.eq("ok")? {
-        return Ok(());
-    }
-    let metadata = scene.getattr("scene")?;
-    let id: String = metadata.getattr("id")?.extract()?;
-    let output: PathBuf = args.getattr("output")?.extract()?;
-    if args.getattr("save_images")?.is_truthy()? {
-        let relative = format!("images/{id}.tif");
-        let path = output.join(&relative);
-        let write = || {
-            if let Some(parent) = path.parent() {
-                fs::create_dir_all(parent)?;
+impl Driver<'_> {
+    fn save_scene(&self, scene: &PreparedScene, explanation: &Bound<'_, PyAny>) -> PyResult<()> {
+        let py = explanation.py();
+        let row = scene.row.bind(py);
+        if !field(row, "status")?.eq("ok")? {
+            return Ok(());
+        }
+        let id = &scene.id;
+        if self.save_images {
+            let relative = format!("images/{id}.tif");
+            let path = self.output.join(&relative);
+            let write = || {
+                if let Some(parent) = path.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+                self.encode_tiff.call1((&path, scene.result.bind(py)))?;
+                Ok::<_, PyErr>(())
+            };
+            match write() {
+                Ok(()) => row.set_item("image", relative)?,
+                Err(error) if error.is_instance_of::<pyo3::exceptions::PyException>(py) => {
+                    if let Err(err) = fs::remove_file(&path)
+                        && err.kind() != std::io::ErrorKind::NotFound
+                    {
+                        return Err(err.into());
+                    }
+                    mark_error(row, "image_error", text(&error, py)?, false)?;
+                }
+                Err(error) => return Err(error),
             }
-            py.import("bokehforge.bench")?
-                .getattr("encode_tiff")?
-                .call1((&path, scene.getattr("result")?))?;
-            Ok::<_, PyErr>(())
-        };
-        match write() {
-            Ok(()) => row.set_item("image", relative)?,
-            Err(error) if error.is_instance_of::<pyo3::exceptions::PyException>(py) => {
-                if let Err(err) = fs::remove_file(&path)
-                    && err.kind() != std::io::ErrorKind::NotFound
+        }
+        if !explanation.is_none() {
+            let relative = format!("score-explanations/{id}.json");
+            let path = self.output.join(&relative);
+            let payload = explanation.cast::<PyDict>()?.copy()?;
+            payload.set_item("scene_id", id)?;
+            payload.set_item("reference_id", &scene.reference_id)?;
+            if let Some(digest) = row.get_item("inspection_map_sha256")? {
+                payload.set_item("inspection_map_sha256", digest)?;
+            }
+            match write_json(payload.as_any(), &path, &path.with_extension("tmp"), false) {
+                Ok(()) => row.set_item("score_explanation_path", relative)?,
+                Err(error)
+                    if error.is_instance_of::<PyOSError>(py)
+                        || error.is_instance_of::<PyValueError>(py) =>
                 {
-                    return Err(err.into());
+                    row.set_item("score_explanation_error", text(&error, py)?)?;
+                    if field(row, "status")?.eq("ok")? {
+                        row.set_item("status", "score_explanation_error")?;
+                    }
                 }
-                mark_error(&row, "image_error", text(&error, py)?, false)?;
+                Err(error) => return Err(error),
             }
-            Err(error) => return Err(error),
         }
+        Ok(())
     }
-    if !explanation.is_none() {
-        let relative = format!("score-explanations/{id}.json");
-        let path = output.join(&relative);
-        let payload = explanation.cast::<PyDict>()?.copy()?;
-        payload.set_item("scene_id", id)?;
-        payload.set_item(
-            "reference_id",
-            metadata.getattr("reference_ids")?.get_item(0)?,
-        )?;
-        if let Some(digest) = row.get_item("inspection_map_sha256")? {
-            payload.set_item("inspection_map_sha256", digest)?;
-        }
-        match write_json(payload.as_any(), &path, &path.with_extension("tmp"), false) {
-            Ok(()) => row.set_item("score_explanation_path", relative)?,
-            Err(error)
-                if error.is_instance_of::<PyOSError>(py)
-                    || error.is_instance_of::<PyValueError>(py) =>
-            {
-                row.set_item("score_explanation_error", text(&error, py)?)?;
-                if field(&row, "status")?.eq("ok")? {
-                    row.set_item("status", "score_explanation_error")?;
-                }
-            }
-            Err(error) => return Err(error),
-        }
-    }
-    Ok(())
 }
 
 #[pyfunction]
@@ -790,7 +799,12 @@ fn report_scoring<'py>(
 }
 
 #[pyfunction]
-fn benchmark(args: Bound<'_, PyAny>, bridge: Bound<'_, PyModule>) -> PyResult<i32> {
+#[pyo3(signature = (args, bridge, *, replay_guard=None))]
+fn benchmark<'py>(
+    args: Bound<'py, PyAny>,
+    bridge: Bound<'py, PyModule>,
+    replay_guard: Option<Bound<'py, PyAny>>,
+) -> PyResult<i32> {
     let py = args.py();
     let output: PathBuf = args.getattr("output")?.extract()?;
     if output.exists() {
@@ -898,7 +912,9 @@ fn benchmark(args: Bound<'_, PyAny>, bridge: Bound<'_, PyModule>) -> PyResult<i3
         )?;
     }
     let driver = Driver {
-        args,
+        replay_guard,
+        encode_tiff: bridge.getattr("encode_tiff")?,
+        save_images: args.getattr("save_images")?.is_truthy()?,
         bridge,
         catalog,
         scorer,
@@ -1007,7 +1023,9 @@ fn benchmark(args: Bound<'_, PyAny>, bridge: Bound<'_, PyModule>) -> PyResult<i3
 pub(crate) fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(benchmark, module)?)?;
     module.add_function(wrap_pyfunction!(benchmark_score, module)?)?;
-    module.add_function(wrap_pyfunction!(benchmark_cuda_memory, module)?)?;
-    module.add_function(wrap_pyfunction!(save_benchmark_scene, module)?)?;
+    module.add_function(wrap_pyfunction!(
+        memory::benchmark_host_replay_fits,
+        module
+    )?)?;
     Ok(())
 }

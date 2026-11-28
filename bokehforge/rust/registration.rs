@@ -186,7 +186,7 @@ pub(crate) fn same_uniform(image: ImageView<'_>) -> bool {
         (0..image.w)
             .step_by((image.w / 24).max(1))
             .all(|x| image.pixel(y, x) == color)
-    }) && (0..image.h).all(|y| image.row(y).chunks_exact(3).all(|p| p == color))
+    }) && (0..image.h).all(|y| image.row(y).as_chunks::<3>().0.iter().all(|&p| p == color))
 }
 
 fn matches_at(needle: ImageView<'_>, image: ImageView<'_>, y: usize, x: usize) -> bool {
@@ -220,7 +220,7 @@ fn uniform_offsets(
     // every possible offset using only one row of counters.
     let mut counts = vec![0usize; image.w];
     for y in 0..needle.h {
-        for (count, pixel) in counts.iter_mut().zip(image.row(y).chunks_exact(3)) {
+        for (count, &pixel) in counts.iter_mut().zip(image.row(y).as_chunks::<3>().0) {
             *count += usize::from(pixel == color);
         }
     }
@@ -241,10 +241,10 @@ fn uniform_offsets(
             }
         }
         if y + 1 < rows {
-            for ((count, old), new) in counts
+            for ((count, &old), &new) in counts
                 .iter_mut()
-                .zip(image.row(y).chunks_exact(3))
-                .zip(image.row(y + needle.h).chunks_exact(3))
+                .zip(image.row(y).as_chunks::<3>().0)
+                .zip(image.row(y + needle.h).as_chunks::<3>().0)
             {
                 *count += usize::from(new == color);
                 *count -= usize::from(old == color);
@@ -312,11 +312,8 @@ fn row_hashes(row: &[f32], width: usize, right_power: u64, mut output: impl FnMu
     let span = width * 3;
     let mut hash = row_digest(&row[..span]);
     output(0, hash);
-    for (index, (old, new)) in row
-        .chunks_exact(3)
-        .zip(row[span..].chunks_exact(3))
-        .enumerate()
-    {
+    let (pixels, _) = row.as_chunks::<3>();
+    for (index, (old, new)) in pixels.iter().zip(&pixels[width..]).enumerate() {
         hash = hash
             .wrapping_sub(rgb_hash(old))
             .wrapping_mul(INV_X)
@@ -854,7 +851,13 @@ pub(crate) fn project<'a>(
     let mut aligned = vec![0.0; h * w * 3];
     let mut support = vec![0u8; h * w];
     let row = |(y, (pixels, coverage)): (usize, (&mut [f32], &mut [u8]))| {
-        for (x, (rgb, present)) in pixels.chunks_exact_mut(3).zip(coverage).enumerate() {
+        for (x, (rgb, present)) in pixels
+            .as_chunks_mut::<3>()
+            .0
+            .iter_mut()
+            .zip(coverage)
+            .enumerate()
+        {
             let [dy, dx] = map(inverse, [y as f64, x as f64]);
             let dy = dy + offset[0];
             let dx = dx + offset[1];

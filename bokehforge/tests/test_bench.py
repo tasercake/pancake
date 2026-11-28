@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 from threading import Barrier, Event, get_ident
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 from zlib import decompress
 
 import numpy as np
@@ -13,6 +13,7 @@ import pytest
 import tifffile
 from PIL import Image
 
+import bokehforge
 from bokehforge import _rust, bench, scoring
 from bokehforge.bench import _score, bench as run_benchmark, main, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
@@ -73,6 +74,8 @@ def test_benchmark_callable_matches_cli(corpus, tmp_path, capsys):
     assert cli_result.returncode == 0, cli_result.stderr
 
     api_output = tmp_path / "api"
+    assert type(bench) is ModuleType
+    assert bokehforge.bench is bench
     assert bench.bench is run_benchmark
     assert run_benchmark([
         "--root", str(corpus), "--config", str(corpus / "sources.json"), "--no-attention",
@@ -345,14 +348,9 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     pytest.param("MemAvailable: 0 kB\n", 12, None, False, id="no-available-memory"),
 ])
 def test_host_replay_memory_accounts_for_page_cache_and_cgroups(
-    tmp_path, monkeypatch, meminfo, free_gib, parent_headroom_gib, fits,
+    tmp_path, meminfo, free_gib, parent_headroom_gib, fits,
 ):
     gib = 1024 ** 3
-    page_size = 4096
-    sysconf = {"SC_AVPHYS_PAGES": free_gib * gib // page_size, "SC_PAGE_SIZE": page_size}
-    monkeypatch.setattr(bench.os, "sysconf", sysconf.__getitem__, raising=False)
-    monkeypatch.setattr(bench, "Path", lambda path: tmp_path / path.removeprefix("/"))
-
     proc = tmp_path / "proc"
     (proc / "self").mkdir(parents=True)
     (proc / "self" / "cgroup").write_text("0::/jobs/benchmark\n")
@@ -365,7 +363,7 @@ def test_host_replay_memory_accounts_for_page_cache_and_cgroups(
         (leaf.parent / "memory.max").write_text(str(16 * gib))
         (leaf.parent / "memory.current").write_text(str((16 - parent_headroom_gib) * gib))
 
-    assert bench._host_replay_fits() is fits
+    assert _rust.benchmark_host_replay_fits(proc, tmp_path / "sys/fs/cgroup", free_gib * gib) is fits
 
 
 def test_cuda_saved_replay_batches_score_and_retries_exhaustion_in_order(tmp_path, monkeypatch, capsys):
@@ -402,9 +400,9 @@ def test_cuda_saved_replay_batches_score_and_retries_exhaustion_in_order(tmp_pat
     checked = []
     committed = []
 
-    def fits(batch, device):
+    def fits(scene_ids, device):
         assert device == "cuda"
-        checked.append([item.scene.id for item in batch])
+        checked.append(scene_ids)
         return True
 
     def measure_delivery(result, reference, *, details, device, generate, retry_on_oom):
@@ -428,22 +426,26 @@ def test_cuda_saved_replay_batches_score_and_retries_exhaustion_in_order(tmp_pat
         explanation = None if details is None else {"level": level}
         return SimpleNamespace(score=level * 100, alignment={}, features={}, explanation=explanation)
 
-    original_save = bench._save_scene
+    original_encode = bench.encode_tiff
 
-    def save(prepared, args, explanation):
+    def encode(path, pixels):
         assert get_ident() == caller
-        committed.append(prepared.scene.id)
-        original_save(prepared, args, explanation)
+        committed.append(path.stem)
+        original_encode(path, pixels)
+
+    native_benchmark = _rust.benchmark
+
+    def benchmark_with_memory(args, bridge):
+        return native_benchmark(args, bridge, replay_guard=fits)
 
     def generate(self, reference):
         print("model stdout")
         return reference[..., 0], sha256(reference.tobytes()).hexdigest()
 
     monkeypatch.setattr(bench, "SceneCatalog", Catalog)
-    monkeypatch.setattr(bench, "_MIN_PARALLEL_PIXELS", 1)
-    monkeypatch.setattr(bench, "_cuda_replay_fits", fits)
+    monkeypatch.setattr(_rust, "benchmark", benchmark_with_memory)
     monkeypatch.setattr(bench, "_measure_delivery", measure_delivery)
-    monkeypatch.setattr(bench, "_save_scene", save)
+    monkeypatch.setattr(bench, "encode_tiff", encode)
     monkeypatch.setattr(Inspection, "generate", generate)
     args = ["--root", str(tmp_path), "--candidate-dir", str(candidates), "--device", "cuda", "--save-images"]
     output = tmp_path / "report"

@@ -37,6 +37,8 @@ and delivery. `scoring_seconds` comes from the bench scorer.
 `wall_seconds` also includes delivery contract validation. Both measure
 scoring with a summary explanation. ZIP reads, fixture preparation, hashing,
 and report writes happen outside the timed interval.
+Pass `--public-measure` to both runs to time the public `scoring.measure` call
+with the same fixtures. This mode includes validation in the scoring time.
 
 The comparison checks the score versions, profile, ordered cohort, input
 fingerprints, scoring and reference statuses, every functional result, and
@@ -69,6 +71,11 @@ at corresponding positions in the traces. It continues to check alignment
 outcomes and selected hypotheses. Pass `--allow-native-rounding` with `--tolerant` to
 allow up to 0.0001 absolute difference in selected placement geometry and
 attention summaries. Embedded attention data must decode to identical bytes.
+
+The CLI's `input_sha256` and `cohort_sha256` include the canonical decoder
+recipe. Changes to the converter or loader produce new CLI provenance digests. When
+comparing such builds, verify the original source digests and decoded float32
+reference and delivery pixels alongside both fingerprints.
 
 ## Synthetic scorer parity
 

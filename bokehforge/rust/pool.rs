@@ -216,18 +216,15 @@ fn pairwise_sum(values: &[f32]) -> f64 {
             .iter()
             .fold(-0.0, |sum, &value| sum + f64::from(value)),
         8..=128 => {
-            let mut chunks = values.chunks_exact(8);
-            let mut lanes = std::array::from_fn::<_, 8, _>(|i| f64::from(values[i]));
-            chunks.next();
-            for chunk in chunks.by_ref() {
+            let (chunks, rest) = values.as_chunks::<8>();
+            let mut lanes = chunks[0].map(f64::from);
+            for chunk in &chunks[1..] {
                 for (sum, &value) in lanes.iter_mut().zip(chunk) {
                     *sum += f64::from(value);
                 }
             }
             let [a, b, c, d, e, f, g, h] = lanes;
-            chunks
-                .remainder()
-                .iter()
+            rest.iter()
                 .fold(((a + b) + (c + d)) + ((e + f) + (g + h)), |sum, &value| {
                     sum + f64::from(value)
                 })

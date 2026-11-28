@@ -161,18 +161,28 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     app.rate({**choice, "grade": 4, "comment": comment})
 
     catalog_scene = app.catalog.scene(scene)
-    legacy_recipe = {**catalog_scene.metadata["recipe"],
-                     "loader_sha256": "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6"}
-    legacy_sha256 = sha256(json.dumps(legacy_recipe, sort_keys=True).encode()).hexdigest()
     result_path = store / "runs" / job / "pancake/results" / (scene + ".json")
     saved = json.loads(result_path.read_text())
-    saved["scene_fingerprint"] = runs.scene_fingerprint(app.catalog, catalog_scene, recipe_sha256=legacy_sha256)
-    result_path.write_text(json.dumps(saved))
 
-    reopened = open_review(root, store)
-    rating = reopened.scene_details(scene, job)["outputs"][0]["rating"]
+    def reopen_with_recipe(converter, loader):
+        recipe = {**catalog_scene.metadata["recipe"], "converter_sha256": converter, "loader_sha256": loader}
+        recipe_hash = sha256(json.dumps(recipe, sort_keys=True).encode()).hexdigest()
+        fingerprint = runs.scene_fingerprint(app.catalog, catalog_scene, recipe_sha256=recipe_hash)
+        result_path.write_text(json.dumps({**saved, "scene_fingerprint": fingerprint}))
+        reopened = open_review(root, store)
+        return reopened, reopened.scene_details(scene, job)["outputs"][0]
+
+    old_converter = "f0b9ebf6223225b9ebd0810cbe450a5bd2ecbf3c38955a8be025745f118fc20b"
+    legacy_loader = "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6"
+    rust_scorer_loader = "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7"
+    _, unrelated = reopen_with_recipe("0" * 64, rust_scorer_loader)
+    assert unrelated["status"] == "different_source" and unrelated["rating"] is None
+    for loader in (legacy_loader, rust_scorer_loader):
+        reopened, output = reopen_with_recipe(old_converter, loader)
+        assert output["status"] == "ready"
+        rating = output["rating"]
+        assert rating["grade"] == 4 and rating["comment"] == comment
     exported, = csv.DictReader(StringIO(reopened.ratings.export_csv()))
-    assert rating["grade"] == 4 and rating["comment"] == comment
     assert exported["run_id"] == job and exported["scene_id"] == scene
     assert exported["stacker"] == "pancake" and exported["grade"] == "4" and exported["comment"] == comment
 

@@ -90,15 +90,15 @@ For relevance `H` and each damage-family value `D`, the scorer uses `D × (1 + �
 
 ### Install the inspection models
 
-From the repository root, install the pinned ONNX Runtime and checkpoint conversion dependencies.
+From the repository root, install the pinned ONNX Runtime 1.24.4 and checkpoint conversion dependencies.
 
 ```sh
 uv sync --project bokehforge --frozen --extra inspection
 ```
 
-The first run with generated attention downloads and verifies the pinned checkpoints, converts them to ONNX with PyTorch, and stores the graphs under `onnx-v1/`. Conversion runs on CPU. Allow about 5 GB for the checkpoints and converted models. Each new process verifies the model cache and loads the native ONNX Runtime sessions on first use. Later scenes reuse the loaded sessions and compiled scoring kernels.
+The first run with generated attention downloads and verifies the pinned checkpoints, converts them to ONNX with PyTorch, and stores the graphs under `onnx-v2/`. Conversion runs on CPU. Allow about 5 GB for the checkpoints and converted models. Each new process verifies the model cache and loads the native ONNX Runtime sessions on first use. Later scenes reuse the loaded sessions and compiled scoring kernels.
 
-The default model directory is `~/.cache/bokehforge/inspection-models`. Set `XDG_CACHE_HOME` to change the cache root or `BOKEHFORGE_INSPECTION_MODELS` to use a specific model directory. A complete verified cache can be reused offline, and interrupted downloads resume on the next attempt. Set `ORT_DYLIB_PATH` to point to a custom ONNX Runtime shared library that supports API 22. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS source](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
+The default model directory is `~/.cache/bokehforge/inspection-models`. Set `XDG_CACHE_HOME` to change the cache root or `BOKEHFORGE_INSPECTION_MODELS` to use a specific model directory. A complete verified cache can be reused offline, and interrupted downloads resume on the next attempt. Set `ORT_DYLIB_PATH` to point to a custom ONNX Runtime shared library that supports API 24. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS source](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
 
 In Python, `measure(candidate, target)` and `score_saved_output(catalog, scene, path)` also generate attention by default. Pass `attention=False` to use the unweighted score. `measure` can also accept an explicit finite `[0, 1]` heatmap on the native reference grid through `inspection_heatmap`.
 

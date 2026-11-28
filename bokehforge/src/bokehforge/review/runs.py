@@ -35,12 +35,19 @@ def _write(path, payload):
     pending.replace(path)
 
 
-# The catalog selection change altered the loader file hash without changing frame decoding.
-# Limit compatibility to that exact loader revision so future decoder changes invalidate old outputs.
-_PREVIOUS_LOADER_HASHES = {
-    "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7":
-        "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6",
-}
+# These converter/loader revisions produce equivalent canonical frames. Match
+# exact pairs so a future decoder change still invalidates previous results.
+_COMPATIBLE_RECIPE_CODE = (
+    # First full-reference benchmark release.
+    ("f0b9ebf6223225b9ebd0810cbe450a5bd2ecbf3c38955a8be025745f118fc20b",
+     "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6"),
+    # Catalog selection update, also shipped in the initial Rust scorer.
+    ("f0b9ebf6223225b9ebd0810cbe450a5bd2ecbf3c38955a8be025745f118fc20b",
+     "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7"),
+    # Native runtime with the equivalent PNG fast path.
+    ("2cb7a404d768a107fc03f2f54049559cae6127af8924190f5bd21aca42f377ac",
+     "9af934c6991ea96d9935d43b932644c38f0a64aae7b927ad37522b6cb3e3061d"),
+)
 
 
 def scene_fingerprint(catalog, scene, *, recipe_sha256=None):
@@ -52,11 +59,14 @@ def scene_fingerprint(catalog, scene, *, recipe_sha256=None):
 def compatible_scene_fingerprints(catalog, scene):
     fingerprints = {scene_fingerprint(catalog, scene)}
     recipe = scene.metadata["recipe"]
-    previous = _PREVIOUS_LOADER_HASHES.get(recipe["loader_sha256"])
-    if previous:
-        old_recipe = {**recipe, "loader_sha256": previous}
-        old_sha256 = sha256(json.dumps(old_recipe, sort_keys=True).encode()).hexdigest()
-        fingerprints.add(scene_fingerprint(catalog, scene, recipe_sha256=old_sha256))
+    current = recipe["converter_sha256"], recipe["loader_sha256"]
+    if current in _COMPATIBLE_RECIPE_CODE:
+        for converter, loader in _COMPATIBLE_RECIPE_CODE:
+            if (converter, loader) == current:
+                continue
+            old_recipe = {**recipe, "converter_sha256": converter, "loader_sha256": loader}
+            old_sha256 = sha256(json.dumps(old_recipe, sort_keys=True).encode()).hexdigest()
+            fingerprints.add(scene_fingerprint(catalog, scene, recipe_sha256=old_sha256))
     return fingerprints
 
 

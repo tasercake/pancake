@@ -2,16 +2,12 @@
 
 import argparse
 from contextlib import closing, redirect_stdout, suppress
-from dataclasses import dataclass
 from importlib import import_module
 from importlib.metadata import version
 import json
-import os
 from pathlib import Path
 import sys
 from time import perf_counter
-
-import numpy as np
 
 from . import _rust
 from ._attention_setup import prepare_attention
@@ -24,12 +20,10 @@ from ._score_contract import (
 from .data._canonical import encode_tiff
 from .data._files import digest
 from .data._config import DEFAULT_CONFIG, data_root
-from .data.lazy import Scene, SceneCatalog
+from .data.lazy import SceneCatalog
 from .stacking import StackFrame, StackInput
 
 _RGB_REFERENCES = {"rendered_all_in_focus", "synthetic_source_image_reference"}
-_MIN_PARALLEL_PIXELS = 1_000_000
-_MAX_PARALLEL_PIXELS = 20_000_000
 
 
 validate_rgb = _rust.validate_rgb
@@ -270,74 +264,6 @@ def write_score_explanation(path, explanation):
             temporary.unlink(missing_ok=True)
 
 
-@dataclass
-class _PreparedScene:
-    scene: Scene
-    row: dict
-    result: np.ndarray
-    reference: np.ndarray
-
-    @property
-    def pixels(self):
-        return self.reference.shape[0] * self.reference.shape[1]
-
-
-def _host_available_memory():
-    # Linux counts reclaimable page cache in MemAvailable.
-    try:
-        for line in Path("/proc/meminfo").read_text().splitlines():
-            if line.startswith("MemAvailable:"):
-                amount, unit = line.removeprefix("MemAvailable:").split()
-                if unit == "kB" and (available := int(amount)) >= 0:
-                    return available * 1024
-                break
-    except (OSError, ValueError):
-        pass
-    return os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE")
-
-
-def _host_replay_fits():
-    try:
-        free = _host_available_memory()
-        paths = Path("/proc/self/cgroup").read_text().splitlines()
-        if len(paths) != 1 or not paths[0].startswith("0::/"):
-            return False
-        root = Path("/sys/fs/cgroup")
-        group = (root / paths[0][4:]).resolve()
-        if not group.is_relative_to(root) or not group.is_dir():
-            return False
-        for parent in (group, *group.parents):
-            with suppress(FileNotFoundError):
-                limit = (parent / "memory.max").read_text().strip()
-                if limit != "max":
-                    free = min(free, int(limit) - int((parent / "memory.current").read_text()))
-            if parent == root:
-                break
-    except (AttributeError, OSError, ValueError):
-        return False
-    # Allow room for two decoded deliveries, projection and pooling working
-    # sets, and temporary arrays while decoding the next scene.
-    return free >= 8 * 1024 ** 3
-
-
-def _cuda_replay_fits(batch, device):
-    if any(not _MIN_PARALLEL_PIXELS <= scene.pixels <= _MAX_PARALLEL_PIXELS
-           or scene.result.size > _MAX_PARALLEL_PIXELS * 3 for scene in batch):
-        return False
-    if not _host_replay_fits():
-        return False
-    free = _rust.benchmark_cuda_memory(device)
-    if free is None:
-        return False
-    # Allow for a cold Inspection blend plus full-resolution maps for both
-    # deliveries, including support masks and CUDA allocator headroom.
-    pixels = sum(scene.pixels for scene in batch)
-    if len(batch) == 1:
-        pixels += _MAX_PARALLEL_PIXELS
-    return free >= 6 * 1024 ** 3 + 128 * pixels
-
-
-_save_scene = _rust.save_benchmark_scene
 _score = _rust.benchmark_score
 
 
@@ -374,6 +300,7 @@ def bench(argv=None):
     report_options.add_argument("--progress", action="store_true", help="Write progress to stderr")
     args = parser.parse_args(argv)
     return _rust.benchmark(args, sys.modules[__name__])
+
 
 def main(argv=None):
     return bench(argv)

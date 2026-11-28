@@ -225,7 +225,8 @@ def _compare_inspection_maps(left, right):
                      for pixels in (left_pixels, right_pixels))
     overlap = np.intersect1d(first, second, assume_unique=True).size / count
     print(f"{left['name']} model-grid Inspection MAE {difference.mean():.9g}, "
-          f"max {difference.max():.9g}, top-1% overlap {overlap:.3%}.")
+          f"max {difference.max():.9g}, top-1% overlap {overlap:.3%}, "
+          f"{np.count_nonzero(difference > .01)}/{difference.size} pixels differ by more than 0.01.")
 
 
 def _warm_statistics(samples, field):
@@ -233,6 +234,21 @@ def _warm_statistics(samples, field):
         return None
     values = [sample[field] for sample in samples]
     return {"mean": mean(values), "median": median(values), "min": min(values), "max": max(values)}
+
+
+def _score_public(candidate, reference, row, device, attention):
+    from bokehforge.scoring import measure
+
+    try:
+        measurement = measure(candidate, reference, details=_DETAILS, device=device, attention=attention)
+    except Exception as error:
+        row.update(status="scoring_error", reference_status="error", scene_score=None,
+                   error=f"{type(error).__name__}: {error}")
+        return None
+    row.update(scene_score=measurement.score, alignment=measurement.alignment)
+    if measurement.features:
+        row.update(score_features=measurement.features, artifact_diagnostics=measurement.diagnostics)
+    return measurement.explanation
 
 
 def _run(args):
@@ -273,14 +289,22 @@ def _run(args):
 
             row = {"status": "ok", "reference_status": "eligible"}
             start = perf_counter()
-            options = {"attention": True} if native_attention else {
-                "inspection": inspection_for(args.device) if attention else None,
-            }
-            explanation = bench._score_delivery(
-                candidate, reference, row, details=_DETAILS, device=args.device, **options,
-            )
+            if args.public_measure:
+                explanation = _score_public(candidate, reference, row, args.device, attention)
+            else:
+                options = {"attention": True} if native_attention else {
+                    "inspection": inspection_for(args.device) if attention else None,
+                }
+                explanation = bench._score_delivery(
+                    candidate, reference, row, details=_DETAILS, device=args.device, **options,
+                )
             wall = perf_counter() - start
-            scoring = row.pop("scoring_seconds", None)
+            if args.public_measure:
+                scoring = wall
+                if attention and row["status"] == "ok":
+                    _, row["inspection_map_sha256"] = inspection_for(args.device).preview_map(reference)
+            else:
+                scoring = row.pop("scoring_seconds", None)
             sample = {
                 "name": name,
                 "inputs": inputs,
@@ -328,6 +352,8 @@ def _run(args):
             "wall_seconds": _warm_statistics(warm, "wall_seconds"),
         },
     }
+    if args.public_measure:
+        report["settings"]["entry_point"] = "scoring.measure"
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     if report["warm"]["scoring_seconds"] is not None:
@@ -428,6 +454,8 @@ def main():
     run.add_argument("--include-results", action="store_true", help="Store score rows and explanations for tolerant comparison.")
     run.add_argument("--include-inspection-maps", action="store_true",
                      help="Capture the model-grid Inspection maps after timing.")
+    run.add_argument("--public-measure", action="store_true",
+                     help="Time public scoring.measure, including validation, instead of the bench scoring stage.")
     compare = modes.add_parser("compare", help="Check the fixtures and all functional outputs of two reports.")
     compare.add_argument("before", type=Path)
     compare.add_argument("after", type=Path)

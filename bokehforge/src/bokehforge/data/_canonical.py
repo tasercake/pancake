@@ -3,6 +3,7 @@
 import hashlib
 import importlib.metadata
 import json
+from functools import lru_cache
 from pathlib import Path
 import platform
 import re
@@ -10,6 +11,7 @@ import re
 import numpy as np
 from PIL import Image, ImageCms, ImageOps
 
+from .. import _rust
 from . import _files
 from ._files import digest, natural_key
 
@@ -173,51 +175,82 @@ def decode(source, transfer, *, suffix=None, page=None):
         if image.mode == "CMYK" and not profile:
             raise RuntimeError("CMYK input requires an ICC profile")
         array = np.asarray(image)
-        yield normalize(array, transfer, profile, {"decoder": "Pillow", "original_orientation": orientation, "source_mode": image.mode})
+        yield normalize(array, transfer, profile,
+                        {"decoder": "Pillow", "original_orientation": orientation, "source_mode": image.mode},
+                        native_png=suffix == ".png" and image.mode in {"L", "LA", "RGB", "RGBA"})
 
 
-def normalize(array, transfer, profile, metadata):
-    native_dtype = str(array.dtype)
-    alpha = None
-    if array.ndim == 2:
-        array = np.repeat(array[..., None], 3, axis=2)
-    if array.ndim != 3 or array.shape[2] not in {2, 3, 4}:
-        raise RuntimeError(f"Unsupported optical frame shape {array.shape}")
-    cmyk = metadata.get("source_mode") == "CMYK"
-    if array.shape[2] in {2, 4} and not cmyk:
-        alpha = array[..., -1].astype(np.float32)
-        if np.issubdtype(array.dtype, np.unsignedinteger):
-            alpha /= np.iinfo(array.dtype).max
-        array = array[..., :-1]
-        if array.shape[2] == 1:
-            array = np.repeat(array, 3, axis=2)
-    if profile:
-        import imagecodecs
-
-        output_profile = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
-        array = imagecodecs.cms_transform(np.ascontiguousarray(array), profile=profile, outprofile=output_profile,
-                                         colorspace="cmyk" if cmyk else "rgb", outcolorspace="rgb", outdtype=np.float32, intent=1)
-        metadata["source_icc_sha256"] = hashlib.sha256(profile).hexdigest()
-        metadata["icc_transform"] = "LittleCMS float32, relative colorimetric, sRGB output"
-        transfer = "srgb"
-    else:
-        if np.issubdtype(array.dtype, np.unsignedinteger):
-            array = array.astype(np.float32) / np.iinfo(array.dtype).max
-        elif np.issubdtype(array.dtype, np.floating):
-            array = array.astype(np.float32)
-        else:
-            raise RuntimeError(f"Ambiguous integer signal range: {array.dtype}")
+def _linear_rgb(array, transfer):
     if transfer in {"srgb", "srgb_assumed"}:
         rgb = np.empty(array.shape, np.float32)
         mask = array <= 0.04045
         rgb[mask] = array[mask] / 12.92
         rgb[~mask] = ((array[~mask] + 0.055) / 1.055) ** 2.4
-    elif transfer == "linear":
-        rgb = array.astype(np.float32)
+        return rgb
+    if transfer == "linear":
+        return array.astype(np.float32)
+    raise RuntimeError(f"Unsupported transfer contract: {transfer}; specify srgb, srgb_assumed or linear")
+
+
+@lru_cache(maxsize=2)
+def _uint8_transfer_table(transfer):
+    values = np.arange(256, dtype=np.float32) / 255
+    if transfer == "linear":
+        values.flags.writeable = False
+        return values
+    table = _linear_rgb(values, transfer)
+    # Compare the installed NumPy's scalar and vector paths before replacing
+    # the transfer calculation with one value per input code.
+    scalar = np.array([_linear_rgb(values[i:i + 1], transfer)[0] for i in range(256)])
+    vector = _linear_rgb(np.repeat(values, 64), transfer).reshape(256, 64)
+    if np.array_equal(table, scalar) and np.all(vector == table[:, None]):
+        table.flags.writeable = False
+        return table
+    return None
+
+
+def normalize(array, transfer, profile, metadata, *, native_png=False):
+    native_dtype = str(array.dtype)
+    source = array
+    table = None
+    if (native_png and not profile and array.dtype == np.uint8 and array.flags.c_contiguous
+            and transfer in {"linear", "srgb", "srgb_assumed"}):
+        table = _uint8_transfer_table("linear" if transfer == "linear" else "srgb")
+    alpha = None
+    if array.ndim == 2:
+        if table is None:
+            array = np.repeat(array[..., None], 3, axis=2)
+    elif array.ndim != 3 or array.shape[2] not in {2, 3, 4}:
+        raise RuntimeError(f"Unsupported optical frame shape {array.shape}")
+    cmyk = metadata.get("source_mode") == "CMYK"
+    if array.ndim == 3 and array.shape[2] in {2, 4} and not cmyk:
+        alpha = array[..., -1].astype(np.float32)
+        if np.issubdtype(array.dtype, np.unsignedinteger):
+            alpha /= np.iinfo(array.dtype).max
+        array = array[..., :-1]
+        if array.shape[2] == 1 and table is None:
+            array = np.repeat(array, 3, axis=2)
+    if table is not None:
+        rgb = _rust.expand_png_rgb8(source, table)
     else:
-        raise RuntimeError(f"Unsupported transfer contract: {transfer}; specify srgb, srgb_assumed or linear")
-    if not np.isfinite(rgb).all():
-        raise RuntimeError("Input contains NaN/Inf")
+        if profile:
+            import imagecodecs
+
+            output_profile = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
+            array = imagecodecs.cms_transform(np.ascontiguousarray(array), profile=profile, outprofile=output_profile,
+                                             colorspace="cmyk" if cmyk else "rgb", outcolorspace="rgb", outdtype=np.float32, intent=1)
+            metadata["source_icc_sha256"] = hashlib.sha256(profile).hexdigest()
+            metadata["icc_transform"] = "LittleCMS float32, relative colorimetric, sRGB output"
+            transfer = "srgb"
+        elif np.issubdtype(array.dtype, np.unsignedinteger):
+            array = array.astype(np.float32) / np.iinfo(array.dtype).max
+        elif np.issubdtype(array.dtype, np.floating):
+            array = array.astype(np.float32)
+        else:
+            raise RuntimeError(f"Ambiguous integer signal range: {array.dtype}")
+        rgb = _linear_rgb(array, transfer)
+        if not np.isfinite(rgb).all():
+            raise RuntimeError("Input contains NaN/Inf")
     return rgb, alpha, {**metadata, "native_dtype": native_dtype, "input_transfer_contract": transfer,
                         "color_space": "linear-sRGB", "range_policy": "dtype normalization only; no per-image normalization or clipping"}
 

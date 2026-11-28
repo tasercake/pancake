@@ -104,7 +104,7 @@ fn sample_rgb(pixels: &[u8], stride: usize, weights: &[i32]) -> [u8; 3] {
 }
 
 fn horizontal_rgb(source: &[u8], dest: &mut [u8], cols: &[Taps<i32>]) {
-    for (pixel, taps) in dest.chunks_exact_mut(3).zip(cols) {
+    for (pixel, taps) in dest.as_chunks_mut::<3>().0.iter_mut().zip(cols) {
         pixel.copy_from_slice(&sample_rgb(&source[3 * taps.start..], 3, &taps.weights));
     }
 }
@@ -123,7 +123,7 @@ fn vertical_rgb(image: Rgb8, height: usize, filter: Filter) -> Rgb8 {
             .zip(rows)
             .for_each(|(out, taps)| {
                 let source = &image.pixels[stride * taps.start..];
-                for (x, pixel) in out.chunks_exact_mut(3).enumerate() {
+                for (x, pixel) in out.as_chunks_mut::<3>().0.iter_mut().enumerate() {
                     pixel.copy_from_slice(&sample_rgb(&source[3 * x..], stride, &taps.weights));
                 }
             });

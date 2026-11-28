@@ -4,6 +4,7 @@ use pyo3::prelude::*;
 
 use crate::c_slice;
 
+/// Return the native lightness planes before pooling for numerical comparisons.
 #[pyfunction]
 #[pyo3(signature = (candidate, target, delta, support, device))]
 fn _accelerated_lightness<'py>(
@@ -25,6 +26,7 @@ fn _accelerated_lightness<'py>(
         ));
     }
     let (height, width) = (shape[0], shape[1]);
+    // Own the inputs while the native backend runs with Python detached.
     let candidate = c_slice(&candidate)?.to_vec();
     let target = c_slice(&target)?.to_vec();
     let delta = c_slice(&delta)?.to_vec();

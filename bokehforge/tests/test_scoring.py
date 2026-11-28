@@ -73,7 +73,8 @@ def test_lab_preparation_keeps_numpy_rounding_and_layouts(layout, shape):
 
     diagnostic = aligned_measure(candidate, target).diagnostics["views"]["native"][0]
     for key, delta in zip(("mean_delta_lightness", "mean_delta_lab_a", "mean_delta_lab_b"), deltas, strict=True):
-        assert diagnostic[key] == pytest.approx(delta.mean(dtype=np.float64), abs=3e-5, rel=0)
+        # Float32 cube-root rounding is amplified by the Lab opponent-plane scale.
+        assert diagnostic[key] == pytest.approx(delta.mean(dtype=np.float64), abs=1.2e-4, rel=0)
 
 
 def test_device_selection_prioritizes_the_available_accelerators(small_delivery):

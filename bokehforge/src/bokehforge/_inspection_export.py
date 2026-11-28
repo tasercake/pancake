@@ -9,7 +9,7 @@ from filelock import FileLock
 
 from .inspection_assets import ensure_inspection_assets
 
-_EXPORT_VERSION = "onnx-v1"
+_EXPORT_VERSION = "onnx-v2"
 _GRAPHS = {"reliqs.onnx", "tempsal.onnx", "sam_encoder.onnx", "sam_decoder.onnx"}
 _MANIFEST = "files.sha256"
 

@@ -6,13 +6,15 @@ from scoring_reference import lightness_damage, range_damage
 
 
 @pytest.mark.parametrize("shape", [(1, 1), (1, 7), (8, 1), (11, 13), (319, 445)])
-@pytest.mark.parametrize("mask", ["none", "empty", "holes"])
+@pytest.mark.parametrize("mask", ["none", "empty", "holes", "full"])
 def test_native_lightness_matches_scipy_at_each_pixel(shape, mask):
     rng = np.random.default_rng(198)
     candidate, target = (rng.uniform(-5, 100, shape).astype(np.float32) for _ in range(2))
     mask_bytes = None if mask == "none" else np.zeros(shape, dtype=np.uint8)
     if mask == "holes":
         mask_bytes[rng.random(shape) > 0.25] = 255
+    elif mask == "full":
+        mask_bytes.fill(255)
     support = None if mask_bytes is None else mask_bytes.view(np.bool_)
     delta = candidate - target
     expected = lightness_damage(candidate, target, delta, support)

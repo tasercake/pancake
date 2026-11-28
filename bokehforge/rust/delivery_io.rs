@@ -3,7 +3,10 @@ use std::fs::File;
 use std::io::{self, BufReader, Read, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
 
-use numpy::{Element, PyArray1, PyArrayMethods};
+use numpy::{
+    Element, PyArray1, PyArray3, PyArrayMethods, PyReadonlyArray1, PyReadonlyArrayDyn,
+    PyUntypedArrayMethods,
+};
 use pyo3::exceptions::{PyFileNotFoundError, PyOSError, PyValueError};
 use pyo3::prelude::*;
 use rayon::prelude::*;
@@ -12,6 +15,7 @@ use tiff::tags::{ByteOrder, CompressionMethod, Tag};
 use tiff::{ColorType, TiffError, TiffFormatError};
 
 const IMAGE_DEPTH: Tag = Tag::Unknown(32997);
+const PARALLEL_IMAGE_BYTES: u64 = 16 * 1024 * 1024;
 
 // Each strip decoder seeks independently within the same open file.
 struct PositionalFile<'a> {
@@ -60,7 +64,11 @@ impl ReadError {
         let path = std::path::absolute(&path).unwrap_or(path);
         match self {
             Self::Open(error) => {
-                let args = (error.raw_os_error(), error.to_string(), path);
+                let args = (
+                    error.raw_os_error(),
+                    error.to_string(),
+                    path.into_os_string(),
+                );
                 if error.kind() == io::ErrorKind::NotFound {
                     PyFileNotFoundError::new_err(args)
                 } else {
@@ -283,7 +291,7 @@ fn decode_delivery(path: &Path) -> Result<Option<(DecodingResult, [usize; 3])>, 
         let predictor = decoder
             .find_tag_unsigned::<u16>(Tag::Predictor)?
             .unwrap_or(1);
-        if data_bytes >= 16 * 1024 * 1024
+        if data_bytes >= PARALLEL_IMAGE_BYTES
             && compression == CompressionMethod::None
             && predictor == 1
             && decoder.byte_order() == ByteOrder::native()
@@ -294,7 +302,7 @@ fn decode_delivery(path: &Path) -> Result<Option<(DecodingResult, [usize; 3])>, 
             return Ok(Some((samples, shape)));
         }
         if compression != CompressionMethod::None
-            && data_bytes >= 16 * 1024 * 1024
+            && data_bytes >= PARALLEL_IMAGE_BYTES
             && offsets.len() >= 8
         {
             let strip_rows = decoder.chunk_dimensions().1.min(height);
@@ -354,6 +362,78 @@ pub(crate) fn read_delivery_tiff(
     .map(Some)
 }
 
+fn expand_samples(source: &[u8], output: &mut [f32], channels: usize, lookup: &[f32; 256]) {
+    match channels {
+        1 | 2 => {
+            for (input, pixel) in source
+                .chunks_exact(channels)
+                .zip(output.as_chunks_mut::<3>().0)
+            {
+                pixel.fill(lookup[usize::from(input[0])]);
+            }
+        }
+        3 => {
+            for (&sample, value) in source.iter().zip(output) {
+                *value = lookup[usize::from(sample)];
+            }
+        }
+        4 => {
+            for (input, pixel) in source
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .zip(output.as_chunks_mut::<3>().0)
+            {
+                pixel[0] = lookup[usize::from(input[0])];
+                pixel[1] = lookup[usize::from(input[1])];
+                pixel[2] = lookup[usize::from(input[2])];
+            }
+        }
+        _ => unreachable!("validated PNG layout"),
+    }
+}
+
+#[pyfunction]
+fn expand_png_rgb8<'py>(
+    py: Python<'py>,
+    pixels: PyReadonlyArrayDyn<'py, u8>,
+    lookup: PyReadonlyArray1<'py, f32>,
+) -> PyResult<Bound<'py, PyArray3<f32>>> {
+    let (height, width, channels) = match *pixels.shape() {
+        [height, width] => (height, width, 1),
+        [height, width, channels @ 2..=4] => (height, width, channels),
+        _ => {
+            return Err(PyValueError::new_err(
+                "Expected a grayscale or RGB byte image",
+            ));
+        }
+    };
+    let source = crate::c_slice(&pixels)?;
+    let lookup: &[f32; 256] = crate::c_slice(&lookup)?
+        .try_into()
+        .map_err(|_| PyValueError::new_err("Expected 256 transfer values"))?;
+    let rgb_len = (source.len() / channels)
+        .checked_mul(3)
+        .ok_or_else(|| PyValueError::new_err("PNG dimensions are too large"))?;
+    let rgb = py.detach(|| {
+        const CHUNK_PIXELS: usize = 32 * 1024;
+        let mut output = vec![0.0; rgb_len];
+        if rgb_len >= 3 * CHUNK_PIXELS {
+            crate::parallel(|| {
+                source
+                    .par_chunks(channels * CHUNK_PIXELS)
+                    .zip(output.par_chunks_mut(3 * CHUNK_PIXELS))
+                    .for_each(|(source, output)| expand_samples(source, output, channels, lookup));
+            });
+        } else {
+            expand_samples(source, &mut output, channels, lookup);
+        }
+        output
+    });
+    PyArray1::from_vec(py, rgb).reshape([height, width, 3])
+}
+
 pub(crate) fn register(module: &Bound<'_, PyModule>) -> PyResult<()> {
-    module.add_function(wrap_pyfunction!(read_delivery_tiff, module)?)
+    module.add_function(wrap_pyfunction!(read_delivery_tiff, module)?)?;
+    module.add_function(wrap_pyfunction!(expand_png_rgb8, module)?)
 }
