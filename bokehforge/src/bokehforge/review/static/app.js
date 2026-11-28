@@ -730,6 +730,14 @@ function railItem(className) {
   return item;
 }
 
+function extendThumbnailTarget(tile, button) {
+  tile.addEventListener("click", (event) => {
+    if (event.target.closest("button")) return;
+    button.focus({ preventScroll: true });
+    button.click();
+  });
+}
+
 function inspectButton(title, params, image, sceneId) {
   const button = part("button", undefined, "inspect-thumb");
   button.type = "button";
@@ -776,6 +784,7 @@ function sourceEntry({ frame, frameIndex }, index) {
   filename.setAttribute("aria-hidden", "true");
   filename.title = frame.name;
   tile.append(button, inspect, filename);
+  extendThumbnailTarget(tile, button);
   return tile;
 }
 
@@ -803,6 +812,7 @@ function lightboxStripEntry(entry) {
     if (activeImage?.gallery === gallery) selectLightboxEntry(entry);
   };
   tile.append(button);
+  extendThumbnailTarget(tile, button);
   return tile;
 }
 
