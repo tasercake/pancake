@@ -100,6 +100,8 @@ The first run with generated attention downloads and verifies the pinned checkpo
 
 The default model directory is `~/.cache/bokehforge/inspection-models`. Set `XDG_CACHE_HOME` to change the cache root or `BOKEHFORGE_INSPECTION_MODELS` to use a specific model directory. A complete verified cache can be reused offline, and interrupted downloads resume on the next attempt. Set `ORT_DYLIB_PATH` to point to a custom ONNX Runtime shared library that supports API 24. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS source](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
 
+If the model cache is a dangling symlink, BokehForge replaces it with a directory and prepares the model files there.
+
 In Python, `measure(candidate, target)` and `score_saved_output(catalog, scene, path)` also generate attention by default. Pass `attention=False` to use the unweighted score. `measure` can also accept an explicit finite `[0, 1]` heatmap on the native reference grid through `inspection_heatmap`.
 
 The `--explain-score` flag includes the exact attention values used to weight damage. The explanation’s `attention` field records native width and height, the 0–1 range, map mean, effective mix, and the range of damage multipliers. Its `data` is Base64 over zlib-compressed, little-endian float32 samples in row-major order. Decode and reshape to height × width to recover the native reference grid.

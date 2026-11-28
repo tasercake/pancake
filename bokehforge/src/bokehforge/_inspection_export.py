@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 
 from filelock import FileLock
 
-from .inspection_assets import ensure_inspection_assets
+from .inspection_assets import _prepare_cache, ensure_inspection_assets
 
 _EXPORT_VERSION = "onnx-v2"
 _GRAPHS = {"reliqs.onnx", "tempsal.onnx", "sam_encoder.onnx", "sam_decoder.onnx"}
@@ -40,11 +40,11 @@ def _export(source, output):
 
 
 def prepare_models(source):
-    source = Path(source).resolve()
+    source = Path(source).expanduser().absolute()
     target = source / _EXPORT_VERSION
     if _complete(target):
         return target
-    source.mkdir(parents=True, exist_ok=True)
+    _prepare_cache(source)
     with FileLock(source / f".{_EXPORT_VERSION}.lock"):
         if _complete(target):
             return target

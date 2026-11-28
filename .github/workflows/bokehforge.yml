@@ -83,5 +83,5 @@ jobs:
         run: >
           python -m uv run --no-sync python -m pytest -ra -m 'not hardware_accelerator'
           tests/test_scoring.py tests/test_alignment.py tests/test_native_damage.py
-          tests/test_native_pooling.py tests/test_inspection.py tests/test_bench.py
+          tests/test_native_pooling.py tests/test_inspection.py tests/test_inspection_export.py tests/test_bench.py
           tests/test_native_runtime.py tests/test_delivery_io.py

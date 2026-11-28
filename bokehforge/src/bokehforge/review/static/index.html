@@ -38,6 +38,17 @@
   </header>
 
   <main>
+    <section class="scene-bar" id="scene-bar" aria-labelledby="scene-name" hidden>
+      <div class="scene-title">
+        <h1 id="scene-name" aria-live="polite"></h1>
+        <p id="scene-position" class="muted"></p>
+        <p id="scene-meta" class="muted"></p>
+        <p id="reference-availability" class="muted" hidden>Ground truth unavailable</p>
+      </div>
+      <label class="control run-control" for="run-select">Evaluation run
+        <select id="run-select"><option value="">No evaluations yet</option></select>
+      </label>
+    </section>
     <p id="connection-status" class="inline-error" role="status" hidden></p>
     <section class="notice" id="catalog-state" aria-live="polite">
       <h1>Indexing local datasets</h1>
@@ -71,13 +82,16 @@
           <figure class="pane candidate">
             <figcaption><span>Stacker output</span><span class="pane-meta" id="candidate-meta"></span></figcaption>
             <div class="candidate-viewport"><div class="image-well" id="candidate-image"></div></div>
-            <div class="benchmark-line candidate-benchmark" hidden>
-              <span id="candidate-benchmark" role="status"></span>
-              <button class="benchmark-info" type="button" aria-label="Why this output scored zero"
-                aria-haspopup="dialog" aria-controls="benchmark-details"
-                title="Why this output scored zero" hidden>i</button>
-              <button class="quiet score-explanation-trigger" id="candidate-explain" type="button"
-                aria-expanded="false" aria-controls="candidate-explanation" hidden>Explain score</button>
+            <div class="candidate-controls">
+              <div class="benchmark-line candidate-benchmark" hidden>
+                <span id="candidate-benchmark" role="status"></span>
+                <button class="benchmark-info" type="button" aria-label="Why this output scored zero"
+                  aria-haspopup="dialog" aria-controls="benchmark-details"
+                  title="Why this output scored zero" hidden>i</button>
+                <button class="quiet score-explanation-trigger" id="candidate-explain" type="button"
+                  aria-expanded="false" aria-controls="candidate-explanation" hidden>Explain score</button>
+              </div>
+              <div class="output-tabs" id="output-tabs" role="group" aria-label="Stacker outputs"></div>
             </div>
           </figure>
           <figure class="pane" id="reference-pane" hidden>
@@ -88,45 +102,32 @@
         </div>
         <section class="score-explanation candidate-explanation" id="candidate-explanation" aria-label="Score explanation" hidden></section>
       </section>
-      <aside class="inspector" aria-labelledby="evaluation-title">
-        <h2 id="evaluation-title">Evaluation</h2>
-        <div class="scene-title">
-          <h1 id="scene-name" aria-live="polite"></h1>
-          <p id="scene-position" class="muted"></p>
-          <p id="scene-meta" class="muted"></p>
-          <p id="reference-availability" class="muted" hidden>Ground truth unavailable</p>
+      <section class="ratings" aria-labelledby="rating-title">
+        <div class="review-heading">
+          <h2 id="rating-title">Rate outputs</h2>
+          <span class="muted" id="rating-count"></span>
         </div>
-        <label class="control run-control" for="run-select">Evaluation run
-          <select id="run-select"><option value="">No evaluations yet</option></select>
-        </label>
-        <div class="output-tabs" id="output-tabs" aria-label="Stacker outputs"></div>
-        <section class="ratings" aria-labelledby="rating-title">
-          <div class="review-heading">
-            <h2 id="rating-title">Rate outputs</h2>
-            <span class="muted" id="rating-count"></span>
-          </div>
-          <form class="rating-form" id="rating-form" hidden>
-            <fieldset>
-              <legend>Grade <span class="muted">· 5 is best</span></legend>
-              <div class="grade-options">
-                <label><input required name="grade" type="radio" value="1"><span>1</span></label>
-                <label><input name="grade" type="radio" value="2"><span>2</span></label>
-                <label><input name="grade" type="radio" value="3"><span>3</span></label>
-                <label><input name="grade" type="radio" value="4"><span>4</span></label>
-                <label><input name="grade" type="radio" value="5"><span>5</span></label>
-              </div>
-            </fieldset>
-            <label class="comment" for="comment">Comment <span class="muted">· optional</span>
-              <textarea id="comment" rows="2" maxlength="4000" placeholder="Describe the details that influenced your grade"></textarea>
-            </label>
-            <div class="save-area">
-              <button class="primary" id="save-rating" type="submit">Save rating</button>
-              <span class="muted" id="rating-status" role="status"></span>
+        <form class="rating-form" id="rating-form" hidden>
+          <fieldset>
+            <legend>Grade <span class="muted">· 5 is best</span></legend>
+            <div class="grade-options">
+              <label><input required name="grade" type="radio" value="1"><span>1</span></label>
+              <label><input name="grade" type="radio" value="2"><span>2</span></label>
+              <label><input name="grade" type="radio" value="3"><span>3</span></label>
+              <label><input name="grade" type="radio" value="4"><span>4</span></label>
+              <label><input name="grade" type="radio" value="5"><span>5</span></label>
             </div>
-          </form>
-          <p class="rating-empty muted" id="rating-empty"></p>
-        </section>
-      </aside>
+          </fieldset>
+          <label class="comment" for="comment">Comment <span class="muted">· optional</span>
+            <textarea id="comment" rows="2" maxlength="4000" placeholder="Describe the details that influenced your grade"></textarea>
+          </label>
+          <div class="save-area">
+            <button class="primary" id="save-rating" type="submit">Save rating</button>
+            <span class="muted" id="rating-status" role="status"></span>
+          </div>
+        </form>
+        <p class="rating-empty muted" id="rating-empty"></p>
+      </section>
       <div class="film">
         <div class="film-heading">
           <div><h3>Source frames</h3><span id="film-range"></span></div>

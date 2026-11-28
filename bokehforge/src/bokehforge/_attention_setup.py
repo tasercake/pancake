@@ -12,7 +12,8 @@ from . import _rust
 def model_directory():
     override = os.environ.get("BOKEHFORGE_INSPECTION_MODELS")
     if override:
-        return Path(override).expanduser().resolve()
+        # Keep the cache entry itself available for dangling-link recovery.
+        return Path(override).expanduser().absolute()
     cache_dir = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache")
     return cache_dir / "bokehforge" / "inspection-models"
 
