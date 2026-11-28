@@ -57,6 +57,7 @@ jobs:
           import sys
 
           from bokehforge import _rust
+          from bokehforge._attention_setup import _runtime_library
 
           print(_rust.__file__)
           assert callable(_rust.sample_linear)
@@ -64,6 +65,8 @@ jobs:
           assert callable(_rust.pool_tiles)
           assert callable(_rust.PreviewEncoder)
           assert _rust.damage_backend("cpu") == "cpu"
+          runtime = _runtime_library()
+          assert runtime is not None and runtime.is_file(), runtime
           if sys.platform == "darwin":
               wheel = next(Path("dist").glob("*.whl"))
               assert wheel.name.endswith("-macosx_15_0_arm64.whl"), wheel.name

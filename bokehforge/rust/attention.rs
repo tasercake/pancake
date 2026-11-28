@@ -116,7 +116,8 @@ impl Runtime {
     fn initialize(&mut self) -> Result<(), String> {
         if !self.initialized {
             let library = self.config.library.as_ref().ok_or_else(|| {
-                "Install BokehForge with the inspection extra to enable ONNX Runtime.".to_owned()
+                "ONNX Runtime is unavailable. Install BokehForge's runtime dependencies or set ORT_DYLIB_PATH."
+                    .to_owned()
             })?;
             ort::init_from(library)
                 .map_err(|error| format!("Could not load ONNX Runtime: {error}"))?

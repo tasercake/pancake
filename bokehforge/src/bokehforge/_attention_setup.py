@@ -1,4 +1,4 @@
-"""Locate the optional native Inspection runtime without importing model code."""
+"""Locate the native Inspection runtime without importing model code."""
 
 from functools import cache
 from importlib.metadata import PackageNotFoundError, distribution

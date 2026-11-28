@@ -12,7 +12,7 @@ Use Python 3.12, `uv`, Rust 1.100 or later with Cargo, and a C++17-capable toolc
 | macOS 15 or later on Apple Silicon | Xcode Command Line Tools |
 | Windows x64 | Rust’s MSVC toolchain, Visual Studio C++ Build Tools, and a Windows SDK |
 
-The source build downloads and statically links the pinned Tracel LLVM 23.1.0-4 bundle for CubeCL. From this directory, install the locked environment.
+The source build downloads and statically links the pinned Tracel LLVM 23.1.0-4 bundle for CubeCL. From this directory, install the locked environment, including the Inspection runtime and model conversion dependencies.
 
 ```sh
 uv sync --frozen
@@ -36,7 +36,7 @@ Run a Python stacker against the downloaded targets or score rendered TIFFs from
 uv run --frozen bokehforge bench --algorithm mean --output ../artifacts/bench-mean --no-attention
 ```
 
-Install the Inspection extra and omit `--no-attention` to use the default attention weighting. The first Inspection run converts the pretrained models once, then later runs reuse the verified model cache. [Benchmark setup, stacker contract, and saved-output replay](docs/benchmark.md)
+Omit `--no-attention` to use the default attention weighting. The first Inspection run downloads and converts the pretrained models. Later runs reuse the verified model cache. [Benchmark setup, stacker contract, and saved-output replay](docs/benchmark.md)
 
 ## Browse and rate stacks in Stackroom
 
@@ -58,7 +58,7 @@ uv run --frozen bokehforge heatmaps
 
 Open the printed URL, normally `http://127.0.0.1:8765/`. Select the datasets you want to browse and click **Generate heatmaps** if any are missing. The app downloads verified originals as needed and shows progress while it prepares the datasets and generates the maps. Completed galleries are cached under `<data-root>/.bokehforge/heatmaps/` in the [shared BokehForge data directory](docs/data.md). They open automatically on later launches from any worktree.
 
-The standard install generates **Texture & light** maps and a center-only comparison. The viewer’s **Inspection models** group uses its Python CUDA generator to display the blend and its component maps. Install the Inspection extra to enable that group on a CUDA machine. Use `--port` to choose a different port and Ctrl+C to stop the server. [Inspection setup](docs/benchmark.md#install-the-inspection-models)
+The viewer generates **Texture & light** maps and a center-only comparison. On a CUDA machine, the **Inspection models** group generates the blend and its component maps. Use `--port` to choose a different port and Ctrl+C to stop the server. [Inspection setup](docs/benchmark.md#install-the-inspection-models)
 
 ## Use from Python
 
@@ -79,7 +79,5 @@ Pass a list of dataset constants or `DATASET_ALL` to load multiple built-in sour
 
 See the [data guide](docs/data.md) for sample fields, color and provenance contracts, and source configuration. Run the project tests with `uv run --frozen pytest`.
 
-Run local CUDA and Metal tests with `uv run --frozen pytest -m hardware_accelerator -v`.
-Add `--extra inspection` to the `uv run` command on an Apple Silicon Mac to include
-the Core ML ONNX fixture. These tests report which accelerators ran and why the
-others were skipped.
+Run local CUDA, Metal, and Core ML tests with `uv run --frozen pytest -m hardware_accelerator -v`.
+These tests report which accelerators ran and why the others were skipped.

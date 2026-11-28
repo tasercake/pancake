@@ -1,10 +1,10 @@
 # Focus-stacking benchmark
 
-Run the mean-blend pilot on InfinigenDefocus from the repository root. Use a new output directory for each run. The Inspection extra enables the default attention-weighted score. With the base installation, add `--no-attention`. [Inspection setup](#install-the-inspection-models)
+Run the mean-blend pilot on InfinigenDefocus from the repository root. Use a new output directory for each run. The default score uses Inspection attention weighting. Add `--no-attention` for the unweighted score. [Inspection setup](#install-the-inspection-models)
 
 ```sh
 uv run --project bokehforge --frozen bokehforge data download
-uv run --project bokehforge --frozen --extra inspection bokehforge bench --algorithm mean --output artifacts/bench-mean --save-images --progress
+uv run --project bokehforge --frozen bokehforge bench --algorithm mean --output artifacts/bench-mean --save-images --progress
 ```
 
 Repeat `--dataset` or `--scene` to select a fixed cohort. By default the benchmark selects all scenes from the configured downloads. Every selected scene must declare exactly one supported all-in-focus RGB reference. If any scene fails this requirement, the command rejects the entire selection before it runs a stacker or creates a report. The shipped configuration selects D29. `--root`, `--config`, and `--lock` have the same meanings as in the catalog. Check that the cohort fingerprint and score version match before comparing runs. Candidate images depend on the stacker environment, so pin the stacker and its dependencies too.
@@ -24,7 +24,7 @@ def first_frame(stack: StackInput) -> np.ndarray:
 For external tools, generate one canonical interleaved RGB float32 TIFF per scene using the path `<candidate-dir>/<scene-id>.tif`. Use orientation 1 and convert the original colors and transfer to linear sRGB before writing. A TIFF from `--save-images` already meets the contract. Replay decodes the delivered TIFFs and references directly. The native TIFF reader handles canonical deliveries and uses the existing Python TIFF adapter for compatible encodings that need it. Dataset and focal-frame decoding use the existing format adapters.
 
 ```sh
-uv run --project bokehforge --frozen --extra inspection bokehforge bench --candidate-dir artifacts/bench-mean/images --dataset D29 --output artifacts/bench-replay
+uv run --project bokehforge --frozen bokehforge bench --candidate-dir artifacts/bench-mean/images --dataset D29 --output artifacts/bench-replay
 ```
 
 On Linux, saved deliveries with generated Inspection maps can score two scenes
@@ -90,10 +90,10 @@ For relevance `H` and each damage-family value `D`, the scorer uses `D Ã— (1 + Î
 
 ### Install the inspection models
 
-From the repository root, install the pinned ONNX Runtime 1.24.4 and checkpoint conversion dependencies.
+The standard BokehForge install includes the pinned ONNX Runtime 1.24.4 and checkpoint conversion dependencies. From the repository root, sync the locked environment.
 
 ```sh
-uv sync --project bokehforge --frozen --extra inspection
+uv sync --project bokehforge --frozen
 ```
 
 The first run with generated attention downloads and verifies the pinned checkpoints, converts them to ONNX with PyTorch, and stores the graphs under `onnx-v2/`. Conversion runs on CPU. Allow about 5 GB for the checkpoints and converted models. Each new process verifies the model cache and loads the native ONNX Runtime sessions on first use. Later scenes reuse the loaded sessions and compiled scoring kernels.

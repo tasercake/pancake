@@ -3,10 +3,10 @@
 Stackroom is BokehForge’s local app for comparing and rating focus stacks. Launch it from the repository root and open one of the HTTP URLs it prints.
 
 ```sh
-bokehforge/.venv/bin/bokehforge review
+uv run --project bokehforge --frozen bokehforge review
 ```
 
-Stackroom uses attention-weighted scores by default. Install the [inspection dependencies](benchmark.md#install-the-inspection-models) once. Stackroom downloads missing model files on first use. Start Stackroom with `--no-attention` for the unweighted score.
+Stackroom uses attention-weighted scores by default. The standard install includes the Inspection runtime. Stackroom downloads missing [model files](benchmark.md#install-the-inspection-models) on first use. Start Stackroom with `--no-attention` for the unweighted score.
 
 The server listens on all IPv4 interfaces by default. From another device, open `http://<hostname>:8765` using the server's hostname or its LAN or Tailscale IPv4 address. The Tailscale MagicDNS short name works when it matches the server's hostname. Any device that can reach the port can review images, save ratings, and start downloads or evaluations. Use `--host 127.0.0.1` for access from the host computer only, or bind to a specific interface by giving its IPv4 address.
 
