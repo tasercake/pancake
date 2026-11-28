@@ -7,10 +7,17 @@
 <style>
 :root { color-scheme:dark; color:#f2f2f2; background:#191919; font:14px system-ui,sans-serif }
 * { box-sizing:border-box }
+[hidden] { display:none !important }
 body { margin:0 }
 header { position:sticky; top:0; z-index:1; background:#232323; border-bottom:1px solid #565656 }
-.toolbar,.context { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:10px 14px }
-.toolbar { border-bottom:1px solid #565656 }
+.toolbar,.context,.viewer-tools { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:10px 14px }
+.toolbar,.viewer-tools { border-bottom:1px solid #565656 }
+fieldset { display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin:0; padding:4px 8px; border:1px solid #565656 }
+fieldset legend { color:#c2c2c2 }
+#generate { color:#191919; background:#fff }
+#generate:disabled { color:#a0a0a0; background:#343434 }
+#generation { display:grid; gap:6px; padding:8px 14px; background:#2b2b2b }
+#generation progress { accent-color:#fff; width:min(100%, 36rem) }
 h1 { font-size:15px; margin:0 4px 0 0; font-weight:650 }
 nav,label,.scale { display:flex; align-items:center; gap:6px; min-width:0 }
 label span,.context,small { color:#c2c2c2 }
@@ -19,6 +26,7 @@ select { max-width:100%; min-width:0 }
 button:disabled,select:disabled { color:#a0a0a0 }
 :focus-visible { outline:2px solid white; outline-offset:2px }
 .context { justify-content:space-between; min-height:38px; padding-block:6px }
+#datasets { display:flex; flex-wrap:wrap; gap:6px 12px }
 .scale i { display:block; width:112px; height:8px; background:linear-gradient(90deg,#0f1427,#22306e 18%,#245c96 40%,#3995b2 58%,#5acdb4 78%,#fcea79) }
 main { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 310px),1fr)); gap:1px; margin:1px; background:#565656 }
 main[data-count="2"] { grid-template-columns:repeat(2,minmax(0,1fr)) }
@@ -31,7 +39,7 @@ figure img { display:block; width:100%; height:auto; aspect-ratio:attr(width typ
 @media (max-width:680px) {
   main[data-count="2"],main[data-count="3"] { grid-template-columns:minmax(0,1fr) }
   h1 { width:100% }
-  .toolbar,.context { padding-inline:9px }
+  .toolbar,.context,.viewer-tools { padding-inline:9px }
   label { max-width:100% }
 }
 </style>
@@ -40,6 +48,15 @@ figure img { display:block; width:100%; height:auto; aspect-ratio:attr(width typ
 <header>
   <div class="toolbar">
     <h1>BokehForge image interest</h1>
+    <fieldset><legend>Datasets</legend><span id="datasets"></span></fieldset>
+    <label id="profile-control" hidden><span>Model group</span><select id="profile"></select></label>
+    <button id="generate" type="button" hidden>Generate heatmaps</button>
+  </div>
+  <div id="generation">
+    <span id="job-message" role="status">Loading datasets…</span>
+    <progress id="progress" aria-label="Heatmap generation progress" hidden></progress>
+  </div>
+  <div class="viewer-tools" id="viewer-tools" hidden>
     <nav aria-label="Photo navigation">
       <button id="prev" type="button" aria-label="Previous photo">←</button>
       <button id="next" type="button" aria-label="Next photo">→</button>
@@ -49,23 +66,17 @@ figure img { display:block; width:100%; height:auto; aspect-ratio:attr(width typ
     <label><span>Model</span><select id="model"></select></label>
     <label><span>Compare with</span><select id="compare"></select></label>
   </div>
-  <div class="context"><span id="status" aria-live="polite"></span><span class="scale" aria-label="Heatmap colors from low to high relevance">Low <i></i> High</span></div>
+  <div class="context" id="context" hidden><span id="status" aria-live="polite"></span><span class="scale" aria-label="Heatmap colors from low to high relevance">Low <i></i> High</span></div>
 </header>
 <main id="panels"></main>
 <script>
-function showGallery({scenes, models}) {
-    const field = id => document.getElementById(id);
+const field = id => document.getElementById(id);
+
+function galleryViewer() {
     const [scene, mode, model, compare, panels, status, prev, next] =
         ['scene', 'mode', 'model', 'compare', 'panels', 'status', 'prev', 'next'].map(field);
-    for (const group of [...new Set(scenes.map(photo => photo.group))]) {
-        const options = document.createElement('optgroup');
-        options.label = group;
-        for (const photo of scenes.filter(photo => photo.group === group)) {
-            options.append(new Option(photo.title, photo.id));
-        }
-        scene.append(options);
-    }
-
+    let scenes = [];
+    let models = {};
     let primary = 'all';
     let secondary = '';
 
@@ -73,7 +84,7 @@ function showGallery({scenes, models}) {
         const [title, description] = key ? models[key] : ['Reference photo', photo.group];
         const href = key ? photo.maps[key][mode.value] : photo.photo;
         const url = new URL(href, location.origin + '/');
-        if (url.origin !== location.origin || !/^\/interest-v1\/[\w-]+\.png$/.test(url.pathname)) {
+        if (url.origin !== location.origin || !/^\/images\/[a-z]+\/[\w-]+\/[a-z0-9-]+\.png$/.test(url.pathname)) {
             throw new Error('Unexpected gallery image path');
         }
         const figure = document.createElement('figure');
@@ -108,7 +119,7 @@ function showGallery({scenes, models}) {
         model.value = available.includes(primary) ? primary : 'all';
         const alternatives = available.filter(key => key !== model.value);
         compare.replaceChildren(new Option('None', ''), ...alternatives.map(key => new Option(models[key][0], key)));
-        compare.disabled = model.value === 'all';
+        compare.disabled = model.value === 'all' || !alternatives.length;
         compare.value = !compare.disabled && alternatives.includes(secondary) ? secondary : '';
         const selection = model.value === 'all' ? available : [model.value, compare.value].filter(Boolean);
         panels.dataset.count = selection.length + 1;
@@ -122,11 +133,11 @@ function showGallery({scenes, models}) {
     }
 
     function restore() {
-        const hash = location.hash.slice(1);
-        const state = new URLSearchParams(hash);
+        if (!scenes.length) return;
+        const state = new URLSearchParams(location.hash.slice(1));
         const identifier = state.get('photo');
         scene.value = scenes.some(photo => photo.id === identifier) ? identifier : scenes[0].id;
-        primary = state.get('model') || (hash.includes('/') ? hash.split('/')[1] : 'all');
+        primary = state.get('model') || 'all';
         secondary = state.get('compare') || '';
         mode.value = state.get('view') === 'processed' ? 'processed' : 'raw';
         render();
@@ -145,26 +156,151 @@ function showGallery({scenes, models}) {
     compare.addEventListener('change', () => { secondary = compare.value; render(); });
     window.addEventListener('hashchange', restore);
     window.addEventListener('keydown', event => {
-        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.target.closest('select,button,a')) return;
+        if (!scenes.length || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.target.closest('select,button,a')) return;
         if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
             event.preventDefault();
             move(event.key === 'ArrowLeft' ? -1 : 1);
         }
     });
-    restore();
+    return gallery => {
+        ({scenes, models} = gallery);
+        const groups = new Map();
+        for (const photo of scenes) {
+            if (!groups.has(photo.group)) {
+                const group = document.createElement('optgroup');
+                group.label = photo.group;
+                groups.set(photo.group, group);
+            }
+            groups.get(photo.group).append(new Option(photo.title, photo.id));
+        }
+        scene.replaceChildren(...groups.values());
+        field('viewer-tools').hidden = field('context').hidden = !scenes.length;
+        if (!scenes.length) panels.replaceChildren();
+        restore();
+    };
 }
 
-async function loadGallery() {
+const showGallery = galleryViewer();
+const datasetControls = field('datasets');
+const profile = field('profile');
+const generate = field('generate');
+const message = field('job-message');
+const progress = field('progress');
+let snapshot;
+let galleryKey = '';
+let requesting = false;
+
+function selectedDatasets() {
+    return Array.from(datasetControls.querySelectorAll('input:checked'), input => input.value);
+}
+
+function loadControls({datasets, profiles}) {
+    for (const {id, name} of datasets) {
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = id;
+        input.checked = true;
+        const label = document.createElement('label');
+        label.append(input, name);
+        datasetControls.append(label);
+    }
+    for (const {id, name} of profiles) profile.append(new Option(name, id));
+    const saved = profiles.findLast(item => datasets.some(dataset => dataset.cached.includes(item.id)));
+    profile.value = saved?.id ?? profiles.at(-1).id;
+    field('profile-control').hidden = profiles.length <= 1;
+}
+
+async function refreshGallery(datasets) {
+    const query = new URLSearchParams({profile:profile.value});
+    for (const dataset of datasets) query.append('dataset', dataset);
+    const key = datasets.length ? query.toString() : '';
+    if (key === galleryKey) return;
+    galleryKey = key;
+    if (!key) {
+        showGallery({scenes:[], models:{}});
+        return;
+    }
     try {
-        const response = await fetch('/gallery.json');
-        if (!response.ok) throw new Error('Gallery request failed');
-        showGallery(await response.json());
+        const response = await fetch('/api/gallery?' + key);
+        if (!response.ok) throw new Error('Could not load the saved heatmaps.');
+        const gallery = await response.json();
+        if (key === galleryKey) showGallery(gallery);
     } catch (error) {
-        document.getElementById('status').textContent = 'Could not load the heatmap gallery.';
-        console.error(error);
+        if (key === galleryKey) {
+            galleryKey = '';
+            message.textContent = error.message;
+        }
     }
 }
-loadGallery();
+
+function update() {
+    const selected = selectedDatasets();
+    const cached = snapshot.datasets.filter(dataset => selected.includes(dataset.id) && dataset.cached.includes(profile.value));
+    const missing = selected.length - cached.length;
+    const canGenerate = snapshot.profiles.find(item => item.id === profile.value).can_generate;
+    const job = snapshot.job;
+    const running = job.status === 'running';
+    generate.hidden = !missing || !canGenerate;
+    generate.disabled = running || requesting;
+    progress.hidden = !running;
+
+    if (running) {
+        const total = job.total;
+        if (total > 0) {
+            progress.max = total;
+            progress.value = job.completed;
+            const label = job.unit === 'bytes'
+                ? `${(job.completed / 2**20).toFixed(1)} of ${(total / 2**20).toFixed(1)} MiB`
+                : `${job.completed} of ${total} scenes`;
+            message.textContent = `${job.message} · ${label}`;
+        } else {
+            progress.removeAttribute('value');
+            message.textContent = job.message;
+        }
+    } else if (job.status === 'failed' && job.profile === profile.value) {
+        message.textContent = `Generation failed. ${job.message}`;
+    } else if (!selected.length) {
+        message.textContent = 'Select a dataset to view or generate heatmaps.';
+    } else if (missing) {
+        message.textContent = canGenerate
+            ? 'Generate heatmaps for the selected datasets that are missing them.'
+            : 'Generating these Inspection heatmaps requires CUDA and the inspection dependencies.';
+    } else {
+        message.textContent = 'Heatmaps ready';
+    }
+    refreshGallery(cached.map(dataset => dataset.id));
+}
+
+datasetControls.addEventListener('change', update);
+profile.addEventListener('change', update);
+generate.addEventListener('click', async () => {
+    requesting = generate.disabled = true;
+    try {
+        const response = await fetch('/api/generate', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({profile:profile.value, datasets:selectedDatasets()}),
+        });
+        if (!response.ok) throw new Error((await response.json()).error);
+    } catch (error) {
+        message.textContent = error.message;
+    } finally {
+        requesting = false;
+        generate.disabled = snapshot?.job.status === 'running';
+    }
+});
+
+const events = new EventSource('/api/events');
+events.addEventListener('heatmaps', event => {
+    const current = JSON.parse(event.data);
+    if (!snapshot) loadControls(current);
+    snapshot = current;
+    update();
+});
+events.onerror = () => {
+    generate.disabled = true;
+    message.textContent = 'Connection interrupted. Reconnecting…';
+};
 </script>
 </body>
 </html>

@@ -73,7 +73,7 @@ _ASSETS = (
 )
 
 
-def ensure_inspection_assets(directory: Path):
+def ensure_inspection_assets(directory: Path, *, progress=None):
     # Inspect the known paths first so a complete, even read-only, cache is usable offline.
     pending = [asset for asset in _ASSETS if not verified(directory / asset["path"], asset.copy())]
     if not pending:
@@ -86,7 +86,11 @@ def ensure_inspection_assets(directory: Path):
         for asset in pending:
             target = directory / asset["path"]
             print(f"Preparing BokehForge inspection asset {target.name}", file=sys.stderr, flush=True)
+
+            def report(phase, received, total, path=asset["path"]):
+                progress(path, phase, received, total)
+
             try:
-                acquire(client, target, asset.copy(), reserve=0, retries=3)
+                acquire(client, target, asset.copy(), reserve=0, retries=3, progress=report if progress else None)
             except (OSError, RuntimeError, ValueError) as exc:
                 raise RuntimeError(f"Could not cache inspection asset {asset['path']}: {exc}") from exc

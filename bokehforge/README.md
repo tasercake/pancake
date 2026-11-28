@@ -35,13 +35,15 @@ See the [Stackroom guide](docs/review.md) for dataset selection, stacker setup, 
 
 ## Compare image-interest heatmaps
 
-Open a rendered image-interest gallery in your browser. Select a photo to see its reference and compare models in raw or processed mode.
+Open the image-interest viewer to compare all-in-focus reference photos and their raw or processed heatmaps.
 
 ```sh
-uv run --frozen bokehforge heatmaps /path/to/gallery
+uv run --frozen bokehforge heatmaps
 ```
 
-Point the command at the directory containing the generated `interest-data.js` manifest and the PNGs in `interest-v1/`. Open the printed URL, normally `http://127.0.0.1:8765/`. Use `--port` to choose a different port. Press Ctrl+C to stop the server.
+Open the printed URL, normally `http://127.0.0.1:8765/`. Select the datasets you want to browse and click **Generate heatmaps** if any are missing. The app downloads verified originals as needed and shows progress while it prepares the datasets and generates the maps. Completed galleries are cached under `<data-root>/.bokehforge/heatmaps/` in the [shared BokehForge data directory](docs/data.md). They open automatically on later launches from any worktree.
+
+The standard install generates **Texture & light** maps and a center-only comparison. Install the [inspection dependencies](docs/benchmark.md#install-the-inspection-models) on a CUDA machine to also generate the **Inspection models** group. It includes the Inspection blend and its component maps. BokehForge downloads missing model files on first use. Use `--port` to choose a different port and Ctrl+C to stop the server.
 
 ## Use from Python
 
