@@ -520,7 +520,11 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
   top: 3.85rem;
   max-height: calc(100% - 4.4rem);
 }
-.damage-canvas { position: absolute; pointer-events: none; }
+.damage-canvas {
+  position: absolute;
+  background: var(--matte);
+  pointer-events: none;
+}
 .damage-legend {
   position: absolute;
   left: .55rem;

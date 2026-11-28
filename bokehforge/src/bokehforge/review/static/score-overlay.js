@@ -38,14 +38,13 @@ function drawGrid(canvas, payload) {
   const { x_edges: xs, y_edges: ys, values, covered_pixels: coverage } = payload.grid;
   const colors = Array.from({ length: 256 }, (_, index) => {
     const t = index / 255;
-    return "rgba(" + Math.round(90 + 165 * t) + "," + Math.round(80 + 121 * t) + "," +
-      Math.round(225 - 177 * t) + "," + (0.26 + 0.57 * t) + ")";
+    return `rgb(${Math.round(90 + 165 * t)}, ${Math.round(80 + 121 * t)}, ${Math.round(225 - 177 * t)})`;
   });
   let index = 0;
   for (let row = 0; row < ys.length - 1; row += 1) {
     for (let col = 0; col < xs.length - 1; col += 1, index += 1) {
       const value = values[index];
-      if (!value || coverage?.[index] === 0) continue;
+      if (value == null || coverage?.[index] === 0) continue;
       ctx.fillStyle = colors[Math.round(255 * Math.min(value / maximum, 1))];
       ctx.fillRect(xs[col], ys[row], xs[col + 1] - xs[col], ys[row + 1] - ys[row]);
     }
@@ -66,7 +65,7 @@ function drawAttention(canvas, payload) {
     image.data[offset] = 29 + 79 * value;
     image.data[offset + 1] = 132 + 90 * value;
     image.data[offset + 2] = 165 + 80 * value;
-    image.data[offset + 3] = 210 * value;
+    image.data[offset + 3] = 255;
   }
   sourceContext.putImageData(image, 0, 0);
   overlayContext(canvas, payload).drawImage(source, 0, 0, ...payload.reference_size_wh);
