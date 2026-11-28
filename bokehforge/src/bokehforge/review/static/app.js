@@ -758,9 +758,9 @@ function sceneEntry(item, index) {
 function frameEntry(frame, index) {
   const tile = railItem("frame-tile");
   const title = `Frame ${index + 1} · ${frame.name}`;
+  tile.title = title;
   const button = part("button", undefined, "thumb preview-thumbnail");
   button.type = "button";
-  button.title = title;
   button.setAttribute("aria-label", title);
   button.onclick = () => selectFrame(index);
   const params = { frame: frame.id };
@@ -778,19 +778,19 @@ function frameEntry(frame, index) {
 function lightboxStripEntry(entry) {
   const gallery = activeImage.gallery;
   const tile = railItem("lightbox-tile");
+  tile.title = entry.title;
   const button = part("button", undefined, "thumb preview-thumbnail");
   button.type = "button";
-  button.title = entry.title;
   button.setAttribute("aria-label", entry.title);
   const thumbnail = createThumbnail(entry.params);
   button.append(thumbnail, part("span", entry.label ?? entry.title));
-  button.addEventListener("pointerenter", (event) => {
+  tile.addEventListener("pointerenter", (event) => {
     if (event.pointerType !== "touch" && !event.buttons && activeImage?.gallery === gallery) {
       clearTimeout(gallery.hoverTimer);
       if (gallery.hover?.entry !== entry) previewLightboxEntry(entry, thumbnail);
     }
   });
-  button.addEventListener("pointerleave", (event) => {
+  tile.addEventListener("pointerleave", (event) => {
     if (event.pointerType !== "touch" && activeImage?.gallery === gallery) {
       scheduleLightboxHoverReset(gallery);
     }

@@ -74,7 +74,12 @@ export class VirtualRail {
       let node = this.nodes.get(index);
       if (!node) {
         node = this.render(this.items[index], index);
-        node.style[this.axis === "x" ? "left" : "top"] = `${index * this.stride}px`;
+        if (this.axis === "x") {
+          node.style.left = `${index * this.stride}px`;
+          node.style.width = `${this.stride}px`;
+        } else {
+          node.style.top = `${index * this.stride}px`;
+        }
         node.setAttribute("aria-posinset", index + 1);
         node.setAttribute("aria-setsize", this.items.length);
         this.nodes.set(index, node);
