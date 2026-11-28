@@ -16,6 +16,8 @@ When configured data is missing, select **Download dataset** in Stackroom. The m
 
 Open **Scenes** in the command bar to scroll through scene previews and filter by dataset. Select a scene, enter a scene number, or press Up and Down to switch scenes. Scroll the filmstrip horizontally or press Left and Right to scrub the source frames in focus order.
 
+While Stackroom opens the scene catalog, it reports the current step in the workspace. Checksum progress shows bytes read from the current file. Archive inspection and scene indexing show counts as the server processes them.
+
 Choose an **Evaluation run** in the scene bar below the command bar, then select a stacker below the **Stacker output** image. Stackroom places its output beside the source frame and the available reference. The scene bar indicates when ground truth is unavailable.
 
 Click any comparison image or the expand control on a thumbnail to open it in the zoomable lightbox. Scroll the lightbox strip to browse the source frames, ready outputs from the selected evaluation, and any references. Hover over a thumbnail to preview it and move away to return to the selected image. Click or tap a thumbnail to select it, or use Left and Right to wrap through the strip. Zoom and pan stay fixed as you browse. Select **Swipe reference** and drag the divider to compare the image with its reference, or hold the period key (`.`) to see the reference across the whole view. You can pan while holding the key and the image resumes at the same position when you release it.

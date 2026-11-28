@@ -20,12 +20,22 @@ const unavailable = {
   different_source: ["Dataset snapshot changed", "Run this scene again with the current source images."],
   missing_file: ["Output file missing", "Restore the saved TIFF or run this scene again."],
 };
+const catalogStages = {
+  connecting: ["Connecting to Stackroom", "Waiting for live workspace status."],
+  discovering: ["Finding local datasets", "Reading the configured dataset sources."],
+  checking: ["Checking local files", "Looking for downloaded originals."],
+  verifying: ["Verifying file checksums", ""],
+  archive: ["Inspecting archive contents", ""],
+  indexing: ["Building the scene catalog", ""],
+  finishing: ["Finalizing the scene catalog", "Preparing the scene list."],
+};
 
 let scenes = [], visible = [], runs = [], scene = null, details = null;
 let frameIndex = 0, referenceIndex = 0, runId = parameters.get("run") ?? "", stackerId = "", formKey = "";
 let sceneRequest, scoreRevision, stopping = "";
 let warmupTimer, warming = [];
 let catalogRevision = -1, lastDownload, rateTimeout, startingDownload = false;
+let catalogProgress = { phase: "connecting" }, catalogNotice = null;
 let outputLoading = false;
 let runOptions = "", outputState = "", candidateState = "";
 let candidateScore = null;
@@ -1333,32 +1343,61 @@ function applyCatalog(catalog) {
   $("active-scene").hidden = $("scene-navigation").hidden = !scenes.length;
   if (!scenes.length) $("scene-browser").hidePopover?.();
   const workspace = $("workspace");
-  const notice = $("catalog-state");
+  const dataset = $("dataset");
+  const selected = workspace.hidden ? parameters.get("dataset") : dataset.value;
+  workspace.hidden = !scenes.length;
+  catalogNotice = null;
   if (scenes.length) {
-    const dataset = $("dataset");
-    const selected = workspace.hidden ? parameters.get("dataset") : dataset.value;
     dataset.replaceChildren(new Option("All datasets", ""), ...Object.entries(catalog.datasets)
       .map(([id, name]) => new Option(name === id ? id : `${name} (${id})`, id)));
     dataset.value = selected ?? "";
     if (dataset.selectedIndex < 0) dataset.value = "";
-    notice.hidden = true;
-    workspace.hidden = false;
     filterScenes(selectedScene);
-  } else {
-    workspace.hidden = true;
-    notice.hidden = false;
-    const heading = notice.querySelector("h1");
-    if (catalog.status === "indexing") {
-      heading.textContent = "Indexing local datasets";
-      $("catalog-note").textContent = "Verifying the downloaded originals before opening the scene catalog.";
-    } else {
-      heading.textContent = catalog.status === "missing" ? "Download a dataset to get started" : "No scenes available";
-      $("catalog-note").textContent = catalog.error ?? (catalog.status === "missing"
-        ? "Scenes appear here after their dataset has been downloaded and verified."
-        : "The verified catalog contains no usable scenes.");
-    }
+  } else if (catalog.status === "missing") {
+    catalogNotice = ["Download a dataset to get started", "Scenes appear after their dataset has been downloaded and verified."];
+  } else if (catalog.error) {
+    catalogNotice = ["Could not open the scene catalog", catalog.error];
+  } else if (catalog.status !== "indexing") {
+    catalogNotice = ["No scenes available", "The local datasets contain no usable scenes."];
   }
+  renderCatalogNotice();
   renderRuns();
+}
+
+function applyCatalogProgress(progress) {
+  catalogProgress = progress;
+  renderCatalogNotice();
+}
+
+function renderCatalogNotice() {
+  const message = catalogProgress ? catalogStages[catalogProgress.phase] : catalogNotice;
+  $("catalog-state").hidden = !message;
+  if (!message) return;
+  const [title, note] = message;
+  if ($("catalog-title").textContent !== title) $("catalog-title").textContent = title;
+  const location = [catalogProgress?.dataset, catalogProgress?.file].filter(Boolean).join(" · ");
+  $("catalog-note").textContent = location || note;
+  $("catalog-meter").hidden = !catalogProgress;
+  if (!catalogProgress) return;
+  const { phase, completed, total } = catalogProgress;
+  const meter = $("catalog-progress");
+  let count = "";
+  if (total > 0) {
+    meter.max = total;
+    meter.value = completed;
+    if (phase === "verifying") {
+      count = `${byteSize(completed)} of ${byteSize(total)} read`;
+    } else {
+      const unit = phase === "archive" ? "entries inspected" : "scene candidates processed";
+      count = `${number.format(completed)} of ${number.format(total)} ${unit}`;
+    }
+    meter.setAttribute("aria-valuetext", count);
+  } else {
+    meter.removeAttribute("value");
+    meter.removeAttribute("aria-valuetext");
+    if (completed > 0) count = `${number.format(completed)} entries inspected`;
+  }
+  $("catalog-count").textContent = count;
 }
 
 function byteSize(bytes) {
@@ -1397,13 +1436,13 @@ function renderDownload(status) {
     retrying: "Retrying the transfer…",
     verifying: "Verifying downloaded files…",
   };
-  const message = active ? phases[status.phase] : indexing ? "Download complete. Indexing scenes…"
+  const message = active ? phases[status.phase] : indexing ? "Download complete"
     : names.length ? `Available to download · ${names.join(", ")}` : "Dataset download";
   if ($("download-state").textContent !== message) $("download-state").textContent = message;
   showMessage($("download-error"), status.error || status.catalog_error || "");
 
   const meter = $("download-meter");
-  meter.hidden = !active && !indexing;
+  meter.hidden = !active;
   const progress = $("download-progress");
   if (status.total > 0) {
     progress.max = status.total;
@@ -1449,9 +1488,13 @@ function connect() {
   events.addEventListener("runs", (event) => applyRuns(JSON.parse(event.data)));
   events.addEventListener("scores", (event) => applyScores(JSON.parse(event.data)));
   events.addEventListener("catalog", (event) => applyCatalog(JSON.parse(event.data)));
+  events.addEventListener("catalog-progress", (event) => applyCatalogProgress(JSON.parse(event.data)));
   events.addEventListener("download", (event) => applyDownload(JSON.parse(event.data)));
   events.onopen = () => showMessage($("connection-status"), "");
-  events.onerror = () => showMessage($("connection-status"), "Live updates disconnected. Reconnecting…");
+  events.onerror = () => {
+    showMessage($("connection-status"), "Live updates disconnected. Reconnecting…");
+    if (catalogProgress) applyCatalogProgress({ phase: "connecting" });
+  };
 }
 
 const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);

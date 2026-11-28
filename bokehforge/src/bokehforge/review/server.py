@@ -10,6 +10,7 @@ from pathlib import Path
 from secrets import token_hex
 from socket import SO_KEEPALIVE, SOL_SOCKET, gethostname
 from threading import Lock, Thread
+from time import monotonic
 from urllib.parse import parse_qs, urlsplit
 
 from .. import SceneCatalog
@@ -45,7 +46,7 @@ ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
 ALL_INTERFACES = "0.0.0.0"
 
 
-def local_sources(args):
+def local_sources(args, progress):
     config = args.config or DEFAULT_CONFIG
     policies = {source["id"]: source for source in read_config(config)["datasets"]
                 if source.get("layout") not in RETIRED_LAYOUTS}
@@ -60,6 +61,7 @@ def local_sources(args):
         policy = policies[dataset_id]
         if policy.get("provider") == "disabled":
             continue
+        progress("checking", dataset=dataset_id)
         raw = safe_path(args.root / "raw", dataset_id)
         path = raw / "download-manifest.json"
         source = by_id.get(dataset_id, {}) if args.lock is not None else (
@@ -127,27 +129,46 @@ class Review:
             with self.catalog_lock:
                 self.refresh_requested = False
             self._load()
+            self.events.publish("catalog", self.catalog_data)
             with self.catalog_lock:
                 pending = self.refresh_requested
+                if not pending:
+                    self.events.publish("catalog-progress", lambda: None)
                 self.indexing = pending
-            self.events.publish("catalog", self.catalog_data)
             self.publish_download()
             if not pending:
                 return
 
     def _load(self):
+        last_task, last_update = None, 0
+
+        def progress(phase, *, dataset=None, file=None, completed=None, total=None):
+            nonlocal last_task, last_update
+            task = (phase, dataset, total is not None)
+            now = monotonic()
+            # Large datasets can yield thousands of updates. Changes of phase,
+            # dataset, or progress mode still reach the UI immediately.
+            if task == last_task and now - last_update < 0.25:
+                return
+            last_task, last_update = task, now
+            self.events.publish("catalog-progress", lambda: {
+                "phase": phase, "dataset": dataset, "file": file, "completed": completed, "total": total,
+            })
+
         args = self.args
         revision = self.catalog_status["revision"] + 1
         summary = {"root": str(args.root), "revision": revision, "missing": {}}
         try:
-            present, missing = local_sources(args)
+            progress("discovering")
+            present, missing = local_sources(args, progress)
             summary["missing"] = missing
             if not present:
                 self.catalog = None
                 self.scenes = []
                 self.catalog_status = {**summary, "status": "missing" if missing else "empty"}
                 return
-            catalog = SceneCatalog(args.root, datasets=tuple(present), config=args.config, lock=args.lock)
+            catalog = SceneCatalog(args.root, datasets=tuple(present), config=args.config, lock=args.lock,
+                                   progress=progress)
             scenes = [catalog.scene(scene_id) for scene_id in catalog.scene_ids]
             entries = [
                 {"id": scene.id, "name": scene.metadata["source_scene_id"],
@@ -181,7 +202,7 @@ class Review:
 
     def require_catalog(self):
         if self.catalog is None:
-            raise CatalogPending(self.catalog_status.get("error", "Indexing local datasets"))
+            raise CatalogPending(self.catalog_status.get("error", "The scene catalog is unavailable"))
         return self.catalog
 
     def scene_details(self, scene_id, run_id):
