@@ -38,6 +38,8 @@ uv run --frozen bokehforge bench --algorithm mean --output ../artifacts/bench-me
 
 Omit `--no-attention` to use the default attention weighting. The first Inspection run downloads and converts the pretrained models. Later runs reuse the verified model cache. [Benchmark setup, stacker contract, and saved-output replay](docs/benchmark.md)
 
+![BokehForge scoring workflow from the reference and stacker images through alignment, damage measurement, and aggregation to the final 0–100 benchmark score.](docs/assets/benchmark-scoring.svg)
+
 ## Browse and rate stacks in Stackroom
 
 Stackroom is BokehForge’s local focus stack review app. Launch it from the repository root.
