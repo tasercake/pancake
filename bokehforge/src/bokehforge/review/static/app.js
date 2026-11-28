@@ -1516,7 +1516,7 @@ const workspaceSocket = new WorkspaceSocket(
 const ratingAutosave = new RatingAutosave(workspaceSocket, () => { if (scene) renderOutput(); });
 
 const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
-const filmRail = new VirtualRail($("filmstrip"), "x", 112, sourceEntry);
+const filmRail = new VirtualRail($("filmstrip"), "x", 112, sourceEntry, { itemPadding: 5 });
 const requestScoreOverlay = (mode, params, signal) =>
   api(url(mode === "attention" ? "/api/score-attention" : "/api/score-tiles", params), undefined, { signal });
 const candidateExplanation = new ScoreExplanation(
@@ -1527,7 +1527,7 @@ const lightboxExplanation = new ScoreExplanation(
 );
 new ResizeObserver(paintCandidateExplanation).observe($("candidate-image"));
 const lightboxStrip = $("lightbox-strip");
-const lightboxRail = new VirtualRail(lightboxStrip, "x", 100, lightboxStripEntry);
+const lightboxRail = new VirtualRail(lightboxStrip, "x", 100, lightboxStripEntry, { itemPadding: 4 });
 lightboxStrip.addEventListener("pointerleave", (event) => {
   const gallery = activeImage?.gallery;
   if (event.pointerType !== "touch" && gallery) scheduleLightboxHoverReset(gallery);

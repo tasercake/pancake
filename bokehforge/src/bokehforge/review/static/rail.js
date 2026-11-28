@@ -1,11 +1,12 @@
 // Keep the visible range and a small buffer in the DOM, even for long stacks
 // and direct jumps into the middle of the catalog.
 export class VirtualRail {
-  constructor(view, axis, stride, render) {
+  constructor(view, axis, stride, render, { itemPadding = 0 } = {}) {
     this.view = view;
     this.track = view.firstElementChild;
     this.axis = axis;
     this.stride = stride;
+    this.itemPadding = itemPadding;
     this.render = render;
     this.offset = axis === "x" ? "scrollLeft" : "scrollTop";
     this.viewportSize = axis === "x" ? "clientWidth" : "clientHeight";
@@ -13,6 +14,7 @@ export class VirtualRail {
     this.nodes = new Map();
     this.selected = -1;
     this.raf = 0;
+    if (itemPadding) view.style.setProperty("--rail-item-padding", `${itemPadding}px`);
     view.addEventListener("scroll", () => this.schedule(), { passive: true });
     new ResizeObserver(() => this.schedule()).observe(view);
     view.addEventListener("focusout", () => this.schedule());
@@ -23,18 +25,26 @@ export class VirtualRail {
     this.selected = -1;
     for (const node of this.nodes.values()) this.remove(node);
     this.nodes.clear();
-    this.track.style[this.axis === "x" ? "width" : "height"] = `${items.length * this.stride}px`;
+    this.track.style[this.axis === "x" ? "width" : "height"] = `${this.itemStart(items.length)}px`;
     this.view[this.offset] = 0;
     this.schedule();
+  }
+
+  itemStart(index) {
+    if (index === 0) return 0;
+    // The first and last tiles each get one extra margin at the strip edge.
+    const extra = index === this.items.length ? 2 * this.itemPadding : this.itemPadding;
+    return index * this.stride + extra;
   }
 
   select(index) {
     this.selected = index;
     const offset = this.view[this.offset];
     const viewport = this.view[this.viewportSize];
-    const start = index * this.stride;
+    const start = this.itemStart(index);
+    const end = this.itemStart(index + 1);
     if (start < offset) this.view[this.offset] = start;
-    else if (start + this.stride > offset + viewport) this.view[this.offset] = start + this.stride - viewport;
+    else if (end > offset + viewport) this.view[this.offset] = end - viewport;
     this.schedule();
   }
 
@@ -53,7 +63,7 @@ export class VirtualRail {
   }
 
   update() {
-    const offset = this.view[this.offset];
+    const offset = this.view[this.offset] - this.itemPadding;
     const viewport = this.view[this.viewportSize];
     if (!viewport) return;
     const start = Math.max(0, Math.floor(offset / this.stride) - 2);
@@ -74,11 +84,14 @@ export class VirtualRail {
       let node = this.nodes.get(index);
       if (!node) {
         node = this.render(this.items[index], index);
+        const start = this.itemStart(index);
         if (this.axis === "x") {
-          node.style.left = `${index * this.stride}px`;
-          node.style.width = `${this.stride}px`;
+          node.style.left = `${start}px`;
+          node.style.width = `${this.itemStart(index + 1) - start}px`;
+          node.classList.toggle("rail-start", index === 0);
+          node.classList.toggle("rail-end", index === this.items.length - 1);
         } else {
-          node.style.top = `${index * this.stride}px`;
+          node.style.top = `${start}px`;
         }
         node.setAttribute("aria-posinset", index + 1);
         node.setAttribute("aria-setsize", this.items.length);
