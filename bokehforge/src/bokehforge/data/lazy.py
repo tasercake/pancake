@@ -109,36 +109,42 @@ def _optical_member(path):
             and "__MACOSX" not in path.parts and "scalebar" not in path.as_posix().lower())
 
 
-def _archive_inventory(asset, relative):
+def _archive_inventory(asset, relative, progress):
     members = set()
     if asset.path.suffix.lower() == ".zip":
         with ZipFile(asset.path) as archive:
-            for entry in archive.infolist():
+            entries = archive.infolist()
+            total = len(entries)
+            if progress is not None:
+                progress(completed=0, total=total)
+            for position, entry in enumerate(entries, 1):
                 if S_ISLNK(entry.external_attr >> 16):
                     raise ValueError(f"Unsafe archive symlink: {asset.path}::{entry.filename}")
                 path = _inventory_member(asset, entry.filename, members)
-                if entry.is_dir() or not _optical_member(path):
-                    continue
-                with archive.open(entry) as stream:
-                    checksum = file_digest(stream, "sha256").hexdigest()
-                    if path.suffix.lower() in TIFF_IMAGES:
-                        stream.seek(0)
-                    pages = _page_count(stream, path.suffix.lower())
-                yield _member_record(asset, relative, entry.filename, path, checksum, pages)
+                if not entry.is_dir() and _optical_member(path):
+                    with archive.open(entry) as stream:
+                        checksum = file_digest(stream, "sha256").hexdigest()
+                        if path.suffix.lower() in TIFF_IMAGES:
+                            stream.seek(0)
+                        pages = _page_count(stream, path.suffix.lower())
+                    yield _member_record(asset, relative, entry.filename, path, checksum, pages)
+                if progress is not None:
+                    progress(completed=position, total=total)
     else:
         import libarchive
 
         with libarchive.file_reader(str(asset.path)) as archive:
-            for entry in archive:
+            for position, entry in enumerate(archive, 1):
                 if entry.issym or entry.islnk:
                     raise ValueError(f"Unsafe archive link: {asset.path}::{entry.pathname}")
                 path = _inventory_member(asset, entry.pathname, members)
-                if entry.isdir or not _optical_member(path):
-                    continue
-                payload = b"".join(entry.get_blocks())
-                with BytesIO(payload) as stream:
-                    pages = _page_count(stream, path.suffix.lower())
-                yield _member_record(asset, relative, entry.pathname, path, sha256(payload).hexdigest(), pages)
+                if not entry.isdir and _optical_member(path):
+                    payload = b"".join(entry.get_blocks())
+                    with BytesIO(payload) as stream:
+                        pages = _page_count(stream, path.suffix.lower())
+                    yield _member_record(asset, relative, entry.pathname, path, sha256(payload).hexdigest(), pages)
+                if progress is not None:
+                    progress(completed=position)
 
 
 def _member_record(asset, relative, name, path, checksum, pages):
@@ -147,19 +153,27 @@ def _member_record(asset, relative, name, path, checksum, pages):
             "member": member, "original": _Original(asset, name, path.suffix.lower(), checksum, pages)}
 
 
-def _native_inventory(raw_root, source):
+def _native_inventory(raw_root, source, progress):
     inventory = []
     for item in source["files"]:
         relative = item["path"]
         path = safe_path(raw_root, relative)
         stamp = _file_stamp(path)
         checksum = item.get("sha256")
-        if not checksum or digest(path) != checksum:
+        report_bytes = None
+        if progress is not None:
+            def report_bytes(received):
+                progress("verifying", file=relative, completed=received, total=stamp[2])
+            report_bytes(0)
+        if not checksum or digest(path, progress=report_bytes) != checksum:
             raise ValueError(f"Missing or mismatched source SHA-256: {source['id']}/{relative}")
         asset = _Asset(path, checksum, stamp)
         suffix = path.suffix.lower()
         if suffix in ARCHIVES:
-            inventory.extend(_archive_inventory(asset, relative))
+            inspect = partial(progress, "archive", file=relative) if progress is not None else None
+            if inspect is not None:
+                inspect(completed=0)
+            inventory.extend(_archive_inventory(asset, relative, inspect))
         elif suffix in IMAGES | CAMERA_RAW:
             original = _Original(asset, None, suffix, checksum, _page_count(path, suffix))
             inventory.append({"path": path, "source_path": relative, "spec": item, "original": original})
@@ -168,9 +182,12 @@ def _native_inventory(raw_root, source):
 
 
 class SceneCatalog:
-    """Index a verified native corpus without decoding pixels or writing files."""
+    """Index a verified native corpus without decoding pixels or writing files.
 
-    def __init__(self, root, *, datasets=None, lock=None, config=None):
+    An optional progress callback receives a phase and keyword details as work proceeds.
+    """
+
+    def __init__(self, root, *, datasets=None, lock=None, config=None, progress=None):
         raw_root = Path(root).resolve() / "raw"
         configured = read_config(config or DEFAULT_CONFIG)["datasets"]
         policies = {source["id"]: source for source in configured if source.get("layout") not in RETIRED_LAYOUTS}
@@ -203,9 +220,15 @@ class SceneCatalog:
                 raise ValueError(f"Dataset {dataset_id} is {source['status']}")
             source = {**source, **{key: policy[key] for key in ("layout", "transfer", "evaluation_domain") if key in policy}}
             recipe, recipe_hash = runtime_recipe(source, loader_sha256=_LOADER_SHA256)
-            plans, quarantine = plan_scenes(source, _native_inventory(safe_path(raw_root, dataset_id), source))
+            report = partial(progress, dataset=dataset_id) if progress is not None else None
+            inventory = _native_inventory(safe_path(raw_root, dataset_id), source, report)
+            if report is not None:
+                report("indexing")
+            plans, quarantine = plan_scenes(source, inventory)
             self.quarantine[dataset_id] = quarantine
-            for plan in plans:
+            for completed, plan in enumerate(plans):
+                if report is not None:
+                    report("indexing", completed=completed, total=len(plans))
                 if sum(item["original"].pages for item in plan["frames"]) < 2:
                     quarantine.append({"scene": plan["source_scene_id"], "reason": "fewer than two focal pages"})
                     continue
@@ -220,6 +243,8 @@ class SceneCatalog:
                     **{role: [{"source_sha256": self.frame(frame_id).source_sha256} for frame_id in ids]
                        for role, ids in (("frames", frames), ("references", references))},
                 })
+        if progress is not None:
+            progress("finishing")
         for scene_id, group in leakage_groups(grouping_records).items():
             self.scene(scene_id).metadata["leakage_group_id"] = group
 

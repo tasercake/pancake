@@ -5,13 +5,17 @@ from pathlib import PurePosixPath
 import re
 
 
-def digest(path, algorithm="sha256"):
+def digest(path, algorithm="sha256", *, progress=None):
     h = hashlib.new(algorithm)
     if algorithm == "sha1":
         h.update(f"blob {path.stat().st_size}\0".encode())
+    received = 0
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(4 * 1024 * 1024), b""):
             h.update(chunk)
+            if progress is not None:
+                received += len(chunk)
+                progress(received)
     return h.hexdigest()
 
 

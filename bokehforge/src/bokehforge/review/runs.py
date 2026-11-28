@@ -35,12 +35,18 @@ def _write(path, payload):
     pending.replace(path)
 
 
-# The catalog selection change altered the loader file hash without changing frame decoding.
-# Limit compatibility to that exact loader revision so future decoder changes invalidate old outputs.
-_PREVIOUS_LOADER_HASHES = {
-    "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7":
-        "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6",
-}
+# Catalog selection and progress changed source hashes without changing frame
+# decoding. Only accept those exact revisions so future changes still invalidate
+# old outputs when their decoded inputs can differ.
+_CATALOG_PROGRESS_SOURCES = (
+    "e086629e6a1963b5eb89f647dcb19c0326b97adf00fa53d952f980bb0af36ce1",
+    "473e4a8473d1422e9d94638e1c4b18e35984c822c40edddab84c08bff0ee154d",
+)
+_PREVIOUS_CATALOG_LOADERS = (
+    "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7",
+    "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6",
+)
+_PREVIOUS_CATALOG_HELPERS = "809aeadd11408d266ca92ced254ee61e45a4bf4d2f1ffbb588e456e2f8ca97b6"
 
 
 def scene_fingerprint(catalog, scene, *, recipe_sha256=None):
@@ -52,11 +58,11 @@ def scene_fingerprint(catalog, scene, *, recipe_sha256=None):
 def compatible_scene_fingerprints(catalog, scene):
     fingerprints = {scene_fingerprint(catalog, scene)}
     recipe = scene.metadata["recipe"]
-    previous = _PREVIOUS_LOADER_HASHES.get(recipe["loader_sha256"])
-    if previous:
-        old_recipe = {**recipe, "loader_sha256": previous}
-        old_sha256 = sha256(json.dumps(old_recipe, sort_keys=True).encode()).hexdigest()
-        fingerprints.add(scene_fingerprint(catalog, scene, recipe_sha256=old_sha256))
+    if (recipe["loader_sha256"], recipe.get("shared_helpers_sha256")) == _CATALOG_PROGRESS_SOURCES:
+        for loader in _PREVIOUS_CATALOG_LOADERS:
+            old_recipe = {**recipe, "loader_sha256": loader, "shared_helpers_sha256": _PREVIOUS_CATALOG_HELPERS}
+            old_sha256 = sha256(json.dumps(old_recipe, sort_keys=True).encode()).hexdigest()
+            fingerprints.add(scene_fingerprint(catalog, scene, recipe_sha256=old_sha256))
     return fingerprints
 
 

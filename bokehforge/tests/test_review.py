@@ -4,6 +4,7 @@ from hashlib import sha256
 from http.client import HTTPConnection
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO, StringIO
+from itertools import count
 from pathlib import Path
 import json
 from shutil import copyfile
@@ -11,6 +12,7 @@ import sys
 from threading import Event, Thread
 from time import sleep
 import xml.etree.ElementTree as ET
+from zipfile import ZipFile
 
 import numpy as np
 from PIL import Image
@@ -18,6 +20,7 @@ import pytest
 import tifffile
 
 from bokehforge.bench import main as bench
+from bokehforge.data import lazy
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
 from bokehforge.review import _zerene, runs, scores
 from bokehforge.scoring import SCORE_VERSION
@@ -161,18 +164,22 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
     app.rate({**choice, "grade": 4, "comment": comment})
 
     catalog_scene = app.catalog.scene(scene)
-    legacy_recipe = {**catalog_scene.metadata["recipe"],
-                     "loader_sha256": "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6"}
-    legacy_sha256 = sha256(json.dumps(legacy_recipe, sort_keys=True).encode()).hexdigest()
     result_path = store / "runs" / job / "pancake/results" / (scene + ".json")
     saved = json.loads(result_path.read_text())
-    saved["scene_fingerprint"] = runs.scene_fingerprint(app.catalog, catalog_scene, recipe_sha256=legacy_sha256)
-    result_path.write_text(json.dumps(saved))
 
     reopened = open_review(root, store)
-    rating = reopened.scene_details(scene, job)["outputs"][0]["rating"]
+    for loader_hash in (
+        "fa756299117c6a728d941742abafe6afab5c88c1ee282e80b102c53e083dedb6",
+        "402b8fd8c03e6b23ce67aa9b981c9798312d7f1109fbab0e0f387938c93940d7",
+    ):
+        legacy_recipe = {**catalog_scene.metadata["recipe"], "loader_sha256": loader_hash,
+                         "shared_helpers_sha256": "809aeadd11408d266ca92ced254ee61e45a4bf4d2f1ffbb588e456e2f8ca97b6"}
+        legacy_sha256 = sha256(json.dumps(legacy_recipe, sort_keys=True).encode()).hexdigest()
+        saved["scene_fingerprint"] = runs.scene_fingerprint(app.catalog, catalog_scene, recipe_sha256=legacy_sha256)
+        result_path.write_text(json.dumps(saved))
+        rating = reopened.scene_details(scene, job)["outputs"][0]["rating"]
+        assert rating["grade"] == 4 and rating["comment"] == comment
     exported, = csv.DictReader(StringIO(reopened.ratings.export_csv()))
-    assert rating["grade"] == 4 and rating["comment"] == comment
     assert exported["run_id"] == job and exported["scene_id"] == scene
     assert exported["stacker"] == "pancake" and exported["grade"] == "4" and exported["comment"] == comment
 
@@ -263,6 +270,81 @@ def test_review_image_caches_and_revalidates_without_decoding(tmp_path, monkeypa
     write_scene(root, 0.5)
     changed = open_review(root, store)
     assert changed.image(query)[1] != original
+
+
+@pytest.mark.parametrize("valid_checksum", [True, False])
+def test_review_pushes_catalog_progress_and_replays_the_current_step(tmp_path, monkeypatch, valid_checksum):
+    root = tmp_path / "data"
+    native = root / "raw/Demo/source.zip"
+    native.parent.mkdir(parents=True)
+    chunk = 4 * 1024 * 1024
+    with BytesIO() as frame:
+        Image.new("RGB", (4, 3)).save(frame, "PNG")
+        with ZipFile(native, "w") as archive:
+            archive.writestr("readme.txt", b" " * chunk)
+            archive.writestr("stack/1.png", frame.getvalue())
+            archive.writestr("stack/2.png", frame.getvalue())
+    checksum = sha256(native.read_bytes()) if valid_checksum else sha256(b"wrong")
+    native.with_name("download-manifest.json").write_text(json.dumps({
+        "id": "Demo", "status": "available", "layout": "archive_stacks", "reference_type": "none",
+        "files": [{"path": native.name, "sha256": checksum.hexdigest()}],
+    }))
+    config = tmp_path / "sources.json"
+    config.write_text(json.dumps({"datasets": [{"id": "Demo"}]}))
+    store = tmp_path / "review"
+    store.mkdir()
+
+    finish_verification, finish_archive = Event(), Event()
+    digest, inventory = lazy.digest, lazy._archive_inventory
+
+    def pause_after_first_chunk(path, *, progress):
+        def update(received):
+            progress(received)
+            if received == chunk:
+                assert finish_verification.wait(6), "Checksum test did not release the reader"
+        return digest(path, progress=update)
+
+    def pause_after_first_entry(asset, relative, progress):
+        def update(*, completed, total):
+            progress(completed=completed, total=total)
+            if completed == 1:
+                assert finish_archive.wait(6), "Archive test did not release the reader"
+        yield from inventory(asset, relative, update)
+
+    monkeypatch.setattr(lazy, "digest", pause_after_first_chunk)
+    monkeypatch.setattr(lazy, "_archive_inventory", pause_after_first_entry)
+    monkeypatch.setattr(review_server, "monotonic", count().__next__)
+    with ReviewServer(("127.0.0.1", 0)) as server:
+        server.app = Review(Namespace(root=root, store=store, dataset=["Demo"], config=config, lock=None,
+                                      no_attention=True, pancake=None, focus_stack=None, openfocus=None,
+                                      shine_python=None))
+        worker = Thread(target=server.serve_forever)
+        worker.start()
+        try:
+            with ReviewStream(server.server_port) as events:
+                verifying = events.expect("catalog-progress", lambda item: item and item["completed"] == chunk)
+                assert verifying == {"phase": "verifying", "dataset": "Demo", "file": "source.zip",
+                                     "completed": chunk, "total": native.stat().st_size}
+
+            with ReviewStream(server.server_port) as events:
+                assert events.expect("catalog-progress", lambda item: bool(item)) == verifying
+                finish_verification.set()
+                if valid_checksum:
+                    inspecting = events.expect("catalog-progress", lambda item: item and item["phase"] == "archive"
+                                               and item["completed"] == 1)
+                    assert inspecting["total"] == 3
+                    finish_archive.set()
+                final = events.expect("catalog", lambda item: item["status"] != "indexing")
+                assert events.expect("catalog-progress", lambda item: item is None) is None
+                if valid_checksum:
+                    assert final["status"] == "ready" and len(final["scenes"]) == 1
+                else:
+                    assert final["status"] == "error" and "mismatched source SHA-256" in final["error"]
+        finally:
+            finish_verification.set()
+            finish_archive.set()
+            server.shutdown()
+            worker.join()
 
 
 def test_review_downloads_missing_data_while_existing_scenes_remain_open(tmp_path):
