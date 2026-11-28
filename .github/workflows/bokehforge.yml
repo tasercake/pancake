@@ -19,6 +19,20 @@ defaults:
     working-directory: bokehforge
 
 jobs:
+  stackroom-url:
+    name: Stackroom URL state
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c581273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+      - run: npm ci --ignore-scripts --prefix web
+      - run: npm --prefix web run check
+      - run: npm --prefix web test
+
   scoring:
     name: BokehForge scoring parity (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -80,6 +94,7 @@ jobs:
           assert files("bokehforge").joinpath("heatmaps.html").is_file()
           assert files("bokehforge.data").joinpath("sources.json").is_file()
           assert files("bokehforge.review").joinpath("static", "index.html").is_file()
+          assert files("bokehforge.review").joinpath("static", "view-state.js").is_file()
           assert files("bokehforge.review").joinpath("static", "fonts", "SpaceGrotesk-Regular.ttf").is_file()
           PY
       - name: Run CPU scoring and parity tests
