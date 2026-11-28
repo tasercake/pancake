@@ -275,7 +275,7 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
 }
 .inspect-thumb::before { content: "⛶"; line-height: 1; }
 .scene-row .inspect-thumb { bottom: .53rem; left: 44px; }
-.frame-tile .inspect-thumb { right: .28rem; top: 51px; }
+.frame-tile .inspect-thumb { right: calc(.28rem + var(--rail-item-gap)); top: 51px; }
 .comparison {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -474,9 +474,9 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
 }
 .film-heading { padding: .45rem .8rem .45rem 0; border-inline-end: 1px solid var(--stroke); }
 .film-heading span { display: block; font-size: .875rem; }
-.filmstrip { overflow-x: auto; overflow-y: hidden; padding: 4px 6px; }
+.filmstrip { --rail-item-gap: 8px; overflow-x: auto; overflow-y: hidden; padding: 4px 6px; }
 .filmstrip .rail-track { height: 101px; }
-.frame-tile { top: 0; width: 104px; height: 101px; padding: 1px; }
+.frame-tile { top: 0; height: 101px; padding: 1px calc(1px + var(--rail-item-gap)) 1px 1px; }
 .thumb {
   position: relative;
   display: block;
@@ -489,7 +489,7 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
   background: var(--matte);
 }
 .frame-tile .thumb { height: 76px; }
-.thumb:hover:not(:disabled) { background: var(--matte); }
+.rail-item:hover > .thumb:not(:disabled) { border-color: var(--icon); background: var(--matte); }
 .thumb[aria-pressed="true"] { border: 2px solid var(--accent); }
 .thumb[aria-pressed="true"] img { inset: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
 .thumb span {
@@ -648,7 +648,7 @@ dialog::backdrop { background: #000b; }
 .lightbox-hover img, .lightbox-reference img { width: 100%; height: 100%; object-fit: contain; }
 .lightbox-strip { border-top: 1px solid var(--stroke); padding: .4rem; overscroll-behavior-x: contain; }
 .lightbox-strip .rail-track { height: 64px; }
-.lightbox-tile { top: 0; width: 92px; height: 64px; }
+.lightbox-tile { top: 0; height: 64px; padding-right: var(--rail-item-gap); }
 .lightbox-tile .thumb:focus-visible { outline-offset: -4px; }
 .lightbox-tile .thumb span { max-width: calc(100% - .4rem); overflow: hidden; text-overflow: ellipsis; }
 #reference-swipe[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--raised); }
