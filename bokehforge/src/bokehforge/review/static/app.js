@@ -3,12 +3,13 @@ import { ScoreExplanation } from "./score-explanation.js";
 import { ScoreOverlay } from "./score-overlay.js";
 import { RatingAutosave } from "./rating-autosave.js";
 import { WorkspaceSocket } from "./workspace-socket.js";
+import { ViewHistory, readEvaluation, restoreEvaluation } from "./view-state.js";
 
 const $ = (id) => document.getElementById(id);
 const number = new Intl.NumberFormat();
 const date = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 const savedTime = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit", second: "2-digit" });
-const parameters = new URLSearchParams(location.hash.slice(1));
+const viewUrl = new ViewHistory(window);
 const tools = new Map();
 const runStates = {
   running: "Running", completed: "Completed", completed_with_errors: "Completed with failures",
@@ -33,7 +34,8 @@ const catalogStages = {
 };
 
 let scenes = [], visible = [], runs = [], scene = null, details = null;
-let sourceIndex = 0, referenceIndex = 0, runId = parameters.get("run") ?? "", stackerId = "", formKey = "";
+let sourceIndex = 0, referenceIndex = 0, runId = "", stackerId = "", formKey = "";
+let restoringView = null, runsLoaded = false, benchmarkTarget = null;
 let comparisonReference, comparisonHoldKey = "";
 let sceneRequest, scoreRevision, stopping = "";
 let warmupTimer, warming = [];
@@ -48,6 +50,7 @@ const panelImages = new WeakMap();
 const LIGHTBOX_HOVER_EXIT_DELAY = 100;
 const ACCENT_KEY = "bokehforge.review.accent";
 const DEFAULT_ACCENT = "#ffffff";
+let localAccent = DEFAULT_ACCENT;
 const CHANNEL_WEIGHTS = [0.2126, 0.7152, 0.0722];
 
 function luminance(channels) {
@@ -76,26 +79,30 @@ function configureAppearance() {
   const input = $("accent-color");
   try {
     const stored = localStorage.getItem(ACCENT_KEY);
-    if (/^#[a-f0-9]{6}$/i.test(stored ?? "")) input.value = stored;
+    if (/^#[a-f0-9]{6}$/i.test(stored ?? "")) localAccent = stored;
   } catch {
     // The picker still works for this page if the browser blocks storage.
   }
   const save = () => {
     applyAccent(input.value);
+    localAccent = input.value;
     try {
       localStorage.setItem(ACCENT_KEY, input.value);
     } catch {
       // Some browsers disable storage for local origins.
     }
+    remember();
   };
-  input.oninput = () => applyAccent(input.value);
+  input.oninput = () => {
+    applyAccent(input.value);
+    remember("continuous");
+  };
   input.onchange = save;
   $("reset-accent").onclick = () => {
     input.value = DEFAULT_ACCENT;
     save();
   };
-  $("open-appearance").onclick = () => $("appearance").showModal();
-  applyAccent(input.value);
+  $("open-appearance").onclick = () => navigate(() => $("appearance").showModal());
 }
 
 function stackerLabel(id) {
@@ -127,12 +134,140 @@ function showMessage(node, message) {
   node.hidden = !message;
 }
 
-function remember() {
-  const params = new URLSearchParams();
-  if ($("dataset").value) params.set("dataset", $("dataset").value);
-  if (scene) params.set("scene", scene.id);
-  if (runId) params.set("run", runId);
-  history.replaceState(null, "", "#" + params);
+function roundUnit(value) {
+  return Math.round(Math.min(1, Math.max(0, value)) * 100000) / 100000;
+}
+
+function lightboxViewState() {
+  if (!activeImage?.gallery.scene || !$("image-dialog").open) return null;
+  const { params, gallery, actual, scale } = activeImage;
+  const { u, v } = lightboxAnchor();
+  return {
+    scene: gallery.scene,
+    run: gallery.run || null,
+    reference: gallery.referenceFrame?.id ?? null,
+    image: params.frame ? { kind: "frame", id: params.frame } : { kind: "output", id: params.stacker },
+    zoom: Math.round(scale * 100000) / 100000,
+    pixels: actual,
+    u: roundUnit(u),
+    v: roundUnit(v),
+    swipe: gallery.swipe,
+    split: roundUnit(gallery.split),
+    explain: lightboxExplanation.open,
+    details: lightboxExplanation.expandedDetails(),
+    benchmark: $("benchmark-details").open ? benchmarkTarget : null,
+  };
+}
+
+function remember(mode = "replace") {
+  if (restoringView) return;
+  viewUrl.write({
+    dataset: $("dataset").value || null,
+    scene: scene?.id ?? null,
+    run: runId || null,
+    stacker: stackerId || null,
+    source: filmRail.items[sourceIndex]?.frame.id ?? null,
+    reference: comparisonReference?.id ?? null,
+    overlay: overlaySettings.mode,
+    family: overlaySettings.family,
+    tiles: overlaySettings.side,
+    opacity: overlaySettings.opacity,
+    accent: $("accent-color").value,
+    scenes: $("scene-browser").matches(":popover-open"),
+    details: candidateExplanation.expandedDetails(),
+    picker: lightboxOverlay.picker.matches(":popover-open") ? "lightbox" :
+      candidateOverlay.picker.matches(":popover-open") ? "output" : null,
+    appearance: $("appearance").open,
+    evaluation: $("new-run").open ? readEvaluation($("run-form")) : null,
+    lightbox: lightboxViewState(),
+  }, mode);
+}
+
+function navigate(action, mode = "push") {
+  if (restoringView) {
+    restoringView.controller.abort();
+    restoringView = null;
+  }
+  if (mode === "push") viewUrl.flush();
+  action();
+  remember(mode);
+}
+
+function restoreView(state) {
+  restoringView?.controller.abort();
+  restoringView = { state, controller: new AbortController(), started: false, finishing: false };
+  for (const id of ["benchmark-details", "image-dialog", "appearance", "new-run"]) {
+    if ($(id).open) $(id).close();
+  }
+  discardLightbox();
+  $("scene-browser").hidePopover();
+  candidateOverlay.picker.hidePopover();
+  lightboxOverlay.picker.hidePopover();
+  $("accent-color").value = state.accent ?? localAccent;
+  applyAccent($("accent-color").value);
+  if (state.appearance) $("appearance").showModal();
+  candidateExplanation.setExpandedDetails(state.details);
+  Object.assign(overlaySettings, { mode: state.overlay, family: state.family, side: state.tiles, opacity: state.opacity });
+  candidateOverlay.paint();
+  lightboxOverlay.paint();
+  beginRestore();
+}
+
+function beginRestore() {
+  const restore = restoringView;
+  if (!restore || restore.started || !runsLoaded || !scenes.length) return;
+  restore.started = true;
+  const { state } = restore;
+  const dataset = $("dataset");
+  dataset.value = state.dataset ?? "";
+  if (dataset.selectedIndex < 0 || (dataset.value && !scenes.some(item => item.dataset === dataset.value))) {
+    dataset.value = "";
+  }
+  const run = runs.find(item => item.id === state.run)?.id ?? runs[0]?.id ?? "";
+  if (run !== runId) {
+    details = null;
+    outputLoading = true;
+  }
+  runId = run;
+  stackerId = state.stacker ?? "";
+  renderRuns();
+  const previousScene = scene?.id;
+  filterScenes(state.scene);
+  if (scene?.id !== previousScene) return;
+  if (!details) {
+    renderOutput();
+    loadScene();
+    return;
+  }
+  sceneRequest?.abort();
+  sceneRequest = null;
+  restoreScenePicks(state);
+  renderOutput();
+  finishRestore(restore);
+}
+
+function restoreScenePicks(state) {
+  referenceIndex = Math.max(0, details.references.findIndex(frame => frame.id === state.reference));
+  renderReference();
+  const index = filmRail.items.findIndex(item => item.frame.id === state.source);
+  selectSource(index < 0 ? Number(Boolean(comparisonReference)) : index);
+}
+
+async function finishRestore(restore) {
+  if (restoringView !== restore || restore.finishing) return;
+  restore.finishing = true;
+  const { state, controller: { signal } } = restore;
+  if (state.lightbox) await restoreLightbox(state.lightbox, signal);
+  if (signal.aborted) return;
+  if (!$("image-dialog").open && !$("appearance").open) {
+    if (state.evaluation && !$("open-run").disabled) openRunDialog(state.evaluation);
+    else if (state.scenes) $("scene-browser").showPopover({ source: $("show-scenes") });
+  }
+  const overlay = state.picker === "output" ? candidateOverlay :
+    state.picker === "lightbox" && activeImage ? lightboxOverlay : null;
+  if (overlay && overlaySettings.mode === "damage" && !overlay.root.hidden) overlay.damage.click();
+  restoringView = null;
+  remember();
 }
 
 function placeholder(well, title, description, log) {
@@ -258,7 +393,7 @@ function showImage(well, title, params, priority = "high") {
       button.classList.add("image-ready");
       button.removeAttribute("aria-disabled");
       button.setAttribute("aria-label", "Inspect " + request.title);
-      button.onclick = () => openLightbox(request.title, params, request.shown);
+      button.onclick = () => navigate(() => openLightbox(request.title, params, request.shown));
       if (candidate) {
         candidatePreview = { src, params, image: ready, host: button, contain: true };
         paintCandidateOverlay();
@@ -297,7 +432,7 @@ function lightboxImageKey({ params }) {
   return params.frame ?? params.stacker;
 }
 
-function setLightboxGallery(gallery, data) {
+function lightboxEntries(gallery, data) {
   const images = data.frames.map((frame, index) => ({
     title: sourceFrameTitle(frame, index), label: String(index + 1), params: { frame: frame.id },
   }));
@@ -314,6 +449,12 @@ function setLightboxGallery(gallery, data) {
     });
   }
   if (reference) images.push({ title: referenceTitle(reference), label: "Reference", params: { frame: reference.id } });
+  return images;
+}
+
+function setLightboxGallery(gallery, data) {
+  const images = lightboxEntries(gallery, data);
+  const reference = data.references[gallery.reference];
   const changed = images.length !== gallery.images.length || images.some((entry, index) =>
     lightboxImageKey(entry) !== lightboxImageKey(gallery.images[index]) || entry.title !== gallery.images[index].title ||
     entry.params.rev !== gallery.images[index].params.rev);
@@ -336,7 +477,7 @@ function setLightboxGallery(gallery, data) {
   paintLightboxOverlays();
 }
 
-function openLightbox(title, params, previewImage, sceneId = scene?.id) {
+function openLightbox(title, params, previewImage, sceneId = scene?.id, options = {}) {
   releaseComparisonReference();
   const previous = activeImage;
   if (previous) closeLightboxRequests(previous);
@@ -352,22 +493,47 @@ function openLightbox(title, params, previewImage, sceneId = scene?.id) {
   stage.append(surface);
   $("image-view").replaceChildren(stage);
   const entry = { title, label: title, params };
-  const currentScene = sceneId === scene?.id;
+  const run = options.run ?? runId;
+  const currentScene = sceneId === scene?.id && run === runId;
   const gallery = {
-    scene: sceneId, run: runId, reference: currentScene ? referenceIndex : 0, images: [entry],
+    scene: sceneId, run, reference: options.reference ?? (currentScene ? referenceIndex : 0), images: [entry],
     surface, hoverLayer, hover: null, referenceLayer, referenceImages: {},
-    baseEntry: entry, benchmarks: new Map(), swipe: false, split: 0.5, holdKey: "",
+    baseEntry: entry, benchmarks: new Map(), swipe: options.swipe ?? false, split: options.split ?? 0.5, holdKey: "",
   };
-  if (currentScene && details) {
-    setLightboxGallery(gallery, details);
-  } else if (!currentScene && sceneId) {
-    loadLightboxGallery(gallery);
-  }
+  const data = options.data ?? (currentScene ? details : null);
+  if (data) setLightboxGallery(gallery, data);
+  else if (sceneId) loadLightboxGallery(gallery);
   const dialog = $("image-dialog");
   if (!dialog.open) dialog.showModal();
-  showLightboxImage(entry, gallery, stage, previewImage);
+  showLightboxImage(entry, gallery, stage, previewImage, options.viewport);
   fillLightboxStrip(gallery);
   $("image-view").focus();
+}
+
+async function restoreLightbox(saved, signal) {
+  if (!scenes.some(item => item.id === saved.scene)) return;
+  const run = saved.run && runs.some(item => item.id === saved.run) ? saved.run : "";
+  try {
+    const data = scene?.id === saved.scene && runId === run && details ? details :
+      await api(url("/api/scene", { scene: saved.scene, run }), undefined, { signal });
+    if (signal.aborted) return;
+    const reference = Math.max(0, data.references.findIndex(frame => frame.id === saved.reference));
+    const entry = lightboxEntries({ scene: saved.scene, run, reference }, data).find(({ params }) =>
+      (saved.image.kind === "frame" ? params.frame : params.stacker) === saved.image.id);
+    if (!entry) return;
+    openLightbox(entry.title, entry.params, undefined, saved.scene, {
+      run, reference, data, swipe: saved.swipe && Boolean(data.references.length), split: saved.split,
+      viewport: { actual: saved.pixels, scale: saved.zoom, position: { u: saved.u, v: saved.v } },
+    });
+    lightboxExplanation.setExpandedDetails(saved.details);
+    lightboxExplanation.setOpen(saved.explain);
+    const benchmark = data.outputs.find(output => output.stacker === saved.benchmark)?.benchmark;
+    if (benchmark?.status === "invalid_output" && benchmark.score === 0) {
+      openBenchmarkReason(saved.benchmark, benchmark.error || invalidDeliveryReason);
+    }
+  } catch {
+    // An unavailable gallery cannot be reconstructed. Keep its workspace view.
+  }
 }
 
 function lightboxScoresPending(gallery) {
@@ -383,6 +549,7 @@ async function loadLightboxGallery(gallery) {
     const data = await api(url("/api/scene", { scene: gallery.scene, run: gallery.run }), undefined, { signal });
     if (signal.aborted) return;
     setLightboxGallery(gallery, data);
+    remember();
     if (revision !== scoreRevision && lightboxScoresPending(gallery)) loadLightboxGallery(gallery);
   } catch {
     // Keep the current preview available if its scene cannot be loaded.
@@ -689,7 +856,7 @@ function paintLightboxOverlays() {
   const viewingReference = held && showing;
   const score = lightboxScore(gallery, entry);
   setLightboxTitle(viewingReference ? referenceTitle(reference) : entry.title);
-  renderLightboxBenchmark(viewingReference ? null : score.benchmark);
+  renderLightboxBenchmark(viewingReference ? null : score.benchmark, entry.params.stacker);
   let status = state.error;
   if (hover) status = hover.unavailable && shown?.entry !== hover.entry ? "Preview unavailable" : "";
   if (comparing && !overlay && fit?.failed && (!native || native.failed)) status = "Reference unavailable";
@@ -743,6 +910,7 @@ function zoomLightbox(scale, x, y) {
   state.scale = Math.max(1, Math.min(12, scale));
   if (state.scale > 1) requestLightbox("native");
   paintLightbox(anchor);
+  remember("continuous");
 }
 
 function lightboxScale() {
@@ -761,6 +929,7 @@ function setPixelMode(actual) {
   activeImage.actual = true;
   requestLightbox("native");
   paintLightbox();
+  remember("continuous");
 }
 
 function railItem(className) {
@@ -782,7 +951,7 @@ function inspectButton(title, params, image, sceneId) {
   button.type = "button";
   button.title = "Inspect " + title;
   button.setAttribute("aria-label", button.title);
-  button.onclick = () => openLightbox(title, params, image, sceneId);
+  button.onclick = () => navigate(() => openLightbox(title, params, image, sceneId));
   return button;
 }
 
@@ -791,7 +960,7 @@ function sceneEntry(item, index) {
   const button = part("button", undefined, "scene-entry");
   button.type = "button";
   button.title = item.name;
-  button.onclick = () => goTo(index);
+  button.onclick = () => navigate(() => goTo(index));
   const params = { frame: item.preview_frame };
   const image = createThumbnail(params);
   const preview = part("span", undefined, "scene-preview preview-thumbnail");
@@ -813,7 +982,7 @@ function sourceEntry({ frame, frameIndex }, index) {
   const button = part("button", undefined, "thumb preview-thumbnail");
   button.type = "button";
   button.setAttribute("aria-label", title);
-  button.onclick = () => selectSource(index);
+  button.onclick = () => navigate(() => selectSource(index));
   const params = { frame: frame.id };
   const image = createThumbnail(params);
   button.append(image, part("span", reference ? "Reference" : String(frameIndex + 1).padStart(3, "0")));
@@ -848,7 +1017,7 @@ function lightboxStripEntry(entry) {
     }
   });
   button.onclick = () => {
-    if (activeImage?.gallery === gallery) selectLightboxEntry(entry);
+    if (activeImage?.gallery === gallery) navigate(() => selectLightboxEntry(entry));
   };
   tile.append(button);
   extendThumbnailTarget(tile, button);
@@ -880,7 +1049,6 @@ function goTo(position) {
   $("next").disabled = visible.length <= 1;
   if (scene?.id === next.id) {
     scene = next;
-    remember();
     return;
   }
   scene = next;
@@ -897,7 +1065,6 @@ function goTo(position) {
   showImage($("source-image"), "source frame 1", { frame: next.first_frame });
   setComparisonReference(next.first_reference ? { id: next.first_reference } : null);
   renderOutput();
-  remember();
   loadScene();
 }
 
@@ -923,17 +1090,23 @@ async function loadScene() {
     if (gallery?.scene === scene.id && gallery.run === runId) setLightboxGallery(gallery, data);
     outputLoading = false;
     showMessage($("scene-error"), "");
-    if (firstLoad) {
+    const restore = restoringView?.started ? restoringView : null;
+    if (restore) {
+      restoreScenePicks(restore.state);
+    } else if (firstLoad) {
       renderReference();
       selectSource(sourceIndex);
     }
     renderOutput();
+    if (restore) finishRestore(restore);
+    else remember();
   } catch (error) {
     if (signal.aborted) return;
     outputLoading = false;
     renderOutput();
     showMessage($("scene-error"), error.message);
     if (!details) placeholder($("source-image"), "Scene unavailable");
+    if (restoringView?.started) finishRestore(restoringView);
   } finally {
     if (!signal.aborted) {
       sceneRequest = null;
@@ -1029,6 +1202,7 @@ function renderReference() {
   $("reference-control").title = details.reference_semantics;
   $("reference-select").replaceChildren(...refs.map((ref, index) =>
     new Option(`${index + 1} · ${ref.name}`, index)));
+  $("reference-select").value = String(referenceIndex);
   selectReference();
 }
 
@@ -1042,7 +1216,7 @@ const benchmarkNumber = new Intl.NumberFormat(undefined, { minimumFractionDigits
 
 const invalidDeliveryReason = "The delivery failed the benchmark's image requirements.";
 
-function renderLightboxBenchmark(benchmark) {
+function renderLightboxBenchmark(benchmark, stacker) {
   const label = $("lightbox-benchmark");
   const line = label.parentElement;
   const info = label.nextElementSibling;
@@ -1062,6 +1236,7 @@ function renderLightboxBenchmark(benchmark) {
   line.dataset.scored = scored;
   label.title = [benchmark?.profile, invalid ? null : benchmark?.error].filter(Boolean).join(" · ");
   info.dataset.reason = invalid ? benchmark.error || invalidDeliveryReason : "";
+  info.dataset.stacker = invalid ? stacker : "";
 }
 
 function renderCandidateScoreStatus(benchmark) {
@@ -1077,9 +1252,14 @@ function renderCandidateScoreStatus(benchmark) {
   if (status.textContent !== text) status.textContent = text;
 }
 
-function showBenchmarkReason(button) {
-  $("benchmark-reason").textContent = button.dataset.reason;
+function openBenchmarkReason(stacker, reason) {
+  benchmarkTarget = stacker;
+  $("benchmark-reason").textContent = reason;
   $("benchmark-details").showModal();
+}
+
+function showBenchmarkReason(button) {
+  navigate(() => openBenchmarkReason(button.dataset.stacker, button.dataset.reason));
 }
 
 function paintCandidateOverlay() {
@@ -1117,7 +1297,10 @@ function renderOutput() {
         button.append(badge);
       }
       if (output.rating?.grade != null) button.append(part("small", output.rating.grade + "/5"));
-      button.onclick = () => { stackerId = output.stacker; renderOutput(); };
+      button.onclick = () => navigate(() => {
+        stackerId = output.stacker;
+        renderOutput();
+      });
       return button;
     });
     tabStrip.replaceChildren(...tabs);
@@ -1208,7 +1391,6 @@ function changeRun(id) {
   if (details) details.outputs = [];
   if (scene) {
     renderOutput();
-    remember();
     loadScene();
   }
 }
@@ -1250,6 +1432,12 @@ function renderRuns() {
 function applyRuns(history) {
   const old = runs.find((run) => run.id === runId);
   runs = history;
+  runsLoaded = true;
+  if (restoringView) {
+    renderRuns();
+    beginRestore();
+    return;
+  }
   if (!runs.some((run) => run.id === runId)) {
     changeRun(runs[0]?.id ?? "");
   } else {
@@ -1322,7 +1510,7 @@ function toolOption(tool, prepared) {
   return card;
 }
 
-function openRunDialog() {
+function openRunDialog(draft = null) {
   const scope = $("scope");
   scope.replaceChildren(new Option("Current scene", "scene"), new Option("Current dataset", "dataset"),
     new Option("All indexed datasets", "all"));
@@ -1340,6 +1528,7 @@ function openRunDialog() {
   $("available-tools").replaceChildren(...Array.from(tools.values(), (tool) => toolOption(tool, prepared)));
   $("start-run").disabled = false;
   showMessage($("run-error"), "");
+  if (draft) restoreEvaluation($("run-form"), draft);
   $("new-run").showModal();
 }
 
@@ -1370,8 +1559,10 @@ async function startRun(event) {
     const result = await api("/api/runs", {
       scope: $("scope").value, scene: scene.id, dataset: scene.dataset, stackers, options,
     });
-    $("new-run").close();
-    changeRun(result.id);
+    navigate(() => {
+      $("new-run").close();
+      changeRun(result.id);
+    });
   } catch (error) {
     showMessage($("run-error"), error.message);
   } finally {
@@ -1395,7 +1586,7 @@ async function stopRun() {
 function applyCatalog(catalog) {
   ratingAutosave.setReady(catalog.status === "ready" || Boolean(catalog.scenes?.length));
   if (catalog.revision === catalogRevision && catalog.image_version === imageVersion) return;
-  const selectedScene = scene?.id ?? parameters.get("scene");
+  const selectedScene = scene?.id;
   if (imageVersion && catalog.image_version !== imageVersion) {
     scene = null;
     details = null;
@@ -1410,7 +1601,7 @@ function applyCatalog(catalog) {
   if (!scenes.length) $("scene-browser").hidePopover?.();
   const workspace = $("workspace");
   const dataset = $("dataset");
-  const selected = workspace.hidden ? parameters.get("dataset") : dataset.value;
+  const selected = dataset.value;
   workspace.hidden = !scenes.length;
   catalogNotice = null;
   if (scenes.length) {
@@ -1418,13 +1609,21 @@ function applyCatalog(catalog) {
       .map(([id, name]) => new Option(name === id ? id : `${name} (${id})`, id)));
     dataset.value = selected ?? "";
     if (dataset.selectedIndex < 0) dataset.value = "";
-    filterScenes(selectedScene);
+    if (restoringView) beginRestore();
+    else {
+      filterScenes(selectedScene);
+      remember();
+    }
   } else if (catalog.status === "missing") {
     catalogNotice = ["Download a dataset to get started", "Scenes appear after their dataset has been downloaded and verified."];
   } else if (catalog.error) {
     catalogNotice = ["Could not open the scene catalog", catalog.error];
   } else if (catalog.status !== "indexing") {
     catalogNotice = ["No scenes available", "The local datasets contain no usable scenes."];
+  }
+  if (!scenes.length && restoringView && catalog.status !== "indexing") {
+    restoringView = null;
+    remember();
   }
   renderCatalogNotice();
   renderRuns();
@@ -1570,13 +1769,15 @@ const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
 const filmRail = new VirtualRail($("filmstrip"), "x", 112, sourceEntry, { itemPadding: 5 });
 const requestScoreOverlay = (mode, params, signal) =>
   api(url(mode === "attention" ? "/api/score-attention" : "/api/score-tiles", params), undefined, { signal });
-const candidateExplanation = new ScoreExplanation($("candidate-explanation"));
-const lightboxExplanation = new ScoreExplanation($("lightbox-explanation"), $("lightbox-explain"));
+const candidateExplanation = new ScoreExplanation($("candidate-explanation"), null, remember);
+const lightboxExplanation = new ScoreExplanation($("lightbox-explanation"), $("lightbox-explain"), remember);
 const overlaySettings = { mode: "off", family: "all", side: 8, opacity: 100 };
 function changeOverlaySettings(changes) {
-  Object.assign(overlaySettings, changes);
-  candidateOverlay.paint();
-  lightboxOverlay.paint();
+  navigate(() => {
+    Object.assign(overlaySettings, changes);
+    candidateOverlay.paint();
+    lightboxOverlay.paint();
+  }, Object.hasOwn(changes, "opacity") ? "continuous" : "push");
 }
 const candidateOverlay = new ScoreOverlay(
   $("candidate-overlay"), $("candidate-image").parentElement, overlaySettings, changeOverlaySettings, requestScoreOverlay,
@@ -1594,38 +1795,47 @@ lightboxStrip.addEventListener("pointerleave", (event) => {
 
 $("scene-browser").addEventListener("toggle", ({ newState }) => {
   if (newState === "open") sceneRail.select(visible.indexOf(scene));
+  remember();
 });
-$("dataset").onchange = () => filterScenes(scene?.id);
-$("previous").onclick = () => moveScene(-1);
-$("next").onclick = () => moveScene(1);
-$("jump").onchange = () => goTo($("jump").valueAsNumber - 1);
-$("reference-select").onchange = (event) => {
+for (const overlay of [candidateOverlay, lightboxOverlay]) {
+  overlay.picker.addEventListener("toggle", () => remember());
+  overlay.opacity.addEventListener("change", () => viewUrl.flush());
+}
+$("dataset").onchange = () => navigate(() => filterScenes(scene?.id));
+$("previous").onclick = () => navigate(() => moveScene(-1));
+$("next").onclick = () => navigate(() => moveScene(1));
+$("jump").onchange = () => navigate(() => goTo($("jump").valueAsNumber - 1));
+$("reference-select").onchange = (event) => navigate(() => {
   referenceIndex = Number(event.target.value);
   selectReference();
   selectSource(0);
   renderOutput();
-};
-$("run-select").onchange = () => changeRun($("run-select").value);
+});
+$("run-select").onchange = () => navigate(() => changeRun($("run-select").value));
 $("rating-form").oninput = captureDraft;
 $("rating-form").onsubmit = (event) => event.preventDefault();
-$("open-run").onclick = openRunDialog;
+$("open-run").onclick = () => navigate(() => openRunDialog());
 $("download-start").onclick = startDownload;
 $("stop-run").onclick = stopRun;
 $("run-form").onsubmit = startRun;
+$("run-form").addEventListener("input", () => remember("continuous"));
+$("run-form").addEventListener("change", () => remember());
+$("run-form").addEventListener("toggle", () => remember(), true);
 $("pixel-mode").onclick = () => setPixelMode(!activeImage.actual);
 $("image-fit").onclick = () => zoomLightbox(1);
 $("zoom-in").onclick = () => zoomLightbox(lightboxScale() * 1.5);
 $("zoom-out").onclick = () => zoomLightbox(lightboxScale() / 1.5);
 const lightboxView = $("image-view");
-$("reference-swipe").onclick = () => {
+$("reference-swipe").onclick = () => navigate(() => {
   const gallery = activeImage.gallery;
   gallery.swipe = !gallery.swipe;
   paintLightboxOverlays();
-};
+});
 const referenceSlider = $("reference-slider");
 function setReferenceSplit(split) {
   activeImage.gallery.split = Math.max(0, Math.min(1, split));
   paintLightboxOverlays();
+  remember("continuous");
 }
 function dragReference(event) {
   const { left, right } = visibleLightboxImage(activeImage.gallery);
@@ -1641,7 +1851,10 @@ referenceSlider.addEventListener("pointermove", (event) => {
     dragReference(event);
   }
 });
-referenceSlider.addEventListener("pointerup", () => lightboxView.focus({ preventScroll: true }));
+referenceSlider.addEventListener("pointerup", () => {
+  viewUrl.flush();
+  lightboxView.focus({ preventScroll: true });
+});
 referenceSlider.addEventListener("keydown", (event) => {
   const { split } = activeImage.gallery;
   const next = { ArrowLeft: split - 0.05, ArrowRight: split + 0.05, Home: 0, End: 1 }[event.key];
@@ -1650,7 +1863,11 @@ referenceSlider.addEventListener("keydown", (event) => {
   event.stopPropagation();
   setReferenceSplit(next);
 });
-lightboxView.addEventListener("scroll", paintLightboxOverlays, { passive: true });
+lightboxView.addEventListener("scroll", () => {
+  if (!activeImage) return;
+  paintLightboxOverlays();
+  remember("continuous");
+}, { passive: true });
 lightboxView.addEventListener("wheel", (event) => {
   if (event.shiftKey) {
     activeImage.position = null;
@@ -1684,7 +1901,7 @@ document.addEventListener("keydown", (event) => {
   }
   if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
     event.preventDefault();
-    moveLightbox(event.key === "ArrowLeft" ? -1 : 1);
+    navigate(() => moveLightbox(event.key === "ArrowLeft" ? -1 : 1), event.repeat ? "continuous" : "push");
     return;
   }
   if (event.target === lightboxView &&
@@ -1729,10 +1946,14 @@ function endLightboxPan() {
   panStart = null;
   lightboxView.classList.remove("dragging");
 }
-lightboxView.addEventListener("pointerup", endLightboxPan);
+lightboxView.addEventListener("pointerup", () => {
+  endLightboxPan();
+  remember("continuous");
+  viewUrl.flush();
+});
 lightboxView.addEventListener("lostpointercapture", endLightboxPan);
-$("image-dialog").addEventListener("close", (event) => {
-  if (event.currentTarget.open || !activeImage) return;
+function discardLightbox() {
+  if (!activeImage) return;
   closeLightboxRequests(activeImage);
   activeImage = null;
   lightboxExplanation.close();
@@ -1740,7 +1961,20 @@ $("image-dialog").addEventListener("close", (event) => {
   endLightboxPan();
   lightboxRail.setItems([]);
   lightboxView.replaceChildren();
+}
+
+$("image-dialog").addEventListener("close", () => {
+  if ($("image-dialog").open || !activeImage) return;
+  discardLightbox();
+  remember("push");
 });
+for (const id of ["appearance", "new-run", "benchmark-details"]) {
+  $(id).addEventListener("close", () => {
+    if ($(id).open) return;
+    if (id === "benchmark-details") benchmarkTarget = null;
+    remember("push");
+  });
+}
 new ResizeObserver(() => {
   if (activeImage) paintLightbox();
 }).observe(lightboxView);
@@ -1763,10 +1997,11 @@ document.addEventListener("keydown", (event) => {
     renderOutput();
   } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
     event.preventDefault();
-    selectSource(sourceIndex + (event.key === "ArrowLeft" ? -1 : 1));
+    navigate(() => selectSource(sourceIndex + (event.key === "ArrowLeft" ? -1 : 1)),
+      event.repeat ? "continuous" : "push");
   } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
     event.preventDefault();
-    moveScene(event.key === "ArrowUp" ? -1 : 1);
+    navigate(() => moveScene(event.key === "ArrowUp" ? -1 : 1), event.repeat ? "continuous" : "push");
   }
 });
 window.addEventListener("beforeunload", (event) => {
@@ -1781,4 +2016,6 @@ new ResizeObserver(([entry]) => {
   document.documentElement.style.setProperty("--command-height", `${height + 4}px`);
 }).observe(commandBar);
 configureAppearance();
+window.addEventListener("popstate", () => restoreView(viewUrl.read()));
+restoreView(viewUrl.read());
 workspaceSocket.connect();

@@ -34,6 +34,12 @@ Use **Heatmaps** in the output sidebar or the floating controls in the lightbox 
 
 The overlay, damage type, tile size, and opacity carry over when you switch outputs or move between the main viewer and the lightbox. Heatmaps use the leading placement and load on demand. The lightbox keeps the heatmap aligned during zoom and pan and confines it to the output side of a reference swipe. The full reference stays clear for comparison.
 
+## Share a review view
+
+Copy Stackroom’s URL to reopen the same scene, evaluation, source frame, reference, and stacker. It also preserves heatmap controls, score details, the open lightbox and its viewport, and open control panels, including an unsent evaluation configuration. Back and Forward restore previous selections. The destination Stackroom server needs the same dataset and saved evaluation for the link to resolve those images.
+
+Ratings and comments stay in the Stackroom store. Hover previews and held-key comparisons are temporary. Existing links using `#dataset=…&scene=…&run=…` still open.
+
 ## Set up the stackers
 
 Choose the stackers in **New evaluation**. When you start the run, Stackroom uses the available open-source stackers and prepares any others you selected before processing scenes. First-time setup may download dependencies. The run banner shows what is being installed, and setup failures include a log for the affected stacker. Other selected stackers can continue when one setup fails.

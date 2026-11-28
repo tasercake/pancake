@@ -80,6 +80,7 @@ jobs:
           assert files("bokehforge").joinpath("heatmaps.html").is_file()
           assert files("bokehforge.data").joinpath("sources.json").is_file()
           assert files("bokehforge.review").joinpath("static", "index.html").is_file()
+          assert files("bokehforge.review").joinpath("static", "view-state.js").is_file()
           assert files("bokehforge.review").joinpath("static", "fonts", "SpaceGrotesk-Regular.ttf").is_file()
           PY
       - name: Run CPU scoring and parity tests

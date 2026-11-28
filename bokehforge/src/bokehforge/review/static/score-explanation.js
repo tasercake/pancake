@@ -13,8 +13,9 @@ function damage(value) {
   return value > 0 && value < 0.0001 ? value.toExponential(1) : number.format(value);
 }
 
-function familyRow(family) {
+function familyRow([id, family]) {
   const row = element("details", undefined, "damage-family");
+  row.dataset.viewDetail = "family:" + id;
   const summary = element("summary");
   const values = [
     [family.label, ""],
@@ -48,18 +49,31 @@ export function scoreExplanationKey(context) {
 }
 
 export class ScoreExplanation {
-  constructor(root, trigger) {
+  constructor(root, trigger, viewChanged) {
     this.root = root;
     this.trigger = trigger;
     root.append(document.querySelector("#score-explanation-template").content.cloneNode(true));
     this.key = "";
     this.open = !trigger;
+    this.expanded = new Set();
+    root.addEventListener("toggle", ({ target }) => {
+      if (!(target instanceof HTMLDetailsElement) || !root.contains(target)) return;
+      const id = target.dataset.viewDetail;
+      if (!id || this.expanded.has(id) === target.open) return;
+      if (target.open) this.expanded.add(id);
+      else this.expanded.delete(id);
+      viewChanged();
+    }, true);
     const dismiss = root.querySelector(".score-explanation-dismiss");
     if (trigger) {
-      trigger.onclick = () => this.setOpen(!this.open);
+      trigger.onclick = () => {
+        this.setOpen(!this.open);
+        viewChanged("push");
+      };
       dismiss.onclick = () => {
         this.setOpen(false);
         trigger.focus();
+        viewChanged("push");
       };
     } else {
       dismiss.remove();
@@ -74,8 +88,24 @@ export class ScoreExplanation {
     this.trigger.textContent = open && this.key ? "Hide explanation" : "Explain score";
   }
 
+  expandedDetails() {
+    return [...this.expanded].sort();
+  }
+
+  setExpandedDetails(ids) {
+    this.expanded = new Set(ids);
+    this.applyExpandedDetails();
+  }
+
+  applyExpandedDetails() {
+    for (const panel of this.root.querySelectorAll("details[data-view-detail]")) {
+      panel.open = this.expanded.has(panel.dataset.viewDetail);
+    }
+  }
+
   close() {
     this.setOpen(false);
+    this.setExpandedDetails([]);
     this.update(null);
   }
 
@@ -93,7 +123,7 @@ export class ScoreExplanation {
 
   showSummary(explanation, placement, alignment) {
     const comparison = placement?.comparison;
-    const families = Object.values(comparison?.families ?? {});
+    const families = Object.entries(comparison?.families ?? {});
     if (this.trigger) {
       this.root.querySelector("[data-score-heading]").textContent =
         "Benchmark score " + points.format(explanation.score) + " / 100";
@@ -122,6 +152,7 @@ export class ScoreExplanation {
         (comparison.inspection_mix == null ? "" : " · Inspection mix " + percent.format(comparison.inspection_mix))
       : "";
     this.root.querySelector("[data-damage-families]").replaceChildren(...families.map(familyRow));
+    this.applyExpandedDetails();
   }
 
 }

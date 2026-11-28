@@ -36,6 +36,7 @@ from .websocket import MessageError, serve_websocket
 STATIC = Path(__file__).with_name("static")
 ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+          "/view-state.js": ("view-state.js", "text/javascript; charset=utf-8"),
           "/rail.js": ("rail.js", "text/javascript; charset=utf-8"),
           "/rating-autosave.js": ("rating-autosave.js", "text/javascript; charset=utf-8"),
           "/workspace-socket.js": ("workspace-socket.js", "text/javascript; charset=utf-8"),

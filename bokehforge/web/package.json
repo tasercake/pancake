@@ -1,0 +1,18 @@
+{
+  "name": "bokehforge-stackroom-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && node build.mjs",
+    "check": "tsc --noEmit && node build.mjs --check",
+    "test": "node --test view-state.test.mjs"
+  },
+  "dependencies": {
+    "serialize-query-params": "2.0.4",
+    "valibot": "1.5.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "typescript": "6.0.3"
+  }
+}

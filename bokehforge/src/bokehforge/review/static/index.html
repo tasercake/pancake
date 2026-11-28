@@ -227,7 +227,7 @@
       <button class="quiet score-explanation-dismiss" type="button" aria-label="Close score explanation">Close</button>
     </div>
     <p class="damage-help" data-alignment-summary></p>
-    <details class="damage-method" data-alignment-details>
+    <details class="damage-method" data-alignment-details data-view-detail="alignment">
       <summary>How alignment was inferred</summary>
       <pre data-alignment-evidence></pre>
     </details>
@@ -236,7 +236,7 @@
       <span>Damage family</span><span>Observed</span><span>Weight</span><span>Contribution</span>
     </div>
     <div data-damage-families></div>
-    <details class="damage-method" data-damage-method>
+    <details class="damage-method" data-damage-method data-view-detail="damage-method">
       <summary>How to read damage</summary>
       <p>Zero damage means no measured difference from the reference. Damage can reach 1 before attention weighting and up to 2 with weighting. The six families separate different ways an output can lose fidelity, such as shifting tones or smoothing away detail.</p>
       <p>Each contribution is observed damage multiplied by its weight. Overlap quality decays exponentially as their sum increases.</p>
