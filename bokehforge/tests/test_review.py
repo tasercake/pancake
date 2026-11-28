@@ -9,8 +9,9 @@ from itertools import count
 from pathlib import Path
 import json
 from shutil import copyfile
-from socket import create_connection
+from socket import SO_LINGER, SOL_SOCKET, create_connection
 import sqlite3
+from struct import pack
 import sys
 from threading import Event, Thread
 from time import sleep
@@ -282,6 +283,66 @@ def test_review_accepts_machine_hostname_and_same_http_origin(tmp_path, monkeypa
         finally:
             server.shutdown()
             worker.join()
+
+
+@pytest.mark.parametrize("next_request", [b"", b"GET /"], ids=["idle", "incomplete"])
+def test_review_logs_timeouts_only_after_request_starts(next_request, monkeypatch, capsys):
+    monkeypatch.setattr(review_server.Handler, "timeout", 0.5)
+    with ReviewServer(("127.0.0.1", 0)) as server:
+        client = HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+        try:
+            client.request("GET", "/")
+            server.handle_request()
+            response = client.getresponse()
+            assert response.status == 200 and not response.will_close
+            response.read()
+            if next_request:
+                client.sock.sendall(next_request)
+            assert client.sock.recv(1) == b""
+        finally:
+            client.close()
+    stderr = capsys.readouterr().err
+    if next_request:
+        assert "Request timed out" in stderr
+    else:
+        assert stderr == ""
+
+
+def test_review_does_not_log_reset_keep_alive_connections(capsys):
+    with ReviewServer(("127.0.0.1", 0)) as server:
+        server.daemon_threads = False
+        client = HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+        try:
+            client.request("GET", "/")
+            server.handle_request()
+            response = client.getresponse()
+            assert response.status == 200 and not response.will_close
+            response.read()
+            linger = pack("HH" if sys.platform == "win32" else "ii", 1, 0)
+            client.sock.setsockopt(SOL_SOCKET, SO_LINGER, linger)
+        finally:
+            client.close()
+    assert capsys.readouterr().err == ""
+
+
+def test_review_still_logs_route_failures(monkeypatch, capsys):
+    def fail(*_):
+        raise TimeoutError("Catalog operation timed out")
+
+    monkeypatch.setattr(review_server.Handler, "get", fail)
+    with ReviewServer(("127.0.0.1", 0)) as server:
+        client = HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+        try:
+            client.request("GET", "/api/catalog")
+            server.handle_request()
+            response = client.getresponse()
+            assert response.status == 500
+            assert json.loads(response.read()) == {"error": "Catalog operation timed out"}
+        finally:
+            client.close()
+    stderr = capsys.readouterr().err
+    assert "Catalog operation timed out" in stderr
+    assert '"GET /api/catalog HTTP/1.1" 500' in stderr
 
 
 def test_rating_websocket_migrates_and_replays_saves_without_overwriting_newer_edits(tmp_path, monkeypatch):

@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 from secrets import token_hex
 from socket import gethostname
+import sys
 from threading import Lock, Thread
 from time import monotonic
 from urllib.parse import parse_qs, urlsplit
@@ -47,6 +48,7 @@ ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
           "/fonts/IBMPlexMono-OFL.txt": ("fonts/IBMPlexMono-OFL.txt", "text/plain; charset=utf-8"),
           "/fonts/SpaceGrotesk-OFL.txt": ("fonts/SpaceGrotesk-OFL.txt", "text/plain; charset=utf-8")}
 ALL_INTERFACES = "0.0.0.0"
+CLIENT_DISCONNECTS = (BrokenPipeError, ConnectionAbortedError, ConnectionResetError)
 
 
 def local_sources(args, progress):
@@ -370,6 +372,18 @@ class Handler(BaseHTTPRequestHandler):
     timeout = 10
     disable_nagle_algorithm = True
 
+    def handle_one_request(self):
+        # Waiting for the first byte is idle time. Once a request starts, let
+        # the standard handler report any timeout while reading or serving it.
+        try:
+            pending = self.rfile.peek(1)
+        except TimeoutError:
+            pending = b""
+        if pending:
+            super().handle_one_request()
+        else:
+            self.close_connection = True
+
     def do_GET(self):
         self.handle_request(self.get)
 
@@ -401,8 +415,8 @@ class Handler(BaseHTTPRequestHandler):
         try:
             parts = urlsplit(self.path)
             route(parts.path, {key: values[-1] for key, values in parse_qs(parts.query).items()})
-        except (BrokenPipeError, ConnectionResetError):
-            pass
+        except CLIENT_DISCONNECTS:
+            raise
         except KeyError as exc:
             self.json(404, {"error": str(exc.args[0])})
         except CatalogPending as exc:
@@ -546,6 +560,9 @@ class ReviewServer(ThreadingHTTPServer):
         self.review_hosts = {self.hostname, address[0].lower()} - {ALL_INTERFACES}
         super().__init__(address, Handler)
 
+    def handle_error(self, request, client_address):
+        if not isinstance(sys.exception(), CLIENT_DISCONNECTS):
+            super().handle_error(request, client_address)
 
     def server_close(self):
         if hasattr(self, "app"):
