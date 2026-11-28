@@ -17,7 +17,7 @@ def _scale(values):
     return np.clip((values - lo) / max(float(hi - lo), 1e-6), 0, 1).astype(np.float32)
 
 
-def _detail_light(image):
+def detail_light(image):
     colors = np.array(image, dtype=np.float32) / 255
     brightness = np.array(image, dtype=np.float32) @ np.float32([.2126, .7152, .0722]) / 255
     scale = max(brightness.shape) / 640
@@ -147,14 +147,14 @@ def _mask_heat(masks, scores, detail):
     return heat
 
 
-def inspection_blend(directory):
+def inspection_components(directory, *, progress=None):
     try:
         import torch
     except ImportError as exc:
         raise RuntimeError("The Inspection blend requires the inspection dependencies") from exc
     if not torch.cuda.is_available():
         raise RuntimeError("The released TempSAL checkpoint requires CUDA")
-    ensure_inspection_assets(directory)
+    ensure_inspection_assets(directory, progress=progress)
     device = "cuda"
     with torch.inference_mode():
         reliqs = _reliqs(directory, device, torch)
@@ -163,12 +163,22 @@ def inspection_blend(directory):
 
     @torch.inference_mode()
     def predict(image):
-        detail_work = workers().submit(_detail_light, image)
+        detail_work = workers().submit(detail_light, image)
         saliency = reliqs(image)
         masks, scores = sam2(image)
         temporal = tempsal(image)
         detail = detail_work.result()
-        maps = np.stack([saliency, detail, _mask_heat(masks, scores, detail), temporal])
-        return (1 - np.prod(1 - .5 * maps, axis=0)) / (1 - .5 ** len(maps))
+        return {"reliqs": saliency, "detail-light": detail, "sam2": _mask_heat(masks, scores, detail),
+                "tempsal": temporal}
 
     return predict
+
+
+def blend_components(components):
+    maps = np.stack(tuple(components.values()))
+    return (1 - np.prod(1 - .5 * maps, axis=0)) / (1 - .5 ** len(maps))
+
+
+def inspection_blend(directory):
+    components = inspection_components(directory)
+    return lambda image: blend_components(components(image))
