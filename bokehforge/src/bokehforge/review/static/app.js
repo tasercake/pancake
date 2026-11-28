@@ -1134,6 +1134,7 @@ function renderRating(row) {
   const ready = row?.status === "ready";
   $("rating-title").textContent = ready ? "Rate " + stackerLabel(row.stacker) : "Rate outputs";
   $("rating-form").hidden = !ready;
+  $("rating-shortcut").hidden = !ready;
   $("rating-empty").hidden = ready;
   $("rating-empty").textContent = row || outputLoading || !details
     ? "Ratings open when this output is available."
@@ -1714,9 +1715,16 @@ new ResizeObserver(() => {
 for (const button of document.querySelectorAll(".benchmark-info")) button.onclick = () => showBenchmarkReason(button);
 for (const button of document.querySelectorAll("[data-close]")) button.onclick = () => $(button.dataset.close).close();
 document.addEventListener("keydown", (event) => {
-  if (!scene || document.querySelector("dialog[open]") ||
-      event.target.closest?.("input, textarea, select, [contenteditable], .overlay-picker") ||
+  if (!scene || document.querySelector("dialog[open]") || event.defaultPrevented || event.isComposing ||
       event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  const field = event.target.closest?.("input, textarea, select, [contenteditable], .overlay-picker");
+  if (/^[1-5]$/.test(event.key)) {
+    if (!formKey || event.repeat || (field && !field.matches("#rating-form input[name=grade]"))) return;
+    event.preventDefault();
+    $("rating-form").querySelector(`input[name=grade][value="${event.key}"]`).click();
+    return;
+  }
+  if (field) return;
   if (event.key === "." && comparisonReference && !event.repeat) {
     event.preventDefault();
     comparisonHoldKey = event.code || event.key;
