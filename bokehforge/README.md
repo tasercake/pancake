@@ -9,7 +9,7 @@ Use Python 3.12, `uv`, Rust 1.100 or later with Cargo, and a C++17-capable toolc
 | Platform | Source build tools |
 | --- | --- |
 | Linux x86-64 | A C/C++ compiler and linker, such as GCC and binutils |
-| macOS on Apple Silicon | Xcode Command Line Tools |
+| macOS 15 or later on Apple Silicon | Xcode Command Line Tools |
 | Windows x64 | Rust’s MSVC toolchain, Visual Studio C++ Build Tools, and a Windows SDK |
 
 The source build downloads and statically links the pinned Tracel LLVM 23.1.0-4 bundle for CubeCL. From this directory, install the locked environment.

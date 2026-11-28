@@ -1,2 +1,3 @@
 include Cargo.toml Cargo.lock rust-toolchain.toml
+include .cargo/config.toml
 recursive-include rust *.rs

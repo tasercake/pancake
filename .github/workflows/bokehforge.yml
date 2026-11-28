@@ -51,6 +51,7 @@ jobs:
           python -m uv run --no-sync python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           from importlib.metadata import distribution
           from importlib.resources import files
+          from pathlib import Path
           import subprocess
           import sys
 
@@ -58,7 +59,7 @@ jobs:
 
           print(_rust.__file__)
           assert callable(_rust.sample_linear)
-          assert callable(_rust.lightness_damage)
+          assert callable(_rust.measure_delivery)
           assert callable(_rust.pool_tiles)
           assert callable(_rust.PreviewEncoder)
           assert _rust.damage_backend("cpu") == "cpu"
@@ -66,6 +67,8 @@ jobs:
           print(f"Native BokehForge scorer on {sys.platform}: selected {selected}")
           if sys.platform == "darwin":
               assert _rust.damage_available("mps") and selected == "mps"
+              wheel = next(Path("dist").glob("*.whl"))
+              assert wheel.name.endswith("-macosx_15_0_arm64.whl"), wheel.name
           else:
               assert not _rust.damage_available("cuda") and selected == "cpu"
           if sys.platform == "linux":

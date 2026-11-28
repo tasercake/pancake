@@ -69,6 +69,7 @@ cache-keys = [
   { file = "Cargo.toml" },
   { file = "Cargo.lock" },
   { file = "rust-toolchain.toml" },
+  { file = ".cargo/config.toml" },
   { file = "rust/**/*.rs" },
   { file = "notices/llvm/*" },
   { file = "src/bokehforge/__init__.py" },
