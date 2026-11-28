@@ -132,6 +132,36 @@ unescaped_backticks = "deny"
 [profile.release]
 overflow-checks = true
 
+# Slint parses the bundled UI once at startup. The same package also builds
+# as a proc-macro dependency, where Cargo already defaults to optimization 0.
+[profile.release.package.i-slint-compiler]
+opt-level = 0
+
+# These crates build IR and lower it to LLVM. CubeCL's generated kernels are
+# optimized by its runtime after this host code runs.
+[profile.release.package.cubecl-ir]
+opt-level = 1
+
+[profile.release.package.pliron]
+opt-level = 1
+
+[profile.release.package.pliron-llvm]
+opt-level = 1
+
+# Native dialog, window and graphics bindings spend most of their time in
+# the platform libraries they call.
+[profile.release.package.gtk]
+opt-level = 1
+
+[profile.release.package.objc2-app-kit]
+opt-level = 1
+
+[profile.release.package.objc2-metal]
+opt-level = 1
+
+[profile.release.package.windows]
+opt-level = 1
+
 [profile.test]
 overflow-checks = true
 debug-assertions = true

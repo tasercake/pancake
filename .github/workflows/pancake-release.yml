@@ -11,6 +11,10 @@ on:
           - build-only
           - prerelease
           - stable
+      cold_build:
+        description: Bypass the package caches and retain Cargo timings in build-only mode
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -162,6 +166,8 @@ jobs:
       RUST_TARGET: ${{ matrix.target }}
       CARGO_BUILD_JOBS: ${{ matrix.jobs }}
       CARGO_INCREMENTAL: "0"
+      COLD_BUILD: ${{ inputs.mode == 'build-only' && inputs.cold_build }}
+      CARGO_TIMINGS: ${{ inputs.mode == 'build-only' && inputs.cold_build && '--timings' || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -213,6 +219,7 @@ jobs:
         run: python -B scripts/release_cache.py keys "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Restore compiled release outputs
+        if: env.COLD_BUILD != 'true'
         id: build-cache
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -250,7 +257,7 @@ jobs:
       - name: Build and verify the Ubuntu Debian package
         if: runner.os == 'Linux'
         run: |
-          time -p cargo build --locked --release --workspace --bins
+          time -p cargo build --locked --release --workspace --bins ${{ env.CARGO_TIMINGS }}
           release="$CARGO_TARGET_DIR/release"
           llvm_build="$release/build/cubecl-llvm"
           shopt -s nullglob
@@ -307,7 +314,7 @@ jobs:
           cp "$RUNNER_TEMP/pancake-zstd/LICENSE" "$RUNNER_TEMP/zstd-source.txt" "$notices/native-zstd/"
           time -p python -B scripts/package_macos.py --output "$payload" \
             --target-dir "$CARGO_TARGET_DIR" --release-notices "$notices" \
-            --bundle-identifier com.github.tasercake.pancake --build-number "$GITHUB_RUN_NUMBER"
+            --bundle-identifier com.github.tasercake.pancake --build-number "$GITHUB_RUN_NUMBER" ${{ env.CARGO_TIMINGS }}
           mv "$payload/build.log" "$DIST/pancake-macos-arm64-build.log"
           mv "$payload/package-receipt.json" "$DIST/pancake-macos-arm64-receipt.json"
 
@@ -351,15 +358,23 @@ jobs:
       - name: Build and verify the Windows executables
         if: runner.os == 'Windows'
         run: |
-          time -p cargo build --locked --release --workspace --bins --target "$RUST_TARGET"
+          time -p cargo build --locked --release --workspace --bins ${{ env.CARGO_TIMINGS }} --target "$RUST_TARGET"
           payload="$RUNNER_TEMP/windows"
           python -B scripts/release_support.py notices "$payload" "$RUST_TARGET"
           python -B scripts/release_support.py windows-assets \
             "$CARGO_TARGET_DIR/$RUST_TARGET/release" "$payload" "$DIST" "$RELEASE_VERSION"
           python -B scripts/release_support.py smoke "$DIST/pancake-cli-$RELEASE_VERSION-windows-x64.exe"
 
+      - name: Upload Cargo timings
+        if: env.COLD_BUILD == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: cargo-timings-${{ matrix.platform }}
+          path: ${{ env.CARGO_TARGET_DIR }}/cargo-timings/cargo-timing.html
+          if-no-files-found: error
+
       - name: Save compiled release outputs
-        if: steps.build-cache.outputs.cache-hit != 'true'
+        if: env.COLD_BUILD != 'true' && steps.build-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |

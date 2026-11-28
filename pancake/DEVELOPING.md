@@ -40,6 +40,16 @@ Cargo checks the lockfile and fingerprints on every run, and each package is
 staged and smoke-tested again. Change the cache key version in the workflow
 when changing how build outputs are produced or stored.
 
+For a clean compile benchmark on the package runners, use
+`gh workflow run pancake-release.yml --ref <branch> -f mode=build-only -f cold_build=true`.
+Package jobs skip cache restores and saves and upload per-platform Cargo
+timing reports beside the verified packages.
+
+The release profile applies cheaper optimization to the Slint compiler, the
+host-side CubeCL and LLVM IR crates, and the largest native platform bindings.
+Use the release profile when benchmarking application throughput so the
+measurements match the shipped CLI and desktop app.
+
 ## Tests and assurance
 
 Run the Lightroom plug-in contract checks from `pancake/` with `luajit lightroom/test_open_stack.lua` or Lua 5.1.
