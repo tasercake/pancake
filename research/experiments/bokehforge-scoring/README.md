@@ -12,8 +12,8 @@ candidate=/path/to/candidate-checkout
 d29_zip=/path/to/InfinigenDefocus.zip
 harness="$candidate/research/experiments/bokehforge-scoring/compare.py"
 
-uv sync --project "$baseline/bokehforge" --frozen --extra inspection
-uv sync --project "$candidate/bokehforge" --frozen --extra inspection
+uv sync --project "$baseline/bokehforge" --frozen
+uv sync --project "$candidate/bokehforge" --frozen
 
 cd "$candidate"
 "$baseline/bokehforge/.venv/bin/python" "$harness" run "$d29_zip" \
@@ -23,6 +23,9 @@ cd "$candidate"
 "$candidate/bokehforge/.venv/bin/python" "$harness" compare \
   artifacts/timing/baseline.json artifacts/timing/candidate.json
 ```
+
+For an older checkout that declares Inspection as an extra, add
+`--extra inspection` to that checkout's sync command.
 
 The default fixture uses six 4000 × 4000 scenes. The harness sorts the
 all-in-focus PNG paths and selects every `reference_count // count` entries

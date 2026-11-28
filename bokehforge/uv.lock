@@ -21,31 +21,27 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
+    { name = "einops" },
     { name = "filelock" },
+    { name = "ftfy" },
     { name = "imagecodecs" },
     { name = "libarchive-c" },
     { name = "numpy" },
-    { name = "pillow" },
-    { name = "rawpy" },
-    { name = "requests" },
-    { name = "scipy" },
-    { name = "tifffile" },
-    { name = "wsproto" },
-]
-
-[package.optional-dependencies]
-inspection = [
-    { name = "einops" },
-    { name = "ftfy" },
     { name = "onnx" },
     { name = "onnxruntime", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux')" },
     { name = "onnxruntime-gpu", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine == 'AMD64' and sys_platform == 'win32')" },
     { name = "opencv-python-headless" },
     { name = "pandas" },
+    { name = "pillow" },
+    { name = "rawpy" },
+    { name = "requests" },
+    { name = "scipy" },
+    { name = "tifffile" },
     { name = "timm" },
     { name = "torch" },
     { name = "torchvision" },
     { name = "transformers" },
+    { name = "wsproto" },
 ]
 
 [package.dev-dependencies]
@@ -56,29 +52,28 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.13,<5" },
-    { name = "einops", marker = "extra == 'inspection'", specifier = "==0.8.2" },
+    { name = "einops", specifier = "==0.8.2" },
     { name = "filelock", specifier = ">=3,<5" },
-    { name = "ftfy", marker = "extra == 'inspection'", specifier = "==6.3.1" },
+    { name = "ftfy", specifier = "==6.3.1" },
     { name = "imagecodecs", specifier = ">=2025.3.30" },
     { name = "libarchive-c", specifier = ">=5.1,<6" },
     { name = "numpy", specifier = ">=2.2,<3" },
-    { name = "onnx", marker = "extra == 'inspection'", specifier = "==1.18.0" },
-    { name = "onnxruntime", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin' and extra == 'inspection') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'inspection')", specifier = "==1.24.4" },
-    { name = "onnxruntime-gpu", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'inspection') or (platform_machine == 'AMD64' and sys_platform == 'win32' and extra == 'inspection')", specifier = "==1.24.4" },
-    { name = "opencv-python-headless", marker = "extra == 'inspection'", specifier = ">=4.13,<5" },
-    { name = "pandas", marker = "extra == 'inspection'", specifier = "==2.3.3" },
+    { name = "onnx", specifier = "==1.18.0" },
+    { name = "onnxruntime", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux')", specifier = "==1.24.4" },
+    { name = "onnxruntime-gpu", marker = "(platform_machine == 'x86_64' and sys_platform == 'linux') or (platform_machine == 'AMD64' and sys_platform == 'win32')", specifier = "==1.24.4" },
+    { name = "opencv-python-headless", specifier = ">=4.13,<5" },
+    { name = "pandas", specifier = "==2.3.3" },
     { name = "pillow", specifier = ">=11,<13" },
     { name = "rawpy", specifier = ">=0.24,<0.27" },
     { name = "requests", specifier = ">=2.32,<3" },
     { name = "scipy", specifier = ">=1.15,<2" },
     { name = "tifffile", specifier = ">=2025.1.10" },
-    { name = "timm", marker = "extra == 'inspection'", specifier = "==1.0.24" },
-    { name = "torch", marker = "extra == 'inspection'", specifier = "==2.6.0" },
-    { name = "torchvision", marker = "extra == 'inspection'", specifier = "==0.21.0" },
-    { name = "transformers", marker = "extra == 'inspection'", specifier = "==4.57.6" },
+    { name = "timm", specifier = "==1.0.24" },
+    { name = "torch", specifier = "==2.6.0" },
+    { name = "torchvision", specifier = "==0.21.0" },
+    { name = "transformers", specifier = "==4.57.6" },
     { name = "wsproto", specifier = ">=1.2,<2" },
 ]
-provides-extras = ["inspection"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = ">=8.3,<10" }]

@@ -20,8 +20,8 @@ def test_native_coreml_executes_onnx(tmp_path, request):
         pytest.skip("Requires a local Apple Metal 3 device")
     library = _runtime_library()
     if library is None or not library.is_file():
-        pytest.skip("Install the inspection extra for ONNX Runtime")
-    onnx = pytest.importorskip("onnx", reason="Install the inspection extra for ONNX fixture generation")
+        pytest.skip("Requires an ONNX Runtime shared library")
+    onnx = pytest.importorskip("onnx", reason="Requires ONNX for fixture generation")
     cargo = shutil.which("cargo")
     if cargo is None:
         pytest.skip("The native Core ML fixture test requires Cargo")
