@@ -1716,7 +1716,7 @@ for (const button of document.querySelectorAll(".benchmark-info")) button.onclic
 for (const button of document.querySelectorAll("[data-close]")) button.onclick = () => $(button.dataset.close).close();
 document.addEventListener("keydown", (event) => {
   if (!scene || document.querySelector("dialog[open]") || event.defaultPrevented || event.isComposing ||
-      event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      event.altKey || event.ctrlKey || event.metaKey) return;
   const field = event.target.closest?.("input, textarea, select, [contenteditable], .overlay-picker");
   if (/^[1-5]$/.test(event.key)) {
     if (!formKey || event.repeat || (field && !field.matches("#rating-form input[name=grade]"))) return;
@@ -1724,7 +1724,7 @@ document.addEventListener("keydown", (event) => {
     $("rating-form").querySelector(`input[name=grade][value="${event.key}"]`).click();
     return;
   }
-  if (field) return;
+  if (field || event.shiftKey) return;
   if (event.key === "." && comparisonReference && !event.repeat) {
     event.preventDefault();
     comparisonHoldKey = event.code || event.key;
