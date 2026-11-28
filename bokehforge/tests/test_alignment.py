@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 from scipy.ndimage import affine_transform, gaussian_filter, map_coordinates
 
+from bokehforge import alignment
 from bokehforge.alignment import ALIGNMENT_VERSION, _Texture, _exact_offsets, _sample_rgb
 from bokehforge.scoring import measure as _measure
 
@@ -29,6 +30,8 @@ def render(target, shape, offset, scale=1, angle=0):
 
 @pytest.mark.parametrize("shape", [(13, 17), (13, 1), (1, 17), (1, 1)])
 def test_alignment_sampling_matches_scipy_at_integer_and_fractional_positions(shape):
+    rust = pytest.importorskip("bokehforge._rust")
+    assert alignment._sample_linear is rust.sample_linear
     rng = np.random.default_rng(2409)
     image = rng.uniform(-1.0, 1.0, (2 * shape[0], 2 * shape[1], 3)).astype(np.float32)
     image[::2, ::3] = -0.0
@@ -49,6 +52,55 @@ def test_alignment_sampling_matches_scipy_at_integer_and_fractional_positions(sh
     step = np.array([1.25, 2.5])
     coordinates = (points + 0.5) / step[:, None] - 0.5
     assert _Texture(planes, step).sample(points).tobytes() == expected(planes, coordinates).tobytes()
+
+
+def test_rust_sampler_writes_strided_buffers_and_rejects_invalid_inputs():
+    rust = pytest.importorskip("bokehforge._rust")
+    image = np.arange(2 * 4 * 3, dtype=np.float32).reshape(2, 4, 3)[::-1, :, ::-1]
+    points = np.array([[1, 0, 0.3], [3, 2.2, 0]])[:, ::-1]
+    backing = np.full((6, 6), -1, dtype=np.float32)
+    output = backing[::-2, ::2]
+    rust.sample_linear(image, points, output, True)
+    np.testing.assert_array_equal(output, _sample_rgb(image, points))
+    assert np.all(backing[::2, :] == -1) and np.all(backing[:, 1::2] == -1)
+    rust.sample_linear(image, points[:, :0], output[:0], True)
+
+    with pytest.raises(ValueError, match="shapes do not match"):
+        rust.sample_linear(image, points, output[:1], True)
+    with pytest.raises(ValueError, match="aligned native floating-point buffer"):
+        rust.sample_linear(image, points.astype(np.float32), output, True)
+    bad_points = points.copy()
+    bad_points[0, 1] = np.nan
+    with pytest.raises(ValueError, match="coordinates must be finite"):
+        rust.sample_linear(image, bad_points, output, True)
+    output.setflags(write=False)
+    with pytest.raises(ValueError, match="writeable"):
+        rust.sample_linear(image, points, output, True)
+
+
+@pytest.mark.parametrize("native", [False, True])
+def test_rust_pose_evidence_matches_numpy_on_full_and_partial_overlap(monkeypatch, native):
+    rust = pytest.importorskip("bokehforge._rust")
+    assert alignment._sample_pose_evidence is rust.sample_pose_evidence
+    rng = np.random.default_rng(5718)
+    image = rng.uniform(-0.1, 1.2, (51, 42, 3)).astype(np.float32)[::-2, ::2, ::-1]
+    if native:
+        texture = alignment._NativeTexture(image)
+        shape = image.shape[:2]
+    else:
+        texture = _Texture(np.moveaxis(image * 0.08, -1, 0), np.array([1.5, 2.0]))
+        shape = (39, 42)
+    poses = [alignment.Pose(0, 0), alignment.Pose(3.5, -6.7, -3.1, 1.1), alignment.Pose(43, 0)]
+
+    def evaluate():
+        sampler = alignment._EvidenceSampler(texture, texture, shape, shape, 19, native=native)
+        return [sampler(pose, subset) for pose in poses for subset in ("fit", "holdout")]
+
+    actual = evaluate()
+    monkeypatch.setattr(alignment, "_sample_pose_evidence", None)
+    monkeypatch.setattr(alignment, "_sample_native_delta", None)
+    monkeypatch.setattr(alignment, "_sample_linear", None)
+    assert actual == evaluate()
 
 
 def test_same_size_exact_search_checks_pixels_between_its_screening_samples():

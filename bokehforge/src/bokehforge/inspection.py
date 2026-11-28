@@ -1,5 +1,6 @@
 """Generate inspection maps from clean references during scoring."""
 
+from functools import lru_cache
 from hashlib import sha256
 import os
 from pathlib import Path
@@ -11,6 +12,11 @@ from PIL import Image
 from ._device import Device
 from ._workers import workers
 from .scoring import validate_heatmap, validate_rgb
+
+try:
+    from . import _rust
+except ImportError:
+    _rust = None
 
 INSPECTION_MAP_VERSION = "inspection-blend-v1"
 _MAX_SIDE = 640
@@ -24,6 +30,34 @@ def _model_directory():
     return cache_dir / "bokehforge" / "inspection-models"
 
 
+def _encode_srgb8(samples):
+    linear = np.clip(samples, 0, 1)
+    srgb = linear ** (1 / 2.4)
+    srgb *= 1.055
+    srgb -= .055
+    np.multiply(linear, 12.92, out=srgb, where=linear <= 0.0031308)
+    srgb *= 255
+    np.rint(srgb, out=srgb)
+    return srgb.astype(np.uint8)
+
+
+@lru_cache(maxsize=1)
+def _preview_encoder():
+    # The inverse curve centers a search for each byte transition. Use the
+    # local NumPy float32 curve and ties-to-even rounding within that window.
+    codes = np.arange(255)
+    levels = (codes + .5) / 255
+    inverse = np.where(levels <= .04045, levels / 12.92, ((levels + .055) / 1.055) ** 2.4)
+    nearest = inverse.astype(np.float32).view(np.int32)
+    bits = nearest[:, None] + np.arange(-64, 65, dtype=np.int32)
+    quantized = _encode_srgb8(bits.view(np.float32))
+    if (np.any(quantized[:, 0] != codes) or np.any(quantized[:, -1] != codes + 1)
+            or np.any(quantized[:, :-1] > quantized[:, 1:])):
+        return None
+    transition = np.argmax(quantized > codes[:, None], axis=1)
+    return _rust.PreviewEncoder(bits[codes, transition].tolist())
+
+
 def reference_preview(reference):
     validate_rgb(reference)
     height, width = reference.shape[:2]
@@ -32,35 +66,33 @@ def reference_preview(reference):
     pool = workers() if height * width >= 1_000_000 else None
     if pool is None:
         pixels = np.empty(reference.shape, np.uint8)
-    else:
-        planes = np.empty((3, height, width), np.uint8)
-        pixels = np.moveaxis(planes, 0, -1)
-
-    def encode(start):
-        rows = slice(start, start + 128)
-        linear = np.clip(reference[rows], 0, 1)
-        srgb = linear ** (1 / 2.4)
-        srgb *= 1.055
-        srgb -= .055
-        np.multiply(linear, 12.92, out=srgb, where=linear <= 0.0031308)
-        srgb *= 255
-        np.rint(srgb, out=srgb)
-        pixels[rows] = srgb
-
-    strips = range(0, height, 128)
-    if pool is None:
-        for start in strips:
-            encode(start)
+        for start in range(0, height, 128):
+            rows = slice(start, start + 128)
+            pixels[rows] = _encode_srgb8(reference[rows])
         return Image.fromarray(pixels).resize(size, Image.Resampling.LANCZOS)
 
-    list(pool.map(encode, strips))
+    encoder = None
+    if (_rust is not None and type(reference) is np.ndarray and reference.dtype == np.float32
+            and reference.flags.c_contiguous and reference.flags.aligned):
+        encoder = _preview_encoder()
+    encode = _encode_srgb8 if encoder is None else encoder.encode
+    planes = np.empty((3, height, size[0]), np.uint8)
+    rows_per_strip = 128 if encoder is None else min(256, max(1, (height + 7) // 8))
 
-    def resize(plane):
+    def horizontal(start):
+        pixels = encode(reference[start:start + rows_per_strip])
+        if width != size[0]:
+            strip = Image.fromarray(pixels).resize((size[0], len(pixels)), Image.Resampling.LANCZOS)
+            pixels = np.asarray(strip)
+        planes[:, start:start + len(pixels)] = np.moveaxis(pixels, -1, 0)
+
+    def vertical(plane):
         return Image.fromarray(plane).resize(size, Image.Resampling.LANCZOS)
 
-    # Pillow applies the same fixed-point Lanczos filter independently to
-    # each RGB channel. Run the three passes on contiguous planes in parallel.
-    return Image.merge("RGB", tuple(pool.map(resize, planes)))
+    # Pillow applies horizontal filtering first and uses identical fixed-point
+    # Lanczos weights for every RGB channel. Horizontal strips are independent.
+    list(pool.map(horizontal, range(0, height, rows_per_strip)))
+    return Image.merge("RGB", tuple(pool.map(vertical, planes)))
 
 
 class Inspection:

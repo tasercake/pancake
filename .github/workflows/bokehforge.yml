@@ -27,6 +27,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, macos-15, windows-2025]
+    env:
+      RUSTUP_TOOLCHAIN: "1.100.0"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -36,12 +38,30 @@ jobs:
           python-version: "3.12"
       - name: Install uv
         run: python -m pip install "uv==0.13.10"
-      - name: Install BokehForge from the lockfile
-        run: python -m uv sync --frozen --no-editable ${{ runner.os == 'macOS' && '--extra inspection' || '' }}
-      - name: Require both native extensions
-        run: >
-          python -m uv run --no-sync python -c
-          'from bokehforge import _alignment_native, _scoring_native; print(_alignment_native.__file__, _scoring_native.__file__)'
+      - name: Install Rust
+        run: rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal
+      - name: Build source distribution and wheel
+        run: python -m uv build
+      - name: Install the wheel with locked dependencies
+        run: |
+          python -m uv sync --frozen --no-install-project ${{ runner.os == 'macOS' && '--extra inspection' || '' }}
+          python -m uv pip install --no-deps dist/*.whl
+      - name: Verify the installed Rust extension and resources
+        run: |
+          python -m uv run --no-sync python - <<'PY'
+          from importlib.resources import files
+
+          from bokehforge import _rust
+
+          print(_rust.__file__)
+          assert callable(_rust.sample_linear)
+          assert callable(_rust.lightness_damage)
+          assert callable(_rust.pool_tiles)
+          assert files("bokehforge").joinpath("heatmaps.html").is_file()
+          assert files("bokehforge.data").joinpath("sources.json").is_file()
+          assert files("bokehforge.review").joinpath("static", "index.html").is_file()
+          assert files("bokehforge.review").joinpath("static", "fonts", "SpaceGrotesk-Regular.ttf").is_file()
+          PY
       - name: Report Apple Metal capability
         if: runner.os == 'macOS'
         run: |

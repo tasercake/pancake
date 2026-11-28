@@ -14,7 +14,7 @@ import tifffile
 from PIL import Image
 
 from bokehforge import bench
-from bokehforge.bench import _score, main, score_saved_output
+from bokehforge.bench import _score, bench as run_benchmark, main, score_saved_output
 from bokehforge.data._canonical import INFINIGEN_DISTANCES
 from bokehforge.data.lazy import Scene, SceneCatalog
 from bokehforge.inspection import INSPECTION_MAP_VERSION, Inspection, reference_preview
@@ -64,6 +64,25 @@ def run_bench(root, output, *args, env=None):
          "--output", str(output), "--no-attention", *args],
         capture_output=True, text=True, env=env,
     )
+
+
+def test_benchmark_callable_matches_cli(corpus, tmp_path, capsys):
+    options = ["--dataset", "referenced", "--algorithm", "mean", "--explain-score"]
+    cli_output = tmp_path / "cli"
+    cli_result = run_bench(corpus, cli_output, *options)
+    assert cli_result.returncode == 0, cli_result.stderr
+
+    api_output = tmp_path / "api"
+    assert bench.bench is run_benchmark
+    assert run_benchmark([
+        "--root", str(corpus), "--config", str(corpus / "sources.json"), "--no-attention",
+        "--output", str(api_output), *options,
+    ]) == cli_result.returncode
+    assert capsys.readouterr().out == cli_result.stdout
+
+    cli_report, api_report = [json.loads((path / "report.json").read_text()) for path in (cli_output, api_output)]
+    for field in ("score", "score_aggregation", "score_version", "cohort_sha256", "scored_groups"):
+        assert api_report[field] == cli_report[field]
 
 
 @pytest.mark.parametrize("device", ["cpu", "mps"])
@@ -282,6 +301,38 @@ def test_inspection_is_generated_during_bench_and_review(corpus, tmp_path, monke
     failed, = json.loads((broken / "report.json").read_text())["scenes"]
     assert failed["status"] == "scoring_error"
     assert "test model loading failed" in failed["error"]
+
+
+@pytest.mark.parametrize(("meminfo", "free_gib", "parent_headroom_gib", "fits"), [
+    pytest.param("MemAvailable: 25165824 kB\n", 2, None, True, id="reclaimable-page-cache"),
+    pytest.param("MemAvailable: 25165824 kB\n", 2, 4, False, id="parent-cgroup-limit"),
+    pytest.param("MemAvailable: 25165824 B\n", 2, None, False, id="unsupported-meminfo-unit"),
+    pytest.param("MemAvailable: invalid kB\n", 12, None, True, id="invalid-meminfo-fallback"),
+    pytest.param(None, 12, None, True, id="missing-meminfo-fallback"),
+    pytest.param("MemAvailable: 0 kB\n", 12, None, False, id="no-available-memory"),
+])
+def test_host_replay_memory_accounts_for_page_cache_and_cgroups(
+    tmp_path, monkeypatch, meminfo, free_gib, parent_headroom_gib, fits,
+):
+    gib = 1024 ** 3
+    page_size = 4096
+    sysconf = {"SC_AVPHYS_PAGES": free_gib * gib // page_size, "SC_PAGE_SIZE": page_size}
+    monkeypatch.setattr(bench.os, "sysconf", sysconf.__getitem__, raising=False)
+    monkeypatch.setattr(bench, "Path", lambda path: tmp_path / path.removeprefix("/"))
+
+    proc = tmp_path / "proc"
+    (proc / "self").mkdir(parents=True)
+    (proc / "self" / "cgroup").write_text("0::/jobs/benchmark\n")
+    if meminfo is not None:
+        (proc / "meminfo").write_text(meminfo)
+    leaf = tmp_path / "sys" / "fs" / "cgroup" / "jobs" / "benchmark"
+    leaf.mkdir(parents=True)
+    (leaf / "memory.max").write_text("max\n")
+    if parent_headroom_gib is not None:
+        (leaf.parent / "memory.max").write_text(str(16 * gib))
+        (leaf.parent / "memory.current").write_text(str((16 - parent_headroom_gib) * gib))
+
+    assert bench._host_replay_fits() is fits
 
 
 def test_cuda_saved_replay_batches_score_and_retries_exhaustion_in_order(tmp_path, monkeypatch, capsys):
@@ -548,3 +599,19 @@ def test_score_averages_independent_groups_and_withholds_on_reference_error():
     assert _score(rows, explanation=explanation) == (None, 3)
     assert explanation["status"] == "evaluation_error"
     assert explanation["score"] is None
+
+
+def test_score_keeps_report_order_and_counts_shared_group_ids_once():
+    rows = [
+        {"dataset_id": dataset, "leakage_group_id": group, "scene_score": score, "reference_status": "eligible"}
+        for dataset, group, score in (("z", "b", 100), ("a", "b", 50), ("z", "a", 20), ("z", "b", 80))
+    ]
+    explanation = {}
+    assert _score(rows, explanation=explanation) == (52.5, 2)
+    assert list(explanation["datasets"]) == ["z", "a"]
+    assert list(explanation["datasets"]["z"]["groups"]) == ["b", "a"]
+    assert explanation["datasets"]["z"] == {
+        "score": 55, "weight": 0.5,
+        "groups": {"b": {"score": 90, "weight": 0.5, "scene_count": 2},
+                   "a": {"score": 20, "weight": 0.5, "scene_count": 1}},
+    }

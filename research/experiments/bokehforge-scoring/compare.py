@@ -1,4 +1,4 @@
-"""Measure BokehForge's bench scoring stage and compare exact results across checkouts."""
+"""Measure BokehForge's bench scoring stage and compare results across checkouts."""
 
 import argparse
 from hashlib import sha256
@@ -6,7 +6,7 @@ from io import BytesIO
 import json
 import os
 from pathlib import Path
-from statistics import mean, median
+from statistics import fmean, mean, median
 import sys
 from time import perf_counter
 from unittest.mock import patch
@@ -14,6 +14,12 @@ from zipfile import BadZipFile, ZipFile
 
 
 _DETAILS = "summary"
+_SCORE_FIELDS = {"score", "scene_score", "overlap_score", "score_contribution"}
+_FAMILY_VALUES = {"burden", "mean", "tail", "worst", "affected_fraction", "weighted_damage",
+                  "value", "contribution", "cutoff"}
+_DIAGNOSTIC_VALUES = {"mean_delta_lightness", "mean_delta_lab_a", "mean_delta_lab_b",
+                      "global_exposure_delta_stops", "linear_rgb_rmse"}
+_TOLERANCES = {"score": .01, "measurement": .0001}
 
 
 def _json_sha256(value):
@@ -23,6 +29,63 @@ def _json_sha256(value):
 
 def _image_sha256(pixels):
     return sha256(memoryview(pixels.astype("<f4", copy=False))).hexdigest()
+
+
+def _numeric_category(path):
+    field = path[-1]
+    if field in _SCORE_FIELDS:
+        return "score"
+    if (field in _DIAGNOSTIC_VALUES or field == "weighted_damage"
+            or "score_features" in path
+            or ("families" in path and field in _FAMILY_VALUES)
+            or ("tile_grids" in path and "values" in path)):
+        return "measurement"
+    return None
+
+
+class ResultComparison:
+    def __init__(self):
+        self.mismatches = 0
+        self.maximum = {category: (0.0, ()) for category in _TOLERANCES}
+
+    def _mismatch(self, path, reason):
+        self.mismatches += 1
+        if self.mismatches <= 20:
+            print(f"{'.'.join(map(str, path))} {reason}.", file=sys.stderr)
+
+    def check(self, left, right, *path):
+        if type(left) is not type(right) and not (
+            {type(left), type(right)} == {int, float} and _numeric_category(path) == "score"
+        ):
+            self._mismatch(path, f"has different types ({type(left).__name__}, {type(right).__name__})")
+        elif isinstance(left, dict):
+            if left.keys() != right.keys():
+                self._mismatch(path, f"has different keys ({sorted(left.keys() ^ right.keys())})")
+            for key in sorted(left.keys() & right.keys()):
+                self.check(left[key], right[key], *path, key)
+        elif isinstance(left, list):
+            if len(left) != len(right):
+                self._mismatch(path, f"has different lengths ({len(left)}, {len(right)})")
+            for index, (first, second) in enumerate(zip(left, right)):
+                self.check(first, second, *path, index)
+        elif type(left) in (int, float) and (category := _numeric_category(path)):
+            difference = abs(left - right)
+            tolerance = _TOLERANCES[category]
+            if difference > self.maximum[category][0]:
+                self.maximum[category] = (difference, path)
+            if not difference <= tolerance:
+                self._mismatch(path, f"differs by {difference:.9g} (limit {tolerance:g})")
+        elif left != right:
+            self._mismatch(path, f"differs ({repr(left)[:120]} vs {repr(right)[:120]})")
+
+    def finish(self):
+        for category, (difference, path) in self.maximum.items():
+            location = f" at {'.'.join(map(str, path))}" if path else ""
+            print(f"Maximum absolute {category} difference {difference:.9g}{location} "
+                  f"(limit {_TOLERANCES[category]:g}).")
+        if self.mismatches:
+            print(f"{self.mismatches} parity mismatches.", file=sys.stderr)
+        return int(bool(self.mismatches))
 
 
 def _prepare_images(png, size):
@@ -113,6 +176,8 @@ def _run(args):
                 "reference_status": row["reference_status"],
                 "error": row.get("error"),
             }
+            if args.include_results:
+                sample["result"] = {"row": row, "explanation": explanation}
             samples.append(sample)
             phase = "warmup" if index == 0 else "warm"
             stage = f"{scoring * 1000:.1f} ms scoring" if scoring is not None else "scoring unavailable"
@@ -176,17 +241,36 @@ def _compare(args):
     if [sample["name"] for sample in first] != [sample["name"] for sample in second]:
         raise ValueError("Reports use different ordered scene cohorts.")
 
+    parity = ResultComparison() if args.tolerant else None
     failed = False
+    fields = ("inputs", "status", "reference_status", "error", "inspection_map_sha256")
+    if parity is None:
+        fields += ("output_sha256", "scene_score")
     for left, right in zip(first, second, strict=True):
         name = left["name"]
-        for field in ("inputs", "status", "reference_status", "error", "output_sha256",
-                      "inspection_map_sha256", "scene_score"):
+        for field in fields:
             if left[field] != right[field]:
                 print(f"{name} differs in {field}.", file=sys.stderr)
                 failed = True
         if not (_scored(left) and _scored(right)):
             print(f"{name} has an unsuccessful score ({left['status']}, {right['status']}).", file=sys.stderr)
             failed = True
+            continue
+        if parity is not None:
+            for sample in (left, right):
+                if "result" not in sample:
+                    raise ValueError("Tolerant comparison requires reports generated with --include-results.")
+                result = sample["result"]
+                if (_json_sha256([result["row"], result["explanation"]]) != sample["output_sha256"]
+                        or result["row"]["scene_score"] != sample["scene_score"]):
+                    raise ValueError(f"Stored results are inconsistent with the report for {name}.")
+            parity.check(left["result"], right["result"], name)
+    if parity is not None:
+        if not failed:
+            first_mean, second_mean = (fmean(sample["scene_score"] for sample in cohort) for cohort in (first, second))
+            parity.check(first_mean, second_mean, "cohort", "score")
+            print(f"Cohort mean scores {first_mean:.9f} and {second_mean:.9f} across {len(first)} scenes, including warmup.")
+        return int(bool(parity.finish() or failed))
     if failed:
         return 1
     print(f"Exact parity across {len(first)} scenes, including warmup.")
@@ -210,11 +294,13 @@ def main():
     run.add_argument("--size", type=_positive_int, default=4000, help="Square image width and height (default: 4000)")
     run.add_argument("--device", choices=("auto", "cpu", "gpu", "cuda", "mps"), default="auto")
     run.add_argument("--no-attention", action="store_true", help="Use unweighted scoring.")
+    run.add_argument("--include-results", action="store_true", help="Store score rows and explanations for tolerant comparison.")
     compare = modes.add_parser("compare", help="Check the fixtures and all functional outputs of two reports.")
     compare.add_argument("before", type=Path)
     compare.add_argument("after", type=Path)
     compare.add_argument("--allow-device-change", action="store_true",
                          help="Compare functional parity across different device selectors.")
+    compare.add_argument("--tolerant", action="store_true", help="Allow bounded differences in numeric scoring results.")
     args = parser.parse_args()
     if args.mode == "run" and args.device in ("cpu", "mps") and not args.no_attention:
         run.error(f"--device {args.device} requires --no-attention")
