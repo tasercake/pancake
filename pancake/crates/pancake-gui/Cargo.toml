@@ -1,6 +1,6 @@
 [package]
 name = "pancake-gui"
-version = "0.1.0"
+version = "0.2.0-rc.3"
 edition = "2024"
 rust-version = "1.100"
 license = "GPL-3.0-or-later"
@@ -11,7 +11,7 @@ categories = ["multimedia::images"]
 publish = false
 
 [dependencies]
-pancake = { version = "=0.1.0", path = "../.." }
+pancake = { version = "=0.2.0-rc.3", path = "../.." }
 num-traits = "=0.2.19"
 slint = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "unstable-wgpu-30", "compat-1-18", "accessibility", "raw-window-handle-06", "unstable-winit-030", "unstable-fontique-012"] }
 slint-interpreter = { version = "=1.19.0", default-features = false, features = ["std", "backend-winit", "renderer-femtovg-wgpu", "renderer-software", "compat-1-18", "accessibility"] }

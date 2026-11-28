@@ -5537,7 +5537,7 @@ dependencies = [
 
 [[package]]
 name = "pancake"
-version = "0.1.0"
+version = "0.2.0-rc.3"
 dependencies = [
  "bytemuck",
  "cubecl",
@@ -5555,7 +5555,7 @@ dependencies = [
 
 [[package]]
 name = "pancake-cli"
-version = "0.1.0"
+version = "0.2.0-rc.3"
 dependencies = [
  "clap",
  "pancake",
@@ -5564,7 +5564,7 @@ dependencies = [
 
 [[package]]
 name = "pancake-gui"
-version = "0.1.0"
+version = "0.2.0-rc.3"
 dependencies = [
  "atk",
  "dirs",
