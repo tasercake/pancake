@@ -210,11 +210,12 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
 .control { display: grid; grid-template-columns: minmax(0, 1fr); gap: .3rem; color: var(--muted); }
 .control select { width: 100%; color: var(--ink); text-overflow: ellipsis; }
 .run-control {
-  flex: 0 1 28rem;
+  flex: 0 1 clamp(18rem, 42vw, 37rem);
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: .65rem;
   min-width: 0;
+  margin-inline-start: auto;
 }
 .scene-browser {
   position: fixed;
@@ -512,13 +513,13 @@ body:has(#scene-browser:popover-open) #show-scenes { border-color: var(--field-s
 .ratings {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: .65rem 1rem;
   padding: .7rem .75rem;
   background: var(--panel);
   border-top: 1px solid var(--stroke);
 }
-.review-heading { flex: 0 1 14rem; overflow-wrap: anywhere; }
+.review-heading { flex: 0 1 16rem; overflow-wrap: anywhere; }
 #rating-count { display: block; margin-top: .15rem; font-size: .9rem; }
 .output-tabs {
   display: flex;
