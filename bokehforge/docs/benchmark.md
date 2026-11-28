@@ -110,7 +110,7 @@ From the repository root, install the pinned inference dependencies once. This p
 uv sync --project bokehforge --frozen --extra inspection
 ```
 
-BokehForge downloads any missing files when it first scores with attention. A cold cache needs about 3.2 GB for the model files. The default cache is `~/.cache/bokehforge/inspection-models`, or `bokehforge/inspection-models` under `XDG_CACHE_HOME` when set. Set `BOKEHFORGE_INSPECTION_MODELS` to use a different directory, including an existing installation. Files that pass the pinned checksums are reused offline. Downloads are verified before they replace incomplete or corrupted files.
+BokehForge downloads any missing files when it first scores with attention. A cold cache needs about 3.2 GB for the model files. The default cache is `~/.cache/bokehforge/inspection-models`, or `bokehforge/inspection-models` under `XDG_CACHE_HOME` when set. Set `BOKEHFORGE_INSPECTION_MODELS` to use a different directory, including an existing installation. If the model cache is a dangling symlink, BokehForge replaces it with a directory and downloads the models there. Files that pass the pinned checksums are reused offline. Downloads are verified before they replace incomplete or corrupted files.
 
 The model directory has this layout. [ReLIQS code](https://github.com/hakan-emre-gedik/ReLIQS/tree/6dd687552cb471c6b834236d917a3c3e43a28d4d) · [ReLIQS KonIQ checkpoint](https://huggingface.co/hakanemre/ReLIQS/blob/48761756eb3ca6d2386e17780cf2faa2622a8742/KONIQ/model_weights.pth) · [TempSAL PNAS code and checkpoint](https://github.com/IVRL/Tempsal/tree/4bdf3d5f173f390da0f714dfd10873c701d7ca32/src) · [SAM 2.1 Hiera Large snapshot](https://huggingface.co/facebook/sam2.1-hiera-large/tree/665f8e2ad61cf5f53d65644ff27c8ee525124610)
 

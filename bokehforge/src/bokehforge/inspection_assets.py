@@ -73,13 +73,24 @@ _ASSETS = (
 )
 
 
+def _prepare_cache(directory: Path):
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+    except FileExistsError:
+        # A dangling link prevents taking the download lock inside the cache.
+        with FileLock(directory.with_name(f".{directory.name}.repair.lock")):
+            if directory.is_symlink() and not directory.exists():
+                directory.unlink()
+            directory.mkdir(parents=True, exist_ok=True)
+
+
 def ensure_inspection_assets(directory: Path, *, progress=None):
     # Inspect the known paths first so a complete, even read-only, cache is usable offline.
     pending = [asset for asset in _ASSETS if not verified(directory / asset["path"], asset.copy())]
     if not pending:
         return
 
-    directory.mkdir(parents=True, exist_ok=True)
+    _prepare_cache(directory)
     # The dataset downloader uses a predictable .part path so a later run can resume.
     # Serialize writers to this cache across benchmark and Stackroom processes.
     with FileLock(directory / ".download.lock"), session() as client:

@@ -189,6 +189,40 @@ def test_inspection_assets_are_shared_and_only_missing_files_are_downloaded(tmp_
     assert state["requests"] == ["bytes=77-"]
 
 
+@pytest.mark.parametrize("override", [False, True])
+def test_inspection_cache_replaces_a_dangling_symlink_and_downloads(tmp_path, origin, monkeypatch, override):
+    from bokehforge import inspection_assets
+    from bokehforge.inspection import _model_directory
+
+    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path))
+    monkeypatch.delenv("BOKEHFORGE_INSPECTION_MODELS", raising=False)
+    cache = tmp_path / "bokehforge" / "inspection-models"
+    if override:
+        cache = tmp_path / "custom-models"
+        monkeypatch.setenv("BOKEHFORGE_INSPECTION_MODELS", str(cache))
+    missing_target = tmp_path / "removed-worktree" / "models"
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        cache.symlink_to(missing_target, target_is_directory=True)
+    except OSError as exc:
+        if sys.platform == "win32" and exc.winerror == 1314:
+            pytest.skip("Creating symlinks requires privileges on this Windows host")
+        raise
+
+    url, state = origin
+    payload = state["body"]
+    item = inspection_assets._asset("model/weights.bin", url, len(payload), hashlib.sha256(payload).hexdigest())
+    monkeypatch.setattr(inspection_assets, "_ASSETS", (item,))
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        list(pool.map(inspection_assets.ensure_inspection_assets, (_model_directory(), _model_directory())))
+
+    assert state["requests"] == [None]
+    assert cache.is_dir() and not cache.is_symlink()
+    assert (cache / item["path"]).read_bytes() == payload
+    assert not missing_target.parent.exists()
+
+
 def test_inspection_cache_rejects_unverified_bytes(tmp_path, origin, monkeypatch):
     from bokehforge import inspection_assets
 
