@@ -1,5 +1,6 @@
 import { VirtualRail } from "./rail.js";
 import { ScoreExplanation } from "./score-explanation.js";
+import { ScoreOverlay } from "./score-overlay.js";
 import { RatingAutosave } from "./rating-autosave.js";
 import { WorkspaceSocket } from "./workspace-socket.js";
 
@@ -254,7 +255,7 @@ function showImage(well, title, params, priority = "high") {
     button.removeAttribute("aria-disabled");
     button.setAttribute("aria-label", "Inspect " + request.title);
     button.onclick = () => openLightbox(request.title, params, request.shown);
-    if (well === $("candidate-image")) paintCandidateExplanation();
+    if (well === $("candidate-image")) paintCandidateOverlay();
   };
   const thumbnail = readyThumbs.get(imageURL(params, "thumb"));
   if (thumbnail) {
@@ -675,10 +676,15 @@ function paintLightboxOverlays() {
       clipLeft = edge;
     }
   }
-  lightboxExplanation.update(viewingReference ? null : {
+  const output = state.params.stacker ? {
+    params: state.params, benchmark: gallery.benchmarks.get(state.params.stacker),
+  } : null;
+  const context = viewingReference ? null : {
     params: entry.params, benchmark, host: gallery.surface,
     image: previewing ? shown.image : state.image, contain: previewing, clipLeft,
-  });
+  };
+  lightboxExplanation.update(context);
+  lightboxOverlay.update(output, context);
 }
 
 function closeLightboxRequests(state) {
@@ -911,8 +917,8 @@ function pendingScores() {
 function applyScores(revision) {
   if (revision === scoreRevision) return;
   scoreRevision = revision;
-  candidateExplanation.scoresChanged(revision);
-  lightboxExplanation.scoresChanged(revision);
+  candidateOverlay.scoresChanged(revision);
+  lightboxOverlay.scoresChanged(revision);
   if (!sceneRequest && pendingScores()) loadScene();
   const gallery = activeImage?.gallery;
   if (gallery && (gallery.scene !== scene?.id || gallery.run !== runId) &&
@@ -1029,17 +1035,13 @@ function showBenchmarkReason(button) {
   $("benchmark-details").showModal();
 }
 
-function paintCandidateExplanation() {
+function paintCandidateOverlay() {
   const request = panelImages.get($("candidate-image"));
-  if (!candidateScore) {
-    candidateExplanation.update(null);
-    return;
-  }
-  const { params, benchmark } = candidateScore;
-  const matches = request && imageURL(params, "panel") === request.src;
-  candidateExplanation.update({
-    params, benchmark, image: matches ? request.shown : null, host: request?.button, contain: true,
-  });
+  const matches = candidateScore && request?.shown && imageURL(candidateScore.params, "panel") === request.src;
+  const context = matches && $("comparison-reference").hidden ? {
+    ...candidateScore, image: request.shown, host: request.button, contain: true,
+  } : null;
+  candidateOverlay.update(candidateScore, context);
 }
 
 function renderOutput() {
@@ -1104,7 +1106,8 @@ function renderOutput() {
     candidateState = currentImage;
   }
   renderBenchmark($("candidate-benchmark"), row?.benchmark);
-  paintCandidateExplanation();
+  candidateExplanation.update(candidateScore);
+  paintCandidateOverlay();
   renderRating(row);
 }
 
@@ -1519,13 +1522,17 @@ const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
 const filmRail = new VirtualRail($("filmstrip"), "x", 112, sourceEntry, { itemPadding: 5 });
 const requestScoreOverlay = (mode, params, signal) =>
   api(url(mode === "attention" ? "/api/score-attention" : "/api/score-tiles", params), undefined, { signal });
-const candidateExplanation = new ScoreExplanation(
-  $("candidate-explanation"), $("candidate-explain"), $("candidate-image").parentElement, requestScoreOverlay,
-);
-const lightboxExplanation = new ScoreExplanation(
-  $("lightbox-explanation"), $("lightbox-explain"), $("image-view").parentElement, requestScoreOverlay,
-);
-new ResizeObserver(paintCandidateExplanation).observe($("candidate-image"));
+const candidateExplanation = new ScoreExplanation($("candidate-explanation"), $("candidate-explain"));
+const lightboxExplanation = new ScoreExplanation($("lightbox-explanation"), $("lightbox-explain"));
+const overlaySettings = { mode: "off", family: "all", side: 8, opacity: 100 };
+function changeOverlaySettings(changes) {
+  Object.assign(overlaySettings, changes);
+  candidateOverlay.paint();
+  lightboxOverlay.paint();
+}
+const candidateOverlay = new ScoreOverlay($("candidate-overlay"), overlaySettings, changeOverlaySettings, requestScoreOverlay);
+const lightboxOverlay = new ScoreOverlay($("lightbox-overlay"), overlaySettings, changeOverlaySettings, requestScoreOverlay);
+new ResizeObserver(paintCandidateOverlay).observe($("candidate-image"));
 const lightboxStrip = $("lightbox-strip");
 const lightboxRail = new VirtualRail(lightboxStrip, "x", 100, lightboxStripEntry, { itemPadding: 4 });
 lightboxStrip.addEventListener("pointerleave", (event) => {
@@ -1607,7 +1614,7 @@ lightboxView.addEventListener("dblclick", (event) => {
 });
 document.addEventListener("keydown", (event) => {
   if (!activeImage || !$("image-dialog").open || $("benchmark-details").open ||
-      event.target.closest?.("input, select") || event.ctrlKey || event.metaKey || event.altKey) return;
+      event.target.closest?.("input, select, .overlay-picker") || event.ctrlKey || event.metaKey || event.altKey) return;
   if (event.key.toLowerCase() === "i") {
     const button = $("lightbox-benchmark").nextElementSibling;
     if (!button.hidden && !event.repeat) showBenchmarkReason(button);
@@ -1677,6 +1684,7 @@ $("image-dialog").addEventListener("close", (event) => {
   closeLightboxRequests(activeImage);
   activeImage = null;
   lightboxExplanation.close();
+  lightboxOverlay.update(null, null);
   endLightboxPan();
   lightboxRail.setItems([]);
   lightboxView.replaceChildren();

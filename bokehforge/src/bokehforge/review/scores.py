@@ -160,15 +160,19 @@ class Scores:
             return None
 
     def tiles(self, catalog, scene, directory, result, revision, family, side):
-        if family not in FAMILY_WEIGHTS or side not in _OVERLAY_GRIDS:
+        if (family != "all" and family not in FAMILY_WEIGHTS) or side not in _OVERLAY_GRIDS:
             raise ValueError("Unknown damage family or grid size")
         spatial = self.get(catalog, scene, directory, result, detail="tiles", expected_revision=revision)
         grids = spatial.pop("grids", None)
         if grids is None:
             return spatial
         grid = grids[_OVERLAY_GRIDS[side]]
-        return {**spatial, "family": family,
-                "grid": {**grid, "values": grid["values"][family]}}
+        values = grid["values"]
+        if family == "all":
+            damage = sum(weight * np.asarray(values[name]) for name, weight in FAMILY_WEIGHTS.items()).tolist()
+        else:
+            damage = values[family]
+        return {**spatial, "family": family, "grid": {**grid, "values": damage}}
 
     def attention_overlay(self, catalog, scene, directory, result, revision):
         summary = self.get(catalog, scene, directory, result, expected_revision=revision)
