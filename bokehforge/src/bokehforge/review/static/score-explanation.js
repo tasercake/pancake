@@ -53,17 +53,23 @@ export class ScoreExplanation {
     this.trigger = trigger;
     root.append(document.querySelector("#score-explanation-template").content.cloneNode(true));
     this.key = "";
-    this.open = false;
-    trigger.onclick = () => this.setOpen(!this.open);
-    root.querySelector(".score-explanation-dismiss").onclick = () => {
-      this.setOpen(false);
-      trigger.focus();
-    };
+    this.open = !trigger;
+    const dismiss = root.querySelector(".score-explanation-dismiss");
+    if (trigger) {
+      trigger.onclick = () => this.setOpen(!this.open);
+      dismiss.onclick = () => {
+        this.setOpen(false);
+        trigger.focus();
+      };
+    } else {
+      dismiss.remove();
+    }
   }
 
   setOpen(open) {
     this.open = open;
     this.root.hidden = !(open && this.key);
+    if (!this.trigger) return;
     this.trigger.setAttribute("aria-expanded", String(!this.root.hidden));
     this.trigger.textContent = open && this.key ? "Hide explanation" : "Explain score";
   }
@@ -77,7 +83,7 @@ export class ScoreExplanation {
     const key = scoreExplanationKey(context);
     if (key === this.key) return;
     this.key = key;
-    this.trigger.hidden = !key;
+    if (this.trigger) this.trigger.hidden = !key;
     this.setOpen(this.open);
     if (key) {
       const { explanation, alignment } = context.benchmark;
@@ -88,8 +94,10 @@ export class ScoreExplanation {
   showSummary(explanation, placement, alignment) {
     const comparison = placement?.comparison;
     const families = Object.values(comparison?.families ?? {});
-    this.root.querySelector("[data-score-heading]").textContent =
-      "Benchmark score " + points.format(explanation.score) + " / 100";
+    if (this.trigger) {
+      this.root.querySelector("[data-score-heading]").textContent =
+        "Benchmark score " + points.format(explanation.score) + " / 100";
+    }
     const summary = this.root.querySelector("[data-alignment-summary]");
     if (!placement) {
       summary.textContent = "The scorer could not place the delivery on the reference.";
