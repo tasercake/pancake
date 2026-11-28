@@ -17,4 +17,14 @@ __all__ = [
     "Scene",
     "SceneCatalog",
     "load_dataset",
+    "measure",
 ]
+
+
+def __getattr__(name):
+    if name == "measure":
+        from .scoring import measure
+
+        globals()[name] = measure
+        return measure
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

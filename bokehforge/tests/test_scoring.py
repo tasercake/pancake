@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import pytest
 from scipy.ndimage import gaussian_filter, shift
@@ -21,8 +23,6 @@ def score(candidate, target):
 @pytest.mark.parametrize("layout", ["packed", "readonly", "cropped", "strided", "byte-swapped", "unaligned"])
 @pytest.mark.parametrize("shape", [(1, 1), (193, 97)])
 def test_lab_preparation_keeps_numpy_rounding_and_layouts(layout, shape, monkeypatch):
-    if scoring._scoring_native is None:
-        pytest.skip("The optional native scorer is unavailable")
     rng = np.random.default_rng(709)
     # Cross both a comparison strip and the native working buffer boundary.
     candidate = rng.uniform(-0.1, 1.1, (*shape, 3)).astype(np.float32)
@@ -56,7 +56,7 @@ def test_lab_preparation_keeps_numpy_rounding_and_layouts(layout, shape, monkeyp
         return *scoring._lab(candidate), cl, tl, *deltas, color
 
     actual = planes()
-    monkeypatch.setattr(scoring, "_scoring_native", None)
+    monkeypatch.setattr(scoring, "_rust", None)
     for observed, expected in zip(actual, planes(), strict=True):
         np.testing.assert_array_equal(observed.view(np.uint32), expected.view(np.uint32))
 
@@ -263,6 +263,19 @@ def test_exact_match_preserves_grain_bokeh_and_headroom():
     assert set(measurement.diagnostics["views"]) == {"native"}
 
 
+def test_exact_crop_full_explanation_serializes_to_json():
+    reference = np.random.default_rng(201).random((72, 96, 3), dtype=np.float32)
+    candidate = reference[8:-6, 14:-12]
+    result = measure(candidate, reference, details="full", attention=False, device="cpu")
+    assert result.alignment["placements"][0]["evidence"]["source"] == "exact_native_delivery_in_reference"
+
+    explanation = json.loads(json.dumps(result.explanation, allow_nan=False))
+    comparison = explanation["placements"][0]["comparison"]
+    tail = comparison["families"]["tone"]["pool"]["tail"]
+    covered = comparison["tile_grids"][tail["grid_id"]]["covered_pixels"]
+    assert tail["eligible_tile_count"] == sum(pixels > 0 for pixels in covered)
+
+
 def test_missing_nyquist_detail_grows_continuously_in_four_directions():
     y, x = np.indices((32, 48))
     colors = np.full_like(x, 0.45, dtype=np.float32)
@@ -341,6 +354,18 @@ def test_fixed_profile_combines_native_family_weights():
     assert scene_score(Measurement(dict.fromkeys(FEATURES, 1.0), {})) == pytest.approx(100 * np.exp(-5))
 
 
+def test_public_measure_export_preserves_measurement_contract():
+    from bokehforge import measure as package_measure
+
+    assert package_measure is measure
+    target = np.full((13, 17, 3), 0.28, dtype=np.float32)
+    candidate = target + np.float32(0.04)
+    measured = package_measure(candidate, target, details="summary", attention=False, device="cpu")
+    assert 0 < measured.score < 100
+    assert measured.score == measured.explanation["score"]
+    assert measured.score == sum(row["score_contribution"] for row in measured.alignment["placements"])
+
+
 def test_explanation_recomposes_score_from_real_tiles():
     target = np.full((113, 151, 3), 0.28, dtype=np.float32)
     candidate = target.copy()
@@ -417,6 +442,24 @@ def test_inspection_weights_match_the_formula_and_bound_sparse_maps():
     assert 1.9 < weights.max() < 2
     assert weights.mean() == pytest.approx(1)
     assert weights.min() >= 0.5
+
+
+def test_inspection_weights_match_on_large_contiguous_and_strided_maps():
+    heatmap = np.tile(np.array([0.0, 1.0], dtype=np.float32), (1024, 512))
+    contiguous, mix = _inspection_weights(heatmap)
+    strided, strided_mix = _inspection_weights(heatmap.T[::-1])
+    assert mix == strided_mix == 0.5
+    np.testing.assert_array_equal(contiguous, heatmap + 0.5)
+    np.testing.assert_array_equal(strided[::-1].T, contiguous)
+
+
+def test_inspection_weights_accept_unaligned_float32_heatmaps():
+    heatmap = np.ndarray((2, 2), np.float32, buffer=bytearray(17), offset=1)
+    heatmap[:] = [[0, 1], [0, 1]]
+    assert not heatmap.flags.aligned
+    weights, mix = _inspection_weights(heatmap)
+    assert mix == 0.5
+    np.testing.assert_array_equal(weights, heatmap + 0.5)
 
 
 def test_inspection_cap_has_a_smooth_shoulder():

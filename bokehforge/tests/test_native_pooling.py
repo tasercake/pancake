@@ -29,10 +29,13 @@ def test_pooling_preserves_weighted_tiles_ties_and_threshold(masked, monkeypatch
     image = np.zeros((*shape, 3), dtype=np.float32)
     kwargs = {"details": "tiles", "inspection": (weights, .1)}
     actual = scoring._measure(image, image, support, **kwargs)
-    monkeypatch.setattr(scoring, "_scoring_native", None)
+    normal = scoring._measure(image, image, support, inspection=kwargs["inspection"])
+    monkeypatch.setattr(scoring, "_native_input", lambda *_: False)
     fallback = scoring._measure(image, image, support, **kwargs)
     assert actual == fallback
     assert actual.score.hex() == fallback.score.hex()
+    assert normal.features == actual.features
+    assert normal.diagnostics == actual.diagnostics
 
     weighted = damage * weights
     covered = weighted if support is None else weighted[support]
@@ -56,6 +59,25 @@ def test_pooling_preserves_weighted_tiles_ties_and_threshold(masked, monkeypatch
     assert np.count_nonzero(ties == tail["cutoff"]) > 1
 
 
+def test_native_tile_prefix_requires_signed_aligned_edges():
+    native = scoring._rust
+    mask = np.ones((2, 4), dtype=np.uint8)
+    # A NumPy bool view can contain noncanonical true bytes.
+    mask[0, 0] = 7
+    y, x = np.array([0, 2], dtype=np.intp), np.array([0, 4], dtype=np.intp)
+    for dtype in map(np.dtype, ("i", "l", "q")):
+        if dtype.itemsize == y.itemsize:
+            compact = native.coverage_tile_prefix(mask, (y.astype(dtype), x.astype(dtype)))
+            np.testing.assert_array_equal(compact, [[0., 0.], [0., 8.]])
+
+    swapped = y.byteswap().view(y.dtype.newbyteorder())
+    unaligned = np.ndarray(y.shape, dtype=y.dtype, buffer=bytearray(y.nbytes + 1), offset=1)
+    unaligned[:] = y
+    for invalid in (y.view(np.uintp), swapped, unaligned):
+        with pytest.raises((TypeError, ValueError)):
+            native.coverage_tile_prefix(mask, (invalid, x))
+
+
 @pytest.mark.parametrize("masked", [False, True])
 @pytest.mark.parametrize("layout", ["contiguous", "crop", "strided", "byteswapped"])
 def test_rgb_diagnostics_keep_float64_results(masked, layout, monkeypatch):
@@ -74,19 +96,17 @@ def test_rgb_diagnostics_keep_float64_results(masked, layout, monkeypatch):
     candidate, target = values
     support = rng.random(target.shape[:2]) > .3 if masked else None
     if masked:
-        support[2, 5] = True
+        support[:5] = True
     exposure = scoring._rgb_exposure(candidate, support)
     rmse = scoring._rgb_rmse(candidate, target, support)
-    monkeypatch.setattr(scoring, "_scoring_native", None)
+    monkeypatch.setattr(scoring, "_rust", None)
     assert exposure.hex() == scoring._rgb_exposure(candidate, support).hex()
     assert rmse.hex() == scoring._rgb_rmse(candidate, target, support).hex()
 
 
 @pytest.mark.parametrize("shape", [(1, 1), (1, 193), (117, 1), (213, 183)])
 def test_native_rgb_means_match_the_serial_numpy_reduction(shape):
-    native = scoring._scoring_native
-    if native is None:
-        pytest.skip("Requires the optional native scoring extension")
+    native = scoring._rust
     rng = np.random.default_rng(605)
     image = np.ldexp(rng.integers(-4, 5, size=(*shape, 3)).astype(np.float32),
                      rng.integers(-149, 123, size=(*shape, 3)))
@@ -94,58 +114,63 @@ def test_native_rgb_means_match_the_serial_numpy_reduction(shape):
     support[0, 0] = True
     for mask in [None, support]:
         expected = scoring._supported_mean(image, mask, axis=(0, 1))
-        actual = np.asarray(native.rgb_means(image, mask))
+        actual = np.asarray(native.rgb_means(image, None if mask is None else mask.view(np.uint8)))
         np.testing.assert_array_equal(actual.view(np.uint64), expected.view(np.uint64))
 
 
-def test_native_buffers_require_matching_pod_formats():
-    native = pytest.importorskip("bokehforge._scoring_native")
+@pytest.mark.parametrize("masked", [False, True])
+def test_native_rgb_mse_preserves_pairwise_blocks_across_padded_rows(masked):
+    rng = np.random.default_rng(186)
+    shape = (259, 523, 3)
+    candidate, target = (
+        np.ldexp(rng.uniform(-1, 1, shape).astype(np.float32),
+                 rng.integers(-20, 10, shape, dtype=np.int32))[:, 2:-1]
+        for _ in range(2)
+    )
+    support = np.ones(candidate.shape[:2], dtype=np.uint8) if masked else None
+    if masked:
+        support.ravel()[65_537::10_003] = 0
+    expected = [scoring._supported_mean(np.square(np.subtract(c, t, dtype=np.float64)),
+                                        None if support is None else support.view(np.bool_))
+                for c, t in zip(np.moveaxis(candidate, -1, 0), np.moveaxis(target, -1, 0), strict=True)]
+    actual = scoring._rust.rgb_mse(candidate, target, support)
+    np.testing.assert_array_equal(np.asarray(actual).view(np.uint64), np.asarray(expected).view(np.uint64))
+
+
+def test_native_pixel_buffers_require_matching_pod_formats():
+    native = scoring._rust
     image = np.zeros((2, 4, 3), dtype=np.float32)
-    mask = np.ones(image.shape[:2], dtype=np.bool_)
-    with pytest.raises(ValueError):
+    mask = np.ones(image.shape[:2], dtype=np.uint8)
+    with pytest.raises(TypeError):
         native.rgb_means(image.view(np.int32), mask)
-    with pytest.raises(ValueError):
-        native.rgb_means(image, mask.view(np.uint8))
+    with pytest.raises(TypeError):
+        native.rgb_means(image, mask.view(np.bool_))
 
-    y, x = np.array([0, 2], dtype=np.intp), np.array([0, 4], dtype=np.intp)
-    compact = np.empty((2, 2), dtype=np.float64)
-    for dtype in map(np.dtype, ("i", "l", "q")):
-        if dtype.itemsize == y.itemsize:
-            native.tile_integral(mask, None, y.astype(dtype), x.astype(dtype), compact, .25)
-            np.testing.assert_array_equal(compact, [[0., 0.], [0., 8.]])
-    with pytest.raises(ValueError):
-        native.tile_integral(mask, None, y.view(np.uintp), x, compact, .25)
-
-    for dtype in (np.uint64, np.dtype(np.float64).newbyteorder()):
-        output = np.full((3, 2, 4), 123, dtype=dtype)
-        with pytest.raises(ValueError):
-            native.rgb_square_difference(image, image, output)
+    for dtype in (np.uint32, np.dtype(np.float32).newbyteorder()):
+        output = np.full((3, 8), 123, dtype=dtype)
+        with pytest.raises(TypeError):
+            native.lab_xyz((image,), scoring._XYZ, output, 0)
         assert (output == 123).all()
 
-    xyz = np.zeros((1, 3, 8), dtype=np.float32)
+    xyz = np.zeros((3, 8), dtype=np.float32)
     strided_output = np.full((3, 9), 123, dtype=np.int32)[:, :8]
-    with pytest.raises(ValueError):
-        native.lab_planes(xyz, xyz, strided_output)
+    with pytest.raises(TypeError):
+        native.lab_planes(xyz, xyz, tuple(strided_output))
     assert (strided_output == 123).all()
 
 
 def test_native_rejects_object_output():
-    pytest.importorskip("bokehforge._scoring_native")
     # Isolate object storage in case a regression writes over its references.
     script = """
 import os
 import numpy as np
-from bokehforge import _scoring_native as native
+from bokehforge import _rust as native
 
-image = np.ones((2, 4, 3), dtype=np.float32)
+xyz = np.zeros((3, 8), dtype=np.float32)
+output = np.empty_like(xyz, dtype=object)
 try:
-    if np.dtype(object).itemsize == 8:
-        output = np.empty((3, 2, 4), dtype=object)
-        native.rgb_square_difference(image, image / 2, output)
-    else:
-        output = np.empty((2, 4), dtype=object)
-        native.range_damage(image, image / 2, output)
-except ValueError:
+    native.lab_planes(xyz, xyz, tuple(output))
+except TypeError:
     pass
 else:
     os._exit(1)

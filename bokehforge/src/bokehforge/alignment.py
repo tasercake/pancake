@@ -12,9 +12,15 @@ from scipy import fft, ndimage as ndi, optimize
 from ._workers import workers
 
 try:
-    from ._alignment_native import sample_linear as _sample_linear
+    from ._rust import (
+        sample_linear as _sample_linear,
+        sample_native_delta as _sample_native_delta,
+        sample_pose_evidence as _sample_pose_evidence,
+    )
 except ImportError:
     _sample_linear = None
+    _sample_native_delta = None
+    _sample_pose_evidence = None
 
 ALIGNMENT_VERSION = 1
 MAX_ROTATION_DEGREES = 5.0
@@ -257,13 +263,22 @@ class _NativeTexture:
         return np.ones(2)
 
     def sample(self, points):
-        offsets = np.array([[0, 0], [-3, 0], [3, 0], [0, -3], [0, 3]]).T
-        neighbors = (points[:, None, :] + offsets[:, :, None]).reshape(2, -1)
-        rgb = np.clip(_sample_rgb(self.image, neighbors), 0, 1).reshape(5, -1, 3)
-        delta = rgb[0] - rgb[1:].mean(axis=0)
-        light = delta @ _LUMA
-        return np.stack((light, (delta[:, 0] - delta[:, 1]) * 0.55,
-                         (delta[:, 2] - delta[:, 1]) * 0.55)).astype(np.float32)
+        if (_sample_native_delta is not None and self.image.dtype == np.float32
+                and self.image.flags.aligned and points.dtype == np.float64):
+            delta = _sample_native_delta(self.image, points)
+        else:
+            offsets = np.array([[0, 0], [-3, 0], [3, 0], [0, -3], [0, 3]]).T
+            neighbors = (points[:, None, :] + offsets[:, :, None]).reshape(2, -1)
+            rgb = np.clip(_sample_rgb(self.image, neighbors), 0, 1).reshape(5, -1, 3)
+            delta = rgb[0] - rgb[1:].mean(axis=0)
+        return _native_texture_planes(delta)
+
+
+def _native_texture_planes(delta):
+    # Preserve NumPy's luma rounding, including FMA in some BLAS kernels.
+    light = delta @ _LUMA
+    return np.stack((light, (delta[:, 0] - delta[:, 1]) * 0.55,
+                     (delta[:, 2] - delta[:, 1]) * 0.55)).astype(np.float32)
 
 
 def _resize_plane(image, size):
@@ -481,6 +496,11 @@ class _EvidenceSampler:
         h, w = crop_shape
         self.reference = reference
         self.last_y, self.last_x = np.asarray(ref_shape) - 1
+        self.sample_bounds = (float(self.last_y), float(self.last_x))
+        self.sample_image = reference.image if native else reference.values
+        self.sample_step = None if native else tuple(map(float, reference.step))
+        if self.sample_image.dtype != np.float32 or not self.sample_image.flags.aligned:
+            self.sample_image = None
         margin_y, margin_x = np.minimum((np.array(crop_shape) - 1) / 5, crop.step * 3)
         yy, xx = np.meshgrid(np.linspace(margin_y, h - 1 - margin_y, min(h, count)),
                              np.linspace(margin_x, w - 1 - margin_x, min(w, count)), indexing="ij")
@@ -510,6 +530,17 @@ class _EvidenceSampler:
     def _evaluate(self, matrix, offset, subset=False, regional=False):
         points, values, region_ids = self.subsets[subset]
         points = matrix @ points + offset[:, None]
+        if not regional and _sample_pose_evidence is not None and self.sample_image is not None:
+            support, samples, selected = _sample_pose_evidence(
+                self.sample_image, points, values, self.sample_bounds, self.sample_step,
+            )
+            if samples is None:
+                return _Evidence(0.0, support, ())
+            if self.sample_step is None:
+                samples = _native_texture_planes(samples)
+            agreement = (_pearson(values, samples, self.prepared[subset]) if selected is None
+                         else _pearson(selected, samples))
+            return _Evidence(agreement, support, ())
         y, x = points
         valid = (y >= 0) & (y <= self.last_y) & (x >= 0) & (x <= self.last_x)
         count = np.count_nonzero(valid)

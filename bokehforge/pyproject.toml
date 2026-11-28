@@ -33,7 +33,7 @@ inspection = [
 ]
 
 [build-system]
-requires = ["setuptools>=80"]
+requires = ["setuptools>=80", "setuptools-rust>=1.12,<2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -48,8 +48,25 @@ bokehforge = ["heatmaps.html"]
 "bokehforge.data" = ["sources.json"]
 "bokehforge.review" = ["static/*", "static/fonts/*"]
 
+[[tool.setuptools-rust.ext-modules]]
+target = "bokehforge._rust"
+path = "Cargo.toml"
+binding = "PyO3"
+cargo-manifest-args = ["--locked"]
+debug = false
+
 [dependency-groups]
 dev = ["pytest>=8.3,<10"]
+
+[tool.uv]
+cache-keys = [
+  { file = "pyproject.toml" },
+  { file = "MANIFEST.in" },
+  { file = "Cargo.toml" },
+  { file = "Cargo.lock" },
+  { file = "rust/**/*.rs" },
+  { file = "src/bokehforge/__init__.py" },
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

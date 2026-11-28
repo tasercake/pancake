@@ -4,7 +4,7 @@ BokehForge downloads verified focus-stacking datasets and loads their frames on 
 
 ## Download data
 
-From this directory, use the pinned project environment to download InfinigenDefocus (D29), the shipped dataset.
+Building BokehForge from source requires Rust 1.88 or later and Cargo. A platform wheel includes the compiled scorer. From this directory, use the pinned project environment to download InfinigenDefocus (D29), the shipped dataset.
 
 ```sh
 uv sync --frozen

@@ -45,3 +45,37 @@ selectors, pass `--allow-device-change` to `compare`. The result hash covers
 the complete score row and summary explanation with the timer removed. Failed
 scores retain their status and error in the JSON report. Scoring failures or
 parity mismatches return a nonzero exit status.
+
+For migrations that permit small numerical differences, pass
+`--include-results` to both timing runs and `--tolerant` to `compare`. The
+comparison uses an absolute limit of 0.01 points on the 100-point scale
+for scene, overlap, and cohort scores. Family damage, diagnostic values,
+and per-tile damage use an absolute limit of 0.0001. It checks alignment,
+tile grid geometry and selection, statuses, and input and Inspection digests
+for equality and verifies each stored result against its own digest.
+
+## Synthetic scorer parity
+
+The synthetic harness calls `scoring.measure` and `bench.score_saved_output`
+in each installation. It covers an exact match, an exact crop, detail and
+color changes, rotated partial support, read-only strided inputs, input
+range and Lab boundaries, and a failed match. It checks all four explanation
+levels and scoring without an explanation. The attention cases use a
+precomputed, unaligned heatmap, so this run needs no model files or network
+access.
+
+```sh
+parity="$candidate/research/experiments/bokehforge-scoring/parity.py"
+"$baseline/bokehforge/.venv/bin/python" "$parity" run \
+  --device cpu --output artifacts/parity/baseline-cpu.json
+"$candidate/bokehforge/.venv/bin/python" "$parity" run \
+  --device cpu --output artifacts/parity/candidate-cpu.json
+"$candidate/bokehforge/.venv/bin/python" "$parity" compare \
+  artifacts/parity/baseline-cpu.json artifacts/parity/candidate-cpu.json
+```
+
+Repeat with `--device cuda` in both CUDA-equipped installations to check
+the accelerated damage path. The synthetic report retains the inputs,
+scores, explanations, and benchmark cohort aggregation. The comparator
+prints the largest absolute score and measurement differences and returns
+a nonzero exit status for a mismatch.

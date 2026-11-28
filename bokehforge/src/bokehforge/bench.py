@@ -1,7 +1,7 @@
 """Run a stacker against a reproducible cohort from the local SceneCatalog."""
 
 import argparse
-from collections import Counter, defaultdict
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing, redirect_stdout, suppress
 from dataclasses import dataclass
@@ -12,13 +12,14 @@ from importlib.metadata import version
 import json
 import os
 from pathlib import Path
-from statistics import fmean
+from statistics import StatisticsError
 import sys
 from time import perf_counter
 
 import numpy as np
 import tifffile
 
+from . import _rust
 from ._device import DEVICES, Device, damage_backend
 from .alignment import ALIGNMENT_VERSION, MAX_ROTATION_DEGREES
 from .data._canonical import encode_tiff
@@ -361,9 +362,23 @@ def _run_scene(catalog, scene, row, algorithm, args, inspection):
         _save_scene(prepared, args, explanation)
 
 
+def _host_available_memory():
+    # Linux counts reclaimable page cache in MemAvailable.
+    try:
+        for line in Path("/proc/meminfo").read_text().splitlines():
+            if line.startswith("MemAvailable:"):
+                amount, unit = line.removeprefix("MemAvailable:").split()
+                if unit == "kB" and (available := int(amount)) >= 0:
+                    return available * 1024
+                break
+    except (OSError, ValueError):
+        pass
+    return os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE")
+
+
 def _host_replay_fits():
     try:
-        free = os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE")
+        free = _host_available_memory()
         paths = Path("/proc/self/cgroup").read_text().splitlines()
         if len(paths) != 1 or not paths[0].startswith("0::/"):
             return False
@@ -447,31 +462,25 @@ def _run_replays(catalog, entries, args, inspection):
 
 
 def _score(rows, *, explanation=None):
-    datasets = defaultdict(lambda: defaultdict(list))
-    groups = set()
-    for row in rows:
-        if row["scene_score"] is not None:
-            group = row["leakage_group_id"]
-            datasets[row["dataset_id"]][group].append(row["scene_score"])
-            groups.add(group)
+    entries = [(row["dataset_id"], row["leakage_group_id"], row["scene_score"])
+               for row in rows if row["scene_score"] is not None]
     unavailable = any(row["reference_status"] == "error" for row in rows)
-    group_means = {dataset: {group: fmean(scores) for group, scores in group_rows.items()}
-                   for dataset, group_rows in datasets.items()}
-    dataset_means = {dataset: fmean(scores.values()) for dataset, scores in group_means.items()}
-    score = None if unavailable else fmean(dataset_means.values())
+    score, group_count, datasets = _rust.cohort_score(entries, unavailable, explanation is not None)
+    if score is None and not unavailable:
+        raise StatisticsError("fmean requires at least one data point")
     if explanation is not None:
         explanation.update(score=score, status="evaluation_error" if unavailable else "ok",
                            datasets={
-                               dataset: {"score": score, "weight": 1 / len(dataset_means), "groups": {
-                                   group: {"score": mean, "weight": 1 / len(group_means[dataset]),
-                                           "scene_count": len(datasets[dataset][group])}
-                                   for group, mean in group_means[dataset].items()
-                               }} for dataset, score in dataset_means.items()
+                               dataset: {"score": mean, "weight": weight, "groups": {
+                                   group: {"score": mean, "weight": weight, "scene_count": count}
+                                   for group, mean, weight, count in groups
+                               }} for dataset, mean, weight, groups in datasets
                            })
-    return score, len(groups)
+    return score, group_count
 
 
-def main(argv=None):
+def bench(argv=None):
+    """Run a benchmark with command-line arguments and return its exit status."""
     parser = argparse.ArgumentParser(prog="bokehforge bench", description=__doc__)
     source = parser.add_argument_group("Stack source")
     candidate = source.add_mutually_exclusive_group(required=True)
@@ -576,3 +585,7 @@ def main(argv=None):
     save_json(args.output / "report.json", report)
     print("unscored" if score is None else f"{score:.6f}")
     return int(any(status != "ok" for status in statuses))
+
+
+def main(argv=None):
+    return bench(argv)

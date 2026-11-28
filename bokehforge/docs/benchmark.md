@@ -35,6 +35,22 @@ rows and output images follow catalog order. The report's total `seconds`
 measures elapsed time, and per-scene `scoring_seconds` can overlap. Stacker runs
 and full explanation exports process one scene at a time.
 
+## Call the scorer from Python
+
+`measure` takes two NumPy arrays in candidate, reference order. Each array has shape (height, width, 3) and contains 32-bit floating-point linear-sRGB samples. The return value provides the scene score, per-family features, diagnostics, alignment, and any requested explanation.
+
+```python
+from bokehforge import measure
+from bokehforge.bench import bench
+
+result = measure(candidate, reference, attention=False, device="cpu", details="summary")
+print(result.score, result.features)
+
+exit_code = bench(["--candidate-dir", "deliveries", "--output", "results", "--no-attention"])
+```
+
+`bench(argv=None)` takes the same argument list as the CLI following `bokehforge bench`. It writes the same report and returns the command's exit code. Existing imports from `bokehforge.scoring.measure` and `bokehforge.bench.main` continue to work.
+
 ## Scoring device
 
 `--device auto` (the default) prefers NVIDIA CUDA, then Apple Metal (MPS),
