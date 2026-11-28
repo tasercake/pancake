@@ -9,22 +9,24 @@ identity.
 ## Workspace
 
 - Use contiguous panes with shared edges. Mount a compact command bar at the
-  top, the preview and inspector side by side, and a source filmstrip beneath
-  them. Keep the preview flexible and the inspector wide enough for its
-  settings. Let the filmstrip span the workspace.
+  top and a source filmstrip beneath the preview workspace. Keep the preview
+  flexible and let the filmstrip span the workspace.
 - Group toolbar commands by task. Separate groups by a gap or one fine
   divider. Keep frequent commands near the view they affect. Use short labels
   for unfamiliar symbols and expose names and shortcuts to assistive
   technology.
-- In Pancake Stacker, keep stack method, alignment, and output controls in the
-  inspector. Put the stack action at the bottom of the inspector. Keep
-  retained results and the complete source list accessible. Open Preferences,
-  About, and export options using the same surfaces and control styles.
+- In Pancake Stacker, place the inspector beside the preview with enough
+  width for stack method, alignment, and output controls. Put the stack
+  action at the bottom of the inspector. Keep retained results and the
+  complete source list accessible. Open Preferences, About, and export
+  options using the same surfaces and control styles.
 - In Stackroom, keep the source frame, stacker output, and available
-  ground-truth comparison aligned on the same matte. Put evaluation and rating
-  controls in the inspector. Keep scene navigation, evaluation progress,
-  result details, and review overlays accessible. At narrow browser widths,
-  stack the panes in reading order and let the filmstrip scroll horizontally.
+  ground-truth comparison aligned on the same matte. Put scene details and
+  the evaluation run in a bar below the command bar. Place the stacker
+  buttons below the output image and the rating controls directly above the
+  filmstrip. Keep scene navigation, evaluation progress, result details, and
+  review overlays accessible. At narrow browser widths, stack the panes in
+  reading order and let the filmstrip scroll horizontally.
 - Use real data and real application states. Give empty and loading
   workspaces a clear next step. Preserve selection, focus, shortcuts,
   cancellation, and progress through layout changes. Deliver state updates

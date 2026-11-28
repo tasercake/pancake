@@ -1329,6 +1329,7 @@ function applyCatalog(catalog) {
   for (const tool of catalog.stackers) tools.set(tool.id, tool);
   scenes = catalog.scenes ?? [];
   $("show-scenes").disabled = !scenes.length;
+  $("scene-bar").hidden = !scenes.length;
   $("active-scene").hidden = $("scene-navigation").hidden = !scenes.length;
   if (!scenes.length) $("scene-browser").hidePopover?.();
   const workspace = $("workspace");
