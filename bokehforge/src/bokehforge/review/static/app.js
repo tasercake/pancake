@@ -1,12 +1,13 @@
 import { VirtualRail } from "./rail.js";
 import { ScoreExplanation } from "./score-explanation.js";
+import { RatingAutosave } from "./rating-autosave.js";
+import { WorkspaceSocket } from "./workspace-socket.js";
 
 const $ = (id) => document.getElementById(id);
 const number = new Intl.NumberFormat();
 const date = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+const savedTime = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit", second: "2-digit" });
 const parameters = new URLSearchParams(location.hash.slice(1));
-const drafts = new Map();
-const saving = new Set();
 const tools = new Map();
 const runStates = {
   running: "Running", completed: "Completed", completed_with_errors: "Completed with failures",
@@ -31,7 +32,8 @@ const catalogStages = {
 };
 
 let scenes = [], visible = [], runs = [], scene = null, details = null;
-let frameIndex = 0, referenceIndex = 0, runId = parameters.get("run") ?? "", stackerId = "", formKey = "";
+let sourceIndex = 0, referenceIndex = 0, runId = parameters.get("run") ?? "", stackerId = "", formKey = "";
+let comparisonReference, comparisonHoldKey = "";
 let sceneRequest, scoreRevision, stopping = "";
 let warmupTimer, warming = [];
 let catalogRevision = -1, lastDownload, rateTimeout, startingDownload = false;
@@ -217,7 +219,7 @@ function holdPanelImage(well) {
   return button;
 }
 
-function showImage(well, title, params) {
+function showImage(well, title, params, priority = "high") {
   const src = imageURL(params, "panel");
   const current = panelImages.get(well);
   if (current?.src === src && current.button.isConnected) {
@@ -237,7 +239,7 @@ function showImage(well, title, params) {
     button.append(part("span", "Inspect", "expand"));
     well.append(button);
   }
-  const image = previewElement(params, "panel", { title, priority: "high" });
+  const image = previewElement(params, "panel", { title, priority });
   const request = { src, button, image, title, params, shown: null };
   panelImages.set(well, request);
   const reveal = (ready) => {
@@ -323,6 +325,7 @@ function setLightboxGallery(gallery, data) {
 }
 
 function openLightbox(title, params, previewImage, sceneId = scene?.id) {
+  releaseComparisonReference();
   const previous = activeImage;
   if (previous) closeLightboxRequests(previous);
   const stage = part("div", undefined, "lightbox-stage");
@@ -755,17 +758,18 @@ function sceneEntry(item, index) {
   return row;
 }
 
-function frameEntry(frame, index) {
-  const tile = railItem("frame-tile");
-  const title = `Frame ${index + 1} · ${frame.name}`;
+function sourceEntry({ frame, frameIndex }, index) {
+  const reference = frameIndex === undefined;
+  const tile = railItem(reference ? "frame-tile reference-tile" : "frame-tile");
+  const title = reference ? referenceTitle(frame) : sourceFrameTitle(frame, frameIndex);
   tile.title = title;
   const button = part("button", undefined, "thumb preview-thumbnail");
   button.type = "button";
   button.setAttribute("aria-label", title);
-  button.onclick = () => selectFrame(index);
+  button.onclick = () => selectSource(index);
   const params = { frame: frame.id };
   const image = createThumbnail(params);
-  button.append(image, part("span", String(index + 1).padStart(3, "0")));
+  button.append(image, part("span", reference ? "Reference" : String(frameIndex + 1).padStart(3, "0")));
   const inspect = inspectButton(title, params, image);
   button.ondblclick = inspect.onclick;
   const filename = part("span", frame.name, "frame-filename");
@@ -833,18 +837,16 @@ function goTo(position) {
   scene = next;
   cancelWarmup();
   details = null;
-  frameIndex = 0;
+  sourceIndex = Number(Boolean(next.first_reference));
   referenceIndex = 0;
   filmRail.setItems([]);
   $("film-range").textContent = `${number.format(next.frames)} frames`;
   $("reference-control").hidden = true;
   setReferenceAvailability(Boolean(next.first_reference));
-  $("reference-title").textContent = "Ground truth";
+  $("source-title").textContent = "Source frame";
   $("source-meta").textContent = "";
-  $("reference-meta").textContent = "";
   showImage($("source-image"), "source frame 1", { frame: next.first_frame });
-  if (next.first_reference) showImage($("reference-image"), "reference", { frame: next.first_reference });
-  else holdPanelImage($("reference-image"));
+  setComparisonReference(next.first_reference ? { id: next.first_reference } : null);
   renderOutput();
   remember();
   loadScene();
@@ -874,8 +876,7 @@ async function loadScene() {
     showMessage($("scene-error"), "");
     if (firstLoad) {
       renderReference();
-      filmRail.setItems(details.frames);
-      selectFrame(frameIndex);
+      selectSource(sourceIndex);
     }
     renderOutput();
   } catch (error) {
@@ -883,9 +884,7 @@ async function loadScene() {
     outputLoading = false;
     renderOutput();
     showMessage($("scene-error"), error.message);
-    if (!details) {
-      for (const role of ["source", "reference"]) placeholder($(`${role}-image`), "Scene unavailable");
-    }
+    if (!details) placeholder($("source-image"), "Scene unavailable");
   } finally {
     if (!signal.aborted) {
       sceneRequest = null;
@@ -914,23 +913,27 @@ function sourceFrameTitle(frame, index) {
   return `source frame ${index + 1} · ${frame.name}`;
 }
 
-function selectFrame(index) {
-  const frame = details?.frames[index];
-  if (!frame) return;
-  const direction = index < frameIndex ? -1 : 1;
-  frameIndex = index;
+function selectSource(index) {
+  const item = filmRail.items[index];
+  if (!item) return;
+  const { frame, frameIndex } = item;
+  const reference = frameIndex === undefined;
+  const direction = index < sourceIndex ? -1 : 1;
+  sourceIndex = index;
   filmRail.select(index);
-  $("film-range").textContent = `${number.format(index + 1)} of ${number.format(details.frames.length)}`;
-  $("source-meta").textContent = frame.focus_distance_m === undefined
-    ? `Frame ${index + 1} / ${details.frames.length}`
+  const total = number.format(details.frames.length);
+  $("film-range").textContent = reference ? `${total} frames` : `${number.format(frameIndex + 1)} of ${total}`;
+  $("source-title").textContent = reference ? "Reference" : "Source frame";
+  $("source-meta").textContent = reference ? frame.name : frame.focus_distance_m === undefined
+    ? `Frame ${frameIndex + 1} / ${details.frames.length}`
     : `${number.format(frame.focus_distance_m)} m · ƒ/${number.format(frame.aperture_f_number)}`;
-  showImage($("source-image"), sourceFrameTitle(frame, index), { frame: frame.id });
+  showImage($("source-image"), reference ? referenceTitle(frame) : sourceFrameTitle(frame, frameIndex), { frame: frame.id });
   cancelWarmup();
   warmupTimer = setTimeout(() => {
     if (document.hidden) return;
-    const adjacentFrame = details.frames[frameIndex + direction] ?? details.frames[frameIndex - direction];
+    const adjacentFrame = filmRail.items[sourceIndex + direction] ?? filmRail.items[sourceIndex - direction];
     const adjacentScene = visible[(visible.indexOf(scene) + 1) % visible.length];
-    const frameIds = new Set([adjacentFrame?.id, adjacentScene !== scene && adjacentScene?.first_frame]);
+    const frameIds = new Set([adjacentFrame?.frame.id, adjacentScene !== scene && adjacentScene?.first_frame]);
     warming = [...frameIds].filter(Boolean).map((frame) => prefetchImage({ frame }));
   }, 240);
 }
@@ -946,29 +949,44 @@ function referenceTitle(frame) {
 }
 
 function setReferenceAvailability(available, explanation = "") {
-  $("reference-pane").hidden = !available;
+  $("reference-shortcut").hidden = !available;
   const status = $("reference-availability");
   status.hidden = available;
   status.title = explanation;
 }
 
-function showReference() {
+function setComparisonReference(frame) {
+  const well = $("comparison-reference");
+  if (frame?.id !== comparisonReference?.id) {
+    clearImageRequest(well);
+    well.replaceChildren();
+  }
+  comparisonReference = frame;
+  if (frame) showImage(well, frame.name ? referenceTitle(frame) : "reference", { frame: frame.id }, "low");
+}
+
+function selectReference() {
   const frame = details.references[referenceIndex];
   setReferenceAvailability(Boolean(frame), details.reference_semantics);
-  $("reference-meta").textContent = frame ? frame.name : "";
-  if (frame) showImage($("reference-image"), referenceTitle(frame), { frame: frame.id });
-  else holdPanelImage($("reference-image"));
+  setComparisonReference(frame);
+  const sources = details.frames.map((frame, frameIndex) => ({ frame, frameIndex }));
+  if (frame) sources.unshift({ frame });
+  filmRail.setItems(sources);
 }
 
 function renderReference() {
   const refs = details.references;
-  const isTruth = ["rendered_all_in_focus", "synthetic_source_image_reference"].includes(details.reference_type);
-  $("reference-title").textContent = refs.length && !isTruth ? "Source reference" : "Ground truth";
-  $("reference-title").title = details.reference_semantics;
   $("reference-control").hidden = refs.length < 2;
+  $("reference-control").title = details.reference_semantics;
   $("reference-select").replaceChildren(...refs.map((ref, index) =>
     new Option(`${index + 1} · ${ref.name}`, index)));
-  showReference();
+  selectReference();
+}
+
+function releaseComparisonReference(event) {
+  if (!comparisonHoldKey || (event && comparisonHoldKey !== (event.code || event.key))) return;
+  comparisonHoldKey = "";
+  if (scene) renderOutput();
 }
 
 const benchmarkNumber = new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -1015,7 +1033,9 @@ function paintCandidateExplanation() {
 }
 
 function renderOutput() {
-  const outputs = details?.outputs ?? [];
+  ratingAutosave.setScene(runId, scene.id);
+  const outputs = (details?.outputs ?? []).map((output) => output.status === "ready"
+    ? { ...output, rating: ratingAutosave.rating(output.stacker, output.rating) } : output);
   if (outputs.length && !outputs.some((output) => output.stacker === stackerId)) {
     stackerId = (outputs.find((output) => output.status === "ready") ?? outputs[0]).stacker;
   }
@@ -1037,7 +1057,7 @@ function renderOutput() {
         badge.setAttribute("aria-label", "Benchmark score " + badge.textContent);
         button.append(badge);
       }
-      if (output.rating) button.append(part("small", output.rating.grade + "/5"));
+      if (output.rating?.grade != null) button.append(part("small", output.rating.grade + "/5"));
       button.onclick = () => { stackerId = output.stacker; renderOutput(); };
       return button;
     });
@@ -1047,15 +1067,19 @@ function renderOutput() {
   }
 
   const readyCount = outputs.filter((output) => output.status === "ready").length;
-  const ratedCount = outputs.filter((output) => output.rating).length;
+  const ratedCount = outputs.filter((output) => output.rating?.grade != null).length;
   $("rating-count").textContent = readyCount ? `${ratedCount} of ${readyCount} available outputs rated` : "";
   const params = outputParams(scene.id, runId, stackerId, row?.artifact_revision);
+  const reference = comparisonHoldKey && comparisonReference;
+  $("comparison-reference").hidden = !reference;
+  $("candidate-title").textContent = reference ? "Reference" : "Stacker output";
+  const method = runs.find((run) => run.id === runId)?.methods?.[stackerId];
+  $("candidate-meta").textContent = reference ? reference.name ?? "" : row ? stackerLabel(stackerId) : "";
+  $("candidate-meta").title = reference ? details?.reference_semantics ?? "" :
+    row ? method ?? tools.get(stackerId)?.method ?? "" : "";
   candidateScore = row?.status === "ready" ? { params, benchmark: row.benchmark } : null;
   const currentImage = JSON.stringify([params, row?.status, row?.image, row?.error, !details || outputLoading]);
   if (candidateState !== currentImage) {
-    const method = runs.find((run) => run.id === runId)?.methods?.[stackerId];
-    $("candidate-meta").textContent = row ? stackerLabel(stackerId) : "";
-    $("candidate-meta").title = row ? method ?? tools.get(stackerId)?.method ?? "" : "";
     const well = $("candidate-image");
     if (row?.status === "ready") {
       showImage(well, stackerLabel(stackerId), params);
@@ -1086,54 +1110,34 @@ function renderRating(row) {
   $("rating-empty").textContent = row || outputLoading || !details
     ? "Ratings open when this output is available."
     : "Run an evaluation to start rating outputs.";
-  if (!ready) {
-    formKey = "";
-    return;
-  }
-  const key = ratingKey();
-  if (key !== formKey) {
-    const data = drafts.get(key) ?? row.rating;
+  formKey = ready ? ratingKey() : "";
+  const draft = ratingAutosave.pending.get(formKey);
+  if (ready) {
+    const data = draft ?? row.rating;
     for (const input of $("rating-form").elements.grade) input.checked = Number(input.value) === data?.grade;
-    $("comment").value = data?.comment ?? "";
-    $("rating-status").textContent = drafts.has(key) ? "Unsaved changes" : row.rating ? "Saved locally" : "";
-    formKey = key;
+    if ($("comment").value !== (data?.comment ?? "")) $("comment").value = data?.comment ?? "";
   }
-  $("save-rating").disabled = saving.has(key);
+  const failed = draft?.error ? formKey : [...ratingAutosave.pending].find(([, entry]) => entry.error)?.[0];
+  const saved = ready && row.rating?.updated_at;
+  const pendingElsewhere = ratingAutosave.pending.size - Number(Boolean(draft));
+  let status = saved ? `Last saved at ${savedTime.format(new Date(saved))}` : "";
+  if (draft?.error) status = `Not saved. ${draft.error}`;
+  else if (draft) status = ratingAutosave.ready ? "Saving…" : "Save pending. Reconnecting…";
+  if (pendingElsewhere) {
+    const other = failed && failed !== formKey ? "Other rating edits need attention." :
+      ratingAutosave.ready ? "Saving other rating edits…" : "Other rating edits are pending.";
+    status = [status, other].filter(Boolean).join(" ");
+  }
+  if ($("rating-status").textContent !== status) $("rating-status").textContent = status;
+  $("rating-retry").hidden = !failed;
+  $("rating-retry").onclick = () => ratingAutosave.retry(failed);
 }
 
 function captureDraft() {
-  const grade = Number($("rating-form").elements.grade.value);
-  const comment = $("comment").value;
-  const old = details.outputs.find((output) => output.stacker === stackerId).rating;
-  if ((old?.grade ?? 0) === grade && (old?.comment ?? "") === comment) {
-    drafts.delete(formKey);
-    $("rating-status").textContent = old ? "Saved locally" : "";
-  } else {
-    drafts.set(formKey, { grade, comment });
-    $("rating-status").textContent = "Unsaved changes";
-  }
-}
-
-async function saveRating(event) {
-  event.preventDefault();
-  const key = formKey;
-  const form = { run: runId, scene: scene.id, stacker: stackerId,
-    grade: Number(event.target.elements.grade.value), comment: $("comment").value };
-  saving.add(key);
-  $("save-rating").disabled = true;
-  $("rating-status").textContent = "Saving…";
-  try {
-    await api("/api/ratings", form);
-    const draft = drafts.get(key);
-    if (draft?.grade === form.grade && draft?.comment === form.comment) drafts.delete(key);
-    if (key === formKey) $("rating-status").textContent = drafts.has(key) ? "Unsaved changes" : "Saved locally";
-    await loadScene();
-  } catch (error) {
-    if (key === formKey) $("rating-status").textContent = error.message;
-  } finally {
-    saving.delete(key);
-    if (key === formKey) $("save-rating").disabled = false;
-  }
+  if (!formKey) return;
+  const grade = Number($("rating-form").elements.grade.value) || null;
+  const old = details.outputs.find((output) => output.stacker === stackerId)?.rating;
+  ratingAutosave.edit(formKey, { grade, comment: $("comment").value }, ratingAutosave.rating(stackerId, old));
 }
 
 function changeRun(id) {
@@ -1328,6 +1332,7 @@ async function stopRun() {
 }
 
 function applyCatalog(catalog) {
+  ratingAutosave.setReady(catalog.status === "ready" || Boolean(catalog.scenes?.length));
   if (catalog.revision === catalogRevision && catalog.image_version === imageVersion) return;
   const selectedScene = scene?.id ?? parameters.get("scene");
   if (imageVersion && catalog.image_version !== imageVersion) {
@@ -1483,22 +1488,25 @@ async function startDownload() {
   }
 }
 
-function connect() {
-  const events = new EventSource("/api/events");
-  events.addEventListener("runs", (event) => applyRuns(JSON.parse(event.data)));
-  events.addEventListener("scores", (event) => applyScores(JSON.parse(event.data)));
-  events.addEventListener("catalog", (event) => applyCatalog(JSON.parse(event.data)));
-  events.addEventListener("catalog-progress", (event) => applyCatalogProgress(JSON.parse(event.data)));
-  events.addEventListener("download", (event) => applyDownload(JSON.parse(event.data)));
-  events.onopen = () => showMessage($("connection-status"), "");
-  events.onerror = () => {
-    showMessage($("connection-status"), "Live updates disconnected. Reconnecting…");
-    if (catalogProgress) applyCatalogProgress({ phase: "connecting" });
-  };
-}
+const workspaceEvents = new Map([
+  ["runs", applyRuns], ["scores", applyScores], ["catalog", applyCatalog],
+  ["catalog-progress", applyCatalogProgress], ["download", applyDownload],
+  ["ratings", (state) => ratingAutosave.receive(state)],
+]);
+const workspaceSocket = new WorkspaceSocket(
+  (name, data) => workspaceEvents.get(name)?.(data),
+  (connected) => {
+    showMessage($("connection-status"), connected ? "" : "Live updates disconnected. Reconnecting…");
+    if (!connected) {
+      ratingAutosave.setReady(false);
+      if (catalogProgress) applyCatalogProgress({ phase: "connecting" });
+    }
+  },
+);
+const ratingAutosave = new RatingAutosave(workspaceSocket, () => { if (scene) renderOutput(); });
 
 const sceneRail = new VirtualRail($("scene-list"), "y", 74, sceneEntry);
-const filmRail = new VirtualRail($("filmstrip"), "x", 112, frameEntry);
+const filmRail = new VirtualRail($("filmstrip"), "x", 112, sourceEntry);
 const requestScoreOverlay = (mode, params, signal) =>
   api(url(mode === "attention" ? "/api/score-attention" : "/api/score-tiles", params), undefined, { signal });
 const candidateExplanation = new ScoreExplanation(
@@ -1522,10 +1530,15 @@ $("dataset").onchange = () => filterScenes(scene?.id);
 $("previous").onclick = () => moveScene(-1);
 $("next").onclick = () => moveScene(1);
 $("jump").onchange = () => goTo($("jump").valueAsNumber - 1);
-$("reference-select").onchange = () => { referenceIndex = Number($("reference-select").value); showReference(); };
+$("reference-select").onchange = (event) => {
+  referenceIndex = Number(event.target.value);
+  selectReference();
+  selectSource(0);
+  renderOutput();
+};
 $("run-select").onchange = () => changeRun($("run-select").value);
 $("rating-form").oninput = captureDraft;
-$("rating-form").onsubmit = saveRating;
+$("rating-form").onsubmit = (event) => event.preventDefault();
 $("open-run").onclick = openRunDialog;
 $("download-start").onclick = startDownload;
 $("stop-run").onclick = stopRun;
@@ -1614,10 +1627,17 @@ document.addEventListener("keydown", (event) => {
   event.preventDefault();
   zoomLightbox(zoom ? lightboxScale() * zoom : 1);
 });
-document.addEventListener("keyup", releaseReference);
-window.addEventListener("blur", () => releaseReference());
+document.addEventListener("keyup", (event) => {
+  releaseReference(event);
+  releaseComparisonReference(event);
+});
+function releaseHeldReference() {
+  releaseReference();
+  releaseComparisonReference();
+}
+window.addEventListener("blur", releaseHeldReference);
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) releaseReference();
+  if (document.hidden) releaseHeldReference();
 });
 let panStart = null;
 lightboxView.addEventListener("pointerdown", (event) => {
@@ -1660,16 +1680,23 @@ document.addEventListener("keydown", (event) => {
   if (!scene || document.querySelector("dialog[open]") ||
       event.target.closest?.("input,textarea,select,[contenteditable]") ||
       event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-  if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+  if (event.key === "." && comparisonReference && !event.repeat) {
     event.preventDefault();
-    selectFrame(frameIndex + (event.key === "ArrowLeft" ? -1 : 1));
+    comparisonHoldKey = event.code || event.key;
+    renderOutput();
+  } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+    event.preventDefault();
+    selectSource(sourceIndex + (event.key === "ArrowLeft" ? -1 : 1));
   } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
     event.preventDefault();
     moveScene(event.key === "ArrowUp" ? -1 : 1);
   }
 });
 window.addEventListener("beforeunload", (event) => {
-  if (drafts.size) event.preventDefault();
+  if (ratingAutosave.pending.size) {
+    event.preventDefault();
+    event.returnValue = true;
+  }
 });
 const commandBar = document.querySelector(".command-bar");
 new ResizeObserver(([entry]) => {
@@ -1677,4 +1704,4 @@ new ResizeObserver(([entry]) => {
   document.documentElement.style.setProperty("--command-height", `${height + 4}px`);
 }).observe(commandBar);
 configureAppearance();
-connect();
+workspaceSocket.connect();

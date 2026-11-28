@@ -80,12 +80,15 @@
         <p id="scene-error" class="inline-error" role="alert" hidden></p>
         <div class="comparison">
           <figure class="pane">
-            <figcaption><span>Source frame</span><span class="pane-meta" id="source-meta"></span></figcaption>
+            <figcaption><span id="source-title">Source frame</span><span class="pane-meta" id="source-meta"></span></figcaption>
             <div class="image-well" id="source-image"></div>
           </figure>
           <figure class="pane candidate">
-            <figcaption><span>Stacker output</span><span class="pane-meta" id="candidate-meta"></span></figcaption>
-            <div class="candidate-viewport"><div class="image-well" id="candidate-image"></div></div>
+            <figcaption><span id="candidate-title">Stacker output</span><span class="pane-meta" id="candidate-meta"></span></figcaption>
+            <div class="candidate-viewport">
+              <div class="image-well" id="candidate-image"></div>
+              <div class="image-well" id="comparison-reference" hidden></div>
+            </div>
             <div class="candidate-controls">
               <div class="benchmark-line candidate-benchmark" hidden>
                 <span id="candidate-benchmark" role="status"></span>
@@ -98,11 +101,6 @@
               <div class="output-tabs" id="output-tabs" role="group" aria-label="Stacker outputs"></div>
             </div>
           </figure>
-          <figure class="pane" id="reference-pane" hidden>
-            <figcaption><span id="reference-title">Ground truth</span><span class="pane-meta" id="reference-meta"></span></figcaption>
-            <div class="image-well" id="reference-image"></div>
-            <label class="reference-select" id="reference-control" hidden>Reference image<select id="reference-select"></select></label>
-          </figure>
         </div>
         <section class="score-explanation candidate-explanation" id="candidate-explanation" aria-label="Score explanation" hidden></section>
       </section>
@@ -110,12 +108,14 @@
         <div class="review-heading">
           <h2 id="rating-title">Rate outputs</h2>
           <span class="muted" id="rating-count"></span>
+          <span class="muted" id="rating-status" role="status"></span>
+          <button class="quiet" id="rating-retry" type="button" hidden>Retry save</button>
         </div>
         <form class="rating-form" id="rating-form" hidden>
           <fieldset>
             <legend>Grade <span class="muted">· 5 is best</span></legend>
             <div class="grade-options">
-              <label><input required name="grade" type="radio" value="1"><span>1</span></label>
+              <label><input name="grade" type="radio" value="1"><span>1</span></label>
               <label><input name="grade" type="radio" value="2"><span>2</span></label>
               <label><input name="grade" type="radio" value="3"><span>3</span></label>
               <label><input name="grade" type="radio" value="4"><span>4</span></label>
@@ -125,22 +125,19 @@
           <label class="comment" for="comment">Comment <span class="muted">· optional</span>
             <textarea id="comment" rows="2" maxlength="4000" placeholder="Describe the details that influenced your grade"></textarea>
           </label>
-          <div class="save-area">
-            <button class="primary" id="save-rating" type="submit">Save rating</button>
-            <span class="muted" id="rating-status" role="status"></span>
-          </div>
         </form>
         <p class="rating-empty muted" id="rating-empty"></p>
       </section>
       <div class="film">
         <div class="film-heading">
-          <div><h3>Source frames</h3><span id="film-range"></span></div>
+          <div><h3>Sources</h3><span id="film-range"></span></div>
+          <label class="reference-select" id="reference-control" hidden>Reference<select id="reference-select"></select></label>
         </div>
-        <div class="filmstrip" id="filmstrip" aria-label="Source frame thumbnails" tabindex="0">
+        <div class="filmstrip" id="filmstrip" aria-label="Source images" tabindex="0">
           <div class="rail-track" role="list"></div>
         </div>
       </div>
-      <footer class="keyboard">Scenes <kbd>↑</kbd> <kbd>↓</kbd><span aria-hidden="true">·</span> Source frames <kbd>←</kbd> <kbd>→</kbd></footer>
+      <footer class="keyboard">Scenes <kbd>↑</kbd> <kbd>↓</kbd><span aria-hidden="true">·</span> Sources <kbd>←</kbd> <kbd>→</kbd><span id="reference-shortcut" hidden><span aria-hidden="true">·</span> Reference <kbd>.</kbd> (hold)</span></footer>
     </div>
   </main>
   <aside class="scene-browser" id="scene-browser" popover="auto" aria-labelledby="scenes-title">

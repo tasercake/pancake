@@ -8,7 +8,7 @@ from ipaddress import ip_address
 import json
 from pathlib import Path
 from secrets import token_hex
-from socket import SO_KEEPALIVE, SOL_SOCKET, gethostname
+from socket import gethostname
 from threading import Lock, Thread
 from time import monotonic
 from urllib.parse import parse_qs, urlsplit
@@ -25,16 +25,19 @@ from .images import (
     DecodedFrames, PREVIEW_VERSION, PreviewCache, ReviewFrameDecoder, SIZES,
     output_identity, output_pixels, output_revision, preview, preview_mime,
 )
-from .ratings import Ratings
+from .ratings import RatingConflict, Ratings, UNCONDITIONAL
 from .runs import Runs, lock_store
 from .scores import Scores
 from .stacker_setup import REPO
 from .stackers import configured_stackers
+from .websocket import MessageError, serve_websocket
 
 STATIC = Path(__file__).with_name("static")
 ASSETS = {"/": ("index.html", "text/html; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8"),
           "/rail.js": ("rail.js", "text/javascript; charset=utf-8"),
+          "/rating-autosave.js": ("rating-autosave.js", "text/javascript; charset=utf-8"),
+          "/workspace-socket.js": ("workspace-socket.js", "text/javascript; charset=utf-8"),
           "/score-explanation.js": ("score-explanation.js", "text/javascript; charset=utf-8"),
           "/style.css": ("style.css", "text/css; charset=utf-8"),
           "/fonts/IBMPlexMono-Regular.ttf": ("fonts/IBMPlexMono-Regular.ttf", "font/ttf"),
@@ -93,6 +96,8 @@ class Review:
         self.scores = Scores(self.publish_scores, attention=not getattr(args, "no_attention", False))
         self.runs = Runs(args.store, configured_stackers(args), self.publish_runs, record_score=self.scores.record)
         self.ratings = Ratings(args.store)
+        self.rating_lock = Lock()
+        self.rating_revision = 0
         self.image_version = token_hex(8)
         self.previews = PreviewCache(args.store)
         self.decoded = DecodedFrames()
@@ -101,6 +106,7 @@ class Review:
                                    self.refresh_catalog, self.publish_download)
         self.publish_runs()
         self.publish_scores()
+        self.events.publish("ratings", self.rating_state)
         self.events.publish("catalog", self.catalog_data)
         self.refresh_catalog()
 
@@ -331,10 +337,32 @@ class Review:
             raise ValueError("Stacker settings must be an object")
         return self.runs.start(catalog, scene_ids, stackers, {"type": kind, "label": label}, options)
 
+    def rating_state(self):
+        return {"version": self.image_version, "revision": self.rating_revision}
+
     def rate(self, form):
         self.artifact(form, "image")
-        return self.ratings.save(form["run"], form["scene"], form["stacker"], form["grade"],
-                                 form.get("comment", ""))
+        expected = form.get("expected", UNCONDITIONAL)
+        if expected is not UNCONDITIONAL and expected is not None and not isinstance(expected, str):
+            raise ValueError("Invalid rating version")
+        with self.rating_lock:
+            rating = self.ratings.save(form["run"], form["scene"], form["stacker"], form["grade"],
+                                       form.get("comment", ""), expected=expected)
+            self.rating_revision += 1
+            self.events.publish("ratings", self.rating_state)
+            return {**rating, **self.rating_state()}
+
+    def scene_ratings(self, run, scene):
+        with self.rating_lock:
+            return {"ratings": self.ratings.get(run, scene), **self.rating_state()}
+
+    def socket_rate(self, form):
+        if "expected" not in form:
+            raise ValueError("Supply the last saved rating version")
+        try:
+            return self.rate(form)
+        except RatingConflict as exc:
+            raise MessageError(str(exc), {"conflict": exc.rating}) from exc
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -369,6 +397,7 @@ class Handler(BaseHTTPRequestHandler):
         if origin is not None and origin != f"http://{host}":
             self.json(403, {"error": "Cross-origin request refused"})
             return
+        self.review_host = host
         try:
             parts = urlsplit(self.path)
             route(parts.path, {key: values[-1] for key, values in parse_qs(parts.query).items()})
@@ -391,7 +420,13 @@ class Handler(BaseHTTPRequestHandler):
             return
         app = self.server.app
         if path == "/api/events":
-            self.send_events(app)
+            if self.headers.get("Origin") is None:
+                self.json(403, {"error": "Workspace events require a same-origin browser request"})
+                return
+            serve_websocket(self, app.events, {
+                "ratings.read": lambda form: app.scene_ratings(form["run"], form["scene"]),
+                "ratings.save": app.socket_rate,
+            })
         elif path == "/api/catalog":
             self.json(200, app.catalog_data())
         elif path == "/api/download":
@@ -419,22 +454,6 @@ class Handler(BaseHTTPRequestHandler):
                       filename="stackroom-ratings.csv")
         else:
             raise KeyError("Page not found")
-
-    def send_events(self, app):
-        self.close_connection = True
-        self.connection.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1)
-        self.send_response(200)
-        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
-        self.send_header("Cache-Control", "no-store, no-transform")
-        self.send_header("Connection", "close")
-        self.send_header("X-Accel-Buffering", "no")
-        self.send_header("X-Content-Type-Options", "nosniff")
-        self.send_header("Cross-Origin-Resource-Policy", "same-origin")
-        self.end_headers()
-        try:
-            app.events.stream(self.connection, self.wfile.write)
-        except (BrokenPipeError, ConnectionResetError, TimeoutError):
-            pass
 
     def send_image(self, app, query):
         variant, identity, read = app.image_target(query)
@@ -481,7 +500,10 @@ class Handler(BaseHTTPRequestHandler):
             app.runs.cancel(form["run"])
             self.json(200, {"stopping": True})
         elif path == "/api/ratings":
-            self.json(200, app.rate(form))
+            try:
+                self.json(200, app.rate(form))
+            except RatingConflict as exc:
+                self.json(409, {"error": str(exc), "rating": exc.rating})
         else:
             raise KeyError("Page not found")
 
@@ -500,8 +522,10 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("ETag", etag)
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Cross-Origin-Resource-Policy", "same-origin")
-        self.send_header("Content-Security-Policy",
-                         "default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+        policy = "default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+        if mime.startswith("text/html") and hasattr(self, "review_host"):
+            policy += f"; connect-src 'self' ws://{self.review_host}"
+        self.send_header("Content-Security-Policy", policy)
         if filename:
             self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
         self.end_headers()

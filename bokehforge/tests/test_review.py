@@ -1,4 +1,5 @@
 from argparse import Namespace
+from collections import deque
 import csv
 from hashlib import sha256
 from http.client import HTTPConnection
@@ -8,6 +9,8 @@ from itertools import count
 from pathlib import Path
 import json
 from shutil import copyfile
+from socket import create_connection
+import sqlite3
 import sys
 from threading import Event, Thread
 from time import sleep
@@ -18,6 +21,8 @@ import numpy as np
 from PIL import Image
 import pytest
 import tifffile
+from wsproto import ConnectionType, WSConnection
+from wsproto.events import AcceptConnection, Request, TextMessage
 
 from bokehforge.bench import main as bench
 from bokehforge.data import lazy
@@ -47,33 +52,61 @@ def write_scene(root, level):
 
 
 def event_payload(message):
-    name, data, _ = message.split(b"\n", 2)
-    return name.removeprefix(b"event: ").decode(), json.loads(data.removeprefix(b"data: "))
+    name, data = message
+    return name, json.loads(data)
 
 
 class ReviewStream:
     def __init__(self, port):
-        self.client = HTTPConnection("127.0.0.1", port, timeout=8)
+        self.port = port
+        self.ws = WSConnection(ConnectionType.CLIENT)
+        self.messages = deque()
+        self.fragments = []
         self.latest = {}
 
     def __enter__(self):
-        self.client.request("GET", "/api/events")
-        self.response = self.client.getresponse()
-        assert self.response.status == 200
-        assert self.response.headers["Content-Type"].startswith("text/event-stream")
+        self.client = create_connection(("127.0.0.1", self.port), timeout=8)
+        host = f"127.0.0.1:{self.port}"
+        self.client.sendall(self.ws.send(Request(host=host, target="/api/events",
+                                                extra_headers=[(b"origin", f"http://{host}".encode())])))
+        assert isinstance(self.read(), AcceptConnection)
         return self
 
     def __exit__(self, *_):
-        self.response.close()
         self.client.close()
+
+    def read(self):
+        while not self.messages:
+            data = self.client.recv(8192)
+            assert data, "Review closed the WebSocket"
+            self.ws.receive_data(data)
+            self.messages.extend(self.ws.events())
+        return self.messages.popleft()
+
+    def receive(self):
+        while True:
+            event = self.read()
+            assert isinstance(event, TextMessage), event
+            self.fragments.append(event.data)
+            if event.message_finished:
+                packet = json.loads("".join(self.fragments))
+                self.fragments.clear()
+                if "event" in packet:
+                    self.latest[packet["event"]] = packet["data"]
+                return packet
 
     def expect(self, name, predicate):
         while name not in self.latest or not predicate(self.latest[name]):
-            header = self.response.readline()
-            assert header, "Review closed the event stream"
-            event, value = event_payload(header + self.response.readline() + self.response.readline())
-            self.latest[event] = value
+            self.receive()
         return self.latest[name]
+
+    def request(self, action, data, request_id=1):
+        self.client.sendall(self.ws.send(TextMessage(data=json.dumps({
+            "id": request_id, "action": action, "data": data,
+        }))))
+        while (reply := self.receive()).get("id") != request_id:
+            pass
+        return reply
 
 
 def open_review(root, store):
@@ -88,7 +121,7 @@ def open_review(root, store):
         while True:
             messages = app.events.take(reader, writer)
             catalog = next((event_payload(message)[1] for message in messages
-                            if message.startswith(b"event: catalog\n")), None)
+                            if message[0] == "catalog"), None)
             if catalog is not None and catalog["status"] != "indexing":
                 assert catalog["status"] == "ready", catalog
                 break
@@ -123,7 +156,7 @@ def test_evaluation_retains_per_stacker_failures_and_canonical_outputs(tmp_path,
         app.runs.worker.join(timeout=10)
         assert not app.runs.worker.is_alive()
         summary, = next(event_payload(packet)[1] for packet in app.events.take(reader, writer)
-                        if packet.startswith(b"event: runs\n"))
+                        if packet[0] == "runs")
     assert (summary["status"], summary["ready"], summary["failed"]) == ("completed_with_errors", 1, 1)
     assert summary["options"]["pancake"]["device"] == "cpu"
     assert summary["options"]["focus-stack"]["device"] == "auto"
@@ -223,13 +256,13 @@ def test_review_accepts_machine_hostname_and_same_http_origin(tmp_path, monkeypa
         worker.start()
         port = server.server_port
 
-        def request(host, origin=None):
+        def request(host, origin=None, path="/api/catalog"):
             headers = {"Host": host}
             if origin is not None:
                 headers["Origin"] = origin
             client = HTTPConnection("127.0.0.1", port, timeout=3)
             try:
-                client.request("GET", "/api/catalog", headers=headers)
+                client.request("GET", path, headers=headers)
                 response = client.getresponse()
                 return response.status, response.read()
             finally:
@@ -243,6 +276,57 @@ def test_review_accepts_machine_hostname_and_same_http_origin(tmp_path, monkeypa
             assert request(f"localhost:{port}")[0] == 200
             assert request(f"other-site.test:{port}")[0] == 403
             assert request(authority, f"http://other-site.test:{port}")[0] == 403
+            assert request(authority, path="/api/events")[0] == 403
+            assert request(authority, f"http://other-site.test:{port}", "/api/events")[0] == 403
+            assert request(authority, f"http://{authority}", "/api/events")[0] == 400
+        finally:
+            server.shutdown()
+            worker.join()
+
+
+def test_rating_websocket_migrates_and_replays_saves_without_overwriting_newer_edits(tmp_path, monkeypatch):
+    root, store = tmp_path / "data", tmp_path / "review"
+    write_scene(root, 0.25)
+    store.mkdir()
+    with sqlite3.connect(store / "ratings.sqlite3") as db:
+        db.execute("""
+            CREATE TABLE ratings (
+                run_id TEXT NOT NULL, scene_id TEXT NOT NULL, stacker TEXT NOT NULL,
+                grade INTEGER NOT NULL CHECK (grade BETWEEN 1 AND 5),
+                comment TEXT NOT NULL, updated_at TEXT NOT NULL,
+                PRIMARY KEY (run_id, scene_id, stacker)
+            )
+        """)
+        db.execute("INSERT INTO ratings VALUES ('old', 'scene', 'pancake', 4, 'legacy', '2026-01-01T00:00:00+00:00')")
+
+    with ReviewServer(("127.0.0.1", 0)) as server:
+        server.app = open_review(root, store)
+        monkeypatch.setattr(server.app, "artifact", lambda form, key: None)
+        worker = Thread(target=server.serve_forever, kwargs={"poll_interval": 0.02})
+        worker.start()
+        choice = {"run": "run", "scene": server.app.scenes[0]["id"], "stacker": "pancake"}
+        draft = {**choice, "grade": None, "comment": "Look at the edges 🔍", "expected": None}
+        try:
+            with ReviewStream(server.server_port) as client, ReviewStream(server.server_port) as observer:
+                legacy = client.request("ratings.read", {"run": "old", "scene": "scene"})["data"]["ratings"]["pancake"]
+                assert legacy["grade"] == 4 and legacy["comment"] == "legacy"
+                saved = client.request("ratings.save", draft)["data"]
+                assert saved["grade"] is None and saved["comment"] == draft["comment"]
+                observer.expect("ratings", lambda state: state["revision"] == saved["revision"])
+
+            with ReviewStream(server.server_port) as client:
+                client.expect("ratings", lambda state: state["revision"] == saved["revision"])
+                replay = client.request("ratings.save", draft)["data"]
+                assert replay["updated_at"] == saved["updated_at"]
+                newer = client.request("ratings.save", {
+                    **draft, "grade": 5, "comment": "Crisp detail", "expected": saved["updated_at"],
+                })["data"]
+                assert newer["updated_at"] > saved["updated_at"]
+                rejected = client.request("ratings.save", draft)
+                assert rejected["error"] == "This rating changed elsewhere."
+                assert rejected["data"]["conflict"]["comment"] == newer["comment"]
+                persisted = client.request("ratings.read", choice)["data"]["ratings"]["pancake"]
+                assert persisted["grade"] == 5 and persisted["updated_at"] == newer["updated_at"]
         finally:
             server.shutdown()
             worker.join()
