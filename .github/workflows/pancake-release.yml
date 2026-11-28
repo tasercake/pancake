@@ -158,9 +158,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {platform: linux-amd64, os: ubuntu-24.04, target: x86_64-unknown-linux-gnu, jobs: 4}
           - {platform: macos-arm64, os: macos-15, target: aarch64-apple-darwin, jobs: 3}
-          - {platform: windows-x64, os: windows-2025, target: x86_64-pc-windows-msvc, jobs: 4}
     env:
       RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
       RUST_TARGET: ${{ matrix.target }}
